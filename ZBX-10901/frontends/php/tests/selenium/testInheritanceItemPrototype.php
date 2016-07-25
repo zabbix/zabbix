@@ -92,15 +92,16 @@ class testInheritanceItemPrototype extends CWebTest {
 	public function testInheritanceItemPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('disc_prototypes.php?form=Create+item+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('name', $data['name']);
-		$this->input_type('key', $data['key']);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of item prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
+				$this->zbxTestCheckHeader('Item prototypes');
 				$this->zbxTestTextPresent('Item prototype added');
+				$this->zbxTestTextPresent($data['name']);
 
 				$itemId = 0;
 
@@ -136,8 +137,8 @@ class testInheritanceItemPrototype extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of item prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-				$this->zbxTestTextPresent('ERROR: Cannot add item');
+				$this->zbxTestCheckHeader('Item prototypes');
+				$this->zbxTestTextPresent('Cannot add item');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
