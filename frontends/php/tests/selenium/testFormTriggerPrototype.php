@@ -75,7 +75,6 @@ class testFormTriggerPrototype extends CWebTest {
 	 */
 	protected $itemKey = 'item-prototype-reuse';
 
-
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
