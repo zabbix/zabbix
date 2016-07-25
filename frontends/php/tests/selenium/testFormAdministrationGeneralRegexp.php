@@ -143,7 +143,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClick('tab_test');
+		$this->zbxTestClickWait('tab_test');
 
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');

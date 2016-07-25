@@ -154,7 +154,6 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
 				$this->zbxTestClickLinkText($itemName);
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 				$this->zbxTestAssertElementValue('name', $itemName);
 				$this->zbxTestAssertElementValue('key', $keyName);
 				$this->zbxTestAssertElementValue('type_name', 'Simple check');

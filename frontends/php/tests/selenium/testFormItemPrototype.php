@@ -2367,6 +2367,8 @@ class testFormItemPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
@@ -2574,6 +2576,8 @@ class testFormItemPrototype extends CWebTest {
 			$this->webDriver->switchTo()->alert()->accept();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**
