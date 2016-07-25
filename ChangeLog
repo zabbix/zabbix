@@ -36,6 +36,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10504] reduced padding around graphs to account for decreased padding in CSS (asaveljevs)
 ..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
 ..F....... [ZBX-10987] fixed table header line not being visible in dark theme (Pavel)
 ........S. [ZBX-10797] fixed evaluation of user macros in calculated items (Andris)
