@@ -36,7 +36,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		var iconMapTable = $('#iconMapTable'),
-			addMappindButton = $('#addMapping');
+			addMappingButton = $('#addMapping');
 
 		function recalculateSortOrder() {
 			var i = 1;
@@ -95,7 +95,7 @@
 				hintBox.showStaticHint(e, this, img, '', true);
 			});
 
-		addMappindButton.click(function() {
+		addMappingButton.click(function() {
 			var tpl = new Template($('#iconMapRowTPL').html()),
 				iconmappingid = getUniqueId(),
 				mapping = {};
@@ -118,7 +118,7 @@
 		});
 
 		if (iconMapTable.find('tr.sortable').length === 0) {
-			addMappindButton.click();
+			addMappingButton.click();
 		}
 	});
 </script>
