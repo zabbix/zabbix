@@ -112,8 +112,6 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid $ui-border-color;
-	padding: 0 0 5px 0;
 }
 
 h2 {
@@ -483,16 +481,25 @@ ul.top-nav-icons {
 
 .header-title {
 	position: relative;
+	width: 100%;
+	padding: 0 0 6px 0;
 	margin: 0 0 10px 0;
+	text-align: right;
+	border-bottom: 1px solid $ui-border-color;
+
+	h1 {
+		text-align: left;
+	}
+
+	form {
+		display: inline-block;
+	}
 
 	ul {
-		position: absolute;
-		right: 0;
-		bottom: 6px;
 
 		li {
-			display: block;
-			float: left;
+			display: inline-block;
+			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
 		}
@@ -508,7 +515,7 @@ article {
 	@extend article;
 }
 
-// Obgect Group Navigation
+// Object Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
 
@@ -1595,6 +1602,7 @@ select {
 		family: $font-stack;
 		size: $font-form-size;
 	}
+
 	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
