@@ -1936,6 +1936,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->comments_orig = NULL;
 			db_trigger->url = NULL;
 			db_trigger->url_orig = NULL;
+			db_trigger->correlation_tag = NULL;
+			db_trigger->correlation_tag_orig = NULL;
 			db_trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
 			zbx_vector_ptr_create(&db_trigger->functions);
