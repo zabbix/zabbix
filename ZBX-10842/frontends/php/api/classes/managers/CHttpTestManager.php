@@ -183,13 +183,15 @@ class CHttpTestManager {
 			DB::update('items', $checkItemsUpdate);
 
 			if (isset($httpTest['applicationid'])) {
-				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
+				self::updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 
-			// update steps
 			if (isset($httpTest['steps'])) {
+				// update steps
+
 				$stepsCreate = $stepsUpdate = array();
-				$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
+				$db_http_test = $dbHttpTest[$httpTest['httptestid']];
+				$dbSteps = zbx_toHash($db_http_test['steps'], 'httpstepid');
 				foreach ($httpTest['steps'] as $webstep) {
 					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
 						$stepsUpdate[] = $webstep;
@@ -213,10 +215,20 @@ class CHttpTestManager {
 
 					DB::delete('httpstep', array('httpstepid' => $stepidsDelete));
 				}
-				if (!empty($stepsUpdate)) {
+
+				if (array_key_exists('applicationid', $httpTest)) {
+					if (bccomp($httpTest['applicationid'], $db_http_test['applicationid'])) {
+						unset($httpTest['applicationid']);
+					}
+				}
+				else {
+					$httpTest['applicationid'] = $db_http_test['application'];
+				}
+
+				if ($stepsUpdate) {
 					$this->updateStepsReal($httpTest, $stepsUpdate);
 				}
-				if (!empty($stepsCreate)) {
+				if ($stepsCreate) {
 					$this->createStepsReal($httpTest, $stepsCreate);
 				}
 			}
@@ -229,7 +241,7 @@ class CHttpTestManager {
 						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
 						, 'itemid'
 					);
-					$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
+					self::updateItemsApplications($dbStepIds, $httpTest['applicationid']);
 				}
 
 				if (isset($httpTest['status'])) {
@@ -251,6 +263,7 @@ class CHttpTestManager {
 		}
 
 		if ($deleteStepItemIds) {
+			// TODO: API::Item()->delete() should not be used for deleting items with ITEM_TYPE_HTTPTEST type.
 			API::Item()->delete($deleteStepItemIds, true);
 		}
 
@@ -721,27 +734,20 @@ class CHttpTestManager {
 			}
 		}
 
-		if (!empty($insertItems)) {
-			$newTestItemIds = DB::insert('items', $insertItems);
-			$testItemIds = array_merge($testItemIds, $newTestItemIds);
-		}
-		if (!empty($updateItems)) {
+		if ($updateItems) {
 			DB::update('items', $updateItems);
-		}
-
-		$itemApplications = array();
-		foreach ($testItemIds as $itemid) {
-			if (!empty($httpTest['applicationid'])) {
-				$itemApplications[] = array(
-					'applicationid' => $httpTest['applicationid'],
-					'itemid' => $itemid
-				);
+			if (array_key_exists('applicationid', $httpTest)) {
+				self::updateItemsApplications($testItemids, $httpTest['applicationid']);
 			}
 		}
-		if (!empty($itemApplications)) {
-			DB::insert('items_applications', $itemApplications);
-		}
+		if ($insertItems) {
+			$new_itemids = DB::insert('items', $insertItems);
+			$testItemIds = array_merge($testItemIds, $new_itemids);
 
+			if (array_key_exists('applicationid', $httpTest)) {
+				self::createItemsApplications($new_itemids, $httpTest['applicationid']);
+			}
+		}
 
 		$httpTestItems = array();
 		foreach ($checkitems as $inum => $item) {
@@ -845,19 +851,27 @@ class CHttpTestManager {
 						throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
 					}
 					$stepItemids[] = $dbItem['itemid'];
-					$updateItems[] = $dbItem;
+					$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
 				}
 				else {
 					$insertItems[] = $item;
 				}
 			}
 
-			if ($insertItems) {
-				$result = API::Item()->create($insertItems);
-				$stepItemids = array_merge($stepItemids, $result['itemids']);
-			}
 			if ($updateItems) {
-				API::Item()->update($updateItems);
+				DB::update('items', $updateItems);
+
+				if (array_key_exists('applicationid', $httpTest)) {
+					self::updateItemsApplications($stepItemids, $httpTest['applicationid']);
+				}
+			}
+			if ($insertItems) {
+				$new_itemids = DB::insert('items', $insertItems);
+				$stepItemids = array_merge($stepItemids, $new_itemids);
+
+				if (array_key_exists('applicationid', $httpTest)) {
+					self::createItemsApplications($new_itemids, $httpTest['applicationid']);
+				}
 			}
 
 			$webstepitems = array();
@@ -941,10 +955,10 @@ class CHttpTestManager {
 			}
 			if ($stepitemsUpdate) {
 				DB::update('items', $stepitemsUpdate);
-			}
 
-			if (isset($httpTest['applicationid'])) {
-				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
+				if (array_key_exists('applicationid', $httpTest)) {
+					self::updateItemsApplications($itemids, $httpTest['applicationid']);
+				}
 			}
 		}
 	}
@@ -953,33 +967,42 @@ class CHttpTestManager {
 	 * Update web item application linkage.
 	 *
 	 * @param array  $itemIds
-	 * @param string $appId
+	 * @param string $applicationid
 	 */
-	protected function updateItemsApplications(array $itemIds, $appId) {
-		if (empty($appId)) {
-			DB::delete('items_applications', array('itemid' => $itemIds));
+	protected static function updateItemsApplications(array $itemids, $applicationid) {
+		if ($applicationid == 0) {
+			DB::delete('items_applications', array('itemid' => $itemids));
+			return;
 		}
-		else {
-			$linkedItemIds = DBfetchColumn(
-				DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.dbConditionInt('ia.itemid', $itemIds)),
-				'itemid'
-			);
 
-			if (!empty($linkedItemIds)) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $appId),
-					'where' => array('itemid' => $linkedItemIds)
-				));
-			}
+		$linked_itemids = DBfetchColumn(
+			DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.dbConditionInt('ia.itemid', $itemids)),
+			'itemid'
+		);
 
-			$notLinkedItemIds = array_diff($itemIds, $linkedItemIds);
-			if (!empty($notLinkedItemIds)) {
-				$insert = array();
-				foreach ($notLinkedItemIds as $itemId) {
-					$insert[] = array('itemid' => $itemId, 'applicationid' => $appId);
-				}
-				DB::insert('items_applications', $insert);
+		if ($linked_itemids) {
+			DB::update('items_applications', array(
+				'values' => array('applicationid' => $applicationid),
+				'where' => array('itemid' => $linked_itemids)
+			));
+		}
+
+		self::createItemsApplications(array_diff($itemids, $linked_itemids));
+	}
+
+	/**
+	 * Create web item application linkage.
+	 *
+	 * @param array  $itemids
+	 * @param string $applicationid
+	 */
+	protected static function createItemsApplications(array $itemids, $applicationid) {
+		if ($applicationid != 0 && $itemids) {
+			$insert = array();
+			foreach ($itemids as $itemid) {
+				$insert[] = array('itemid' => $itemid, 'applicationid' => $applicationid);
 			}
+			DB::insert('items_applications', $insert);
 		}
 	}
 
