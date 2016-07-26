@@ -296,7 +296,7 @@ TABLE|items|itemid|ZBX_DATA
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|snmp_oid	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
@@ -1443,4 +1443,4 @@ INDEX		|1		|correlationid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010067	|3010067
+ROW		|3010068	|3010068
