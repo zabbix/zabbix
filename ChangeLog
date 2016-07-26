@@ -1467,6 +1467,7 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
