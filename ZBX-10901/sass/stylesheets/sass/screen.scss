@@ -3407,8 +3407,8 @@ td.inactive-bg {
 .overlay-close-btn {
 	position: absolute;
 	z-index: 1000;
-	top: 0;
-	right: 0;
+	top: 1px;
+	right: 1px;
 	min-height: auto;
 	border: none;
 	background-color: $transparent !important;
