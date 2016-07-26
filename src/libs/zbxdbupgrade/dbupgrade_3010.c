@@ -1551,6 +1551,14 @@ static int	DBpatch_3010067(void)
 	return DBadd_foreign_key("corr_operation", 1, &field);
 }
 
+static int	DBpatch_3010068(void)
+{
+	const ZBX_FIELD field = {"snmp_oid", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
+
 #endif
 
 DBPATCH_START(3010)
@@ -1625,5 +1633,6 @@ DBPATCH_ADD(3010064, 0, 1)
 DBPATCH_ADD(3010065, 0, 1)
 DBPATCH_ADD(3010066, 0, 1)
 DBPATCH_ADD(3010067, 0, 1)
+DBPATCH_ADD(3010068, 0, 1)
 
 DBPATCH_END()
