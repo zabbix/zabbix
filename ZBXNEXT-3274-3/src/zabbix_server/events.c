@@ -799,9 +799,14 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
 	{
+		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			/* If old event condition never matches event we can return FAIL.  */
+			/* Otherwise we must check if the new event has the requested tag. */
+			if (SUCCEED != old_value)
+				return FAIL;
+			break;
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			return old_value;
 	}
 
@@ -836,6 +841,15 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 				ret = (SUCCEED == ret ? FAIL : SUCCEED);
 
 			return ret;
+
+		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			for (i = 0; i < event->tags.values_num; i++)
+			{
+				tag = (zbx_tag_t *)event->tags.values[i];
+				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
+					return SUCCEED;
+			}
+			return FAIL;
 	}
 
 	return FAIL;
@@ -1039,10 +1053,11 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
  ******************************************************************************/
 static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condition, const DB_EVENT *event)
 {
-	int		i;
-	zbx_tag_t	*tag;
-	char		*tag_esc, *value_esc, *filter = NULL;
-	size_t		filter_alloc = 0, filter_offset = 0;
+	int			i;
+	zbx_tag_t		*tag;
+	char			*tag_esc, *filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
+	zbx_vector_str_t	values;
 
 	/* replace new event dependent condition with precalculated value */
 	switch (condition->type)
@@ -1071,29 +1086,41 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			return filter;
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			zbx_vector_str_create(&values);
+
 			for (i = 0; i < event->tags.values_num; i++)
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					break;
+					zbx_vector_str_append(&values, DBdyn_escape_string(tag->value));
 			}
 
-			if (i == event->tags.values_num)
+			if (0 == values.values_num)
 			{
 				/* no new tag found, substitute condition with failure expression */
-				return zbx_strdup(NULL, "0");
+				filter = zbx_strdup(NULL, "0");
+			}
+			else
+			{
+				tag_esc = DBdyn_escape_string(condition->data.tag_pair.oldtag);
+
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+						"exists (select null from problem_tag pt"
+							" where p.eventid=pt.eventid"
+								" and pt.tag='%s'"
+								" and",
+						tag_esc);
+
+				DBadd_str_condition_alloc(&filter, &filter_alloc, &filter_offset, "pt.value",
+						(const char **)values.values, values.values_num);
+
+				zbx_chrcpy_alloc(&filter, &filter_alloc, &filter_offset, ')');
+
+				zbx_free(tag_esc);
+				zbx_vector_str_clear_ext(&values, zbx_ptr_free);
 			}
 
-			tag_esc = DBdyn_escape_string(condition->data.tag_pair.oldtag);
-			value_esc = DBdyn_escape_string(tag->value);
-			zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
-					"exists (select null from problem_tag pt"
-						" where p.eventid=pt.eventid"
-							" and pt.tag='%s'"
-							" and pt.value='%s')",
-					tag_esc, value_esc);
-			zbx_free(value_esc);
-			zbx_free(tag_esc);
+			zbx_vector_str_destroy(&values);
 			return filter;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
@@ -1133,7 +1160,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 	zbx_strloc_t		*loc;
 	zbx_corr_condition_t	*condition;
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " (c.correlationid=" ZBX_FS_UI64, correlation->correlationid);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "c.correlationid=" ZBX_FS_UI64, correlation->correlationid);
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
@@ -1163,8 +1190,6 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 
 	if ('\0' != *expression)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " and (%s)", expression);
-
-	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 	ret = SUCCEED;
 out:
@@ -1315,7 +1340,7 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
 			correlation_add_event_filter(&sql, &sql_alloc, &sql_offset, correlation, event);
-			delim = " or";
+			delim = " or ";
 		}
 
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
@@ -1556,7 +1581,7 @@ out:
  * Purpose: update number of open problems for correlated triggers            *
  *                                                                            *
  * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
- *                               generated the events in local cache.         *                                                                            *
+ *                               generated the events in local cache.         *
  *                                                                            *
  * Comments: When event is closed by correlation (trigger or global) the      *
  *           open problem count is needed to calculate new trigger value.     *
