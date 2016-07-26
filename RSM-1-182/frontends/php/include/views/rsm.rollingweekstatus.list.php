@@ -293,7 +293,7 @@ if (isset($this->data['tld'])) {
 						$tld[RSM_RDDS]['itemid'], 'cell-value')
 				: null;
 
-			$ok_rdds_services = [];
+			$ok_rdds_services = array();
 			if (array_key_exists(RSM_TLD_RDDS43_ENABLED, ($tld[RSM_RDDS]['subservices']))
 					&& $tld[RSM_RDDS]['subservices'][RSM_TLD_RDDS43_ENABLED] == 1) {
 				$ok_rdds_services[] = 'RDDS43';

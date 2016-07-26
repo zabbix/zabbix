@@ -232,7 +232,7 @@ if ($mainEvent) {
 					'macro' => array(RSM_TLD_RDDS43_ENABLED, RSM_TLD_RDDS80_ENABLED, RSM_TLD_RDAP_ENABLED)
 				)));
 
-				$data['tld']['subservices'] = [];
+				$data['tld']['subservices'] = array();
 				foreach ($template_macros as $template_macro) {
 					$data['tld']['subservices'][$template_macro['macro']] = $template_macro['value'];
 				}

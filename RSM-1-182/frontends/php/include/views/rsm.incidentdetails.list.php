@@ -272,7 +272,7 @@ $details = array(
 );
 
 if ($data['type'] == RSM_RDDS) {
-	$ok_rdds_services = [];
+	$ok_rdds_services = array();
 	if (array_key_exists(RSM_TLD_RDDS43_ENABLED, ($data['tld']['subservices']))
 			&& $data['tld']['subservices'][RSM_TLD_RDDS43_ENABLED] == 1) {
 		$ok_rdds_services[] = 'RDDS43';
