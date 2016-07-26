@@ -1,19 +1,21 @@
 <script type="text/javascript">
-	jQuery(function() {
+	jQuery(function($) {
 		// select service
-		jQuery('.service-name').click(function() {
-			var e = jQuery(this);
-			window.opener.add_child_service(e.data('name'), e.data('serviceid'), e.data('trigger'));
+		$('.service-name').click(function() {
+			var service = $(this).data('service');
+
+			window.opener.add_child_service(service.name, service.id, service.trigger);
 
 			self.close();
 			return false;
 		});
+
 		// service multiselect
-		jQuery('#select').click(function() {
-			var e;
-			jQuery('.service-select:checked').each(function(key, cb) {
-				e = jQuery('#service-name-' + jQuery(cb).val());
-				window.opener.add_child_service(e.data('name'), e.data('serviceid'), e.data('trigger'));
+		$('#select').click(function() {
+			$('.service-select:checked').each(function(key, cb) {
+				var service = $('#service-name-' + $(cb).val()).data('service');
+
+				window.opener.add_child_service(service.name, service.id, service.trigger);
 			});
 
 			self.close();
