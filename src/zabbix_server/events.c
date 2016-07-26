@@ -1520,8 +1520,8 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 				index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&queue->ts, TRIGGER_VALUE_OK, trigger->description,
 						trigger->expression_orig, trigger->recovery_expression_orig,
-						trigger->priority, trigger->type, &trigger->tags,
-						trigger->correlation_mode, trigger->correlation_tag);
+						trigger->priority, trigger->type, NULL, ZBX_TRIGGER_CORRELATION_NONE,
+						"");
 
 				recovery_local.eventid = queue->eventid;
 				recovery_local.objectid = queue->objectid;
