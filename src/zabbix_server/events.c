@@ -613,7 +613,7 @@ out:
 static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 {
 	const char		*__function_name = "correlate_events_by_trigger_rules";
-	int			j, index;
+	int			j, index, do_correlation = 0;
 	zbx_uint64_t		objectid;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -622,7 +622,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 	zbx_trigger_diff_t	*diff;
 	zbx_vector_str_t	values;
 	char			*sql = NULL, *tag_esc, *separator = "";
-	size_t			i, sql_alloc = 0, sql_offset = 0, sql_offset_old;
+	size_t			i, sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -632,8 +632,6 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 			"select distinct p.eventid,p.objectid from problem p,problem_tag pt"
 			" where p.r_eventid is null"
 				" and (");
-
-	sql_offset_old = sql_offset;
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -683,10 +681,12 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 			zbx_free(tag_esc);
 
 			zbx_vector_str_clear(&values);
+
+			do_correlation = 1;
 		}
 	}
 
-	if (sql_offset_old != sql_offset)
+	if (0 != do_correlation)
 	{
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 		result = DBselect("%s", sql);
