@@ -265,7 +265,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
 		$this->zbxTestInputTypeByXpath("//div[@id='add_templates_']/input", 'Template OS Linux');
 
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+		$this->zbxTestClickXpathWait("//li[@class='suggest-hover']");
 		$this->zbxTestClickWait('add_template');
 
 		$this->zbxTestTextPresent('Template OS Linux');
@@ -326,8 +326,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
 		$this->zbxTestInputTypeByXpath("//div[@id='add_templates_']/input", 'Template OS Linux');
-;
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+
+		$this->zbxTestClickXpathWait("//li[@class='suggest-hover']");
 		$this->zbxTestClickWait('add_template');
 
 		$this->zbxTestTextPresent('Template OS Linux');
