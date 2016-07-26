@@ -184,7 +184,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('search_limit', '1');
+		$this->zbxTestInputTypeOverwrite('search_limit', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
 
@@ -205,7 +205,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('search_limit', '0');
+		$this->zbxTestInputTypeOverwrite('search_limit', '0');
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);

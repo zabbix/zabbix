@@ -51,12 +51,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 
-		$this->zbxTestClickWait('tab_templateTab');
+		$this->zbxTestTabSwitch('Templates');
 
 		$this->zbxTestAssertElementPresentId('add_templates_');
-		$this->zbxTestInputTypeByXpath('//input[@class="input"]', 'Template App Zabbix Agent');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//span[@class='suggest-found']"));
-		$this->zbxTestClickXpath("//span[@class='suggest-found']");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickWait('add_template');
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
