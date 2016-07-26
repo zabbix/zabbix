@@ -24,9 +24,9 @@
  */
 class CTree {
 
-	public $tree;
-	public $fields;
-	public $treename;
+	protected $tree;
+	private $fields;
+	private $treename;
 	private $size;
 	private $maxlevel;
 
@@ -36,7 +36,6 @@ class CTree {
 		$this->fields = $fields;
 		$this->treename = $treename;
 		$this->size = count($value);
-		unset($value, $fields);
 
 		if (!$this->checkTree()) {
 			$this->destroy();
@@ -108,8 +107,8 @@ class CTree {
 		$caption = new CSpan();
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$caption->addItem((new CDiv((new CSpan())->addClass('arrow-right')))
-				->addClass('treeview')
+			$caption->addItem((new CSimpleButton((new CSpan())->addClass('arrow-right')))
+				->addClass(ZBX_STYLE_TREEVIEW)
 				->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);')
 				->setId('idi_'.$id)
 			);
@@ -136,7 +135,9 @@ class CTree {
 			$this->tree[$parentid]['nodetype'] = 2;
 			$this->tree[$id]['Level'] = isset($this->tree[$parentid]['Level']) ? $this->tree[$parentid]['Level'] + 1 : 1;
 
-			$this->maxlevel>$this->tree[$id]['Level'] ? '' : $this->maxlevel = $this->tree[$id]['Level'];
+			if ($this->maxlevel < $this->tree[$id]['Level']) {
+				$this->maxlevel = $this->tree[$id]['Level'];
+			}
 		}
 	}
 
