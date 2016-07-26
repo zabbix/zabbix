@@ -25,6 +25,18 @@
 #include "events.h"
 #include "zbxserver.h"
 
+/* event recovery data */
+typedef struct
+{
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	objectid;
+	int		r_event_index;
+	zbx_uint64_t	correlationid;
+	zbx_uint64_t	c_eventid;
+	zbx_timespec_t	ts;
+}
+zbx_event_recovery_t;
+
 static DB_EVENT			*events = NULL;
 static size_t			events_alloc = 0, events_num = 0;
 static zbx_hashset_t		event_recovery;
@@ -361,6 +373,7 @@ static void	save_event_recovery()
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_hashset_iter_t	iter;
+	DB_EVENT		*r_event;
 
 	if (0 == event_recovery.num_data)
 		return;
@@ -372,9 +385,9 @@ static void	save_event_recovery()
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 	{
-		recovery->r_event = &events[recovery->r_event_index];
+		r_event = &events[recovery->r_event_index];
 
-		zbx_db_insert_add_values(&db_insert, recovery->eventid, recovery->r_event->eventid,
+		zbx_db_insert_add_values(&db_insert, recovery->eventid, r_event->eventid,
 				recovery->correlationid, recovery->c_eventid);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -382,9 +395,9 @@ static void	save_event_recovery()
 			" r_eventid=" ZBX_FS_UI64
 			",r_clock=%d"
 			",r_ns=%d",
-			recovery->r_event->eventid,
-			recovery->r_event->clock,
-			recovery->r_event->ns);
+			r_event->eventid,
+			r_event->clock,
+			r_event->ns);
 
 		if (0 != recovery->correlationid)
 		{
@@ -572,7 +585,6 @@ static void	correlate_events_by_default_rules()
 		}
 
 		recovery_local.objectid = objectid;
-		recovery_local.r_event = NULL;
 		recovery_local.r_event_index = index;
 		recovery_local.correlationid = 0;
 		recovery_local.c_eventid = 0;
@@ -712,7 +724,6 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 			events[index].flags = ZBX_FLAGS_DB_EVENT_CREATE;
 
 			recovery_local.objectid = objectid;
-			recovery_local.r_event = NULL;
 			recovery_local.r_event_index = index;
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
@@ -1208,7 +1219,6 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 				recovery_local.objectid = event->objectid;
 				recovery_local.correlationid = correlation->correlationid;
 				recovery_local.c_eventid = event->eventid;
-				recovery_local.r_event = NULL;
 				recovery_local.r_event_index = index;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
@@ -1517,7 +1527,6 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 				recovery_local.objectid = queue->objectid;
 				recovery_local.correlationid = queue->correlationid;
 				recovery_local.c_eventid = queue->c_eventid;
-				recovery_local.r_event = NULL;
 				recovery_local.r_event_index = index;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
@@ -1677,7 +1686,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 		while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 		{
-			if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
+			DB_EVENT	*r_event = &events[recovery->r_event_index];
+
+			if (EVENT_SOURCE_TRIGGERS != r_event->source)
 				continue;
 
 			if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &recovery->objectid,
@@ -1694,7 +1705,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 			if (0 == diff->correlated)
 				diff->problem_count = 0;
 
-			diff->lastchange = recovery->r_event->clock;
+			diff->lastchange = r_event->clock;
 			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT |
 					ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
 		}
@@ -1779,13 +1790,29 @@ static void	clean_events()
  ******************************************************************************/
 static int	flush_events()
 {
-	int	ret;
+	int				ret;
+	zbx_event_recovery_t		*recovery;
+	zbx_vector_uint64_pair_t	closed_events;
+	zbx_hashset_iter_t		iter;
 
 	ret = save_events();
 	save_problems();
 	save_event_recovery();
 
-	process_actions(events, events_num, &event_recovery);
+	zbx_vector_uint64_pair_create(&closed_events);
+
+	zbx_hashset_iter_reset(&event_recovery, &iter);
+	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_pair_t	pair = {recovery->eventid, events[recovery->r_event_index].eventid};
+
+		zbx_vector_uint64_pair_append_ptr(&closed_events, &pair);
+	}
+
+	zbx_vector_uint64_pair_sort(&closed_events, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	process_actions(events, events_num, &closed_events);
+	zbx_vector_uint64_pair_destroy(&closed_events);
 
 	return ret;
 }

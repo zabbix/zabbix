@@ -20,19 +20,6 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-/* event recovery data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	DB_EVENT	*r_event;
-	int		r_event_index;
-	zbx_uint64_t	correlationid;
-	zbx_uint64_t	c_eventid;
-	zbx_timespec_t	ts;
-}
-zbx_event_recovery_t;
-
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
