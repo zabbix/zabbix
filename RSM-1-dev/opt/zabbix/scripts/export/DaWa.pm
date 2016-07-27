@@ -55,6 +55,18 @@ our @EXPORT = qw(ID_PROBE ID_TLD ID_NS_NAME ID_NS_IP ID_TRANSPORT_PROTOCOL ID_TE
 		dw_csv_init dw_append_csv dw_load_ids_from_db dw_get_id dw_get_name dw_write_csv_files
 		dw_write_csv_catalogs dw_delete_csvs dw_get_cycle_id dw_translate_cycle_id dw_error dw_set_date);
 
+my %_MAX_IDS = (
+	ID_PROBE() => 32767,
+	ID_TLD() => 32767,
+	ID_NS_NAME() => 32767,
+	ID_NS_IP() => 32767,
+	ID_TRANSPORT_PROTOCOL() => 127,
+	ID_TEST_TYPE() => 127,
+	ID_SERVICE_CATEGORY() => 127,
+	ID_TLD_TYPE() => 127,
+	ID_STATUS_MAP() => 127,
+	ID_IP_VERSION() => 127);
+
 my (%_csv_files, %_csv_catalogs, $_csv);
 
 my ($_year, $_month, $_day);
@@ -90,8 +102,22 @@ sub dw_append_csv
         }
         else
         {
-                die("internal error: invalid row format for CSV");
+                fail("internal error: invalid row format for CSV");
         }
+}
+
+sub __dw_check_id
+{
+	my $id_type = shift;
+	my $id = shift;
+
+	my $max_id = $_MAX_IDS{$id_type};
+
+	fail("unknown catalog: \"$id_type\"") unless ($max_id);
+
+	return E_FAIL if ($id > $max_id);
+
+	return SUCCESS;
 }
 
 # only works with catalogs
@@ -105,6 +131,9 @@ sub dw_load_ids_from_db
 
 		foreach my $row_ref (@$rows_ref)
 		{
+			fail("ID overflow of catalog \"$id_type\": ", $row_ref->[1])
+				unless (__dw_check_id($id_type, $row_ref->[1]) == SUCCESS);
+
 			$_csv_catalogs{$id_type}{$row_ref->[0]} = $row_ref->[1];
 		}
 	}
@@ -132,6 +161,8 @@ sub dw_get_id
 	return $_csv_catalogs{$id_type}{$name} if ($_csv_catalogs{$id_type}{$name});
 
 	my $id = db_exec("insert into rsm_$id_type (name) values ('$name')");
+
+	fail("ID overflow of catalog \"$id_type\": $id") unless (__dw_check_id($id_type, $id) == SUCCESS);
 
 	$_csv_catalogs{$id_type}{$name} = $id;
 
