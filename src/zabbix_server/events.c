@@ -1064,6 +1064,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 	{
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			if (SUCCEED == correlation_condition_match_new_event(condition, event, SUCCEED))
 				filter = "1";
 			else
