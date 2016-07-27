@@ -1507,11 +1507,12 @@ class testFormDiscoveryRule extends CWebTest {
 
 			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
-				$this->zbxTestInputType('delay_flex_'.$itemCount.'_period', $period['flexTime']);
-
 				if (isset($period['flexDelay'])) {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
+
+				$this->zbxTestInputType('delay_flex_'.$itemCount.'_period', $period['flexTime']);
+
 				$itemCount ++;
 				$this->zbxTestClickWait('interval_add');
 
