@@ -1090,6 +1090,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['add_opcondition'])) {
 			$this->zbxTestClickWait('new_opcondition');
+			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('new_opcondition_conditiontype'));
 			$add_opcondition = $data['add_opcondition'];
 		}
 		else {
@@ -1675,7 +1676,6 @@ class testFormAction extends CWebTest {
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
-
 	public static function create() {
 		return [
 			[[
@@ -1932,7 +1932,7 @@ class testFormAction extends CWebTest {
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 						$this->zbxTestClickWait('all_users');
 						$this->zbxTestClick('select');
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', $operation['media']);
 						break;
@@ -1941,20 +1941,17 @@ class testFormAction extends CWebTest {
 						$this->zbxTestClickXpathWait('//*[@id="opcmdEditForm"]//button[@id="save"]');
 						$this->zbxTestInputType('new_operation_opcommand_command', $operation['command']);
 						break;
-					case 'Remote command':
-						$this->zbxTestClickXpathWait('//tr[@id="opCmdListFooter"]//button[@id="add"]');
-						break;
 				}
 				$this->zbxTestClickWait('add_operation');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
 		}
 
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
+			$this->zbxTestClickWait('search');
 		}
-
-		$this->zbxTestClickWait('search');
 
 		$this->zbxTestClickWait('add');
 
