@@ -411,6 +411,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		});
 	}
 
+	public function zbxTestSwitchToNewWindow() {
+		$this->webDriver->wait(60)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles > 1) {
+						$all = $this->webDriver->getWindowHandles();
+						return $this->webDriver->switchTo()->window(end($all));
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
+	}
+
 	public function zbxTestWaitWindowClose() {
 		$this->webDriver->wait(10)->until(function () {
 			try {
