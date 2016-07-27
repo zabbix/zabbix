@@ -95,7 +95,7 @@ class testTemplateInheritance extends CWebTest {
 				'Test LLD item2',
 				'test-additional-item',
 				[]
-				]
+			]
 			];
 	}
 
@@ -264,12 +264,12 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
-		$this->zbxTestClick('add_item');
 
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClick('add_item');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
-		$this->zbxTestClick('add');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Graph added');
 
 		// check that the inherited graph matches the original
@@ -490,11 +490,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add_protoitem');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestClickLinkTextWait('Test LLD item');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
 
 		$this->zbxTestClickWait('add_item');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item1');
