@@ -2711,7 +2711,7 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		padding: 8px 5px;
+		padding: 2px 3px;
 	}
 
 	.table-forms {
@@ -2723,6 +2723,7 @@ $form-icon-btn: (
 
 		td {
 			text-align: left;
+			padding: 6px 5px;
 			border: none;
 			border-bottom: 1px solid $table-border-color;
 		}
@@ -2735,7 +2736,7 @@ $form-icon-btn: (
 
 	.dashbrd-widget-head {
 		text-align: left;
-		padding: 8px;
+		padding: 6px 2px;
 
 		li {
 			line-height: 2.9em;
