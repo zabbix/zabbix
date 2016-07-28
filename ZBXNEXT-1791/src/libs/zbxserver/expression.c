@@ -4005,7 +4005,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 				continue;
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
+					FAIL == evaluatable_for_notsupported(func->function))
 			{
 				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
 						" item is not supported.",
