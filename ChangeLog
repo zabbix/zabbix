@@ -36,6 +36,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10504] reduced padding around graphs to account for decreased padding in CSS (asaveljevs)
 ..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
