@@ -1905,10 +1905,10 @@ class testFormAction extends CWebTest {
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 						$this->zbxTestClickWait('all_usrgrps');
 						$this->zbxTestClick('select');
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+						$this->zbxTestSwitchToNewWindow();
 						$this->zbxTestClickWait('all_users');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
@@ -1981,17 +1981,17 @@ class testFormAction extends CWebTest {
 		$this->zbxTestInputType('def_longdata', 'message');
 		$this->zbxTestClickWait('new_operation');
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('usrgrps_7');
 		$this->zbxTestClickWait('usrgrps_11');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('users_1');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
 		$this->zbxTestClick('add_operation');
