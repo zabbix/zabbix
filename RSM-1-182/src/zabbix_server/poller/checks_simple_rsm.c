@@ -1833,9 +1833,6 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 
 	for (ipv = ipvs; NULL != ipv->name; ipv++)
 	{
-		if (0 == (ipv_flags & ipv->flag))
-			continue;
-
 		if (NULL == (pkt = ldns_resolver_query(res, host_rdf, ipv->rr_type, LDNS_RR_CLASS_IN, LDNS_RD)))
 		{
 			zbx_snprintf(err, err_size, "cannot resolve host \"%s\" to %s address", host, ipv->name);
@@ -1870,7 +1867,8 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 			goto out;
 		}
 
-		if (NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, ipv->rr_type, LDNS_SECTION_ANSWER)))
+		if (0 != (ipv_flags & ipv->flag) &&
+				NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, ipv->rr_type, LDNS_SECTION_ANSWER)))
 		{
 			rr_count = ldns_rr_list_rr_count(rrset);
 
