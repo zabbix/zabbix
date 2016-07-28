@@ -260,8 +260,8 @@ nav {
 				height: 0;
 				font-size: 0;
 				line-height: 0;
-				border-left: 9px solid transparent;
-				border-right: 9px solid transparent;
+				border-left: 9px solid $transparent;
+				border-right: 9px solid $transparent;
 				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
@@ -572,13 +572,6 @@ footer {
 	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
-
-	a {
-
-		&.logo {
-			border: none;
-		}
-	}
 }
 
 .footer {
@@ -590,8 +583,13 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 10px 10px 0 0;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
+}
+
+.header-logo {
+	float: left;
+	display: block;
+	margin: 10px 10px 0 0;
 }
 
 // Tables
