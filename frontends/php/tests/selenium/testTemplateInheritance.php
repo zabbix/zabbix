@@ -471,6 +471,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait('Test LLD');
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
+		$this->zbxTestCheckHeader('Graph prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->zbxTestInputType('name', 'Test LLD graph');
