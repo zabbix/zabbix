@@ -2275,6 +2275,7 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['trends'])) {
 			$this->zbxTestInputTypeOverwrite('trends', $data['trends']);
+			$this->zbxTestClickWait('search');
 		}
 
 		switch ($type) {
