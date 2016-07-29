@@ -145,8 +145,10 @@ class CHttpTestManager {
 		));
 
 		$deleteStepItemIds = array();
+		$steps_create = array();
+		$steps_update = array();
 
-		foreach ($httpTests as $httpTest) {
+		foreach ($httpTests as $key => $httpTest) {
 			DB::update('httptest', array(
 				'values' => $httpTest,
 				'where' => array('httptestid' => $httpTest['httptestid'])
@@ -189,16 +191,17 @@ class CHttpTestManager {
 			if (isset($httpTest['steps'])) {
 				// update steps
 
-				$stepsCreate = $stepsUpdate = array();
+				$steps_create[$key] = array();
+				$steps_update[$key] = array();
 				$db_http_test = $dbHttpTest[$httpTest['httptestid']];
 				$dbSteps = zbx_toHash($db_http_test['steps'], 'httpstepid');
 				foreach ($httpTest['steps'] as $webstep) {
 					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
-						$stepsUpdate[] = $webstep;
+						$steps_update[$key][] = $webstep;
 						unset($dbSteps[$webstep['httpstepid']]);
 					}
 					elseif (!isset($webstep['httpstepid'])) {
-						$stepsCreate[] = $webstep;
+						$steps_create[$key][] = $webstep;
 					}
 					// TODO: Exception should be thrown if incorrect httpstepid is provided.
 				}
@@ -224,12 +227,21 @@ class CHttpTestManager {
 				else {
 					$httpTest['applicationid'] = $db_http_test['application'];
 				}
+			}
+		}
 
-				if ($stepsUpdate) {
-					$this->updateStepsReal($httpTest, $stepsUpdate);
+		if ($deleteStepItemIds) {
+			// TODO: API::Item()->delete() should not be used for deleting items with ITEM_TYPE_HTTPTEST type.
+			API::Item()->delete($deleteStepItemIds, true);
+		}
+
+		foreach ($httpTests as $key => $httpTest) {
+			if (isset($httpTest['steps'])) {
+				if ($steps_update[$key]) {
+					$this->updateStepsReal($httpTest, $steps_update[$key]);
 				}
-				if ($stepsCreate) {
-					$this->createStepsReal($httpTest, $stepsCreate);
+				if ($steps_create[$key]) {
+					$this->createStepsReal($httpTest, $steps_create[$key]);
 				}
 			}
 			else {
@@ -260,11 +272,6 @@ class CHttpTestManager {
 					));
 				}
 			}
-		}
-
-		if ($deleteStepItemIds) {
-			// TODO: API::Item()->delete() should not be used for deleting items with ITEM_TYPE_HTTPTEST type.
-			API::Item()->delete($deleteStepItemIds, true);
 		}
 
 		// TODO: REMOVE info
@@ -700,46 +707,25 @@ class CHttpTestManager {
 		}
 
 		$insertItems = array();
-		$updateItems = array();
 		$testItemIds = array();
 		foreach ($checkitems as $item) {
-			$dbItem = DBfetch(DBselect(
-				'SELECT i.itemid,i.templateid'.
-				' FROM items i'.
-				' WHERE i.key_='.zbx_dbstr($item['key_']).
-					' AND i.hostid='.zbx_dbstr($httpTest['hostid'])
-			));
-
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $httpTest['hostid'];
 			$item['delay'] = $httpTest['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
 			$item['history'] = self::ITEM_HISTORY;
 			$item['trends'] = self::ITEM_TRENDS;
-			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status'])
+				? ITEM_STATUS_ACTIVE
+				: ITEM_STATUS_DISABLED;
 
 			if (isset($parentItems[$item['key_']])) {
 				$item['templateid'] = $parentItems[$item['key_']]['itemid'];
 			}
 
-			if ($dbItem) {
-				if (!empty($dbItem['templateid'])) {
-					throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
-				}
-				$testItemIds[] = $dbItem['itemid'];
-				$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
-			}
-			else {
-				$insertItems[] = $item;
-			}
+			$insertItems[] = $item;
 		}
 
-		if ($updateItems) {
-			DB::update('items', $updateItems);
-			if (array_key_exists('applicationid', $httpTest)) {
-				self::updateItemsApplications($testItemids, $httpTest['applicationid']);
-			}
-		}
 		if ($insertItems) {
 			$new_itemids = DB::insert('items', $insertItems);
 			$testItemIds = array_merge($testItemIds, $new_itemids);
@@ -824,16 +810,8 @@ class CHttpTestManager {
 			}
 
 			$insertItems = array();
-			$updateItems = array();
 			$stepItemids = array();
 			foreach ($stepitems as $item) {
-				$dbItem = DBfetch(DBselect(
-					'SELECT i.itemid,i.templateid'.
-					' FROM items i'.
-					' WHERE i.key_='.zbx_dbstr($item['key_']).
-						' AND i.hostid='.zbx_dbstr($httpTest['hostid'])
-				));
-
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
@@ -846,31 +824,14 @@ class CHttpTestManager {
 					$item['templateid'] = $parentStepItems[$item['key_']]['itemid'];
 				}
 
-				if ($dbItem) {
-					if (!empty($dbItem['templateid'])) {
-						throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
-					}
-					$stepItemids[] = $dbItem['itemid'];
-					$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
-				}
-				else {
-					$insertItems[] = $item;
-				}
+				$insertItems[] = $item;
 			}
 
-			if ($updateItems) {
-				DB::update('items', $updateItems);
-
-				if (array_key_exists('applicationid', $httpTest)) {
-					self::updateItemsApplications($stepItemids, $httpTest['applicationid']);
-				}
-			}
 			if ($insertItems) {
-				$new_itemids = DB::insert('items', $insertItems);
-				$stepItemids = array_merge($stepItemids, $new_itemids);
+				$stepItemids = DB::insert('items', $insertItems);
 
 				if (array_key_exists('applicationid', $httpTest)) {
-					self::createItemsApplications($new_itemids, $httpTest['applicationid']);
+					self::createItemsApplications($stepItemids, $httpTest['applicationid']);
 				}
 			}
 
