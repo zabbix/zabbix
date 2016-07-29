@@ -989,6 +989,8 @@ class CCorrelation extends CApiService {
 		}
 
 		$groupids = [];
+		$formulaIds = [];
+		$conditions = [];
 
 		foreach ($correlation['filter']['conditions'] as $condition) {
 			if (!array_key_exists('type', $condition)) {
@@ -1136,6 +1138,27 @@ class CCorrelation extends CApiService {
 					}
 					break;
 			}
+
+			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				if (array_key_exists($condition['formulaid'], $formulaIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Duplicate "%1$s" value "%2$s" for correlation "%3$s".', 'formulaid', $condition['formulaid'],
+							$correlation['name']
+					));
+				}
+				else {
+					$formulaIds[$condition['formulaid']] = true;
+				}
+			}
+
+			unset($condition['formulaid']);
+			$conditions[] = $condition;
+		}
+
+		if (count($conditions) != count(array_unique($conditions, SORT_REGULAR))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Conditions duplicates for correlation "%1$s".', $correlation['name'])
+			);
 		}
 
 		return $groupids;
