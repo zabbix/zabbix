@@ -542,7 +542,7 @@ sub get_lastclock
 sub get_tlds
 {
 	my $service = shift;	# in case of 2 services one of which is 'DNS' it has to be specified first
-	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS and EPP
+	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS43/RDAP and EPP
 
 	$service = defined($service) ? uc($service) : 'DNS';
 	$service2 = uc($service2) if ($service2);

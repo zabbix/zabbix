@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# RDDS80 monthly Query RTT
+# RDAP monthly Query RTT
 
 BEGIN
 {
@@ -16,13 +16,13 @@ use Parallel;
 
 use constant VALUE_INVALID	=> -1;	# used internally
 
-my $cfg_key_in = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+my $cfg_key_in = 'rsm.rdds.rdap.rtt[{$RSM.TLD}]';
 my $cfg_keys_out =
 {
-	'failed'	=> 'rsm.slv.rdds80.rtt.failed',
-	'max'		=> 'rsm.slv.rdds80.rtt.max',
-	'avg'		=> 'rsm.slv.rdds80.rtt.avg',
-	'pfailed'	=> 'rsm.slv.rdds80.rtt.pfailed'
+	'failed'	=> 'rsm.slv.rdap.rtt.failed',
+	'max'		=> 'rsm.slv.rdap.rtt.max',
+	'avg'		=> 'rsm.slv.rdap.rtt.avg',
+	'pfailed'	=> 'rsm.slv.rdap.rtt.pfailed'
 };
 
 parse_opts('tld=s', 'now=i');
@@ -60,7 +60,7 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds('RDDS80');
+        $tlds_ref = get_tlds('RDAP');
 }
 
 my $month_cycles = get_num_cycles($from, $month_till, $delay);
@@ -102,7 +102,7 @@ while ($tld_index < $tld_count)
 		{
 			if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
 			{
-				wrn("configuration error: RDDS80 monthly Query resolution RTT item not found (\"$test_key\")");
+				wrn("configuration error: RDAP monthly Query resolution RTT item not found (\"$test_key\")");
 				exit(0);
 			}
 
