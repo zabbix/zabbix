@@ -491,6 +491,7 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	unsigned char	value;
 	unsigned char	state;
+	unsigned char	priority;
 	int		lastchange;
 	int		problem_count;
 	int		correlated;
@@ -544,7 +545,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
-int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
+int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
 void	zbx_create_itservices_lock();

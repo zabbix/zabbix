@@ -1483,6 +1483,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			{
 				diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
 				diff->triggerid = trigger->triggerid;
+				diff->priority = trigger->priority;
 				diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
 				diff->value = trigger->value;
 				diff->problem_count = 0;
@@ -1920,8 +1921,8 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
 		correlate_events_by_global_rules(trigger_diff, triggerids_lock);
 
 		processed_num = flush_events();
-		DBupdate_itservices(events, events_num);
 		update_trigger_changes(trigger_diff);
+		DBupdate_itservices(trigger_diff);
 		clean_events();
 	}
 
@@ -1960,8 +1961,8 @@ int	flush_correlated_events()
 	if (0 != events_num)
 	{
 		flush_events();
-		DBupdate_itservices(events, events_num);
 		update_trigger_changes(&trigger_diff);
+		DBupdate_itservices(&trigger_diff);
 		clean_events();
 
 		DBbegin();
