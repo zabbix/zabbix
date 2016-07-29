@@ -1181,7 +1181,7 @@ sub create_slv_items {
     }
 
 
-    if (defined($OPTS{'rdds43-servers'})) {
+    if (defined($OPTS{'rdds43-servers'}) || defined($OPTS{'rdds80-servers'}) || defined($OPTS{'rdap-servers'})) {
 	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
 	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 
@@ -1235,6 +1235,7 @@ sub create_slv_items {
 
 	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
 	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
+	create_slv_monthly("RDAP Query RTT", "rsm.slv.rdap.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
     }
 
     create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
@@ -1299,6 +1300,7 @@ sub create_slv_epp_items($$) {
 
     create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
     create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDAP update time", "rsm.slv.rdap.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdap-servers'}));
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
@@ -2086,7 +2088,8 @@ sub update_epp_objects($) {
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
 
     create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDDS43 update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDAP update time", "rsm.slv.rdap.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdap-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
 
