@@ -1233,9 +1233,9 @@ sub create_slv_items {
 
 	undef($depend_down);
 
-	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
-	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
-	create_slv_monthly("RDAP Query RTT", "rsm.slv.rdap.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
+	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}') if (defined($OPTS{'rdds80-servers'}));
+	create_slv_monthly("RDAP Query RTT", "rsm.slv.rdap.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}') if (defined($OPTS{'rdap-servers'}));
     }
 
     create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
