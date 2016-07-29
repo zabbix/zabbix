@@ -1854,17 +1854,6 @@ class testFormItem extends CWebTest {
 					]
 				]
 			],
-			// Trends
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item trends Check',
-					'key' => 'item-trends-test',
-					'trends' => 'trends',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2275,7 +2264,6 @@ class testFormItem extends CWebTest {
 
 		if (isset($data['trends'])) {
 			$this->zbxTestInputTypeOverwrite('trends', $data['trends']);
-			$this->zbxTestClickWait('search');
 		}
 
 		switch ($type) {
