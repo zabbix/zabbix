@@ -144,6 +144,7 @@ int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 		memset(diff, 0, sizeof(zbx_trigger_diff_t));
 
 		diff->triggerid = trigger->triggerid;
+		diff->priority = trigger->priority;
 		diff->flags = flags;
 
 		/* trigger value will be recalculated during event processing */
