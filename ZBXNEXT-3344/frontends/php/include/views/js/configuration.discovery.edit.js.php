@@ -427,11 +427,11 @@
 		if (isset(dcheckType, keyRowTypes)) {
 			if (dcheckType == ZBX_SVC.agent) {
 				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('Key')) ?>);
-				jQuery('#newCheckKeyRow #key_').attr('maxlenght', '255');
+				jQuery('#newCheckKeyRow #key_').attr('maxlength', '255');
 			}
 			else {
 				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('SNMP OID')) ?>);
-				jQuery('#newCheckKeyRow #key_').attr('maxlenght', '512');
+				jQuery('#newCheckKeyRow #key_').attr('maxlength', '512');
 			}
 		}
 
