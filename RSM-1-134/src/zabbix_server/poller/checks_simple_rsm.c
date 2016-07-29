@@ -923,7 +923,7 @@ static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt
 	const DC_ITEM	*item;
 	char		rtt_set = 0, upd_set = 0, ns[ZBX_HOST_BUF_SIZE], ip[ZBX_IP_BUF_SIZE];
 
-	if (ZBX_NO_VALUE == upd)
+	if (ZBX_NOT_PERFORMED == upd)
 		upd_set = 1;
 
 	for (i = 0; i < items_num; i++)
@@ -1133,11 +1133,8 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 		}
 
 		p = in_item->key + keypart_size;
-		if (0 != strncmp(p, "udp.rtt[", 8) && 0 != strncmp(p, "tcp.rtt[", 8)
-				&& 0 != strncmp(p, "udp.upd[", 8) && 0 != strncmp(p, "tcp.upd[", 8))
-		{
+		if (0 != strncmp(p, "rtt[", 4) && 0 != strncmp(p, "upd[", 4))
 			continue;
-		}
 
 		if (0 == out_items_num)
 		{
@@ -1280,8 +1277,8 @@ static void	zbx_clean_nss(zbx_ns_t *nss, size_t nss_num)
 
 static int	is_service_err(int ec)
 {
-	if (-200 >= ec && ZBX_NO_VALUE != ec && ZBX_EC_RDDS43_RES_NOREPLY != ec && ZBX_EC_RDDS80_RES_NOREPLY != ec &&
-			ZBX_EC_RDAP_RES_NOREPLY != ec)
+	if (-200 >= ec && ZBX_NOT_PERFORMED != ec && ZBX_EC_RDDS43_RES_NOREPLY != ec &&
+			ZBX_EC_RDDS80_RES_NOREPLY != ec && ZBX_EC_RDAP_RES_NOREPLY != ec)
 	{
 		return SUCCEED;
 	}
@@ -1463,18 +1460,155 @@ out:
 	return tld;
 }
 
+typedef struct
+{
+	int	proto;
+	int	res;
+}
+proto_data_t;
+
+#define DNS_TEST_RESULT_UP_UDP_UP		2
+#define DNS_TEST_RESULT_UP_TCP_UP		3
+#define DNS_TEST_RESULT_UP_UDP_UP_TCP_UP	4
+#define DNS_TEST_RESULT_DOWN_UDP_DOWN		5
+#define DNS_TEST_RESULT_DOWN_TCP_DOWN		6
+#define DNS_TEST_RESULT_DOWN_UDP_UP_TCP_DOWN	7
+#define DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_UP	8
+#define DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_DOWN	9
+
+#define UDP_PROTO_IDX	0
+#define TCP_PROTO_IDX	1
+
+static int	get_test_result(const proto_data_t *protos, int minns)
+{
+	int	udp_res, tcp_res;
+
+	udp_res = protos[UDP_PROTO_IDX].res;
+	tcp_res = protos[TCP_PROTO_IDX].res;
+
+	if (ZBX_NOT_PERFORMED == tcp_res)
+	{
+		/* TCP not performed */
+		if (udp_res < minns)
+			return DNS_TEST_RESULT_DOWN_UDP_DOWN;
+
+		return DNS_TEST_RESULT_UP_UDP_UP;
+	}
+
+	if (ZBX_NOT_PERFORMED == udp_res)
+	{
+		/* UDP not performed */
+		if (tcp_res < minns)
+			return DNS_TEST_RESULT_DOWN_TCP_DOWN;
+
+		return DNS_TEST_RESULT_UP_TCP_UP;
+	}
+
+	/* both UDP and TCP performed */
+
+	if (udp_res < minns)
+	{
+		/* UDP down */
+		if (tcp_res < minns)
+			return DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_DOWN;
+
+		return DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_UP;
+	}
+
+	/* UDP up */
+
+	if (FAIL == tcp_res)
+		return DNS_TEST_RESULT_DOWN_UDP_UP_TCP_DOWN;
+
+	return DNS_TEST_RESULT_UP_UDP_UP_TCP_UP;
+}
+
+static int	test_result_up(int test_result)
+{
+	switch (test_result)
+	{
+		case DNS_TEST_RESULT_UP_UDP_UP:
+		case DNS_TEST_RESULT_UP_TCP_UP:
+		case DNS_TEST_RESULT_UP_UDP_UP_TCP_UP:
+			return SUCCEED;
+		case DNS_TEST_RESULT_DOWN_UDP_DOWN:
+		case DNS_TEST_RESULT_DOWN_TCP_DOWN:
+		case DNS_TEST_RESULT_DOWN_UDP_UP_TCP_DOWN:
+		case DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_UP:
+		case DNS_TEST_RESULT_DOWN_UDP_DOWN_TCP_DOWN:
+			return FAIL;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_on_exit();
+	}
+}
+
+static void	get_dns_test_data(zbx_uint64_t hostid, int *dns_test_step, int *dns_test_upd_step,
+		int *dns_test_rec_step, char *dbrec_found)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select dns_test_step,dns_test_upd_step,dns_test_rec_step"
+			" from rsm_test_data"
+			" where hostid=" ZBX_FS_UI64,
+			hostid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*dbrec_found = 1;
+
+		*dns_test_step = atoi(row[0]);
+		*dns_test_upd_step = atoi(row[1]);
+		*dns_test_rec_step = atoi(row[2]);
+	}
+	else
+	{
+		*dbrec_found = 0;
+
+		*dns_test_step = 1;
+		*dns_test_upd_step = 1;
+		*dns_test_rec_step = 0;
+	}
+}
+
+void	set_dns_test_data(zbx_uint64_t hostid, int dns_test_step, int dns_test_upd_step, int dns_test_rec_step,
+		char dbrec_found)
+{
+	if (0 != dbrec_found)
+	{
+		DBexecute(
+				"update rsm_test_data"
+				" set dns_test_step=%d,dns_test_upd_step=%d,dns_test_rec_step=%d"
+				" where hostid=" ZBX_FS_UI64,
+				dns_test_step, dns_test_upd_step, dns_test_rec_step, hostid);
+
+		return;
+	}
+
+	DBexecute(
+			"insert into rsm_test_data"
+				" (hostid,dns_test_step,dns_test_upd_step,dns_test_rec_step)"
+			" values"
+				" (" ZBX_FS_UI64 ",%d,%d,%d)",
+			hostid, dns_test_step, dns_test_upd_step, dns_test_rec_step);
+}
+
 int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
-	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], ok_nss_num = 0, *res_ip = NULL,
-			*testprefix = NULL, proto = ZBX_RSM_UDP;
+	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], *res_ip = NULL, *testprefix = NULL, idx,
+			dbrec_found;
+	proto_data_t	protos[TCP_PROTO_IDX + 1];
 	ldns_resolver	*res = NULL;
 	ldns_rr_list	*keys = NULL;
 	FILE		*log_fd;
 	DC_ITEM		*items = NULL;
 	zbx_ns_t	*nss = NULL;
 	size_t		i, j, items_num = 0, nss_num = 0;
-	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, res_ec = ZBX_EC_NOERROR, rtt,
-			upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
+	int		ipv4_enabled, ipv6_enabled, ipv_flags = 0, dnssec_enabled, epp_enabled, minns, test_result,
+			dns_test_step, dns_test_upd_step, dns_test_rec_step, max_test_step, max_upd_step, max_rec_step,
+			ret = SYSINFO_RET_FAIL;
 
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
@@ -1491,6 +1625,31 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_DNSSEC_ENABLED, &dnssec_enabled, 0,
 			err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_DNS_MINNS, &minns, 0, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_DNS_MAX_TEST_STEP, &max_test_step, 0, err,
+			sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_DNS_MAX_UPD_STEP, &max_upd_step, 0, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_DNS_MAX_REC_STEP, &max_rec_step, 0, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -1526,93 +1685,194 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		}
 	}
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_RSM_UDP == proto ? ZBX_MACRO_DNS_UDP_RTT :
-			ZBX_MACRO_DNS_TCP_RTT, &rtt_limit, 1, err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
 	if (SUCCEED != zbx_conf_ip_support(&item->host.hostid, &ipv4_enabled, &ipv6_enabled, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
 	}
 
-	/* create resolver */
-	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
-			err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
-		goto out;
-	}
+	if (0 != ipv4_enabled)
+		ipv_flags |= ZBX_FLAG_IPV4_ENABLED;
+	if (0 != ipv6_enabled)
+		ipv_flags |= ZBX_FLAG_IPV6_ENABLED;
 
-	/* get rsm items */
-	if (0 == (items_num = zbx_get_dns_items(keyname, item, domain, &items, log_fd)))
+	get_dns_test_data(item->host.hostid, &dns_test_step, &dns_test_upd_step, &dns_test_rec_step, &dbrec_found);
+
+	protos[UDP_PROTO_IDX].proto = ZBX_RSM_UDP;
+	protos[TCP_PROTO_IDX].proto = ZBX_RSM_TCP;
+
+	for (idx = UDP_PROTO_IDX; idx <= TCP_PROTO_IDX; idx++)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "no trapper %s.* items found", keyname));
-		goto out;
+		char	proto = protos[idx].proto, keybuf[12];	/* rsm.dns.[udp|tcp] */
+		int	upd, res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
+
+		if (0 != dns_test_step)
+		{
+			/* normal mode */
+			if ((ZBX_RSM_UDP == proto && max_test_step == dns_test_step) ||			/* no UDP */
+					(ZBX_RSM_TCP == proto && max_test_step != dns_test_step))	/* no TCP */
+			{
+				protos[idx].res = ZBX_NOT_PERFORMED;
+				continue;
+			}
+		}
+
+		protos[idx].res = 0;
+
+		if (0 != epp_enabled && max_upd_step == dns_test_upd_step)
+			upd = 0;
+		else
+			upd = ZBX_NOT_PERFORMED;
+
+		zbx_snprintf(keybuf, sizeof(keybuf), "%s.%s", keyname, (ZBX_RSM_UDP == proto ? "udp" : "tcp"));
+
+		/* create resolver */
+		if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
+				err, sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
+			goto out;
+		}
+
+		/* get rsm items */
+		if (0 == (items_num = zbx_get_dns_items(keybuf, item, domain, &items, log_fd)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "no trapper %s.* items found", keybuf));
+			goto out;
+		}
+
+		/* get list of Name Servers and IPs, by default it will set every Name Server */
+		/* as working so if we have no IPs the result of Name Server will be SUCCEED  */
+		nss_num = zbx_get_nameservers(items, items_num, &nss, ipv4_enabled, ipv6_enabled, log_fd);
+
+		if (SUCCEED != zbx_conf_int(&item->host.hostid,
+				(ZBX_RSM_UDP == proto ? ZBX_MACRO_DNS_UDP_RTT : ZBX_MACRO_DNS_TCP_RTT),
+				&rtt_limit, 1, err, sizeof(err)))
+		{
+			free_items(items, items_num);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		zbx_rsm_infof(log_fd, ZBX_FS_UI64 ":%s upd:%s rtt:%d", item->host.hostid, keybuf, (ZBX_NOT_PERFORMED == upd ? "NO" : "YES"), rtt_limit);
+
+		/* get DNSKEY records */
+		if (0 != dnssec_enabled && SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec,
+				err, sizeof(err)))
+		{
+			zbx_rsm_err(log_fd, err);
+		}
+
+		for (i = 0; i < nss_num; i++)
+		{
+			nss[i].result = SUCCEED;
+
+			for (j = 0; j < nss[i].ips_num; j++)
+			{
+				if (ZBX_EC_NOERROR == res_ec)
+				{
+					if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys,
+							testprefix, domain, log_fd, &rtt,
+							(ZBX_NOT_PERFORMED != upd ? &upd : NULL), ipv4_enabled,
+							ipv6_enabled, epp_enabled, err, sizeof(err)))
+					{
+						zbx_rsm_err(log_fd, err);
+					}
+				}
+				else
+					rtt = res_ec;
+
+				zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck,
+						strlen(keybuf) + 1, items, items_num);
+
+				/* if a single IP of the Name Server fails, consider the whole Name Server down */
+				if (SUCCEED != rtt_result(rtt, rtt_limit))
+					nss[i].result = FAIL;
+			}
+		}
+
+		for (i = 0; i < nss_num; i++)
+		{
+			if (SUCCEED == nss[i].result)
+				protos[idx].res++;	/* increase number of successful NSs */
+		}
+
+		if (0 != nss_num)
+		{
+			zbx_clean_nss(nss, nss_num);
+			zbx_free(nss);
+		}
+		nss = NULL;
+
+		free_items(items, items_num);
+		items = NULL;
+
+		if (NULL != keys)
+		{
+			ldns_rr_list_deep_free(keys);
+			keys = NULL;
+		}
+
+		if (0 != ldns_resolver_nameserver_count(res))
+			ldns_resolver_deep_free(res);
+		else
+			ldns_resolver_free(res);
+		res = NULL;
 	}
 
 	/* from this point item will not become NOTSUPPORTED */
 	ret = SYSINFO_RET_OK;
 
-	/* get DNSKEY records */
-	if (0 != dnssec_enabled && SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec,
-			err, sizeof(err)))
-	{
-		zbx_rsm_err(log_fd, err);
-	}
+	test_result = get_test_result(protos, minns);
 
-	/* get list of Name Servers and IPs, by default it will set every Name Server */
-	/* as working so if we have no IPs the result of Name Server will be SUCCEED  */
-	nss_num = zbx_get_nameservers(items, items_num, &nss, ipv4_enabled, ipv6_enabled, log_fd);
+	if (dns_test_upd_step == max_upd_step)
+		dns_test_upd_step = 1;
+	else
+		dns_test_upd_step++;
 
-	for (i = 0; i < nss_num; i++)
+	if (SUCCEED == test_result_up(test_result))
 	{
-		for (j = 0; j < nss[i].ips_num; j++)
+		/* test successful */
+		if (0 == dns_test_step)
 		{
-			if (ZBX_EC_NOERROR == res_ec)
+			/* currently we are in critical mode */
+			if (dns_test_rec_step == max_rec_step)
 			{
-				if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys, testprefix,
-						domain, log_fd, &rtt, (ZBX_RSM_UDP == proto) ? &upd : NULL,
-						ipv4_enabled, ipv6_enabled, epp_enabled, err, sizeof(err)))
-				{
-					zbx_rsm_err(log_fd, err);
-				}
+				/* switch to normal */
+				dns_test_rec_step = 0;
+				dns_test_step = 1;
 			}
 			else
-				rtt = res_ec;
-
-			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck, strlen(keyname) + 1,
-					items, items_num);
-
-			/* if a single IP of the Name Server fails, consider the whole Name Server down */
-			if (SUCCEED != rtt_result(rtt, rtt_limit))
-				nss[i].result = FAIL;
+			{
+				/* continue recovery */
+				dns_test_rec_step++;
+			}
+		}
+		else
+		{
+			/* we are in normal mode, update steps */
+			if (dns_test_step == max_test_step)
+				dns_test_step = 1;
+			else
+				dns_test_step++;
 		}
 	}
-
-	free_items(items, items_num);
-
-	for (i = 0; i < nss_num; i++)
+	else
 	{
-		if (SUCCEED == nss[i].result)
-			ok_nss_num++;
+		/* test failed */
+
+		/* NB! dns_test_step == 0 means critical mode */
+		dns_test_step = 0;
+
+		/* stop recovery */
+		dns_test_rec_step = 0;
 	}
+
+	set_dns_test_data(item->host.hostid, dns_test_step, dns_test_upd_step, dns_test_rec_step, dbrec_found);
 
 	/* set the value of our simple check item itself */
-	zbx_add_value_uint(item, item->nextcheck, ok_nss_num);
+	zbx_add_value_uint(item, item->nextcheck, test_result);
 out:
-	if (0 != nss_num)
-	{
-		zbx_clean_nss(nss, nss_num);
-		zbx_free(nss);
-	}
-
-	if (NULL != keys)
-		ldns_rr_list_deep_free(keys);
-
 	if (NULL != res)
 	{
 		if (0 != ldns_resolver_nameserver_count(res))
@@ -2074,9 +2334,9 @@ static void	zbx_set_rdds_value(const char *keypart, const DC_ITEM *item, int ts,
 {
 	if (0 == strncmp(keypart, "ip[", strlen("ip[")) && NULL != ip)
 		zbx_add_value_str(item, ts, ip);
-	else if (0 == strncmp(keypart, "rtt[", strlen("rtt[")) && ZBX_NO_VALUE != rtt)
+	else if (0 == strncmp(keypart, "rtt[", strlen("rtt[")) && ZBX_NOT_PERFORMED != rtt)
 		zbx_add_value_dbl(item, ts, rtt);
-	else if (0 == strncmp(keypart, "upd[", strlen("upd[")) && ZBX_NO_VALUE != upd)
+	else if (0 == strncmp(keypart, "upd[", strlen("upd[")) && ZBX_NOT_PERFORMED != upd)
 		zbx_add_value_dbl(item, ts, upd);
 }
 
@@ -2095,7 +2355,7 @@ static void	zbx_set_rdds_values(const char *ip_rdds43, int rtt_rdds43, int upd_r
 		if (0 == strncmp(p, "43.", strlen("43.")))
 			zbx_set_rdds_value(p + strlen("43."), &items[i], ts, ip_rdds43, rtt_rdds43, upd_rdds43);
 		else if (0 == strncmp(p, "80.", strlen("80.")))
-			zbx_set_rdds_value(p + strlen("80."), &items[i], ts, ip_rdds80, rtt_rdds80, ZBX_NO_VALUE);
+			zbx_set_rdds_value(p + strlen("80."), &items[i], ts, ip_rdds80, rtt_rdds80, ZBX_NOT_PERFORMED);
 		else if (0 == strncmp(p, "rdap.", strlen("rdap.")))
 			zbx_set_rdds_value(p + strlen("rdap."), &items[i], ts, ip_rdap, rtt_rdap, upd_rdap);
 	}
@@ -2469,12 +2729,11 @@ while (0)
 	DC_ITEM			*items = NULL;
 	size_t			i, items_num = 0, value_alloc = 0;
 	time_t			ts, now;
-	int			rtt_rdds43 = ZBX_NO_VALUE, upd_rdds43 = ZBX_NO_VALUE, rtt_limit_rdds43,
-				rtt_rdds80 = ZBX_NO_VALUE, rtt_limit_rdds80, maxredirs_rdds80,
-				rtt_rdap = ZBX_NO_VALUE, upd_rdap = ZBX_NO_VALUE, rtt_limit_rdap, maxredirs_rdap,
-				ipv4_enabled, ipv6_enabled, ipv_flags = 0,
-				rdds43_enabled, rdds80_enabled, rdap_enabled, epp_enabled,
-				ret = SYSINFO_RET_FAIL;
+	int			rtt_rdds43 = ZBX_NOT_PERFORMED, upd_rdds43 = ZBX_NOT_PERFORMED, rtt_limit_rdds43,
+				rtt_rdds80 = ZBX_NOT_PERFORMED, rtt_limit_rdds80, maxredirs_rdds80,
+				rtt_rdap = ZBX_NOT_PERFORMED, upd_rdap = ZBX_NOT_PERFORMED, rtt_limit_rdap,
+				maxredirs_rdap, ipv4_enabled, ipv6_enabled, ipv_flags = 0, rdds43_enabled,
+				rdds80_enabled, rdap_enabled, epp_enabled, ret = SYSINFO_RET_FAIL;
 
 	/* first read the TLD */
 	if (SUCCEED != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -3618,18 +3877,18 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 
 		if (NULL != ip && 0 == strncmp(p, "ip[", 3))
 			zbx_add_value_str(item, value_ts, ip);
-		else if ((ZBX_NO_VALUE != rtt1 || ZBX_NO_VALUE != rtt2 || ZBX_NO_VALUE != rtt3) &&
+		else if ((ZBX_NOT_PERFORMED != rtt1 || ZBX_NOT_PERFORMED != rtt2 || ZBX_NOT_PERFORMED != rtt3) &&
 				0 == strncmp(p, "rtt[", 4))
 		{
 			*cmd = '\0';
 
 			if (0 == get_param(item->params, 2, cmd, sizeof(cmd)) && '\0' != *cmd)
 			{
-				if (ZBX_NO_VALUE != rtt1 && 0 == strcmp("login", cmd))
+				if (ZBX_NOT_PERFORMED != rtt1 && 0 == strcmp("login", cmd))
 					zbx_add_value_dbl(item, value_ts, rtt1);
-				else if (ZBX_NO_VALUE != rtt2 && 0 == strcmp("update", cmd))
+				else if (ZBX_NOT_PERFORMED != rtt2 && 0 == strcmp("update", cmd))
 					zbx_add_value_dbl(item, value_ts, rtt2);
-				else if (ZBX_NO_VALUE != rtt3 && 0 == strcmp("info", cmd))
+				else if (ZBX_NOT_PERFORMED != rtt3 && 0 == strcmp("info", cmd))
 					zbx_add_value_dbl(item, value_ts, rtt3);
 			}
 		}
@@ -3935,9 +4194,9 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM			*items = NULL;
 	size_t			items_num = 0;
 	zbx_vector_str_t	epp_hosts, epp_ips;
-	int			ec, rv, i, epp_enabled, epp_cert_size, rtt, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE,
-				rtt3 = ZBX_NO_VALUE, rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled,
-				ret = SYSINFO_RET_FAIL;
+	int			ec, rv, i, epp_enabled, epp_cert_size, rtt, rtt1 = ZBX_NOT_PERFORMED,
+				rtt2 = ZBX_NOT_PERFORMED, rtt3 = ZBX_NOT_PERFORMED, rtt1_limit, rtt2_limit, rtt3_limit,
+				ipv4_enabled, ipv6_enabled, ret = SYSINFO_RET_FAIL;
 
 	memset(&sock, 0, sizeof(zbx_sock_t));
 	sock.socket = ZBX_SOCK_ERROR;

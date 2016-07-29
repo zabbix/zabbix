@@ -110,11 +110,15 @@
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
 
-#define ZBX_NO_VALUE			-1000	/* no item value should be set */
+#define ZBX_NOT_PERFORMED		-100000	/* NB! Must not conflict with any of the error codes above! */
 
 #define ZBX_RSM_UDP	0
 #define ZBX_RSM_TCP	1
 
+#define ZBX_MACRO_DNS_MAX_TEST_STEP	"{$RSM.DNS.TEST.PROTO.RATIO}"
+#define ZBX_MACRO_DNS_MAX_UPD_STEP	"{$RSM.DNS.TEST.UPD.RATIO}"
+#define ZBX_MACRO_DNS_MAX_REC_STEP	"{$RSM.DNS.TEST.CRIT.RECOVER}"
+#define ZBX_MACRO_DNS_MINNS		"{$RSM.DNS.AVAIL.MINNS}"
 #define ZBX_MACRO_DNS_RESOLVER		"{$RSM.RESOLVER}"
 #define ZBX_MACRO_DNS_TESTPREFIX	"{$RSM.DNS.TESTPREFIX}"
 #define ZBX_MACRO_DNS_UDP_RTT		"{$RSM.DNS.UDP.RTT.HIGH}"

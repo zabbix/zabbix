@@ -58,6 +58,13 @@ if (0 == @{$rows_ref})
 info("fixing global macros...");
 db_exec("update globalmacro set macro='{\$RSM.DNS.DELAY}' where macro='{\$RSM.DNS.UDP.DELAY}'");
 db_exec("delete from globalmacro where macro='{\$RSM.DNS.TCP.DELAY}'");
+my $global_macros =
+{
+	'{$RSM.DNS.TEST.PROTO.RATIO}' => 10,
+        '{$RSM.DNS.TEST.UPD.RATIO}' => 2,
+        '{$RSM.DNS.TEST.CRIT.RECOVER}' => 3
+};
+__bulk_macro_create($global_macros, undef);	# do not force update
 
 my $tlds_ref = get_tlds('epp');
 my @items_to_create;
@@ -513,4 +520,51 @@ sub __create_missing_slv_montly_items_and_triggers
 	}
 
 	undef($tld);
+}
+
+sub __bulk_macro_create
+{
+	my $macros = shift;
+	my $force_update = shift;
+
+	my $macro_to_update = {};
+	my @data;
+
+	my $zbx_macros = $zabbix->get('usermacro',{'output' => 'extend', 'globalmacro' => 1, 'preservekeys' => 1} );
+
+	foreach my $globalmacroid (keys %{$zbx_macros})
+	{
+		my $value = $zbx_macros->{$globalmacroid}->{'value'};
+		my $macro = $zbx_macros->{$globalmacroid}->{'macro'};
+
+		next unless exists $macros->{$macro};
+
+		if ($value eq $macros->{$macro})
+		{
+			delete $macros->{$macro};
+		}
+		else
+		{
+			$macro_to_update->{$macro} = $globalmacroid;
+		}
+	}
+
+	foreach my $macro (keys %{$macros})
+	{
+		my $value = $macros->{$macro};
+		if (exists($macro_to_update->{$macro}))
+		{
+			my $globalmacroid = $macro_to_update->{$macro};
+			$zabbix->macro_global_update({'globalmacroid' => $globalmacroid, 'value' => $value}) if defined($force_update);
+		}
+		else
+		{
+			push @data, {'macro' => $macro, 'value' => $value};
+		}
+	}
+
+	if (scalar(@data))
+	{
+		$zabbix->macro_global_create(\@data);
+	}
 }
