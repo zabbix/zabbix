@@ -85,7 +85,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
-		$this->zbxTestInputType('name', $this->icon_image_name2);
+		$this->zbxTestInputTypeWait('name', $this->icon_image_name2);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
@@ -98,8 +98,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_DeleteImage() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestClickLinkText($this->icon_image_name2);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickLinkTextWait($this->icon_image_name2);
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');
@@ -112,7 +112,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_AddBgImage() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestDropdownSelect('imagetype', 'Background');
+		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestInputType('name', $this->bg_image_name);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
