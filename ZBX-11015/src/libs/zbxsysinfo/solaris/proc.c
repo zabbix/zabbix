@@ -493,7 +493,7 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
  *           /proc/[pid]/usage also contains CPU time spent in trap context   *
  *           Currently trap CPU time is not taken into account.               *
  *                                                                            *
- *           prsat(1) skips processes 0 (sched), 2 (pageout) and 3 (fsflush)  *
+ *           prstat(1) skips processes 0 (sched), 2 (pageout) and 3 (fsflush) *
  *           however we take them into account.                               *
  *                                                                            *
  ******************************************************************************/
