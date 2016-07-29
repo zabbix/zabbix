@@ -425,11 +425,14 @@
 		toggleInputs('newCheckKeyRow', isset(dcheckType, keyRowTypes));
 
 		if (isset(dcheckType, keyRowTypes)) {
-			var caption = (dcheckType == ZBX_SVC.agent)
-				? <?= CJs::encodeJson(_('Key')) ?>
-				: <?= CJs::encodeJson(_('SNMP OID')) ?>;
-
-			jQuery('#newCheckKeyRow label').text(caption);
+			if (dcheckType == ZBX_SVC.agent) {
+				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('Key')) ?>);
+				jQuery('#newCheckKeyRow #key_').attr('maxlenght', '255');
+			}
+			else {
+				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('SNMP OID')) ?>);
+				jQuery('#newCheckKeyRow #key_').attr('maxlenght', '512');
+			}
 		}
 
 		toggleInputs('newCheckCommunityRow', isset(dcheckType, comRowTypes));
