@@ -1191,7 +1191,7 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 	{
 		case EVENT_OBJECT_DHOST:
 			result = DBselect("select r.%s from drules r,dhosts h"
-					" where r.druleid=r.druleid and h.dhostid=" ZBX_FS_UI64,
+					" where r.druleid=h.druleid and h.dhostid=" ZBX_FS_UI64,
 					fieldname, event->objectid);
 			break;
 		case EVENT_OBJECT_DSERVICE:
