@@ -96,6 +96,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 		DCconfig_clean_triggers(&trigger, &errcode, 1);
 	}
+	DBfree_result(result);
 
 	DBexecute("delete from task where taskid=" ZBX_FS_UI64, taskid);
 
@@ -157,7 +158,6 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid, const char *acknowledg
 			ret = SUCCEED;
 		}
 	}
-
 	DBfree_result(result);
 
 	zbx_vector_uint64_destroy(&locked_triggerids);
