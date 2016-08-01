@@ -52,9 +52,15 @@
 							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckKeyRow">
-					<td><label for="key_"><?= _('SNMP Key') ?></label></td>
+					<td><label for="key_"><?= _('Key') ?></label></td>
 					<td>
 						<input type="text" id="key_" name="key_" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+					</td>
+				</tr>
+				<tr id="new_check_snmp_oid_row">
+					<td><label for="snmp_oid"><?= _('SNMP OID') ?></label></td>
+					<td>
+						<input type="text" id="snmp_oid" name="snmp_oid" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="512">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow">
@@ -380,7 +386,10 @@
 
 		// restore form values
 		if (isUpdate) {
-			jQuery('#dcheckCell_' + dcheckId + ' input').each(function(i, item) {
+			var dcheck_cell = jQuery('#dcheckCell_' + dcheckId);
+			var check_type = jQuery('[name="dchecks[' + dcheckId + '][type]"]', dcheck_cell).val();
+
+			jQuery('input', dcheck_cell).each(function(i, item) {
 				var itemObj = jQuery(item);
 
 				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
@@ -388,7 +397,17 @@
 
 				// ignore "name" value because it is virtual
 				if (name !== 'name') {
-					jQuery('#' + name).val(itemObj.val());
+					var snmp_row_types = {};
+					snmp_row_types[ZBX_SVC.snmpv1] = true;
+					snmp_row_types[ZBX_SVC.snmpv2] = true;
+					snmp_row_types[ZBX_SVC.snmpv3] = true;
+
+					if(name == 'key_' && isset(check_type, snmp_row_types)) {
+						jQuery('#snmp_oid').val(itemObj.val());
+					}
+					else {
+						jQuery('#' + name).val(itemObj.val());
+					}
 
 					// set radio button value
 					var radioObj = jQuery('input[name=' + name + ']');
@@ -408,11 +427,10 @@
 	function updateNewDCheckType(dcheckId) {
 		var dcheckType = parseInt(jQuery('#type').val(), 10);
 
-		var keyRowTypes = {};
-		keyRowTypes[ZBX_SVC.agent] = true;
-		keyRowTypes[ZBX_SVC.snmpv1] = true;
-		keyRowTypes[ZBX_SVC.snmpv2] = true;
-		keyRowTypes[ZBX_SVC.snmpv3] = true;
+		var snmp_row_types = {};
+		snmp_row_types[ZBX_SVC.snmpv1] = true;
+		snmp_row_types[ZBX_SVC.snmpv2] = true;
+		snmp_row_types[ZBX_SVC.snmpv3] = true;
 
 		var comRowTypes = {};
 		comRowTypes[ZBX_SVC.snmpv1] = true;
@@ -422,19 +440,8 @@
 		secNameRowTypes[ZBX_SVC.snmpv3] = true;
 
 		toggleInputs('newCheckPortsRow', (ZBX_SVC.icmp != dcheckType));
-		toggleInputs('newCheckKeyRow', isset(dcheckType, keyRowTypes));
-
-		if (isset(dcheckType, keyRowTypes)) {
-			if (dcheckType == ZBX_SVC.agent) {
-				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('Key')) ?>);
-				jQuery('#newCheckKeyRow #key_').attr('maxlength', '255');
-			}
-			else {
-				jQuery('#newCheckKeyRow label').text(<?= CJs::encodeJson(_('SNMP OID')) ?>);
-				jQuery('#newCheckKeyRow #key_').attr('maxlength', '512');
-			}
-		}
-
+		toggleInputs('newCheckKeyRow', dcheckType == ZBX_SVC.agent);
+		toggleInputs('new_check_snmp_oid_row', isset(dcheckType, snmp_row_types));
 		toggleInputs('newCheckCommunityRow', isset(dcheckType, comRowTypes));
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
@@ -502,6 +509,10 @@
 
 	function saveNewDCheckForm(dcheckId) {
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
+		if (isset('snmp_oid', dCheck)) {
+			dCheck.key_ = dCheck.snmp_oid;
+			delete dCheck.snmp_oid;
+		}
 
 		// get check id
 		dCheck.dcheckid = (typeof dcheckId === 'undefined') ? getUniqueId() : dcheckId;
