@@ -59,7 +59,10 @@ $icons->addItem(
 
 // 1st level menu
 $top_menu = (new CDiv())
-	->addItem(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+	->addItem(
+		(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+			->addClass(ZBX_STYLE_HEADER_LOGO)
+	)
 	->addItem(
 		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
 	)

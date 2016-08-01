@@ -1133,6 +1133,7 @@ define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
