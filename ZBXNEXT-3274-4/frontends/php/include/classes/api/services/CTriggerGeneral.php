@@ -706,39 +706,43 @@ abstract class CTriggerGeneral extends CApiService {
 				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
 			}
 
-			$trigger['correlation_mode'] = array_key_exists('correlation_mode', $trigger)
-				? $trigger['correlation_mode']
-				: $_db_trigger['correlation_mode'];
+			// Skip validation of correlation_mode and correlation_tag if these fields are readonly.
+			if (!(array_key_exists('flags', $_db_trigger) && $_db_trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+					&& $_db_trigger['templateid'] == 0) {
+				$trigger['correlation_mode'] = array_key_exists('correlation_mode', $trigger)
+					? $trigger['correlation_mode']
+					: $_db_trigger['correlation_mode'];
 
-			$trigger['correlation_tag'] = array_key_exists('correlation_tag', $trigger)
-				? $trigger['correlation_tag']
-				: $_db_trigger['correlation_tag'];
+				$trigger['correlation_tag'] = array_key_exists('correlation_tag', $trigger)
+					? $trigger['correlation_tag']
+					: $_db_trigger['correlation_tag'];
 
-			$correlation_mode_validator = new CLimitedSetValidator([
-				'values' => [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]
-			]);
+				$correlation_mode_validator = new CLimitedSetValidator([
+					'values' => [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]
+				]);
 
-			if (!$correlation_mode_validator->validate($trigger['correlation_mode'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'correlation_mode',
-					_s('unexpected value "%1$s"', $trigger['correlation_mode'])
-				));
-			}
+				if (!$correlation_mode_validator->validate($trigger['correlation_mode'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'correlation_mode',
+						_s('unexpected value "%1$s"', $trigger['correlation_mode'])
+					));
+				}
 
-			if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_NONE) {
-				$trigger['correlation_tag'] = '';
-			}
-			elseif ($trigger['correlation_tag'] === '' || $trigger['correlation_tag'] === false
-					|| $trigger['correlation_tag'] === null) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
-				);
-			}
-			elseif (strpos($trigger['correlation_tag'], '/') !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'correlation_tag',
-					_('unacceptable characters are used')
-				));
+				if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_NONE) {
+					$trigger['correlation_tag'] = '';
+				}
+				elseif ($trigger['correlation_tag'] === '' || $trigger['correlation_tag'] === false
+						|| $trigger['correlation_tag'] === null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+					);
+				}
+				elseif (strpos($trigger['correlation_tag'], '/') !== false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'correlation_tag',
+						_('unacceptable characters are used')
+					));
+				}
 			}
 
 			if ($class === 'CTrigger') {
