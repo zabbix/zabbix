@@ -1551,6 +1551,17 @@ static int	DBpatch_3010067(void)
 	return DBadd_foreign_key("corr_operation", 1, &field);
 }
 
+static int	DBpatch_3010068(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update triggers set error='', state=%d where flags=%d",
+			TRIGGER_STATE_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1625,5 +1636,6 @@ DBPATCH_ADD(3010064, 0, 1)
 DBPATCH_ADD(3010065, 0, 1)
 DBPATCH_ADD(3010066, 0, 1)
 DBPATCH_ADD(3010067, 0, 1)
+DBPATCH_ADD(3010068, 0, 1)
 
 DBPATCH_END()
