@@ -75,12 +75,12 @@ class CScreenProblem extends CScreenBase {
 
 		$db_problems = API::Problem()->get(
 			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
-			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
 			+ ['selectTags' => ['tag', 'value']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
 			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
 			+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+			+ ($this->data['filter']['unacknowledged'] && $config['event_ack_enable'] ? ['acknowledged' => false] : [])
 			+ ($this->data['filter']['age_state'] == 1
 				? ['time_from' => $now - $this->data['filter']['age'] * SEC_PER_DAY + 1]
 				: []
@@ -94,11 +94,6 @@ class CScreenProblem extends CScreenBase {
 		foreach ($db_problems as $eventid => $db_problem) {
 			if ($db_problem['r_eventid'] != 0 && ($db_problem['r_clock'] < $ok_events_from
 					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
-				unset($db_problems[$eventid]);
-				continue;
-			}
-
-			if ($this->data['filter']['unacknowledged'] && $db_problem['acknowledges']) {
 				unset($db_problems[$eventid]);
 				continue;
 			}
@@ -240,11 +235,21 @@ class CScreenProblem extends CScreenBase {
 				];
 		}
 
-		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1);
-
 		CArrayHelper::sort($db_problems, $sort_fields);
 
+		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1, true);
+
 		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
+
+		$db_problems = API::Problem()->get(
+			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
+			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
+			+ ['selectTags' => ['tag', 'value']]
+			+ ['source' => EVENT_SOURCE_TRIGGERS]
+			+ ['object' => EVENT_OBJECT_TRIGGER]
+			+ ['eventids' => array_keys($db_problems)]
+			+ ['preservekeys' => true]
+		);
 
 		// create table
 		$table = (new CTableInfo())

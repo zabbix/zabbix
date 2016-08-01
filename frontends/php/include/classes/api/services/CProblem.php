@@ -72,6 +72,7 @@ class CProblem extends CApiService {
 			// filter
 			'time_from'					=> null,
 			'time_till'					=> null,
+			'acknowledged'				=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -242,6 +243,15 @@ class CProblem extends CApiService {
 				'SELECT NULL'.
 				' FROM '.implode(',', $sub_sql_parts['from']).
 				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
+			')';
+		}
+
+		// acknowledged
+		if ($options['acknowledged'] !== null) {
+			$sqlParts['where'][] = ($options['acknowledged'] ? '' : 'NOT ').'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges a'.
+				' WHERE p.eventid=a.eventid'.
 			')';
 		}
 
