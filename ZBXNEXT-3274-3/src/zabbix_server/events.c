@@ -1578,7 +1578,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_correlaeted_trigger_problem_count                         *
+ * Function: update_correlated_trigger_problem_count                          *
  *                                                                            *
  * Purpose: update number of open problems for correlated triggers            *
  *                                                                            *
@@ -1589,7 +1589,7 @@ out:
  *           open problem count is needed to calculate new trigger value.     *
  *                                                                            *
  ******************************************************************************/
-static void	update_correlaeted_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
+static void	update_correlated_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1663,7 +1663,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
 
-	update_correlaeted_trigger_problem_count(trigger_diff);
+	update_correlated_trigger_problem_count(trigger_diff);
 
 	/* update trigger problem_count for new problem events */
 	for (i = 0; i < events_num; i++)
