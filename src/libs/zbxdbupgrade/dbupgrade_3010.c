@@ -1551,6 +1551,64 @@ static int	DBpatch_3010067(void)
 	return DBadd_foreign_key("corr_operation", 1, &field);
 }
 
+static int	DBpatch_3010068(void)
+{
+	const ZBX_TABLE table =
+			{"task", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010069(void)
+{
+	const ZBX_TABLE table =
+			{"task_close_problem", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010070(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_close_problem", 1, &field);
+}
+
+static int	DBpatch_3010071(void)
+{
+	const ZBX_FIELD	field = {"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3010072(void)
+{
+	const ZBX_FIELD	field = {"manual_close", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010073(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_field("event_recovery", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1625,5 +1683,11 @@ DBPATCH_ADD(3010064, 0, 1)
 DBPATCH_ADD(3010065, 0, 1)
 DBPATCH_ADD(3010066, 0, 1)
 DBPATCH_ADD(3010067, 0, 1)
+DBPATCH_ADD(3010068, 0, 1)
+DBPATCH_ADD(3010069, 0, 1)
+DBPATCH_ADD(3010070, 0, 1)
+DBPATCH_ADD(3010071, 0, 1)
+DBPATCH_ADD(3010072, 0, 1)
+DBPATCH_ADD(3010073, 0, 1)
 
 DBPATCH_END()
