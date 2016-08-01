@@ -111,9 +111,10 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestLaunchPopup('add_protoitem');
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
 				$this->zbxTestClickLinkTextWait($item['itemName']);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
 		}
