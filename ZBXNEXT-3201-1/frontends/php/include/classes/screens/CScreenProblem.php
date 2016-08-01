@@ -74,9 +74,10 @@ class CScreenProblem extends CScreenBase {
 		$now = time();
 
 		$db_problems = API::Problem()->get(
-			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
+			['output' => ['eventid', 'objectid', 'clock', 'ns']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
+			+ ['recent' => ($this->data['filter']['show'] == TRIGGERS_OPTION_RECENT_PROBLEM)]
 			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
 			+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
 			+ ($this->data['filter']['unacknowledged'] && $config['event_ack_enable'] ? ['acknowledged' => false] : [])
@@ -92,12 +93,6 @@ class CScreenProblem extends CScreenBase {
 		$ok_events_from = $now - $config['ok_period'];
 
 		foreach ($db_problems as $eventid => $db_problem) {
-			if ($db_problem['r_eventid'] != 0 && ($db_problem['r_clock'] < $ok_events_from
-					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
-				unset($db_problems[$eventid]);
-				continue;
-			}
-
 			$triggerids[$db_problem['objectid']] = true;
 		}
 
@@ -230,6 +225,7 @@ class CScreenProblem extends CScreenBase {
 			+ ['selectTags' => ['tag', 'value']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
+			+ ['recent' => true]
 			+ ['eventids' => array_keys($db_problems)]
 			+ ['preservekeys' => true]
 		);
