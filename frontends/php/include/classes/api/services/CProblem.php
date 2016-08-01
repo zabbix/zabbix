@@ -66,6 +66,7 @@ class CProblem extends CApiService {
 			'time_till'					=> null,
 			'acknowledged'				=> null,
 			'tags'						=> null,
+			'recent'					=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -248,7 +249,7 @@ class CProblem extends CApiService {
 			')';
 		}
 
-		// acknowledged
+		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			foreach ($options['tags'] as $tag) {
 				if ($tag['value'] !== '') {
@@ -267,6 +268,17 @@ class CProblem extends CApiService {
 						$tag['value'].
 				')';
 			}
+		}
+
+		// recent
+		if ($options['recent'] !== null && $options['recent']) {
+			$config = select_config();
+			$ok_events_from = time() - $config['ok_period'];
+
+			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
+		}
+		else {
+			$sqlParts['where'][] = 'p.r_eventid IS NULL';
 		}
 
 		// time_from
