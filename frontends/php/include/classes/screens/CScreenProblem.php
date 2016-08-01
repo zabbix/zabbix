@@ -75,7 +75,6 @@ class CScreenProblem extends CScreenBase {
 
 		$db_problems = API::Problem()->get(
 			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
-			+ ['selectTags' => ['tag', 'value']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
 			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
@@ -85,6 +84,7 @@ class CScreenProblem extends CScreenBase {
 				? ['time_from' => $now - $this->data['filter']['age'] * SEC_PER_DAY + 1]
 				: []
 			)
+			+ ($this->data['filter']['tags'] ? ['tags' => $this->data['filter']['tags']] : [])
 			+ ['preservekeys' => true]
 		);
 
@@ -96,23 +96,6 @@ class CScreenProblem extends CScreenBase {
 					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
 				unset($db_problems[$eventid]);
 				continue;
-			}
-
-			if ($this->data['filter']['tags']) {
-				$match = 0;
-				foreach ($this->data['filter']['tags'] as $filter_tag) {
-					foreach ($db_problem['tags'] as $problem_tag) {
-						if ($problem_tag['tag'] === $filter_tag['tag'] && ($filter_tag['value'] === '' ||
-								mb_stripos($problem_tag['value'], $filter_tag['value']) !== false)) {
-							$match++;
-							break;
-						}
-					}
-				}
-				if ($match != count($this->data['filter']['tags'])) {
-					unset($db_problems[$eventid]);
-					continue;
-				}
 			}
 
 			$triggerids[$db_problem['objectid']] = true;

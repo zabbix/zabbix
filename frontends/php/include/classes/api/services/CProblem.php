@@ -34,14 +34,6 @@ class CProblem extends CApiService {
 	 * Get problem data.
 	 *
 	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['eventids']
-	 * @param array $options['editable']
-	 * @param array $options['count']
-	 * @param array $options['limit']
-	 * @param array $options['order']
 	 *
 	 * @return array|int item data as array or false if error
 	 */
@@ -73,6 +65,7 @@ class CProblem extends CApiService {
 			'time_from'					=> null,
 			'time_till'					=> null,
 			'acknowledged'				=> null,
+			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -253,6 +246,27 @@ class CProblem extends CApiService {
 				' FROM acknowledges a'.
 				' WHERE p.eventid=a.eventid'.
 			')';
+		}
+
+		// acknowledged
+		if ($options['tags'] !== null && $options['tags']) {
+			foreach ($options['tags'] as $tag) {
+				if ($tag['value'] !== '') {
+					$tag['value'] = str_replace('!', '!!', $tag['value']);
+					$tag['value'] = str_replace('%', '!%', $tag['value']);
+					$tag['value'] = str_replace('_', '!_', $tag['value']);
+					$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
+					$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+				}
+
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM problem_tag pt'.
+					' WHERE p.eventid=pt.eventid'.
+						' AND pt.tag='.zbx_dbstr($tag['tag']).
+						$tag['value'].
+				')';
+			}
 		}
 
 		// time_from
