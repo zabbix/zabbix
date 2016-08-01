@@ -97,73 +97,85 @@ class CProblem extends CApiService {
 		$sqlParts['where'][] = 'p.source='.zbx_dbstr($options['source']);
 		$sqlParts['where'][] = 'p.object='.zbx_dbstr($options['object']);
 
-		// editable + PERMISSION CHECK
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				// specific triggers
-				if ($options['objectids'] !== null) {
-					$triggers = API::Trigger()->get([
-						'output' => ['triggerid'],
-						'triggerids' => $options['objectids'],
-						'editable' => $options['editable']
+		// triggers
+		if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			// specific triggers
+			if ($options['objectids'] !== null) {
+				$triggers = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => $options['objectids'],
+					'editable' => $options['editable'],
+					'preservekeys' => true
+				]);
+				$options['objectids'] = array_keys($triggers);
+			}
+			// all triggers
+			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM triggers t'.
+					' WHERE p.objectid=t.triggerid'.
+					')';
+			}
+			else {
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+					' WHERE p.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+					')';
+			}
+		}
+		elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+			// specific items or lld rules
+			if ($options['objectids'] !== null) {
+				if ($options['object'] == EVENT_OBJECT_ITEM) {
+					$items = API::Item()->get([
+						'output' => [],
+						'itemids' => $options['objectids'],
+						'editable' => $options['editable'],
+						'preservekeys' => true
 					]);
-					$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
+					$options['objectids'] = array_keys($items);
 				}
-				// all triggers
-				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-					$sqlParts['where'][] = 'EXISTS ('.
-							'SELECT NULL'.
-							' FROM functions f,items i,hosts_groups hgg'.
-								' JOIN rights r'.
-									' ON r.id=hgg.groupid'.
-										' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
-							' WHERE p.objectid=f.triggerid'.
-								' AND f.itemid=i.itemid'.
-								' AND i.hostid=hgg.hostid'.
-							' GROUP BY f.triggerid'.
-							' HAVING MIN(r.permission)>'.PERM_DENY.
-								' AND MAX(r.permission)>='.zbx_dbstr($permission).
-							')';
+				elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
+					$items = API::DiscoveryRule()->get([
+						'output' => [],
+						'itemids' => $options['objectids'],
+						'editable' => $options['editable'],
+						'preservekeys' => true
+					]);
+					$options['objectids'] = array_keys($items);
 				}
 			}
-			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				// specific items or LLD rules
-				if ($options['objectids'] !== null) {
-					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$items = API::Item()->get([
-							'output' => ['itemid'],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable']
-						]);
-						$options['objectids'] = zbx_objectValues($items, 'itemid');
-					}
-					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$items = API::DiscoveryRule()->get([
-							'output' => ['itemid'],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable']
-						]);
-						$options['objectids'] = zbx_objectValues($items, 'itemid');
-					}
-				}
-				// all items and LLD rules
-				else {
-					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-					$sqlParts['where'][] = 'EXISTS ('.
-							'SELECT NULL'.
-							' FROM items i,hosts_groups hgg'.
-								' JOIN rights r'.
-									' ON r.id=hgg.groupid'.
-										' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
-							' WHERE p.objectid=i.itemid'.
-								' AND i.hostid=hgg.hostid'.
-							' GROUP BY hgg.hostid'.
-							' HAVING MIN(r.permission)>'.PERM_DENY.
-								' AND MAX(r.permission)>='.zbx_dbstr($permission).
-							')';
-				}
+			// all items or lld rules
+			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i'.
+					' WHERE p.objectid=i.itemid'.
+					')';
+			}
+			else {
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+					' WHERE p.objectid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
+					')';
 			}
 		}
 
