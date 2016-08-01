@@ -93,7 +93,7 @@ DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t obj
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag)
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag, zbx_uint64_t userid)
 {
 	int	i;
 
@@ -112,6 +112,7 @@ DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t obj
 	events[events_num].value = value;
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 	events[events_num].flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	events[events_num].userid = userid;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -362,13 +363,14 @@ static void	save_event_recovery()
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid", NULL);
+	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid",
+			"userid", NULL);
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_db_insert_add_values(&db_insert, recovery->eventid, recovery->r_event->eventid,
-				recovery->correlationid, recovery->c_eventid);
+				recovery->correlationid, recovery->c_eventid, recovery->userid);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update problem set"
@@ -561,6 +563,7 @@ static void	correlate_events_by_default_rules()
 		recovery_local.r_event = event;
 		recovery_local.correlationid = 0;
 		recovery_local.c_eventid = 0;
+		recovery_local.userid = event->userid;
 		zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 	}
 
@@ -688,6 +691,7 @@ static void	correlate_events_by_trigger_rules()
 			recovery_local.r_event = event;
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
+			recovery_local.userid = 0;
 			zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 
 		}
@@ -1150,13 +1154,14 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 						event->objectid, &ts, TRIGGER_VALUE_OK,
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
-						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
+						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", 0);
 
 				recovery_local.eventid = event->eventid;
 				recovery_local.objectid = event->objectid;
 				recovery_local.correlationid = correlation->correlationid;
 				recovery_local.c_eventid = event->eventid;
 				recovery_local.r_event = r_event;
+				recovery_local.userid = 0;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 				break;
@@ -1455,13 +1460,14 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 						&queue->ts, TRIGGER_VALUE_OK, trigger->description,
 						trigger->expression_orig, trigger->recovery_expression_orig,
 						trigger->priority, trigger->type, &trigger->tags,
-						trigger->correlation_mode, trigger->correlation_tag);
+						trigger->correlation_mode, trigger->correlation_tag, 0);
 
 				recovery_local.eventid = queue->eventid;
 				recovery_local.objectid = queue->objectid;
 				recovery_local.correlationid = queue->correlationid;
 				recovery_local.c_eventid = queue->c_eventid;
 				recovery_local.r_event = event;
+				recovery_local.userid = 0;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 
