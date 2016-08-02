@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with screen items.
- *
- * @package API
  */
 class CScreenItem extends CApiService {
 

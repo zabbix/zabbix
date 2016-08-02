@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with host groups.
- *
- * @package API
  */
 class CHostGroup extends CApiService {
 

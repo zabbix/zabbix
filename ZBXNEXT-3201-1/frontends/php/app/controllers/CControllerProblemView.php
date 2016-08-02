@@ -21,8 +21,6 @@
 
 class CControllerProblemView extends CController {
 
-	private $sysmapid;
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -86,21 +84,6 @@ class CControllerProblemView extends CController {
 	}
 
 	protected function checkPermissions() {
-/*		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
-			return false;
-		}
-
-		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
-			$drules = API::DRule()->get([
-				'output' => [],
-				'druleids' => [$this->getInput('druleid')],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE]
-			]);
-			if (!$drules) {
-				return false;
-			}
-		}*/
-
 		return true;
 	}
 
