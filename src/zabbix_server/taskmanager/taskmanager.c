@@ -81,10 +81,9 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			zbx_timespec(&ts);
 
 			add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-					&ts, TRIGGER_VALUE_OK, trigger.description,
-					trigger.expression_orig, trigger.recovery_expression_orig,
-					trigger.priority, trigger.type, NULL,
-					trigger.correlation_mode, trigger.correlation_tag, userid);
+					&ts, TRIGGER_VALUE_OK, trigger.description, trigger.expression_orig,
+					trigger.recovery_expression_orig, trigger.priority, trigger.type, NULL,
+					ZBX_TRIGGER_CORRELATION_NONE, NULL, userid);
 
 			process_trigger_events(&trigger_diff, locked_triggerids);
 			DCconfig_triggers_apply_changes(&trigger_diff);
