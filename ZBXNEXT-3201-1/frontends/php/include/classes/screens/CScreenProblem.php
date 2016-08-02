@@ -241,16 +241,18 @@ class CScreenProblem extends CScreenBase {
 			unset($db_problem);
 		}
 
+		$link = 'zabbix.php?action=problem.view';
+
 		// create table
 		$table = (new CTableInfo())
 			->setHeader([
-				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'])
+				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
+				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
 					->addClass(ZBX_STYLE_CELL_WIDTH),
 				(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 				_('Status'),
-				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder']),
-				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder']),
+				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
 				_('Duration'),
 				$config['event_ack_enable'] ? _('Ack') : null,
 				_('Actions'),
