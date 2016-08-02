@@ -31,12 +31,12 @@ $filterForm = (new CFilter($filter['filterid']))
 
 $column1 = (new CFormList())
 	->addRow(_('Triggers status'),
-		(new CComboBox('show_triggers', $filter['showTriggers'], null, [
-			TRIGGERS_OPTION_ALL => _('Any'),
-			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
-			TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
-		]))
-			->setAttribute('autofocus', 'autofocus')
+		(new CRadioButtonList('show_triggers', (int) $filter['showTriggers']))
+			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
+			->addValue(_('Recent problems'), TRIGGERS_OPTION_RECENT_PROBLEM)
+			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
+			->setModern(true)
+			->setFocused(true)
 	);
 
 // ack status
