@@ -9730,6 +9730,12 @@ void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules)
 	zbx_hashset_clear(&rules->conditions);
 }
 
+void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
+{
+	zbx_vector_ptr_destroy(&rules->correlations);
+	zbx_hashset_destroy(&rules->conditions);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dc_correlation_get_rules                                     *

@@ -565,6 +565,7 @@ void	zbx_set_availability_diff_ts(int ts);
 
 void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
