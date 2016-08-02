@@ -1,47 +1,52 @@
 #!/usr/bin/perl
 #
-# - DNS availability test		(data collection)	rsm.dns.udp			(simple, every minute)
-#								rsm.dns.tcp			(simple, every 50 minutes)
+# DNS test							rsm.dns				(simple check, Proxy)
 #								rsm.dns.udp.rtt			(trapper, Proxy)
+#					if EPP enabled		rsm.dns.udp.upd			-|-
 #								rsm.dns.tcp.rtt			-|-
-#								rsm.dns.udp.upd			-|-
+#					if EPP enabled		rsm.dns.tcp.upd			-|-
 #
-# - RDDS availability test		(data collection)	rsm.rdds			(simple, every 5 minutes)
-#   (also RDDS43 and RDDS80					rsm.rdds.43.ip			(trapper, Proxy)
-#   availability at a particular				rsm.rdds.43.rtt			-|-
-#   minute)							rsm.rdds.43.upd			-|-
-#								rsm.rdds.80.ip			-|-
-#								rsm.rdds.80.rtt			-|-
+# RDDS test				if any RDDS enabled	rsm.rdds			(simple check, Proxy)
+#					if RDDS43 enabled	rsm.rdds.43.ip			(trapper, Proxy)
+#					if RDDS43 & EPP enabled	rsm.rdds.43.rtt			-|-
+#					if EPP enabled		rsm.rdds.43.upd			-|-
+#					if RDDS80 enabled	rsm.rdds.80.ip			-|-
+#					if RDDS80 enabled	rsm.rdds.80.rtt			-|-
+#   					if RDAP enabled		rsm.rdds.rdap.ip		-|-
+#   					if RDAP enabled		rsm.rdds.rdap.rtt		-|-
+#					if RDAP & EPP enabled	rsm.rdds.rdap.upd		-|-
 #
-# - EPP	availability test		(data collection)	rsm.epp				(simple, every 5 minutes)
-# - info RTT							rsm.epp.ip[{$RSM.TLD}]		(trapper, Proxy)
-# - login RTT							rsm.epp.rtt[{$RSM.TLD},login]	-|-
-# - update RTT							rsm.epp.rtt[{$RSM.TLD},update]	-|-
-# - info RTT							rsm.epp.rtt[{$RSM.TLD},info]	-|-
+# EPP test				if EPP enabled		rsm.epp				(simple check, Proxy)
+#								rsm.epp.ip[{$RSM.TLD}]		(trapper, Proxy)
+#								rsm.epp.rtt[{$RSM.TLD},login]	-|-
+#								rsm.epp.rtt[{$RSM.TLD},update]	-|-
+#								rsm.epp.rtt[{$RSM.TLD},info]	-|-
 #
-# - DNS NS availability			(given minute)		rsm.slv.dns.ns.avail		(trapper, Server)
-# - DNS NS monthly availability		(monthly)		rsm.slv.dns.ns.month		-|-
-# - DNS monthly resolution RTT		(monthly)		rsm.slv.dns.ns.rtt.udp.month	-|-
-# - DNS monthly resolution RTT (TCP)	(monthly, TCP)		rsm.slv.dns.ns.rtt.tcp.month	-|-
-# - DNS monthly update time		(monthly)		rsm.slv.dns.ns.upd.month	-|-
-# - DNS availability			(given minute)		rsm.slv.dns.avail		-|-
-# - DNS rolling week			(rolling week)		rsm.slv.dns.rollweek		-|-
+# DNS NS availability						rsm.slv.dns.ns.avail		(trapper, Server)
+# DNS NS monthly availability					rsm.slv.dns.ns.month		-|-
+# DNS monthly resolution RTT (UDP)				rsm.slv.dns.ns.rtt.udp.month	-|-
+# DNS monthly resolution RTT (TCP)				rsm.slv.dns.ns.rtt.tcp.month	-|-
+# DNS monthly update time					rsm.slv.dns.ns.upd.month	-|-
+# DNS availability						rsm.slv.dns.avail		-|-
+# DNS rolling week						rsm.slv.dns.rollweek		-|-
 #
-# - DNSSEC proper resolution		(given minute)		rsm.slv.dnssec.avail		-|-
-# - DNSSEC rolling week			(rolling week)		rsm.slv.dnssec.rollweek		-|-
+# DNSSEC proper resolution					rsm.slv.dnssec.avail		-|-
+# DNSSEC rolling week						rsm.slv.dnssec.rollweek		-|-
 #
-# - RDDS availability			(given minute)		rsm.slv.rdds.avail		-|-
-# - RDDS rolling week			(rolling week)		rsm.slv.rdds.rollweek		-|-
-# - RDDS43 monthly resolution RTT	(monthly)		rsm.slv.rdds.43.rtt.month	-|-
-# - RDDS80 monthly resolution RTT	(monthly)		rsm.slv.rdds.80.rtt.month	-|-
-# - RDDS monthly update time		(monthly)		rsm.slv.rdds.upd.month		-|-
+# RDDS availability						rsm.slv.rdds.avail		-|-
+# RDDS rolling week						rsm.slv.rdds.rollweek		-|-
+# RDDS43 monthly resolution RTT					rsm.slv.rdds43.rtt		-|-
+# RDDS80 monthly resolution RTT					rsm.slv.rdds80.rtt		-|-
+# RDAP monthly resolution RTT					rsm.slv.rdap.rtt		-|-
+# RDDS43 monthly update time					rsm.slv.rdds43.upd		-|-
+# RDAP monthly update time					rsm.slv.rdap.upd		-|-
 #
-# - EPP availability			(given minute)		rsm.slv.epp.avail		-|-
-# - EPP minutes of downtime		(monthlhy)		rsm.slv.epp.downtime		-|-
-# - EPP weekly unavailability		(rolling week)		rsm.slv.epp.rollweek		-|-
-# - EPP monthly LOGIN resolution RTT	(monthly)		rsm.slv.epp.rtt.login.month	-|-
-# - EPP monthly UPDATE resolution RTT	(monthly)		rsm.slv.epp.rtt.update.month	-|-
-# - EPP monthly INFO resolution RTT	(monthly)		rsm.slv.epp.rtt.info.month	-|-
+# EPP availability						rsm.slv.epp.avail		-|-
+# EPP minutes of downtime					rsm.slv.epp.downtime		-|-
+# EPP weekly unavailability					rsm.slv.epp.rollweek		-|-
+# EPP monthly LOGIN resolution RTT				rsm.slv.epp.rtt.login		-|-
+# EPP monthly UPDATE resolution RTT				rsm.slv.epp.rtt.update		-|-
+# EPP monthly INFO resolution RTT				rsm.slv.epp.rtt.info		-|-
 
 BEGIN
 {
