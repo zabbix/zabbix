@@ -26,7 +26,7 @@ class CProblem extends CApiService {
 
 	protected $tableName = 'problem';
 	protected $tableAlias = 'p';
-	protected $sortColumns = ['eventid', 'objectid', 'clock'];
+	protected $sortColumns = ['eventid'];
 
 	/**
 	 * Get problem data.
