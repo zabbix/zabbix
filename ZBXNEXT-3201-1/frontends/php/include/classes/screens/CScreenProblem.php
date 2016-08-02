@@ -219,16 +219,27 @@ class CScreenProblem extends CScreenBase {
 
 		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
 
-		$db_problems = API::Problem()->get(
-			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
+		$db_problems_data = API::Problem()->get(
+			['output' => ['eventid', 'r_eventid', 'r_clock']]
 			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
 			+ ['selectTags' => ['tag', 'value']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
 			+ ['recent' => true]
 			+ ['eventids' => array_keys($db_problems)]
-			+ ['preservekeys' => true]
 		);
+
+		foreach ($db_problems_data as $db_problem_data) {
+			$db_problem = &$db_problems[$db_problem_data['eventid']];
+
+			$db_problem['r_eventid'] = $db_problem_data['r_eventid'];
+			$db_problem['r_clock'] = $db_problem_data['r_clock'];
+			if ($config['event_ack_enable']) {
+				$db_problem['acknowledges'] = $db_problem_data['acknowledges'];
+			}
+			$db_problem['tags'] = $db_problem_data['tags'];
+			unset($db_problem);
+		}
 
 		// create table
 		$table = (new CTableInfo())
