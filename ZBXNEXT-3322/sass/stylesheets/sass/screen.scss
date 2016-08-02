@@ -2474,22 +2474,22 @@ $form-icon-btn: (
 
 .header-dropdown {
 	position: relative;
+	display: inline-block;
+	color: $font-color;
 
-	.link-action {
-		position: relative;
-
-		&::after {
-			content: '';
-			position: absolute;
-			top: 48%;
-			left: 103%;
-			border-top-color: $font-alt-color;
-			@extend .arrow-down;
-		}
+	&::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		right: -14px;
+		@extend %arrow;
+		border-left: 4px solid transparent;
+		border-right: 4px solid transparent;
+		border-top: 6px solid;
 	}
 }
 
-.test-dropdown {
+.header-dropdown-list {
 	padding: 5px 10px;
 	font-size: $font-h4-size;
 
