@@ -291,7 +291,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 }
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
-		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event)
+		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
+		const DB_EVENT *r_event)
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
@@ -335,9 +336,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
 				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
 				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -1102,7 +1103,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg,
-							subject, message, event);
+							subject, message, event, NULL);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operationid, escalation->esc_step);
@@ -1231,7 +1232,7 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 					}
 
 					add_object_msg(action->actionid, operationid, mediatypeid, &user_msg, subject,
-							message, r_event);
+							message, event, r_event);
 					break;
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if (SUCCEED == DBis_null(row[3]))
