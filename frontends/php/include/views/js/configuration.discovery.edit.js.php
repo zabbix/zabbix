@@ -43,35 +43,44 @@
 				<tr id="newCheckPortsRow">
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
-						<input type="text" id="ports" name="ports" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="ports" name="ports" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
-					<td><input type="text" id="snmp_community" name="snmp_community" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
+					<td>
+						<input type="text" id="snmp_community" name="snmp_community" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+					</td>
 				</tr>
 				<tr id="newCheckKeyRow">
 					<td><label for="key_"><?= _('Key') ?></label></td>
 					<td>
-						<input type="text" id="key_" name="key_" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="key_" name="key_" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="new_check_snmp_oid_row">
 					<td><label for="snmp_oid"><?= _('SNMP OID') ?></label></td>
 					<td>
-						<input type="text" id="snmp_oid" name="snmp_oid" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="512">
+						<input type="text" id="snmp_oid" name="snmp_oid" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="512">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow">
 					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckSecNameRow">
 					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
-					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td>
+						<input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+					</td>
 				</tr>
 				<tr id="newCheckSecLevRow">
 					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
@@ -95,7 +104,10 @@
 				?>
 				<tr id="newCheckAuthPassRow">
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td>
+						<input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+					</td>
 				</tr>
 				<?= (new CRow([
 						_('Privacy protocol'),
@@ -109,7 +121,10 @@
 				?>
 				<tr id="newCheckPrivPassRow">
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td>
+						<input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+					</td>
 				</tr>
 				</tbody>
 			</table>
@@ -193,6 +208,22 @@
 		svcPort = parseInt(svcPort, 10);
 
 		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?= CJs::encodeJson(_('Unknown')) ?>;
+	}
+
+	/**
+	 * Checks if type of SNMP.
+	 *
+	 * @param integer type
+	 *
+	 * @return bool
+	 */
+	function typeOfSnmp(type) {
+		var types = {};
+		types[ZBX_SVC.snmpv1] = true;
+		types[ZBX_SVC.snmpv2] = true;
+		types[ZBX_SVC.snmpv3] = true;
+
+		return (typeof types[type] != 'undefined');
 	}
 
 	function toggleInputs(id, state) {
@@ -386,10 +417,10 @@
 
 		// restore form values
 		if (isUpdate) {
-			var dcheck_cell = jQuery('#dcheckCell_' + dcheckId);
-			var check_type = jQuery('[name="dchecks[' + dcheckId + '][type]"]', dcheck_cell).val();
+			var dcheck_inputs = jQuery('#dcheckCell_' + dcheckId + ' input'),
+				check_type = dcheck_inputs.filter('[name="dchecks[' + dcheckId + '][type]"]').val();
 
-			jQuery('input', dcheck_cell).each(function(i, item) {
+			dcheck_inputs.each(function(i, item) {
 				var itemObj = jQuery(item);
 
 				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
@@ -397,12 +428,9 @@
 
 				// ignore "name" value because it is virtual
 				if (name !== 'name') {
-					var snmp_row_types = {};
-					snmp_row_types[ZBX_SVC.snmpv1] = true;
-					snmp_row_types[ZBX_SVC.snmpv2] = true;
-					snmp_row_types[ZBX_SVC.snmpv3] = true;
+					if(name == 'key_' && typeOfSnmp(check_type)) {
+						// Use key_ value in snmp_oid input.
 
-					if(name == 'key_' && isset(check_type, snmp_row_types)) {
 						jQuery('#snmp_oid').val(itemObj.val());
 					}
 					else {
@@ -427,11 +455,6 @@
 	function updateNewDCheckType(dcheckId) {
 		var dcheckType = parseInt(jQuery('#type').val(), 10);
 
-		var snmp_row_types = {};
-		snmp_row_types[ZBX_SVC.snmpv1] = true;
-		snmp_row_types[ZBX_SVC.snmpv2] = true;
-		snmp_row_types[ZBX_SVC.snmpv3] = true;
-
 		var comRowTypes = {};
 		comRowTypes[ZBX_SVC.snmpv1] = true;
 		comRowTypes[ZBX_SVC.snmpv2] = true;
@@ -441,7 +464,7 @@
 
 		toggleInputs('newCheckPortsRow', (ZBX_SVC.icmp != dcheckType));
 		toggleInputs('newCheckKeyRow', dcheckType == ZBX_SVC.agent);
-		toggleInputs('new_check_snmp_oid_row', isset(dcheckType, snmp_row_types));
+		toggleInputs('new_check_snmp_oid_row', typeOfSnmp(dcheckType));
 		toggleInputs('newCheckCommunityRow', isset(dcheckType, comRowTypes));
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
@@ -509,7 +532,7 @@
 
 	function saveNewDCheckForm(dcheckId) {
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
-		if (isset('snmp_oid', dCheck)) {
+		if (typeof dCheck.snmp_oid != 'undefined') {
 			dCheck.key_ = dCheck.snmp_oid;
 			delete dCheck.snmp_oid;
 		}
