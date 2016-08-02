@@ -162,7 +162,7 @@ $showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
 $showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 $txtSelect = CProfile::get('web.tr_status.filter.txt_select', '');
 $showChange = CProfile::get('web.tr_status.filter.status_change', 0);
-$statusChangeBydays = CProfile::get('web.tr_status.filter.status_change_days', 14);
+$statusChangeDays = CProfile::get('web.tr_status.filter.status_change_days', 14);
 $ackStatus = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
 	? ZBX_ACK_STS_ANY : CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
 $showEvents = CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
@@ -221,7 +221,7 @@ $filterFormView = new CView('common.filter.trigger', [
 		'showEvents' => $showEvents,
 		'showSeverity' => $showSeverity,
 		'statusChange' => $showChange,
-		'statusChangeDays' => $statusChangeBydays,
+		'statusChangeDays' => $statusChangeDays,
 		'showDetails' => $showDetails,
 		'txtSelect' => $txtSelect,
 		'application' => $filter['application'],
@@ -353,7 +353,7 @@ if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
 if ($showChange) {
-	$options['lastChangeSince'] = time() - $statusChangeBydays * SEC_PER_DAY;
+	$options['lastChangeSince'] = time() - $statusChangeDays * SEC_PER_DAY;
 }
 if (!$showMaintenance) {
 	$options['maintenance'] = false;
