@@ -47,10 +47,14 @@ extern int		server_num, process_num;
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid, zbx_vector_uint64_t *locked_triggerids)
 {
+	const char		*__function_name = "tm_execute_task_close_problem";
 	DB_RESULT		result;
 	DC_TRIGGER		trigger;
 	int			errcode;
 	zbx_timespec_t		ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
+			taskid, eventid);
 
 	DBbegin();
 
@@ -100,6 +104,8 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 	DBexecute("delete from task where taskid=" ZBX_FS_UI64, taskid);
 
 	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
