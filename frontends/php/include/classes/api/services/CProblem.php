@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with problems.
- *
- * @package API
  */
 class CProblem extends CApiService {
 
@@ -338,11 +336,9 @@ class CProblem extends CApiService {
 	/**
 	 * Validates the input parameters for the get() method.
 	 *
-	 * @throws APIException     if the input is invalid
+	 * @throws APIException  if the input is invalid
 	 *
-	 * @param array     $options
-	 *
-	 * @return void
+	 * @param array $options
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery hosts.
- *
- * @package API
  */
 class CDHost extends CApiService {
 

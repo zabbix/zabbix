@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $this->addJsFile('js/gtlc.js');
 $this->addJsFile('js/flickerfreescreen.js');
 $this->addJsFile('js/multiselect.js');

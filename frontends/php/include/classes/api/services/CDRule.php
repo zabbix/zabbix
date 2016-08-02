@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery rules.
- *
- * @package API
  */
 class CDRule extends CApiService {
 
@@ -771,8 +769,6 @@ class CDRule extends CApiService {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $druleIds
-	 *
-	 * @return void
 	 */
 	protected function validateDelete(array $druleIds) {
 		if (!$druleIds) {
@@ -937,8 +933,6 @@ class CDRule extends CApiService {
 	 * @throws APIException if the user doesn't have write permissions for discovery rules.
 	 *
 	 * @param array $druleIds
-	 *
-	 * @return void
 	 */
 	protected function checkDrulePermissions(array $druleIds) {
 		if (!$this->isWritable($druleIds)) {

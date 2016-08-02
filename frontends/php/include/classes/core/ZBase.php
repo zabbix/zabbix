@@ -367,8 +367,10 @@ class ZBase {
 
 	/**
 	 * Process request and generate response. Main entry for all processing.
+	 *
+	 * @param CRouter $rourer
 	 */
-	private function processRequest($router) {
+	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
 
 		$controller = new $controller();
