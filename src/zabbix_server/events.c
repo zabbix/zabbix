@@ -181,7 +181,7 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
  * Purpose: flushes the events into a database                                *
  *                                                                            *
  ******************************************************************************/
-static int	save_events()
+static int	save_events(void)
 {
 	size_t			i;
 	zbx_db_insert_t		db_insert, db_insert_tags;
@@ -257,7 +257,7 @@ static int	save_events()
  *          event sources)                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	save_problems()
+static void	save_problems(void)
 {
 	size_t			i;
 	zbx_vector_ptr_t	problems;
@@ -366,7 +366,7 @@ static void	save_problems()
  *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
-static void	save_event_recovery()
+static void	save_event_recovery(void)
 {
 	zbx_db_insert_t		db_insert;
 	zbx_event_recovery_t	*recovery;
@@ -456,7 +456,7 @@ static int	get_event_index_by_source_object_id(int source, int object, zbx_uint6
  * Purpose: find problem events recovered by the new success (OK) events      *
  *                                                                            *
  ******************************************************************************/
-static void	correlate_events_by_default_rules()
+static void	correlate_events_by_default_rules(void)
 {
 	const char		*__function_name = "correlate_events_by_default_rules";
 	int			source, object;
@@ -1758,24 +1758,32 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: initialize_events                                                *
+ * Function: zbx_initialize_events                                            *
  *                                                                            *
  * Purpose: initializes the data structures required for event processing     *
  *                                                                            *
  ******************************************************************************/
-static void	initialize_events()
+void	zbx_initialize_events(void)
 {
-	static int	is_initialized = 0;
-
-	if (0 != is_initialized)
-		return;
-
 	zbx_hashset_create(&event_recovery, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&event_queue, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_dc_correlation_rules_init(&correlation_rules);
+}
 
-	is_initialized = 1;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_uninitialize_events                                          *
+ *                                                                            *
+ * Purpose: uninitializes the data structures required for event processing   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_uninitialize_events(void)
+{
+	zbx_hashset_destroy(&event_recovery);
+	zbx_hashset_destroy(&event_queue);
+
+	zbx_dc_correlation_rules_free(&correlation_rules);
 }
 
 /******************************************************************************
@@ -1785,7 +1793,7 @@ static void	initialize_events()
  * Purpose: cleans all array entries and resets events_num                    *
  *                                                                            *
  ******************************************************************************/
-static void	clean_events()
+static void	clean_events(void)
 {
 	size_t	i;
 
@@ -1815,7 +1823,7 @@ static void	clean_events()
  * Purpose: flushes local event cache to disk                                 *
  *                                                                            *
  ******************************************************************************/
-static int	flush_events()
+static int	flush_events(void)
 {
 	int				ret;
 	zbx_event_recovery_t		*recovery;
@@ -1856,12 +1864,10 @@ static int	flush_events()
  *           process_trigger_events() function must be used instead           *
  *                                                                            *
  ******************************************************************************/
-int	process_events()
+int	process_events(void)
 {
 	const char	*__function_name = "process_events";
 	int		processed_num = 0;
-
-	initialize_events();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -1905,8 +1911,6 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
 	size_t		i, processed_num = 0;
 	zbx_uint64_t	eventid;
 
-	initialize_events();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	if (0 != events_num)
@@ -1940,13 +1944,11 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
  * Return value: The number of events left in correlation queue               *
  *                                                                            *
  ******************************************************************************/
-int	flush_correlated_events()
+int	flush_correlated_events(void)
 {
 	const char		*__function_name = "flush_correlated_events";
 	zbx_vector_ptr_t	trigger_diff;
 	zbx_vector_uint64_t	triggerids_lock;
-
-	initialize_events();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __function_name, event_queue.num_data);
 
