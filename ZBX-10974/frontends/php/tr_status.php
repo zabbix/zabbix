@@ -90,6 +90,9 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 
 // filter set
 if (hasRequest('filter_set')) {
+	CProfile::update('web.tr_status.filter.show_triggers',
+		getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM), PROFILE_TYPE_INT
+	);
 	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.tr_status.filter.show_severity',
@@ -101,13 +104,6 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
-
-	// show triggers
-	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
-	// whole page inaccessible on large installations.
-	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
-	}
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
@@ -151,12 +147,7 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
-	$showTriggers = TRIGGERS_OPTION_ALL;
-}
-else {
-	$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-}
+$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
 $showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
 $showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
@@ -365,8 +356,7 @@ order_result($triggers, $sortField, $sortOrder);
 $url = (new CUrl('tr_status.php'))
 	->setArgument('fullscreen', getRequest('fullscreen'))
 	->setArgument('groupid', $pageFilter->groupid)
-	->setArgument('hostid', $pageFilter->hostid)
-	->setArgument('show_triggers', getRequest('show_triggers'));
+	->setArgument('hostid', $pageFilter->hostid);
 
 $paging = getPagingLine($triggers, $sortOrder, $url);
 
