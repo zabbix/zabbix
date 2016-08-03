@@ -502,7 +502,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	int		fd, n;
 	char		tmp[MAX_STRING_LEN];
 	psinfo_t	psinfo;
-	struct prusage	prusage;
+	prusage_t	prusage;
 
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/psinfo", (int)procutil->pid);
 
