@@ -108,7 +108,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
