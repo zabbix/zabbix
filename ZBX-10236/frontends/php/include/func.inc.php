@@ -1566,12 +1566,12 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 	}
 
 	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
+	$start = (($currentPage - 1) * $rowsPerPage) + 1;
 
 	if ($pagesCount == 1) {
 		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$start = (($currentPage - 1) * $rowsPerPage) + 1;
 		$end = $start - 1  + $rowsPerPage;
 
 		if ($end > $itemsCount) {
