@@ -6371,19 +6371,20 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *           and which does not have its host in no-data maintenance.         *
  *                                                                            *
  *           This function is meant to be called multiple times, each time    *
- *           yielding up to max_triggers in return. When called, the function *
- *           first unlocks triggers locked the previous time (if any), then   *
+ *           yielding up to max_triggers in return. When called the function  *
  *           starts where it left off to yield the next bunch of triggers.    *
  *                                                                            *
  *           Also see function DCconfig_lock_triggers_by_history_items(),     *
  *           which history syncer processes use to lock triggers.             *
  *                                                                            *
+ *           Note that the caller must unlock all returned triggers by        *
+ *           DCconfig_unlock_triggers() function                              *
+ *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
-		int process_num)
+int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
+		zbx_uint64_t next_triggerid, int process_num)
 {
-	static int		next_index;
-	int			i, found;
+	int			i, found, start, ret = FAIL;
 	zbx_uint64_t		functionid;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_FUNCTION	*dc_function;
@@ -6394,16 +6395,10 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 	LOCK_CACHE;
 
-	if (NULL == *trigger_info)
-	{
-		/* initialize iteration cycle  */
-		*trigger_info = zbx_malloc(*trigger_info, max_triggers * sizeof(DC_TRIGGER));
-		zbx_vector_ptr_reserve(trigger_order, max_triggers);
-		next_index = 0;
-	}
+	start = zbx_vector_ptr_nearestindex(&config->time_triggers[process_num - 1], &next_triggerid,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	for (i = next_index; i < config->time_triggers[process_num - 1].values_num &&
-			trigger_order->values_num < max_triggers; i++)
+	for (i = start; i < config->time_triggers[process_num - 1].values_num; i++)
 	{
 		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
@@ -6459,18 +6454,24 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 		{
 			dc_trigger->locked = 1;
 
-			trigger = &(*trigger_info)[trigger_order->values_num];
+			trigger = &trigger_info[trigger_order->values_num];
 
 			DCget_trigger(trigger, dc_trigger, ZBX_EXPAND_MACROS);
 			zbx_timespec(&trigger->timespec);
 
 			zbx_vector_ptr_append(trigger_order, trigger);
+
+			if (trigger_order->values_num == max_triggers)
+			{
+				ret = SUCCEED;
+				break;
+			}
 		}
 	}
 
-	next_index = i;
-
 	UNLOCK_CACHE;
+
+	return ret;
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
