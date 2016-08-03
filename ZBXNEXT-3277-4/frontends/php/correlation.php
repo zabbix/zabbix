@@ -119,7 +119,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			$filter['formula'] = getRequest('formula');
 		}
 		else {
-			// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
+			// If only one or no conditions are left, reset the evaltype to "and/or" and clear the formula.
 			$filter['formula'] = '';
 			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		}
@@ -500,7 +500,7 @@ else {
 	order_result($data['correlations'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
-	// render view
+	// Render view.
 	$correlationView = new CView('configuration.correlation.list', $data);
 	$correlationView->render();
 	$correlationView->show();
