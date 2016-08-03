@@ -512,7 +512,6 @@ typedef struct
 zbx_trigger_diff_t;
 
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs);
 void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 

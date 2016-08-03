@@ -6382,9 +6382,11 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
-		zbx_uint64_t next_triggerid, int process_num)
+		int process_num)
 {
-	int			i, found, start, ret = FAIL;
+	static int		triggers_left = 1;
+	static zbx_uint64_t	next_triggerid = 0;
+	int			i, found, start;
 	zbx_uint64_t		functionid;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_FUNCTION	*dc_function;
@@ -6392,6 +6394,15 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 	const ZBX_DC_HOST	*dc_host;
 	DC_TRIGGER		*trigger;
 	const char		*p, *q;
+
+	if (0 == triggers_left)
+	{
+		triggers_left = 1;
+		next_triggerid = 0;
+		return FAIL;
+	}
+
+	triggers_left = 0;
 
 	LOCK_CACHE;
 
@@ -6461,9 +6472,11 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 
 			zbx_vector_ptr_append(trigger_order, trigger);
 
+			next_triggerid = trigger->triggerid + 1;
+
 			if (trigger_order->values_num == max_triggers)
 			{
-				ret = SUCCEED;
+				triggers_left = 1;
 				break;
 			}
 		}
@@ -6471,7 +6484,7 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 
 	UNLOCK_CACHE;
 
-	return ret;
+	return SUCCEED;
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)

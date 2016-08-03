@@ -2109,10 +2109,12 @@ static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 			for (k = 0; k < j; k++)
 			{
 				tag_tmp = (zbx_lld_tag_t *)trigger->tags.values[k];
+
 				if (0 == strcmp(tag->tag, tag_tmp->tag) && 0 == strcmp(tag->value, tag_tmp->value))
 				{
 					*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\","
 						"\"%s\" already exists.\n", tag->tag, tag->value);
+
 					if (0 != tag->triggertagid)
 						tag->flags = ZBX_FLAG_LLD_TAG_DELETE;
 					else

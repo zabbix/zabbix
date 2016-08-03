@@ -66,7 +66,7 @@
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
+static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
 	const char	*__function_name = "zbx_process_trigger";
 
