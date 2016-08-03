@@ -476,7 +476,7 @@ if ($readonly) {
 		->setModern(true)
 		->setEnabled(false);
 
-	$ok_event_closes = (new CRadioButtonList('correlation_mode_name', (int) $data['correlation_mode']))
+	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 		->setModern(true)
