@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
-$page['title'] = _('Status of triggers');
+$page['title'] = _('Triggers');
 $page['scripts'] = ['class.cswitcher.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -197,7 +197,7 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 /*
  * Display
  */
-$triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
+$triggerWidget = (new CWidget())->setTitle(_('Triggers'));
 
 $rightForm = (new CForm('get'))
 	->addVar('fullscreen', $_REQUEST['fullscreen']);
