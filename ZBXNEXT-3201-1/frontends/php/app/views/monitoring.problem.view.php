@@ -24,6 +24,10 @@ $this->addJsFile('js/flickerfreescreen.js');
 $this->addJsFile('js/multiselect.js');
 require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
+
 $filter_column1 = (new CFormList())
 	->addRow(_('Show'),
 		(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
