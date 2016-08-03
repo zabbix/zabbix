@@ -6361,6 +6361,35 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 /******************************************************************************
  *                                                                            *
+ * Comments: helper function for DCconfig_get_time_based_triggers()           *
+ *                                                                            *
+ ******************************************************************************/
+static int	DCconfig_find_active_time_function(const char *expression)
+{
+	zbx_uint64_t		functionid;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+
+	while (SUCCEED == get_N_functionid(expression, 1, &functionid, &expression))
+	{
+		if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
+				SUCCEED == is_time_function(dc_function->function) &&
+				NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
+				ITEM_STATUS_ACTIVE == dc_item->status &&
+				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
+				HOST_STATUS_MONITORED == dc_host->status &&
+				SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
+		{
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_time_based_triggers                                 *
  *                                                                            *
  * Purpose: get triggers that have time-based functions (sorted by triggerid) *
@@ -6384,14 +6413,9 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
 		zbx_uint64_t start_triggerid, int process_num)
 {
-	int			i, found, start;
-	zbx_uint64_t		functionid;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_FUNCTION	*dc_function;
+	int			i, start;
 	ZBX_DC_TRIGGER		*dc_trigger;
-	const ZBX_DC_HOST	*dc_host;
 	DC_TRIGGER		*trigger;
-	const char		*p, *q;
 
 	LOCK_CACHE;
 
@@ -6402,55 +6426,8 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 	{
 		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
-		if (TRIGGER_STATUS_ENABLED != dc_trigger->status || 1 == dc_trigger->locked)
-			continue;
-
-		found = 0;
-
-		for (p = dc_trigger->expression; '\0' != *p; p++)
-		{
-			if ('{' != *p)
-				continue;
-
-			if ('$' == p[1])
-			{
-				int	macro_r, context_l, context_r;
-
-				if (SUCCEED == zbx_user_macro_parse(p, &macro_r, &context_l, &context_r))
-					p += macro_r;
-				else
-					p++;
-
-				continue;
-			}
-
-			for (q = p + 1; '}' != *q && '\0' != *q; q++)
-			{
-				if ('0' > *q || '9' < *q)
-					break;
-			}
-
-			if ('}' != *q)
-				continue;
-
-			sscanf(p + 1, ZBX_FS_UI64, &functionid);
-
-			if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
-					SUCCEED == is_time_function(dc_function->function) &&
-					NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
-					ITEM_STATUS_ACTIVE == dc_item->status &&
-					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
-					HOST_STATUS_MONITORED == dc_host->status &&
-					SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
-			{
-				found = 1;
-				break;
-			}
-
-			p = q;
-		}
-
-		if (1 == found)
+		if (TRIGGER_STATUS_ENABLED == dc_trigger->status && 0 == dc_trigger->locked &&
+				SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
 		{
 			dc_trigger->locked = 1;
 
