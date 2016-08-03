@@ -72,7 +72,7 @@ class CScreenTriggersOverview extends CScreenBase {
 		]);
 
 		$header = (new CDiv([
-			new CTag('h4', true, _('Triggers overview')),
+			new CTag('h4', true, _('Trigger overview')),
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 

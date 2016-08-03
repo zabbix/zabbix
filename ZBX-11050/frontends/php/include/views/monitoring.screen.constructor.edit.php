@@ -371,11 +371,9 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		)
 		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
-
-/*
- * Screen item: Status of triggers
- */
 elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS])) {
+	// Screen item: Triggers
+
 	$data = [];
 
 	if ($resourceType == SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
@@ -554,11 +552,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 				'&screenid='.$_REQUEST['screenid'].'");')
 	]);
 }
-
-/*
- * Screen item: Hosts info
- */
 elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_RESOURCE_TRIGGERS_INFO) {
+	// Screen item: Host info
+
 	$data = [];
 
 	if ($resourceId > 0) {

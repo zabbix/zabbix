@@ -30,7 +30,7 @@ $filterForm = (new CFilter($filter['filterid']))
 	->addVar('hostid', $filter['hostId']);
 
 $column1 = (new CFormList())
-	->addRow(_('Triggers status'),
+	->addRow(_('Trigger status'),
 		(new CComboBox('show_triggers', $filter['showTriggers'], null, [
 			TRIGGERS_OPTION_ALL => _('Any'),
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
