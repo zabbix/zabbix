@@ -241,11 +241,27 @@ class CScreenProblem extends CScreenBase {
 			unset($db_problem);
 		}
 
+		$form = (new CForm('get', 'zabbix.php'))
+			->setName('problem')
+			->cleanItems()
+			->addVar('backurl', 'zabbix.php?action=problem.view&uncheck=1');
+
+		if ($config['event_ack_enable']) {
+			$header_check_box = (new CColHeader(
+				(new CCheckBox('all_eventids'))
+					->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH);
+		}
+		else {
+			$header_check_box = null;
+		}
+
 		$link = 'zabbix.php?action=problem.view';
 
 		// create table
 		$table = (new CTableInfo())
 			->setHeader([
+				$header_check_box,
 				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
 				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
 					->addClass(ZBX_STYLE_CELL_WIDTH),
@@ -263,6 +279,7 @@ class CScreenProblem extends CScreenBase {
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
 			$url->setArgument('page', $this->data['page']);
+			$url->setArgument('uncheck', '1');
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
@@ -294,6 +311,9 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			$table->addRow([
+				$config['event_ack_enable']
+					? new CCheckBox('eventids['.$db_problem['eventid'].']', $db_problem['eventid'])
+					: null,
 				getSeverityCell($db_trigger['priority'], $config, null, $db_problem['r_eventid'] != 0),
 				(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
 				(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
@@ -313,6 +333,13 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput([$table, $paging], true, $this->data);
+		$footer = null;
+		if ($config['event_ack_enable']) {
+			$footer = new CActionButtonList('action', 'eventids', [
+				'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
+			]);
+		}
+
+		return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 	}
 }
