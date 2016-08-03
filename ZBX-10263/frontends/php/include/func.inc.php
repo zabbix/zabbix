@@ -1460,9 +1460,9 @@ function getPageNumber() {
 }
 
 /**
- * Returns paging line.
+ * Returns paging line and recursively slice $items of current page.
  *
- * @param array  $items				list of items
+ * @param array  $items				list of elements
  * @param string $sortorder			the order in which items are sorted ASC or DESC
  * @param CUrl $url					URL object containing arguments and query
  *
@@ -1471,7 +1471,20 @@ function getPageNumber() {
 function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
-	$rowsPerPage = CWebUser::$data['rows_per_page'];
+	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
+	$config = select_config();
+
+	$limit_exceeded = ($config['search_limit'] < count($items));
+
+	if ($limit_exceeded) {
+		if ($sortorder == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+	}
+
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 	$currentPage = getPageNumber();
@@ -1483,7 +1496,6 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$currentPage = $pagesCount;
 	}
 
-	$start = ($currentPage - 1) * $rowsPerPage;
 	$tags = [];
 
 	if ($pagesCount > 1) {
@@ -1497,7 +1509,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 		}
 
-		// viewed pages (better to use not odd)
+		// viewed pages (better to use odd)
 		$pagingNavRange = 11;
 
 		$endPage = $currentPage + floor($pagingNavRange / 2);
@@ -1511,11 +1523,15 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
 		if ($startPage > 1) {
+			// Adds link to first page.
+
 			$url->setArgument('page', 1);
 			$tags[] = new CLink(_('First'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
+			// Adds link to go to previous page.
+
 			$url->setArgument('page', $currentPage - 1);
 			$tags[] = new CLink(
 				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
@@ -1523,6 +1539,8 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 
 		for ($p = $startPage; $p <= $endPage; $p++) {
+			// Adds link of nth page.
+
 			$url->setArgument('page', $p);
 			$link = new CLink($p, $url->getUrl());
 			if ($p == $currentPage) {
@@ -1533,44 +1551,38 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 
 		if ($currentPage < $pagesCount) {
+			// Adds link to go to next page.
+
 			$url->setArgument('page', $currentPage + 1);
 			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 		}
 
 		if ($p < $pagesCount) {
+			// Adds link to last page.
+
 			$url->setArgument('page', $pagesCount);
 			$tags[] = new CLink(_('Last'), $url->getUrl());
 		}
 	}
 
+	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
+	$start = (($currentPage - 1) * $rowsPerPage) + 1;
+
 	if ($pagesCount == 1) {
-		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
+		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$config = select_config();
+		$end = $start - 1  + $rowsPerPage;
 
-		$end = $start + $rowsPerPage;
 		if ($end > $itemsCount) {
 			$end = $itemsCount;
 		}
-		$total = $itemsCount;
 
-		if ($config['search_limit'] < $itemsCount) {
-			if ($sortorder == ZBX_SORT_UP) {
-				array_pop($items);
-			}
-			else {
-				array_shift($items);
-			}
-
-			$total .= '+';
-		}
-
-		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
+		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start, $end, $total);
 	}
 
-	// trim array with items to contain items for current page
-	$items = array_slice($items, $start, $rowsPerPage, true);
+	// Trim array with elements to contain elements for current page.
+	$items = array_slice($items, $start - 1, $rowsPerPage, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
