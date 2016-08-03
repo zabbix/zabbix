@@ -89,14 +89,13 @@ class CScreenProblem extends CScreenBase {
 			+ ['preservekeys' => true]
 		);
 
-		$triggerids = [];
-		$ok_events_from = $now - $config['ok_period'];
+		if ($db_problems) {
+			$triggerids = [];
 
-		foreach ($db_problems as $eventid => $db_problem) {
-			$triggerids[$db_problem['objectid']] = true;
-		}
+			foreach ($db_problems as $eventid => $db_problem) {
+				$triggerids[$db_problem['objectid']] = true;
+			}
 
-		if ($triggerids) {
 			if ($this->data['filter']['application'] !== '') {
 				$db_applications = API::Application()->get(
 					['output' => []]
@@ -154,68 +153,68 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$triggers_hosts = getTriggersHostsList($db_triggers);
+
+			switch ($this->data['sort']) {
+				case 'host':
+					$triggers_hosts_list = [];
+					foreach ($triggers_hosts as $triggerid => $trigger_hosts) {
+						$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
+					}
+
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['host'] = $triggers_hosts_list[$db_problem['objectid']];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'host', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				case 'priority':
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'priority', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				case 'problem':
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['description'] = $db_triggers[$db_problem['objectid']]['description'];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'description', 'order' => $this->data['sortorder']],
+						['field' => 'objectid', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				default:
+					$sort_fields = [
+						['field' => 'clock', 'order' => $this->data['sortorder']],
+						['field' => 'ns', 'order' => $this->data['sortorder']]
+					];
+			}
+
+			CArrayHelper::sort($db_problems, $sort_fields);
+
+			$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1, true);
 		}
 
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
-
-		switch ($this->data['sort']) {
-			case 'host':
-				$triggers_hosts_list = [];
-				foreach ($triggers_hosts as $triggerid => $trigger_hosts) {
-					$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
-				}
-
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['host'] = $triggers_hosts_list[$db_problem['objectid']];
-				}
-				unset($db_problem);
-
-				$sort_fields = [
-					['field' => 'host', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
-
-			case 'priority':
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
-				}
-				unset($db_problem);
-
-				$sort_fields = [
-					['field' => 'priority', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
-
-			case 'problem':
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['description'] = $db_triggers[$db_problem['objectid']]['description'];
-				}
-				unset($db_problem);
-
-				$sort_fields = [
-					['field' => 'description', 'order' => $this->data['sortorder']],
-					['field' => 'objectid', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
-
-			default:
-				$sort_fields = [
-					['field' => 'clock', 'order' => $this->data['sortorder']],
-					['field' => 'ns', 'order' => $this->data['sortorder']]
-				];
-		}
-
-		CArrayHelper::sort($db_problems, $sort_fields);
-
-		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1, true);
 
 		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
 
