@@ -51,7 +51,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		// add groups
 		if (!empty($data['groups'])) {
-			API::HostGroup()->massAdd($options = [
+			API::HostGroup()->massAdd([
 				'hosts' => $data['hosts'],
 				'templates' => $data['templates'],
 				'groups' => $data['groups']
@@ -154,7 +154,7 @@ abstract class CHostGeneral extends CHostBase {
 				'templateids' => $hostTplIds['templateid']
 			]);
 
-			API::Itemprototype()->syncTemplates([
+			API::ItemPrototype()->syncTemplates([
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
 			]);
@@ -211,7 +211,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Unlinks the templates from the given hosts. If $tragetids is set to null, the templates will be unlinked from
+	 * Unlinks the templates from the given hosts. If $targetids is set to null, the templates will be unlinked from
 	 * all hosts.
 	 *
 	 * @param array      $templateids
@@ -387,7 +387,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($clear) {
 				// This will include deletion of linked application prototypes.
-				$result = API::Itemprototype()->delete($item_prototypeids, true);
+				$result = API::ItemPrototype()->delete($item_prototypeids, true);
 
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
