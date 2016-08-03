@@ -1471,7 +1471,7 @@ function getPageNumber() {
 function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
-	$rowsPerPage = CWebUser::$data['rows_per_page'];
+	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
 	$config = select_config();
 
 	$limit_exceeded = ($config['search_limit'] < count($items));
@@ -1572,7 +1572,6 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 	}
 	else {
 		$start = (($currentPage - 1) * $rowsPerPage) + 1;
-
 		$end = $start - 1  + $rowsPerPage;
 
 		if ($end > $itemsCount) {
@@ -1582,8 +1581,8 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start, $end, $total);
 	}
 
-	// trim array with items to contain items for current page
-	$items = array_slice($items, $start, $rowsPerPage, true);
+	// Trim array with elements to contain elements for current page.
+	$items = array_slice($items, $start - 1, $rowsPerPage, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
