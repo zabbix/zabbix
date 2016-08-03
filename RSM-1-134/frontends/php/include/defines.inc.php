@@ -927,7 +927,9 @@ define('RSM_DNS_DELAY',			'{$RSM.DNS.DELAY}');
 define('RSM_RDDS_DELAY',			'{$RSM.RDDS.DELAY}');
 define('RSM_TLD_DNSSEC_ENABLED',	'{$RSM.TLD.DNSSEC.ENABLED}');
 define('RSM_TLD_EPP_ENABLED',		'{$RSM.TLD.EPP.ENABLED}');
-define('RSM_TLD_RDDS_ENABLED',		'{$RSM.TLD.RDDS.ENABLED}');
+define('RSM_TLD_RDDS43_ENABLED',	'{$RSM.TLD.RDDS43.ENABLED}');
+define('RSM_TLD_RDDS80_ENABLED',	'{$RSM.TLD.RDDS80.ENABLED}');
+define('RSM_TLD_RDAP_ENABLED',		'{$RSM.TLD.RDAP.ENABLED}');
 define('RSM_SLV_NS_AVAIL',			'{$RSM.SLV.NS.AVAIL}');
 define('RSM_SLV_DNS_TCP_RTT',		'{$RSM.SLV.DNS.TCP.RTT}');
 define('RSM_DNS_TCP_RTT_LOW',		'{$RSM.DNS.TCP.RTT.LOW}');
@@ -1035,6 +1037,8 @@ define('PROBE_RDDS43_RTT',			'rsm.rdds.43.rtt[{$RSM.TLD}]');
 define('PROBE_RDDS43_UPD',			'rsm.rdds.43.upd[{$RSM.TLD}]');
 define('PROBE_RDDS80_IP',			'rsm.rdds.80.ip[{$RSM.TLD}]');
 define('PROBE_RDDS80_RTT',			'rsm.rdds.80.rtt[{$RSM.TLD}]');
+define('PROBE_RDAP_IP',				'rsm.rdds.rdap.ip[{$RSM.TLD}]');
+define('PROBE_RDAP_RTT',			'rsm.rdds.rdap.rtt[{$RSM.TLD}]');
 
 // SLA monitoring NS names
 define('NS_NO_RESULT',	0);

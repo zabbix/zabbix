@@ -184,7 +184,7 @@ foreach my $service (keys(%{$services}))
 		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
 		$services->{$service}->{'max_value'} = get_macro_rdds_rtt_low();
 		$services->{$service}->{'minonline'} = get_macro_rdds_probe_online();
-		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80, 4 - only RDAP, 5 - without 43, 6 - without 80, 7 - without RDAP
 		$services->{$service}->{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 		$services->{$service}->{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 		$services->{$service}->{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
@@ -724,7 +724,7 @@ foreach (keys(%$servicedata))
 							if (!defined($cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'}))
 							{
 								$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} =
-									__interface_status($interface, $probe_result_ref->{'value'}, $services->{$service});
+									interface_status($interface, $probe_result_ref->{'value'}, $services->{$service});
 							}
 						}
 					}
@@ -1107,7 +1107,8 @@ sub __create_cycle_hash
 				$probe_ref->{'status'} = ($dnssec_success_ns >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
 			}
 
-			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 ||
+					$interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
 			{
 				$test_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
 
@@ -1117,7 +1118,8 @@ sub __create_cycle_hash
 			push(@{$interface_ref->{'probes'}}, $probe_ref);
 		}
 
-		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 ||
+				$interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
 		{
 			my $interface_status;
 
@@ -1183,37 +1185,6 @@ sub __check_test
 	return E_FAIL unless ($value);
 
 	return (is_service_error($value) == SUCCESS or $value > $max_value) ? E_FAIL : SUCCESS;
-}
-
-sub __interface_status
-{
-	my $interface = shift;
-	my $value = shift;
-	my $service_ref = shift;
-
-	my $status;
-
-	if ($interface eq JSON_INTERFACE_DNS)
-	{
-		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	elsif ($interface eq JSON_INTERFACE_DNSSEC)
-	{
-		# TODO: dnssec status on a particular probe is not supported currently,
-		# make this calculation in function __create_cycle_hash() for now.
-	}
-	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
-	{
-		my $service_only = ($interface eq JSON_INTERFACE_RDDS43 ? 2 : 3);	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
-
-		$status = (($value == 1 || $value == $service_only) ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	else
-	{
-		fail("$interface: unsupported interface");
-	}
-
-	return $status;
 }
 
 __END__

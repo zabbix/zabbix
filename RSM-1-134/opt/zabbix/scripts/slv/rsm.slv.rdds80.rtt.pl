@@ -60,7 +60,7 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds('RDDS');
+        $tlds_ref = get_tlds('RDDS80');
 }
 
 my $month_cycles = get_num_cycles($from, $month_till, $delay);
@@ -102,7 +102,7 @@ while ($tld_index < $tld_count)
 		{
 			if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
 			{
-				wrn("configuration error: RDDS80 monthly Query resulution RTT item not found (\"$test_key\")");
+				wrn("configuration error: RDDS80 monthly Query resolution RTT item not found (\"$test_key\")");
 				exit(0);
 			}
 

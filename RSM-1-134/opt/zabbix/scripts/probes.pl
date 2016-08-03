@@ -19,7 +19,8 @@ use constant HOST_STATUS_PROXY_ACTIVE => 5;
 use constant true => 1;
 use constant false => 0;
 
-my %macros = ('{$RSM.EPP.ENABLED}' => 0, '{$RSM.IP4.ENABLED}' => 0, '{$RSM.IP6.ENABLED}' => 0, '{$RSM.RDDS.ENABLED}' => 0);
+my %macros = ('{$RSM.EPP.ENABLED}' => 0, '{$RSM.IP4.ENABLED}' => 0, '{$RSM.IP6.ENABLED}' => 0,
+		'{$RSM.RDDS43.ENABLED}' => 0, '{$RSM.RDDS80.ENABLED}' => 0, '{$RSM.RDAP.ENABLED}' => 0);
 
 sub add_probe($$);
 sub delete_probe($);
@@ -30,7 +31,7 @@ sub usage;
 
 my %OPTS;
 my $rv = GetOptions(\%OPTS, "probe=s", "ip=s",
-			    "epp!", "ipv4!", "ipv6!", "rdds!", "resolver=s",
+			    "epp!", "ipv4!", "ipv6!", "rdds43!", "rdds80!", "rdap!", "resolver=s",
                 	    "delete!", "disable!", "add!",
                 	    "verbose!", "quiet!", "help|?");
 
@@ -104,7 +105,8 @@ sub add_probe($$) {
 
     print "Creating '$probe_name' template: ";
 
-    $probe_tmpl = create_probe_template($probe_name, $OPTS{'epp'}, $OPTS{'ipv4'}, $OPTS{'ipv6'}, $OPTS{'rdds'}, $OPTS{'resolver'});
+	$probe_tmpl = create_probe_template($probe_name, $OPTS{'epp'}, $OPTS{'ipv4'}, $OPTS{'ipv6'}, $OPTS{'rdds43'},
+			$OPTS{'rdds80'}, $OPTS{'rdap'}, $OPTS{'resolver'});
 
     is_not_empty($probe_tmpl, true);
 
@@ -456,8 +458,14 @@ Options for adding new probe. Argument --add.
 	--ipv6
 		Enable IPv6 support for the Probe
 		(default: disabled)
-	--rdds
-		Enable RDDS support for the Probe
+	--rdds43
+		Enable RDDS43 support for the Probe
+		(default: disabled)
+	--rdds80
+		Enable RDDS80 support for the Probe
+		(default: disabled)
+	--rdap
+		Enable RDAP support for the Probe
 		(default: disabled)
 	--resolver
 		The name of resolver
@@ -496,7 +504,9 @@ sub validate_input {
     $OPTS{'epp'} = 0 unless defined($OPTS{'epp'});
     $OPTS{'ipv4'} = 0 unless defined($OPTS{'ipv4'});
     $OPTS{'ipv6'} = 0 unless defined($OPTS{'ipv6'});
-    $OPTS{'rdds'} = 0 unless defined($OPTS{'rdds'});
+    $OPTS{'rdds43'} = 0 unless defined($OPTS{'rdds43'});
+    $OPTS{'rdds80'} = 0 unless defined($OPTS{'rdds80'});
+    $OPTS{'rdap'} = 0 unless defined($OPTS{'rdap'});
 
     if (defined($msg)) {
         print($msg);

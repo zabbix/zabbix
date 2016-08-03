@@ -214,6 +214,28 @@ if ($mainEvent) {
 		case RSM_SLV_RDDS_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_RDDS_FAIL, CALCULATED_ITEM_RDDS_RECOVERY, CALCULATED_ITEM_RDDS_DELAY);
 			$data['type'] = RSM_RDDS;
+
+			$templates = API::Template()->get(array(
+				'output' => array('templateid'),
+				'filter' => array(
+					'host' => 'Template '.$data['tld']['host']
+				),
+				'preservekeys' => true
+			));
+
+			$template = reset($templates);
+
+			$template_macros = API::UserMacro()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'hostids' => $template['templateid'],
+				'filter' => array(
+					'macro' => array(RSM_TLD_RDDS43_ENABLED, RSM_TLD_RDDS80_ENABLED, RSM_TLD_RDAP_ENABLED)
+				)));
+
+				$data['tld']['subservices'] = array();
+				foreach ($template_macros as $template_macro) {
+					$data['tld']['subservices'][$template_macro['macro']] = $template_macro['value'];
+				}
 			break;
 		case RSM_SLV_EPP_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_EPP_FAIL, CALCULATED_ITEM_EPP_RECOVERY, CALCULATED_ITEM_EPP_DELAY);
