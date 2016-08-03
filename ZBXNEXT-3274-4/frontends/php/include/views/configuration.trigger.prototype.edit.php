@@ -453,8 +453,9 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 }
 
 if ($data['limited']) {
-	$triggersFormList->addVar('type', (int) $data['type'])
-		->addVar('correlation_mode', (int) $data['correlation_mode']);
+	$triggersFormList
+		->addVar('type', $data['type'])
+		->addVar('correlation_mode', $data['correlation_mode']);
 
 	$problem_event_generation_mode = (new CRadioButtonList('type_name', (int) $data['type']))
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
