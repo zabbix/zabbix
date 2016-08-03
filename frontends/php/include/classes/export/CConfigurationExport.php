@@ -1037,9 +1037,9 @@ class CConfigurationExport {
 			foreach ($screen['screenitems'] as $screenItem) {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_HOST_INFO:
+						case SCREEN_RESOURCE_TRIGGER_INFO:
+						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -1091,9 +1091,9 @@ class CConfigurationExport {
 			foreach ($screen['screenitems'] as &$screenItem) {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_HOST_INFO:
+						case SCREEN_RESOURCE_TRIGGER_INFO:
+						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];

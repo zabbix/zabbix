@@ -83,11 +83,11 @@ $screenResources = screen_resources();
 if ($this->data['screen']['templateid']) {
 	unset(
 		$screenResources[SCREEN_RESOURCE_DATA_OVERVIEW], $screenResources[SCREEN_RESOURCE_ACTIONS],
-		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOSTS_INFO],
+		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOST_INFO],
 		$screenResources[SCREEN_RESOURCE_MAP], $screenResources[SCREEN_RESOURCE_SCREEN],
 		$screenResources[SCREEN_RESOURCE_SERVER_INFO], $screenResources[SCREEN_RESOURCE_HOSTGROUP_TRIGGERS],
 		$screenResources[SCREEN_RESOURCE_HOST_TRIGGERS], $screenResources[SCREEN_RESOURCE_SYSTEM_STATUS],
-		$screenResources[SCREEN_RESOURCE_TRIGGERS_INFO], $screenResources[SCREEN_RESOURCE_TRIGGERS_OVERVIEW]
+		$screenResources[SCREEN_RESOURCE_TRIGGER_INFO], $screenResources[SCREEN_RESOURCE_TRIGGER_OVERVIEW]
 	);
 }
 
@@ -481,7 +481,7 @@ elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
 /*
  * Screen item: Overviews
  */
-elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
 	$data = [];
 
 	if ($resourceId > 0) {
@@ -552,7 +552,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 				'&screenid='.$_REQUEST['screenid'].'");')
 	]);
 }
-elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_RESOURCE_TRIGGERS_INFO) {
+elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RESOURCE_TRIGGER_INFO) {
 	// Screen item: Host info
 
 	$data = [];
@@ -644,7 +644,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 /*
  * Append common fields
  */
-if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO])) {
+if (in_array($resourceType, [SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO])) {
 	$screenFormList->addRow(_('Style'),
 		(new CRadioButtonList('style', (int) $style))
 			->addValue(_('Horizontal'), STYLE_HORIZONTAL)
@@ -652,7 +652,7 @@ if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGER
 			->setModern(true)
 	);
 }
-elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
 	$screenFormList->addRow(_('Hosts location'),
 		(new CRadioButtonList('style', (int) $style))
 			->addValue(_('Left'), STYLE_LEFT)
