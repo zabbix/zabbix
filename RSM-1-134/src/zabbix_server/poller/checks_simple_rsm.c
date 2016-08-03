@@ -684,7 +684,7 @@ out:
 }
 
 static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
-		const char *testprefix, const char *domain, FILE *log_fd, int *rtt, int *upd, char ipv4_enabled,
+		const char *testprefix, const char *domain, FILE *log_fd, int *rtt, int *upd_ptr, char ipv4_enabled,
 		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
 {
 	char		testname[ZBX_HOST_BUF_SIZE], *host, *last_label = NULL;
@@ -739,12 +739,16 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 
 	ldns_pkt_print(log_fd, pkt);
 
+	zbx_rsm_info(log_fd, "DIM start referral validation?");
+
 	if (0 != epp_enabled)
 	{
 		/* start referral validation */
 
+		zbx_rsm_info(log_fd, "DIM start referral validation");
+
 		/* no AA flag */
-		if (0 != ldns_pkt_aa(pkt))
+		if (0 != ldns_pkt_aa(pkt) && 0)
 		{
 			zbx_snprintf(err, err_size, "AA flag is set in the answer of \"%s\" from nameserver \"%s\" (%s)",
 					testname, ns, ip);
@@ -768,7 +772,8 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 			goto out;
 		}
 
-		if (NULL == (nsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NS,
+		/*if (NULL == (nsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NS,*/
+		if (NULL == (nsset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NS,
 				LDNS_SECTION_AUTHORITY)))
 		{
 			zbx_snprintf(err, err_size, "no NS records of \"%s\" at nameserver \"%s\" (%s)", last_label,
@@ -779,9 +784,13 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 
 		/* end referral validation */
 
-		if (NULL != upd)
+		zbx_rsm_info(log_fd, "DIM end referral validation");
+
+		if (NULL != upd_ptr)
 		{
 			/* extract UNIX timestamp of random NS record */
+
+			zbx_rsm_info(log_fd, "DIM upd_ptr!=NULL");
 
 			rr = ldns_rr_list_rr(nsset, zbx_random(ldns_rr_list_rr_count(nsset)));
 			host = ldns_rdf2str(ldns_rr_rdf(rr, 0));
@@ -791,7 +800,7 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 			{
 				zbx_snprintf(err, err_size, "cannot extract Unix timestamp from %s", host);
 				zbx_free(host);
-				*upd = ZBX_EC_DNS_NS_NOTS;
+				*upd_ptr = ZBX_EC_DNS_NS_NOTS;
 				goto out;
 			}
 
@@ -802,14 +811,14 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 				zbx_snprintf(err, err_size, "Unix timestamp of %s is in the future (current: %lu)",
 						host, now);
 				zbx_free(host);
-				*upd = ZBX_EC_DNS_NS_ETS;
+				*upd_ptr = ZBX_EC_DNS_NS_ETS;
 				goto out;
 			}
 
 			zbx_free(host);
 
 			/* successful update time */
-			*upd = now - ts;
+			*upd_ptr = now - ts;
 		}
 
 		if (NULL != keys)	/* DNSSEC enabled */
@@ -836,8 +845,8 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 	/* no errors */
 	ret = SUCCEED;
 out:
-	if (NULL != upd)
-		zbx_rsm_infof(log_fd, "RSM DNS \"%s\" (%s) RTT:%d UPD:%d", ns, ip, *rtt, *upd);
+	if (NULL != upd_ptr)
+		zbx_rsm_infof(log_fd, "RSM DNS \"%s\" (%s) RTT:%d UPD:%d", ns, ip, *rtt, *upd_ptr);
 	else
 		zbx_rsm_infof(log_fd, "RSM DNS \"%s\" (%s) RTT:%d", ns, ip, *rtt);
 
@@ -1597,8 +1606,9 @@ void	set_dns_test_data(zbx_uint64_t hostid, int dns_test_step, int dns_test_upd_
 
 int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
-	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], *res_ip = NULL, *testprefix = NULL, idx,
-			dbrec_found;
+	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], *res_ip = NULL, idx, *testprefix = NULL,
+			*testprefix_epp = NULL, dbrec_found;
+	const char	*testprefix_ptr;
 	proto_data_t	protos[TCP_PROTO_IDX + 1];
 	ldns_resolver	*res = NULL;
 	ldns_rr_list	*keys = NULL;
@@ -1606,9 +1616,9 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM		*items = NULL;
 	zbx_ns_t	*nss = NULL;
 	size_t		i, j, items_num = 0, nss_num = 0;
-	int		ipv4_enabled, ipv6_enabled, ipv_flags = 0, dnssec_enabled, epp_enabled, minns, test_result,
+	int		ipv4_enabled, ipv6_enabled, ipv_flags = 0, dnssec_enabled, epp_enabled, minns, test_result, upd,
 			dns_test_step, dns_test_upd_step, dns_test_rec_step, max_test_step, max_upd_step, max_rec_step,
-			ret = SYSINFO_RET_FAIL;
+			*upd_ptr = NULL, ret = SYSINFO_RET_FAIL;
 
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
@@ -1674,6 +1684,13 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
+	if (0 != epp_enabled && SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_TESTPREFIX_EPP,
+			&testprefix_epp, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
 	if (0 == strcmp(testprefix, "*randomtld*"))
 	{
 		zbx_free(testprefix);
@@ -1698,19 +1715,40 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	get_dns_test_data(item->host.hostid, &dns_test_step, &dns_test_upd_step, &dns_test_rec_step, &dbrec_found);
 
+	/* adjust step steps according to possible macro values change */
+	if (dns_test_step > max_test_step)
+		dns_test_step = max_test_step;
+
+	if (dns_test_upd_step > max_upd_step)
+		dns_test_upd_step = max_upd_step;
+
+	if (dns_test_rec_step > max_rec_step)
+		dns_test_rec_step = max_rec_step;
+
+	if (0 != epp_enabled && max_upd_step == dns_test_upd_step)
+	{
+		testprefix_ptr = testprefix_epp;
+		upd_ptr = &upd;
+	}
+	else
+	{
+		testprefix_ptr = testprefix;
+		upd_ptr = NULL;
+	}
+
 	protos[UDP_PROTO_IDX].proto = ZBX_RSM_UDP;
 	protos[TCP_PROTO_IDX].proto = ZBX_RSM_TCP;
 
 	for (idx = UDP_PROTO_IDX; idx <= TCP_PROTO_IDX; idx++)
 	{
-		char	proto = protos[idx].proto, keybuf[12];	/* rsm.dns.[udp|tcp] */
-		int	upd, res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
+		char		proto = protos[idx].proto, keybuf[12];	/* rsm.dns.[udp|tcp] */
+		int		res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
 
 		if (0 != dns_test_step)
 		{
 			/* normal mode */
-			if ((ZBX_RSM_UDP == proto && max_test_step == dns_test_step) ||			/* no UDP */
-					(ZBX_RSM_TCP == proto && max_test_step != dns_test_step))	/* no TCP */
+			if ((ZBX_RSM_UDP == proto && dns_test_step == max_test_step) ||			/* no UDP */
+					(ZBX_RSM_TCP == proto && dns_test_step != max_test_step))	/* no TCP */
 			{
 				protos[idx].res = ZBX_NOT_PERFORMED;
 				continue;
@@ -1718,11 +1756,6 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		}
 
 		protos[idx].res = 0;
-
-		if (0 != epp_enabled && max_upd_step == dns_test_upd_step)
-			upd = 0;
-		else
-			upd = ZBX_NOT_PERFORMED;
 
 		zbx_snprintf(keybuf, sizeof(keybuf), "%s.%s", keyname, (ZBX_RSM_UDP == proto ? "udp" : "tcp"));
 
@@ -1754,7 +1787,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 			goto out;
 		}
 
-		zbx_rsm_infof(log_fd, ZBX_FS_UI64 ":%s upd:%s rtt:%d", item->host.hostid, keybuf, (ZBX_NOT_PERFORMED == upd ? "NO" : "YES"), rtt_limit);
+		zbx_rsm_infof(log_fd, ZBX_FS_UI64 ":%s upd:%s rtt:%d testprefix:%s", item->host.hostid, keybuf, (NULL == upd_ptr ? "NO" : "YES"), rtt_limit, testprefix_ptr);
 
 		/* get DNSKEY records */
 		if (0 != dnssec_enabled && SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec,
@@ -1769,11 +1802,12 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 			for (j = 0; j < nss[i].ips_num; j++)
 			{
+				upd = ZBX_NOT_PERFORMED;
+
 				if (ZBX_EC_NOERROR == res_ec)
 				{
 					if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys,
-							testprefix, domain, log_fd, &rtt,
-							(ZBX_NOT_PERFORMED != upd ? &upd : NULL), ipv4_enabled,
+							testprefix_ptr, domain, log_fd, &rtt, upd_ptr, ipv4_enabled,
 							ipv6_enabled, epp_enabled, err, sizeof(err)))
 					{
 						zbx_rsm_err(log_fd, err);
@@ -1884,6 +1918,7 @@ out:
 	if (0 != ISSET_MSG(result))
 		zbx_rsm_err(log_fd, result->msg);
 
+	zbx_free(testprefix_epp);
 	zbx_free(testprefix);
 	zbx_free(res_ip);
 

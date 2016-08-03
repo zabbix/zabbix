@@ -118,6 +118,7 @@ my $rv = GetOptions(\%OPTS,
 		    "epp-commands=s",
 		    "epp-serverid=s",
 		    "epp-test-prefix=s",
+		    "dns-test-prefix-epp=s",
 		    "epp-servercert=s",
 		    "ns-servers-v4=s",
 		    "ns-servers-v6=s",
@@ -997,6 +998,8 @@ sub create_epp_objects($$$$) {
     create_macro('{$RSM.EPP.SERVERCERTMD5}', get_md5($OPTS{'epp-servercert'}), $templateid, true, $is_new);
     create_macro('{$RSM.EPP.SERVERS}', $OPTS{'epp-servers'}, $templateid, true, $is_new);
 
+    create_macro('{$RSM.DNS.TESTPREFIX.EPP}', $OPTS{'dns-test-prefix-epp'}, $templateid, true, $is_new);
+
     my $passphrase = get_sensdata("Enter EPP secret key passphrase: ");
     my $passwd = get_sensdata("Enter EPP password: ");
     create_macro('{$RSM.EPP.PASSWD}', get_encrypted_passwd($keysalt, $passphrase, $passwd), $templateid, true, $is_new);
@@ -1447,6 +1450,8 @@ Other options
                 specify expected EPP Server ID string in reply
 	--epp-test-prefix=STRING
                 this string represents DOMAIN (in DOMAIN.TLD) to use in EPP commands
+	--dns-test-prefix-epp=STRING
+                this string represents DOMAIN (in DOMAIN.TLD) to use in DNS test for "update time" check
 	--epp-commands
                 path to a directory on the Probe Node containing EPP command templates
 		(default: /opt/test-sla/epp-commands/TLD)
@@ -1516,7 +1521,8 @@ sub validate_input {
     if ($OPTS{'epp-servers'} or defined($OPTS{'only-epp'})) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
 	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
-	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
+	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-test-prefix'});
+	$msg .= "DNS domain test prefix for \"update time\" check must be specified (--dns-test-prefix-epp)\n" unless ($OPTS{'dns-test-prefix-epp'});
 	if (!$OPTS{'epp-cert'}) {
 	    $msg .= "EPP Client certificate file must be specified (--epp-cert)\n";
 	} elsif (! -r $OPTS{'epp-cert'}) {
