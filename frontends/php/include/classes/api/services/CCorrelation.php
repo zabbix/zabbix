@@ -94,7 +94,7 @@ class CCorrelation extends CApiService {
 					);
 					$filter = reset($filter);
 
-					if (isset($filter['conditions'])) {
+					if (array_key_exists('conditions', $filter)) {
 						foreach ($filter['conditions'] as &$condition) {
 							unset($condition['correlationid'], $condition['corr_conditionid']);
 						}
@@ -917,7 +917,7 @@ class CCorrelation extends CApiService {
 	 * Converts a formula with letters to a formula with IDs and updates it.
 	 *
 	 * @param string 	$correlationid
-	 * @param string 	$formula_with_letters		formula with letters
+	 * @param string 	$formula_with_letters		Formula with letters.
 	 * @param array 	$conditions
 	 */
 	protected function updateFormula($correlationid, $formula_with_letters, array $conditions) {
@@ -1357,11 +1357,21 @@ class CCorrelation extends CApiService {
 		return $conditions;
 	}
 
+	/**
+	 * Apply query output options.
+	 *
+	 * @param type $table_name
+	 * @param type $table_alias
+	 * @param array $options
+	 * @param array $sql_parts
+	 *
+	 * @return array
+	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ($options['countOutput'] === null) {
-			// add filter fields
+			// Add filter fields.
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
 					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
@@ -1378,6 +1388,14 @@ class CCorrelation extends CApiService {
 		return $sql_parts;
 	}
 
+	/**
+	 * Extend result with requested objects.
+	 *
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @return array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1395,7 +1413,7 @@ class CCorrelation extends CApiService {
 				foreach ($result as $correlation) {
 					$filters[$correlation['correlationid']] = [
 						'evaltype' => $correlation['evaltype'],
-						'formula' => isset($correlation['formula']) ? $correlation['formula'] : '',
+						'formula' => array_key_exists('formula', $correlation) ? $correlation['formula'] : '',
 						'conditions' => []
 					];
 				}
@@ -1509,7 +1527,6 @@ class CCorrelation extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($operations, 'correlationid', 'corr_operationid');
-			$operationids = $relation_map->getRelatedIds();
 
 			foreach ($operations as &$operation) {
 				unset($operation['correlationid'], $operation['corr_operationid']);
@@ -1525,7 +1542,7 @@ class CCorrelation extends CApiService {
 	/**
 	 * Returns true if the given correlations exist and are available for writing.
 	 *
-	 * @param array $correlationids				An array if there are correlation IDs
+	 * @param array $correlationids				An array if there are correlation IDs.
 	 *
 	 * @return bool
 	 */
@@ -1533,7 +1550,7 @@ class CCorrelation extends CApiService {
 		if (!is_array($correlationids)) {
 			return false;
 		}
-		elseif (empty($correlationids)) {
+		elseif (!$correlationids) {
 			return true;
 		}
 
