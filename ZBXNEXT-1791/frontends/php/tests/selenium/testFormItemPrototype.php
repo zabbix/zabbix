@@ -1943,17 +1943,6 @@ class testFormItemPrototype extends CWebTest {
 					]
 				]
 			],
-			// Trends
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item trends Check',
-					'key' => 'item-trends-test',
-					'trends' => 'trends',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2139,8 +2128,8 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
-					'dbCheck' => true,
 					'params_ap' => 'SELECT * FROM items',
+					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],

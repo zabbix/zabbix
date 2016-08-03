@@ -50,7 +50,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, Japanese, Polish, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page; thanks to 1N3 at Early Warning Services, LLC (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.4rc1
@@ -1476,7 +1476,7 @@ Bug fixes:
 Changes for 2.2.14
 
 Bug fixes:
-..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page; thanks to 1N3 at Early Warning Services, LLC (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14rc1
