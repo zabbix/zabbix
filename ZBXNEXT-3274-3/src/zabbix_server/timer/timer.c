@@ -53,7 +53,6 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 	DC_TRIGGER		trigger_info[ZBX_TRIGGERS_MAX];
 	zbx_vector_ptr_t	trigger_order, trigger_diff;
 	zbx_vector_uint64_t	triggerids;
-	zbx_uint64_t		next_triggerid = 0;
 	int			events_num, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -63,13 +62,10 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_create(&triggerids);
 
-	while (SUCCEED == DCconfig_get_time_based_triggers(trigger_info, &trigger_order, ZBX_TRIGGERS_MAX,
-			next_triggerid, process_num))
+	while (SUCCEED == DCconfig_get_time_based_triggers(trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, process_num))
 	{
 		for (i = 0; i < trigger_order.values_num; i++)
 			zbx_vector_uint64_append(&triggerids, trigger_info[i].triggerid);
-
-		next_triggerid = trigger_info[trigger_order.values_num - 1].triggerid + 1;
 
 		*triggers_count += trigger_order.values_num;
 
