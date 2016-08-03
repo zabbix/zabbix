@@ -6373,16 +6373,28 @@ static int	DCconfig_find_active_time_function(const char *expression)
 
 	while (SUCCEED == get_N_functionid(expression, 1, &functionid, &expression))
 	{
-		if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
-				SUCCEED == is_time_function(dc_function->function) &&
-				NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
-				ITEM_STATUS_ACTIVE == dc_item->status &&
-				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
-				HOST_STATUS_MONITORED == dc_host->status &&
-				SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
-		{
-			return SUCCEED;
-		}
+		if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)))
+			continue;
+
+		if (SUCCEED != is_time_function(dc_function->function))
+			continue;
+
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
+			continue;
+
+		return SUCCEED;
 	}
 
 	return FAIL;
