@@ -107,8 +107,8 @@ class testInheritanceGraph extends CWebTest {
 
 		foreach ($data['addItems'] as $item) {
 			$this->zbxTestLaunchPopup('add_item');
-			$this->zbxTestClickLinkText($item['itemName']);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestClickLinkTextWait($item['itemName']);
+			$this->zbxTestWaitWindowClose();
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
