@@ -2032,9 +2032,12 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
 
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait('Simple form test host');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 // add target group Zabbix servers
@@ -2042,8 +2045,11 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host group');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command');
