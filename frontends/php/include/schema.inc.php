@@ -2807,12 +2807,6 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'problem_count' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 		],
 	],
 	'trigger_depends' => [
