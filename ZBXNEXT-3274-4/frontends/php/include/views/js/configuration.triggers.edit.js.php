@@ -41,7 +41,7 @@
 			);
 			$('.recovery_expression_constructor_row')
 				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>);
-			$('#correlation_mode').closest('li')
+			$('#correlation_mode_row')
 				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
 					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>
 				);
@@ -53,7 +53,7 @@
 			var	recovery_mode = $('input[name=recovery_mode]:checked').val(),
 				correlation_mode = $('input[name=correlation_mode]:checked').val();
 
-			$('#correlation_tag').closest('li')
+			$('#correlation_tag_row')
 				.toggle((recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
 					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
 					&& correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
