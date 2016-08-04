@@ -3637,6 +3637,8 @@ static void	DCsync_actions(DB_RESULT result)
 
 		zbx_strpool_release(action->formula);
 
+		zbx_vector_ptr_destroy(&action->conditions);
+
 		zbx_hashset_iter_remove(&iter);
 	}
 
