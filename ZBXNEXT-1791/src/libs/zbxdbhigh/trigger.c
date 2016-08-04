@@ -66,7 +66,7 @@
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
+static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
 	const char	*__function_name = "zbx_process_trigger";
 
@@ -144,11 +144,14 @@ int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 		memset(diff, 0, sizeof(zbx_trigger_diff_t));
 
 		diff->triggerid = trigger->triggerid;
+		diff->priority = trigger->priority;
 		diff->flags = flags;
 
-		/* trigger problem_count and value will be calculated during event processing */
-		diff->problem_count = trigger->problem_count;
+		/* trigger value will be recalculated during event processing */
 		diff->value = trigger->value;
+
+		diff->problem_count = 0;
+		diff->correlated = 0;
 
 		if (0 != (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE))
 			diff->state = new_state;
@@ -164,7 +167,8 @@ int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s flags:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
+			flags);
 
 	return ret;
 }
@@ -204,13 +208,6 @@ void	zbx_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%clastchange=%d", delim, diff->lastchange);
-			delim = ',';
-		}
-
-		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cproblem_count=%d", delim,
-					diff->problem_count);
 			delim = ',';
 		}
 
