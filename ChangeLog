@@ -39,7 +39,7 @@ Bug fixes:
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
 ........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
 ........S. [ZBX-10971] fixed memory leak when action is removed from configuration (Sergejs)
-........S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ...G...... [ZBX-11015] fixed proc.cpu.util for non-privileged agent on Solaris (Sandis)
 ........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
@@ -1476,7 +1476,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
 ........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
-........S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
 
