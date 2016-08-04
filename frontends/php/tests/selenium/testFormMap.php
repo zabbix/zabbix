@@ -70,6 +70,7 @@ class testFormMap extends CWebTest {
 		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->zbxTestLogin('sysmaps.php');
+		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkTextWait($map_name);
 		$this->zbxTestClickWait('edit');
 
