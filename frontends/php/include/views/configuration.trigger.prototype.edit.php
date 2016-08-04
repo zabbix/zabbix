@@ -250,10 +250,6 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 
-if ($data['limited']) {
-	$triggersFormList->addVar('recovery_mode', (int) $data['recovery_mode']);
-}
-
 $triggersFormList->addRow(_('OK event generation'),
 	(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
 		->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
@@ -451,12 +447,6 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			'document.forms["'.$triggersForm->getName().'"].submit();'
 		);
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
-}
-
-if ($data['limited']) {
-	$triggersFormList
-		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode']);
 }
 
 $triggersFormList
