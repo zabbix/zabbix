@@ -1253,62 +1253,6 @@ static int	DBpatch_3010039(void)
 	return DBadd_foreign_key("problem_tag", 1, &field);
 }
 
-static int	DBpatch_3010040(void)
-{
-	const ZBX_FIELD	field = {"problem_count", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("triggers", &field);
-}
-
-static int	DBpatch_3010041(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		ret = FAIL, value, problem_count;
-	char		*sql = NULL;
-	size_t		sql_alloc = 4096, sql_offset = 0;
-
-	sql = zbx_malloc(NULL, sql_alloc);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	result = DBselect("select t.triggerid,count(p.objectid) from triggers t"
-				" left join problem p on p.source=0"
-					" and p.object=0"
-					" and p.objectid=t.triggerid"
-				" group by t.triggerid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		problem_count = atoi(row[1]);
-		value = (0 == problem_count ? 0 : 1);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update triggers"
-					" set value=%d,"
-					"problem_count=%d"
-				" where triggerid=%s;\n",
-				value, problem_count, row[0]);
-
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	DBfree_result(result);
-	zbx_free(sql);
-
-	return ret;
-}
-
 static int	DBpatch_3010042(void)
 {
 	if (ZBX_DB_OK <= DBexecute("update config set ok_period=%d where ok_period>%d", SEC_PER_DAY, SEC_PER_DAY))
@@ -1597,8 +1541,6 @@ DBPATCH_ADD(3010036, 0, 1)
 DBPATCH_ADD(3010037, 0, 1)
 DBPATCH_ADD(3010038, 0, 1)
 DBPATCH_ADD(3010039, 0, 1)
-DBPATCH_ADD(3010040, 0, 1)
-DBPATCH_ADD(3010041, 0, 1)
 DBPATCH_ADD(3010042, 0, 1)
 DBPATCH_ADD(3010043, 0, 1)
 DBPATCH_ADD(3010044, 0, 1)
