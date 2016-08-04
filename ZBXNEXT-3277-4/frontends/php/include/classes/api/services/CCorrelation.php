@@ -1538,30 +1538,4 @@ class CCorrelation extends CApiService {
 
 		return $result;
 	}
-
-	/**
-	 * Returns true if the given correlations exist and are available for writing.
-	 *
-	 * @param array $correlationids				An array if there are correlation IDs.
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $correlationids) {
-		if (!is_array($correlationids)) {
-			return false;
-		}
-		elseif (!$correlationids) {
-			return true;
-		}
-
-		$correlationids = array_unique($correlationids);
-
-		$count = $this->get([
-			'correlationids' => $correlationids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($correlationids) == $count);
-	}
 }

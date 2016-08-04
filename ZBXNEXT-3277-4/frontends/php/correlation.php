@@ -84,7 +84,7 @@ $correlationid = getRequest('correlationid');
 
 if ($correlationid !== null) {
 	$correlation = API::Correlation()->get([
-		'output' => ['correlationid'],
+		'output' => [],
 		'correlationids' => [$correlationid],
 		'editable' => true
 	]);
@@ -94,11 +94,21 @@ if ($correlationid !== null) {
 	}
 }
 
-$correlationids = getRequest('g_correlationid', []);
-$correlationids = zbx_toArray($correlationids);
+if (hasRequest('action')) {
+	if (!hasRequest('g_correlationid') || !is_array(getRequest('g_correlationid'))) {
+		access_deny();
+	}
+	else {
+		$correlations = API::Correlation()->get([
+			'correlationids' => getRequest('g_correlationid'),
+			'editable' => true,
+			'countOutput' => true
+		]);
 
-if ($correlationids && !API::Correlation()->isWritable($correlationids)) {
-	access_deny();
+		if ($correlations != count(getRequest('g_correlationid'))) {
+			access_deny();
+		}
+	}
 }
 
 if (hasRequest('add') || hasRequest('update')) {
