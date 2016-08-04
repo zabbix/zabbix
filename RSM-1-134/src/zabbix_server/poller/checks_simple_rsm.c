@@ -739,16 +739,12 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 
 	ldns_pkt_print(log_fd, pkt);
 
-	zbx_rsm_info(log_fd, "DIM start referral validation?");
-
 	if (0 != epp_enabled)
 	{
 		/* start referral validation */
 
-		zbx_rsm_info(log_fd, "DIM start referral validation");
-
 		/* no AA flag */
-		if (0 != ldns_pkt_aa(pkt) && 0)
+		if (0 != ldns_pkt_aa(pkt))
 		{
 			zbx_snprintf(err, err_size, "AA flag is set in the answer of \"%s\" from nameserver \"%s\" (%s)",
 					testname, ns, ip);
@@ -772,8 +768,7 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 			goto out;
 		}
 
-		/*if (NULL == (nsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NS,*/
-		if (NULL == (nsset = ldns_pkt_rr_list_by_type(pkt, LDNS_RR_TYPE_NS,
+		if (NULL == (nsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NS,
 				LDNS_SECTION_AUTHORITY)))
 		{
 			zbx_snprintf(err, err_size, "no NS records of \"%s\" at nameserver \"%s\" (%s)", last_label,
@@ -784,13 +779,9 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 
 		/* end referral validation */
 
-		zbx_rsm_info(log_fd, "DIM end referral validation");
-
 		if (NULL != upd_ptr)
 		{
 			/* extract UNIX timestamp of random NS record */
-
-			zbx_rsm_info(log_fd, "DIM upd_ptr!=NULL");
 
 			rr = ldns_rr_list_rr(nsset, zbx_random(ldns_rr_list_rr_count(nsset)));
 			host = ldns_rdf2str(ldns_rr_rdf(rr, 0));
@@ -1715,7 +1706,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	get_dns_test_data(item->host.hostid, &dns_test_step, &dns_test_upd_step, &dns_test_rec_step, &dbrec_found);
 
-	/* adjust step steps according to possible macro values change */
+	/* adjust steps according to possible macro value changes */
 	if (dns_test_step > max_test_step)
 		dns_test_step = max_test_step;
 
@@ -1786,8 +1777,6 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 			goto out;
 		}
-
-		zbx_rsm_infof(log_fd, ZBX_FS_UI64 ":%s upd:%s rtt:%d testprefix:%s", item->host.hostid, keybuf, (NULL == upd_ptr ? "NO" : "YES"), rtt_limit, testprefix_ptr);
 
 		/* get DNSKEY records */
 		if (0 != dnssec_enabled && SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec,
