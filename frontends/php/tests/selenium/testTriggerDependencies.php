@@ -32,8 +32,9 @@ class testTriggerDependencies extends CWebTest {
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
 
 		$this->zbxTestLogin('triggers.php?groupid=1&hostid='.$hostId);
+		$this->zbxTestCheckTitle('Configuration of triggers');
 
-		$this->zbxTestClickLinkText('{HOST.NAME} has just been restarted');
+		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
 		$this->zbxTestClickWait('tab_dependenciesTab');
 		$this->zbxTestClickWait('bnt1');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
