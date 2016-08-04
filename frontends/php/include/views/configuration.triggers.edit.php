@@ -50,9 +50,13 @@ if ($data['triggerid'] !== null) {
 	}
 }
 
-$readonly = false;
-if ($data['limited'] || $discovered_trigger) {
-	$readonly = true;
+$readonly = ($data['limited'] || $discovered_trigger);
+
+if ($readonly) {
+	$triggersForm
+		->addVar('recovery_mode', $data['recovery_mode'])
+		->addVar('type', $data['type'])
+		->addVar('correlation_mode', $data['correlation_mode']);
 }
 
 // Create form list.
@@ -466,11 +470,13 @@ $triggersFormList
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern(true)
-			->setEnabled(!$readonly)
+			->setEnabled(!$readonly),
+		'correlation_mode_row'
 	)
 	->addRow(_('Tag for matching'),
 		(new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'correlation_tag_row'
 	);
 
 // Append tags to form list.
