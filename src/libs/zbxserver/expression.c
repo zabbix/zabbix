@@ -70,7 +70,7 @@
  *                            function id (can be NULL)                       *
  *                                                                            *
  ******************************************************************************/
-static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
+int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
 {
 	enum state_t {NORMAL, ID}	state = NORMAL;
 	int				num = 0, ret = FAIL;
