@@ -308,7 +308,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
-		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, ((SQLUSMALLINT) i)+1, SQL_DESC_OCTET_LENGTH, NULL, 0,
+		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_DESC_OCTET_LENGTH, NULL, 0,
 				NULL, (SQLLEN *)&ColLenArray[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot execute ODBC query"))
 		{
