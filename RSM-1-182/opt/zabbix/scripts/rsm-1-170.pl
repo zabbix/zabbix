@@ -553,7 +553,7 @@ sub __create_missing_slv_montly_items_and_triggers
 		if ($rdds_enabled == 1)
 		{
 			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
-			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
+			__create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
 		}
 
 		if ($epp_enabled == 1)
