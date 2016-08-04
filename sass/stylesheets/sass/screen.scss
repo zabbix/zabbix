@@ -3052,6 +3052,9 @@ a.blue {
 	padding: 2px 3px;
 	text-align: center;
 	line-height: 1em;
+	max-width: 133px;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
 	@include border-radius(2px);
 
 	&:last-child {
