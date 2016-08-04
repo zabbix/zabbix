@@ -4790,7 +4790,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strmatch                                                     *
+ * Function: zbx_strmatch_condition                                           *
  *                                                                            *
  * Purpose: check if pattern matches the specified value                      *
  *                                                                            *
