@@ -21,13 +21,13 @@
 #include "zbxalgo.h"
 #include "db.h"
 
-DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag)
 {
-	return NULL;
+	return FAIL;
 }
 
 int	process_events()
