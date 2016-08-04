@@ -36,6 +36,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ...G...... [ZBX-11015] fixed proc.cpu.util for non-privileged agent on Solaris (Sandis)
 ........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
@@ -1470,6 +1471,7 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
 
