@@ -1146,28 +1146,6 @@ class testFormDiscoveryRule extends CWebTest {
 					'formCheck' => true
 				]
 			],
-			// Flexfields with negative number in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-negative flexdelay',
-					'key' => 'item-flex-negative-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
-			// Flexfields with symbols in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-symbols in flexdelay',
-					'key' => 'item-flex-symbols-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1507,11 +1485,12 @@ class testFormDiscoveryRule extends CWebTest {
 
 			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
-				$this->zbxTestInputType('delay_flex_'.$itemCount.'_period', $period['flexTime']);
-
 				if (isset($period['flexDelay'])) {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
+
+				$this->zbxTestInputType('delay_flex_'.$itemCount.'_period', $period['flexTime']);
+
 				$itemCount ++;
 				$this->zbxTestClickWait('interval_add');
 

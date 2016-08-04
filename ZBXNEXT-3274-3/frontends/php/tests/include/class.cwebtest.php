@@ -271,6 +271,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestInputTypeByXpath($xpath, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
 	}
 
@@ -367,21 +368,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitUntil($condition, $message) {
-		$this->webDriver->wait(30)->until($condition, $message);
+		$this->webDriver->wait(60)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestWaitUntilElementVisible($by) {
-		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 30 sec element still not visible');
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
 	public function zbxTestWaitUntilElementPresent($by) {
-		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
 	}
 
 	public function zbxTestWaitUntilMessageTextPresent($css, $string) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className($css));
-		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
 	public function zbxTestTabSwitch($tab) {
@@ -397,7 +398,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitWindowAndSwitchToIt($id) {
-		$this->webDriver->wait(31)->until(function () use ($id) {
+		$this->webDriver->wait(90)->until(function () use ($id) {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
 					if ($handles > 1) {
@@ -408,8 +409,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 				return false;
 			}
 		});
+	}
 
-		$this->zbxTestCheckFatalErrors();
+	public function zbxTestSwitchToNewWindow() {
+		$this->webDriver->wait(60)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles > 1) {
+						$all = $this->webDriver->getWindowHandles();
+						return $this->webDriver->switchTo()->window(end($all));
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
 	}
 
 	public function zbxTestWaitWindowClose() {

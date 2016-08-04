@@ -99,13 +99,14 @@ class testFormMap extends CWebTest {
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
-			$this->zbxTestClick('gridshow');
+			$this->zbxTestClickWait('gridshow');
 		}
 		if (($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)) {
-			$this->zbxTestClick('gridautoalign');
+			$this->zbxTestClickWait('gridautoalign');
 		}
 
 		$this->zbxTestClickWait('sysmap_update');
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::alertIsPresent());
 		$this->webDriver->switchTo()->alert()->accept();
 
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");

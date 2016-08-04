@@ -254,6 +254,7 @@ static int	is_recoverable_mysql_error(void)
 		case CR_CONNECTION_ERROR:
 		case CR_SERVER_LOST:
 		case CR_UNKNOWN_HOST:
+		case CR_COMMANDS_OUT_OF_SYNC:
 		case ER_SERVER_SHUTDOWN:
 		case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
 		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
