@@ -513,7 +513,7 @@ function makeEventsTags($events) {
 
 		foreach ($event['tags'] as $tag) {
 			if ($tags_count++ == EVENTS_LIST_TAGS_COUNT) {
-				$tags[$event['eventid']][] = '&hellip;';
+				$tags[$event['eventid']][] = '&nbsp;&hellip;';
 				break;
 			}
 			else {
