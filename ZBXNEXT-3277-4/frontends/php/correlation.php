@@ -46,7 +46,7 @@ $fields = [
 											IN([ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
 											null
 										],
-	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({action})'],
 	'conditions' =>						[null,		O_OPT,	null,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
 	'operations' =>						[null,		O_OPT,	null,	null,		null],
@@ -95,19 +95,14 @@ if ($correlationid !== null) {
 }
 
 if (hasRequest('action')) {
-	if (!hasRequest('g_correlationid') || !is_array(getRequest('g_correlationid'))) {
-		access_deny();
-	}
-	else {
-		$correlations = API::Correlation()->get([
-			'correlationids' => getRequest('g_correlationid'),
-			'editable' => true,
-			'countOutput' => true
-		]);
+	$correlations = API::Correlation()->get([
+		'countOutput' => true,
+		'correlationids' => getRequest('g_correlationid'),
+		'editable' => true
+	]);
 
-		if ($correlations != count(getRequest('g_correlationid'))) {
-			access_deny();
-		}
+	if ($correlations != count(getRequest('g_correlationid'))) {
+		access_deny();
 	}
 }
 
@@ -338,8 +333,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	unset($_REQUEST['new_operation']);
 }
 elseif (hasRequest('action')
-		&& str_in_array(getRequest('action'), ['correlation.massenable', 'correlation.massdisable'])
-		&& hasRequest('g_correlationid')) {
+		&& str_in_array(getRequest('action'), ['correlation.massenable', 'correlation.massdisable'])) {
 
 	$enable = (getRequest('action') === 'correlation.massenable');
 	$status = $enable ? ZBX_CORRELATION_ENABLED : ZBX_CORRELATION_DISABLED;
@@ -371,7 +365,7 @@ elseif (hasRequest('action')
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'correlation.massdelete' && hasRequest('g_correlationid')) {
+elseif (hasRequest('action') && getRequest('action') === 'correlation.massdelete') {
 	$result = API::Correlation()->delete(getRequest('g_correlationid'));
 
 	if ($result) {
