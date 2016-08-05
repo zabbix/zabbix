@@ -609,7 +609,7 @@ class CConfigurationExport {
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -878,7 +878,7 @@ class CConfigurationExport {
 
 		$triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
