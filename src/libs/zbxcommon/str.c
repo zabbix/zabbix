@@ -4796,7 +4796,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
  *                                                                            *
  * Parameters: value    - [IN] the value to match                             *
  *             pattern  - [IN] the pattern to match                           *
- *             op - [IN] the matching operator                                *
+ *             op       - [IN] the matching operator                          *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
