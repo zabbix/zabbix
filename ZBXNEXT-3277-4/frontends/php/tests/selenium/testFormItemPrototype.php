@@ -1871,28 +1871,6 @@ class testFormItemPrototype extends CWebTest {
 					'formCheck' => true
 				]
 			],
-			// Flexfields with negative number in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-negative flexdelay',
-					'key' => 'item-flex-negative-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
-			// Flexfields with symbols in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-symbols in flexdelay',
-					'key' => 'item-flex-symbols-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
 			// History
 			[
 				[
@@ -1926,15 +1904,6 @@ class testFormItemPrototype extends CWebTest {
 					'errors' => [
 							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
 					]
-				]
-			],
-			// History
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item history',
-					'key' => 'item-history-test',
-					'history' => 'days'
 				]
 			],
 			// Trends
@@ -1972,17 +1941,6 @@ class testFormItemPrototype extends CWebTest {
 					'errors' => [
 							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
 					]
-				]
-			],
-			// Trends
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item trends Check',
-					'key' => 'item-trends-test',
-					'trends' => 'trends',
-					'dbCheck' => true,
-					'formCheck' => true
 				]
 			],
 			[
@@ -2170,8 +2128,8 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
-					'dbCheck' => true,
 					'params_ap' => 'SELECT * FROM items',
+					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
@@ -2367,6 +2325,8 @@ class testFormItemPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
@@ -2406,7 +2366,8 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['params_ap'])) {
-			$this->zbxTestInputTypeWait('params_ap', $data['params_ap']);
+			$this->zbxTestTextPresent('SQL query');
+			$this->zbxTestInputTypeOverwrite('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {
@@ -2434,7 +2395,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestInputType('delay_flex_'.$itemCount.'_period', $period['flexTime']);
 
 				if (isset($period['flexDelay'])) {
-					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
+					$this->zbxTestInputTypeOverwrite('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
 				$this->zbxTestClickWait('interval_add');
@@ -2574,6 +2535,8 @@ class testFormItemPrototype extends CWebTest {
 			$this->webDriver->switchTo()->alert()->accept();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**
