@@ -143,7 +143,7 @@ static void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags)
 static void	zbx_signal_process_by_pid(int pid, int flags)
 {
 	union sigval	s;
-	int		i, found;
+	int		i, found = 0;
 
 	s.ZBX_SIVAL_INT = flags;
 
