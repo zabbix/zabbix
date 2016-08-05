@@ -762,8 +762,8 @@ class testFormGraph extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
-					'width' => 'name',
-					'height' => 'name',
+					'width' => '0',
+					'height' => '0',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'yaxismin' => 'name',
@@ -839,6 +839,8 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
@@ -932,14 +934,15 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 			$ymin_name = $data['ymin_name'];
 			$ymin_nameValue = $this->zbxTestGetValue("//input[@id='ymin_name']");
 			$this->assertEquals($ymin_nameValue, $this->host.": $ymin_name");
 		}
 
 		if (isset($data['ymax_name'])) {
-			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
+			$this->zbxTestClickWait('yaxis_max');
+			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup_item');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
@@ -947,7 +950,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 			$ymax_name = $data['ymax_name'];
 			$ymax_nameValue = $this->zbxTestGetValue("//input[@id='ymax_name']");
 			$this->assertEquals($ymax_nameValue, $this->host.": $ymax_name");
@@ -966,7 +969,7 @@ class testFormGraph extends CWebTest {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error-msg']);
 				$this->zbxTestCheckHeader('Graphs');
 				foreach ($data['errors'] as $msg) {
-				$this->zbxTestTextPresent($msg);
+					$this->zbxTestTextPresent($msg);
 				}
 				$this->zbxTestTextPresent(['Name', 'Width', 'Height']);
 				break;
@@ -988,6 +991,8 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestAssertElementValue('width', $width);
 			$this->zbxTestAssertElementValue('height', $height);
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**
