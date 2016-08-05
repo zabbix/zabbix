@@ -115,12 +115,8 @@ class CJson {
 	}
 
 	/**
-	 *
 	 * Default destructor; does nothing other than provide a safe fallback
 	 * for calls to parent::__destruct().
-	 *
-	 * @return void
-	 *
 	 */
 	public function __destruct() {
 	}
@@ -1041,8 +1037,6 @@ class CJson {
 	/**
 	 * Map the 128 ASCII characters into the 32 character classes.
 	 * The remaining Unicode characters should be mapped to S_ETC.
-	 *
-	 * @return void
 	 */
 	protected function _mapAscii() {
 		$this->_ascii_class = [
@@ -1073,8 +1067,6 @@ class CJson {
 	 * and returns either a new state or an action. A new state is a number between
 	 * 0 and 29. An action is a negative number between -1 and -9. A JSON text is
 	 * accepted if the end of the text is in state 9 and mode is MODE_DONE.
-	 *
-	 * @return void;
 	 */
 	protected function _setStateTransitionTable() {
 		$this->_state_transition_table = [
