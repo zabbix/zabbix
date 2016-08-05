@@ -32,8 +32,6 @@ class CTemplateImporter extends CImporter {
 	 * @throws Exception
 	 *
 	 * @param array $templates
-	 *
-	 * @return void
 	 */
 	public function import(array $templates) {
 		$templates = zbx_toHash($templates, 'host');
@@ -138,8 +136,6 @@ class CTemplateImporter extends CImporter {
 	 * @see checkCircularRecursive
 	 *
 	 * @param array $templates
-	 *
-	 * @return void
 	 */
 	protected function checkCircularTemplateReferences(array $templates) {
 		foreach ($templates as $name => $template) {

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with host groups.
- *
- * @package API
  */
 class CHostGroup extends CApiService {
 
@@ -175,31 +173,29 @@ class CHostGroup extends CApiService {
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
-		$sub_sql_parts = array();
+		$sub_sql_parts = [];
 
 		// monitored_hosts, real_hosts, templated_hosts, with_hosts_and_templates
 		if ($options['monitored_hosts'] !== null) {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
 		}
 		elseif ($options['real_hosts'] !== null) {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status',
-				array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)
-			);
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 		}
 		elseif ($options['templated_hosts'] !== null) {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_TEMPLATE));
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]);
 		}
 		elseif ($options['with_hosts_and_templates'] !== null) {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('h.status',
-				array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE)
+				[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 			);
 		}
 
@@ -208,7 +204,7 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 		elseif ($options['with_monitored_items'] !== null) {
@@ -216,21 +212,19 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
-			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 		elseif ($options['with_simple_graph_items'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('i.value_type',
-				array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)
-			);
-			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 
@@ -243,7 +237,7 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
 			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
 			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 		elseif ($options['with_monitored_triggers'] !== null) {
@@ -255,11 +249,11 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
 			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
 			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
-			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
-			$sub_sql_parts['where'][] = dbConditionInt('t.status', array(TRIGGER_STATUS_ENABLED));
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
+			$sub_sql_parts['where'][] = dbConditionInt('t.status', [TRIGGER_STATUS_ENABLED]);
 			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 
@@ -271,7 +265,7 @@ class CHostGroup extends CApiService {
 		elseif ($options['with_monitored_httptests'] !== null) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
 			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('ht.status', array(HTTPTEST_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('ht.status', [HTTPTEST_STATUS_ACTIVE]);
 		}
 
 		// with_graphs
@@ -283,7 +277,7 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
-				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 

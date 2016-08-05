@@ -19,9 +19,6 @@
 **/
 
 
-/**
- * @package API
- */
 abstract class CHostBase extends CApiService {
 
 	protected $tableName = 'hosts';
