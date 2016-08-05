@@ -105,7 +105,7 @@ class testInheritanceWeb extends CWebTest {
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
 			$this->zbxTestLaunchPopup('add_step');
-			$this->zbxTestInputType('name', $step['name']);
+			$this->zbxTestInputTypeWait('name', $step['name']);
 			$this->zbxTestInputType('url', $step['url']);
 			$this->zbxTestClick('add');
 			$this->webDriver->switchTo()->window('');

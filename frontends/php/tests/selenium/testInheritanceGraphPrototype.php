@@ -105,15 +105,17 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestLaunchPopup('add_protoitem');
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
 				$this->zbxTestClickLinkTextWait($item['itemName']);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
 		}
@@ -135,6 +137,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testInheritanceGraphPrototype_restore() {
