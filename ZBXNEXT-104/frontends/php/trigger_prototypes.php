@@ -37,11 +37,11 @@ $fields = [
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
-	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	'isset({add}) || isset({update})'],
+	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	'isset({add}) || isset({update})'],
+	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'status' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
@@ -191,26 +191,45 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
+	$description = getRequest('description', '');
+	$expression = getRequest('expression', '');
+	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
+	$recovery_expression = getRequest('recovery_expression', '');
+	$type = getRequest('type', 0);
+	$url = getRequest('url', '');
+	$priority = getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED);
+	$comments = getRequest('comments', '');
+	$correlation_mode = getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
+	$correlation_tag = getRequest('correlation_tag', '');
+	$status = getRequest('status', TRIGGER_STATUS_ENABLED);
+
 	if (hasRequest('add')) {
-		$trigger = [
-			'description' => getRequest('description'),
-			'expression' => getRequest('expression'),
-			'recovery_mode' => getRequest('recovery_mode'),
-			'type' => getRequest('type'),
-			'url' => getRequest('url'),
-			'priority' => getRequest('priority'),
-			'comments' => getRequest('comments'),
+		$trigger_prototype = [
+			'description' => $description,
+			'expression' => $expression,
+			'recovery_mode' => $recovery_mode,
+			'type' => $type,
+			'url' => $url,
+			'priority' => $priority,
+			'comments' => $comments,
 			'tags' => $tags,
 			'dependencies' => $dependencies,
-			'status' => getRequest('status'),
-			'correlation_mode' => getRequest('correlation_mode'),
-			'correlation_tag' => getRequest('correlation_tag')
+			'status' => $status
 		];
-		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-			$trigger['recovery_expression'] = getRequest('recovery_expression');
+		switch ($recovery_mode) {
+			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+				$trigger_prototype['recovery_expression'] = $recovery_expression;
+				// break; is not missing here
+
+			case ZBX_RECOVERY_MODE_EXPRESSION:
+				$trigger_prototype['correlation_mode'] = $correlation_mode;
+				if ($correlation_mode == ZBX_TRIGGER_CORRELATION_TAG) {
+					$trigger_prototype['correlation_tag'] = $correlation_tag;
+				}
+				break;
 		}
 
-		$result = (bool) API::TriggerPrototype()->create($trigger);
+		$result = (bool) API::TriggerPrototype()->create($trigger_prototype);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
@@ -233,38 +252,45 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$trigger_prototype = [];
 
 		if ($db_trigger_prototype['templateid'] == 0) {
-			if ($db_trigger_prototype['description'] !== getRequest('description')) {
-				$trigger_prototype['description'] = getRequest('description');
+			if ($db_trigger_prototype['description'] !== $description) {
+				$trigger_prototype['description'] = $description;
 			}
-			if ($db_trigger_prototype['expression'] !== getRequest('expression')) {
-				$trigger_prototype['expression'] = getRequest('expression');
+			if ($db_trigger_prototype['expression'] !== $expression) {
+				$trigger_prototype['expression'] = $expression;
 			}
-			if ($db_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
-				$trigger_prototype['recovery_mode'] = getRequest('recovery_mode');
+			if ($db_trigger_prototype['recovery_mode'] != $recovery_mode) {
+				$trigger_prototype['recovery_mode'] = $recovery_mode;
 			}
-			if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-					&& $db_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
-				$trigger_prototype['recovery_expression'] = getRequest('recovery_expression');
-			}
-			if ($db_trigger_prototype['correlation_mode'] != getRequest('correlation_mode')) {
-				$trigger_prototype['correlation_mode'] = getRequest('correlation_mode');
-			}
-			if ($db_trigger_prototype['correlation_tag'] !== getRequest('correlation_tag')) {
-				$trigger_prototype['correlation_tag'] = getRequest('correlation_tag');
+			switch ($recovery_mode) {
+				case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+					if ($db_trigger_prototype['recovery_expression'] !== $recovery_expression) {
+						$trigger_prototype['recovery_expression'] = $recovery_expression;
+					}
+					// break; is not missing here
+
+				case ZBX_RECOVERY_MODE_EXPRESSION:
+					if ($db_trigger_prototype['correlation_mode'] != $correlation_mode) {
+						$trigger_prototype['correlation_mode'] = $correlation_mode;
+					}
+					if ($correlation_mode == ZBX_TRIGGER_CORRELATION_TAG
+							&& $db_trigger_prototype['correlation_tag'] !== $correlation_tag) {
+						$trigger_prototype['correlation_tag'] = $correlation_tag;
+					}
+					break;
 			}
 		}
 
-		if ($db_trigger_prototype['type'] != getRequest('type')) {
-			$trigger_prototype['type'] = getRequest('type');
+		if ($db_trigger_prototype['type'] != $type) {
+			$trigger_prototype['type'] = $type;
 		}
-		if ($db_trigger_prototype['url'] !== getRequest('url')) {
-			$trigger_prototype['url'] = getRequest('url');
+		if ($db_trigger_prototype['url'] !== $url) {
+			$trigger_prototype['url'] = $url;
 		}
-		if ($db_trigger_prototype['priority'] != getRequest('priority')) {
-			$trigger_prototype['priority'] = getRequest('priority');
+		if ($db_trigger_prototype['priority'] != $priority) {
+			$trigger_prototype['priority'] = $priority;
 		}
-		if ($db_trigger_prototype['comments'] !== getRequest('comments')) {
-			$trigger_prototype['comments'] = getRequest('comments');
+		if ($db_trigger_prototype['comments'] !== $comments) {
+			$trigger_prototype['comments'] = $comments;
 		}
 
 		$db_tags = $db_trigger_prototype['tags'];
@@ -281,8 +307,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$trigger_prototype['dependencies'] = $dependencies;
 		}
 
-		if ($db_trigger_prototype['status'] != getRequest('status')) {
-			$trigger_prototype['status'] = getRequest('status');
+		if ($db_trigger_prototype['status'] != $status) {
+			$trigger_prototype['status'] = $status;
 		}
 
 		if ($trigger_prototype) {
@@ -425,11 +451,11 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression' => getRequest('recovery_expression', ''),
 		'expr_temp' => getRequest('expr_temp', ''),
 		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
-		'recovery_mode' => getRequest('recovery_mode', 0),
+		'recovery_mode' => getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
 		'description' => getRequest('description', ''),
 		'type' => getRequest('type', 0),
-		'priority' => getRequest('priority', 0),
-		'status' => getRequest('status', 0),
+		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
 		'comments' => getRequest('comments', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),

@@ -681,8 +681,10 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 -- inheritance testing
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15000, 'Inheritance test template', 'Inheritance test template', 3, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15002, 'Inheritance test template 2', 'Inheritance test template 2', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (15015, 'Inheritance test template for unlink', 'Inheritance test template for unlink', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15000, 15000, 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15002, 15002, 1);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15015, 15015, 1);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Template inheritance test host', 'Template inheritance test host', 0, '');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
@@ -693,6 +695,7 @@ INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES 
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15001, 15001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15000, 15001, 15000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15001, 15001, 15002);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15003, 15001, 15015);
 
 -- testFormItem.LayoutCheck testInheritanceItem.SimpleUpdate
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15000, 15000, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, 1, '', '');

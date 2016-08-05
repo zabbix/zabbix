@@ -518,7 +518,6 @@ function makeEventsTags($events) {
 			}
 			else {
 				$tags[$event['eventid']][] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
-					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 					->addClass(ZBX_STYLE_TAG);
 			}
 		}
