@@ -21,8 +21,6 @@
 
 class CControllerProblemView extends CController {
 
-	private $sysmapid;
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -36,6 +34,7 @@ class CControllerProblemView extends CController {
 		$fields = [
 			'sort' =>					'in clock,host,priority,problem',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>				'in 1',
 			'fullscreen' =>				'in 0,1',
 			'page' =>					'ge 1',
 			'filter_set' =>				'in 1',
@@ -86,21 +85,6 @@ class CControllerProblemView extends CController {
 	}
 
 	protected function checkPermissions() {
-/*		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
-			return false;
-		}
-
-		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
-			$drules = API::DRule()->get([
-				'output' => [],
-				'druleids' => [$this->getInput('druleid')],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE]
-			]);
-			if (!$drules) {
-				return false;
-			}
-		}*/
-
 		return true;
 	}
 
@@ -211,9 +195,10 @@ class CControllerProblemView extends CController {
 		 * Display
 		 */
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
+			'uncheck' => $this->hasInput('uncheck'),
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'page' => $this->getInput('page', 1),
 			'filter' => [
 				'show' => CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM),

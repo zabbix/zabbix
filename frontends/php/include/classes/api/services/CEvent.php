@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with events.
- *
- * @package API
  */
 class CEvent extends CApiService {
 
@@ -353,8 +351,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $options
-	 *
-	 * @return void
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([
@@ -422,8 +418,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $data
-	 *
-	 * @return void
 	 */
 	protected function validateAcknowledge(array $data) {
 		$dbfields = ['eventids' => null, 'message' => null];
@@ -644,8 +638,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if an event does not exist, is not accessible or is not a trigger event
 	 *
 	 * @param array $eventIds
-	 *
-	 * @return void
 	 */
 	protected function checkCanBeAcknowledged(array $eventIds) {
 		$allowedEvents = $this->get([
