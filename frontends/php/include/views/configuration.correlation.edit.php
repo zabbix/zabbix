@@ -130,17 +130,17 @@ switch ($data['new_condition']['type']) {
 		break;
 
 	case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-		$condition = (new CTextBox('new_condition[newtag]'))
+		$condition = (new CTextBox('new_condition[newtag]', $data['new_condition']['newtag']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('placeholder', _('tag'));
-		$condition2 = (new CTextBox('new_condition[oldtag]'))
+			->setAttribute('placeholder', _('new event tag'));
+		$condition2 = (new CTextBox('new_condition[oldtag]', $data['new_condition']['oldtag']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('placeholder', _('tag'));
+			->setAttribute('placeholder', _('old event tag'));
 		break;
 
 	case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 	case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-		$condition = (new CTextBox('new_condition[value]'))
+		$condition = (new CTextBox('new_condition[value]', $data['new_condition']['value']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('placeholder', _('value'));
 		$condition2 = (new CTextBox('new_condition[tag]'))
