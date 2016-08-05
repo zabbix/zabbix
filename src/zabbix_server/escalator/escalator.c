@@ -1251,10 +1251,6 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 						message = action->r_longdata;
 					}
 
-					/* flush messages created by recovery operations so they are */
-					/* included in sent messages list                            */
-					flush_user_msg(&user_msg, escalation, event, r_event, action);
-
 					add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject,
 							message);
 					break;
