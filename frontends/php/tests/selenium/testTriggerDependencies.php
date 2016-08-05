@@ -37,8 +37,9 @@ class testTriggerDependencies extends CWebTest {
 		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
 		$this->zbxTestClickWait('tab_dependenciesTab');
 		$this->zbxTestClickWait('bnt1');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestDropdownSelect('hostid', 'Template OS FreeBSD');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('hostid'));
+		$this->zbxTestDropdownSelectWait('hostid', 'Template OS FreeBSD');
 		$this->zbxTestClickLinkText('/etc/passwd has been changed on Template OS FreeBSD');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
