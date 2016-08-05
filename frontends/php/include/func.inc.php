@@ -1543,6 +1543,8 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 	}
 
+	$offset = 0;
+
 	if ($pagesCount == 1) {
 		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
 	}
@@ -1556,13 +1558,11 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$total = $itemsCount;
 
 		if ($config['search_limit'] < $itemsCount) {
-			if ($sortorder == ZBX_SORT_UP) {
-				array_pop($items);
-			}
-			else {
-				array_shift($items);
+			if ($sortorder == ZBX_SORT_DOWN) {
+				$offset = $itemsCount - $config['search_limit'];
 			}
 
+			$total -= $offset;
 			$total .= '+';
 		}
 
@@ -1570,7 +1570,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 	}
 
 	// trim array with items to contain items for current page
-	$items = array_slice($items, $start, $rowsPerPage, true);
+	$items = array_slice($items, $start + $offset, $rowsPerPage, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)

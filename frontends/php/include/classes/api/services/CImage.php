@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with images.
- *
- * @package API
  */
 class CImage extends CApiService {
 

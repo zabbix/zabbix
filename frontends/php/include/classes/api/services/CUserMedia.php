@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with users media.
- *
- * @package API
  */
 class CUserMedia extends CApiService {
 
