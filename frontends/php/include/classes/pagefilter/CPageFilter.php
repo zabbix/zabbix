@@ -652,8 +652,6 @@ class CPageFilter {
 	 * @param int    $options['default']	default severity
 	 * @param string $options['mapId']		ID of a map
 	 * @param array	 $config				array of configuration parameters for getting severity names
-	 *
-	 * @return void
 	 */
 	private function _initSeveritiesMin($severityMin, array $options, array $config) {
 		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_NOT_CLASSIFIED;

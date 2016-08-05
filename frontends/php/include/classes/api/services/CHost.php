@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with hosts.
- *
- * @package API
  */
 class CHost extends CHostGeneral {
 
@@ -1163,8 +1161,6 @@ class CHost extends CHostGeneral {
 	 *
 	 * @param array $hostIds
 	 * @param bool 	$nopermissions
-	 *
-	 * @return void
 	 */
 	protected function validateDelete(array $hostIds, $nopermissions = false) {
 		if (!$hostIds) {

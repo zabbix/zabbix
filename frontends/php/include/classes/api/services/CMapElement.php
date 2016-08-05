@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with map elements.
- *
- * @package API
  */
 abstract class CMapElement extends CApiService {
 
