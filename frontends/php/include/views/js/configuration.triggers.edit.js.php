@@ -32,25 +32,32 @@
 		});
 
 		function changeRecoveryMode() {
-			// Used textarea selector by ID because there are ID duplicates on page.
-			if ($('input[name=recovery_mode]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>
-					|| $('input[name=recovery_mode_name]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>) {
-				$('#recovery_expression_row, .recovery_expression_constructor_row').show();
-				$('#expression_row').find('label').html('<?= _('Problem expression') ?>');
-			}
-			else {
-				$('#recovery_expression_row, .recovery_expression_constructor_row').hide();
-				$('#expression_row').find('label').html('<?= _('Expression') ?>');
-			}
+			var	recovery_mode = $('input[name=recovery_mode]:checked').val();
+
+			$('#expression_row').find('label').text(
+				(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
+					? '<?= _('Problem expression') ?>'
+					: '<?= _('Expression') ?>'
+			);
+			$('.recovery_expression_constructor_row')
+				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>);
+			$('#correlation_mode_row')
+				.toggle(recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
+					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>
+				);
+
+			changeCorrelationMode();
 		}
 
 		function changeCorrelationMode() {
-			if ($('input[name=correlation_mode]:checked').val() == <?= ZBX_TRIGGER_CORRELATION_TAG ?>) {
-				$('#correlation_tag').closest('li').show();
-			}
-			else {
-				$('#correlation_tag').closest('li').hide();
-			}
+			var	recovery_mode = $('input[name=recovery_mode]:checked').val(),
+				correlation_mode = $('input[name=correlation_mode]:checked').val();
+
+			$('#correlation_tag_row')
+				.toggle((recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
+					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
+					&& correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
+				);
 		}
 
 		$('#tbl_tags').dynamicRows({
