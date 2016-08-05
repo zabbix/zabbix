@@ -512,10 +512,10 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementNotPresentId('update');
 		}
 
-		$this->zbxTestTabSwitch('Authentication');
+		$this->zbxTestClickWait('tab_authenticationTab');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestAssertVisibleId('authentication');
 		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM']);
 
 		if (isset($data['authentication'])) {
