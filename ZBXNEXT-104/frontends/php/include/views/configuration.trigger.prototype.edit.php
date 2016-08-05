@@ -45,7 +45,8 @@ if ($data['limited']) {
 	$triggersForm
 		->addVar('recovery_mode', $data['recovery_mode'])
 		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode']);
+		->addVar('correlation_mode', $data['correlation_mode'])
+		->addVar('manual_close', $data['manual_close']);
 }
 
 // create form list
@@ -509,7 +510,9 @@ $triggersFormList
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)
 	->addRow(_('Allow manual close'),
-		(new CCheckBox('manual_close'))->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+		(new CCheckBox('manual_close'))
+			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			->setEnabled(!$data['limited'])
 	);
 
 // append status to form list
