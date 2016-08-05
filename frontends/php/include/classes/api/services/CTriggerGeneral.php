@@ -146,7 +146,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag'
+				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag',
+				'manual_close'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -586,6 +587,14 @@ abstract class CTriggerGeneral extends CApiService {
 					));
 			}
 
+			if (array_key_exists('manual_close', $trigger)
+					&& $trigger['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+					&& $trigger['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'manual_close', _s('unexpected value "%1$s"', $trigger['manual_close'])
+				));
+			}
+
 			$this->checkTriggerExpressions($trigger);
 			$this->checkIfExistsOnHost($trigger);
 			$trigger = $this->checkTriggerTags($trigger);
@@ -653,7 +662,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerDbFields = ['triggerid' => null];
 		$read_only_fields = ['value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
 		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression',
-			'correlation_mode', 'correlation_tag'
+			'correlation_mode', 'correlation_tag', 'manual_close'
 		];
 
 		foreach ($triggers as $trigger) {
@@ -664,7 +673,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
-				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -747,7 +757,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$field_names = ['description', 'expression', 'recovery_mode', 'recovery_expression', 'correlation_mode',
-				'correlation_tag'
+				'correlation_tag', 'manual_close'
 			];
 			foreach ($field_names as $field_name) {
 				if (!array_key_exists($field_name, $trigger)) {
@@ -808,6 +818,14 @@ abstract class CTriggerGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'correlation_mode', _s('unexpected value "%1$s"', $trigger['correlation_mode'])
 					));
+			}
+
+			if (array_key_exists('manual_close', $trigger)
+					&& $trigger['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+					&& $trigger['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'manual_close', _s('unexpected value "%1$s"', $trigger['manual_close'])
+				));
 			}
 
 			$expressions_changed = ($trigger['expression'] !== $_db_trigger['expression']
@@ -1041,6 +1059,9 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			if ($trigger['correlation_tag'] !== $db_trigger['correlation_tag']) {
 				$upd_trigger['values']['correlation_tag'] = $trigger['correlation_tag'];
+			}
+			if ($trigger['manual_close'] != $db_trigger['manual_close']) {
+				$upd_trigger['values']['manual_close'] = $trigger['manual_close'];
 			}
 
 			if ($upd_trigger['values']) {
@@ -1595,7 +1616,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
