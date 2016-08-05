@@ -84,6 +84,19 @@ class testInheritanceGraphPrototype extends CWebTest {
 						['itemName' => 'testInheritanceItemPrototype4']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'testInheritanceGraphPrototype4',
+					'addItemPrototypes' => [
+						['itemName' => 'testInheritanceItemPrototype1']
+					],
+					'errors'=> [
+						'Cannot add graph prototype',
+						'Graph with name "testInheritanceGraphPrototype4" already exists in graphs or graph prototypes.'
+					]
+				]
 			]
 		];
 	}
@@ -92,16 +105,18 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestLaunchPopup('add_protoitem');
-				$this->zbxTestClick("//span[text()='".$item['itemName']."']");
-				sleep(1);
-				$this->selectWindow();
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
+				$this->zbxTestClickLinkTextWait($item['itemName']);
+				$this->zbxTestWaitWindowClose();
+				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
 		}
 
@@ -110,16 +125,20 @@ class testInheritanceGraphPrototype extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+				$this->zbxTestCheckHeader('Graph prototypes');
 				$this->zbxTestTextPresent('Graph prototype added');
+				$this->zbxTestTextPresent($data['name']);
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+				$this->zbxTestCheckHeader('Graph prototypes');
 				$this->zbxTestTextPresent($data['errors']);
+				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testInheritanceGraphPrototype_restore() {

@@ -32,11 +32,9 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
-		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
-		$this->zbxTestTextPresent('Value mapping');
+		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent(['Name', 'Value map']);
-		$this->assertElementPresent('form');
-		// checking that all valuemaps are present in the report
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestTextPresent($valuemap['name']);
 
 		// checking that in the "Value map" column are correct values
@@ -58,7 +56,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$oldHashMappings = DBhash($sqlMappings);
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->zbxTestClickWait('link='.$valuemap['name']);
+		$this->zbxTestClickLinkText($valuemap['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Value map updated');
 

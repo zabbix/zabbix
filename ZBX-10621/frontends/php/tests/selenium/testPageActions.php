@@ -50,7 +50,7 @@ class testPageActions extends CWebTest {
 	private function calculateHash($actionid) {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid='.$actionid;
 		$this->oldHashAction = DBhash($this->sqlHashAction);
-		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' ORDER BY conditionid';
+		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' AND actionid>2  ORDER BY conditionid';
 		$this->oldHashConditions = DBhash($this->sqlHashConditions);
 		$this->sqlHashOperations = 'SELECT * FROM operations WHERE actionid='.$actionid.' ORDER BY operationid';
 		$this->oldHashOperations = DBhash($this->sqlHashOperations);
@@ -161,9 +161,8 @@ class testPageActions extends CWebTest {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
+		$this->zbxTestCheckHeader('Actions');
 		$this->zbxTestTextPresent('Event source');
-		$this->zbxTestTextPresent('Actions');
 		$this->zbxTestTextPresent('Displaying');
 
 		$eventsources = [
@@ -173,7 +172,7 @@ class testPageActions extends CWebTest {
 			EVENT_SOURCE_INTERNAL => 'Internal'
 		];
 
-		$this->zbxTestDrowpdownAssertSelected('eventsource', $eventsources[$eventsource]);
+		$this->zbxTestDropdownAssertSelected('eventsource', $eventsources[$eventsource]);
 		$this->zbxTestDropdownHasOptions('eventsource', $eventsources);
 
 		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
@@ -191,8 +190,7 @@ class testPageActions extends CWebTest {
 			$this->zbxTestTextPresent([$dbRow['name'], $statusStr]);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
-		$this->assertElementValue('goButton', 'Go (0)');
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);
 	}
 
 	/**
@@ -202,7 +200,7 @@ class testPageActions extends CWebTest {
 		$this->calculateHash($action['actionid']);
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
-		$this->zbxTestClickWait('link='.$action['name']);
+		$this->zbxTestClickLinkText($action['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');
@@ -215,6 +213,8 @@ class testPageActions extends CWebTest {
 	* @dataProvider allActions
 	*/
 	public function testPageActions_SingleEnableDisable($action) {
+		DBexecute("UPDATE usrgrp SET debug_mode = 0 WHERE usrgrpid = 7");
+
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
@@ -223,12 +223,12 @@ class testPageActions extends CWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestHrefClickWait('actionconf.php?action=action.massdisable&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestClickXpathWait("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
 				$this->zbxTestTextPresent('Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$this->zbxTestHrefClickWait('actionconf.php?action=action.massenable&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestClickXpath("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
 				$this->zbxTestTextPresent('Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;
@@ -246,6 +246,8 @@ class testPageActions extends CWebTest {
 		));
 
 		$this->assertEquals($this->oldHashAction, DBhash($this->sqlHashAction));
+
+		DBexecute("UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7");
 	}
 
 	/**
@@ -255,16 +257,13 @@ class testPageActions extends CWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestClickButton('action.massdisable');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action disabled');
@@ -287,16 +286,13 @@ class testPageActions extends CWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestClickButton('action.massenable');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action enabled');
@@ -323,19 +319,16 @@ class testPageActions extends CWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestClickButton('action.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Selected actions deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected actions deleted');
 
 		$this->assertEquals(0, DBcount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 

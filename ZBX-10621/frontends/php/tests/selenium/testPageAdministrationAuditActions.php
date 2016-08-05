@@ -24,27 +24,23 @@ class testPageAdministrationAuditActions extends CWebTest {
 
 	public function testPageAdministrationAuditActions_CheckLayout() {
 
-		$this->zbxTestLogin('auditacts.php?stime=20130207090000&period=63072000');
-		$this->zbxTestCheckTitle('Audit');
-		$this->assertElementPresent('config');
-		$this->zbxTestTextPresent('AUDIT ACTIONS');
-		$this->zbxTestTextPresent('ACTIONS');
-
-		$this->zbxTestClick('flicker_icon_l');
+		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
+		$this->zbxTestCheckTitle('Action log');
+		$this->zbxTestAssertElementPresentId('config');
+		$this->zbxTestCheckHeader('Action log');
 
 		$this->zbxTestTextPresent('Recipient');
-		$this->assertElementPresent('alias');
-		$this->assertAttribute("//input[@id='alias']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='alias']/@size", '20');
-		$this->assertElementPresent('btn1');
-		$this->assertElementPresent('filter');
-		$this->assertElementPresent('filter_rst');
-		$this->zbxTestTextPresent(['Time', 'Type', 'Status', 'Retries left', 'Recipient(s)', 'Message', 'Error']);
+		$this->zbxTestAssertElementPresentId('alias');
+		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
+		$this->zbxTestAssertElementPresentId('btn1');
+		$this->zbxTestAssertElementPresentId('filter_set');
+		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
+		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient(s)', 'Message', 'Status', 'Info']);
 
 	}
 
 	public static function allAuditActions() {
-		return DBdata('SELECT * FROM alerts');
+		return DBdata('SELECT * FROM alerts ORDER BY alertid LIMIT 7');
 	}
 
 	/**
@@ -52,31 +48,29 @@ class testPageAdministrationAuditActions extends CWebTest {
 	*/
 	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
 
-		$this->zbxTestLogin('auditacts.php?stime=20130207090000&period=63072000');
-		$this->zbxTestCheckTitle('Audit');
-		$this->assertElementPresent('config');
-		$this->zbxTestTextPresent('AUDIT ACTIONS');
-		$this->zbxTestTextPresent('ACTIONS');
+		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
+		$this->zbxTestCheckTitle('Action log');
+		$this->zbxTestAssertElementPresentId('config');
+		$this->zbxTestCheckHeader('Action log');
 
-		$this->zbxTestClick('flicker_icon_l');
 		$time = $auditactions['clock'];
-		$today = date("d M Y H:i:s", $time);
+		$today = date("Y-m-d H:i:s", $time);
 
 		$status = '';
 		$type = '';
 		$retries = '';
 
 		if ($auditactions['status'] == 1 && $auditactions['alerttype'] == 0) {
-			$status = 'sent';
+			$status = 'Sent';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] == 0) {
-			$status = 'not sent';
+			$status = 'Not sent';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] <> 0) {
 			$status = 'In progress';
 		}
 		if ($auditactions['status'] == 1 && $auditactions['alerttype'] == 1) {
-			$status = 'executed';
+			$status = 'Executed';
 		}
 
 		$sql = 'SELECT mt.description FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alerttype=0';
@@ -89,15 +83,27 @@ class testPageAdministrationAuditActions extends CWebTest {
 			$retries = $auditactions['retries'];
 		}
 
-		$this->zbxTestTextPresent([$today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']]);
+		$message = str_replace('>', '&gt;', $auditactions['message']);
+		$subject = str_replace('>', '&gt;', $auditactions['subject']);
+		$info = str_replace('"', '&amp;quot;', $auditactions['error']);
 
-		// checking that there are no records in the report for 'guest' user
-		$this->zbxTestClick('flicker_icon_l');
-		$this->input_type('alias', 'guest');
-		$this->zbxTestClickWait('filter');
-		$this->zbxTestTextPresent('No actions defined.');
+		$this->zbxTestTextPresent(
+				[
+					$today,
+					$type['description'],
+					$status,
+					$retries,
+					$auditactions['sendto'],
+					$subject,
+					$message,
+					$info
+				]
+		);
 
-		$this->zbxTestClick('flicker_icon_l');
-		$this->zbxTestClickWait('filter_rst');
+		$this->zbxTestInputTypeWait('alias', 'guest');
+		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestTextPresent('No data found.');
+
+		$this->zbxTestClickButtonText('Reset');
 	}
 }

@@ -97,14 +97,7 @@ var CPMaster = Class.create({
 		if (typeof(this.dolls[domid]) != 'undefined' && !is_null(this.dolls[domid])) {
 			this.dolls[domid].pexec.stop();
 			this.dolls[domid].pexec = null;
-			this.dolls[domid].rmvDarken();
-
-			try {
-				delete(this.dolls[domid]);
-			}
-			catch(e) {
-				this.dolls[domid] = null;
-			}
+			delete this.dolls[domid];
 		}
 	},
 
@@ -176,13 +169,6 @@ var CDoll = Class.create({
 	restartDoll: function() {
 		if (!is_null(this.pexec)) {
 			this.pexec.stop();
-
-			try {
-				delete(this.pexec);
-			}
-			catch(e) {
-				this.pexec = null;
-			}
 			this.pexec = null;
 		}
 
@@ -192,12 +178,6 @@ var CDoll = Class.create({
 	stopDoll: function() {
 		if (!is_null(this.pexec)) {
 			this.pexec.stop();
-			try {
-				delete(this.pexec);
-			}
-			catch(e) {
-				this.pexec = null;
-			}
 			this.pexec = null;
 		}
 	},
@@ -383,12 +363,12 @@ var CDoll = Class.create({
 	},
 
 	updateSortable: function() {
-		var columnObj = jQuery('.cell');
+		var columnObj = jQuery('.widget-placeholder .cell');
 
 		if (columnObj.length > 0) {
 			columnObj
 				.sortable({
-					connectWith: '.cell',
+					connectWith: '.widget-placeholder .cell',
 					handle: 'div.dashbrd-widget-head',
 					forcePlaceholderSize: true,
 					placeholder: 'dashbrd-widget',
@@ -410,7 +390,7 @@ var CDoll = Class.create({
 						if (!ui.sender) {
 							var widgetPositions = {};
 
-							jQuery('.cell').each(function(colNum, column) {
+							jQuery('.widget-placeholder .cell').each(function(colNum, column) {
 								widgetPositions[colNum] = {};
 
 								jQuery('.dashbrd-widget', column).each(function(rowNum, widget) {

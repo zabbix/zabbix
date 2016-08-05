@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageSlideShows extends CWebTest {
-	// Returns all slide shows
+
 	public static function allSlideShows() {
 		return DBdata("select * from slideshows order by slideshowid");
 	}
@@ -33,15 +33,13 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
-		$this->zbxTestTextPresent('SLIDE SHOWS');
+		$this->zbxTestCheckHeader('Slide shows');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		// Header
-		$this->zbxTestTextPresent(['Name', 'Delay', 'Number of slides']);
-		// Data
+
+		$this->zbxTestTextPresent(['Name', 'Delay', 'Number of slides', 'Actions']);
+
 		$this->zbxTestTextPresent([$slideshow['name']]);
-		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 	}
 
 	/**
@@ -58,12 +56,16 @@ class testPageSlideShows extends CWebTest {
 
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestHrefClickWait('?form=update&slideshowid='.$slideshow['slideshowid']);
+		$this->zbxTestCheckHeader('Slide shows');
+		$this->zbxTestTextPresent(['Slide','Sharing']);
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay (in seconds)', 'Slides']);
+
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show updated');
 		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestCheckHeader('Slide shows');
 
 		$this->assertEquals($oldHashSlideShow, DBhash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
 		$this->assertEquals($oldHashSlide, DBhash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
@@ -74,14 +76,16 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestClickWait('form');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
-		$this->zbxTestTextPresent('Slide');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Default delay (in seconds)');
-		$this->zbxTestTextPresent('Slides');
+		$this->zbxTestCheckHeader('Slide shows');
+		$this->zbxTestTextPresent(['Slide','Sharing']);
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay (in seconds)', 'Slides']);
 		$this->zbxTestTextPresent(['Screen', 'Delay', 'Action']);
 		$this->zbxTestClickWait('cancel');
-		$this->zbxTestTextPresent('SLIDE SHOWS');
+		$this->zbxTestTextPresent('Slide shows');
+	}
+
+	public function testPageSlideShows_backup() {
+		DBsave_tables('slideshows');
 	}
 
 	/**
@@ -91,27 +95,23 @@ class testPageSlideShows extends CWebTest {
 		$slideshowid = $slideshow['slideshowid'];
 		$name = $slideshow['name'];
 
-		$this->chooseOkOnNextConfirmation();
-
-		DBsave_tables('slideshows');
-
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
-		$this->zbxTestCheckboxSelect('shows['.$slideshowid.']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-
-		$this->getConfirmation();
+		$this->zbxTestCheckboxSelect('shows_'.$slideshowid);
+		$this->zbxTestClickButton('slideshow.massdelete');
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show deleted');
-		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestCheckHeader('Slide shows');
 
 		$sql = "select * from slideshows where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
+	}
 
+	public function testPageSlideShows_restore() {
 		DBrestore_tables('slideshows');
 	}
 
