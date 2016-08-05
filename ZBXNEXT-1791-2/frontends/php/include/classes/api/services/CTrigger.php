@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with triggers.
- *
- * @package API
  */
 class CTrigger extends CTriggerGeneral {
 
@@ -877,8 +875,6 @@ class CTrigger extends CTriggerGeneral {
 	 * find this dependency trigger child on dependent trigger host and add new dependency.
 	 *
 	 * @param array $data
-	 *
-	 * @return void
 	 */
 	public function syncTemplateDependencies(array $data) {
 		$templateIds = zbx_toArray($data['templateids']);
