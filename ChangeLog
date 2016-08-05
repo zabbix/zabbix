@@ -36,6 +36,8 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
+..F....... [ZBX-10621] removed excessive white space in dashboard (Pavel, Alexei)
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
 ........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
 ........S. [ZBX-10971] fixed memory leak when action is removed from configuration (Sergejs)
