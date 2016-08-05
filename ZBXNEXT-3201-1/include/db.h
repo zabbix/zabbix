@@ -79,9 +79,8 @@ struct	_DC_TRIGGER;
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
-#define TRIGGER_TAG_LEN			255
-#define TRIGGER_TAG_VALUE_LEN		255
-#define TRIGGER_CORRELATION_TAG_LEN	TRIGGER_TAG_LEN
+#define TAG_NAME_LEN			255
+#define TAG_VALUE_LEN			255
 
 #define GROUP_NAME_LEN			64
 
@@ -492,8 +491,10 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	unsigned char	value;
 	unsigned char	state;
+	unsigned char	priority;
 	int		lastchange;
 	int		problem_count;
+	int		correlated;
 	char		*error;
 
 #define ZBX_FLAGS_TRIGGER_DIFF_UNSET			0x0000
@@ -511,7 +512,6 @@ typedef struct
 zbx_trigger_diff_t;
 
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs);
 void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 
@@ -544,7 +544,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
-int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
+int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
 void	zbx_create_itservices_lock();

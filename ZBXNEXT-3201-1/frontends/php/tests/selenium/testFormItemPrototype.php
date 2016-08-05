@@ -2366,7 +2366,8 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['params_ap'])) {
-			$this->zbxTestInputTypeWait('params_ap', $data['params_ap']);
+			$this->zbxTestTextPresent('SQL query');
+			$this->zbxTestInputTypeOverwrite('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {
