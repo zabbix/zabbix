@@ -54,6 +54,12 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+													]),
+													null
+												],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -467,7 +473,8 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
-		'correlation_tag' => getRequest('correlation_tag', '')
+		'correlation_tag' => getRequest('correlation_tag', ''),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	]);
 
 	$data['hostid'] = $discoveryRule['hostid'];

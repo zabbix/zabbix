@@ -502,18 +502,22 @@ $tags_table->setFooter(new CCol(
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
 ));
-$triggersFormList->addRow(_('Tags'),
-	(new CDiv($tags_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-);
+$triggersFormList
+	->addRow(_('Tags'),
+		(new CDiv($tags_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+	->addRow(_('Allow manual close'),
+		(new CCheckBox('manual_close'))->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+	);
 
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 	$status = true;
 }
 else {
-	$status = ($data['status'] == 0);
+	$status = ($data['status'] == TRIGGER_STATUS_ENABLED);
 }
 $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
