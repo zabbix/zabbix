@@ -410,7 +410,7 @@ else {
 		$data['screens'] = API::Screen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'],
+			'limit' => $config['search_limit'] + 1,
 			'search' => [
 				'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
 			],
