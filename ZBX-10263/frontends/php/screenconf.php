@@ -388,7 +388,7 @@ else {
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'templateids' => $data['templateid'],
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'],
+			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
 			'preservekeys' => true
 		]);
