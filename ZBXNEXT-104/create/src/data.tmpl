@@ -1342,6 +1342,7 @@ ROW   |13554    |{13096}=0                                                      
 ROW   |13555    |{13097}>0.15                                                            |Response time is too high on {HOST.NAME}                            |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |0            |                   |
 ROW   |13556    |{13098}>20                                                              |Ping loss is too high on {HOST.NAME}                                |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |0            |                   |
 ROW   |13557    |{13160}=1                                                               |Zabbix value cache working in low memory mode                       |   |0     |4       |                                                                                                                                      |NULL      |0   |0    |0            |                   |
+ROW   |13559    |({TRIGGER.VALUE}=0 and {13162}>75) or ({TRIGGER.VALUE}=1 and {13162}>65)|Zabbix task manager processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |0            |                   |
 ROW   |10045    |{12927}>0                                                               |Version of zabbix_agent(d) was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13026     |0   |0    |0            |                   |
 ROW   |10047    |{12550}=1                                                               |Zabbix agent on {HOST.NAME} is unreachable for 5 minutes            |   |0     |3       |                                                                                                                                      |13025     |0   |0    |0            |                   |
 ROW   |13075    |{12648}<5                                                               |Less than 5% free in the value cache                                |   |0     |3       |                                                                                                                                      |13074     |0   |0    |0            |                   |
@@ -1415,6 +1416,7 @@ ROW   |13515    |{12944}>0                                                      
 ROW   |13516    |{12945}>0                                                               |Host name of zabbix_agentd was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13507     |0   |0    |0            |                   |
 ROW   |13537    |{12966}<25                                                              |Less than 25% free in the vmware cache                              |   |0     |3       |                                                                                                                                      |13536     |0   |0    |0            |                   |
 ROW   |13558    |{13161}=1                                                               |Zabbix value cache working in low memory mode                       |   |0     |4       |                                                                                                                                      |13557     |0   |0    |0            |                   |
+ROW   |13560    |({TRIGGER.VALUE}=0 and {13163}>75) or ({TRIGGER.VALUE}=1 and {13163}>65)|Zabbix task manager processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |13559     |0   |0    |0            |                   |
 
 TABLE |trigger_depends
 FIELDS|triggerdepid|triggerid_down|triggerid_up|
@@ -1780,6 +1782,8 @@ ROW   |13158     |23653 |13553    |max     |#3       |
 ROW   |13159     |23654 |13285    |max     |#3       |
 ROW   |13160     |23661 |13557    |last    |         |
 ROW   |13161     |23662 |13558    |last    |         |
+ROW   |13162     |23663 |13559    |avg     |10m      |
+ROW   |13163     |23664 |13560    |avg     |10m      |
 
 TABLE |graphs
 FIELDS|graphid|name                                    |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
@@ -2181,8 +2185,8 @@ ROW   |1812   |543    |23062 |5       |0        |00C800|0        |2       |0   |
 ROW   |1814   |544    |22862 |5       |0        |00C800|0        |2       |0   |
 ROW   |1816   |545    |23022 |5       |0        |00C800|0        |2       |0   |
 ROW   |1818   |546    |23158 |5       |0        |00C800|0        |2       |0   |
-ROW   |1819   |406    |23663 |0       |8        |00A000|0        |2       |0   |
-ROW   |1820   |517    |23664 |0       |8        |00A000|0        |2       |0   |
+ROW   |1819   |406    |23663 |0       |8        |009900|0        |2       |0   |
+ROW   |1820   |517    |23664 |0       |8        |009900|0        |2       |0   |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|
@@ -3067,6 +3071,8 @@ ROW   |5879     |276          |23122 |
 ROW   |5880     |279          |23122 |
 ROW   |5883     |179          |23661 |
 ROW   |5884     |345          |23662 |
+ROW   |5885     |179          |23663 |
+ROW   |5886     |345          |23664 |
 
 TABLE |mappings
 FIELDS|mappingid|valuemapid|value|newvalue                              |
