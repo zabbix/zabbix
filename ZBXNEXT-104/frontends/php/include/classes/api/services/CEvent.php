@@ -416,7 +416,7 @@ class CEvent extends CApiService {
 		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
 
 		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-			// Close problems manually.
+			// Close problem manually.
 			$tasks = [];
 
 			for ($i = 0; $i < count($acknowledgeids); $i++) {
@@ -464,8 +464,17 @@ class CEvent extends CApiService {
 
 		$this->checkCanBeAcknowledged($data['eventids']);
 
-		if (array_key_exists('action', $data) && $data['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-			$this->checkCanBeManuallyClosed($data['eventids']);
+		if (array_key_exists('action', $data)) {
+			if ($data['action'] != ZBX_ACKNOWLEDGE_ACTION_NONE
+					&& $data['action'] != ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'action', _s('unexpected value "%1$s"', $data['action'])
+				));
+			}
+
+			if ($data['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				$this->checkCanBeManuallyClosed($data['eventids']);
+			}
 		}
 	}
 
