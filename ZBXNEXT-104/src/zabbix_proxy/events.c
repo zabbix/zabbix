@@ -25,7 +25,17 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag, zbx_uint64_t userid)
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag)
+{
+	return FAIL;
+}
+
+int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *ts, zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
+		const char *trigger_description, const char *trigger_expression,
+		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
+		const zbx_vector_ptr_t *trigger_tags, unsigned char trigger_correlation_mode,
+		const char *trigger_correlation_tag)
 {
 	return FAIL;
 }
@@ -35,7 +45,7 @@ int	process_events()
 	return 0;
 }
 
-int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode)
 {
 	return 0;
 }
