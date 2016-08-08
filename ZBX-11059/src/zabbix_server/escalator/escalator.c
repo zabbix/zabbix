@@ -226,11 +226,29 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (0 == mediatypeid)
+	{
+		p = *user_msg;
+
+		while (NULL != p)
+		{
+			if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
+			{
+				zbx_free(p->subject);
+				zbx_free(p->message);
+				*user_msg = p->next;
+			}
+
+			p = p->next;
+		}
+	}
+
+
 	p = *user_msg;
 
 	while (NULL != p)
 	{
-		if (p->userid == userid && p->mediatypeid == mediatypeid &&
+		if (p->userid == userid && (0 == p->mediatypeid || p->mediatypeid == mediatypeid) &&
 				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
 			break;
 
