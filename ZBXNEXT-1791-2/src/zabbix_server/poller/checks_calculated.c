@@ -303,6 +303,8 @@ out:
 	zbx_free(items);
 	zbx_free(keys);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
