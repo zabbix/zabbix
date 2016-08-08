@@ -26,6 +26,8 @@ class CControllerAcknowledgeCreate extends CController {
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
 			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
+			'close_problem' =>		'db acknowledges.action|in '.
+										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
 			'backurl' =>			'string'
 		];
 
@@ -113,10 +115,103 @@ class CControllerAcknowledgeCreate extends CController {
 		}
 
 		if ($result && $eventids) {
-			$result = API::Event()->acknowledge([
-				'eventids' => $eventids,
-				'message' => $this->getInput('message', '')
-			]);
+			$eventids_to_ack = $eventids;
+
+			$close_problem = $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE);
+
+			if ($close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				$events = API::Event()->get([
+					'output' => ['eventid', 'objectid'],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'eventids' => $eventids,
+					'preservekeys' => true
+				]);
+
+				$triggerids = zbx_objectValues($events, 'objectid');
+				$_eventids = [];
+
+				// User should have read-write permissions to trigger and trigger must have "manual_close" set to "1".
+				$triggers = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => $triggerids,
+					'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
+					'editable' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($triggerids as $triggerid) {
+					if (array_key_exists($triggerid, $triggers)) {
+						// Collect trigger IDs (RW permissions and manual close allowed) as keys for event IDs.
+						$_eventids[$triggerid] = [];
+					}
+				}
+
+				// Event should be in problem state. Get events to check if it can be closed.
+				$problem_events = API::Event()->get([
+					'output' => ['eventid', 'objectid'],
+					'select_acknowledges' => ['action'],
+					'eventids' => array_keys($events),
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'filter' => ['value' => TRIGGER_VALUE_TRUE],
+					'preservekeys' => true
+				]);
+
+				$closed_eventids = [];
+
+				foreach ($problem_events as $problem_event) {
+					$eventid = $problem_event['eventid'];
+
+					if (array_key_exists($problem_event['objectid'], $_eventids)) {
+						if ($problem_event['acknowledges']) {
+							foreach ($problem_event['acknowledges'] as $acknowledge) {
+								if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_NONE) {
+									$_eventids[$problem_event['objectid']][$eventid] = $eventid;
+								}
+								else {
+									// Found a closed event, remove it from the list. Move on to next event.
+									unset($_eventids[$problem_event['objectid']][$eventid]);
+									break;
+								}
+							}
+						}
+						else {
+							// No acknowledges yet, so it is still open.
+							$_eventids[$problem_event['objectid']][$eventid] = $eventid;
+						}
+					}
+				}
+
+				if ($_eventids) {
+					// Gather event IDs for closing into one-dimensioal array.
+					$eventids_to_close = [];
+					foreach ($_eventids as $__eventids) {
+						if ($__eventids) {
+							foreach ($__eventids as $eventid) {
+								$eventids_to_close[$eventid] = $eventid;
+							}
+						}
+					}
+
+					$eventids_to_ack = array_diff($eventids, $eventids_to_close);
+
+					// Acknowledge and close problems.
+					$result = API::Event()->acknowledge([
+						'eventids' => $eventids_to_close,
+						'message' => $this->getInput('message', ''),
+						'action' => $close_problem
+					]);
+				}
+			}
+
+			// There might be nothing more to acknowledge since previous action closed all the events.
+			if ($result && $eventids_to_ack) {
+				$result = API::Event()->acknowledge([
+					'eventids' => $eventids_to_ack,
+					'message' => $this->getInput('message', '')
+				]);
+			}
 		}
 
 		if ($result) {
