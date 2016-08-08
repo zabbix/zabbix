@@ -80,7 +80,7 @@ static int	is_operator_delimiter(char c)
  * Purpose: evaluate a suffixed number like "12.345K"                         *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_number()
+static double	evaluate_number(void)
 {
 	int		digits = 0, dots = 0;
 	const char	*iter = ptr;
@@ -125,14 +125,14 @@ static double	evaluate_number()
 	}
 }
 
-static double	evaluate_term1();
+static double	evaluate_term1(void);
 
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate a suffixed number or a parenthesized expression          *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term9()
+static double	evaluate_term9(void)
 {
 	double	result;
 
@@ -182,7 +182,7 @@ static double	evaluate_term9()
  * Purpose: evaluate "-" (unary)                                              *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term8()
+static double	evaluate_term8(void)
 {
 	double	result;
 
@@ -209,7 +209,7 @@ static double	evaluate_term8()
  * Purpose: evaluate "not"                                                    *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term7()
+static double	evaluate_term7(void)
 {
 	double	result;
 
@@ -236,7 +236,7 @@ static double	evaluate_term7()
  * Purpose: evaluate "*" and "/"                                              *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term6()
+static double	evaluate_term6(void)
 {
 	char	op;
 	double	result, operand;
@@ -275,7 +275,7 @@ static double	evaluate_term6()
  * Purpose: evaluate "+" and "-"                                              *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term5()
+static double	evaluate_term5(void)
 {
 	char	op;
 	double	result, operand;
@@ -304,7 +304,7 @@ static double	evaluate_term5()
  * Purpose: evaluate "<", "<=", ">=", ">"                                     *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term4()
+static double	evaluate_term4(void)
 {
 	char	op;
 	double	result, operand;
@@ -352,7 +352,7 @@ static double	evaluate_term4()
  * Purpose: evaluate "=" and "<>"                                             *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term3()
+static double	evaluate_term3(void)
 {
 	char	op;
 	double	result, operand;
@@ -391,7 +391,7 @@ static double	evaluate_term3()
  * Purpose: evaluate "and"                                                    *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term2()
+static double	evaluate_term2(void)
 {
 	double	result, operand;
 
@@ -416,7 +416,7 @@ static double	evaluate_term2()
  * Purpose: evaluate "or"                                                     *
  *                                                                            *
  ******************************************************************************/
-static double	evaluate_term1()
+static double	evaluate_term1(void)
 {
 	double	result, operand;
 
