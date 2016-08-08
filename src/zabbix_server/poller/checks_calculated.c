@@ -161,7 +161,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	return ret;
 }
 
-static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
+static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
 	function_t	*f = NULL;
