@@ -114,7 +114,9 @@ if ($data['filter_search']) {
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $template['templateid'],
 			'filter' => array(
-				'macro' => array(RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS_ENABLED)
+				'macro' => array(RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS43_ENABLED, RSM_TLD_RDDS80_ENABLED,
+					RSM_TLD_RDAP_ENABLED
+				)
 			)
 		));
 
@@ -130,7 +132,9 @@ if ($data['filter_search']) {
 		$epp = false;
 
 		foreach ($template_macros as $template_macro) {
-			if ($template_macro['macro'] == RSM_TLD_RDDS_ENABLED && $template_macro['value'] == 1) {
+			if ($template_macro['value'] == 1 && ($template_macro['macro'] == RSM_TLD_RDDS43_ENABLED
+					|| $template_macro['macro'] == RSM_TLD_RDDS80_ENABLED
+					|| $template_macro['macro'] == RSM_TLD_RDAP_ENABLED)) {
 				$rdds = true;
 				$item_keys = array_merge($item_keys, array(RSM_SLV_RDDS_DOWNTIME, RSM_SLV_RDDS43_UPD_PFAILED));
 				$macro_keys = array_merge($macro_keys, array(RSM_SLV_MACRO_RDDS_AVAIL, RSM_SLV_RDDS_UPD,
@@ -240,7 +244,7 @@ if ($data['filter_search']) {
 				' AND h.clock<'.zbx_dbstr($end_time)
 		));
 
-		$data['services'][] = [
+		$data['services'][] = array(
 			'name' => 'DNS service availability',
 			'main' => true,
 			'details' => '-',
@@ -254,7 +258,7 @@ if ($data['filter_search']) {
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
 				)
 			)
-		];
+		);
 
 		// Get NS items.
 		$ns_items = DBselect(
@@ -293,7 +297,7 @@ if ($data['filter_search']) {
 			$item_key = new CItemKey($ns_item['key_']);
 			$params = $item_key->getParameters();
 
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => _('DNS name server availability'),
 				'main' => false,
 				'details' => $params[0],
@@ -317,7 +321,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 					)
 				)
-			];
+			);
 		}
 
 		// TCP DNS resolution RTT.
@@ -337,7 +341,7 @@ if ($data['filter_search']) {
 		}
 
 		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_DNS_TCP_RTT_LOW]['value']._('ms');
-		$data['services'][] = [
+		$data['services'][] = array(
 			'name' => 'TCP DNS resolution RTT',
 			'main' => false,
 			'details' => '-',
@@ -358,7 +362,7 @@ if ($data['filter_search']) {
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 				)
 			)
-		];
+		);
 
 		// UDP DNS resolution RTT.
 		$item_hystory = DBfetch(DBselect(
@@ -377,7 +381,7 @@ if ($data['filter_search']) {
 		}
 
 		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_DNS_UDP_RTT_LOW]['value']._('ms');
-		$data['services'][] = [
+		$data['services'][] = array(
 			'name' => 'UDP DNS resolution RTT',
 			'main' => false,
 			'details' => '-',
@@ -398,7 +402,7 @@ if ($data['filter_search']) {
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 				)
 			)
-		];
+		);
 
 		// DNS update time.
 		$item_hystory = DBfetch(DBselect(
@@ -417,7 +421,7 @@ if ($data['filter_search']) {
 		}
 
 		$slv = $item_hystory['value'].'% > '.$macros[RSM_DNS_UPDATE_TIME]['value']._('ms');
-		$data['services'][] = [
+		$data['services'][] = array(
 			'name' => 'DNS update time',
 			'main' => false,
 			'details' => '-',
@@ -438,7 +442,7 @@ if ($data['filter_search']) {
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 				)
 			)
-		];
+		);
 
 		// RDDS availability.
 		if ($rdds) {
@@ -451,7 +455,7 @@ if ($data['filter_search']) {
 					' AND h.clock<'.zbx_dbstr($end_time)
 			));
 
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'RDDS service availability',
 				'main' => true,
 				'details' => '-',
@@ -470,10 +474,10 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 
 			// RDDS Query RTT (combined from 43 and 80 below).
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'RDDS Query RTT (combined from 43 and 80 below)',
 				'main' => false,
 				'details' => '-',
@@ -492,7 +496,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 
 			// If RDDS and EPP is avail
 			if ($epp) {
@@ -513,7 +517,7 @@ if ($data['filter_search']) {
 				}
 
 				$slv = $item_hystory['value'].'% > '.$macros[RSM_RDDS_UPDATE_TIME]['value']._('ms');
-				$data['services'][] = [
+				$data['services'][] = array(
 					'name' => 'RDDS update time',
 					'main' => false,
 					'details' => '-',
@@ -534,7 +538,7 @@ if ($data['filter_search']) {
 							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 						)
 					)
-				];
+				);
 			}
 		}
 
@@ -549,7 +553,7 @@ if ($data['filter_search']) {
 					' AND h.clock<'.zbx_dbstr($end_time)
 			));
 
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'EPP service availability',
 				'main' => true,
 				'details' => '-',
@@ -568,7 +572,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 
 			// EPP session-command RTT.
 			$item_hystory = DBfetch(DBselect(
@@ -587,7 +591,7 @@ if ($data['filter_search']) {
 			}
 
 			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'EPP session-command RTT',
 				'main' => false,
 				'details' => '-',
@@ -608,7 +612,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 
 			// EPP query-command RTT.
 			$item_hystory = DBfetch(DBselect(
@@ -627,7 +631,7 @@ if ($data['filter_search']) {
 			}
 
 			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'EPP query-command RTT',
 				'main' => false,
 				'details' => '-',
@@ -648,7 +652,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 
 			// EPP transform-command RTT.
 			$item_hystory = DBfetch(DBselect(
@@ -667,7 +671,7 @@ if ($data['filter_search']) {
 			}
 
 			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_UPDATE_RTT_LOW]['value']._('ms');
-			$data['services'][] = [
+			$data['services'][] = array(
 				'name' => 'EPP transform-command RTT',
 				'main' => false,
 				'details' => '-',
@@ -688,7 +692,7 @@ if ($data['filter_search']) {
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 					)
 				)
-			];
+			);
 		}
 	}
 }

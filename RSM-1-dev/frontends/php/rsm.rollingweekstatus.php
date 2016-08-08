@@ -455,29 +455,42 @@ if ($hostIds) {
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $templateIds,
 			'filter' => array(
-				'macro' => array(RSM_TLD_DNSSEC_ENABLED, RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS_ENABLED)
+				'macro' => array(RSM_TLD_DNSSEC_ENABLED, RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS43_ENABLED,
+					RSM_TLD_RDDS80_ENABLED, RSM_TLD_RDAP_ENABLED
+				)
 			)
 		));
 
 		foreach ($templateMacros as $templateMacro) {
-			if ($templateMacro['value'] == 0) {
-				$disabledHostId = $hostIdByTemplateName[$templates[$templateMacro['hostid']]['host']];
-				switch ($templateMacro['macro']) {
-					case RSM_TLD_DNSSEC_ENABLED:
-						$serviceType = RSM_DNSSEC;
-						break;
-					case RSM_TLD_EPP_ENABLED:
-						$serviceType = RSM_EPP;
-						break;
-					case RSM_TLD_RDDS_ENABLED:
-						$serviceType = RSM_RDDS;
-						break;
-				}
+			$current_hostid = $hostIdByTemplateName[$templates[$templateMacro['hostid']]['host']];
+			if ($templateMacro['macro'] == RSM_TLD_DNSSEC_ENABLED || $templateMacro['macro'] == RSM_TLD_EPP_ENABLED) {
+				if ($templateMacro['value'] == 0) {
+					if ($templateMacro['macro'] == RSM_TLD_DNSSEC_ENABLED) {
+						$service_type = RSM_DNSSEC;
+					}
+					else {
+						$service_type = RSM_EPP;
+					}
 
-				// unset services
-				if (isset($data['tld'][$disabledHostId][$serviceType])) {
-					unset($itemIds[$data['tld'][$disabledHostId][$serviceType]['availItemId']]);
-					unset($data['tld'][$disabledHostId][$serviceType]);
+					// Unset disabled services
+					if (isset($data['tld'][$current_hostid][$service_type])) {
+						unset($itemIds[$data['tld'][$current_hostid][$service_type]['availItemId']]);
+						unset($data['tld'][$current_hostid][$service_type]);
+					}
+				}
+			}
+			else {
+				if (array_key_exists(RSM_RDDS, $data['tld'][$current_hostid])) {
+					$data['tld'][$current_hostid][RSM_RDDS]['subservices'][$templateMacro['macro']] = $templateMacro['value'];
+				}
+			}
+		}
+
+		foreach ($data['tld'] as $key => $tld) {
+			if (array_key_exists(RSM_RDDS, $tld)) {
+				if (!array_key_exists('subservices', $tld[RSM_RDDS]) || !array_sum($tld[RSM_RDDS]['subservices'])) {
+					unset($itemIds[$data['tld'][$key][RSM_RDDS]['availItemId']]);
+					unset($data['tld'][$key][RSM_RDDS]);
 				}
 			}
 		}

@@ -60,7 +60,7 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = get_tlds('RDDS', 'EPP');
+	$tlds_ref = get_tlds('RDDS43', 'EPP');
 }
 
 my $month_cycles = get_num_cycles($from, $month_till, $delay);

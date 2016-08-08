@@ -26,11 +26,22 @@
 
 /* item values indicating an error code: */
 /* -1   .. -199    internal monitoring software errors */
-/* -200 .. -999    service errors (registry operator fault) */
+/* -200 .. -999    service errors (registry operator fault), except -208, -250 and -500 */
 
 /* internal */
 #define ZBX_EC_INTERNAL			-1	/* general internal error */
 #define ZBX_EC_INTERNAL_IP_UNSUP	-2	/* IP version not supported by Probe */
+/* auxiliary generic resolver error codes */
+#define ZBX_EC_RES_NOREPLY		-3
+#define ZBX_EC_RES_NOADBIT		-4
+#define ZBX_EC_RES_SERVFAIL		-5
+#define ZBX_EC_RES_NXDOMAIN		-6
+#define ZBX_EC_RES_CATCHALL		-7
+/* auxiliary generic HTTP error codes */
+#define ZBX_EC_HTTP_ECON		-8
+#define ZBX_EC_HTTP_EHTTP		-9
+#define ZBX_EC_HTTP_EHTTPS		-10
+#define ZBX_EC_HTTP_BASE		-11
 /* DNS */
 #define ZBX_EC_DNS_NS_NOREPLY		-200	/* no reply from Name Server */
 #define ZBX_EC_DNS_NS_EREPLY		-201	/* invalid reply from Name Server */
@@ -40,14 +51,47 @@
 #define ZBX_EC_DNS_RES_NOREPLY		-205	/* no reply from resolver */
 #define ZBX_EC_DNS_RES_NOADBIT		-206	/* no AD bit in the answer from resolver */
 /* RDDS */
-#define ZBX_EC_RDDS43_NOREPLY		-200	/* no reply from RDDS43 server */
-#define ZBX_EC_RDDS43_NONS		-201	/* Whois server returned no NS */
-#define ZBX_EC_RDDS43_NOTS		-202	/* no Unix timestamp */
-#define ZBX_EC_RDDS43_ETS		-203	/* invalid Unix timestamp */
-#define ZBX_EC_RDDS80_NOREPLY		-204	/* no reply from RDDS80 server */
-#define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
-#define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP response code in response from RDDS80 server */
-#define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP response code in response from RDDS80 server */
+#define ZBX_EC_RDDS43_NONS		-201	/* RDDS43 - The output of the response does not match specification */
+#define ZBX_EC_RDDS43_RES_NOREPLY	-208	/* RDDS43 - No reply from local resolver */
+#define ZBX_EC_RDDS43_RES_NOADBIT	-209	/* RDDS43 - No AD bit from local resolver */
+#define ZBX_EC_RDDS43_RES_SERVFAIL	-210	/* RDDS43 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDDS43_RES_NXDOMAIN	-211	/* RDDS43 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDDS43_RES_CATCHALL	-212	/* RDDS43 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDDS43_TO		-213	/* RDDS43 - Timeout reply from server */
+#define ZBX_EC_RDDS43_ECON		-214	/* RDDS43 - Error opening connection to server */
+#define ZBX_EC_RDDS43_NOTS		-215	/* RDDS43 - No Unix timestamp in response */
+#define ZBX_EC_RDDS43_ETS		-216	/* RDDS43 - Invalid Unix timestamp in response */
+#define ZBX_EC_RDDS43_EMPTY		-217	/* RDDS43 - Empty response */
+#define ZBX_EC_RDDS80_RES_NOREPLY	-250	/* RDDS80 - No reply from local resolver */
+#define ZBX_EC_RDDS80_RES_NOADBIT	-251	/* RDDS80 - No AD bit from local resolver */
+#define ZBX_EC_RDDS80_RES_SERVFAIL	-252	/* RDDS80 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDDS80_RES_NXDOMAIN	-253	/* RDDS80 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDDS80_RES_CATCHALL	-254	/* RDDS80 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDDS80_TO		-255	/* RDDS80 - Timeout reply from server */
+#define ZBX_EC_RDDS80_ECON		-256	/* RDDS80 - Error opening connection to server */
+#define ZBX_EC_RDDS80_EHTTP		-257	/* RDDS80 - Error in HTTP protocol */
+#define ZBX_EC_RDDS80_EHTTPS		-258	/* RDDS80 - Error in HTTPS protocol */
+#define ZBX_EC_RDDS80_HTTP_BASE		-300
+/* Code ZBX_EC_RDDS80_HTTP_BASE - zbx_map_http_code(xxx) means */
+						/* RDDS80 - Expecting HTTP status code 200 but got xxx */
+#define ZBX_EC_RDAP_RES_NOREPLY		-500	/* RDAP - No reply from local resolver */
+#define ZBX_EC_RDAP_RES_NOADBIT		-501	/* RDAP - No AD bit from local resolver */
+#define ZBX_EC_RDAP_RES_SERVFAIL	-502	/* RDAP - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDAP_RES_NXDOMAIN	-503	/* RDAP - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDAP_RES_CATCHALL	-504	/* RDAP - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDAP_TO			-505	/* RDAP - Timeout reply from server */
+#define ZBX_EC_RDAP_ECON		-506	/* RDAP - Error opening connection to server */
+#define ZBX_EC_RDAP_EJSON		-507	/* RDAP - Invalid JSON format in response */
+#define ZBX_EC_RDAP_NONAME		-508	/* RDAP - ldhName member not found in response */
+#define ZBX_EC_RDAP_ENAME		-509	/* RDAP - ldhName member doesn't match query in response */
+#define ZBX_EC_RDAP_NONS		-510	/* RDAP - Syntax valid Name server member not found in response */
+#define ZBX_EC_RDAP_NOTS		-511	/* RDAP - No Unix timestamp in response */
+#define ZBX_EC_RDAP_ETS			-512	/* RDAP - Invalid Unix timestamp in response */
+#define ZBX_EC_RDAP_EHTTP		-513	/* RDAP - Error in HTTP protocol */
+#define ZBX_EC_RDAP_EHTTPS		-514	/* RDAP - Error in HTTPS protocol */
+#define ZBX_EC_RDAP_HTTP_BASE		-550
+/* Code ZBX_EC_RDAP_HTTP_BASE - zbx_map_http_code(xxx) means */
+						/* RDAP - Expecting HTTP status code 200 but got xxx */
 /* EPP */
 #define ZBX_EC_EPP_NO_IP		-200	/* IP is missing for EPP server */
 #define ZBX_EC_EPP_CONNECT		-201	/* cannot connect to EPP server */
@@ -76,10 +120,15 @@
 #define ZBX_MACRO_DNS_UDP_RTT		"{$RSM.DNS.UDP.RTT.HIGH}"
 #define ZBX_MACRO_DNS_TCP_RTT		"{$RSM.DNS.TCP.RTT.HIGH}"
 #define ZBX_MACRO_RDDS_TESTPREFIX	"{$RSM.RDDS.TESTPREFIX}"
-#define ZBX_MACRO_RDDS_RTT		"{$RSM.RDDS.RTT.HIGH}"
+#define ZBX_MACRO_RDDS43_RTT		"{$RSM.RDDS43.RTT.HIGH}"
+#define ZBX_MACRO_RDDS80_RTT		"{$RSM.RDDS80.RTT.HIGH}"
+#define ZBX_MACRO_RDAP_RTT		"{$RSM.RDAP.RTT.HIGH}"
 #define ZBX_MACRO_RDDS_NS_STRING	"{$RSM.RDDS.NS.STRING}"
-#define ZBX_MACRO_RDDS_MAXREDIRS	"{$RSM.RDDS.MAXREDIRS}"
-#define ZBX_MACRO_RDDS_ENABLED		"{$RSM.RDDS.ENABLED}"
+#define ZBX_MACRO_RDDS80_MAXREDIRS	"{$RSM.RDDS80.MAXREDIRS}"
+#define ZBX_MACRO_RDAP_MAXREDIRS	"{$RSM.RDAP.MAXREDIRS}"
+#define ZBX_MACRO_RDDS43_ENABLED	"{$RSM.RDDS43.ENABLED}"
+#define ZBX_MACRO_RDDS80_ENABLED	"{$RSM.RDDS80.ENABLED}"
+#define ZBX_MACRO_RDAP_ENABLED		"{$RSM.RDAP.ENABLED}"
 #define ZBX_MACRO_EPP_LOGIN_RTT		"{$RSM.EPP.LOGIN.RTT.HIGH}"
 #define ZBX_MACRO_EPP_UPDATE_RTT	"{$RSM.EPP.UPDATE.RTT.HIGH}"
 #define ZBX_MACRO_EPP_INFO_RTT		"{$RSM.EPP.INFO.RTT.HIGH}"
@@ -101,7 +150,9 @@
 #define ZBX_MACRO_EPP_TESTPREFIX	"{$RSM.EPP.TESTPREFIX}"
 #define ZBX_MACRO_EPP_SERVERCERTMD5	"{$RSM.EPP.SERVERCERTMD5}"
 #define ZBX_MACRO_TLD_DNSSEC_ENABLED	"{$RSM.TLD.DNSSEC.ENABLED}"
-#define ZBX_MACRO_TLD_RDDS_ENABLED	"{$RSM.TLD.RDDS.ENABLED}"
+#define ZBX_MACRO_TLD_RDDS43_ENABLED	"{$RSM.TLD.RDDS43.ENABLED}"
+#define ZBX_MACRO_TLD_RDDS80_ENABLED	"{$RSM.TLD.RDDS80.ENABLED}"
+#define ZBX_MACRO_TLD_RDAP_ENABLED	"{$RSM.TLD.RDAP.ENABLED}"
 #define ZBX_MACRO_TLD_EPP_ENABLED	"{$RSM.TLD.EPP.ENABLED}"
 
 #define ZBX_RSM_UDP_TIMEOUT	3	/* seconds */

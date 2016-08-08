@@ -7,11 +7,14 @@
 #								rsm.dns.udp.upd			-|-
 #
 # - RDDS availability test		(data collection)	rsm.rdds			(simple, every 5 minutes)
-#   (also RDDS43 and RDDS80					rsm.rdds.43.ip			(trapper, Proxy)
+#   (also RDDS43, RDDS80 and RDAP				rsm.rdds.43.ip			(trapper, Proxy)
 #   availability at a particular				rsm.rdds.43.rtt			-|-
 #   minute)							rsm.rdds.43.upd			-|-
 #								rsm.rdds.80.ip			-|-
 #								rsm.rdds.80.rtt			-|-
+#								rsm.rdds.rdap.ip		-|-
+#								rsm.rdds.rdap.rtt		-|-
+#								rsm.rdds.rdap.upd		-|-
 #
 # - EPP	availability test		(data collection)	rsm.epp				(simple, every 5 minutes)
 # - info RTT							rsm.epp.ip[{$RSM.TLD}]		(trapper, Proxy)
@@ -34,6 +37,7 @@
 # - RDDS rolling week			(rolling week)		rsm.slv.rdds.rollweek		-|-
 # - RDDS43 monthly resolution RTT	(monthly)		rsm.slv.rdds.43.rtt.month	-|-
 # - RDDS80 monthly resolution RTT	(monthly)		rsm.slv.rdds.80.rtt.month	-|-
+# - RDAP monthly resolution RTT		(monthly)		rsm.slv.rdds.rdap.rtt.month	-|-
 # - RDDS monthly update time		(monthly)		rsm.slv.rdds.upd.month		-|-
 #
 # - EPP availability			(given minute)		rsm.slv.epp.avail		-|-
@@ -78,6 +82,8 @@ my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
 my $cfg_global_macros = cfg_global_macros;
 
+my $rsm_rdds_interfaces = rsm_rdds_interfaces;
+
 my ($rsm_groupid, $rsm_hostid);
 
 my ($ns_servers, $root_servers_macros, $applications);
@@ -94,6 +100,7 @@ my $rv = GetOptions(\%OPTS,
 		    "set-type!",
 		    "rdds43-servers=s",
 		    "rdds80-servers=s",
+		    "rdap-servers=s",
 		    "dns-test-prefix=s",
 		    "rdds-test-prefix=s",
 		    "ipv4!",
@@ -201,8 +208,9 @@ if (defined($OPTS{'list-services'})) {
 
     my $report;
 
-    my @columns = ('tld_type', '{$RSM.DNS.TESTPREFIX}', '{$RSM.RDDS.NS.STRING}', '{$RSM.RDDS.TESTPREFIX}',
-		    '{$RSM.TLD.DNSSEC.ENABLED}', '{$RSM.TLD.EPP.ENABLED}', '{$RSM.TLD.RDDS.ENABLED}');
+	my @columns = ('tld_type', '{$RSM.DNS.TESTPREFIX}', '{$RSM.RDDS.NS.STRING}', '{$RSM.RDDS.TESTPREFIX}',
+			'{$RSM.TLD.DNSSEC.ENABLED}', '{$RSM.TLD.EPP.ENABLED}', '{$RSM.TLD.RDDS43.ENABLED}',
+			'{$RSM.TLD.RDDS80.ENABLED}', '{$RSM.TLD.RDAP.ENABLED}');
 
     foreach my $tld (@tlds) {
 	my $services = get_services($tld);
@@ -367,7 +375,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_templateid;
 
     if ($probe_status == HOST_STATUS_PROXY_ACTIVE) {
-	$probe_templateid = create_probe_template($probe_name, 0, 0, 0, 0);
+	$probe_templateid = create_probe_template($probe_name, 0, 0, 0, 0, 0, 0);
     }
     else {
 	$probe_templateid = create_probe_template($probe_name);
@@ -635,93 +643,79 @@ sub create_items_dns {
     create_item($options, $is_new);
 }
 
-sub create_items_rdds {
-    my $templateid = shift;
-    my $template_name = shift;
-    my $is_new = shift;
+sub create_items_rdds
+{
+	my $templateid = shift;
+	my $template_name = shift;
+	my $is_new = shift;
 
-    $is_new = false unless defined $is_new;
+	$is_new = false unless defined $is_new;
 
-    unless (exists($applications->{$templateid}->{'RDDS43'})) {
-        $applications->{$templateid}->{'RDDS43'} = get_application_id('RDDS43', $templateid, $is_new)
-    }
+	my $any_interface_enabled = false;
+	my %hosts;
+	my $options;
 
-    unless (exists($applications->{$templateid}->{'RDDS80'})) {
-        $applications->{$templateid}->{'RDDS80'} = get_application_id('RDDS80', $templateid, $is_new)
-    }
+	$options->{'hostid'} = $templateid;
+	$options->{'type'} = 2;
 
-    my $applicationid_43 = $applications->{$templateid}->{'RDDS43'};
-    my $applicationid_80 = $applications->{$templateid}->{'RDDS80'};
+	while (my ($interface, $details) = each(%{$rsm_rdds_interfaces}))
+	{
+		if (defined($OPTS{$details->{'option'}}))
+		{
+			$any_interface_enabled ||= true;
+			$hosts{$interface} = $OPTS{$details->{'option'}};
 
-    my $item_key = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+			unless (exists($applications->{$templateid}->{$interface}))
+			{
+				$applications->{$templateid}->{$interface} =
+						get_application_id($interface, $templateid, $is_new);
+			}
 
-    my $options = {'name' => 'RDDS43 IP',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_43],
-                                              'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
-    create_item($options, $is_new);
+			$options->{'applications'} = [$applications->{$templateid}->{$interface}];
 
-    $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+			$options->{'name'} = $interface . ' IP';
+			$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.ip[{$RSM.TLD}]';
+			$options->{'value_type'} = 1;
+			delete($options->{'valuemapid'}) if (exists($options->{'valuemapid'}));
+			create_item($options, $is_new);
 
-    $options = {'name' => 'RDDS43 RTT',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_43],
-                                              'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
+			$options->{'name'} = $interface . ' RTT';
+			$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.rtt[{$RSM.TLD}]';
+			$options->{'value_type'} = 0;
+			$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_result'};
+			create_item($options, $is_new);
 
-    create_item($options, $is_new);
+			if ($details->{'update'} && defined($OPTS{'epp-servers'}))
+			{
+				$options->{'name'} = $interface . ' update time';
+				$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.upd[{$RSM.TLD}]';
+				$options->{'value_type'} = 0;
+				$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_result'};
+				create_item($options, $is_new);
+			}
+		}
+	}
 
-    if (defined($OPTS{'epp-servers'})) {
-	$item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+	if ($any_interface_enabled)
+	{
+		unless (exists($applications->{$templateid}->{'RDDS'}))
+		{
+			$applications->{$templateid}->{'RDDS'} = get_application_id('RDDS', $templateid, $is_new);
+		}
 
-	$options = {'name' => 'RDDS43 update time of $1',
-		    'key_'=> $item_key,
-		    'hostid' => $templateid,
-		    'applications' => [$applicationid_43],
-		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
-		    'status' => 0};
+		$options->{'applications'} = [$applications->{$templateid}->{'RDDS'}];
 
-	create_item($options, $is_new);
-    }
-
-    $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
-
-    $options = {'name' => 'RDDS80 IP',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_80],
-                                              'type' => 2, 'value_type' => 1};
-    create_item($options, $is_new);
-
-    $item_key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-
-    $options = {'name' => 'RDDS80 RTT',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_80],
-                                              'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
-
-    create_item($options, $is_new);
-
-    $item_key = 'rsm.rdds[{$RSM.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
-
-    unless (exists($applications->{$templateid}->{'RDDS'})) {
-        $applications->{$templateid}->{'RDDS'} = get_application_id('RDDS', $templateid, $is_new)
-    }
-
-    $options = {'name' => 'RDDS test',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'RDDS'}],
-                                              'type' => 3, 'value_type' => 3,
-					      'delay' => $cfg_global_macros->{'{$RSM.RDDS.DELAY}'},
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_probe_result'}};
-    create_item($options, $is_new);
+		$options->{'name'} = 'RDDS test';
+		$options->{'key_'} = 'rsm.rdds[{$RSM.TLD},"' .
+				(exists($hosts{'RDDS43'}) ? $hosts{'RDDS43'} : '') . '","' .
+				(exists($hosts{'RDDS80'}) ? $hosts{'RDDS80'} : '') . '","' .
+				(exists($hosts{'RDAP'}) ? $hosts{'RDAP'} : '') . '"]';
+		$options->{'type'} = 3;
+		$options->{'value_type'} = 3;
+		$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_probe_result'};
+		$options->{'delay'} = $cfg_global_macros->{'{$RSM.RDDS.DELAY}'};
+		create_item($options, $is_new);
+	}
 }
 
 sub create_items_epp {
@@ -792,22 +786,6 @@ sub create_items_epp {
 		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options, $is_new);
-
-    if (defined($OPTS{'rdds43-servers'})) {
-        $item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-
-        my $applicationid_43 = get_application_id('RDDS43', $templateid);
-
-        $options = {'name' => 'RDDS43 update time',
-                    'key_'=> $item_key,
-		    'hostid' => $templateid,
-		    'applications' => [$applicationid_43],
-		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'},
-		    'status' => 0};
-
-	create_item($options);
-    }
 }
 
 sub trim
@@ -985,7 +963,7 @@ sub create_main_template {
     }
 
     create_items_dns($templateid, $template_name, $is_new);
-    create_items_rdds($templateid, $template_name, $is_new) if (defined($OPTS{'rdds43-servers'}));
+    create_items_rdds($templateid, $template_name, $is_new);
     create_epp_objects($templateid, $template_name, $tld, $is_new) if (defined($OPTS{'epp-servers'}));
 
     create_macro('{$RSM.TLD}', $tld, $templateid, undef, $is_new);
@@ -993,8 +971,13 @@ sub create_main_template {
     create_macro('{$RSM.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid, undef, $is_new) if (defined($OPTS{'rdds-test-prefix'}));
     create_macro('{$RSM.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid, undef, $is_new);
     create_macro('{$RSM.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid, true, $is_new);
-    create_macro('{$RSM.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid, true, $is_new);
     create_macro('{$RSM.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid, true, $is_new);
+
+	while (my ($interface, $details) = each(%{$rsm_rdds_interfaces}))
+	{
+		create_macro('{$RSM.TLD.' . $interface . '.ENABLED}', (defined($OPTS{$details->{'option'}}) ? 1 : 0),
+				$templateid, true, $is_new);
+	}
 
     return $templateid;
 }
@@ -1012,7 +995,7 @@ sub create_epp_objects($$$$) {
     pfail('cannot get macro ', $m) unless defined($keysalt);
     trim($keysalt);
     pfail("the value of global macro $m is empty") unless ($keysalt);
-    pfail("the value of global macro $m must conatin | ($keysalt)") unless ($keysalt =~ m/\|/);
+    pfail("the value of global macro $m must contain | ($keysalt)") unless ($keysalt =~ m/\|/);
 
     if ($OPTS{'epp-commands'}) {
 	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, true);
@@ -1198,124 +1181,150 @@ sub create_slv_items {
     }
 
 
-    if (defined($OPTS{'rdds43-servers'})) {
-	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+	if (defined($OPTS{'rdds43-servers'}) || defined($OPTS{'rdds80-servers'}) || defined($OPTS{'rdap-servers'}))
+	{
+		create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL,
+				[$applications->{$hostid}->{APP_SLV_PARTTEST}]);
+		create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM,
+				[$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+		# NB! Configuration trigger that is used in PHP and C code to detect incident!
+		# priority must be set to 0!
+		$options = {
+			'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
+			'expression' => '({TRIGGER.VALUE}=0&'.
+				'{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.FAIL},0,"eq")}={$RSM.INCIDENT.RDDS.FAIL})|'.
+				'({TRIGGER.VALUE}=1&'.
+				'{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.RECOVER},0,"ne")}<{$RSM.INCIDENT.RDDS.RECOVER})',
+			'priority' => '0',
+		};
+
+		create_trigger($options);
+
+		$options = {
+			'description' => 'RDDS has been down for over {$RSM.SLV.RDDS.AVAIL} minutes',
+			'expression' => '{'.$host_name.':rsm.slv.rdds.downtime.last(0)}>{$RSM.SLV.RDDS.AVAIL}',
+			'priority' => '4'
+		};
+
+		create_trigger($options);
+
+		create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC,
+				[$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
+
+		my $depend_down;
+
+		foreach my $position (sort keys %{$trigger_rollweek_thresholds})
+		{
+			my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+			my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+			next if ($threshold eq 0);
+
+			$options = {
+				'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+				'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>'.$threshold.'|'.
+					'{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}='.$threshold,
+				'priority' => $priority,
+			};
+
+			my $result = create_trigger($options);
+
+			my $triggerid = $result->{'triggerids'}[0];
+
+			if (defined($depend_down))
+			{
+				add_dependency($triggerid, $depend_down);
+			}
+
+			$depend_down = $triggerid;
+		}
+
+		undef($depend_down);
+
+		create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}')
+				if (defined($OPTS{'rdds43-servers'}));
+		create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}')
+				if (defined($OPTS{'rdds80-servers'}));
+		create_slv_monthly("RDAP Query RTT", "rsm.slv.rdap.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}')
+				if (defined($OPTS{'rdap-servers'}));
+	}
+
+	create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
+}
+
+sub create_slv_epp_items($$)
+{
+	my $hostid = shift;
+	my $host_name = shift;
+
+	create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL,
+			[$applications->{$hostid}->{APP_SLV_PARTTEST}]);
+	create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM,
+			[$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+	create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC,
+			[$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
+
+	create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $host_name,
+			'{$RSM.SLV.EPP.LOGIN}');
+	create_slv_monthly('EPP Query-Command RTT',     'rsm.slv.epp.rtt.info',   $hostid, $host_name,
+			'{$RSM.SLV.EPP.INFO}');
+	create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid, $host_name,
+			'{$RSM.SLV.EPP.UPDATE}');
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
-	$options = { 'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
-		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.FAIL},0,"eq")}={$RSM.INCIDENT.RDDS.FAIL})|'.
-			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.RECOVER},0,"ne")}<{$RSM.INCIDENT.RDDS.RECOVER})',
-			 'priority' => '0',
+	my $options = {
+		'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
+		'expression' => '({TRIGGER.VALUE}=0&'.
+			'{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
+			'({TRIGGER.VALUE}=1&'.
+			'{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
+		'priority' => '0',
 	};
 
 	create_trigger($options);
 
 	$options = {
-	    'description' => 'RDDS has been down for over {$RSM.SLV.RDDS.AVAIL} minutes',
-	    'expression' => '{'.$host_name.':rsm.slv.rdds.downtime.last(0)}>{$RSM.SLV.RDDS.AVAIL}',
-	    'priority' => '4'
+		'description' => 'EPP has been down for over {$RSM.SLV.EPP.AVAIL} minutes',
+		'expression' => '{'.$host_name.':rsm.slv.epp.downtime.last(0)}>{$RSM.SLV.EPP.AVAIL}',
+		'priority' => '4'
 	};
 
 	create_trigger($options);
 
-	create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
+	my $depend_down;
 
-        my $depend_down;
+	foreach my $position (sort keys %{$trigger_rollweek_thresholds})
+	{
+		my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+		my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
 
-	foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
-    	    my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
-    	    my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
-    	    next if ($threshold eq 0);
+		next if ($threshold eq 0);
 
-            $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-                         'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>'.$threshold.'|'.
-					    '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}='.$threshold,
-                        'priority' => $priority,
-                };
+		$options = {
+			'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+			'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
+				'{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
+			'priority' => $priority,
+		};
 
-	    my $result = create_trigger($options);
+		my $result = create_trigger($options);
 
-    	    my $triggerid = $result->{'triggerids'}[0];
+		my $triggerid = $result->{'triggerids'}[0];
 
-	    if (defined($depend_down)) {
-    	        add_dependency($triggerid, $depend_down);
-    	    }
+		if (defined($depend_down))
+		{
+			add_dependency($triggerid, $depend_down);
+		}
 
-    	    $depend_down = $triggerid;
-        }
-
-	undef($depend_down);
-
-	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
-	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
-    }
-
-    create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
-}
-
-sub create_slv_epp_items($$) {
-    my $hostid = shift;
-    my $host_name = shift;
-
-    create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
-
-    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $host_name, '{$RSM.SLV.EPP.LOGIN}');
-    create_slv_monthly('EPP Query-Command RTT',     'rsm.slv.epp.rtt.info',   $hostid, $host_name, '{$RSM.SLV.EPP.INFO}');
-    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid, $host_name, '{$RSM.SLV.EPP.UPDATE}');
-
-    # NB! Configuration trigger that is used in PHP and C code to detect incident!
-    # priority must be set to 0!
-    my $options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
-		    'expression' => '({TRIGGER.VALUE}=0&'.
-			    '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
-			    '({TRIGGER.VALUE}=1&'.
-			    '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
-			    'priority' => '0',
-    };
-
-    create_trigger($options);
-
-    $options = {
-	'description' => 'EPP has been down for over {$RSM.SLV.EPP.AVAIL} minutes',
-	'expression' => '{'.$host_name.':rsm.slv.epp.downtime.last(0)}>{$RSM.SLV.EPP.AVAIL}',
-	'priority' => '4'
-    };
-
-    create_trigger($options);
-
-    my $depend_down;
-
-    foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
-	my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
-	my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
-
-	next if ($threshold eq 0);
-
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-		     'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
-			     '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
-			     'priority' => $priority,
-	};
-
-	my $result = create_trigger($options);
-
-	my $triggerid = $result->{'triggerids'}[0];
-
-	if (defined($depend_down)) {
-	    add_dependency($triggerid, $depend_down);
+		$depend_down = $triggerid;
 	}
 
-	$depend_down = $triggerid;
-    }
-
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
+	create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}')
+			if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDAP update time", "rsm.slv.rdap.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}')
+			if (defined($OPTS{'rdap-servers'}));
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
@@ -1407,7 +1416,7 @@ Other options
                 action with EPP only
 	--list-services
 		list services of each TLD, the output is comma-separated list:
-                <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS.ENABLED>
+                <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS43.ENABLED>,<TLD.RDDS80.ENABLED>,<TLD.RDAP.ENABLED>
 	--get-nsservers-list
 		CSV formatted list of NS + IP server pairs for specified TLD
 	--update-nsservers
@@ -1434,7 +1443,9 @@ Other options
         --rdds43-servers=STRING
                 list of RDDS43 servers separated by comma: "NAME1,NAME2,..."
         --rdds80-servers=STRING
-                list of RDDS80 servers separated by comma: "NAME1,NAME2,..."
+                list of RDDS80 server URLs separated by comma: "NAME1,NAME2,..."
+	--rdap-servers=STRING
+		list of RDAP server URLs separated by comma: "NAME1,NAME2,..."
         --epp-servers=STRING
                 list of EPP servers separated by comma: "NAME1,NAME2,..."
         --epp-user
@@ -1456,7 +1467,7 @@ Other options
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
         --rdds-test-prefix=STRING
-		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
+		domain test prefix for RDDS monitoring (needed only if RDDS43 servers specified)
         --setup-cron
 		create cron jobs and exit
 	--epp
@@ -1509,10 +1520,11 @@ sub validate_input {
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'only-epp'}) and !defined($OPTS{'dns-test-prefix'})
 									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
 									    and !defined($OPTS{'list-services'}));
-    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
-									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
-    $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
-											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
+
+	if ((defined($OPTS{$rsm_rdds_interfaces->{'RDDS43'}->{'option'}}) && !defined($OPTS{'rdds-test-prefix'})))
+	{
+		$msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n";
+	}
 
     if ($OPTS{'epp-servers'} or defined($OPTS{'only-epp'})) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
@@ -1549,14 +1561,17 @@ sub validate_input {
     }
 }
 
-sub lc_options {
-    foreach my $key (keys(%OPTS))
-    {
-	foreach ("tld", "rdds43-servers", "rdds80-servers=s", "epp-servers", "ns-servers-v4", "ns-servers-v6")
+sub lc_options
+{
+	my @options_to_lowercase = ("tld", "epp-servers", "ns-servers-v4", "ns-servers-v6",
+			$rsm_rdds_interfaces->{'RDDS43'}->{'option'},
+			$rsm_rdds_interfaces->{'RDDS80'}->{'option'},
+			$rsm_rdds_interfaces->{'RDAP'}->{'option'},);
+
+	foreach my $option (@options_to_lowercase)
 	{
-	    $OPTS{$_} = lc($OPTS{$_}) if ($key eq $_);
+	    $OPTS{$option} = lc($OPTS{$option}) if (exists($OPTS{$option}));
 	}
-    }
 }
 
 sub add_default_actions() {
@@ -1585,12 +1600,15 @@ sub create_global_macros() {
         '{$RSM.DNS.ROLLWEEK.SLA}' => 60,
 
         '{$RSM.RDDS.RTT.LOW}' => 2000,
-        '{$RSM.RDDS.RTT.HIGH}' => 10000,
+        '{$RSM.RDDS43.RTT.HIGH}' => 10000,
+        '{$RSM.RDDS80.RTT.HIGH}' => 10000,
+        '{$RSM.RDAP.RTT.HIGH}' => 10000,
         '{$RSM.RDDS.DELAY}' => 60,
         '{$RSM.RDDS.UPDATE.TIME}' => 3600,
         '{$RSM.RDDS.PROBE.ONLINE}' => 2,
         '{$RSM.RDDS.ROLLWEEK.SLA}' => 60,
-        '{$RSM.RDDS.MAXREDIRS}' => 10,
+        '{$RSM.RDDS80.MAXREDIRS}' => 10,
+        '{$RSM.RDAP.MAXREDIRS}' => 10,
 
         '{$RSM.EPP.DELAY}' => 60,
         '{$RSM.EPP.LOGIN.RTT.LOW}' => 4000,
@@ -2094,7 +2112,8 @@ sub update_epp_objects($) {
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
 
     create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDDS43 update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
+	create_slv_monthly("RDAP update time", "rsm.slv.rdap.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdap-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
 

@@ -17,6 +17,7 @@ use Data::Dumper;
 use Time::HiRes qw(time);
 use Fcntl qw(:flock);
 use TLD_constants qw(:api);
+use ApiHelper;
 
 use constant SUCCESS	=> 0;
 use constant E_FAIL	=> -1;
@@ -66,6 +67,7 @@ use constant JSON_INTERFACE_DNS		=> 'DNS';
 use constant JSON_INTERFACE_DNSSEC	=> 'DNSSEC';
 use constant JSON_INTERFACE_RDDS43	=> 'RDDS43';
 use constant JSON_INTERFACE_RDDS80	=> 'RDDS80';
+use constant JSON_INTERFACE_RDAP	=> 'RDAP';
 use constant JSON_INTERFACE_EPP		=> 'EPP';
 
 use constant JSON_TAG_TARGET_IP		=> 'targetIP';
@@ -99,7 +101,7 @@ our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR
 		MIN_INFO_ERROR MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
 		PROBE_ONLINE_SHIFT AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43
-		JSON_INTERFACE_RDDS80 JSON_INTERFACE_EPP
+		JSON_INTERFACE_RDDS80 JSON_INTERFACE_RDAP JSON_INTERFACE_EPP
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION EPP_COMMAND_LOGIN
 		EPP_COMMAND_INFO EPP_COMMAND_UPDATE PROTO_UDP PROTO_TCP
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
@@ -122,7 +124,7 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_avail process_slv_ns_avail process_slv_downtime get_results uint_value_exists
 		dbl_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
-		get_service_status_itemids get_probe_results get_ip_version
+		get_service_status_itemids get_probe_results interface_status get_ip_version
 		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute
 		avail_result_msg
 		get_current_value get_itemids_by_hostids get_valuemaps get_statusmaps get_detailed_result
@@ -540,7 +542,7 @@ sub get_lastclock
 sub get_tlds
 {
 	my $service = shift;	# in case of 2 services one of which is 'DNS' it has to be specified first
-	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS and EPP
+	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS43/RDAP and EPP
 
 	$service = defined($service) ? uc($service) : 'DNS';
 	$service2 = uc($service2) if ($service2);
@@ -2737,26 +2739,48 @@ sub __find_probe_key_by_itemid
 	return ($probe, $key);
 }
 
-sub __get_rdds_port
+sub __get_rdds_interface_n_type
 {
 	my $key = shift;
 
-	# rsm.rdds.43... <-- returns 43 or 80
-	return substr($key, 9, 2);
-}
+	my @keyparts = split(/./, substr($key, 0, index($key, '[')));
 
-sub __get_rdds_dbl_type
-{
-	my $key = shift;
+	my $interface;
+	my $type;
 
-	# rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns "rtt" or "upd"
-	return substr($key, 12, 3);
-}
+	if (defined($keyparts[2]))
+	{
+		if ($keyparts[2] eq '43')
+		{
+			$interface = JSON_INTERFACE_RDDS43;
+		}
+		elsif ($keyparts[2] eq '80')
+		{
+			$interface = JSON_INTERFACE_RDDS80;
+		}
+		elsif ($keyparts[2] eq 'rdap')
+		{
+			$interface = JSON_INTERFACE_RDAP;
+		}
+	}
 
-sub __get_rdds_str_type
-{
-	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
-	return 'ip';
+	if (defined($keyparts[3]))
+	{
+		if ($keyparts[3] eq 'rtt')
+		{
+			$interface = JSON_TAG_RTT;
+		}
+		elsif ($keyparts[3] eq 'upd')
+		{
+			$interface = JSON_TAG_UPD;
+		}
+		elsif ($keyparts[3] eq 'ip')
+		{
+			$interface = JSON_TAG_TARGET_IP;
+		}
+	}
+
+	return ($interface, $type);
 }
 
 sub __get_epp_dbl_type
@@ -2872,53 +2896,32 @@ sub get_rdds_test_values
 		fail("internal error: cannot get Probe-key pair by itemid:$itemid")
 			unless (defined($probe) and defined($key));
 
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_dbl_type($key);	# rtt (double) or upd (int, if EPP is enabled)
+		my ($interface, $type) = __get_rdds_interface_n_type($key);
+		my $description;
 
-		my $interface;
-		if ($port eq '43')
+		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
+		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
+
+		if ($type ne JSON_TAG_RTT && $type ne JSON_TAG_UPD)
 		{
-			$interface = JSON_INTERFACE_RDDS43;
-		}
-		elsif ($port eq '80')
-		{
-			$interface = JSON_INTERFACE_RDDS80;
-		}
-		else
-		{
-			fail("unknown RDDS port in item (id:$itemid)");
+			fail("internal error: unknown item key (itemid:$itemid), expected 'rtt' or 'upd' value involved in $interface test");
 		}
 
-		my ($new_value, $new_description, $value_tag, $set_idx);
+		$value = int($value);
 
-		if ($type eq 'rtt')
+		if ($value < 0)
 		{
-			$value_tag = JSON_TAG_RTT;
-			$new_value = $value;
-		}
-		elsif ($type eq 'upd')
-		{
-			$value_tag = JSON_TAG_UPD;
-			$new_value = int($value);
-		}
-		else
-		{
-			fail("unknown $interface item key (itemid:$itemid), expected 'rtt' or 'upd' value");
-		}
-
-		if ($new_value < 0)
-		{
-			$new_description = get_detailed_result($valuemaps, $new_value);
-			undef($new_value);
+			$description = get_detailed_result($valuemaps, $value);
+			undef($value);
 		}
 
 		my $cycleclock = cycle_start($clock, $delay);
 
 		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-		$test_ref->{$value_tag} = $new_value;
+		$test_ref->{$type} = $value;
 		$test_ref->{JSON_TAG_CLOCK()} = $clock;
-		$test_ref->{JSON_TAG_DESCRIPTION()} = $new_description;
+		$test_ref->{JSON_TAG_DESCRIPTION()} = $description;
 	}
 
 	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
@@ -2926,31 +2929,19 @@ sub get_rdds_test_values
 	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
-		my $ip = $row_ref->[1];
+		my $value = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
 
 		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_str_type($key);
+		my ($interface, $type) = __get_rdds_interface_n_type($key);
 
-		my $interface;
-                if ($port eq '43')
-                {
-                        $interface = JSON_INTERFACE_RDDS43;
-                }
-                elsif ($port eq '80')
-                {
-                        $interface = JSON_INTERFACE_RDDS80;
-                }
-                else
-                {
-                        fail("unknown RDDS port in item (id:$itemid)");
-                }
+		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
+		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
 
-		if ($type ne 'ip')
+		if ($type ne JSON_TAG_TARGET_IP)
 		{
 			fail("internal error: unknown item key (itemid:$itemid), expected item key representing the IP involved in $interface test");
 		}
@@ -2959,7 +2950,7 @@ sub get_rdds_test_values
 
 		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-		$test_ref->{JSON_TAG_TARGET_IP()} = $ip;
+		$test_ref->{$type} = $value;
 	}
 
 	return $result;
@@ -3208,6 +3199,37 @@ sub get_probe_results
 	}
 
 	return \%result;
+}
+
+sub interface_status
+{
+	my $interface = shift;
+	my $value = shift;
+	my $service_ref = shift;
+
+	my $status;
+
+	if ($interface eq JSON_INTERFACE_DNS)
+	{
+		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
+	}
+	elsif ($interface eq JSON_INTERFACE_DNSSEC)
+	{
+		# TODO: dnssec status on a particular probe is not supported currently,
+		# make this calculation in function __create_cycle_hash() for now.
+	}
+	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
+	{
+		my $rsm_rdds_probe_result = rsm_rdds_probe_result;
+
+		$status = (exists($rsm_rdds_probe_result->[$value]->{$interface}) ? AH_STATUS_UP : AH_STATUS_DOWN);
+	}
+	else
+	{
+		fail("$interface: unsupported interface");
+	}
+
+	return $status;
 }
 
 sub get_ip_version

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# RDDS80 monthly Query RTT
+# RDAP monthly update time
 
 BEGIN
 {
@@ -16,13 +16,13 @@ use Parallel;
 
 use constant VALUE_INVALID	=> -1;	# used internally
 
-my $cfg_key_in = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+my $cfg_key_in = 'rsm.rdds.rdap.upd[{$RSM.TLD}]';
 my $cfg_keys_out =
 {
-	'failed'	=> 'rsm.slv.rdds80.rtt.failed',
-	'max'		=> 'rsm.slv.rdds80.rtt.max',
-	'avg'		=> 'rsm.slv.rdds80.rtt.avg',
-	'pfailed'	=> 'rsm.slv.rdds80.rtt.pfailed'
+	'failed'	=> 'rsm.slv.rdap.upd.failed',
+	'max'		=> 'rsm.slv.rdap.upd.max',
+	'avg'		=> 'rsm.slv.rdap.upd.avg',
+	'pfailed'	=> 'rsm.slv.rdap.upd.pfailed'
 };
 
 parse_opts('tld=s', 'now=i');
@@ -40,7 +40,7 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $cfg_max_value = get_macro_rdds_rtt_low();
+my $cfg_max_value = get_macro_rdds_update_time();
 my $delay = get_macro_rdds_delay($now);
 
 my ($from, $month_till, $value_ts) = get_month_bounds($now, $delay);
@@ -54,13 +54,13 @@ my $probe_times_ref = get_probe_times($from, $cycle_till, $probes_ref);
 my $tlds_ref;
 if (opt('tld'))
 {
-        fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-        $tlds_ref = [ getopt('tld') ];
+	$tlds_ref = [ getopt('tld') ];
 }
 else
 {
-        $tlds_ref = get_tlds('RDDS80');
+	$tlds_ref = get_tlds('RDAP', 'EPP');
 }
 
 my $month_cycles = get_num_cycles($from, $month_till, $delay);
@@ -102,7 +102,7 @@ while ($tld_index < $tld_count)
 		{
 			if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
 			{
-				wrn("configuration error: RDDS80 monthly Query resolution RTT item not found (\"$test_key\")");
+				wrn("configuration error: RDDS43 monthly update time item not found (\"$test_key\")");
 				exit(0);
 			}
 
@@ -128,7 +128,7 @@ while ($tld_index < $tld_count)
 		my $max = $month_cycles * $probe_count;
 
 		push_value($tld, $cfg_keys_out->{'failed'},  $value_ts, $failed,  "failed tests (total: ", $result->{'total_tests'}, ")");
-		push_value($tld, $cfg_keys_out->{'avg'},     $value_ts, $avg,     "average RTT") unless ($avg == VALUE_INVALID);
+		push_value($tld, $cfg_keys_out->{'avg'},     $value_ts, $avg,     "average update time") unless ($avg == VALUE_INVALID);
 		push_value($tld, $cfg_keys_out->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
 		push_value($tld, $cfg_keys_out->{'max'},     $value_ts, $max,     "max tests per month");
 
