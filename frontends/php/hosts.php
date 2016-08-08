@@ -117,7 +117,11 @@ $fields = [
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
-
+API::Event()->acknowledge([
+	"eventids" => [40,24],
+	"message" => "message body",
+	"action" => 1
+]);
 /*
  * Permissions
  */
