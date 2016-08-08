@@ -192,6 +192,7 @@ class testZBX6663 extends CWebTest {
 
 		if (isset($zbx_data['discoveryRule'])) {
 			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestCheckHeader('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
 		}
