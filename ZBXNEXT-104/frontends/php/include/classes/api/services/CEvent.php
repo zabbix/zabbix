@@ -400,18 +400,42 @@ class CEvent extends CApiService {
 		}
 
 		$time = time();
-		$dataInsert = [];
+		$acknowledges = [];
+		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_ACKNOWLEDGE_ACTION_NONE;
 
 		foreach ($eventIds as $eventId) {
-			$dataInsert[] = [
+			$acknowledges[] = [
 				'userid' => self::$userData['userid'],
 				'eventid' => $eventId,
 				'clock' => $time,
-				'message'=> $data['message']
+				'message' => $data['message'],
+				'action' => $action
 			];
 		}
 
-		DB::insert('acknowledges', $dataInsert);
+		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
+
+		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			// Close problems manually.
+			$tasks = [];
+
+			for ($i = 0; $i < count($acknowledgeids); $i++) {
+				$tasks[] = ['type' => ZBX_TM_TASK_CLOSE_PROBLEM];
+			}
+
+			$taskids = DB::insert('task', $tasks);
+
+			$task_close = [];
+
+			for ($i = 0; $i < count($acknowledgeids); $i++) {
+				$task_close[] = [
+					'taskid' => $taskids[$i],
+					'acknowledgeid' => $acknowledgeids[$i]
+				];
+			}
+
+			DB::insert('task_close_problem', $task_close, false);
+		}
 
 		return ['eventids' => array_values($eventIds)];
 	}
@@ -439,6 +463,10 @@ class CEvent extends CApiService {
 		}
 
 		$this->checkCanBeAcknowledged($data['eventids']);
+
+		if (array_key_exists('action', $data) && $data['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			$this->checkCanBeManuallyClosed($data['eventids']);
+		}
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -682,6 +710,48 @@ class CEvent extends CApiService {
 				else {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+		}
+	}
+
+	/**
+	 * Checks if the given events can be closed manually.
+	 *
+	 * @param array $eventids
+	 */
+	protected function checkCanBeManuallyClosed(array $eventids) {
+		$events_count = count($eventids);
+
+		$events = $this->get([
+			'output' => ['eventid'],
+			'eventids' => $eventids,
+			'editable' => true,
+			'object' => EVENT_OBJECT_TRIGGER
+		]);
+
+		if ($events_count != count($events)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$events = $this->get([
+			'output' => ['eventid'],
+			'eventids' => $eventids,
+			'value' => TRIGGER_VALUE_TRUE,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'selectRelatedObject' => ['manual_close']
+		]);
+
+		if ($events_count != count($events)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Cannot close problem: %1$s.',  _('event is not in PROBLEM state'))
+			);
+		}
+
+		foreach($events as $event) {
+			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot close problem: %1$s.',  _('trigger does not allow manual closing'))
+				);
 			}
 		}
 	}
