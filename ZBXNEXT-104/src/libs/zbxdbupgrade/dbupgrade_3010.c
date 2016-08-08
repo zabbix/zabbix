@@ -1553,6 +1553,13 @@ static int	DBpatch_3010073(void)
 	return DBadd_field("event_recovery", &field);
 }
 
+static int	DBpatch_3010074(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1631,5 +1638,6 @@ DBPATCH_ADD(3010070, 0, 1)
 DBPATCH_ADD(3010071, 0, 1)
 DBPATCH_ADD(3010072, 0, 1)
 DBPATCH_ADD(3010073, 0, 1)
+DBPATCH_ADD(3010074, 0, 1)
 
 DBPATCH_END()
