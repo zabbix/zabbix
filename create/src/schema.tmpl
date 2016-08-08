@@ -1379,6 +1379,7 @@ FIELD		|r_eventid	|t_id		|	|NULL		|0			|2|events	|eventid
 FIELD		|r_clock	|t_time		|'0'	|NOT NULL	|0
 FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
+FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
 
@@ -1453,4 +1454,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010073	|3010073
+ROW		|3010074	|3010074

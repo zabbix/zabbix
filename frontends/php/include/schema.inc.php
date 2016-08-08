@@ -6304,6 +6304,13 @@ return [
 				'ref_table' => 'correlation',
 				'ref_field' => 'correlationid',
 			],
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid',
+			],
 		],
 	],
 	'problem_tag' => [
