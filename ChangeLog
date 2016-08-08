@@ -1,4 +1,12 @@
-Changes for 3.1.0
+Changes for 3.2.0alpha2
+
+New features:
+..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.2.0alpha1
 
 New features:
 ........S. [ZBXNEXT-3195] implemented independent escalations for each problem event (wiper, Sandis)
@@ -36,6 +44,13 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
+..F....... [ZBX-10621] removed excessive white space in dashboard (Pavel, Alexei)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+........S. [ZBX-10971] fixed memory leak when action is removed from configuration (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+...G...... [ZBX-11015] fixed proc.cpu.util for non-privileged agent on Solaris (Sandis)
 ........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10504] reduced padding around graphs to account for decreased padding in CSS (asaveljevs)
@@ -50,7 +65,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, Japanese, Polish, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page; thanks to 1N3 at Early Warning Services, LLC (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.4rc1
@@ -1469,14 +1484,17 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
-..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
 
 Bug fixes:
-..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page; thanks to 1N3 at Early Warning Services, LLC (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14rc1

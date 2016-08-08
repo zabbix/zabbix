@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery checks.
- *
- * @package API
  */
 class CDCheck extends CApiService {
 

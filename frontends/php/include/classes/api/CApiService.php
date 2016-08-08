@@ -908,8 +908,6 @@ class CApiService {
 	 * @param array  $params
 	 * @param string $paramName
 	 * @param string $value
-	 *
-	 * @return void
 	 */
 	protected function checkDeprecatedParam(array $params, $paramName, $value = null) {
 		if (isset($params[$paramName])) {

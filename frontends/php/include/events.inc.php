@@ -513,12 +513,11 @@ function makeEventsTags($events) {
 
 		foreach ($event['tags'] as $tag) {
 			if ($tags_count++ == EVENTS_LIST_TAGS_COUNT) {
-				$tags[$event['eventid']][] = '&hellip;';
+				$tags[$event['eventid']][] = '&nbsp;&hellip;';
 				break;
 			}
 			else {
 				$tags[$event['eventid']][] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
-					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 					->addClass(ZBX_STYLE_TAG);
 			}
 		}

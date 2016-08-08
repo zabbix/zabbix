@@ -127,7 +127,6 @@ function getSeverityCell($severity, $config, $text = null, $forceNormal = false)
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
  * @param int $triggerLastChange
  * @param bool $isAcknowledged
- * @return void
  */
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
