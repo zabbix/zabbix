@@ -322,6 +322,8 @@ static void	zbx_handle_free(zbx_handle_t *handle)
 	switch (handle->type)
 	{
 		case ZBX_HANDLE_HISTORY:
+		case ZBX_HANDLE_HISTORY_RECORD:
+		case ZBX_HANDLE_HISTORY_RECORD_VALUELOG:
 			zbx_free(handle->data);
 			break;
 		default:
