@@ -53,7 +53,7 @@ static const char	*ptr;		/* character being looked at */
 static int		level;		/* expression nesting level  */
 
 static char		*buffer;	/* error message buffer      */
-static int		max_buffer_len;	/* error message buffer size */
+static size_t		max_buffer_len;	/* error message buffer size */
 
 /******************************************************************************
  *                                                                            *
@@ -117,7 +117,7 @@ static double	evaluate_number(void)
 		if (SUCCEED != is_number_delimiter(*iter))
 			return ZBX_INFINITY;
 
-		result = atof(ptr) * factor;
+		result = atof(ptr) * (double)factor;
 
 		ptr = iter;
 
@@ -223,7 +223,7 @@ static double	evaluate_term7(void)
 		if (ZBX_INFINITY == (result = evaluate_term8()))
 			return ZBX_INFINITY;
 
-		result = (SUCCEED == zbx_double_compare(result, 0) ? 1 : 0);
+		result = (SUCCEED == zbx_double_compare(result, 0.0) ? 1 : 0);
 	}
 	else
 		result = evaluate_term8();
@@ -257,7 +257,7 @@ static double	evaluate_term6(void)
 		}
 		else
 		{
-			if (SUCCEED == zbx_double_compare(operand, 0))
+			if (SUCCEED == zbx_double_compare(operand, 0.0))
 			{
 				zbx_strlcpy(buffer, "Cannot evaluate expression: division by zero.", max_buffer_len);
 				return ZBX_INFINITY;
@@ -405,7 +405,7 @@ static double	evaluate_term2(void)
 		if (ZBX_INFINITY == (operand = evaluate_term3()))
 			return ZBX_INFINITY;
 
-		result = (SUCCEED != zbx_double_compare(result, 0) && SUCCEED != zbx_double_compare(operand, 0));
+		result = (SUCCEED != zbx_double_compare(result, 0.0) && SUCCEED != zbx_double_compare(operand, 0.0));
 	}
 
 	return result;
@@ -438,7 +438,7 @@ static double	evaluate_term1(void)
 		if (ZBX_INFINITY == (operand = evaluate_term2()))
 			return ZBX_INFINITY;
 
-		result = (SUCCEED != zbx_double_compare(result, 0) || SUCCEED != zbx_double_compare(operand, 0));
+		result = (SUCCEED != zbx_double_compare(result, 0.0) || SUCCEED != zbx_double_compare(operand, 0.0));
 	}
 
 	level--;
