@@ -238,6 +238,10 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
+extern int		(*next_history_index)(zbx_dc_history_t, int, int *);
+extern void		(*get_history_field)(zbx_dc_history_t, int, zabbix_label_t, zabbix_basic_t *);
+extern zbx_uint64_t	(*get_history_type)(zbx_dc_history_t, int);
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -850,6 +854,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
+	next_history_index = zbx_next_history_index;
+	get_history_field = zbx_get_history_field;
+	get_history_type = zbx_get_history_type;
+
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");

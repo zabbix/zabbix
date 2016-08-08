@@ -24,6 +24,7 @@
 #include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
+#include "module.h"
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -584,5 +585,11 @@ typedef struct
 zbx_hc_item_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
+
+typedef struct zbx_dc_history	*zbx_dc_history_t;
+
+int		zbx_next_history_index(zbx_dc_history_t history, int history_num, int *index);
+void		zbx_get_history_field(zbx_dc_history_t history, int index, zabbix_label_t label, zabbix_basic_t *res);
+zbx_uint64_t	zbx_get_history_type(zbx_dc_history_t history, int index);
 
 #endif

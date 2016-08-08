@@ -22,6 +22,65 @@
 
 #include "zbxtypes.h"
 
+/* Zabbix API */
+
+/* these definitions MUST stay the same unless we decide to release new API version */
+
+typedef unsigned char	zabbix_error_t;
+typedef unsigned char	zabbix_label_t;
+typedef zbx_uint64_t	zabbix_handle_t;
+
+/* convenience wrapper to access contents of buffers passed to */
+/* zabbix_get_object_member() and zabbix_get_vector_element () */
+/* WILL NOT WORK if Zabbix binary and module binary use different endianness */
+typedef union
+{
+	char		bytes[8];
+	zbx_uint64_t	as_uint64;
+	double		as_double;
+	char		*as_string;
+	zabbix_handle_t	as_object;
+	zabbix_handle_t	as_vector;
+}
+zabbix_basic_t;
+
+/* return codes */
+#define ZABBIX_SUCCESS		0
+#define ZABBIX_END_OF_VECTOR	1
+#define ZABBIX_INVALID_HANDLE	2
+#define ZABBIX_NOT_AN_OBJECT	3
+#define ZABBIX_NOT_A_VECTOR	4
+#define ZABBIX_NO_SUCH_MEMBER	5
+#define ZABBIX_INTERNAL_ERROR	6
+
+/* object labels */
+#define ZABBIX_HISTORY_RECORD_ITEMID			1
+#define ZABBIX_HISTORY_RECORD_CLOCK			2
+#define ZABBIX_HISTORY_RECORD_NS			3
+#define ZABBIX_HISTORY_RECORD_VALUETYPE			4
+#define ZABBIX_HISTORY_RECORD_VALUE			5
+#define ZABBIX_HISTORY_RECORD_VALUELOG_VALUE		6
+#define ZABBIX_HISTORY_RECORD_VALUELOG_TIMESTAMP	7
+#define ZABBIX_HISTORY_RECORD_VALUELOG_SOURCE		8
+#define ZABBIX_HISTORY_RECORD_VALUELOG_LOGEVENTID	9
+#define ZABBIX_HISTORY_RECORD_VALUELOG_SEVERITY		10
+
+/* types */
+#define ZABBIX_TYPE_UINT64	1
+#define ZABBIX_TYPE_DOUBLE	2
+#define ZABBIX_TYPE_STRING	3
+#define ZABBIX_TYPE_OBJECT	4
+#define ZABBIX_TYPE_VECTOR	5
+
+unsigned char	zabbix_version(void);
+
+const char * const	zabbix_error_message(zabbix_error_t error);
+
+zabbix_error_t	zabbix_get_object_member(zabbix_handle_t object, zabbix_label_t label, void *buffer);
+zabbix_error_t	zabbix_get_vector_element(zabbix_handle_t vector, void *buffer);
+
+/* module API */
+
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 

@@ -20,7 +20,11 @@
 #ifndef ZABBIX_ZBXMODULES_H
 #define ZABBIX_ZBXMODULES_H
 
+#include	"dbcache.h"
+
 int	load_modules(const char *path, char **file_names, int timeout, int verbose);
 void	unload_modules();
+
+void	zbx_sync_history_with_modules(zbx_dc_history_t history, int history_num);
 
 #endif

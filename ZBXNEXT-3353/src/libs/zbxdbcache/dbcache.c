@@ -31,6 +31,7 @@
 #include "memalloc.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
+#include "zbxmodules.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -87,7 +88,7 @@ static ZBX_DC_IDS	*ids = NULL;
 #define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
 #define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
 
-typedef struct
+typedef struct zbx_dc_history
 {
 	zbx_uint64_t	itemid;
 	history_value_t	value_orig;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
@@ -2197,6 +2198,8 @@ int	DCsync_history(int sync_type, int *total_num)
 		*total_num += history_num;
 		candidate_num = history_items.values_num;
 
+		zbx_sync_history_with_modules(history, history_num);
+
 		now = time(NULL);
 
 		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
@@ -3539,4 +3542,90 @@ out:
 	zbx_vector_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+int	zbx_next_history_index(zbx_dc_history_t history, int history_num, int *index)
+{
+	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history;
+
+	for (; *index < history_num; (*index)++)
+	{
+		if (0 != (h[*index].flags & ZBX_DC_FLAG_NOVALUE) || 0 != (h[*index].flags & ZBX_DC_FLAG_UNDEF))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+void	zbx_get_history_field(zbx_dc_history_t history, int index, zabbix_label_t label, zabbix_basic_t *res)
+{
+	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history + index;
+
+	switch (label)
+	{
+		case ZABBIX_HISTORY_RECORD_ITEMID:
+			res->as_uint64 = h->itemid;
+			break;
+		case ZABBIX_HISTORY_RECORD_CLOCK:
+			res->as_uint64 = (zbx_uint64_t)h->ts.sec;
+			break;
+		case ZABBIX_HISTORY_RECORD_NS:
+			res->as_uint64 = (zbx_uint64_t)h->ts.ns;
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUE:
+			switch (h->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					res->as_double = h->value_orig.dbl;
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					res->as_uint64 = h->value_orig.ui64;
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					res->as_string = h->value_orig.str;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUELOG_VALUE:
+			res->as_string = h->value_orig.str;
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUELOG_TIMESTAMP:
+			res->as_uint64 = (zbx_uint64_t)h->timestamp;
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUELOG_SOURCE:
+			res->as_string = h->value.str;
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUELOG_LOGEVENTID:
+			res->as_uint64 = (zbx_uint64_t)h->logeventid;
+			break;
+		case ZABBIX_HISTORY_RECORD_VALUELOG_SEVERITY:
+			res->as_uint64 = (zbx_uint64_t)h->severity;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+}
+
+zbx_uint64_t	zbx_get_history_type(zbx_dc_history_t history, int index)
+{
+	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history + index;
+
+	switch (h->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			return ZABBIX_TYPE_DOUBLE;
+		case ITEM_VALUE_TYPE_UINT64:
+			return ZABBIX_TYPE_UINT64;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			return ZABBIX_TYPE_STRING;
+		case ITEM_VALUE_TYPE_LOG:
+			return ZABBIX_TYPE_OBJECT;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return (zbx_uint64_t)0;
+	}
 }

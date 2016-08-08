@@ -30,8 +30,74 @@
 #define ZBX_MODULE_FUNC_ITEM_PROCESS	"zbx_module_item_process"
 #define ZBX_MODULE_FUNC_ITEM_TIMEOUT	"zbx_module_item_timeout"
 #define ZBX_MODULE_FUNC_UNINIT		"zbx_module_uninit"
+#define ZBX_MODULE_FUNC_HISTORY_WRITE	"zbx_module_history_write"
 
-static void	**modules = NULL;
+/* these function pointers will be initialized for server and proxy in runtime, agent does not need them */
+int		(*next_history_index)(zbx_dc_history_t, int, int *);
+void		(*get_history_field)(zbx_dc_history_t, int, zabbix_label_t, zabbix_basic_t *);
+zbx_uint64_t	(*get_history_type)(zbx_dc_history_t, int);
+
+typedef struct
+{
+	void		*lib;
+	char		*name;
+	zabbix_error_t	(*func_history_write)(zabbix_handle_t);
+}
+zbx_module_t;
+
+static zbx_module_t	*modules = NULL;
+
+unsigned char	zabbix_version(void)
+{
+	return ZABBIX_VERSION_MAJOR * 10 + ZABBIX_VERSION_MINOR;
+}
+
+/* the order of messages MUST match the order of return code defines in module.h */
+static const char * const	error_messages[] =
+{
+	"call was successful",							/* ZABBIX_SUCCESS		0 */
+	"vector iteration reached its end",					/* ZABBIX_END_OF_VECTOR		1 */
+	"provided handle wasn't created properly or its lifetime has expired",	/* ZABBIX_INVALID_HANDLE	2 */
+	"provided handle is not an object handle",				/* ZABBIX_NOT_AN_OBJECT		3 */
+	"provided handle is not a vector handle",				/* ZABBIX_NOT_A_VECTOR		4 */
+	"object has no member associated with provided label",			/* ZABBIX_NO_SUCH_MEMBER	5 */
+	"internal error, please report to Zabbix developers",			/* ZABBIX_INTERNAL_ERROR	6 */
+	"unknown error"								/* ZBX_MAX_ERROR		7 */
+};
+
+const char * const	zabbix_error_message(zabbix_error_t error)
+{
+/* refers to the last error in error_messages */
+#define ZBX_MAX_ERROR	7
+
+	if (ZABBIX_SUCCESS <= error && error < ZBX_MAX_ERROR)
+		return error_messages[error];
+
+	return error_messages[ZBX_MAX_ERROR];
+
+#undef ZBX_MAX_ERROR
+}
+
+#define ZBX_HANDLE_HISTORY			1
+#define ZBX_HANDLE_HISTORY_RECORD		2
+#define ZBX_HANDLE_HISTORY_RECORD_VALUELOG	3
+
+typedef struct
+{
+	int	type;	/* one of ZBX_HANDLE_* defines */
+	void	*data;	/* private handle data needed for implementation */
+}
+zbx_handle_t;
+
+static zbx_vector_ptr_t	handle_pool;
+
+typedef struct
+{
+	zbx_dc_history_t	history;
+	int			history_num;
+	int			index;
+}
+zbx_history_handle_data_t;
 
 /******************************************************************************
  *                                                                            *
@@ -40,13 +106,16 @@ static void	**modules = NULL;
  * Purpose: Add module to the list of loaded modules (dynamic libraries).     *
  *          It skips a module if it is already registered.                    *
  *                                                                            *
- * Parameters: module - library handler                                       *
+ * Parameters: lib                - library handle                            *
+ *             name               - library name                              *
+ *             func_history_write - library function which will be invoked    *
+ *                                  to sync historical data with module       *
  *                                                                            *
  * Return value: SUCCEED - if module is successfully registered               *
  *               FAIL - if module is already registered                       *
  *                                                                            *
  ******************************************************************************/
-static int	register_module(void *module)
+static int	register_module(void *lib, char *name, zabbix_error_t (*func_history_write)(zabbix_handle_t))
 {
 	const char	*__function_name = "register_module";
 
@@ -56,20 +125,23 @@ static int	register_module(void *module)
 
 	if (NULL == modules)
 	{
-		modules = zbx_malloc(modules, sizeof(void *));
-		modules[0] = NULL;
+		zbx_vector_ptr_create(&handle_pool);
+		modules = zbx_malloc(modules, sizeof(zbx_module_t));
+		modules[0].lib = NULL;
 	}
 
-	while (NULL != modules[i])
+	while (NULL != modules[i].lib)
 	{
-		if (module == modules[i])	/* a module is already registered */
+		if (lib == modules[i].lib)	/* a module is already registered */
 			goto out;
 		i++;
 	}
 
-	modules = zbx_realloc(modules, (i + 2) * sizeof(void *));
-	modules[i] = module;
-	modules[i + 1] = NULL;
+	modules = zbx_realloc(modules, (i + 2) * sizeof(zbx_module_t));
+	modules[i].lib = lib;
+	modules[i].name = zbx_strdup(NULL, name);
+	modules[i].func_history_write = func_history_write;
+	modules[i + 1].lib = NULL;
 
 	ret = SUCCEED;
 out:
@@ -104,9 +176,13 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
 	void		(*func_timeout)();
+	zabbix_error_t	(*func_history_write)(zabbix_handle_t);
 	int		i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (8 != sizeof(zabbix_basic_t))	/* all basic types for Zabbix <-> module data transfer are 64 bit */
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	for (file_name = file_names; NULL != *file_name; file_name++)
 	{
@@ -171,7 +247,14 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 			continue;
 		}
 
-		if (SUCCEED == register_module(lib))
+		func_history_write = (zabbix_error_t (*)(zabbix_handle_t))dlsym(lib, ZBX_MODULE_FUNC_HISTORY_WRITE);
+		if (NULL == func_history_write)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_HISTORY_WRITE "()\""
+					" function in module \"%s\": %s", *file_name, dlerror());
+		}
+
+		if (SUCCEED == register_module(lib, *file_name, func_history_write))
 		{
 			ZBX_METRIC	*metrics;
 
@@ -213,6 +296,85 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_handle_alloc                                                 *
+ *                                                                            *
+ * Purpose: Creates a new handle of desired type in the handle pool, attaches *
+ *          provided private handle data to it and returns a public handle    *
+ *          identifier.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static zabbix_handle_t	zbx_handle_alloc(int type, void *data)
+{
+	zabbix_handle_t	handleid;
+	zbx_handle_t	*handle;
+
+	handleid = (zabbix_handle_t)handle_pool.values_num;
+	handle = zbx_malloc(NULL, sizeof(zbx_handle_t));
+	handle->type = type;
+	handle->data = data;
+	zbx_vector_ptr_append(&handle_pool, handle);
+
+	return handleid;
+}
+
+static void	zbx_handle_free(zbx_handle_t *handle)
+{
+	switch (handle->type)
+	{
+		case ZBX_HANDLE_HISTORY:
+			zbx_free(handle->data);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	zbx_free(handle);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_sync_history_with_modules                                    *
+ *                                                                            *
+ * Purpose: Invoke zbx_module_history_write() from every loaded module which  *
+ *          exports such symbol                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_history_with_modules(zbx_dc_history_t history, int history_num)
+{
+	zbx_module_t	*module;
+
+	if (NULL == modules)
+		return;
+
+	for (module = modules; NULL != module->lib; module++)
+	{
+		if (NULL != module->func_history_write)
+		{
+			int				module_sync_start = time(NULL);
+			zbx_history_handle_data_t	*history_handle_data;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing history data with module %s...", module->name);
+
+			history_handle_data = zbx_malloc(NULL, sizeof(zbx_history_handle_data_t));
+			history_handle_data->history = history;
+			history_handle_data->history_num = history_num;
+			history_handle_data->index = 0;
+
+			module->func_history_write(zbx_handle_alloc(ZBX_HANDLE_HISTORY, history_handle_data));
+
+			/* handles which were used by module during zbx_module_history_write() call must be */
+			/* destroyed because their lifetime ended and they must not interfere with handles */
+			/* created in other module function calls */
+			zbx_vector_ptr_clear_ext(&handle_pool, (zbx_clean_func_t)zbx_handle_free);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing history data with module %s took %d seconds",
+					module->name, time(NULL) - module_sync_start);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: unload_modules                                                   *
  *                                                                            *
  * Purpose: Unload already loaded loadable modules (dynamic libraries).       *
@@ -224,7 +386,7 @@ void	unload_modules()
 	const char	*__function_name = "unload_modules";
 
 	int		(*func_uninit)();
-	void		**module;
+	zbx_module_t	*module;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -232,24 +394,150 @@ void	unload_modules()
 	if (NULL == modules)
 		goto out;
 
-	for (module = modules; NULL != *module; module++)
+	for (module = modules; NULL != module->lib; module++)
 	{
-		func_uninit = (int (*)(void))dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
+		func_uninit = (int (*)(void))dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT "()\" function: %s",
 					dlerror());
-			dlclose(*module);
+			dlclose(module->lib);
 			continue;
 		}
 
 		if (ZBX_MODULE_OK != func_uninit())
 			zabbix_log(LOG_LEVEL_WARNING, "uninitialization failed");
 
-		dlclose(*module);
+		dlclose(module->lib);
+		zbx_free(module->name);
 	}
 
+	zbx_vector_ptr_clear_ext(&handle_pool, (zbx_clean_func_t)zbx_handle_free);
+	zbx_vector_ptr_destroy(&handle_pool);
 	zbx_free(modules);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+zabbix_error_t	zabbix_get_object_member(zabbix_handle_t object, zabbix_label_t label, void *buffer)
+{
+	zabbix_basic_t	res;
+	zabbix_error_t	ret;
+
+	if (object < (zabbix_handle_t)handle_pool.values_num)
+	{
+		zbx_handle_t	*handle = (zbx_handle_t *)handle_pool.values[object];
+
+		if (ZBX_HANDLE_HISTORY_RECORD == handle->type)
+		{
+			zbx_history_handle_data_t	*record_data = (zbx_history_handle_data_t *)handle->data;
+
+			if (ZABBIX_HISTORY_RECORD_ITEMID == label || ZABBIX_HISTORY_RECORD_CLOCK == label ||
+					ZABBIX_HISTORY_RECORD_NS == label)
+			{
+				get_history_field(record_data->history, record_data->index, label, &res);
+				ret = ZABBIX_SUCCESS;
+			}
+			else if (ZABBIX_HISTORY_RECORD_VALUETYPE == label)
+			{
+				res.as_uint64 = get_history_type(record_data->history, record_data->index);
+				ret = ZABBIX_SUCCESS;
+			}
+			else if (ZABBIX_HISTORY_RECORD_VALUE == label)
+			{
+				zbx_uint64_t	type;
+
+				type = get_history_type(record_data->history, record_data->index);
+
+				if (ZABBIX_TYPE_UINT64 == type || ZABBIX_TYPE_DOUBLE == type ||
+						ZABBIX_TYPE_STRING == type)
+				{
+					get_history_field(record_data->history, record_data->index, label, &res);
+					ret = ZABBIX_SUCCESS;
+				}
+				else if (ZABBIX_TYPE_OBJECT == type)
+				{
+					zbx_history_handle_data_t	*log_data;
+
+					log_data = zbx_malloc(NULL, sizeof(zbx_history_handle_data_t));
+					log_data->history = record_data->history;
+					log_data->history_num = record_data->history_num;
+					log_data->index = record_data->index;
+					res.as_object = zbx_handle_alloc(ZBX_HANDLE_HISTORY_RECORD_VALUELOG, log_data);
+					ret = ZABBIX_SUCCESS;
+				}
+				else
+					ret = ZABBIX_INTERNAL_ERROR;
+			}
+			else
+				ret = ZABBIX_NO_SUCH_MEMBER;
+		}
+		else if (ZBX_HANDLE_HISTORY_RECORD_VALUELOG == handle->type)
+		{
+			zbx_history_handle_data_t	*log_data = (zbx_history_handle_data_t *)handle->data;
+
+			switch (label)
+			{
+				case ZABBIX_HISTORY_RECORD_VALUELOG_VALUE:
+				case ZABBIX_HISTORY_RECORD_VALUELOG_TIMESTAMP:
+				case ZABBIX_HISTORY_RECORD_VALUELOG_SOURCE:
+				case ZABBIX_HISTORY_RECORD_VALUELOG_LOGEVENTID:
+				case ZABBIX_HISTORY_RECORD_VALUELOG_SEVERITY:
+					get_history_field(log_data->history, log_data->index, label, &res);
+					ret = ZABBIX_SUCCESS;
+					break;
+				default:
+					ret = ZABBIX_NO_SUCH_MEMBER;
+			}
+		}
+		else
+			ret = ZABBIX_NOT_AN_OBJECT;
+	}
+	else
+		ret = ZABBIX_INVALID_HANDLE;
+
+	if (ZABBIX_SUCCESS == ret)
+		memcpy(buffer, &res, sizeof(zabbix_basic_t));	/* buffer may be unaligned */
+
+	return ret;
+}
+
+zabbix_error_t	zabbix_get_vector_element(zabbix_handle_t vector, void *buffer)
+{
+	zabbix_basic_t	res;
+	zabbix_error_t	ret;
+
+	if (vector < (zabbix_handle_t)handle_pool.values_num)
+	{
+		zbx_handle_t	*handle = (zbx_handle_t *)handle_pool.values[vector];
+
+		if (ZBX_HANDLE_HISTORY == handle->type)
+		{
+			zbx_history_handle_data_t	*history_data = (zbx_history_handle_data_t *)handle->data;
+
+			if (SUCCEED == next_history_index(history_data->history, history_data->history_num,
+					&history_data->index))
+			{
+				zbx_history_handle_data_t	*history_record_data;
+
+				history_record_data = zbx_malloc(NULL, sizeof(zbx_history_handle_data_t));
+				history_record_data->history = history_data->history;
+				history_record_data->history_num = history_data->history_num;
+				history_record_data->index = history_data->index++;
+				res.as_object = zbx_handle_alloc(ZBX_HANDLE_HISTORY_RECORD, history_record_data);
+				ret = ZABBIX_SUCCESS;
+			}
+			else
+				ret = ZABBIX_END_OF_VECTOR;
+		}
+		else
+			ret = ZABBIX_NOT_A_VECTOR;
+	}
+	else
+		ret = ZABBIX_INVALID_HANDLE;
+
+	if (ZABBIX_SUCCESS == ret)
+		memcpy(buffer, &res, sizeof(zabbix_basic_t));	/* buffer may be unaligned */
+
+	return ret;
 }
