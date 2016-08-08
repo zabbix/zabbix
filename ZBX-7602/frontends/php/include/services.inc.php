@@ -468,8 +468,6 @@ function updateItServices() {
  * @throws APIException if the given service time is invalid
  *
  * @param array $serviceTime
- *
- * @return void
  */
 function checkServiceTime(array $serviceTime) {
 	// type validation

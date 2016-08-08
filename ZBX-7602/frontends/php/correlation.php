@@ -46,7 +46,7 @@ $fields = [
 											IN([ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
 											null
 										],
-	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({action})'],
 	'conditions' =>						[null,		O_OPT,	null,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
 	'operations' =>						[null,		O_OPT,	null,	null,		null],
@@ -84,7 +84,7 @@ $correlationid = getRequest('correlationid');
 
 if ($correlationid !== null) {
 	$correlation = API::Correlation()->get([
-		'output' => ['correlationid'],
+		'output' => [],
 		'correlationids' => [$correlationid],
 		'editable' => true
 	]);
@@ -94,18 +94,23 @@ if ($correlationid !== null) {
 	}
 }
 
-$correlationids = getRequest('g_correlationid', []);
-$correlationids = zbx_toArray($correlationids);
+if (hasRequest('action')) {
+	$correlations = API::Correlation()->get([
+		'countOutput' => true,
+		'correlationids' => getRequest('g_correlationid'),
+		'editable' => true
+	]);
 
-if ($correlationids && !API::Correlation()->isWritable($correlationids)) {
-	access_deny();
+	if ($correlations != count(getRequest('g_correlationid'))) {
+		access_deny();
+	}
 }
 
 if (hasRequest('add') || hasRequest('update')) {
 	$correlation = [
 		'name' => getRequest('name'),
 		'description' => getRequest('description'),
-		'status' => getRequest('status', ZBX_CORRELATION_ENABLED),
+		'status' => getRequest('status', ZBX_CORRELATION_DISABLED),
 		'operations' => getRequest('operations', [])
 	];
 
@@ -119,7 +124,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			$filter['formula'] = getRequest('formula');
 		}
 		else {
-			// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
+			// If only one or no conditions are left, reset the evaltype to "and/or" and clear the formula.
 			$filter['formula'] = '';
 			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		}
@@ -169,11 +174,11 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 
 		// Check existing conditions and remove duplicate condition values.
 		$valid_conditions = [];
-		foreach ($conditions as &$condition) {
+		foreach ($conditions as $condition) {
 			$valid_conditions[] = $condition;
 
-			// Check only if type is the same.
-			if ($new_condition['type'] == $condition['type']) {
+			// Check if still exists in loop and if type is the same. Remove same values.
+			if (isset($new_condition) && $new_condition['type'] == $condition['type']) {
 				switch ($new_condition['type']) {
 					case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 					case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
@@ -212,15 +217,12 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 				}
 			}
 		}
-		unset($condition);
 
 		// Check if new condition is valid (tags cannot be empty) and host group IDs must be valid.
 		if (isset($new_condition)) {
 			switch ($new_condition['type']) {
 				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 					if ($new_condition['tag'] === '') {
 						error(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
 						show_error_message(_('Cannot add correlation condition'));
@@ -267,6 +269,20 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 					}
 					else {
 						$valid_conditions[] = $new_condition;
+						unset($_REQUEST['new_condition']['oldtag']);
+						unset($_REQUEST['new_condition']['newtag']);
+					}
+					break;
+
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+					if ($new_condition['tag'] === '') {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
+						show_error_message(_('Cannot add correlation condition'));
+					}
+					else {
+						$valid_conditions[] = $new_condition;
+						unset($_REQUEST['new_condition']['value']);
 					}
 					break;
 			}
@@ -317,8 +333,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	unset($_REQUEST['new_operation']);
 }
 elseif (hasRequest('action')
-		&& str_in_array(getRequest('action'), ['correlation.massenable', 'correlation.massdisable'])
-		&& hasRequest('g_correlationid')) {
+		&& str_in_array(getRequest('action'), ['correlation.massenable', 'correlation.massdisable'])) {
 
 	$enable = (getRequest('action') === 'correlation.massenable');
 	$status = $enable ? ZBX_CORRELATION_ENABLED : ZBX_CORRELATION_DISABLED;
@@ -350,7 +365,7 @@ elseif (hasRequest('action')
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'correlation.massdelete' && hasRequest('g_correlationid')) {
+elseif (hasRequest('action') && getRequest('action') === 'correlation.massdelete') {
 	$result = API::Correlation()->delete(getRequest('g_correlationid'));
 
 	if ($result) {
@@ -408,7 +423,27 @@ if (hasRequest('form')) {
 		);
 	}
 
-	if (!$data['new_condition']) {
+	if ($data['new_condition']) {
+		switch ($data['new_condition']['type']) {
+			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+				if (!array_key_exists('oldtag', $data['new_condition'])) {
+					$data['new_condition']['oldtag'] = '';
+				}
+
+				if (!array_key_exists('newtag', $data['new_condition'])) {
+					$data['new_condition']['newtag'] = '';
+				}
+				break;
+
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+				if (!array_key_exists('value', $data['new_condition'])) {
+					$data['new_condition']['value'] = '';
+				}
+				break;
+		}
+	}
+	else {
 		$data['new_condition'] = [
 			'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
 			'operator' => CONDITION_OPERATOR_EQUAL,
@@ -469,7 +504,7 @@ else {
 	order_result($data['correlations'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['correlations'], $sortOrder, new CUrl('correlation.php'));
 
-	// render view
+	// Render view.
 	$correlationView = new CView('configuration.correlation.list', $data);
 	$correlationView->render();
 	$correlationView->show();
