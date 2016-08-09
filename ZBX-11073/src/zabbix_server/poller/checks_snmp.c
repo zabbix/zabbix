@@ -19,11 +19,15 @@
 
 #include "checks_snmp.h"
 
+#ifdef HAVE_NETSNMP
+
+#define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
+
 #include "comms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-
-#ifdef HAVE_NETSNMP
 
 /*
  * SNMP Dynamic Index Cache
@@ -2134,6 +2138,11 @@ exit:
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+void	zbx_init_snmp(void)
+{
+	init_snmp(progname);
 }
 
 #endif	/* HAVE_NETSNMP */
