@@ -2732,11 +2732,15 @@ $form-icon-btn: (
 	.dashbrd-widget {
 		margin: 0;
 		border: none;
+
+		th {
+			padding: 6px 5px;
+		}
 	}
 
 	.dashbrd-widget-head {
 		text-align: left;
-		padding: 4px 2px;
+		padding: 4px 5px;
 
 		li {
 			line-height: 2.9em;
