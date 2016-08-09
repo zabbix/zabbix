@@ -75,7 +75,7 @@ class CScreenProblem extends CScreenBase {
 
 		$db_problems = API::Problem()->get(
 			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
-			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
+			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message', 'action']] : [])
 			+ ['selectTags' => ['tag', 'value']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
