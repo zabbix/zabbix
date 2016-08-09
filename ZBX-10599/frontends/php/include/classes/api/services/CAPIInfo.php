@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with API.
- *
- * @package API
  */
 class CAPIInfo extends CApiService {
 

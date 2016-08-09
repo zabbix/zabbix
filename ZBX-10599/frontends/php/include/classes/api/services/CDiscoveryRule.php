@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery rules.
- *
- * @package API
  */
 class CDiscoveryRule extends CItemGeneral {
 
