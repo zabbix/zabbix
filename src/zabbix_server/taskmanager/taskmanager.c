@@ -220,6 +220,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	sec1 = zbx_time();
@@ -227,6 +228,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	if (0 == (sleeptime = ZBX_TASKMANAGER_TIMEOUT - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT))
 		sleeptime = ZBX_TASKMANAGER_TIMEOUT;
+
+	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
 	for (;;)
 	{
