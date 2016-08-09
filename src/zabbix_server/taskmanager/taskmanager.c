@@ -216,8 +216,8 @@ static int	tm_process_tasks()
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	double	sec;
-	int	tasks_num;
+	double	sec, sec2;
+	int	tasks_num, sleeptime, nextcheck;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -235,12 +235,17 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
 		sec = zbx_time();
+		nextcheck = ((int)sec + ZBX_TASKMANAGER_TIMEOUT) / ZBX_TASKMANAGER_TIMEOUT * ZBX_TASKMANAGER_TIMEOUT;
 		tasks_num = tm_process_tasks();
-		sec = zbx_time() - sec;
+		sec2 = zbx_time();
+		sec = sec2 - sec;
+
+		if (0 > (sleeptime = nextcheck - (int)sec2))
+			sleeptime = 0;
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), tasks_num, sec, ZBX_TASKMANAGER_TIMEOUT);
+				get_process_type_string(process_type), tasks_num, sec, sleeptime);
 
-		zbx_sleep_loop(ZBX_TASKMANAGER_TIMEOUT);
+		zbx_sleep_loop(sleeptime);
 	}
 }
