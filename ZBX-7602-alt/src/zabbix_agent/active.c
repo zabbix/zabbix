@@ -1277,7 +1277,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *key_severity, *key_source, *key_logeventid, *maxlines_persec, *skip,
 			*str_severity;
-	int		rate, s_count, p_count, send_err = SUCCEED;
+	int		rate, s_count, p_count, match, send_err = SUCCEED;
 	char		*value = NULL, *provider = NULL, *source = NULL, str_logeventid[8];
 	zbx_uint64_t	lastlogsize;
 	unsigned long	timestamp, logeventid;
@@ -1447,13 +1447,44 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+				if (0 == p_count)
+				{
+					int	ret1, ret2, ret3, ret4;
+
+					if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern,
+									ZBX_CASE_SENSITIVE)) ||
+							FAIL == (ret2 = regexp_match_ex(&regexps, str_severity,
+									key_severity, ZBX_IGNORE_CASE)) ||
+							FAIL == (ret3 = regexp_match_ex(&regexps, provider,
+									key_source, ZBX_IGNORE_CASE)) ||
+							FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid,
+									key_logeventid, ZBX_CASE_SENSITIVE)))
+					{
+						zbx_free(source);
+						zbx_free(provider);
+						zbx_free(value);
+
+						*error = zbx_strdup(*error, "Cannot compile regular expression.");
+						ret = FAIL;
+						break;
+					}
+
+					match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+				}
+				else
+				{
+					match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern,
+								ZBX_CASE_SENSITIVE) &&
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
 								key_severity, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, provider,
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, provider,
 								key_source, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
-								key_logeventid, ZBX_CASE_SENSITIVE))
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+								key_logeventid, ZBX_CASE_SENSITIVE));
+				}
+
+				if (1 == match)
 				{
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
@@ -1543,13 +1574,42 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-			if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity, key_severity,
-							ZBX_IGNORE_CASE) &&
-					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source, key_source,
-							ZBX_IGNORE_CASE) &&
-					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
-							ZBX_CASE_SENSITIVE))
+			if (0 == p_count)
+			{
+				int	ret1, ret2, ret3, ret4;
+
+				if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE)) ||
+						FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+								ZBX_IGNORE_CASE)) ||
+						FAIL == (ret3 = regexp_match_ex(&regexps, source, key_source,
+								ZBX_IGNORE_CASE)) ||
+						FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+								ZBX_CASE_SENSITIVE)))
+				{
+					zbx_free(source);
+					zbx_free(value);
+
+					*error = zbx_strdup(*error, "Cannot compile regular expression.");
+					ret = FAIL;
+					break;
+				}
+
+				match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+						ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+			}
+			else
+			{
+				match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern,
+							ZBX_CASE_SENSITIVE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+							key_severity, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source,
+							key_source, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+							key_logeventid, ZBX_CASE_SENSITIVE));
+			}
+
+			if (1 == match)
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
