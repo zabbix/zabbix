@@ -123,9 +123,5 @@
 				updateUserProfile('web.latest.toggle', open_state, [applicationid]);
 			}
 		});
-
-		$('#filter_set, #filter_rst').click(function() {
-			chkbxRange.clearSelectedOnFilterChange();
-		});
 	});
 </script>

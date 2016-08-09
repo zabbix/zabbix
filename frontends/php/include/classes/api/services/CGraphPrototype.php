@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with graph prototypes.
- *
- * @package API
  */
 class CGraphPrototype extends CGraphGeneral {
 

@@ -3658,9 +3658,8 @@ static void	DCsync_actions(DB_RESULT result)
  * Comments: The result contains the following fields:                        *
  *           0 - correlationid                                                *
  *           1 - name                                                         *
- *           2 - description                                                  *
- *           3 - evaltype                                                     *
- *           4 - formula                                                      *
+ *           2 - evaltype                                                     *
+ *           3 - formula                                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_correlations(DB_RESULT result)
@@ -6226,7 +6225,7 @@ next:;
  *                                                                            *
  * Function: DCconfig_lock_triggers_by_triggerids                             *
  *                                                                            *
- * Purpose: Lock triggersso that multiple processes do not process one        *
+ * Purpose: Lock triggers so that multiple processes do not process one       *
  *          trigger simultaneously.                                           *
  *                                                                            *
  * Parameters: triggerids_in  - [IN] ids of triggers to lock                  *

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with graph.
- *
- * @package API
  */
 class CGraph extends CGraphGeneral {
 
