@@ -40,18 +40,19 @@ extern int		server_num, process_num;
  *             triggerid         - [IN] the source trigger id                 *
  *             eventid           - [IN] the problem eventid to close          *
  *             userid            - [IN] the user that requested to close the  *
- *                                    problem                                 *
+ *                                      problem                               *
  *             locked_triggerids - [IN] the locked trigger identifiers        *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid, zbx_vector_uint64_t *locked_triggerids)
 {
-	const char		*__function_name = "tm_execute_task_close_problem";
-	DB_RESULT		result;
-	DC_TRIGGER		trigger;
-	int			errcode;
-	zbx_timespec_t		ts;
+	const char	*__function_name = "tm_execute_task_close_problem";
+
+	DB_RESULT	result;
+	DC_TRIGGER	trigger;
+	int		errcode;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __function_name,
 			taskid, eventid);
@@ -112,15 +113,13 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  *                                                                            *
  * Purpose: try to close problem by event acknowledgment action               *
  *                                                                            *
- * Parameters: taskid          - [IN] the task identifier                     *
- *             acknowledgeid_s - [IN] the acknowledgment identifier in        *
- *                                    string format                           *
+ * Parameters: taskid - [IN] the task identifier                              *
  *                                                                            *
  * Return value: SUCCEED - task was executed and removed                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_try_task_close_problem(zbx_uint64_t taskid, const char *acknowledgeid_s)
+static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 {
 	const char		*__function_name = "tm_try_task_close_problem";
 
@@ -130,18 +129,18 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid, const char *acknowledg
 	zbx_uint64_t		userid, triggerid, eventid;
 	zbx_vector_uint64_t	triggerids, locked_triggerids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64 " acknowledgeid:%s", __function_name,
-			taskid, acknowledgeid_s);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_create(&locked_triggerids);
 
 	result = DBselect("select a.userid,a.eventid,e.objectid"
-				" from acknowledges a"
+				" from task_close_problem tcp,acknowledges a"
 				" left join events e"
 					" on a.eventid=e.eventid"
-				" where a.acknowledgeid=%s",
-			acknowledgeid_s);
+				" where tcp.taskid=" ZBX_FS_UI64
+					" and tcp.acknowledgeid=a.acknowledgeid",
+			taskid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -182,16 +181,12 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid, const char *acknowledg
  ******************************************************************************/
 static int	tm_process_tasks()
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			type, ret, processed_num = 0;
-	zbx_uint64_t		taskid;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		type, ret, processed_num = 0;
+	zbx_uint64_t	taskid;
 
-	result = DBselect("select t.taskid,t.type,tcp.acknowledgeid"
-				" from task t"
-				" left join task_close_problem tcp"
-					" on t.taskid=tcp.taskid"
-				" order by t.taskid");
+	result = DBselect("select taskid,type from task order by taskid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -201,14 +196,13 @@ static int	tm_process_tasks()
 		switch (type)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
-				ret = tm_try_task_close_problem(taskid, row[2]);
+				ret = tm_try_task_close_problem(taskid);
 				break;
 		}
 
 		if (FAIL != ret)
 			processed_num++;
 	}
-
 	DBfree_result(result);
 
 	return 0;

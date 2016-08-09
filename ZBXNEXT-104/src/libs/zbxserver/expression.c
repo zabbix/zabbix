@@ -1596,7 +1596,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 	{
 		now = atoi(row[0]);
 		ZBX_STR2UINT64(userid, row[1]);
-		ZBX_STR2UCHAR(action, row[3]);
+		action = atoi(row[3]);
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
