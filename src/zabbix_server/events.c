@@ -92,7 +92,7 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *             trigger_tags                - [IN] trigger tags                *
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
- *             trigger_correlation_tag     - [IN] trigger correlation taag    *
+ *             trigger_correlation_tag     - [IN] trigger correlation tag     *
  *                                                                            *
  ******************************************************************************/
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -1996,7 +1996,7 @@ out:
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *             trigger_tags                - [IN] trigger tags                *
  *             trigger_correlation_mode    - [IN] trigger correlation mode    *
- *             trigger_correlation_tag     - [IN] trigger correlation taag    *
+ *             trigger_correlation_tag     - [IN] trigger correlation tag     *
  *                                                                            *
  ******************************************************************************/
 int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -2009,9 +2009,9 @@ int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object
 	int			index;
 	zbx_event_recovery_t	recovery_local;
 
-	index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
-			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, trigger_tags, trigger_correlation_mode, trigger_correlation_tag);
+	index = add_event(source, object, objectid, ts, TRIGGER_VALUE_OK, trigger_description, trigger_expression,
+			trigger_recovery_expression, trigger_priority, trigger_type, trigger_tags,
+			trigger_correlation_mode, trigger_correlation_tag);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
