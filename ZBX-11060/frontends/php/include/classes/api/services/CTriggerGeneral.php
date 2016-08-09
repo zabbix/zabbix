@@ -846,6 +846,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['comments']            [IN] (optional)
 	 * @param int    $triggers[]['type']                [IN] (optional)
 	 * @param string $triggers[]['templateid']          [IN] (optional)
+	 * @param array  $triggers[]['tags']                [IN] (optional)
 	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
 	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
 	 *
