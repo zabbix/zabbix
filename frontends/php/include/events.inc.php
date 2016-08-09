@@ -443,6 +443,7 @@ function getEventAckState($event, $backurl) {
  * @param string $events[]['acknowledges'][]['userid']
  * @param int    $events[]['acknowledges'][]['clock']
  * @param string $events[]['acknowledges'][]['message']
+ * @param string $events[]['acknowledges'][]['action']
  * @param string $backurl  add url param to link with current page file name
  *
  * @return array
@@ -497,11 +498,12 @@ function makeEventsAcknowledges($events, $backurl) {
  * @param string $acknowledges[]['userid']
  * @param int    $acknowledges[]['clock']
  * @param string $acknowledges[]['message']
+ * @param string $acknowledges[]['action']
  *
  * @return CTableInfo
  */
 function makeAcknowledgesTable($acknowledges, $users) {
-	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message'), _('User action')]);
 
 	foreach ($acknowledges as $acknowledge) {
 		$table->addRow([
@@ -509,7 +511,8 @@ function makeAcknowledgesTable($acknowledges, $users) {
 			array_key_exists($acknowledge['userid'], $users)
 				? getUserFullname($users[$acknowledge['userid']])
 				: _('Inaccessible user'),
-			zbx_nl2br($acknowledge['message'])
+			zbx_nl2br($acknowledge['message']),
+			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
 		]);
 	}
 
