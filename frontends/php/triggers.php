@@ -514,6 +514,8 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.massdelete' && 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -526,6 +528,7 @@ if (hasRequest('action') && getRequest('action') == 'trigger.massupdateform' && 
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
+		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => null,
@@ -584,8 +587,6 @@ else {
 		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
 	}
-
-	$config = select_config();
 
 	$data = [
 		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),

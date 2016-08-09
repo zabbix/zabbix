@@ -439,6 +439,8 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -453,6 +455,7 @@ if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdat
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
+		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -495,8 +498,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
