@@ -47,7 +47,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_INFINITY	(1.0 / 0.0)	/* value used as an error code */
+#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
+#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
 
 static const char	*ptr;		/* character being looked at */
 static int		level;		/* expression nesting level  */
@@ -86,6 +87,12 @@ static double	evaluate_number(void)
 	const char	*iter = ptr;
 	double		result;
 	zbx_uint64_t	factor = 1;
+
+	if (0 == strncmp("ZBX_UNKNOWN", ptr, 11) && SUCCEED == is_number_delimiter(ptr[11]))
+	{
+		ptr += 11;
+		return ZBX_UNKNOWN;
+	}
 
 	while (1)
 	{
@@ -152,6 +159,8 @@ static double	evaluate_term9(void)
 		if (ZBX_INFINITY == (result = evaluate_term1()))
 			return ZBX_INFINITY;
 
+		/* if evaluate_term1() returns ZBX_UNKNOWN then continue as with regular number */
+
 		if (')' != *ptr)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
@@ -181,6 +190,10 @@ static double	evaluate_term9(void)
  *                                                                            *
  * Purpose: evaluate "-" (unary)                                              *
  *                                                                            *
+ * -0.0     -> -0.0                                                           *
+ * -1.2     -> -1.2                                                           *
+ * -Unknown ->  Unknown                                                       *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term8(void)
 {
@@ -193,8 +206,8 @@ static double	evaluate_term8(void)
 	{
 		ptr++;
 
-		if (ZBX_INFINITY == (result = evaluate_term9()))
-			return ZBX_INFINITY;
+		if (ZBX_UNKNOWN == (result = evaluate_term9()) || ZBX_INFINITY == result)
+			return result;
 
 		result = -result;
 	}
@@ -208,6 +221,10 @@ static double	evaluate_term8(void)
  *                                                                            *
  * Purpose: evaluate "not"                                                    *
  *                                                                            *
+ * not 0.0     ->  1.0                                                        *
+ * not 1.2     ->  0.0                                                        *
+ * not Unknown ->  Unknown                                                    *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term7(void)
 {
@@ -220,10 +237,10 @@ static double	evaluate_term7(void)
 	{
 		ptr += 3;
 
-		if (ZBX_INFINITY == (result = evaluate_term8()))
-			return ZBX_INFINITY;
+		if (ZBX_UNKNOWN == (result = evaluate_term8()) || ZBX_INFINITY == result)
+			return result;
 
-		result = (SUCCEED == zbx_double_compare(result, 0.0) ? 1 : 0);
+		result = (SUCCEED == zbx_double_compare(result, 0.0) ? 1.0 : 0.0);
 	}
 	else
 		result = evaluate_term8();
@@ -235,6 +252,17 @@ static double	evaluate_term7(void)
  *                                                                            *
  * Purpose: evaluate "*" and "/"                                              *
  *                                                                            *
+ *     0.0 * Unknown  ->  Unknown (yes, not 0 as we don't want to lose        *
+ *                        Unknown in arithmetic operations)                   *
+ *     1.2 * Unknown  ->  Unknown                                             *
+ *     0.0 / 1.2      ->  0.0                                                 *
+ *     1.2 / 0.0      ->  error (ZBX_INFINITY)                                *
+ * Unknown / 0.0      ->  error (ZBX_INFINITY)                                *
+ * Unknown / 1.2      ->  Unknown                                             *
+ * Unknown / Unknown  ->  Unknown                                             *
+ *     0.0 / Unknown  ->  Unknown                                             *
+ *     1.2 / Unknown  ->  Unknown                                             *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term6(void)
 {
@@ -244,24 +272,37 @@ static double	evaluate_term6(void)
 	if (ZBX_INFINITY == (result = evaluate_term7()))
 		return ZBX_INFINITY;
 
+	/* if evaluate_term7() returns ZBX_UNKNOWN then continue as with regular number */
+
 	while ('*' == *ptr || '/' == *ptr)
 	{
 		op = *ptr++;
+
+		/* 'ZBX_UNKNOWN' in multiplication and division produces 'ZBX_UNKNOWN'. */
+		/* Even if 1st operand is Unknown we evaluate 2nd operand too to catch fatal errors in it. */
 
 		if (ZBX_INFINITY == (operand = evaluate_term7()))
 			return ZBX_INFINITY;
 
 		if ('*' == op)
 		{
+			if (ZBX_UNKNOWN == result || ZBX_UNKNOWN == operand)
+				return ZBX_UNKNOWN;
+
 			result *= operand;
 		}
 		else
 		{
+			/* catch division by 0 even if 1st operand is Unknown */
+
 			if (SUCCEED == zbx_double_compare(operand, 0.0))
 			{
 				zbx_strlcpy(buffer, "Cannot evaluate expression: division by zero.", max_buffer_len);
 				return ZBX_INFINITY;
 			}
+
+			if (ZBX_UNKNOWN == result || ZBX_UNKNOWN == operand)
+				return ZBX_UNKNOWN;
 
 			result /= operand;
 		}
@@ -274,6 +315,10 @@ static double	evaluate_term6(void)
  *                                                                            *
  * Purpose: evaluate "+" and "-"                                              *
  *                                                                            *
+ *     0.0 +/- Unknown  ->  Unknown                                           *
+ *     1.2 +/- Unknown  ->  Unknown                                           *
+ * Unknown +/- Unknown  ->  Unknown                                           *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term5(void)
 {
@@ -283,12 +328,19 @@ static double	evaluate_term5(void)
 	if (ZBX_INFINITY == (result = evaluate_term6()))
 		return ZBX_INFINITY;
 
+	/* if evaluate_term6() returns ZBX_UNKNOWN then continue as with regular number */
+
 	while ('+' == *ptr || '-' == *ptr)
 	{
 		op = *ptr++;
 
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+
 		if (ZBX_INFINITY == (operand = evaluate_term6()))
 			return ZBX_INFINITY;
+
+		if (ZBX_UNKNOWN == result || ZBX_UNKNOWN == operand)
+			return ZBX_UNKNOWN;
 
 		if ('+' == op)
 			result += operand;
@@ -303,6 +355,10 @@ static double	evaluate_term5(void)
  *                                                                            *
  * Purpose: evaluate "<", "<=", ">=", ">"                                     *
  *                                                                            *
+ *     0.0 < Unknown  ->  Unknown                                             *
+ *     1.2 < Unknown  ->  Unknown                                             *
+ * Unknown < Unknown  ->  Unknown                                             *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term4(void)
 {
@@ -311,6 +367,8 @@ static double	evaluate_term4(void)
 
 	if (ZBX_INFINITY == (result = evaluate_term5()))
 		return ZBX_INFINITY;
+
+	/* if evaluate_term5() returns ZBX_UNKNOWN then continue as with regular number */
 
 	while (1)
 	{
@@ -331,8 +389,13 @@ static double	evaluate_term4(void)
 		else
 			break;
 
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+
 		if (ZBX_INFINITY == (operand = evaluate_term5()))
 			return ZBX_INFINITY;
+
+		if (ZBX_UNKNOWN == result || ZBX_UNKNOWN == operand)
+			return ZBX_UNKNOWN;
 
 		if ('<' == op)
 			result = (result <= operand - ZBX_DOUBLE_EPSILON);
@@ -351,6 +414,13 @@ static double	evaluate_term4(void)
  *                                                                            *
  * Purpose: evaluate "=" and "<>"                                             *
  *                                                                            *
+ *      0.0 = Unknown  ->  Unknown                                            *
+ *      1.2 = Unknown  ->  Unknown                                            *
+ *  Unknown = Unknown  ->  Unknown                                            *
+ *     0.0 <> Unknown  ->  Unknown                                            *
+ *     1.2 <> Unknown  ->  Unknown                                            *
+ * Unknown <> Unknown  ->  Unknown                                            *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term3(void)
 {
@@ -359,6 +429,8 @@ static double	evaluate_term3(void)
 
 	if (ZBX_INFINITY == (result = evaluate_term4()))
 		return ZBX_INFINITY;
+
+	/* if evaluate_term4() returns ZBX_UNKNOWN then continue as with regular number */
 
 	while (1)
 	{
@@ -374,8 +446,13 @@ static double	evaluate_term3(void)
 		else
 			break;
 
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+
 		if (ZBX_INFINITY == (operand = evaluate_term4()))
 			return ZBX_INFINITY;
+
+		if (ZBX_UNKNOWN == result || ZBX_UNKNOWN == operand)
+			return ZBX_UNKNOWN;
 
 		if ('=' == op)
 			result = (SUCCEED == zbx_double_compare(result, operand));
@@ -390,6 +467,12 @@ static double	evaluate_term3(void)
  *                                                                            *
  * Purpose: evaluate "and"                                                    *
  *                                                                            *
+ *      0.0 and Unknown  -> 0.0                                               *
+ *  Unknown and 0.0      -> 0.0                                               *
+ *      1.0 and Unknown  -> Unknown                                           *
+ *  Unknown and 1.0      -> Unknown                                           *
+ *  Unknown and Unknown  -> Unknown                                           *
+ *                                                                            *
  ******************************************************************************/
 static double	evaluate_term2(void)
 {
@@ -398,12 +481,30 @@ static double	evaluate_term2(void)
 	if (ZBX_INFINITY == (result = evaluate_term3()))
 		return ZBX_INFINITY;
 
+	/* if evaluate_term3() returns ZBX_UNKNOWN then continue as with regular number */
+
 	while ('a' == ptr[0] && 'n' == ptr[1] && 'd' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
 
 		if (ZBX_INFINITY == (operand = evaluate_term3()))
 			return ZBX_INFINITY;
+
+		if (ZBX_UNKNOWN == result)
+		{
+			if (SUCCEED == zbx_double_compare(operand, 0.0))
+				return 0.0;
+			else
+				return ZBX_UNKNOWN;
+		}
+
+		if (ZBX_UNKNOWN == operand)
+		{
+			if (SUCCEED == zbx_double_compare(result, 0.0))
+				return 0.0;
+			else
+				return ZBX_UNKNOWN;
+		}
 
 		result = (SUCCEED != zbx_double_compare(result, 0.0) && SUCCEED != zbx_double_compare(operand, 0.0));
 	}
@@ -414,6 +515,12 @@ static double	evaluate_term2(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate "or"                                                     *
+ *                                                                            *
+ *      1.0 or Unknown  -> 1.0                                                *
+ *  Unknown or 1.0      -> 1.0                                                *
+ *      0.0 or Unknown  -> Unknown                                            *
+ *  Unknown or 0.0      -> Unknown                                            *
+ *  Unknown or Unknown  -> Unknown                                            *
  *                                                                            *
  ******************************************************************************/
 static double	evaluate_term1(void)
@@ -431,6 +538,8 @@ static double	evaluate_term1(void)
 	if (ZBX_INFINITY == (result = evaluate_term2()))
 		return ZBX_INFINITY;
 
+	/* if evaluate_term2() returns ZBX_UNKNOWN then continue as with regular number */
+
 	while ('o' == ptr[0] && 'r' == ptr[1] && SUCCEED == is_operator_delimiter(ptr[2]))
 	{
 		ptr += 2;
@@ -438,7 +547,33 @@ static double	evaluate_term1(void)
 		if (ZBX_INFINITY == (operand = evaluate_term2()))
 			return ZBX_INFINITY;
 
-		result = (SUCCEED != zbx_double_compare(result, 0.0) || SUCCEED != zbx_double_compare(operand, 0.0));
+		if (ZBX_UNKNOWN == result)
+		{
+			if (ZBX_UNKNOWN == operand)
+			{
+				result = ZBX_UNKNOWN;
+			}
+			else if (SUCCEED != zbx_double_compare(operand, 0.0))
+			{
+				result = 1;
+			}
+			else
+				result = ZBX_UNKNOWN;
+		}
+		else if (ZBX_UNKNOWN == operand)
+		{
+			if (SUCCEED != zbx_double_compare(result, 0.0))
+			{
+				result = 1;
+			}
+			else
+				result = ZBX_UNKNOWN;
+		}
+		else
+		{
+			result = (SUCCEED != zbx_double_compare(result, 0.0) ||
+					SUCCEED != zbx_double_compare(operand, 0.0));
+		}
 	}
 
 	level--;
@@ -478,6 +613,15 @@ int	evaluate(double *value, const char *expression, char *error, int max_error_l
 	if (ZBX_INFINITY == *value)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
+		return FAIL;
+	}
+
+	if (ZBX_UNKNOWN == *value)
+	{
+		/* Map Unknown result to error. Callers currently do not operate with ZBX_UNKNOWN. */
+		*value = ZBX_INFINITY;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value: unknown", __function_name);
 		return FAIL;
 	}
 
