@@ -353,7 +353,7 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => API_OUTPUT_EXTEND,
@@ -435,9 +435,11 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 				'priority' => $srcTrigger['priority'],
 				'comments' => $srcTrigger['comments'],
 				'type' => $srcTrigger['type'],
-				'tags' => $srcTrigger['tags'],
 				'recovery_mode' => $srcTrigger['recovery_mode'],
-				'recovery_expression' => $srcTrigger['recovery_expression']
+				'recovery_expression' => $srcTrigger['recovery_expression'],
+				'correlation_mode' => $srcTrigger['correlation_mode'],
+				'correlation_tag' => $srcTrigger['correlation_tag'],
+				'tags' => $srcTrigger['tags']
 			]]);
 
 			if (!$result) {
