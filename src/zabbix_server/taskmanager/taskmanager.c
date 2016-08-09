@@ -76,15 +76,13 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			diff->triggerid = triggerid;
 			diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
 			diff->value = trigger.value;
-			/* TODO: set problem_count to 0 after merging in 3274-3 changes */
-			diff->problem_count = 1;
+			diff->problem_count = 0;
 			diff->error = NULL;
-
 			zbx_vector_ptr_append(&trigger_diff, diff);
 
 			zbx_timespec(&ts);
 
-			close_event(userid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
+			close_event(eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
 					&ts, userid, 0, 0, trigger.description, trigger.expression_orig,
 					trigger.recovery_expression_orig, trigger.priority, trigger.type, NULL,
 					ZBX_TRIGGER_CORRELATION_NONE, "");
