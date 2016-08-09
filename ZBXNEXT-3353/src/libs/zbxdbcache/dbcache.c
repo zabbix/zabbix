@@ -3550,8 +3550,16 @@ int	zbx_next_history_index(zbx_dc_history_t history, int history_num, int *index
 
 	for (; *index < history_num; (*index)++)
 	{
-		if (0 == (h[*index].flags & ZBX_DC_FLAG_NOVALUE) && 0 == (h[*index].flags & ZBX_DC_FLAG_UNDEF))
-			return SUCCEED;
+		if (0 != (h[*index].flags & ZBX_DC_FLAG_NOVALUE))
+			continue;
+
+		if (0 != (h[*index].flags & ZBX_DC_FLAG_UNDEF))
+			continue;
+
+		if (0 != (h[*index].flags & ZBX_DC_FLAG_LLD))
+			continue;
+
+		return SUCCEED;
 	}
 
 	return FAIL;
