@@ -222,16 +222,14 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	sec1 = sec2 = zbx_time();
+	sec1 = zbx_time();
+	sec2 = sec1;
 
 	if (0 == (sleeptime = ZBX_TASKMANAGER_TIMEOUT - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT))
 		sleeptime = ZBX_TASKMANAGER_TIMEOUT;
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
-
 		zbx_sleep_loop(sleeptime);
 
 		zbx_handle_log();
@@ -246,5 +244,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		if (0 > (sleeptime = nextcheck - (int)sec2))
 			sleeptime = 0;
+
+		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
+				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
 }
