@@ -484,7 +484,8 @@ class CEvent extends CApiService {
 		if ($options['countOutput'] === null) {
 			if ($this->outputIsRequested('r_eventid', $options['output'])
 					|| $this->outputIsRequested('c_eventid', $options['output'])
-					|| $this->outputIsRequested('correlationid', $options['output'])) {
+					|| $this->outputIsRequested('correlationid', $options['output'])
+					|| $this->outputIsRequested('userid', $options['output'])) {
 				// Select fields from event_recovery table using LEFT JOIN.
 
 				if ($this->outputIsRequested('r_eventid', $options['output'])) {
@@ -495,6 +496,9 @@ class CEvent extends CApiService {
 				}
 				if ($this->outputIsRequested('correlationid', $options['output'])) {
 					$sqlParts['select']['correlationid'] = 'er.correlationid';
+				}
+				if ($this->outputIsRequested('userid', $options['output'])) {
+					$sqlParts['select']['userid'] = 'er.userid';
 				}
 
 				$sqlParts['left_join'][] = ['from' => 'event_recovery er', 'on' => 'er.eventid=e.eventid'];

@@ -1147,10 +1147,21 @@ function make_trigger_details($trigger) {
 			new CCol($trigger['recovery_expression'])
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
-			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
-		->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-			? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))
+			? SPACE.'+'.SPACE._('Multiple PROBLEM events')
+			: '')
 		]);
+
+	if ($config['event_ack_enable']) {
+		$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
+		]);
+	}
+
+	$table->addRow([_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'])
+		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED)
+	]);
 
 	return $table;
 }
