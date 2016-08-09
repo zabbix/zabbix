@@ -222,37 +222,33 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		const char *subject, const char *message)
 {
 	const char	*__function_name = "add_user_msg";
-	ZBX_USER_MSG	*p;
+	ZBX_USER_MSG	*p, **pnext;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == mediatypeid)
 	{
-		p = *user_msg;
-
-		while (NULL != p)
+		for (pnext = user_msg, p = *user_msg; NULL != p; p = *pnext)
 		{
-			if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
+			if (p->userid == userid && 0 == strcmp(p->subject, subject) &&
+					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
 			{
+				*pnext = p->next;
+
 				zbx_free(p->subject);
 				zbx_free(p->message);
-				*user_msg = p->next;
+				zbx_free(p);
 			}
-
-			p = p->next;
+			else
+				pnext = (ZBX_USER_MSG **)&p->next;
 		}
 	}
 
-
-	p = *user_msg;
-
-	while (NULL != p)
+	for (p = *user_msg; NULL != p; p = p->next)
 	{
-		if (p->userid == userid && (0 == p->mediatypeid || p->mediatypeid == mediatypeid) &&
-				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
+		if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message) &&
+				(0 == p->mediatypeid || mediatypeid == p->mediatypeid))
 			break;
-
-		p = p->next;
 	}
 
 	if (NULL == p)
