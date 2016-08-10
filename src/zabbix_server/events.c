@@ -1473,15 +1473,9 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &triggerids.values[j],
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
-				diff->triggerid = trigger->triggerid;
-				diff->priority = trigger->priority;
-				diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
-				diff->value = trigger->value;
-				diff->problem_count = 0;
-				diff->error = NULL;
+				zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority,
+						ZBX_FLAGS_TRIGGER_DIFF_UNSET, trigger->value, 0, 0, NULL);
 
-				zbx_vector_ptr_append(trigger_diff, diff);
 				/* TODO: should we store trigger diffs in hashset rather than vector? */
 				zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			}
