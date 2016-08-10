@@ -737,8 +737,9 @@ class CEvent extends CApiService {
 		$events_count = count($eventids);
 
 		$events = $this->get([
-			'output' => ['eventid'],
+			'output' => [],
 			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'editable' => true
 		]);
@@ -748,11 +749,12 @@ class CEvent extends CApiService {
 		}
 
 		$events = $this->get([
-			'output' => ['eventid'],
+			'output' => [],
 			'selectRelatedObject' => ['manual_close'],
 			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
-			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
 		if ($events_count != count($events)) {

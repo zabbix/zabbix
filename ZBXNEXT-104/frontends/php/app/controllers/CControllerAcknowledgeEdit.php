@@ -126,13 +126,11 @@ class CControllerAcknowledgeEdit extends CController {
 
 		$triggerids = array_keys($triggerids);
 
-		$trigger_cond = false;
 		$event_cond = false;
-		$events_closed = 0;
 		$data['close_problem_chbox'] = false;
 
-		// Get triggers that user should have RW permissions and is allowed manual close.
-		$triggers = API::Trigger()->get([
+		// At least one trigger should have RW permissions and should be allowed manual close.
+		$trigger_cond = (bool) API::Trigger()->get([
 			'output' => [],
 			'triggerids' => $triggerids,
 			'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
@@ -140,37 +138,32 @@ class CControllerAcknowledgeEdit extends CController {
 			'preservekeys' => true
 		]);
 
-		// At least one trigger should have RW permissions and should be allowed manual close.
-		foreach ($triggerids as $triggerid) {
-			if (array_key_exists($triggerid, $triggers)) {
-				$trigger_cond = true;
-				break;
-			}
-		}
-
 		// Get events in problem state with acknowledges.
 		$problems_events = API::Event()->get([
-			'output' => ['eventid'],
+			'output' => [],
 			'select_acknowledges' => ['action'],
-			'filter' => ['value' => TRIGGER_VALUE_TRUE],
 			'eventids' => array_keys($events),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);
 
 		// At least one event should not be closed.
 		foreach ($problems_events as $problem_event) {
+			$event_closed = false;
+
 			if ($problem_event['acknowledges']) {
 				foreach ($problem_event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_NONE) {
-						// If at least one event is not opened, checkbox could potentially be enabled.
-						$event_cond = true;
+					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+						$event_closed = true;
+						break;
 					}
-					else {
-						// Count events closed. If in the end all are closed, checkbox is definitely disabled.
-						$events_closed++;
-					}
+				}
+
+				if (!$event_closed) {
+					$event_cond = true;
+					break;
 				}
 			}
 			else {
@@ -180,15 +173,10 @@ class CControllerAcknowledgeEdit extends CController {
 			}
 		}
 
-		if ($events_closed == count($problems_events)) {
-			$event_cond = false;
-		}
-
 		/*
 		 * Show checkbox as enabled if trigger conditions (has permissions and allowed to close) and
 		 * event conditions (problem state and not closed) are both set to true. Otherwise checkbox is disabled.
 		 */
-
 		if ($trigger_cond && $event_cond) {
 			$data['close_problem_chbox'] = true;
 		}
