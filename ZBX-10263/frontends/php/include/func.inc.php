@@ -1474,18 +1474,17 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
 	$config = select_config();
 
-	$limit_exceeded = ($config['search_limit'] < count($items));
+	$itemsCount = count($items);
+	$limit_exceeded = ($config['search_limit'] < $itemsCount);
+	$offset = 0;
 
 	if ($limit_exceeded) {
-		if ($sortorder == ZBX_SORT_UP) {
-			array_pop($items);
+		if ($sortorder == ZBX_SORT_DOWN) {
+			$offset = $itemsCount - $config['search_limit'];
 		}
-		else {
-			array_shift($items);
-		}
+		$itemsCount = $config['search_limit'];
 	}
 
-	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 	$currentPage = getPageNumber();
 
@@ -1566,23 +1565,23 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 	}
 
 	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
-	$start = (($currentPage - 1) * $rowsPerPage) + 1;
+	$start = ($currentPage - 1) * $rowsPerPage;
 
 	if ($pagesCount == 1) {
 		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$end = $start - 1  + $rowsPerPage;
+		$end = $start + $rowsPerPage;
 
 		if ($end > $itemsCount) {
 			$end = $itemsCount;
 		}
 
-		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start, $end, $total);
+		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
 	// Trim array with elements to contain elements for current page.
-	$items = array_slice($items, $start - 1, $rowsPerPage, true);
+	$items = array_slice($items, $start + $offset, $rowsPerPage, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
