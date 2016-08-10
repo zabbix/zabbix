@@ -563,7 +563,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['triggerid'],
-			'selectTags' => API_OUTPUT_EXTEND,
+			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
 

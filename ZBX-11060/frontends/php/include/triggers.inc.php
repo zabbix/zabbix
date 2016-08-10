@@ -356,7 +356,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
 		],
 		'selectDependencies' => ['triggerid'],
-		'selectTags' => API_OUTPUT_EXTEND,
+		'selectTags' => ['tag', 'value'],
 		'triggerids' => $src_triggerids
 	];
 
