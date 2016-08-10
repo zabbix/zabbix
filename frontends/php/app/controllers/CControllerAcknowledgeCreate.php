@@ -122,14 +122,13 @@ class CControllerAcknowledgeCreate extends CController {
 			if ($close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
 				$events = API::Event()->get([
 					'output' => ['eventid', 'objectid'],
+					'eventids' => $eventids,
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'eventids' => $eventids,
 					'preservekeys' => true
 				]);
 
 				$triggerids = zbx_objectValues($events, 'objectid');
-				$_eventids = [];
 
 				// User should have read-write permissions to trigger and trigger must have "manual_close" set to "1".
 				$triggers = API::Trigger()->get([
@@ -140,12 +139,7 @@ class CControllerAcknowledgeCreate extends CController {
 					'preservekeys' => true
 				]);
 
-				foreach ($triggerids as $triggerid) {
-					if (array_key_exists($triggerid, $triggers)) {
-						// Collect trigger IDs (RW permissions and manual close allowed) as keys for event IDs.
-						$_eventids[$triggerid] = [];
-					}
-				}
+				$_eventids = array_fill_keys(array_keys($triggers), []);
 
 				// Event should be in problem state. Get events to check if it can be closed.
 				$problem_events = API::Event()->get([
@@ -154,11 +148,9 @@ class CControllerAcknowledgeCreate extends CController {
 					'eventids' => array_keys($events),
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'filter' => ['value' => TRIGGER_VALUE_TRUE],
+					'value' => TRIGGER_VALUE_TRUE,
 					'preservekeys' => true
 				]);
-
-				$closed_eventids = [];
 
 				foreach ($problem_events as $problem_event) {
 					$eventid = $problem_event['eventid'];
@@ -197,11 +189,13 @@ class CControllerAcknowledgeCreate extends CController {
 					$eventids_to_ack = array_diff($eventids, $eventids_to_close);
 
 					// Acknowledge and close problems.
-					$result = API::Event()->acknowledge([
-						'eventids' => $eventids_to_close,
-						'message' => $this->getInput('message', ''),
-						'action' => $close_problem
-					]);
+					if ($eventids_to_close) {
+						$result = API::Event()->acknowledge([
+							'eventids' => $eventids_to_close,
+							'message' => $this->getInput('message', ''),
+							'action' => $close_problem
+						]);
+					}
 				}
 			}
 

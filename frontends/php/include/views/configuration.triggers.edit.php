@@ -56,8 +56,11 @@ if ($readonly) {
 	$triggersForm
 		->addVar('recovery_mode', $data['recovery_mode'])
 		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode'])
-		->addVar('manual_close', $data['manual_close']);
+		->addVar('correlation_mode', $data['correlation_mode']);
+
+	if ($data['config']['event_ack_enable']) {
+		$triggersForm->addVar('manual_close', $data['manual_close']);
+	}
 }
 
 // Create form list.
