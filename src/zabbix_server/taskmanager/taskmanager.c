@@ -73,7 +73,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 			zbx_vector_ptr_create(&trigger_diff);
 
 			zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
-					ZBX_FLAGS_TRIGGER_DIFF_UNSET, trigger.value, 0, 0, NULL);
+					ZBX_FLAGS_TRIGGER_DIFF_UNSET, trigger.value, TRIGGER_STATE_NORMAL, 0, NULL);
 
 			zbx_timespec(&ts);
 
