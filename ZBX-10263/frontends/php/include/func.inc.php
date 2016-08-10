@@ -1522,15 +1522,11 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
 		if ($startPage > 1) {
-			// Adds link to first page.
-
 			$url->setArgument('page', 1);
 			$tags[] = new CLink(_('First'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
-			// Adds link to go to previous page.
-
 			$url->setArgument('page', $currentPage - 1);
 			$tags[] = new CLink(
 				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
@@ -1538,8 +1534,6 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 
 		for ($p = $startPage; $p <= $endPage; $p++) {
-			// Adds link of nth page.
-
 			$url->setArgument('page', $p);
 			$link = new CLink($p, $url->getUrl());
 			if ($p == $currentPage) {
@@ -1550,15 +1544,11 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 
 		if ($currentPage < $pagesCount) {
-			// Adds link to go to next page.
-
 			$url->setArgument('page', $currentPage + 1);
 			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 		}
 
 		if ($p < $pagesCount) {
-			// Adds link to last page.
-
 			$url->setArgument('page', $pagesCount);
 			$tags[] = new CLink(_('Last'), $url->getUrl());
 		}
