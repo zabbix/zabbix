@@ -2476,26 +2476,50 @@ $form-icon-btn: (
 	position: relative;
 	display: inline-block;
 	color: $font-color;
+	cursor: pointer;
 
 	&::after {
+		//content: '';
+		//position: absolute;
+		//top: 50%;
+		//right: -14px;
+		//@extend %arrow;
+		//border-left: 4px solid transparent;
+		//border-right: 4px solid transparent;
+		//border-top: 6px solid;
 		content: '';
 		position: absolute;
-		top: 50%;
-		right: -14px;
-		@extend %arrow;
-		border-left: 4px solid transparent;
-		border-right: 4px solid transparent;
-		border-top: 6px solid;
+		display: block;
+		width: 7px;
+		height: 7px;
+		top: 49%;
+		right: -18px;
+		border-left: 2px solid $font-color;
+		border-bottom: 2px solid $font-color;
+		@include transform(translate3d(-50%, -50%, 0) rotate(-45deg));
+	}
+
+	&:hover {
+
+		&::after {
+			border-left: 2px solid $link-hover-color;
+			border-bottom: 2px solid $link-hover-color;
+		}
 	}
 }
 
+a.header-dropdown {
+	border: none;
+}
+
 .header-dropdown-list {
-	padding: 5px 10px;
+	//margin: 0 0 0 -10px;
+	padding: 5px 9px;
 	font-size: $font-h4-size;
 
 	.action-menu-item {
-		padding: 0 10px;
-		margin: 0 -10px;
+		padding: 0 9px;
+		margin: 0 -9px;
 	}
 	@extend .action-menu;
 }
