@@ -1556,9 +1556,7 @@ static int	DBpatch_3010068(void)
 	/* state: 0 - TRIGGER_STATE_NORMAL */
 	/* flags: 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK <= DBexecute("update triggers set error='',state=0 where flags=2"))
-	{
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
