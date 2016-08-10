@@ -282,13 +282,29 @@ class CScreenProblem extends CScreenBase {
 				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['r_clock']),
 					'tr_events.php?triggerid='.$db_problem['objectid'].'&eventid='.$db_problem['r_eventid'])
 				: '';
-			$cell_status = new CSpan($db_problem['r_eventid'] != 0 ? _('RESOLVED') : _('PROBLEM'));
 
-			// add colors and blinking to span depending on configuration and trigger parameters
+			$status = _('PROBLEM');
+			$is_closed = false;
+
+			if ($config['event_ack_enable'] && $db_problem['acknowledges']) {
+				foreach ($db_problem['acknowledges'] as $acknowledge) {
+					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+						$status = _('CLOSING');
+						$is_closed = true;
+						break;
+					}
+				}
+			}
+
+			$cell_status = new CSpan(($db_problem['r_eventid'] != 0) ? _('RESOLVED') : $status);
+
+			// Add colors and blinking to span depending on configuration and trigger parameters.
 			addTriggerValueStyle(
 				$cell_status,
-				$db_problem['r_eventid'] != 0 ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE,
-				$db_problem['r_eventid'] != 0 ? $db_problem['r_clock'] : $db_problem['clock'],
+				($db_problem['r_eventid'] != 0)
+					? TRIGGER_VALUE_FALSE
+					: ($is_closed ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE),
+				($db_problem['r_eventid'] != 0) ? $db_problem['r_clock'] : $db_problem['clock'],
 				$config['event_ack_enable'] ? (bool) $db_problem['acknowledges'] : false
 			);
 
@@ -305,7 +321,7 @@ class CScreenProblem extends CScreenBase {
 				(new CSpan($description))
 					->setMenuPopup(CMenuPopupHelper::getTrigger($db_trigger))
 					->addClass(ZBX_STYLE_LINK_ACTION),
-				$db_problem['r_eventid'] != 0
+				($db_problem['r_eventid'] != 0)
 					? zbx_date2age($db_problem['clock'], $db_problem['r_clock'])
 					: zbx_date2age($db_problem['clock']),
 				$config['event_ack_enable'] ? $acknowledges[$db_problem['eventid']] : null,
