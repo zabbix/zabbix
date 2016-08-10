@@ -2512,15 +2512,15 @@ a.header-dropdown {
 	&::before, &::after {
 		content: '';
 		position: absolute;
-		top: -12px;
-		border-left: 12px solid transparent;
-		border-right: 12px solid transparent;
-		border-bottom: 12px solid darken($action-border-color, 1%);
+		top: -10px;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid darken($action-border-color, 1%);
 		@extend %arrow;
 	}
 
 	&::after {
-		top: -11px;
+		top: -9px;
 		border-bottom-color: $ui-bg-color;
 	}
 }
