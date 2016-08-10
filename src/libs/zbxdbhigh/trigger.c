@@ -308,7 +308,6 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 	diff->error = (NULL != error ? zbx_strdup(NULL, error) : NULL);
 
 	diff->problem_count = 0;
-	diff->correlated = 0;
 
 	zbx_vector_ptr_append(trigger_diff, diff);
 }
