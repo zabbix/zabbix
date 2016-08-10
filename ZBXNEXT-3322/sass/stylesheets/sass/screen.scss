@@ -2479,14 +2479,6 @@ $form-icon-btn: (
 	cursor: pointer;
 
 	&::after {
-		//content: '';
-		//position: absolute;
-		//top: 50%;
-		//right: -14px;
-		//@extend %arrow;
-		//border-left: 4px solid transparent;
-		//border-right: 4px solid transparent;
-		//border-top: 6px solid;
 		content: '';
 		position: absolute;
 		display: block;
@@ -2498,30 +2490,39 @@ $form-icon-btn: (
 		border-bottom: 2px solid $font-color;
 		@include transform(translate3d(-50%, -50%, 0) rotate(-45deg));
 	}
-
-	&:hover {
-
-		&::after {
-			border-left: 2px solid $link-hover-color;
-			border-bottom: 2px solid $link-hover-color;
-		}
-	}
 }
 
 a.header-dropdown {
 	border: none;
+	color: $font-color;
 }
 
 .header-dropdown-list {
-	//margin: 0 0 0 -10px;
-	padding: 5px 9px;
+	padding: 5px 8px;
 	font-size: $font-h4-size;
+	@extend .action-menu;
 
 	.action-menu-item {
-		padding: 0 9px;
-		margin: 0 -9px;
+		padding: 0 8px;
+		margin: 0 -8px;
+		height: 26px;
+		line-height: 26px;
 	}
-	@extend .action-menu;
+
+	&::before, &::after {
+		content: '';
+		position: absolute;
+		top: -12px;
+		border-left: 12px solid transparent;
+		border-right: 12px solid transparent;
+		border-bottom: 12px solid darken($action-border-color, 1%);
+		@extend %arrow;
+	}
+
+	&::after {
+		top: -11px;
+		border-bottom-color: $ui-bg-color;
+	}
 }
 
 .overlay-dialogue {
