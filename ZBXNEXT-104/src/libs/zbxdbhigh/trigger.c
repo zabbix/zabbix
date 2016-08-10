@@ -138,31 +138,8 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 
 	if (0 != (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE))
 	{
-		zbx_trigger_diff_t	*diff;
-
-		diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
-		memset(diff, 0, sizeof(zbx_trigger_diff_t));
-
-		diff->triggerid = trigger->triggerid;
-		diff->priority = trigger->priority;
-		diff->flags = flags;
-
-		/* trigger value will be recalculated during event processing */
-		diff->value = trigger->value;
-
-		diff->problem_count = 0;
-		diff->correlated = 0;
-
-		if (0 != (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE))
-			diff->state = new_state;
-
-		if (0 != (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
-			diff->lastchange = trigger->timespec.sec;
-
-		if (0 != (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR))
-			diff->error = zbx_strdup(NULL, new_error);
-
-		zbx_vector_ptr_append(diffs, diff);
+		zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value,
+				new_state, trigger->timespec.sec, new_error);
 	}
 
 	ret = SUCCEED;
@@ -314,4 +291,26 @@ void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
+void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
+		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error)
+
+{
+	zbx_trigger_diff_t	*diff;
+
+	diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
+	diff->triggerid = triggerid;
+	diff->priority = priority;
+	diff->flags = flags;
+	diff->value = value;
+	diff->state = state;
+	diff->lastchange = lastchange;
+	diff->error = (NULL != error ? zbx_strdup(NULL, error) : NULL);
+
+	diff->problem_count = 0;
+	diff->correlated = 0;
+
+	zbx_vector_ptr_append(trigger_diff, diff);
 }

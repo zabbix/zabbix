@@ -69,17 +69,11 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 		if (SUCCEED == errcode)
 		{
 			zbx_vector_ptr_t	trigger_diff;
-			zbx_trigger_diff_t	*diff;
 
 			zbx_vector_ptr_create(&trigger_diff);
 
-			diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
-			diff->triggerid = triggerid;
-			diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
-			diff->value = trigger.value;
-			diff->problem_count = 0;
-			diff->error = NULL;
-			zbx_vector_ptr_append(&trigger_diff, diff);
+			zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
+					ZBX_FLAGS_TRIGGER_DIFF_UNSET, trigger.value, 0, 0, NULL);
 
 			zbx_timespec(&ts);
 
