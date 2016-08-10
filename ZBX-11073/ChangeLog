@@ -3,6 +3,8 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
+..F....... [ZBX-10263] fixed incorrect record count in getPagingLine() when search limit is reached (Cemeris)
 ..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
 ..F....... [ZBX-10621] removed excessive white space in dashboard (Pavel, Alexei)
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
