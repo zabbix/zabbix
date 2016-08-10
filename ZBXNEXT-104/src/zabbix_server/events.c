@@ -1473,16 +1473,17 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority,
-						ZBX_FLAGS_TRIGGER_DIFF_UNSET, trigger->value, TRIGGER_STATE_NORMAL, 0,
-						NULL);
+						ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger->value,
+						TRIGGER_STATE_NORMAL, 0, NULL);
 
 				/* TODO: should we store trigger diffs in hashset rather than vector? */
 				zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			}
 			else
+			{
 				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
-
-			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
+				diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
+			}
 		}
 
 		/* get queued eventids that are still open (unresolved) */
