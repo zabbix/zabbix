@@ -293,7 +293,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error)
 
