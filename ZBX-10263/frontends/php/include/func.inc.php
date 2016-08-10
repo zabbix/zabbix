@@ -1556,22 +1556,21 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
 	$start = ($currentPage - 1) * $rowsPerPage;
+	$end = $start + $rowsPerPage;
+
+	if ($end > $itemsCount) {
+		$end = $itemsCount;
+	}
 
 	if ($pagesCount == 1) {
 		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$end = $start + $rowsPerPage;
-
-		if ($end > $itemsCount) {
-			$end = $itemsCount;
-		}
-
 		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
 	// Trim array with elements to contain elements for current page.
-	$items = array_slice($items, $start + $offset, $rowsPerPage, true);
+	$items = array_slice($items, $start + $offset, $end - $start, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
