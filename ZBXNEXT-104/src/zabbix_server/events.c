@@ -707,9 +707,8 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 				continue;
 			}
 
-			/* mark the trigger as correlated to recalculate its value from open problems */
 			diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
-			diff->correlated = 1;
+			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
 
 			ZBX_STR2UINT64(recovery_local.eventid, row[0]);
 
@@ -1483,8 +1482,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			else
 				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
 
-			/* mark trigger as correlated to recalculate it's value from open problem count */
-			diff->correlated = 1;
+			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
 		}
 
 		/* get queued eventids that are still open (unresolved) */
@@ -1556,18 +1554,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_correlated_trigger_problem_count                          *
+ * Function: update_trigger_problem_count                                     *
  *                                                                            *
- * Purpose: update number of open problems for correlated triggers            *
+ * Purpose: update number of open problems                                    *
  *                                                                            *
  * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
  *                               generated the events in local cache.         *
  *                                                                            *
- * Comments: When event is closed by correlation (trigger or global) the      *
- *           open problem count is needed to calculate new trigger value.     *
+ * Comments: When a specific event is closed (by correlation or manually) the *
+ *           open problem count has to be queried from problem table to       *
+ *           correctly calculate new trigger value.                           *
  *                                                                            *
  ******************************************************************************/
-static void	update_correlated_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
+static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1584,7 +1583,7 @@ static void	update_correlated_trigger_problem_count(zbx_vector_ptr_t *trigger_di
 	{
 		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
 
-		if (0 != diff->correlated)
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 			zbx_vector_uint64_append(&triggerids, diff->triggerid);
 	}
 
@@ -1641,7 +1640,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
 
-	update_correlated_trigger_problem_count(trigger_diff);
+	update_trigger_problem_count(trigger_diff);
 
 	/* update trigger problem_count for new problem events */
 	for (i = 0; i < events_num; i++)
@@ -1670,9 +1669,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		/* For non-correlated triggers set problem count to 1   */
-		/* to show that trigger value should be set to PROBLEM. */
-		if (0 == diff->correlated)
+		/* in trivial cases problem count should be set to 1   */
+		/* to show that trigger value should be set to PROBLEM */
+		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 			diff->problem_count = 1;
 
 		diff->lastchange = event->clock;
@@ -1705,9 +1704,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 			diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
 
-			/* For non-correlated triggers set problem count to 0 */
-			/* to show that trigger value should be set to OK.    */
-			if (0 == diff->correlated)
+			/* in trivial cases problem count should be set to 0 */
+			/* to show that trigger value should be set to OK    */
+			if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 				diff->problem_count = 0;
 
 			diff->lastchange = r_event->clock;
