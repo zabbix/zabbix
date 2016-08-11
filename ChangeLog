@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ..F....PS. [ZBX-11050] renamed constants SCREEN_RESOURCE_TRIGGERS_OVERVIEW => SCREEN_RESOURCE_TRIGGER_OVERVIEW SCREEN_RESOURCE_HOSTS_INFO => SCREEN_RESOURCE_HOST_INFO SCREEN_RESOURCE_TRIGGERS_INFO => SCREEN_RESOURCE_TRIGGER_INFO (Cemeris, Sasha)
 ..F....... [ZBX-11050] changed translation strings "Alarm acknowledgements" => "Event acknowledgements" and "Status of triggers" => "Triggers" and changed few other translation strings to singular form (Cemeris)
 ....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
@@ -48,6 +49,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
 ..F....... [ZBX-10263] fixed incorrect record count in getPagingLine() when search limit is reached (Cemeris)
 ..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
@@ -1490,6 +1492,7 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
 ........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
 ...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
