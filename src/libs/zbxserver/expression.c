@@ -1538,6 +1538,25 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 /******************************************************************************
  *                                                                            *
+ * Function: acknowledge_expand_action_names                                  *
+ *                                                                            *
+ * Purpose: expand acknowledge action flags into user readable list           *
+ *                                                                            *
+ * Parameters: str        - [IN/OUT]                                          *
+ *             str_alloc  - [IN/OUT]                                          *
+ *             str_offset - [IN/OUT]                                          *
+ *             action       [IN] the acknowledge action flags                 *
+ *                               (see ZBX_ACKNOWLEDGE_ACTION_* defines)       *
+ *                                                                            *
+ ******************************************************************************/
+static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_t *str_offset, int action)
+{
+	if (0 != (action & ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM))
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "Close problem");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_event_ack_history                                            *
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
@@ -1557,6 +1576,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
 	time_t		now;
 	zbx_uint64_t	userid;
+	int		action;
 
 	if (0 == event->acknowledged)
 	{
@@ -1567,7 +1587,7 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
-	result = DBselect("select clock,userid,message"
+	result = DBselect("select clock,userid,message,action"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
 			event->eventid);
@@ -1576,13 +1596,22 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 	{
 		now = atoi(row[0]);
 		ZBX_STR2UINT64(userid, row[1]);
+		action = atoi(row[3]);
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"%s %s \"%s\"\n%s\n\n",
+				"%s %s \"%s\"\n",
 				zbx_date2str(now),
 				zbx_time2str(now),
-				zbx_user_string(userid),
-				row[2]);
+				zbx_user_string(userid));
+
+		if (ZBX_ACKNOWLEDGE_ACTION_NONE != action)
+		{
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Action: ");
+			acknowledge_expand_action_names(&buf, &buf_alloc, &buf_offset, action);
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+		}
+
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", row[2]);
 	}
 
 	DBfree_result(result);

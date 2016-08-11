@@ -33,6 +33,7 @@ typedef struct
 	int		r_event_index;
 	zbx_uint64_t	correlationid;
 	zbx_uint64_t	c_eventid;
+	zbx_uint64_t	userid;
 	zbx_timespec_t	ts;
 }
 zbx_event_recovery_t;
@@ -90,6 +91,8 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_priority            - [IN] trigger priority            *
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *             trigger_tags                - [IN] trigger tags                *
+ *             trigger_correlation_mode    - [IN] trigger correlation mode    *
+ *             trigger_correlation_tag     - [IN] trigger correlation tag     *
  *                                                                            *
  ******************************************************************************/
 int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
@@ -371,7 +374,8 @@ static void	save_event_recovery(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid", NULL);
+	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid",
+			"userid", NULL);
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
@@ -379,16 +383,18 @@ static void	save_event_recovery(void)
 		r_event = &events[recovery->r_event_index];
 
 		zbx_db_insert_add_values(&db_insert, recovery->eventid, r_event->eventid,
-				recovery->correlationid, recovery->c_eventid);
+				recovery->correlationid, recovery->c_eventid, recovery->userid);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update problem set"
 			" r_eventid=" ZBX_FS_UI64
 			",r_clock=%d"
-			",r_ns=%d",
+			",r_ns=%d"
+			",userid=" ZBX_FS_UI64,
 			r_event->eventid,
 			r_event->clock,
-			r_event->ns);
+			r_event->ns,
+			recovery->userid);
 
 		if (0 != recovery->correlationid)
 		{
@@ -579,6 +585,7 @@ static void	correlate_events_by_default_rules(void)
 		recovery_local.r_event_index = index;
 		recovery_local.correlationid = 0;
 		recovery_local.c_eventid = 0;
+		recovery_local.userid = 0;
 		zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 	}
 
@@ -700,9 +707,8 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 				continue;
 			}
 
-			/* mark the trigger as correlated to recalculate its value from open problems */
 			diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
-			diff->correlated = 1;
+			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
 
 			ZBX_STR2UINT64(recovery_local.eventid, row[0]);
 
@@ -718,6 +724,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 			recovery_local.r_event_index = index;
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
+			recovery_local.userid = 0;
 			zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 
 		}
@@ -1206,9 +1213,9 @@ out:
 static void	correlation_execute_operations(zbx_correlation_t *correlation, const DB_EVENT *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
-	int			i, index;
+	int			i;
 	zbx_corr_operation_t	*operation;
-	zbx_event_recovery_t	recovery_local, queue_local;
+	zbx_event_recovery_t	queue_local;
 	zbx_timespec_t		ts;
 
 	for (i = 0; i < correlation->operations.values_num; i++)
@@ -1226,19 +1233,12 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 
 				ts.sec = event->clock;
 				ts.ns = event->ns;
-				index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-						event->objectid, &ts, TRIGGER_VALUE_OK,
+
+				close_event(event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+						event->objectid, &ts, 0, correlation->correlationid, event->eventid,
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
 						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
-
-				recovery_local.eventid = event->eventid;
-				recovery_local.objectid = event->objectid;
-				recovery_local.correlationid = correlation->correlationid;
-				recovery_local.c_eventid = event->eventid;
-				recovery_local.r_event_index = index;
-
-				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 				break;
 			case ZBX_CORR_OPERATION_CLOSE_OLD:
 				/* queue closing of old events to lock them by triggerids */
@@ -1472,23 +1472,18 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &triggerids.values[j],
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				diff = (zbx_trigger_diff_t *)zbx_malloc(NULL, sizeof(zbx_trigger_diff_t));
-				diff->triggerid = trigger->triggerid;
-				diff->priority = trigger->priority;
-				diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
-				diff->value = trigger->value;
-				diff->problem_count = 0;
-				diff->error = NULL;
+				zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority,
+						ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger->value,
+						TRIGGER_STATE_NORMAL, 0, NULL);
 
-				zbx_vector_ptr_append(trigger_diff, diff);
 				/* TODO: should we store trigger diffs in hashset rather than vector? */
 				zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			}
 			else
+			{
 				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
-
-			/* mark trigger as correlated to recalculate it's value from open problem count */
-			diff->correlated = 1;
+				diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
+			}
 		}
 
 		/* get queued eventids that are still open (unresolved) */
@@ -1520,8 +1515,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 		zbx_hashset_iter_reset(&event_queue, &iter);
 		while (NULL != (queue = zbx_hashset_iter_next(&iter)))
 		{
-			zbx_event_recovery_t	recovery_local;
-			int			index;
+			int	index;
 
 			if (FAIL == (index = zbx_vector_uint64_bsearch(&triggerids, queue->objectid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -1535,19 +1529,11 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			{
 				trigger = &triggers[index];
 
-				index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-						&queue->ts, TRIGGER_VALUE_OK, trigger->description,
-						trigger->expression_orig, trigger->recovery_expression_orig,
-						trigger->priority, trigger->type, NULL, ZBX_TRIGGER_CORRELATION_NONE,
-						"");
-
-				recovery_local.eventid = queue->eventid;
-				recovery_local.objectid = queue->objectid;
-				recovery_local.correlationid = queue->correlationid;
-				recovery_local.c_eventid = queue->c_eventid;
-				recovery_local.r_event_index = index;
-
-				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
+				close_event(queue->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+						queue->objectid, &queue->ts, 0, queue->correlationid,
+						queue->c_eventid, trigger->description, trigger->expression_orig,
+						trigger->recovery_expression_orig, trigger->priority, trigger->type,
+						NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
 
 				closed_num++;
 			}
@@ -1569,18 +1555,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_correlated_trigger_problem_count                          *
+ * Function: update_trigger_problem_count                                     *
  *                                                                            *
- * Purpose: update number of open problems for correlated triggers            *
+ * Purpose: update number of open problems                                    *
  *                                                                            *
  * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
  *                               generated the events in local cache.         *
  *                                                                            *
- * Comments: When event is closed by correlation (trigger or global) the      *
- *           open problem count is needed to calculate new trigger value.     *
+ * Comments: When a specific event is closed (by correlation or manually) the *
+ *           open problem count has to be queried from problem table to       *
+ *           correctly calculate new trigger value.                           *
  *                                                                            *
  ******************************************************************************/
-static void	update_correlated_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
+static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1597,7 +1584,7 @@ static void	update_correlated_trigger_problem_count(zbx_vector_ptr_t *trigger_di
 	{
 		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
 
-		if (0 != diff->correlated)
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 			zbx_vector_uint64_append(&triggerids, diff->triggerid);
 	}
 
@@ -1654,7 +1641,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
 
-	update_correlated_trigger_problem_count(trigger_diff);
+	update_trigger_problem_count(trigger_diff);
 
 	/* update trigger problem_count for new problem events */
 	for (i = 0; i < events_num; i++)
@@ -1683,9 +1670,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		/* For non-correlated triggers set problem count to 1   */
-		/* to show that trigger value should be set to PROBLEM. */
-		if (0 == diff->correlated)
+		/* in trivial cases problem count should be set to 1   */
+		/* to show that trigger value should be set to PROBLEM */
+		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 			diff->problem_count = 1;
 
 		diff->lastchange = event->clock;
@@ -1718,9 +1705,9 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 			diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
 
-			/* For non-correlated triggers set problem count to 0 */
-			/* to show that trigger value should be set to OK.    */
-			if (0 == diff->correlated)
+			/* in trivial cases problem count should be set to 0 */
+			/* to show that trigger value should be set to OK    */
+			if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 				diff->problem_count = 0;
 
 			diff->lastchange = r_event->clock;
@@ -1892,11 +1879,15 @@ int	process_events(void)
  *                               vector.                                      *
  *                               Can be NULL when processing events from      *
  *                               non trigger sources                          *
+ *             mode            - [IN] event processing mode. When events are  *
+ *                               already correlated (close_event() function)  *
+ *                               ZBX_EVENT_PROCESSING_MODE_NO_CORRELATION     *
+ *                               mode should be used.                         *
  *                                                                            *
  * Return value: The number of processed events                               *
  *                                                                            *
  ******************************************************************************/
-int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode)
 {
 	const char	*__function_name = "process_trigger_events";
 	size_t		i, processed_num = 0;
@@ -1911,9 +1902,12 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
 		for (i = 0; i < events_num; i++)
 			events[i].eventid = eventid++;
 
-		correlate_events_by_default_rules();
-		correlate_events_by_trigger_rules(trigger_diff);
-		correlate_events_by_global_rules(trigger_diff, triggerids_lock);
+		if (ZBX_EVENTS_PROCESS_CORRELATION == mode)
+		{
+			correlate_events_by_default_rules();
+			correlate_events_by_trigger_rules(trigger_diff);
+			correlate_events_by_global_rules(trigger_diff, triggerids_lock);
+		}
 
 		processed_num = flush_events();
 		update_trigger_changes(trigger_diff);
@@ -1973,4 +1967,55 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events_num:%d", __function_name, event_queue.num_data);
 
 	return event_queue.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: close_event                                                      *
+ *                                                                            *
+ * Purpose: add closing OK event for the specified problem event to an array  *
+ *                                                                            *
+ * Parameters: eventid  - [IN] the problem eventid                            *
+ *             source   - [IN] event source (EVENT_SOURCE_*)                  *
+ *             object   - [IN] event object (EVENT_OBJECT_*)                  *
+ *             objectid - [IN] trigger, item ... identificator from database, *
+ *                             depends on source and object                   *
+ *             timespec - [IN] event time                                     *
+ *             userid   - [IN] the user closing the problem                   *
+ *             correlationid - [IN] the correlation rule                      *
+ *             c_eventid - [IN] the correlation event                         *
+ *             trigger_description         - [IN] trigger description         *
+ *             trigger_expression          - [IN] trigger short expression    *
+ *             trigger_recovery_expression - [IN] trigger recovery expression *
+ *             trigger_priority            - [IN] trigger priority            *
+ *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
+ *             trigger_tags                - [IN] trigger tags                *
+ *             trigger_correlation_mode    - [IN] trigger correlation mode    *
+ *             trigger_correlation_tag     - [IN] trigger correlation tag     *
+ *                                                                            *
+ ******************************************************************************/
+int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *ts, zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
+		const char *trigger_description, const char *trigger_expression,
+		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
+		const zbx_vector_ptr_t *trigger_tags, unsigned char trigger_correlation_mode,
+		const char *trigger_correlation_tag)
+{
+	int			index;
+	zbx_event_recovery_t	recovery_local;
+
+	index = add_event(source, object, objectid, ts, TRIGGER_VALUE_OK, trigger_description, trigger_expression,
+			trigger_recovery_expression, trigger_priority, trigger_type, trigger_tags,
+			trigger_correlation_mode, trigger_correlation_tag);
+
+	recovery_local.eventid = eventid;
+	recovery_local.objectid = objectid;
+	recovery_local.correlationid = correlationid;
+	recovery_local.c_eventid = c_eventid;
+	recovery_local.r_event_index = index;
+	recovery_local.userid = userid;
+
+	zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
+
+	return index;
 }

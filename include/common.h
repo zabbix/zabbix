@@ -657,6 +657,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
+/* task manager task types  */
+#define ZBX_TM_TASK_CLOSE_PROBLEM	1
+
+/* acknowledgment actions (flags) */
+#define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
+#define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
+
 /* user permissions */
 typedef enum
 {
