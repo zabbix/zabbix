@@ -242,8 +242,8 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestAssertElementValue('description', 'Test LLD trigger1');
 		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:key-item-inheritance-test.last(0)}=0');
-		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_name_0'));
-		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_name_0'][@disabled]");
+		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'url');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));

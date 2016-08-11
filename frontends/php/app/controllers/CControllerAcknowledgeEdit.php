@@ -208,7 +208,7 @@ class CControllerAcknowledgeEdit extends CController {
 		]);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Alarm acknowledgements'));
+		$response->setTitle(_('Event acknowledgements'));
 		$this->setResponse($response);
 	}
 }

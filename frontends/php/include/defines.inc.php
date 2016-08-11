@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.1.0');
-define('ZABBIX_API_VERSION',	'3.1.0');
+define('ZABBIX_VERSION',		'3.2.0alpha2');
+define('ZABBIX_API_VERSION',	'3.2.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010074);
+define('ZABBIX_DB_VERSION',		3010075);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -571,12 +571,12 @@ define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
 define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
-define('SCREEN_RESOURCE_HOSTS_INFO',		4);
-define('SCREEN_RESOURCE_TRIGGERS_INFO',		5);
+define('SCREEN_RESOURCE_HOST_INFO',		4);
+define('SCREEN_RESOURCE_TRIGGER_INFO',		5);
 define('SCREEN_RESOURCE_SERVER_INFO',		6);
 define('SCREEN_RESOURCE_CLOCK',				7);
 define('SCREEN_RESOURCE_SCREEN',			8);
-define('SCREEN_RESOURCE_TRIGGERS_OVERVIEW',	9);
+define('SCREEN_RESOURCE_TRIGGER_OVERVIEW',	9);
 define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
 define('SCREEN_RESOURCE_URL',				11);
 define('SCREEN_RESOURCE_ACTIONS',			12);
@@ -1224,6 +1224,7 @@ define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
+define('ZBX_STYLE_PRELOADER', 'preloader');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');

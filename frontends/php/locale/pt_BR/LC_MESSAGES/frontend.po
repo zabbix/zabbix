@@ -6662,7 +6662,7 @@ msgid "Hosts in maintenance"
 msgstr "Hosts em manutenção"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Informações dos hosts"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14522,16 +14522,16 @@ msgstr "As triggers foram excluídas"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Informações sobre triggers"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Visão geral triggers"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Estado das triggers"
 
 #: include/menu.inc.php:159

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with events.
- *
- * @package API
  */
 class CEvent extends CApiService {
 
@@ -353,8 +351,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $options
-	 *
-	 * @return void
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([
