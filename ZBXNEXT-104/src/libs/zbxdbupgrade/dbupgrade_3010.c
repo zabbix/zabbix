@@ -1568,7 +1568,9 @@ static int	DBpatch_3010075(void)
 	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("problem", &field);
-}#endif
+}
+
+#endif
 
 DBPATCH_START(3010)
 
