@@ -6677,7 +6677,7 @@ msgid "Hosts in maintenance"
 msgstr "Хостове в поддръжка"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Информация за хостове"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14539,16 +14539,16 @@ msgstr "Тригери изтрити"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Информация за тригери"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Преглед на тригери"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Състояние на тригери"
 
 #: include/menu.inc.php:159
