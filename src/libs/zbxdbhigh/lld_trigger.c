@@ -1861,7 +1861,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		lld_validate_trigger_field(trigger, &trigger->url, &trigger->url_orig,
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_URL, TRIGGER_URL_LEN, error);
 		lld_validate_trigger_field(trigger, &trigger->correlation_tag, &trigger->correlation_tag_orig,
-				ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG, TRIGGER_CORRELATION_TAG_LEN, error);
+				ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG, TAG_NAME_LEN, error);
 	}
 
 	/* checking duplicated triggers in DB */
@@ -1936,6 +1936,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->comments_orig = NULL;
 			db_trigger->url = NULL;
 			db_trigger->url_orig = NULL;
+			db_trigger->correlation_tag = NULL;
+			db_trigger->correlation_tag_orig = NULL;
 			db_trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
 			zbx_vector_ptr_create(&db_trigger->functions);
@@ -2080,11 +2082,10 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
  ******************************************************************************/
 static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 {
-	int			i, j;
+	int			i, j, k;
 	zbx_lld_trigger_t	*trigger;
-	zbx_lld_tag_t		*tag;
+	zbx_lld_tag_t		*tag, *tag_tmp;
 
-	/* marking dependencies which will be deleted */
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -2097,9 +2098,36 @@ static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 			tag = (zbx_lld_tag_t *)trigger->tags.values[j];
 
 			lld_validate_trigger_tag_field(tag, tag->tag, ZBX_FLAG_LLD_TAG_UPDATE_TAG,
-					TRIGGER_TAG_LEN, error);
+					TAG_NAME_LEN, error);
 			lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_LLD_TAG_UPDATE_VALUE,
-					TRIGGER_TAG_VALUE_LEN, error);
+					TAG_VALUE_LEN, error);
+
+			if (0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
+				continue;
+
+			/* check for duplicated tag,values pairs */
+			for (k = 0; k < j; k++)
+			{
+				tag_tmp = (zbx_lld_tag_t *)trigger->tags.values[k];
+
+				if (0 == strcmp(tag->tag, tag_tmp->tag) && 0 == strcmp(tag->value, tag_tmp->value))
+				{
+					*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\","
+						"\"%s\" already exists.\n", tag->tag, tag->value);
+
+					if (0 != tag->triggertagid)
+						tag->flags = ZBX_FLAG_LLD_TAG_DELETE;
+					else
+						tag->flags &= ~ZBX_FLAG_LLD_TAG_DISCOVERED;
+				}
+			}
+
+			/* reset trigger discovery flags for new trigger if tag discovery failed */
+			if (0 == trigger->triggerid && 0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
+			{
+				trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+				break;
+			}
 		}
 	}
 }

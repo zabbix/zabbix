@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with actions.
- *
- * @package API
  */
 class CAction extends CApiService {
 

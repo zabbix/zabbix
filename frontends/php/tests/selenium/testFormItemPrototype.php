@@ -2339,8 +2339,10 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestClickWait('form');
 
 		if (isset($data['type'])) {
-			$this->zbxTestDropdownSelect('type', $data['type']);
 			$type = $data['type'];
+			$type_value = $this->zbxTestGetValue("//select[@id='type']//option[text()='".$type."']");
+			$this->zbxTestDropdownSelect('type', $type);
+			$this->zbxTestAssertElementValue('type', $type_value);
 		}
 		else {
 			$type = $this->zbxTestGetSelectedLabel('type');
@@ -2348,11 +2350,13 @@ class testFormItemPrototype extends CWebTest {
 
 		if (isset($data['name'])) {
 			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
 
 		if (isset($data['key'])) {
 			$this->zbxTestInputTypeOverwrite('key', $data['key']);
+			$this->zbxTestAssertElementValue('key', $data['key']);
 		}
 		$key = $this->zbxTestGetValue("//input[@id='key']");
 
@@ -2366,7 +2370,8 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['params_ap'])) {
-			$this->zbxTestInputTypeWait('params_ap', $data['params_ap']);
+			$this->zbxTestTextPresent('SQL query');
+			$this->zbxTestInputTypeOverwrite('params_ap', $data['params_ap']);
 		}
 
 		if (isset($data['params_es'])) {

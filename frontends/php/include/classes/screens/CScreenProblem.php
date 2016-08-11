@@ -74,56 +74,28 @@ class CScreenProblem extends CScreenBase {
 		$now = time();
 
 		$db_problems = API::Problem()->get(
-			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
-			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
-			+ ['selectTags' => ['tag', 'value']]
+			['output' => ['eventid', 'objectid', 'clock', 'ns']]
 			+ ['source' => EVENT_SOURCE_TRIGGERS]
 			+ ['object' => EVENT_OBJECT_TRIGGER]
+			+ ['recent' => ($this->data['filter']['show'] == TRIGGERS_OPTION_RECENT_PROBLEM)]
 			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
 			+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+			+ ($this->data['filter']['unacknowledged'] && $config['event_ack_enable'] ? ['acknowledged' => false] : [])
 			+ ($this->data['filter']['age_state'] == 1
 				? ['time_from' => $now - $this->data['filter']['age'] * SEC_PER_DAY + 1]
 				: []
 			)
+			+ ($this->data['filter']['tags'] ? ['tags' => $this->data['filter']['tags']] : [])
 			+ ['preservekeys' => true]
 		);
 
-		$triggerids = [];
-		$ok_events_from = $now - $config['ok_period'];
+		if ($db_problems) {
+			$triggerids = [];
 
-		foreach ($db_problems as $eventid => $db_problem) {
-			if ($db_problem['r_eventid'] != 0 && ($db_problem['r_clock'] < $ok_events_from
-					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
-				unset($db_problems[$eventid]);
-				continue;
+			foreach ($db_problems as $eventid => $db_problem) {
+				$triggerids[$db_problem['objectid']] = true;
 			}
 
-			if ($this->data['filter']['unacknowledged'] && $db_problem['acknowledges']) {
-				unset($db_problems[$eventid]);
-				continue;
-			}
-
-			if ($this->data['filter']['tags']) {
-				$match = 0;
-				foreach ($this->data['filter']['tags'] as $filter_tag) {
-					foreach ($db_problem['tags'] as $problem_tag) {
-						if ($problem_tag['tag'] === $filter_tag['tag'] && ($filter_tag['value'] === '' ||
-								mb_stripos($problem_tag['value'], $filter_tag['value']) !== false)) {
-							$match++;
-							break;
-						}
-					}
-				}
-				if ($match != count($this->data['filter']['tags'])) {
-					unset($db_problems[$eventid]);
-					continue;
-				}
-			}
-
-			$triggerids[$db_problem['objectid']] = true;
-		}
-
-		if ($triggerids) {
 			if ($this->data['filter']['application'] !== '') {
 				$db_applications = API::Application()->get(
 					['output' => []]
@@ -181,81 +153,121 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$triggers_hosts = getTriggersHostsList($db_triggers);
+
+			switch ($this->data['sort']) {
+				case 'host':
+					$triggers_hosts_list = [];
+					foreach ($triggers_hosts as $triggerid => $trigger_hosts) {
+						$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
+					}
+
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['host'] = $triggers_hosts_list[$db_problem['objectid']];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'host', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				case 'priority':
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'priority', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				case 'problem':
+					foreach ($db_problems as &$db_problem) {
+						$db_problem['description'] = $db_triggers[$db_problem['objectid']]['description'];
+					}
+					unset($db_problem);
+
+					$sort_fields = [
+						['field' => 'description', 'order' => $this->data['sortorder']],
+						['field' => 'objectid', 'order' => $this->data['sortorder']],
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					];
+					break;
+
+				default:
+					$sort_fields = [
+						['field' => 'clock', 'order' => $this->data['sortorder']],
+						['field' => 'ns', 'order' => $this->data['sortorder']]
+					];
+			}
+
+			CArrayHelper::sort($db_problems, $sort_fields);
+
+			$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1, true);
 		}
 
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
 
-		switch ($this->data['sort']) {
-			case 'host':
-				$triggers_hosts_list = [];
-				foreach ($triggers_hosts as $triggerid => $trigger_hosts) {
-					$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
-				}
+		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
 
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['host'] = $triggers_hosts_list[$db_problem['objectid']];
-				}
-				unset($db_problem);
+		$db_problems_data = API::Problem()->get(
+			['output' => ['eventid', 'r_eventid', 'r_clock']]
+			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
+			+ ['selectTags' => ['tag', 'value']]
+			+ ['source' => EVENT_SOURCE_TRIGGERS]
+			+ ['object' => EVENT_OBJECT_TRIGGER]
+			+ ['recent' => true]
+			+ ['eventids' => array_keys($db_problems)]
+		);
 
-				$sort_fields = [
-					['field' => 'host', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
+		foreach ($db_problems_data as $db_problem_data) {
+			$db_problem = &$db_problems[$db_problem_data['eventid']];
 
-			case 'priority':
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
-				}
-				unset($db_problem);
-
-				$sort_fields = [
-					['field' => 'priority', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
-
-			case 'problem':
-				foreach ($db_problems as &$db_problem) {
-					$db_problem['description'] = $db_triggers[$db_problem['objectid']]['description'];
-				}
-				unset($db_problem);
-
-				$sort_fields = [
-					['field' => 'description', 'order' => $this->data['sortorder']],
-					['field' => 'objectid', 'order' => $this->data['sortorder']],
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-				];
-				break;
-
-			default:
-				$sort_fields = [
-					['field' => 'clock', 'order' => $this->data['sortorder']],
-					['field' => 'ns', 'order' => $this->data['sortorder']]
-				];
+			$db_problem['r_eventid'] = $db_problem_data['r_eventid'];
+			$db_problem['r_clock'] = $db_problem_data['r_clock'];
+			if ($config['event_ack_enable']) {
+				$db_problem['acknowledges'] = $db_problem_data['acknowledges'];
+			}
+			$db_problem['tags'] = $db_problem_data['tags'];
+			unset($db_problem);
 		}
 
-		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1);
+		$form = (new CForm('get', 'zabbix.php'))
+			->setName('problem')
+			->cleanItems()
+			->addVar('backurl', 'zabbix.php?action=problem.view&uncheck=1');
 
-		CArrayHelper::sort($db_problems, $sort_fields);
+		if ($config['event_ack_enable']) {
+			$header_check_box = (new CColHeader(
+				(new CCheckBox('all_eventids'))
+					->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH);
+		}
+		else {
+			$header_check_box = null;
+		}
 
-		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
+		$link = 'zabbix.php?action=problem.view';
 
 		// create table
 		$table = (new CTableInfo())
 			->setHeader([
-				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'])
+				$header_check_box,
+				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
+				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
 					->addClass(ZBX_STYLE_CELL_WIDTH),
 				(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 				_('Status'),
-				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder']),
-				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder']),
+				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
 				_('Duration'),
 				$config['event_ack_enable'] ? _('Ack') : null,
 				_('Actions'),
@@ -266,6 +278,7 @@ class CScreenProblem extends CScreenBase {
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
 			$url->setArgument('page', $this->data['page']);
+			$url->setArgument('uncheck', '1');
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
@@ -297,6 +310,9 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			$table->addRow([
+				$config['event_ack_enable']
+					? new CCheckBox('eventids['.$db_problem['eventid'].']', $db_problem['eventid'])
+					: null,
 				getSeverityCell($db_trigger['priority'], $config, null, $db_problem['r_eventid'] != 0),
 				(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
 				(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
@@ -316,6 +332,13 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput([$table, $paging], true, $this->data);
+		$footer = null;
+		if ($config['event_ack_enable']) {
+			$footer = new CActionButtonList('action', 'eventids', [
+				'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
+			]);
+		}
+
+		return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 	}
 }

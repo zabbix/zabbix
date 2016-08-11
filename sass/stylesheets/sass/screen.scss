@@ -869,6 +869,13 @@ footer {
 .cell {
 	display: table-cell;
 	vertical-align: top;
+
+	&:last-child {
+
+		.dashbrd-widget {
+			margin: 0 0 10px 0;
+		}
+	}
 }
 
 .adm-img {
@@ -1836,7 +1843,7 @@ $icon-btn: (
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -329px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
 	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
 	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
@@ -2276,18 +2283,15 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.widget-placeholder {
+.dashbrd-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+}
 
-	.cell {
-		min-width: 250px;
-
-		&:last-child {
-
-			.dashbrd-widget {
-				margin: 0 0 10px 0;
-			}
-		}
-	}
+.dashbrd-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 }
 
 .dashbrd-widget {
@@ -3052,6 +3056,9 @@ a.blue {
 	padding: 2px 3px;
 	text-align: center;
 	line-height: 1em;
+	max-width: 133px;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
 	@include border-radius(2px);
 
 	&:last-child {
