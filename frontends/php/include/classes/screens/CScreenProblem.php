@@ -243,7 +243,13 @@ class CScreenProblem extends CScreenBase {
 		$form = (new CForm('get', 'zabbix.php'))
 			->setName('problem')
 			->cleanItems()
-			->addVar('backurl', 'zabbix.php?action=problem.view&uncheck=1');
+			->addVar('backurl',
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('fullscreen', $this->data['fullscreen'])
+					->setArgument('uncheck', '1')
+					->getUrl()
+			);
 
 		if ($config['event_ack_enable']) {
 			$header_check_box = (new CColHeader(
@@ -255,7 +261,7 @@ class CScreenProblem extends CScreenBase {
 			$header_check_box = null;
 		}
 
-		$link = 'zabbix.php?action=problem.view';
+		$link = $url->getUrl();
 
 		// create table
 		$table = (new CTableInfo())
@@ -277,8 +283,8 @@ class CScreenProblem extends CScreenBase {
 		// actions
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
-			$url->setArgument('page', $this->data['page']);
 			$url->setArgument('uncheck', '1');
+			$url->setArgument('page', $this->data['page']);
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
