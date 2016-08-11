@@ -2807,6 +2807,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'manual_close' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'trigger_depends' => [
@@ -4863,6 +4869,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'action' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'auditlog' => [
@@ -6292,6 +6304,13 @@ return [
 				'ref_table' => 'correlation',
 				'ref_field' => 'correlationid',
 			],
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid',
+			],
 		],
 	],
 	'problem_tag' => [
@@ -6353,6 +6372,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'correlation',
 				'ref_field' => 'correlationid',
+			],
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid',
 			],
 		],
 	],
@@ -6535,6 +6561,40 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+		],
+	],
+	'task' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			],
+		],
+	],
+	'task_close_problem' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid',
+			],
+			'acknowledgeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid',
 			],
 		],
 	],

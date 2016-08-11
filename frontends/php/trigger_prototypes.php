@@ -54,6 +54,12 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+													]),
+													null
+												],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -201,6 +207,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$comments = getRequest('comments', '');
 	$correlation_mode = getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
 	$correlation_tag = getRequest('correlation_tag', '');
+	$manual_close = getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED);
 	$status = getRequest('status', TRIGGER_STATUS_ENABLED);
 
 	if (hasRequest('add')) {
@@ -213,6 +220,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'priority' => $priority,
 			'comments' => $comments,
 			'tags' => $tags,
+			'manual_close' => $manual_close,
 			'dependencies' => $dependencies,
 			'status' => $status
 		];
@@ -236,7 +244,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -298,6 +306,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		CArrayHelper::sort($tags, ['tag', 'value']);
 		if (array_values($db_tags) !== array_values($tags)) {
 			$trigger_prototype['tags'] = $tags;
+		}
+
+		if ($db_trigger_prototype['manual_close'] != $manual_close) {
+			$trigger_prototype['manual_close'] = $manual_close;
 		}
 
 		$db_dependencies = $db_trigger_prototype['dependencies'];
@@ -427,6 +439,8 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -441,6 +455,7 @@ if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdat
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
+		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -467,7 +482,8 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
-		'correlation_tag' => getRequest('correlation_tag', '')
+		'correlation_tag' => getRequest('correlation_tag', ''),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	]);
 
 	$data['hostid'] = $discoveryRule['hostid'];
@@ -482,8 +498,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
