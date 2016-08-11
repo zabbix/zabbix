@@ -140,7 +140,7 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// Get events in problem state with acknowledges.
 		$problems_events = API::Event()->get([
-			'output' => [],
+			'output' => ['r_eventid'],
 			'select_acknowledges' => ['action'],
 			'eventids' => array_keys($events),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -151,6 +151,11 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// At least one event should not be closed.
 		foreach ($problems_events as $problem_event) {
+			// Check if it was closed by event recovery.
+			if ($problem_event['r_eventid'] != 0) {
+				continue;
+			}
+
 			$event_closed = false;
 
 			if ($problem_event['acknowledges']) {
