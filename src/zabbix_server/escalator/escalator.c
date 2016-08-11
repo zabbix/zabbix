@@ -222,19 +222,33 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		const char *subject, const char *message)
 {
 	const char	*__function_name = "add_user_msg";
-	ZBX_USER_MSG	*p;
+	ZBX_USER_MSG	*p, **pnext;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	p = *user_msg;
-
-	while (NULL != p)
+	if (0 == mediatypeid)
 	{
-		if (p->userid == userid && p->mediatypeid == mediatypeid &&
-				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
-			break;
+		for (pnext = user_msg, p = *user_msg; NULL != p; p = *pnext)
+		{
+			if (p->userid == userid && 0 == strcmp(p->subject, subject) &&
+					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
+			{
+				*pnext = p->next;
 
-		p = p->next;
+				zbx_free(p->subject);
+				zbx_free(p->message);
+				zbx_free(p);
+			}
+			else
+				pnext = (ZBX_USER_MSG **)&p->next;
+		}
+	}
+
+	for (p = *user_msg; NULL != p; p = p->next)
+	{
+		if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message) &&
+				(0 == p->mediatypeid || mediatypeid == p->mediatypeid))
+			break;
 	}
 
 	if (NULL == p)
