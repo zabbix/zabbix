@@ -1,6 +1,7 @@
 Changes for 3.2.0alpha2
 
 New features:
+A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Andris, Gunars, Ivo)
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
