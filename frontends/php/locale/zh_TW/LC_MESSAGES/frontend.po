@@ -6611,7 +6611,7 @@ msgid "Hosts in maintenance"
 msgstr "維修中主機"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "主機資訊"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14434,16 +14434,16 @@ msgstr "觸發器已删除"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "觸發器資訊"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "觸發器概覽"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "觸發器狀態"
 
 #: include/menu.inc.php:159

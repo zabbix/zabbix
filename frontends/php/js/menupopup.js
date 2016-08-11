@@ -223,7 +223,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['showGraphs']		link to host graphs page
  * @param bool   options['showScreens']		link to host screen page
- * @param bool   options['showTriggers']	link to "Status of triggers" page
+ * @param bool   options['showTriggers']	link to Monitoring->Triggers page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
