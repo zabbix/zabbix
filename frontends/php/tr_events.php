@@ -87,6 +87,10 @@ $events = API::Event()->get([
 	'objectids' => getRequest('triggerid')
 ]);
 
+if (!$events) {
+	access_deny();
+}
+
 $event = reset($events);
 
 /*
