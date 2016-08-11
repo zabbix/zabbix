@@ -1,4 +1,17 @@
-Changes for 3.1.0
+Changes for 3.2.0alpha2
+
+New features:
+..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
+
+Bug fixes:
+........S. [ZBX-10761] added upgrade patch to clean wrong values in 'triggers' table (Sergejs)
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+..F....PS. [ZBX-11050] renamed constants SCREEN_RESOURCE_TRIGGERS_OVERVIEW => SCREEN_RESOURCE_TRIGGER_OVERVIEW SCREEN_RESOURCE_HOSTS_INFO => SCREEN_RESOURCE_HOST_INFO SCREEN_RESOURCE_TRIGGERS_INFO => SCREEN_RESOURCE_TRIGGER_INFO (Cemeris, Sasha)
+..F....... [ZBX-11050] changed translation strings "Alarm acknowledgements" => "Event acknowledgements" and "Status of triggers" => "Triggers" and changed few other translation strings to singular form (Cemeris)
+....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.0alpha1
 
 New features:
 ........S. [ZBXNEXT-3195] implemented independent escalations for each problem event (wiper, Sandis)
@@ -21,6 +34,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
+A.F....... [ZBX-11060] fixed copying correlation_mode, correlation_tag, tags of trigger and trigger prototype (Cemeris)
 ...G...... [ZBX-10768] fixed compilation warning on FreeBSD (viktors)
 ..F....... [ZBX-10561] improved style consistency for disabled elements (Pavel)
 ........S. [ZBX-3823] improved validation and error messaging when history, discovery, autoregistration and host availability data sent by passive and active proxies are processed on server (gleb)
@@ -36,6 +50,16 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
+..F....... [ZBX-10263] fixed incorrect record count in getPagingLine() when search limit is reached (Cemeris)
+..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
+..F....... [ZBX-10621] removed excessive white space in dashboard (Pavel, Alexei)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+........S. [ZBX-10971] fixed memory leak when action is removed from configuration (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+...G...... [ZBX-11015] fixed proc.cpu.util for non-privileged agent on Solaris (Sandis)
 ........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10504] reduced padding around graphs to account for decreased padding in CSS (asaveljevs)
@@ -1469,8 +1493,12 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
-..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14

@@ -81,7 +81,7 @@ $footer_buttons = makeFormFooter(
 );
 
 (new CWidget())
-	->setTitle(_('Alarm acknowledgements'))
+	->setTitle(_('Event acknowledgements'))
 	->addItem(
 		(new CForm())
 			->setId('acknowledge_form')

@@ -6716,7 +6716,7 @@ msgid "Hosts in maintenance"
 msgstr "Mezgli uzturēšanā"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr ""
 
 #: include/views/monitoring.overview.items.php:50
@@ -14583,16 +14583,16 @@ msgstr "Trigeri izdzēsti"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Informācija par trigeriem"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr ""
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Trigera status"
 
 #: include/menu.inc.php:159

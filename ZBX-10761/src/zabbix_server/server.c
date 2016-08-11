@@ -54,6 +54,7 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
+#include "events.h"
 
 #include "valuecache.h"
 #include "setproctitle.h"
@@ -751,6 +752,8 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
+	zbx_initialize_events();
+
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
@@ -1081,6 +1084,8 @@ void	zbx_on_exit(void)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
+
+	zbx_uninitialize_events();
 
 	unload_modules();
 
