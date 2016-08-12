@@ -128,6 +128,12 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'ge' => '-5'
 				]
 			],
+			['ge -5|le 10', '',
+				[
+					'ge' => '-5',
+					'le' => '10'
+				]
+			],
 			['array_id', '',
 				[
 					'array_id' => true

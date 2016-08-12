@@ -59,6 +59,7 @@ class CValidationRule {
 							if (!$this->parseString($buffer, $pos, $rule)				// string
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
+									&& !$this->parseLE($buffer, $pos, $rule)			// le
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
 									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
@@ -185,6 +186,35 @@ class CValidationRule {
 	}
 
 	/**
+	 * le <value>
+	 *
+	 * 'le' => '<value>'
+	 */
+	private function parseLE($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'le ', 3)) {
+			return false;
+		}
+
+		$i += 3;
+		$value = '';
+
+		while (isset($buffer[$i]) && $buffer[$i] != '|') {
+			$value .= $buffer[$i++];
+		}
+
+		if (!CNewValidator::is_int32($value)) {
+			return false;
+		}
+
+		$pos = $i;
+		$rules['le'] = $value;
+
+		return true;
+	}
+
+	/**
 	 * json
 	 *
 	 * 'json' => true
@@ -263,9 +293,9 @@ class CValidationRule {
 	}
 
 	/**
-	 * ge <value1>
+	 * ge <value>
 	 *
-	 * 'ge' => '<value1>'
+	 * 'ge' => '<value>'
 	 */
 	private function parseGE($buffer, &$pos, &$rules) {
 		$i = $pos;
