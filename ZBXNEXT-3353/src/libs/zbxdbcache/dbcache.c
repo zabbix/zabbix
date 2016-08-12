@@ -3584,10 +3584,10 @@ void	zbx_get_history_field(zbx_dc_history_t history, int index, zabbix_label_t l
 			switch (h->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					res->as_double = h->value_orig.dbl;
+					res->as_double = h->value.dbl;
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					res->as_uint64 = h->value_orig.ui64;
+					res->as_uint64 = h->value.ui64;
 					break;
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
