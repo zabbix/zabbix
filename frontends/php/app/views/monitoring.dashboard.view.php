@@ -19,7 +19,7 @@
 **/
 
 
-$this->addJSfile('js/class.pmaster.js');
+$this->addJsFile('class.pmaster.js');
 
 /*
  * Dashboard grid
