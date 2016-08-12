@@ -19,9 +19,9 @@
 **/
 
 
-$this->addJsFile('js/gtlc.js');
-$this->addJsFile('js/flickerfreescreen.js');
-$this->addJsFile('js/multiselect.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('multiselect.js');
 require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 if ($data['uncheck']) {
