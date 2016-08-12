@@ -5,6 +5,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Andris,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+........S. [ZBX-3101] fixed EVENT macro processing in recovery operations (wiper)
 ........S. [ZBX-10761] added upgrade patch to clean wrong values in 'triggers' table (Sergejs)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ..F....PS. [ZBX-11050] renamed constants SCREEN_RESOURCE_TRIGGERS_OVERVIEW => SCREEN_RESOURCE_TRIGGER_OVERVIEW SCREEN_RESOURCE_HOSTS_INFO => SCREEN_RESOURCE_HOST_INFO SCREEN_RESOURCE_TRIGGERS_INFO => SCREEN_RESOURCE_TRIGGER_INFO (Cemeris, Sasha)
