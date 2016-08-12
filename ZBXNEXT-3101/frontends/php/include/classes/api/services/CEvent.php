@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with events.
- *
- * @package API
  */
 class CEvent extends CApiService {
 
@@ -353,8 +351,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $options
-	 *
-	 * @return void
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([
@@ -378,13 +374,15 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Acknowledges the given events.
+	 * Acknowledges the given events and closes them if necessary.
 	 *
-	 * Supported parameters:
-	 * - eventids   - an event ID or an array of event IDs to acknowledge
-	 * - message    - acknowledgment message
-	 *
-	 * @param array $data
+	 * @param array  $data					And array of event acknowledgement data.
+	 * @param mixed  $data['eventids']		An event ID or an array of event IDs to acknowledge.
+	 * @param string $data['message']		Acknowledgement message.
+	 * @param int	 $data['action']		Close problem
+	 *										Possible values are:
+	 *											0x00 - ZBX_ACKNOWLEDGE_ACTION_NONE;
+	 *											0x01 - ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM.
 	 *
 	 * @return array
 	 */
@@ -393,27 +391,53 @@ class CEvent extends CApiService {
 
 		$this->validateAcknowledge($data);
 
-		$eventIds = zbx_toHash($data['eventids']);
+		$eventids = zbx_toHash($data['eventids']);
 
-		if (!DBexecute('UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventIds))) {
+		if (!DBexecute('UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventids))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
 		$time = time();
-		$dataInsert = [];
+		$acknowledges = [];
+		$action = array_key_exists('action', $data) ? $data['action'] : ZBX_ACKNOWLEDGE_ACTION_NONE;
 
-		foreach ($eventIds as $eventId) {
-			$dataInsert[] = [
+		foreach ($eventids as $eventid) {
+			$acknowledges[] = [
 				'userid' => self::$userData['userid'],
-				'eventid' => $eventId,
+				'eventid' => $eventid,
 				'clock' => $time,
-				'message'=> $data['message']
+				'message' => $data['message'],
+				'action' => $action
 			];
 		}
 
-		DB::insert('acknowledges', $dataInsert);
+		$acknowledgeids = DB::insert('acknowledges', $acknowledges);
 
-		return ['eventids' => array_values($eventIds)];
+		if ($action == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			// Close the problem manually.
+
+			$tasks = [];
+			$ack_count = count($acknowledgeids);
+
+			for ($i = 0; $i < $ack_count; $i++) {
+				$tasks[] = ['type' => ZBX_TM_TASK_CLOSE_PROBLEM];
+			}
+
+			$taskids = DB::insert('task', $tasks);
+
+			$task_close = [];
+
+			for ($i = 0; $i < $ack_count; $i++) {
+				$task_close[] = [
+					'taskid' => $taskids[$i],
+					'acknowledgeid' => $acknowledgeids[$i]
+				];
+			}
+
+			DB::insert('task_close_problem', $task_close, false);
+		}
+
+		return ['eventids' => array_values($eventids)];
 	}
 
 	/**
@@ -422,8 +446,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $data
-	 *
-	 * @return void
 	 */
 	protected function validateAcknowledge(array $data) {
 		$dbfields = ['eventids' => null, 'message' => null];
@@ -439,6 +461,19 @@ class CEvent extends CApiService {
 		}
 
 		$this->checkCanBeAcknowledged($data['eventids']);
+
+		if (array_key_exists('action', $data)) {
+			if ($data['action'] != ZBX_ACKNOWLEDGE_ACTION_NONE
+					&& $data['action'] != ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'action', _s('unexpected value "%1$s"', $data['action'])
+				));
+			}
+
+			if ($data['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+				$this->checkCanBeManuallyClosed(array_unique($data['eventids']));
+			}
+		}
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -447,20 +482,25 @@ class CEvent extends CApiService {
 		if ($options['countOutput'] === null) {
 			if ($this->outputIsRequested('r_eventid', $options['output'])
 					|| $this->outputIsRequested('c_eventid', $options['output'])
-					|| $this->outputIsRequested('correlationid', $options['output'])) {
+					|| $this->outputIsRequested('correlationid', $options['output'])
+					|| $this->outputIsRequested('userid', $options['output'])) {
 				// Select fields from event_recovery table using LEFT JOIN.
 
 				if ($this->outputIsRequested('r_eventid', $options['output'])) {
-					$sqlParts['select']['r_eventid'] = 'er.r_eventid';
+					$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
 				}
 				if ($this->outputIsRequested('c_eventid', $options['output'])) {
-					$sqlParts['select']['c_eventid'] = 'er.c_eventid';
+					$sqlParts['select']['c_eventid'] = 'er2.c_eventid';
 				}
 				if ($this->outputIsRequested('correlationid', $options['output'])) {
-					$sqlParts['select']['correlationid'] = 'er.correlationid';
+					$sqlParts['select']['correlationid'] = 'er2.correlationid';
+				}
+				if ($this->outputIsRequested('userid', $options['output'])) {
+					$sqlParts['select']['userid'] = 'er2.userid';
 				}
 
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er', 'on' => 'er.eventid=e.eventid'];
+				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
+				$sqlParts['left_join'][] = ['from' => 'event_recovery er2', 'on' => 'er2.r_eventid=e.eventid'];
 			}
 
 			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
@@ -644,8 +684,6 @@ class CEvent extends CApiService {
 	 * @throws APIException     if an event does not exist, is not accessible or is not a trigger event
 	 *
 	 * @param array $eventIds
-	 *
-	 * @return void
 	 */
 	protected function checkCanBeAcknowledged(array $eventIds) {
 		$allowedEvents = $this->get([
@@ -682,6 +720,50 @@ class CEvent extends CApiService {
 				else {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+		}
+	}
+
+	/**
+	 * Checks if the given events can be closed manually.
+	 *
+	 * @param array $eventids
+	 */
+	protected function checkCanBeManuallyClosed(array $eventids) {
+		$events_count = count($eventids);
+
+		$events = $this->get([
+			'output' => [],
+			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'editable' => true
+		]);
+
+		if ($events_count != count($events)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$events = $this->get([
+			'output' => [],
+			'selectRelatedObject' => ['manual_close'],
+			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
+		]);
+
+		if ($events_count != count($events)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Cannot close problem: %1$s.', _('event is not in PROBLEM state'))
+			);
+		}
+
+		foreach ($events as $event) {
+			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
+				);
 			}
 		}
 	}

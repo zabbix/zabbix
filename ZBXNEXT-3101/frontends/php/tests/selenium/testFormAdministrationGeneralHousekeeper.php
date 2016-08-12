@@ -338,7 +338,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_sessions'])) {
-				$this->zbxTestInputType('hk_sessions', $data['hk_sessions']);
+				$this->zbxTestInputTypeOverwrite('hk_sessions', $data['hk_sessions']);
 			}
 
 			// history

@@ -717,25 +717,28 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
+int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff)
 {
 	const char		*__function_name = "DBupdate_itservices";
 
 	int			ret = SUCCEED;
 	zbx_vector_ptr_t	updates;
-	size_t			i;
+	int			i;
+	zbx_trigger_diff_t	*diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&updates);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < trigger_diff->values_num; i++)
 	{
-		if (EVENT_SOURCE_TRIGGERS != events[i].source)
+		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
+
+		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE))
 			continue;
 
-		its_updates_append(&updates, events[i].objectid, TRIGGER_VALUE_PROBLEM == events[i].value ?
-				events[i].trigger.priority : 0, events[i].clock);
+		its_updates_append(&updates, diff->triggerid, TRIGGER_VALUE_PROBLEM == diff->value ?
+				diff->priority : 0, diff->lastchange);
 	}
 
 	if (0 != updates.values_num)

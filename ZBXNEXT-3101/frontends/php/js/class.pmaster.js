@@ -155,6 +155,7 @@ var CDoll = Class.create({
 		this.counter(obj4update.counter);
 		this.params(obj4update.params);
 		this.ready(obj4update.ready);
+		this.updateSortable();
 	},
 
 	startDoll: function() {
@@ -282,9 +283,6 @@ var CDoll = Class.create({
 		url.setArgument('upd_counter', this.counter());
 		url.setArgument('pmasterid', this.pmasterid());
 
-		jQuery(window).off('resize');
-		jQuery(document).off('mousemove');
-
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
 				'parameters': this._params,
@@ -298,7 +296,6 @@ var CDoll = Class.create({
 
 	onSuccess: function(resp) {
 		this.rmwDarken();
-		this.updateSortable();
 
 		var headers = resp.getAllResponseHeaders();
 
@@ -375,7 +372,19 @@ var CDoll = Class.create({
 					handle: 'div.dashbrd-widget-head',
 					forcePlaceholderSize: true,
 					placeholder: 'dashbrd-widget',
-					opacity: '0.8',
+					tolerance: 'pointer',
+					start: function(e, ui) {
+						jQuery(ui.placeholder).addClass('dashbrd-widget-placeholder');
+						jQuery(ui.item).addClass('dashbrd-widget-draggable');
+						jQuery('.widget-placeholder .cell').css('min-width', '250px');
+						jQuery('.widget-placeholder .cell').sortable('refreshPositions');
+					},
+					stop: function(e, ui) {
+						jQuery(ui.placeholder).removeClass('dashbrd-widget-placeholder');
+						jQuery(ui.item).removeClass('dashbrd-widget-draggable');
+						jQuery('.widget-placeholder .cell').css('min-width', '');
+						jQuery('.widget-placeholder .cell[style=""]').removeAttr('style');
+					},
 					update: function(e, ui) {
 						// prevent duplicate save requests when moving a widget from one column to another
 						if (!ui.sender) {
@@ -394,10 +403,7 @@ var CDoll = Class.create({
 							});
 						}
 					}
-				})
-				.children('div')
-				.children('div.header')
-				.addClass('move');
+				});
 		}
 	}
 });

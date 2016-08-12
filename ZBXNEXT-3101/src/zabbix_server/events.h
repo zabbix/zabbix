@@ -20,25 +20,26 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-/* event recovery data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	DB_EVENT	*r_event;
-	zbx_uint64_t	correlationid;
-	zbx_uint64_t	c_eventid;
-	zbx_timespec_t	ts;
-}
-zbx_event_recovery_t;
+#define ZBX_EVENTS_SKIP_CORRELATION	0
+#define ZBX_EVENTS_PROCESS_CORRELATION	1
 
-DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+void	zbx_initialize_events(void);
+void	zbx_uninitialize_events(void);
+int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag);
-int	process_events();
-int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
-int	flush_correlated_events();
+
+int	close_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *ts, zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
+		const char *trigger_description, const char *trigger_expression,
+		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
+		const zbx_vector_ptr_t *trigger_tags, unsigned char trigger_correlation_mode,
+		const char *trigger_correlation_tag);
+
+int	process_events(void);
+int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock, int mode);
+int	flush_correlated_events(void);
 
 #endif

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with graphs.
- *
- * @package API
  */
 abstract class CGraphGeneral extends CApiService {
 

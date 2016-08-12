@@ -350,12 +350,12 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define SCREEN_RESOURCE_SIMPLE_GRAPH		1
 #define SCREEN_RESOURCE_MAP			2
 #define SCREEN_RESOURCE_PLAIN_TEXT		3
-#define SCREEN_RESOURCE_HOSTS_INFO		4
-#define SCREEN_RESOURCE_TRIGGERS_INFO		5
+#define SCREEN_RESOURCE_HOST_INFO		4
+#define SCREEN_RESOURCE_TRIGGER_INFO		5
 #define SCREEN_RESOURCE_SERVER_INFO		6
 #define SCREEN_RESOURCE_CLOCK			7
 #define SCREEN_RESOURCE_SCREEN			8
-#define SCREEN_RESOURCE_TRIGGERS_OVERVIEW	9
+#define SCREEN_RESOURCE_TRIGGER_OVERVIEW	9
 #define SCREEN_RESOURCE_DATA_OVERVIEW		10
 #define SCREEN_RESOURCE_URL			11
 #define SCREEN_RESOURCE_ACTIONS			12
@@ -656,6 +656,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* trigger correlation modes */
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
+
+/* task manager task types  */
+#define ZBX_TM_TASK_CLOSE_PROBLEM	1
+
+/* acknowledgment actions (flags) */
+#define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
+#define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
 /* user permissions */
 typedef enum

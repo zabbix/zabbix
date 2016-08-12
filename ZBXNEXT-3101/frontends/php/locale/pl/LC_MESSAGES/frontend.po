@@ -6719,7 +6719,7 @@ msgid "Hosts in maintenance"
 msgstr "Hosty w utrzymaniu"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Informacja o hostach"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14587,16 +14587,16 @@ msgstr "Usunięto wyzwalacze"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Info o wyzwalaczach"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Przegląd wyzwalaczy"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Stan wyzwalaczy"
 
 #: include/menu.inc.php:159
