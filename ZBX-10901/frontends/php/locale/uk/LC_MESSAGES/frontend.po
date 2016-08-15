@@ -14151,11 +14151,11 @@ msgid "This month"
 msgstr "Цей місяць"
 
 #: include/classes/screens/CScreenBuilder.php:614
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "Стовпчик комплексного екрану не порожній. Видалити його?"
 
 #: include/classes/screens/CScreenBuilder.php:568
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "Рядок комплексного екрану не порожній. Видалити його?"
 
 #: srv_status.php:35

@@ -13993,11 +13993,11 @@ msgid "This month"
 msgstr "Bulan ini"
 
 #: include/classes/screens/CScreenBuilder.php:614
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "Kolom layar ini tidak kosong. Hapus?"
 
 #: include/classes/screens/CScreenBuilder.php:568
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "Baris layar ini tidak kosong. Hapus?"
 
 #: srv_status.php:35
