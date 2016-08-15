@@ -1851,17 +1851,6 @@ class testFormItem extends CWebTest {
 					]
 				]
 			],
-			// Trends
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item trends Check',
-					'key' => 'item-trends-test',
-					'trends' => 'trends',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
 			[
 				[
 					'expected' => TEST_GOOD,

@@ -1926,10 +1926,10 @@ class testFormAction extends CWebTest {
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 						$this->zbxTestClickWait('all_usrgrps');
 						$this->zbxTestClick('select');
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+						$this->zbxTestSwitchToNewWindow();
 						$this->zbxTestClickWait('all_users');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
@@ -1974,6 +1974,7 @@ class testFormAction extends CWebTest {
 	}
 
 	public function testFormAction_Create() {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
@@ -2001,17 +2002,17 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestClickWait('new_operation');
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('usrgrps_7');
 		$this->zbxTestClickWait('usrgrps_11');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('users_1');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
 		$this->zbxTestClick('add_operation');
@@ -2032,9 +2033,12 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
 
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait('Simple form test host');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 // add target group Zabbix servers
@@ -2042,8 +2046,11 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host group');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command');
@@ -2087,6 +2094,7 @@ class testFormAction extends CWebTest {
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
 		$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testFormAction_Teardown() {
