@@ -153,6 +153,10 @@ if ($data['filter_search']) {
 			}
 		}
 
+		// Remove key duplicates.
+		$item_keys = array_unique($item_keys);
+		$macro_keys = array_unique($macro_keys);
+
 		// Get items.
 		$items = API::Item()->get(array(
 			'output' => array('itemid', 'name', 'key_', 'value_type'),
