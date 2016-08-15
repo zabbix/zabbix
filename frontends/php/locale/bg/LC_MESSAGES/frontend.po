@@ -12868,7 +12868,7 @@ msgid "Search pattern is empty"
 msgstr "Шаблона за търсене е празен"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Search/Filter element limit"
 msgstr "Ограничение за елементи на търсене/филтър"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
