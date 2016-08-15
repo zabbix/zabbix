@@ -68,6 +68,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
 	{"hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},
 	{"hv.perfcounter", VMCHECK_FUNC(check_vcenter_hv_perfcounter)},
+	{"hv.sensor.health.state", VMCHECK_FUNC(check_vcenter_hv_sensor_health_state)},
 	{"hv.status", VMCHECK_FUNC(check_vcenter_hv_status)},
 	{"hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
 	{"hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},
