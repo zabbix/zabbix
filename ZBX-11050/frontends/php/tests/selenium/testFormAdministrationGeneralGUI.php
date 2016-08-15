@@ -44,9 +44,9 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'Default theme',
 					'Dropdown first entry',
 					'remember selected',
-					'Search/Filter elements limit',
+					'Search/Filter element limit',
 					'Max count of elements to show inside table cell',
-					'Enable event acknowledges',
+					'Enable event acknowledgement',
 					'Show events not older than (in days)',
 					'Max count of events per trigger to show',
 					'Show warning if Zabbix server is down'
@@ -176,7 +176,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestInputType('search_limit', '1000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter element limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1000';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -186,7 +186,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter element limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -196,7 +196,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '999999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter element limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=999999';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -208,9 +208,9 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('search_limit', '0');
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['GUI', 'Search/Filter element limit']);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
-		$this->zbxTestTextPresent('Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.');
+		$this->zbxTestTextPresent('Incorrect value "0" for "Search/Filter element limit" field: must be between 1 and 999999.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value
@@ -220,8 +220,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('search_limit', '-1');
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.']);
+		$this->zbxTestTextPresent(['GUI', 'Search/Filter element limit']);
+		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "-1" for "Search/Filter element limit" field: must be between 1 and 999999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
@@ -293,7 +293,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestTextPresent('Enable event acknowledges');
+		$this->zbxTestTextPresent('Enable event acknowledgement');
 		$this->assertTrue($this->zbxTestCheckboxSelected('event_ack_enable'));
 
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=1';
@@ -305,7 +305,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestCheckboxSelect('event_ack_enable', false);
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Enable event acknowledges']);
+		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Enable event acknowledgement']);
 		$this->assertFalse($this->zbxTestCheckboxSelected('event_ack_enable'));
 
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=0';
