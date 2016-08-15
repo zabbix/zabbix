@@ -118,8 +118,30 @@ else {
 
 	$header = [];
 	$users = [];
-	$db_users = DBselect('SELECT u.userid,u.alias,u.name,u.surname FROM users u ORDER BY u.alias,u.userid');
-	while ($user_data = DBfetch($db_users)) {
+
+	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+		$db_users = API::User()->get([
+			'output' => ['userid', 'alias', 'name', 'surname'],
+			'sortfield' => 'alias'
+		]);
+	}
+	else{
+		$user_groups = API::UserGroup()->get([
+			'userids' => CWebUser::$data['userid'],
+			'selectUsers' => ['userid', 'alias', 'name', 'surname']
+		]);
+
+		$db_users = [];
+		foreach ($user_groups as $user_group) {
+			foreach ($user_group['users'] as $user) {
+				$db_users[$user['alias']] = $user;
+			}
+		}
+
+		ksort($db_users);
+	}
+
+	foreach ($db_users as $user_data) {
 		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
 		$users[] = $user_data['userid'];
 	}
