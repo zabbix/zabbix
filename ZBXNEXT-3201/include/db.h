@@ -494,19 +494,19 @@ typedef struct
 	unsigned char	priority;
 	int		lastchange;
 	int		problem_count;
-	int		correlated;
 	char		*error;
 
-#define ZBX_FLAGS_TRIGGER_DIFF_UNSET			0x0000
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE		0x0001
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE	0x0002
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE		0x0004
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR		0x0008
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT	0x0010
+#define ZBX_FLAGS_TRIGGER_DIFF_UNSET				0x0000
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE			0x0001
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE		0x0002
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE			0x0004
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR			0x0008
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT		0x0010
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE										\
 		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE | 		\
 		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR |			\
 		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT)
+#define ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT	0x1000
 	zbx_uint64_t			flags;
 }
 zbx_trigger_diff_t;
@@ -514,6 +514,8 @@ zbx_trigger_diff_t;
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
 void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
+void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
+		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);

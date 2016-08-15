@@ -2350,6 +2350,9 @@ class testFormItemPrototype extends CWebTest {
 
 		if (isset($data['name'])) {
 			$this->zbxTestInputTypeWait('name', $data['name']);
+			if ($data['name'] != $this->zbxTestGetValue("//input[@id='name']")) {
+				$this->zbxTestInputTypeOverwrite('name', $data['name']);
+			}
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
@@ -2472,6 +2475,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Item prototypes');
+			$this->zbxTestCheckHeader('Item prototypes');
 
 			if (isset ($data['dbName'])) {
 				$itemNameDB = $data['dbName'];

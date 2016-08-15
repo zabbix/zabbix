@@ -353,7 +353,7 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
@@ -439,7 +439,8 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 				'recovery_expression' => $srcTrigger['recovery_expression'],
 				'correlation_mode' => $srcTrigger['correlation_mode'],
 				'correlation_tag' => $srcTrigger['correlation_tag'],
-				'tags' => $srcTrigger['tags']
+				'tags' => $srcTrigger['tags'],
+				'manual_close' => $srcTrigger['manual_close']
 			]]);
 
 			if (!$result) {
@@ -1149,10 +1150,21 @@ function make_trigger_details($trigger) {
 			new CCol($trigger['recovery_expression'])
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
-			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
-		->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-			? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))
+			? SPACE.'+'.SPACE._('Multiple PROBLEM events')
+			: '')
 		]);
+
+	if ($config['event_ack_enable']) {
+		$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
+		]);
+	}
+
+	$table->addRow([_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'])
+		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED)
+	]);
 
 	return $table;
 }
