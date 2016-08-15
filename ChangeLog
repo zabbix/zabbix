@@ -5,6 +5,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Andris,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
 ........S. [ZBX-3101] fixed EVENT macro processing in recovery operations (wiper)
 ........S. [ZBX-10761] added upgrade patch to clean wrong values in 'triggers' table (Sergejs)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
@@ -53,6 +54,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
 ..F....... [ZBX-10263] fixed incorrect record count in getPagingLine() when search limit is reached (Cemeris)
