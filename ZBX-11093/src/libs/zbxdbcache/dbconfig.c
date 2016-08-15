@@ -4017,7 +4017,7 @@ static void	DCsync_corr_operations(DB_RESULT result)
 		zbx_vector_ptr_append(&correlation->operations, operation);
 	}
 
-	/* remove deleted correlation oeprations */
+	/* remove deleted correlation operations */
 
 	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
