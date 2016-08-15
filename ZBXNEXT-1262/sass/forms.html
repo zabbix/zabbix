@@ -77,7 +77,17 @@
 		<td rowspan="3">SNMP</td><td class="td-drag-icon"><div class="drag-icon cursor-move"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
 		<tr class="drag-drop-area">
-		<td class="td-drag-icon"><div class="drag-icon cursor-move"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		<td class="td-drag-icon"><div class="drag-icon cursor-move"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td style="white-space: nowrap"><div class="multiselect-wrapper">
+	<div class="multiselect" style="width: 160px">
+      <div class="selected">
+        <ul class="multiselect-list">
+          <li data-id="" class="selected"><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
+        </ul>
+      </div>
+      <input type="text" style="" value="" placeholder="Search">
+    </div>
+    <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
+    </div></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
 		<tr class="drag-drop-area"><td></td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr></tbody>
 		<tr><td colspan="8"></td></tr>
