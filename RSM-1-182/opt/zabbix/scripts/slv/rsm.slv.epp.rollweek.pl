@@ -38,7 +38,7 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = get_tlds('EPP');
+	$tlds_ref = get_tlds(ENABLED_EPP);
 }
 
 init_values();

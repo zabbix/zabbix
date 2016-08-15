@@ -54,7 +54,7 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = get_tlds('EPP');
+	$tlds_ref = get_tlds(ENABLED_EPP);
 }
 
 foreach (@$tlds_ref)

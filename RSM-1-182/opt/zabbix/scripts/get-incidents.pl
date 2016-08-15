@@ -28,7 +28,7 @@ db_connect();
 my $from = getopt('from');
 my $till = getopt('till');
 
-my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds();
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds(ENABLED_DNS);
 
 foreach (@$tlds_ref)
 {

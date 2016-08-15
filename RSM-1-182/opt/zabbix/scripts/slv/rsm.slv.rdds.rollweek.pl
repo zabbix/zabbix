@@ -38,7 +38,7 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = [@{get_tlds('RDDS43')}, @{get_tlds('RDDS80')}, @{get_tlds('RDAP')}];
+	$tlds_ref = get_tlds(ENABLED_RDDS);
 }
 
 init_values();

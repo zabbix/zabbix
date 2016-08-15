@@ -31,11 +31,12 @@ use constant OFFLINE	=> 0;
 
 use constant SLV_UNAVAILABILITY_LIMIT	=> 49; # NB! must be in sync with frontend
 
-use constant MAX_SERVICE_ERROR	=> -200; # -200, -201 ...
-use constant MIN_LOGIN_ERROR	=> -205;
-use constant MAX_LOGIN_ERROR	=> -203;
-use constant MIN_INFO_ERROR	=> -211;
-use constant MAX_INFO_ERROR	=> -209;
+use constant MIN_SERVICE_ERROR		=> -200;	# -200, -201 ...
+
+# internal errors are from -1 .. (MIN_SERVICE_ERROR + 1), including the following:
+use constant ZBX_EC_RDDS43_RES_NOREPLY	=> -208;	# internal error
+use constant ZBX_EC_RDDS80_RES_NOREPLY	=> -250;	# internal error
+use constant ZBX_EC_RDAP_RES_NOREPLY	=> -500;	# internal error
 
 use constant EVENT_OBJECT_TRIGGER	=> 0;
 use constant EVENT_SOURCE_TRIGGERS	=> 0;
@@ -85,6 +86,17 @@ use constant PROTO_TCP	=> 1;
 
 use constant SEC_PER_WEEK	=> 604800;
 
+use constant ENABLED_DNS	=> 0;
+use constant ENABLED_DNSSEC	=> 1;
+use constant ENABLED_RDDS	=> 2;	# any of rdd43, rdds80 or rdap
+use constant ENABLED_RDDS43	=> 3;
+use constant ENABLED_RDDS80	=> 4;
+use constant ENABLED_RDAP	=> 5;
+use constant ENABLED_RDDS_EPP	=> 6;	# any of (rdds43 or rdap) and EPP
+use constant ENABLED_RDDS43_EPP	=> 7;
+use constant ENABLED_RDAP_EPP	=> 8;
+use constant ENABLED_EPP	=> 9;
+
 our ($result, $dbh, $tld);
 
 my $start_time;
@@ -98,12 +110,14 @@ my $lock_tmp;
 my %OPTS;	# command-line options
 
 our @EXPORT = qw($result $dbh $tld
-		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR
-		MIN_INFO_ERROR MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
+		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT
+		PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
 		PROBE_ONLINE_SHIFT AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43
 		JSON_INTERFACE_RDDS80 JSON_INTERFACE_RDAP JSON_INTERFACE_EPP
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION EPP_COMMAND_LOGIN
 		EPP_COMMAND_INFO EPP_COMMAND_UPDATE PROTO_UDP PROTO_TCP
+		ENABLED_DNS ENABLED_DNSSEC ENABLED_RDDS ENABLED_RDDS43 ENABLED_RDDS80 ENABLED_RDAP ENABLED_RDDS_EPP
+		ENABLED_RDDS43_EPP ENABLED_RDAP_EPP ENABLED_EPP
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_rtt_low get_macro_dns_udp_delay
@@ -112,15 +126,14 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
-		get_probe_macros get_ipv_probes
+		get_probe_macros get_ipv_probes probe_service_enabled
 		get_probes get_templated_nsips get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled
 		db_connect db_disconnect db_select db_select_binds
 		db_exec set_slv_config get_cycle_bounds get_rollweek_bounds get_prev_month_bounds get_month_bounds
-		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_times2
-		get_probe_availabilities
+		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_availabilities
 		probe_offline_at probes2tldhostids get_probe_online_key_itemid
-		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error
-		process_slv_monthly process_slv_ns_monthly
+		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error is_internal_error
+		process_slv_monthly
 		process_slv_avail process_slv_ns_avail process_slv_downtime get_results uint_value_exists
 		dbl_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
@@ -392,7 +405,14 @@ sub get_itemid_by_host
 	    		" and h.host='$host'".
 			" and i.key_='$key'";
 
-	return __get_itemid_by_sql($sql);
+	my $itemid =  __get_itemid_by_sql($sql, \$errbuf);
+
+	if (!$itemid)
+	{
+		$__rsm_slv_error = "item \"$key\" not found at host \"$host\": $errbuf";
+	}
+
+	return $itemid;
 }
 
 sub get_itemid_by_hostid
@@ -541,79 +561,162 @@ sub get_lastclock
 
 sub get_tlds
 {
-	my $service = shift;	# in case of 2 services one of which is 'DNS' it has to be specified first
-	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS43/RDAP and EPP
-
-	$service = defined($service) ? uc($service) : 'DNS';
-	$service2 = uc($service2) if ($service2);
+	my $option = shift;
 
 	my $rows_ref;
 
-	if (!$service2)
+	if ($option == ENABLED_DNS)
 	{
-		if ($service eq 'DNS')
-		{
-			$rows_ref = db_select(
-				"select h.host".
-				" from hosts h,hosts_groups hg,groups g".
-				" where h.hostid=hg.hostid".
-					" and hg.groupid=g.groupid".
-					" and g.name='TLDs'".
-					" and h.status=0");
-		}
-		else
-		{
-			$rows_ref = db_select(
-				"select h.host".
-				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
-				" where h.hostid=hg.hostid".
-					" and hg.groupid=g.groupid".
-					" and h2.name=concat('Template ', h.host)".
-					" and g.name='TLDs'".
-					" and h2.hostid=hm.hostid".
-					" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
-					" and hm.value!=0".
-					" and h.status=0");
-		}
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and g.name='TLDs'".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_DNSSEC)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.DNSSEC.ENABLED}'".
+				" and hm.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDDS)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and (hm.macro='{\$RSM.TLD.RDDS43.ENABLED}'".
+					" or hm.macro='{\$RSM.TLD.RDDS80.ENABLED}'".
+					" or hm.macro='{\$RSM.TLD.RDAP.ENABLED}')".
+				" and hm.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDDS43)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.RDDS43.ENABLED}'".
+				" and hm.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDDS80)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.RDDS80.ENABLED}'".
+				" and hm.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDAP)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.RDAP.ENABLED}'".
+				" and hm.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDDS_EPP)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm,hostmacro hm2".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and (hm.macro='{\$RSM.TLD.RDDS43.ENABLED}'".
+					" or hm.macro='{\$RSM.RDDS80.ENABLED}'".
+					" or hm.macro='{\$RSM.TLD.RDAP.ENABLED}')".
+				" and hm.value!=0".
+				" and h2.hostid=hm2.hostid".
+				" and hm2.macro='{\$RSM.TLD.EPP.ENABLED}'".
+				" and hm2.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDDS43_EPP)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm,hostmacro hm2".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.RDDS43.ENABLED}'".
+				" and hm.value!=0".
+				" and h2.hostid=hm2.hostid".
+				" and hm2.macro='{\$RSM.TLD.EPP.ENABLED}'".
+				" and hm2.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_RDAP_EPP)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm,hostmacro hm2".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.RDAP.ENABLED}'".
+				" and hm.value!=0".
+				" and h2.hostid=hm2.hostid".
+				" and hm2.macro='{\$RSM.TLD.EPP.ENABLED}'".
+				" and hm2.value!=0".
+				" and h.status=0");
+	}
+	elsif ($option == ENABLED_EPP)
+	{
+		$rows_ref = db_select(
+			"select distinct h.host".
+			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+			" where h.hostid=hg.hostid".
+				" and hg.groupid=g.groupid".
+				" and h2.name=concat('Template ', h.host)".
+				" and g.name='TLDs'".
+				" and h2.hostid=hm.hostid".
+				" and hm.macro='{\$RSM.TLD.EPP.ENABLED}'".
+				" and hm.value!=0".
+				" and h.status=0");
 	}
 	else
 	{
-		if ($service eq 'DNS')
-		{
-			$rows_ref = db_select(
-				"select h.host,h2.hostid".
-				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
-				" where h.hostid=hg.hostid".
-					" and hg.groupid=g.groupid".
-					" and h2.name=concat('Template ', h.host)".
-					" and g.name='TLDs'".
-					" and h2.hostid=hm.hostid".
-					" and hm.macro='{\$RSM.TLD.$service2.ENABLED}'".
-					" and hm.value!=0".
-					" and h.status=0");
-		}
-		else
-		{
-			my $rows_ref2 = db_select(
-				"select h.host,h2.hostid".
-				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
-				" where h.hostid=hg.hostid".
-					" and hg.groupid=g.groupid".
-					" and h2.name=concat('Template ', h.host)".
-					" and g.name='TLDs'".
-					" and h2.hostid=hm.hostid".
-					" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
-					" and hm.value!=0".
-					" and h.status=0");
-
-			my $idx = 0;
-			foreach my $row_ref (@{$rows_ref2})
-			{
-				next if (__get_host_macro($row_ref->[1], "{\$RSM.TLD.$service2.ENABLED}") == 0);
-
-				$rows_ref->[$idx++]->[0] = $row_ref->[0];
-			}
-		}
+		fail("internal error: unknown option \"$option\"");
 	}
 
 	my @tlds;
@@ -694,13 +797,39 @@ sub get_ipv_probes
 	return ($probes_ipv4, $probes_ipv6);
 }
 
-# Returns a reference to hash of all probes (host => hostid).
+sub probe_service_enabled
+{
+	my $hostid = shift;
+	my $option = shift;
+
+	my $m;
+	if ($option == ENABLED_RDDS43)
+	{
+		$m = '{$RSM.RDDS43.ENABLED}';
+	}
+	elsif ($option == ENABLED_RDDS80)
+	{
+		$m = '{$RSM.RDDS80.ENABLED}';
+	}
+	elsif ($option == ENABLED_RDAP)
+	{
+		$m = '{$RSM.RDAP.ENABLED}';
+	}
+	else
+	{
+		fail("internal error: service option \"$option\" not implemented");
+	}
+
+	return __get_host_macro($hostid, $m, 0);	# not optional
+}
+
+# Returns a reference to hash of all probes "host" => hostid, where
+# - host is the name of the Probe
+# - hostid is the ID of the host that is being monitored by proxy with the same name
 sub get_probes
 {
-	my $service = shift;
+	my $option = shift;
 	my $name = shift;
-
-	$service = defined($service) ? uc($service) : 'DNS';
 
 	my $name_cond = "";
 
@@ -714,28 +843,134 @@ sub get_probes
 			$name_cond.
 			" and g.name='".PROBE_GROUP_NAME."'");
 
-	my $result;
+	my %result;
 	foreach my $row_ref (@$rows_ref)
 	{
 		my $host = $row_ref->[0];
 		my $hostid = $row_ref->[1];
 
-		if ($service ne 'DNS')
+		my $skip = 1;
+
+		if ($option == ENABLED_DNS)
 		{
-			$rows_ref = db_select(
-				"select hm.value".
+			$skip = 0;
+		}
+		elsif ($option == ENABLED_RDDS)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
 				" from hosts h,hostmacro hm".
 				" where h.hostid=hm.hostid".
 					" and h.host='Template $host'".
-					" and hm.macro='{\$RSM.$service.ENABLED}'");
+					" and (hm.macro='{\$RSM.RDDS43.ENABLED}'".
+						" or hm.macro='{\$RSM.RDDS80.ENABLED}'".
+						" or hm.macro='{\$RSM.RDAP.ENABLED}')".
+					" and hm.value!=0");
 
-			next if (scalar(@$rows_ref) != 0 and $rows_ref->[0]->[0] == 0);
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDDS43)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.RDDS43.ENABLED}'".
+					" and hm.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDDS80)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.RDDS80.ENABLED}'".
+					" and hm.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDAP)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.RDAP.ENABLED}'".
+					" and hm.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDDS_EPP)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm,hostmacro hm2".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and (hm.macro='{\$RSM.RDDS43.ENABLED}'".
+						" or hm.macro='{\$RSM.RDDS80.ENABLED}'".
+						" or hm.macro='{\$RSM.RDAP.ENABLED}')".
+					" and hm.value!=0".
+					" and h.hostid=hm2.hostid".
+					" and hm2.macro='{\$RSM.EPP.ENABLED}'".
+					" and hm2.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDDS43_EPP)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm,hostmacro hm2".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.RDDS43.ENABLED}'".
+					" and hm.value!=0".
+					" and h.hostid=hm2.hostid".
+					" and hm2.macro='{\$RSM.EPP.ENABLED}'".
+					" and hm2.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_RDAP_EPP)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm,hostmacro hm2".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.RDAP.ENABLED}'".
+					" and hm.value!=0".
+					" and h.hostid=hm2.hostid".
+					" and hm2.macro='{\$RSM.EPP.ENABLED}'".
+					" and hm2.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
+		}
+		elsif ($option == ENABLED_EPP)
+		{
+			my $rows_ref2 = db_select(
+				"select 1".
+				" from hosts h,hostmacro hm".
+				" where h.hostid=hm.hostid".
+					" and h.host='Template $host'".
+					" and hm.macro='{\$RSM.EPP.ENABLED}'".
+					" and hm.value!=0");
+
+			$skip = 0 if (scalar(@$rows_ref2) != 0);
 		}
 
-		$result->{$host} = $hostid;
+		next if ($skip != 0);
+
+		$result{$host} = $hostid;
 	}
 
-	return $result;
+	return \%result;
 }
 
 # get array of key nameservers ('i.ns.se,130.239.5.114', ...)
@@ -1367,21 +1602,26 @@ sub get_probe_times
 	my $till = shift;
 	my $probes_ref = shift; # { host => hostid, ... }
 
+	my $result;
+
+	return $result if (scalar(keys(%{$probes_ref})) == 0);
+
+	my @probes = map {"'$_ - mon'"} (keys(%{$probes_ref}));
+
 	my $items_ref = db_select(
 		"select i.itemid,h.host".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and h.host in (".join(',', @probes).")".
 			" and i.templateid is not null".
 			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and i.key_='".PROBE_KEY_ONLINE."'");
-
-	my $result;
 
 	if (scalar(@{$items_ref}) == 0)
 	{
 		wrn("Probe main status items (".PROBE_KEY_ONLINE.") not available, will calculate manually.");
 
-		$result = get_probe_times2($from, $till, $probes_ref);
+		$result = __get_probe_times_old($from, $till, $probes_ref);
 
 		__print_probe_times($result) if (opt('dry-run'));
 
@@ -1451,7 +1691,7 @@ sub get_probe_times
 # - manual status (manually turn off probe)
 #
 # Must return results the same way get_probe_times() does.
-sub get_probe_times2
+sub __get_probe_times_old
 {
 	my $from = shift;
 	my $till = shift;
@@ -1460,8 +1700,6 @@ sub get_probe_times2
 	my $probe_avail_limit = get_macro_probe_avail_limit();
 
 	dbg("from:$from till:$till probe_avail_limit:$probe_avail_limit");
-
-	$probes_ref = get_probes() unless (defined($probes_ref));
 
 	my $result;
 
@@ -1797,12 +2035,152 @@ sub is_service_error
 {
 	my $error = shift;
 
-	return SUCCESS if ($error <= MAX_SERVICE_ERROR);
+	return E_FAIL if ($error >= 0 || is_internal_error($error) == SUCCESS);
+
+	return SUCCESS;
+}
+
+sub is_internal_error
+{
+	my $error = shift;
+
+	return SUCCESS if ($error < 0 && MIN_SERVICE_ERROR < $error);
+	return SUCCESS if ($error == ZBX_EC_RDDS43_RES_NOREPLY || $error == ZBX_EC_RDDS80_RES_NOREPLY ||
+			$error == ZBX_EC_RDAP_RES_NOREPLY);
 
 	return E_FAIL;
 }
 
-sub process_slv_monthly
+# Calculate monthly failed tests and average in last test cycle.
+sub process_slv_monthly($$$$$$$$$$)
+{
+	my $tld = shift;
+	my $month_from = shift;
+	my $cycle_till = shift;
+	my $value_ts = shift;
+	my $delay = shift;
+	my $probe_times_ref = shift;
+	my $keys = shift;
+	my $slv_name = shift;
+	my $check_item_value_ref = shift;	# function to check if value is successful
+	my $max_tests_ref = shift;		# function to calculate maximum values per month
+
+	my ($test_key, $check_services);
+
+	if ($keys->{'totals'})
+	{
+		$test_key = $keys->{'totals'}->{'pfailed'};
+		$check_services = 1;
+	}
+	else
+	{
+		$test_key = $keys->{'services'}->[0]->{'keys'}->{'out'}->{'pfailed'};
+		$check_services = 0;
+	}
+
+	my $result;
+
+	if (!opt('dry-run'))
+	{
+		if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
+		{
+			wrn("configuration error: $slv_name item(s) not found (\"$test_key\")");
+			exit(0);
+		}
+
+		exit(0) if (uint_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
+	}
+
+	init_values();
+
+	my $totals;
+
+	if ($keys->{'totals'})
+	{
+		$totals->{'total_tests'} = 0;
+		$totals->{'max'} = 0;
+
+		# for pfailed
+		$totals->{'successful_tests'} = 0;
+
+		# for avg in totals (avg is per cycle)
+		$totals->{'successful_cycle_tests'} = 0;
+		$totals->{'successful_cycle_accum'} = 0;
+	}
+
+	foreach my $service_ref (@{$keys->{'services'}})
+	{
+		my $service = $service_ref->{'service'};
+		my $key_in = $service_ref->{'keys'}->{'in'};
+
+		next if ($check_services && tld_service_enabled($tld, $service) != SUCCESS);
+
+		$result = __process_slv_monthly($tld, $key_in, $month_from, $cycle_till, $value_ts, $delay, $probe_times_ref,
+				$check_item_value_ref);
+
+		if (!$result->{'total_tests'})
+		{
+			wrn("$slv_name: no values found in the database for a given period: ".
+					selected_period($month_from, $cycle_till));
+			exit(0);
+		}
+
+		my $total_tests = $result->{'total_tests'};
+		my $successful_tests = $result->{'successful_tests'};
+		my $successful_cycle_tests = $result->{'successful_cycle_tests'};
+		my $successful_cycle_accum = $result->{'successful_cycle_accum'};
+
+		my $failed = $total_tests - $successful_tests;
+		my $avg = ($successful_cycle_tests ? sprintf("%.3f",
+			($successful_cycle_accum / $successful_cycle_tests)) : undef);
+		my $pfailed = ($total_tests ? sprintf("%.3f", ($failed * 100 / $total_tests)) : 0);
+
+		my $max = $max_tests_ref->($total_tests, $service);
+
+		my $k = $service_ref->{'keys'}->{'out'};
+
+		push_value($tld, $k->{'failed'}, $value_ts, $failed, "failed tests (total: $total_tests)");
+		push_value($tld, $k->{'avg'}, $value_ts, $avg, "cycle average RTT") if (defined($avg));
+		push_value($tld, $k->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
+		push_value($tld, $k->{'max'}, $value_ts, $max, "max tests per month");
+
+		if ($keys->{'totals'})
+		{
+			$totals->{'total_tests'} += $total_tests;
+			$totals->{'max'} += $max;
+
+			$totals->{'successful_tests'} += $successful_tests;
+
+			$totals->{'successful_cycle_tests'} += $successful_cycle_tests;
+			$totals->{'successful_cycle_accum'} += $successful_cycle_accum;
+		}
+	}
+
+	if ($keys->{'totals'})
+	{
+		my $total_tests = $totals->{'total_tests'};
+		my $successful_tests = $totals->{'successful_tests'};
+		my $successful_cycle_tests = $totals->{'successful_cycle_tests'};
+		my $successful_cycle_accum = $totals->{'successful_cycle_accum'};
+		my $max = $totals->{'max'};
+
+		my $failed = $total_tests - $successful_tests;
+		my $avg = ($successful_cycle_tests ? sprintf("%.3f",
+			($successful_cycle_accum / $successful_cycle_tests)) : undef);
+		my $pfailed = ($total_tests ? sprintf("%.3f", ($failed * 100 / $total_tests)) : 0);
+
+		my $k = $keys->{'totals'};
+
+		push_value($tld, $k->{'failed'}, $value_ts, $failed, "failed tests (total: $total_tests)");
+		push_value($tld, $k->{'avg'}, $value_ts, $avg, "cycle average RTT") if (defined($avg));
+		push_value($tld, $k->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
+		push_value($tld, $k->{'max'}, $value_ts, $max, "max tests per month");
+	}
+
+	send_values();
+}
+
+sub __process_slv_monthly
 {
 	my $tld = shift;
 	my $cfg_key_in = shift;		# input key, e. g. 'rsm.rdds.43.rtt[{$RSM.TLD}]'
@@ -1816,9 +2194,9 @@ sub process_slv_monthly
 	my $result;
 
 	$result->{'total_tests'} = 0;
-	$result->{'failed_tests'} = 0;
 	$result->{'successful_tests'} = 0;
-	$result->{'successful_accum'} = 0;	# accumulated successful values, to get the average later
+	$result->{'successful_cycle_tests'} = 0;
+	$result->{'successful_cycle_accum'} = 0;	# accumulated cycle values to get cycle avg later
 
 	my $hostids_ref = probes2tldhostids($tld, $probe_times_ref);
 	if (!$hostids_ref)
@@ -1827,7 +2205,8 @@ sub process_slv_monthly
 		return $result;
 	}
 
-	my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 1);	# complete key
+	my $complete_key = ("]" eq substr($cfg_key_in, -1)) ? 1 : 0;
+	my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, $complete_key);
 	if (scalar(@$items_ref) == 0)
 	{
 		wrn("no items ($cfg_key_in) found");
@@ -1835,6 +2214,8 @@ sub process_slv_monthly
 	}
 
 	my $values_ref = __get_item_values($items_ref, $from, $till, ITEM_VALUE_TYPE_FLOAT);
+
+	my $cycle_start = $till - $delay + 1;
 
 	foreach my $itemid (keys(%{$values_ref}))
 	{
@@ -1847,92 +2228,16 @@ sub process_slv_monthly
 			if ($check_value_ref->($value) == SUCCESS)
 			{
 				$result->{'successful_tests'}++;
-				$result->{'successful_accum'} += $value;
-			}
-			else
-			{
-				$result->{'failed_tests'}++;
-			}
-		}
-	}
 
-	return $result;
-}
-
-sub process_slv_ns_monthly
-{
-	my $tld = shift;
-	my $cfg_key_in = shift;		# part of input key, e. g. 'rsm.dns.tcp.rtt[{$RSM.TLD},'
-	my $from = shift;		# start of the period
-	my $till = shift;		# end of the period
-	my $value_ts = shift;		# value timestamp
-	my $delay = shift;		# item delay
-	my $probe_times_ref = shift;	# reference to the probes that were online
-	my $check_value_ref = shift;	# a pointer to subroutine to check if the value was successful
-
-	my $nsips_ref = get_templated_nsips($tld, $cfg_key_in);
-
-	dbg("using filter '$cfg_key_in' found next NS:\n", Dumper($nsips_ref)) if (opt('debug'));
-
-	my $result;
-
-	$result->{'total_tests'} = 0;
-	$result->{'failed_tests'} = 0;
-	$result->{'successful_tests'} = 0;
-	$result->{'successful_accum'} = 0;	# accumulated successful values, to get the average later
-	$result->{'ipv4_addresses'} = 0;
-	$result->{'ipv6_addresses'} = 0;
-
-	foreach my $nsip (@$nsips_ref)
-	{
-		my $ip_version = get_ip_version(get_ip_from_nsip($nsip));
-
-		if ($ip_version == 4)
-		{
-			$result->{'ipv4_addresses'}++;
-		}
-		else
-		{
-			$result->{'ipv6_addresses'}++;
-		}
-	}
-
-	my $nsip_items_ref = get_nsip_items($nsips_ref, $cfg_key_in, $tld);
-
-	dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($nsip_items_ref)) if (opt('debug'));
-
-	foreach my $probe (keys(%{$probe_times_ref}))
-	{
-		my $times_ref = $probe_times_ref->{$probe};
-
-		my $hostid = __probe2tldhostid($tld, $probe);
-
-		my $itemids_ref = get_itemids_by_hostids([$hostid], $nsip_items_ref);
-		my $values_ref = __get_nsip_values($itemids_ref, $times_ref, $nsip_items_ref);
-
-		foreach my $nsip (keys(%$values_ref))
-		{
-			foreach my $itemid (keys(%{$values_ref->{$nsip}}))
-			{
-				foreach my $clock (keys(%{$values_ref->{$nsip}->{$itemid}}))
+				if (is_internal_error($value) != SUCCESS && $clock >= $cycle_start)	# ignore internal errors
 				{
-					my $value = $values_ref->{$nsip}->{$itemid}->{$clock};
-
-					$result->{'total_tests'}++;
-
-					if ($check_value_ref->($value) == SUCCESS)
-					{
-						$result->{'successful_tests'}++;
-						$result->{'successful_accum'} += $value;
-					}
-					else
-					{
-						$result->{'failed_tests'}++;
-					}
+					$result->{'successful_cycle_tests'}++;
+					$result->{'successful_cycle_accum'} += $value if ($value > 0);
 				}
 			}
 		}
 	}
+
 
 	return $result;
 }
@@ -4674,7 +4979,7 @@ sub __log
 
 	if (opt('dry-run') or opt('nolog'))
 	{
-		print {$stdout ? *STDOUT : *STDERR} (ts_str(), " [$priority] $cur_tld", __func(), "$msg\n");
+		print {$stdout ? *STDOUT : *STDERR} (ts_str(), " [$$:$priority] $cur_tld", __func(), "$msg\n");
 		return;
 	}
 
@@ -4729,7 +5034,7 @@ sub __get_host_macro
 
 	if (1 != scalar(@$rows_ref))
 	{
-		fail("cannot find macro '$m'") unless ($optional);
+		fail("cannot find macro '$m' at host (hostid: $hostid)") unless ($optional);
 		return undef;
 	}
 
