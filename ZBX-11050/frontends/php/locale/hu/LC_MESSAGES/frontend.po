@@ -12831,7 +12831,7 @@ msgid "Search pattern is empty"
 msgstr "A keresési feltétel üres"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Search/Filter element limit"
 msgstr "Keresési/Szűrési limit"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112

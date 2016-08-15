@@ -12885,7 +12885,7 @@ msgid "Search pattern is empty"
 msgstr "Suchmuster ist leer"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Search/Filter element limit"
 msgstr "Suche/Filter nach Elementen"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
