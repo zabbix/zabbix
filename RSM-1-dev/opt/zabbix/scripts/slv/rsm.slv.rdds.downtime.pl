@@ -30,8 +30,7 @@ my $delay = get_macro_rdds_delay($now);
 my ($month_from, undef, $value_ts) = get_month_bounds($now, $delay);
 my $month_till = cycle_end($value_ts, $delay);
 
-my $result = process_slv_downtime($month_from, $month_till, $value_ts, $cfg_key_in, $cfg_key_out,
-		[@{get_tlds('RDDS43')}, @{get_tlds('RDDS80')}, @{get_tlds('RDAP')}]);
+my $result = process_slv_downtime($month_from, $month_till, $value_ts, $cfg_key_in, $cfg_key_out, get_tlds(ENABLED_RDDS));
 
 init_values();
 

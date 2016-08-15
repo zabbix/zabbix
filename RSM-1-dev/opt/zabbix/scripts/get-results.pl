@@ -32,7 +32,7 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $service_type, $delay, $proto, $command);	# $proto is needed for DNS, $command for EPP
+my ($key, $service_name, $service_option, $delay, $proto, $command);	# $proto is needed for DNS, $command for EPP
 
 my ($from, $till);
 
@@ -49,60 +49,83 @@ if (getopt('service') eq 'tcp-dns-rtt')
 {
 	$key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
 	$delay = get_macro_dns_tcp_delay();
-	$service_type = 'DNS';
+	$service_name = 'DNS';
+	$service_option = ENABLED_DNS;
 	$proto = PROTO_TCP;
 }
 elsif (getopt('service') eq 'udp-dns-rtt')
 {
 	$key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	$delay = get_macro_dns_udp_delay();
-	$service_type = 'DNS';
+	$service_name = 'DNS';
+	$service_option = ENABLED_DNS;
 	$proto = PROTO_UDP;
 }
 elsif (getopt('service') eq 'dns-upd')
 {
 	$key = 'rsm.dns.udp.upd[{$RSM.TLD},';
 	$delay = get_macro_dns_udp_delay();
-	$service_type = 'EPP';
+	$service_name = 'EPP';
+	$service_option = ENABLED_EPP;
 }
 elsif (getopt('service') eq 'rdds43-rtt')
 {
 	$key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 	$delay = get_macro_rdds_delay();
-	$service_type = 'RDDS';
+	$service_name = 'RDDS';
+	$service_option = ENABLED_RDDS43;
 }
 elsif (getopt('service') eq 'rdds80-rtt')
 {
 	$key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 	$delay = get_macro_rdds_delay();
-	$service_type = 'RDDS';
+	$service_name = 'RDDS';
+	$service_option = ENABLED_RDDS80;
 }
-elsif (getopt('service') eq 'rdds-upd')
+elsif (getopt('service') eq 'rdap-rtt')
+{
+	$key = 'rsm.rdds.rdap.rtt[{$RSM.TLD}]';
+	$delay = get_macro_rdds_delay();
+	$service_name = 'RDDS';
+	$service_option = ENABLED_RDAP;
+}
+elsif (getopt('service') eq 'rdds43-upd')
 {
 	$key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
 	$delay = get_macro_rdds_delay();
-	$service_type = 'EPP';
+	$service_name = 'RDDS';
+	$service_option = ENABLED_RDDS43_EPP;
+}
+elsif (getopt('service') eq 'rdap-upd')
+{
+	$key = 'rsm.rdds.rdap.upd[{$RSM.TLD}]';
+	$delay = get_macro_rdds_delay();
+	$service_name = 'RDDS';
+	$service_option = ENABLED_RDAP_EPP;
 }
 elsif (getopt('service') eq 'epp-login-rtt')
 {
 	$command = 'login';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$delay = get_macro_epp_delay();
-	$service_type = 'EPP';
+	$service_name = 'EPP';
+	$service_option = ENABLED_EPP;
 }
 elsif (getopt('service') eq 'epp-info-rtt')
 {
 	$command = 'info';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$delay = get_macro_epp_delay();
-	$service_type = 'EPP';
+	$service_name = 'EPP';
+	$service_option = ENABLED_EPP;
 }
 elsif (getopt('service') eq 'epp-update-rtt')
 {
 	$command = 'update';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$delay = get_macro_epp_delay();
-	$service_type = 'EPP';
+	$service_name = 'EPP';
+	$service_option = ENABLED_EPP;
 }
 else
 {
@@ -114,9 +137,10 @@ else
 
 info('selected period: ', selected_period($from, $till));
 
-my $probes_ref = get_probes($service_type);
+my $probes_ref = get_probes($service_option);
 my $probe_times_ref = get_probe_times($from, $till, $probes_ref);
-my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
+
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_option);
 
 my $rtt_low;	# used in __check_test()
 
@@ -136,7 +160,8 @@ foreach (@$tlds_ref)
 		$items_ref = get_all_items($key, $tld);
 	}
 
-	$rtt_low = get_rtt_low(lc($service_type), $proto, $command);	# used in __check_test()
+	# used in __check_test()
+	$rtt_low = get_rtt_low(lc($service_name), $proto, $command);
 
 	my $result = get_results($tld, $probe_times_ref, $items_ref, \&__check_test);
 
@@ -208,7 +233,7 @@ get-results.pl - get successful/total test results of the service for given peri
 
 =head1 SYNOPSIS
 
-get-results.pl --service <tcp-dns-rtt|udp-dns-rtt|dns-upd|rdds43-rtt|rdds80-rtt|rdds-upd|epp-login-rtt|epp-info-rtt|epp-update-rtt> [--tld tld] [--from timestamp] [--till timestamp] [--debug] [--help]
+get-results.pl --service <tcp-dns-rtt|udp-dns-rtt|dns-upd|rdds43-rtt|rdds80-rtt|rdap-rtt|rdds43-upd|rdap-upd|epp-login-rtt|epp-info-rtt|epp-update-rtt> [--tld tld] [--from timestamp] [--till timestamp] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -216,7 +241,7 @@ get-results.pl --service <tcp-dns-rtt|udp-dns-rtt|dns-upd|rdds43-rtt|rdds80-rtt|
 
 =item B<--service> name
 
-Specify the name of the service. Supported services: tcp-dns-rtt, udp-dns-rtt, dns-upd, rdds43-rtt, rdds80-rtt, rdds-upd, epp-login-rtt, epp-info-rtt, epp-update-rtt.
+Specify the name of the service. Supported services: tcp-dns-rtt, udp-dns-rtt, dns-upd, rdds43-rtt, rdds80-rtt, rdap-rtt, rdds43-upd, rdap-upd, epp-login-rtt, epp-info-rtt, epp-update-rtt.
 
 =item B<--tld> tld
 

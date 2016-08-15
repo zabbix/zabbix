@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# EPP session-command RTT
+# RDDS Update Time
 
 BEGIN
 {
@@ -16,19 +16,40 @@ use Parallel;
 
 my $keys =
 {
+	'totals' =>
+	{
+		'failed'	=> 'rsm.slv.rdds.upd.failed',
+		'max'		=> 'rsm.slv.rdds.upd.max',
+		'avg'		=> 'rsm.slv.rdds.upd.avg',
+		'pfailed'	=> 'rsm.slv.rdds.upd.pfailed'
+	},
 	'services' =>
 	[
 		{
-			'service' => 'EPP',
+			'service' => 'RDDS43',
 			'keys' =>
 			{
-				'in' => 'rsm.epp.rtt[{$RSM.TLD},login]',
+				'in' => 'rsm.rdds.43.upd[{$RSM.TLD}]',
 				'out' =>
 				{
-					'failed'	=> 'rsm.slv.epp.rtt.login.failed',
-					'max'		=> 'rsm.slv.epp.rtt.login.max',
-					'avg'		=> 'rsm.slv.epp.rtt.login.avg',
-					'pfailed'	=> 'rsm.slv.epp.rtt.login.pfailed'
+					'failed'	=> 'rsm.slv.rdds43.upd.failed',
+					'max'		=> 'rsm.slv.rdds43.upd.max',
+					'avg'		=> 'rsm.slv.rdds43.upd.avg',
+					'pfailed'	=> 'rsm.slv.rdds43.upd.pfailed'
+				}
+			}
+		},
+		{
+			'service' => 'RDAP',
+			'keys' =>
+			{
+				'in' => 'rsm.rdds.rdap.upd[{$RSM.TLD}]',
+				'out' =>
+				{
+					'failed'	=> 'rsm.slv.rdap.upd.failed',
+					'max'		=> 'rsm.slv.rdap.upd.max',
+					'avg'		=> 'rsm.slv.rdap.upd.avg',
+					'pfailed'	=> 'rsm.slv.rdap.upd.pfailed'
 				}
 			}
 		}
@@ -50,29 +71,39 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $cfg_max_value = get_macro_epp_rtt_low('login');
-my $delay = get_macro_epp_delay($now);
+my $cfg_max_value = get_macro_rdds_update_time();
+my $delay = get_macro_rdds_delay($now);
 
 my ($month_from, $month_till, $value_ts) = get_month_bounds($now, $delay);
 my $cycle_till = cycle_end($value_ts, $delay);
 
 my $left_cycles = get_num_cycles($cycle_till + 1, $month_till, $delay);
 
-my $probes_ref = get_probes(ENABLED_EPP);
-my $probe_count = scalar(keys(%{$probes_ref}));
+my $probes_ref = get_probes(ENABLED_RDDS_EPP);
+
+my $rdds43_probe_count = 0;
+my $rdap_probe_count = 0;
+
+foreach my $probe (keys(%{$probes_ref}))
+{
+	my $templateid = get_hostid("Template $probe");
+
+	$rdds43_probe_count++ if (probe_service_enabled($templateid, ENABLED_RDDS43) != 0);
+	$rdap_probe_count++ if (probe_service_enabled($templateid, ENABLED_RDAP) != 0);
+}
 
 my $probe_times_ref = get_probe_times($month_from, $cycle_till, $probes_ref);
 
 my $tlds_ref;
 if (opt('tld'))
 {
-        fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-        $tlds_ref = [ getopt('tld') ];
+	$tlds_ref = [ getopt('tld') ];
 }
 else
 {
-        $tlds_ref = get_tlds(ENABLED_EPP);
+	$tlds_ref = get_tlds(ENABLED_RDDS_EPP);
 }
 
 if (opt('debug'))
@@ -105,7 +136,7 @@ while ($tld_index < $tld_count)
 		db_connect();
 
 		process_slv_monthly($tld, $month_from, $cycle_till, $value_ts, $delay, $probe_times_ref, $keys,
-			'EPP session-command RTT', \&check_item_value, \&max_tests);
+				'RDDS Update Time', \&check_item_value, \&max_tests);
 
 		exit(0);
 	}
@@ -134,6 +165,22 @@ sub check_item_value
 sub max_tests
 {
 	my $tests_performed = shift;
+	my $service = shift;
+
+	my $probe_count;;
+
+	if ($service eq 'RDDS43')
+	{
+		$probe_count = $rdds43_probe_count;
+	}
+	elsif ($service eq 'RDAP')
+	{
+		$probe_count = $rdap_probe_count;
+	}
+	else
+	{
+		fail("internal error: unkown service: \"$service\"");
+	}
 
 	return $tests_performed + ($left_cycles * $probe_count);
 }
