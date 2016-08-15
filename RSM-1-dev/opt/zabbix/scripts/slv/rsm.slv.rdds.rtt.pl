@@ -149,8 +149,6 @@ while ($tld_index < $tld_count)
 		# child
 		$tld = $tlds_ref->[$tld_index];
 
-		print("LAUNCHED PID $$ TO HANDLE TLD $tld (tld_index:$tld_index)\n");
-
 		db_connect();
 
 		process_slv_monthly($tld, $month_from, $cycle_till, $value_ts, $delay, $probe_times_ref, $keys,

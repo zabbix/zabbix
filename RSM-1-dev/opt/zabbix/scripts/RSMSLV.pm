@@ -4014,17 +4014,17 @@ sub get_downtime
 		$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
 	}
 
-	$downtime /= 60;	# minutes;
+	my $minutes = int($downtime / 60);
 
 	if (opt('stats'))
 	{
 		my $sec_cur = time() - $sec;
 		$sql_time += $sec_cur;
 
-		info(sprintf("down:%dm time:%.3fs fetches:%d", $downtime, $sec_cur, $fetches));
+		info(sprintf("down:%dm time:%.3fs fetches:%d", $minutes, $sec_cur, $fetches));
 	}
 
-	return $downtime;
+	return $minutes;
 }
 
 sub get_downtime_prepare
