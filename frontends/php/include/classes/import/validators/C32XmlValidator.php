@@ -255,6 +255,7 @@ class C32XmlValidator {
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -622,6 +623,7 @@ class C32XmlValidator {
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -787,6 +789,7 @@ class C32XmlValidator {
 					'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 					'description' =>			['type' => XML_STRING | XML_REQUIRED],
 					'type' =>					['type' => XML_STRING | XML_REQUIRED],
+					'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 						'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
