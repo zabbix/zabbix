@@ -1565,6 +1565,13 @@ static int	DBpatch_3010069(void)
 	return DBmodify_field_type("dchecks", &field);
 }
 
+static int	DBpatch_3010070(void)
+{
+	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dservices", &field);
+}
+
 
 #endif
 
@@ -1642,5 +1649,6 @@ DBPATCH_ADD(3010066, 0, 1)
 DBPATCH_ADD(3010067, 0, 1)
 DBPATCH_ADD(3010068, 0, 1)
 DBPATCH_ADD(3010069, 0, 1)
+DBPATCH_ADD(3010070, 0, 1)
 
 DBPATCH_END()
