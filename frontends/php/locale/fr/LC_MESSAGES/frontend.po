@@ -12835,7 +12835,7 @@ msgid "Search pattern is empty"
 msgstr "Expression de recherche vide"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter element limit"
+msgid "Limit for selected elements"
 msgstr "Limite d'éléments recherchés/filtrés"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
