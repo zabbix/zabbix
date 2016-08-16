@@ -3929,6 +3929,7 @@ static void	DCsync_corr_conditions(DB_RESULT result)
 		condition->type = type;
 		dc_corr_condition_init_data(condition, found, row + 3);
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->conditions, condition);
 	}
 
@@ -4014,6 +4015,7 @@ static void	DCsync_corr_operations(DB_RESULT result)
 		operation->correlationid = correlationid;
 		operation->type = type;
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->operations, operation);
 	}
 
