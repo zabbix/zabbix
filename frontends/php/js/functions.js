@@ -575,7 +575,7 @@ function overlayDialogue(params) {
 		}
 	})
 		.append(
-			jQuery('<span>', {
+			jQuery('<button>', {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
