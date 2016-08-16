@@ -5018,7 +5018,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "于所选的群组中启用调试模式?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "启用事件确认"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883

@@ -5119,7 +5119,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Povolit ladící mód pro vybrané skupiny?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Povolit potvrzování událostí"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883
