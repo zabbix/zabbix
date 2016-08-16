@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+        <meta name="msapplication-TileColor" content="#d40000">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+            <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title table">
+  <div class="cell"><h1>Dashboard</h1></div><div class="cell"<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div></div>
+		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+	<form>
+	<div class="table-forms-container">
+
+	<ul class="ui-tabs-nav"><li><a href="#">Host</a></li><li><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li class="ui-tabs-active"><a href="#">Host inventory</a></li></ul>
+
+		<ul class="table-forms">
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><!--<span class="radio-switch paging-selected">Disabled</span><span class="radio-switch">Manual</span><span class="radio-switch">Automatic</span>--><ul class="radio-segmented"><li><input type="radio" id="Disabled" checked><label for="Disabled">Disabled</label></li><li><input type="radio" id="Manual"><label for="Manual">Manual</label></li><li><input type="radio" id="Auto"><label for="Auto">Automatic</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Type</label></div><div class="table-forms-td-right"><div class="input-help-wrapper"><input type="text" id="HostName"><span class="help-icon"></span></div><div class="red">You can't leave this empty.</div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Type (full details)</label></div><div class="table-forms-td-right"><input type="text" id="HostName" disabled></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" disabled><div class="form-input-margin"></div><a href="">Host name</a></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Alias</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OS</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OS (full details)</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OS (short)</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Serial number A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Serial number B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Tag</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Asset tag</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">MAC address A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">MAC address B</label></div><div class="table-forms-td-right"><input type="text" id="HostName" style="width: 300px"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Hardware</label></div><div class="table-forms-td-right"><input type="text" id="HostName" style="width: 300px"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Hardware (full deatails)</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software (full deatails)</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software application A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software application B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software application C</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software application D</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Software application E</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Contact</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Location</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Location latitude</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Location longitude</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Notes</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Chasis</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Model</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">HW architecture</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Vendor</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Contact number</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Installer name</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Deployment status</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">URL A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">URL B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">URL C</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host networks</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host subnet mask</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host router</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OOB IP address</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OOB subnet mask</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">OOB router</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Date HW purchased</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Date HW installed</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Date HW maintenance expires</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Date HW decommissioned</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site address A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site address B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site address C</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site city</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site state/province</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site country</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site ZIP/postal</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site rack location</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Site notes</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC name</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC email</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Prmary POC phone A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC phone B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC cell</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC screen name</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Primary POC notes</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC name</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC email</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC phone A</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC phone B</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC cell</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC screen name</label></div><div class="table-forms-td-right"><input type="text" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Secondary POC notes</label></div><div class="table-forms-td-right"><textarea id="HostName"></textarea></div>
+		</li>
+		</ul>
+		<ul class="table-forms">
+		<li><div class="table-forms-td-left">&nbsp;</div><div class="table-forms-td-right tfoot-buttons"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></div>
+		</li>
+		</ul>
+	</div>
+	</form>
+	</div>
+	<div class="footer">
+	<!--<a href="http://www.zabbix.com" target="_blank" class="logo"></a>-->
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+</body>
+</html>
