@@ -1458,8 +1458,8 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 								"Invalid regular expression in the second parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity,
-							key_severity, ZBX_IGNORE_CASE)))
+					else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+							ZBX_IGNORE_CASE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the third parameter.");
@@ -1489,11 +1489,9 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 						ret = FAIL;
 						break;
 					}
-					else
-					{
-						match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
-								ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
-					}
+
+					match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
 				}
 				else
 				{
@@ -1509,9 +1507,9 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				if (1 == match)
 				{
-					send_err = process_value(server, port, CONFIG_HOSTNAME,
-							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize, NULL,
-							&timestamp, provider, &severity, &logeventid,
+					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
+							&severity, &logeventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 					if (SUCCEED == send_err)
@@ -1601,8 +1599,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 			{
 				int	ret1, ret2, ret3, ret4;
 
-				if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern,
-						ZBX_CASE_SENSITIVE)))
+				if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the second parameter.");
@@ -1622,8 +1619,8 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 							"Invalid regular expression in the fourth parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid,
-						key_logeventid, ZBX_CASE_SENSITIVE)))
+				else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+						ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the fifth parameter.");
@@ -1638,11 +1635,9 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 					ret = FAIL;
 					break;
 				}
-				else
-				{
-					match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
-							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
-				}
+
+				match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+						ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
 			}
 			else
 			{
