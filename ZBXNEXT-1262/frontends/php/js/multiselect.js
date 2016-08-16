@@ -1006,7 +1006,7 @@ jQuery(function($) {
 
 	function removeSubgroupPostfix(str) {
 		if (hasSubgroupPostfix(str)) {
-			str = str.slice(0, str.length - 2);
+			str = str.slice(0, -2);
 		}
 
 		return str;
