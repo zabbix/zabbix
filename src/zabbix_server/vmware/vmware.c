@@ -1837,14 +1837,14 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 #	define ZBX_POST_HV_DATACENTER_NAME									\
 		ZBX_POST_VSPHERE_HEADER										\
 			"<ns0:RetrieveProperties>"								\
-				"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"		\
+				"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
 				"<ns0:specSet>"									\
 					"<ns0:propSet>"								\
 						"<ns0:type>Datacenter</ns0:type>"				\
 						"<ns0:pathSet>name</ns0:pathSet>"				\
 					"</ns0:propSet>"							\
 					"<ns0:objectSet>"							\
-						"<ns0:obj type=\"HostSystem\">host-28</ns0:obj>"		\
+						"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
 						"<ns0:skip>false</ns0:skip>"					\
 						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
 							"<ns0:name>parentObject</ns0:name>"			\
@@ -1884,7 +1884,7 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 			"</ns0:RetrieveProperties>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vmware_service_get_hv_data";
+	const char	*__function_name = "vmware_hv_get_datacenter_name";
 
 	char		tmp[MAX_STRING_LEN];
 	int		err, opt, ret = FAIL;
