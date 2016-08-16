@@ -85,11 +85,11 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
-		$this->zbxTestInputType('name', $this->icon_image_name2);
+		$this->zbxTestInputTypeOverwrite('name', $this->icon_image_name2);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestCheckHeader('Images');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');;
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
@@ -98,8 +98,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_DeleteImage() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestClickLinkText($this->icon_image_name2);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickLinkTextWait($this->icon_image_name2);
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');
@@ -112,7 +112,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_AddBgImage() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestDropdownSelect('imagetype', 'Background');
+		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestInputType('name', $this->bg_image_name);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
