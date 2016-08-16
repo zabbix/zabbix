@@ -383,9 +383,9 @@ var CMessageList = Class.create({
 		$(this.dom.container).hide();
 
 		// close all
-		this.dom.container.close = document.createElement('span');
-		this.dom.container.close.className = 'overlay-close-btn';
+		this.dom.container.close = document.createElement('button');
 		this.dom.container.close.setAttribute('title', locale['S_CLEAR']);
+		this.dom.container.close.className = 'overlay-close-btn';
 		this.dom.container.appendChild(this.dom.container.close);
 
 		// header
