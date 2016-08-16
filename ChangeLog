@@ -5,6 +5,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Andris,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+........S. [ZBX-11093] fixed possible crash when copying cached correlation rules (wiper)
 ..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
 ..F....... [ZBX-11075] fixed host full clone with discovered items and discovered triggers (Cemeris)
 ..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
