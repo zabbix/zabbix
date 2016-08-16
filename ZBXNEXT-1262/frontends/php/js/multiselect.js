@@ -250,6 +250,14 @@ jQuery(function($) {
 				})
 				.attr('placeholder', options.labels['type here to search'])
 				.on('keyup change', function(e) {
+					switch (e.which) {
+						case KEY.ARROW_DOWN:
+						case KEY.ARROW_LEFT:
+						case KEY.ARROW_RIGHT:
+						case KEY.ARROW_UP:
+							return false;
+					}
+
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
 						return false;
@@ -261,6 +269,7 @@ jQuery(function($) {
 					}
 
 					var search = input.val();
+
 					if (!empty(search)) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
@@ -290,7 +299,7 @@ jQuery(function($) {
 											dataType: 'json',
 											cache: false,
 											data: {
-												search: values.search,
+												search: removeSubgroupPostfix(values.search),
 												limit: getLimit(values, options)
 											},
 											success: function(data) {
@@ -321,6 +330,14 @@ jQuery(function($) {
 
 								if (selected.length > 0) {
 									select(selected.data('id'), obj, values, options);
+								}
+								else {
+									// Try to select by search string if nothing was selected.
+									var search = removeSubgroupPostfix(values.search);
+
+									if (typeof(values.available_names[search]) !== 'undefined') {
+										select(values.available_names[search].id, obj, values, options);
+									}
 								}
 
 								// stop form submit
@@ -406,29 +423,61 @@ jQuery(function($) {
 
 						case KEY.ARROW_UP:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									prev = selected.prev();
+								var selected = $('.available li.suggest-hover', obj);
 
-								if (prev.length > 0) {
-									selected.removeClass('suggest-hover');
+								if (selected.length === 0) {
+									// Select lasts element.
+									var prev = $('ul.multiselect-suggest li:last-child', obj);
+
 									prev.addClass('suggest-hover');
+									$('input[type="text"]', obj).val(prev.attr('data-name'));
+								}
+								else {
+									selected.removeClass('suggest-hover');
+
+									var prev = selected.prev();
+
+									if (prev.length > 0) {
+										prev.addClass('suggest-hover');
+										$('input[type="text"]', obj).val(prev.attr('data-name'));
+									}
+									else {
+										// Select search input.
+										$('input[type="text"]', obj).val(values.search);
+									}
 								}
 
-								scrollAvailable(obj);
+								// Position cursor to the end of search input.
+								cancelEvent(e);
+								$('input[type="text"]', obj).focus();
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									next = selected.next();
+								var selected = $('.available li.suggest-hover', obj);
 
-								if (next.length > 0) {
-									selected.removeClass('suggest-hover');
+								if (selected.length === 0) {
+									// Select first element.
+									var next = $('ul.multiselect-suggest li:first-child', obj);
+
+									$('input[type="text"]', obj).val(next.attr('data-name'));
 									next.addClass('suggest-hover');
 								}
+								else {
+									selected.removeClass('suggest-hover');
 
-								scrollAvailable(obj);
+									var next = selected.next();
+
+									if (next.length > 0) {
+										next.addClass('suggest-hover');
+										$('input[type="text"]', obj).val(next.attr('data-name'));
+									}
+									else {
+										// Select search input.
+										$('input[type="text"]', obj).val(values.search);
+									}
+								}
 							}
 							break;
 
@@ -598,6 +647,7 @@ jQuery(function($) {
 							&& typeof values.selected[item.id] === 'undefined'
 							&& typeof values.ignored[item.id] === 'undefined') {
 						values.available[item.id] = item;
+						values.available_names[item.name] = item;
 					}
 				}
 				else {
@@ -668,6 +718,15 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
+			if (hasSubgroupPostfix(item.name)) {
+				// Add hidden input.
+				obj.append($('<input>', {
+					type: 'hidden',
+					name: options.name.slice(0, -2) + '_subgroups[]',
+					value: item.id
+				}));
+			}
+
 			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
 			});
@@ -678,6 +737,8 @@ jQuery(function($) {
 				});
 			}
 
+			var postfix = '';
+
 			var li = $('<li>', {
 				'data-id': item.id
 			}).append(
@@ -685,7 +746,7 @@ jQuery(function($) {
 					'class': 'subfilter-enabled'
 				})
 					.append($('<span>', {
-						text: prefix + item.name
+						text: prefix + item.name + postfix
 					}))
 					.append(close_btn)
 			);
@@ -724,7 +785,8 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
-			'data-id': item.id
+			'data-id': item.id,
+			'data-name': item.name
 		})
 		.click(function() {
 			select(item.id, obj, values, options);
@@ -777,7 +839,20 @@ jQuery(function($) {
 
 	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			var search = removeSubgroupPostfix(values.search);
+
+			if (typeof(values.available_names[search]) !== 'undefined') {
+				var tmp_item = values.available_names[search];
+
+				// Copy search string to name in case it has subgroups postfix.
+				tmp_item.name = values.search;
+
+				addSelected(tmp_item, obj, values, options);
+			}
+			else {
+				addSelected(values.available[id], obj, values, options);
+			}
+
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
@@ -799,21 +874,6 @@ jQuery(function($) {
 
 		available.fadeIn(0);
 		available.scrollTop(0);
-
-		if (objectLength(values.available) != 0) {
-			// remove selected item selected state
-			if ($('.selected li.selected', obj).length > 0) {
-				$('.selected li.selected', obj).removeClass('selected');
-			}
-
-			// pre-select first available
-			if ($('li', available).length > 0) {
-				if ($('li.suggest-hover', available).length > 0) {
-					$('li.suggest-hover', available).removeClass('suggest-hover');
-				}
-				$('li:first-child', available).addClass('suggest-hover');
-			}
-		}
 	}
 
 	function hideAvailable(obj) {
@@ -824,6 +884,7 @@ jQuery(function($) {
 		$('.multiselect-matches', obj).remove();
 		$('.available ul', obj).remove();
 		values.available = {};
+		values.available_names = {};
 		values.isMoreMatchesFound = false;
 	}
 
@@ -941,5 +1002,21 @@ jQuery(function($) {
 		}
 
 		return length;
+	}
+
+	function removeSubgroupPostfix(str) {
+		if (hasSubgroupPostfix(str)) {
+			str = str.slice(0, str.length - 2);
+		}
+
+		return str;
+	}
+
+	function hasSubgroupPostfix(str) {
+		if ('/*' === str.slice(-2)) {
+			return true;
+		}
+
+		return false;
 	}
 });
