@@ -17,21 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SNMP_H
-#define ZABBIX_CHECKS_SNMP_H
+#ifndef ZABBIX_TASKMANAGER_H
+#define ZABBIX_TASKMANAGER_H
 
-#include "common.h"
-#include "log.h"
-#include "dbcache.h"
-#include "sysinfo.h"
+#include "threads.h"
 
-extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
-
-#ifdef HAVE_NETSNMP
-void	zbx_init_snmp(void);
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
-#endif
+ZBX_THREAD_ENTRY(taskmanager_thread, args);
 
 #endif

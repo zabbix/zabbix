@@ -79,7 +79,8 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		zbx_process_triggers(&trigger_order, &trigger_diff);
 
-		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids)))
+		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids,
+				ZBX_EVENTS_PROCESS_CORRELATION)))
 		{
 			*events_count += events_num;
 

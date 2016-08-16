@@ -349,7 +349,7 @@ function make_system_status($filter, $backurl) {
 		$eventAcknowledges = API::Event()->get([
 			'output' => ['eventid'],
 			'eventids' => $eventIds,
-			'select_acknowledges' => ['eventid', 'clock', 'message', 'alias', 'name', 'surname'],
+			'select_acknowledges' => ['eventid', 'clock', 'message', 'action', 'alias', 'name', 'surname'],
 			'preservekeys' => true
 		]);
 	}
