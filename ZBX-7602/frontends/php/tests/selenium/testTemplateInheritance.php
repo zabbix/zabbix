@@ -496,8 +496,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('form');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph');
-		$this->zbxTestInputType('width', '950');
-		$this->zbxTestInputType('height', '250');
+		$this->zbxTestInputTypeOverwrite('width', '950');
+		$this->zbxTestInputTypeOverwrite('height', '250');
+		if ('250' != $this->zbxTestGetValue("//input[@id='height']")) {
+				$this->zbxTestInputTypeOverwrite('height', '250');
+		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);

@@ -6597,7 +6597,7 @@ msgid "Hosts in maintenance"
 msgstr "میزبا در دست نگه داری"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "اطلاعات هاست"
 
 #: include/views/monitoring.overview.items.php:50
@@ -13979,11 +13979,11 @@ msgid "This month"
 msgstr "این ماه"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr ""
 
 #: srv_status.php:35
@@ -14418,16 +14418,16 @@ msgstr ""
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "اطلاعات هشدارها"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "نمای کلی هشدارها"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "وضعیت هشدارها"
 
 #: include/menu.inc.php:159

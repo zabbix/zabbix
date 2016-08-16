@@ -6659,8 +6659,8 @@ msgid "Hosts in maintenance"
 msgstr "Hosts in maintenance"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
-msgstr "Hosts info"
+msgid "Host info"
+msgstr "Host info"
 
 #: include/views/monitoring.overview.items.php:50
 #: include/views/monitoring.overview.triggers.php:84
@@ -14060,12 +14060,12 @@ msgid "This month"
 msgstr "This month"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
-msgstr "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
+msgstr "This screen column is not empty. Delete it?"
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
-msgstr "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
+msgstr "This screen row is not empty. Delete it?"
 
 #: srv_status.php:35
 msgid "This week"
@@ -14503,17 +14503,17 @@ msgstr "Triggers deleted"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
-msgstr "Triggers info"
+msgid "Trigger info"
+msgstr "Trigger info"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
-msgstr "Triggers overview"
+msgid "Trigger overview"
+msgstr "Trigger overview"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
-msgstr "Triggers status"
+msgid "Trigger status"
+msgstr "Trigger status"
 
 #: include/menu.inc.php:159
 msgid "Triggers top 100"

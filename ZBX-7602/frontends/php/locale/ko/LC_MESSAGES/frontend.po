@@ -6602,7 +6602,7 @@ msgid "Hosts in maintenance"
 msgstr "메인터넌스 대상 호스트"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "호스트 정보"
 
 #: include/views/monitoring.overview.items.php:50
@@ -13984,11 +13984,11 @@ msgid "This month"
 msgstr "이번 달"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "스크린의 열은 공백이 아닙니다. 삭제합니까?"
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "스크린의 행은 공백이 아닙니다. 삭제합니까?"
 
 #: srv_status.php:35
@@ -14423,16 +14423,16 @@ msgstr "트리거를 삭제하였습니다"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "트리거 정보"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "트리거 개요"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "트리거의 상태"
 
 #: include/menu.inc.php:159
