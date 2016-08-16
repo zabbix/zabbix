@@ -14083,12 +14083,12 @@ msgid "This month"
 msgstr "Αυτό το μήνα"
 
 #: include/classes/screens/CScreenBuilder.php:614
-msgid "This screen-column is not empty. Delete it?"
-msgstr "Αυτή η στήλη-οθόνης δεν είναι κενή. Να διαγραφεί;"
+msgid "This screen column is not empty. Delete it?"
+msgstr "Αυτή η στήλη οθόνης δεν είναι κενή. Να διαγραφεί;"
 
 #: include/classes/screens/CScreenBuilder.php:568
-msgid "This screen-row is not empty. Delete it?"
-msgstr "Αυτή η γραμμή-οθόνης δεν είναι κενή. Να διαγραφεί;"
+msgid "This screen row is not empty. Delete it?"
+msgstr "Αυτή η γραμμή οθόνης δεν είναι κενή. Να διαγραφεί;"
 
 #: srv_status.php:35
 msgid "This week"
