@@ -5075,7 +5075,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Seçilen gruplarda hata ayıklama modu etkinleştirilsin mi?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Olay onaylarını etkinleştir"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883

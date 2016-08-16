@@ -5069,7 +5069,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Ativar modo depuração nos grupos selecionados?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Ativar reconhecimento dos eventos"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883

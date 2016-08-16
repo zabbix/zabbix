@@ -5082,7 +5082,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Активиране на режим отстраняване на грешки в избраните групи?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Активиране потвърждаване на събитие"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883

@@ -5066,8 +5066,8 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Enable debug mode in selected groups?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
-msgstr "Enable event acknowledges"
+msgid "Enable event acknowledgement"
+msgstr "Enable event acknowledgement"
 
 #: include/actions.inc.php:602 include/actions.inc.php:883
 msgid "Enable host"
