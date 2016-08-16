@@ -5,6 +5,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Andris,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
 ..F....... [ZBX-11075] fixed host full clone with discovered items and discovered triggers (Cemeris)
 ..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
 ........S. [ZBX-3101] fixed EVENT macro processing in recovery operations (wiper)
@@ -55,6 +56,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
 ..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
