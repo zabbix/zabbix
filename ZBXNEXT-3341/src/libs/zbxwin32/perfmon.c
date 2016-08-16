@@ -250,12 +250,40 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 	return counterName->name;
 }
 
+static void	zbx_map_instance_name(wchar_t *wptr, int *modified)
+{
+	if (NULL == wptr)
+		return;
+
+	for (; L'\0' != *wptr; wptr++)
+	{
+		switch (*wptr)
+		{
+			case L'(':
+				*wptr = L'[';
+				break;
+			case L')':
+				*wptr = L']';
+				break;
+			case L'#':
+			case L'\\':
+			case L'/':
+				*wptr = L'_';
+				break;
+			default:
+				continue;
+		}
+
+		*modified = 1;
+	}
+}
+
 int	check_counter_path(char *counterPath)
 {
 	const char			*__function_name = "check_counter_path";
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
-	int				is_numeric, ret = FAIL;
+	int				path_modified = 0, ret = FAIL;
 	DWORD				dwSize = 0;
 	wchar_t				*wcounterPath;
 
@@ -280,16 +308,22 @@ int	check_counter_path(char *counterPath)
 		goto clean;
 	}
 
-	is_numeric = (SUCCEED == _wis_uint(cpe->szObjectName) ? 0x01 : 0);
-	is_numeric |= (SUCCEED == _wis_uint(cpe->szCounterName) ? 0x02 : 0);
-
-	if (0 != is_numeric)
+	if (SUCCEED == _wis_uint(cpe->szObjectName))
 	{
-		if (0x01 & is_numeric)
-			cpe->szObjectName = get_counter_name(_wtoi(cpe->szObjectName));
-		if (0x02 & is_numeric)
-			cpe->szCounterName = get_counter_name(_wtoi(cpe->szCounterName));
+		cpe->szObjectName = get_counter_name(_wtoi(cpe->szObjectName));
+		path_modified = 1;
+	}
 
+	if (SUCCEED == _wis_uint(cpe->szCounterName))
+	{
+		cpe->szCounterName = get_counter_name(_wtoi(cpe->szCounterName));
+		path_modified = 1;
+	}
+
+	zbx_map_instance_name(cpe->szInstanceName, &path_modified);
+
+	if (0 != path_modified)
+	{
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, cpe, counterPath))
 			goto clean;
 
