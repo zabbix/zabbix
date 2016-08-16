@@ -1757,7 +1757,6 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
 					"<ns0:pathSet>name</ns0:pathSet>"			\
-					"<ns0:pathSet>overallStatus</ns0:pathSet>"		\
 					"<ns0:pathSet>vm</ns0:pathSet>"				\
 					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
 					"<ns0:pathSet>summary.config</ns0:pathSet>"		\
