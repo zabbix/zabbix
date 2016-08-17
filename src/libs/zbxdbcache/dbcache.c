@@ -1198,8 +1198,6 @@ notsupported:
 			update_cache = 1;
 		}
 
-		DCadd_nextcheck(item->itemid, &h->ts, h->value_orig.err);
-
 		if (0 != update_cache)
 			DCconfig_set_item_db_state(item->itemid, h->state, h->value_orig.err);
 	}
@@ -2162,7 +2160,6 @@ int	DCsync_history(int sync_type, int *total_num)
 			DCmass_add_history(history, history_num);
 			DCmass_update_triggers(history, history_num, &trigger_diff);
 			DCmass_update_trends(history, history_num);
-			DCflush_nextchecks(&trigger_diff);
 
 			/* processing of events, generated in functions: */
 			/*   DCmass_update_items() */
