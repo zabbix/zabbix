@@ -3962,14 +3962,14 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->num_data);
 
-	itemids = zbx_malloc(itemids, ifuncs->num_data * sizeof(zbx_uint64_t));
+	itemids = zbx_malloc(itemids, (size_t)ifuncs->num_data * sizeof(zbx_uint64_t));
 
 	zbx_hashset_iter_reset(ifuncs, &iter);
 	for (i = 0; NULL != (ifunc = zbx_hashset_iter_next(&iter)); i++)
 		itemids[i] = ifunc->itemid;
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->num_data);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->num_data);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)ifuncs->num_data);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)ifuncs->num_data);
 
 	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->num_data);
 
@@ -4331,7 +4331,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		}
 
 		/* trigger expression evaluates to true, set PROBLEM value */
-		if (SUCCEED != zbx_double_compare(expr_result, 0))
+		if (SUCCEED != zbx_double_compare(expr_result, 0.0))
 		{
 			tr->new_value = TRIGGER_VALUE_PROBLEM;
 			continue;
@@ -4354,7 +4354,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 				continue;
 			}
 
-			if (SUCCEED != zbx_double_compare(expr_result, 0))
+			if (SUCCEED != zbx_double_compare(expr_result, 0.0))
 			{
 				tr->new_value = TRIGGER_VALUE_OK;
 				continue;
@@ -4365,18 +4365,21 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		tr = (DC_TRIGGER *)triggers->values[i];
-
-		if (NULL != tr->new_error)
+		for (i = 0; i < triggers->values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
-					__function_name, tr->expression, tr->new_error);
-		}
-	}
+			tr = (DC_TRIGGER *)triggers->values[i];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+			if (NULL != tr->new_error)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
+						__function_name, tr->expression, tr->new_error);
+			}
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	}
 }
 
 /******************************************************************************
