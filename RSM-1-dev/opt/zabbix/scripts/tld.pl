@@ -1033,8 +1033,11 @@ sub create_all_slv_ns_items {
         $applications->{$hostid}->{APP_SLV_PARTTEST} = get_application_id(APP_SLV_PARTTEST, $hostid)
     }
 
-    create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+    my $slv_dns_ns_avail = create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
+    my $slv_dns_ns_downtime = create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+    create_graph('DNS NS Availability - ['.$ns_name.', '.$ip.'] Accumulated minutes of downtime', [{'itemid' => $slv_dns_ns_downtime, 'hostid' => $hostid}]);
+    create_graph('DNS NS Availability - ['.$ns_name.', '.$ip.'] UP/DOWN', [{'itemid' => $slv_dns_ns_avail, 'hostid' => $hostid}]);
 
     my $options = {
 	    'description' => 'Name Server '.$ns_name.' ('.$ip.') has been down for over {$RSM.SLV.NS.AVAIL} minutes',
@@ -1043,6 +1046,8 @@ sub create_all_slv_ns_items {
     };
 
     create_trigger($options);
+
+    return $slv_dns_ns_downtime;
 }
 
 sub create_slv_ns_items {
@@ -1050,14 +1055,24 @@ sub create_slv_ns_items {
     my $host_name = shift;
     my $hostid = shift;
 
+    my @slv_dns_ns_downtime_itemids;
+
     foreach my $ns_name (sort keys %{$ns_servers}) {
 	foreach my $ipv (keys %{$ns_servers->{$ns_name}}) {
 	    my $ip_list = $ns_servers->{$ns_name}->{$ipv};
 
 	    foreach my $ip (@{$ip_list}) {
-		create_all_slv_ns_items($ns_name, $ip, $host_name, $hostid);
+		my $slv_dns_ns_downtime = create_all_slv_ns_items($ns_name, $ip, $host_name, $hostid);
+
+		push(@slv_dns_ns_downtime_itemids, $slv_dns_ns_downtime);
 	    }
 	}
+    }
+
+    if (scalar(@slv_dns_ns_downtime_itemids) != 0)
+    {
+	create_graph('DNS NS Availability - Accumulated minutes of downtime',
+	    [map {{'itemid' => $_, 'hostid' => $hostid}} (@slv_dns_ns_downtime_itemids)]);
     }
 }
 
@@ -1081,7 +1096,10 @@ sub create_slv_items {
     }
 
     create_slv_item('DNS availability', 'rsm.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+    my $slv_dns_downtime = create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM,
+        [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+    create_graph('DNS Service Availability - Accumulated minutes of downtime', [{ 'itemid' => $slv_dns_downtime, 'hostid' => $hostid }]);
 
     my $item_key = 'rsm.slv.dns.downtime';
 
@@ -1185,8 +1203,10 @@ sub create_slv_items {
 	{
 		create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL,
 				[$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-		create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM,
-				[$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+		my $rsm_slv_rdds_downtime = create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid,
+				VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+		create_graph('RDDS Service Availability - Accumulated minutes of downtime', [{'itemid' => $rsm_slv_rdds_downtime, 'hostid' => $hostid}]);
 
 		# NB! Configuration trigger that is used in PHP and C code to detect incident!
 		# priority must be set to 0!
@@ -1261,10 +1281,12 @@ sub create_slv_epp_items($$)
 
 	create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL,
 			[$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-	create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM,
-			[$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 	create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC,
 			[$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
+
+	my $rsm_slv_epp_downtime = create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid,
+			VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+	create_graph('EPP Service Availability - Accumulated minutes of downtime', [{'itemid' => $rsm_slv_epp_downtime, 'hostid' => $hostid}]);
 
 	create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $host_name,
 			'{$RSM.SLV.EPP.LOGIN}');
@@ -2161,13 +2183,17 @@ sub create_slv_monthly($$$$$)
 
     my $applicationid = $applications->{$hostid}->{APP_SLV_MONTHLY};
 
-    create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC,   [$applicationid]);
-    create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,    [$applicationid]);
-    create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,    [$applicationid]);
-    create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
+    my $pfailed_item = create_slv_item($test_name.': % of failed tests', $key_base.'.pfailed', $hostid, VALUE_TYPE_PERC, [$applicationid]);
+    create_slv_item($test_name.': # of failed tests', $key_base.'.failed', $hostid, VALUE_TYPE_NUM, [$applicationid]);
+    create_slv_item($test_name.': expected # of tests', $key_base.'.max', $hostid, VALUE_TYPE_NUM, [$applicationid]);
+    my $avg_item = create_slv_item($test_name.': average cycle result', $key_base.'.avg', $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
+
+    create_graph($test_name.' - Average', [{'itemid' => $avg_item, 'hostid' => $hostid}]);
 
     if ($host_name)
     {
+	    create_graph($test_name.' - Ratio of Failed tests', [{'itemid' => $pfailed_item, 'hostid' => $hostid}]);
+
 	    my $options = {
 		    'description' => $test_name . ' < ' . $macro . '%',
 		    'expression' => '{'.$host_name.':'.$key_base.'.pfailed.last(0)}<'.$macro,
