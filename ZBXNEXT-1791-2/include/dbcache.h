@@ -406,10 +406,10 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
-void	dc_flush_history();
+void	dc_flush_history(void);
 int	DCsync_history(int sync_type, int *sync_num);
-void	init_database_cache();
-void	free_database_cache();
+void	init_database_cache(void);
+void	free_database_cache(void);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -453,7 +453,7 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
-void	DCconfig_unlock_all_triggers();
+void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num,
 		unsigned char expand);
@@ -546,7 +546,7 @@ void	zbx_config_clean(zbx_config_t *cfg);
 int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
-void	DCupdate_hosts_availability();
+void	DCupdate_hosts_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
 void	zbx_action_eval_free(zbx_action_eval_t *action);

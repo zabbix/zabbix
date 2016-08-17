@@ -805,7 +805,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_trends()
+static void	DCsync_trends(void)
 {
 	const char		*__function_name = "DCsync_trends";
 	zbx_hashset_iter_t	iter;
@@ -1073,7 +1073,7 @@ static void	DCcalculate_item_delta_uint64(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 	}
 }
 
-zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM *item, ZBX_DC_HISTORY *h)
+static zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM *item, ZBX_DC_HISTORY *h)
 {
 	zbx_item_history_value_t	*deltaitem;
 
@@ -2283,7 +2283,7 @@ static void	dc_string_buffer_realloc(size_t len)
 	string_values = zbx_realloc(string_values, string_values_alloc);
 }
 
-static dc_item_value_t	*dc_local_get_history_slot()
+static dc_item_value_t	*dc_local_get_history_slot(void)
 {
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
 		dc_flush_history();
@@ -2600,7 +2600,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	}
 }
 
-void	dc_flush_history()
+void	dc_flush_history(void)
 {
 	if (0 == item_values_num)
 		return;
@@ -3254,7 +3254,7 @@ static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num)
 
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
-static void	init_trend_cache()
+static void	init_trend_cache(void)
 {
 	const char	*__function_name = "init_trend_cache";
 	key_t		trend_shm_key;
@@ -3304,7 +3304,7 @@ static void	init_trend_cache()
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	init_database_cache()
+void	init_database_cache(void)
 {
 	const char	*__function_name = "init_database_cache";
 	key_t		hc_shm_key, hc_index_shm_key;
@@ -3370,7 +3370,7 @@ void	init_database_cache()
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all()
+static void	DCsync_all(void)
 {
 	int	sync_num;
 
@@ -3392,7 +3392,7 @@ static void	DCsync_all()
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	free_database_cache()
+void	free_database_cache(void)
 {
 	const char	*__function_name = "free_database_cache";
 
@@ -3502,7 +3502,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  *          on interfaces without enabled items                               *
  *                                                                            *
  ******************************************************************************/
-void	DCupdate_hosts_availability()
+void	DCupdate_hosts_availability(void)
 {
 	const char		*__function_name = "DCupdate_hosts_availability";
 	zbx_vector_ptr_t	hosts;
