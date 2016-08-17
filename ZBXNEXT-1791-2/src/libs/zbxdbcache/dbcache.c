@@ -104,7 +104,7 @@ typedef struct
 	unsigned char	keep_trends;
 	unsigned char	state;
 }
-ZBX_DC_HISTORY;
+ZBX_DC_HISTORY;		/* structure for copying data about one item from history cache to temporary array */
 
 typedef struct
 {
@@ -862,8 +862,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * history_num);
-	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * history_num);
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
+	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1105,7 +1105,7 @@ zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM 
  * Purpose: 1) generate sql for updating item in database                     *
  *          2) calculate item delta value                                     *
  *          3) add events (item supported/not supported)                      *
- *          4) update cache (requeue item, add nextcheck)                     *
+ *          4) update cache (requeue item)                                    *
  *                                                                            *
  * Parameters: item - [IN/OUT] item reference                                 *
  *             h    - [IN/OUT] a reference to history cache value             *
@@ -1314,17 +1314,16 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	const char		*__function_name = "DCmass_update_items";
 
 	size_t			sql_offset = 0;
-	ZBX_DC_HISTORY		*h;
 	zbx_vector_uint64_t	ids;
 	DC_ITEM			*items = NULL;
-	int			i, j, *errcodes = NULL;
+	int			i, *errcodes = NULL;
 	zbx_hashset_t		delta_history = {NULL};
 	zbx_vector_ptr_t	inventory_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * history_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * history_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)history_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)history_num);
 	zbx_hashset_create(&delta_history, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&inventory_values);
@@ -1345,6 +1344,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
+		ZBX_DC_HISTORY	*h;
+		int		j;
+
 		if (SUCCEED != errcodes[i])
 			continue;
 
@@ -2060,7 +2062,10 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 int	DCsync_history(int sync_type, int *total_num)
 {
 	const char		*__function_name = "DCsync_history";
-	static ZBX_DC_HISTORY	*history = NULL;
+
+	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history cache are */
+							/* copied into to process triggers, trends etc and finally */
+							/* write into db */
 	int			history_num, candidate_num, next_sync = 0;
 	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
@@ -2132,13 +2137,13 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		LOCK_CACHE;
 
-		hc_pop_items(&history_items);
+		hc_pop_items(&history_items);		/* select and take items out of history cache */
 
 		if (0 != history_items.values_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
 
-			/* there are unavailable items, push them back in history queue */
+			/* if there are unavailable items, push them back in history queue */
 			if (history_num != history_items.values_num)
 				hc_push_busy_items(&history_items);
 		}
@@ -2150,7 +2155,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		if (0 == history_num)
 			break;
 
-		hc_get_item_values(history, &history_items);
+		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
 		DBbegin();
 
@@ -2186,7 +2191,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		LOCK_CACHE;
 
-		next_sync = hc_push_processed_items(&history_items);
+		next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
 		cache->history_num -= history_num;
 
 		UNLOCK_CACHE;
