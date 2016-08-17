@@ -34,6 +34,7 @@ a {
 	}
 
 	&:hover {
+		outline: 0;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
@@ -45,6 +46,7 @@ a {
 	}
 
 	&:active {
+		outline: 0;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
