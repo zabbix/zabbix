@@ -1314,7 +1314,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	const char		*__function_name = "DCmass_update_items";
 
 	size_t			sql_offset = 0;
-	zbx_vector_uint64_t	ids;
+	zbx_vector_uint64_t	itemids;
 	DC_ITEM			*items = NULL;
 	int			i, *errcodes = NULL;
 	zbx_hashset_t		delta_history = {NULL};
@@ -1327,18 +1327,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_hashset_create(&delta_history, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&inventory_values);
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, history_num);
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_reserve(&itemids, history_num);
 
 	for (i = 0; i < history_num; i++)
-		zbx_vector_uint64_append(&ids, history[i].itemid);
+		zbx_vector_uint64_append(&itemids, history[i].itemid);
 
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DCconfig_get_items_by_itemids(items, ids.values, errcodes, history_num);
-	DCget_delta_items(&delta_history, &ids);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
+	DCget_delta_items(&delta_history, &itemids);
 
-	zbx_vector_uint64_clear(&ids);	/* item ids that are not disabled and not deleted in DB */
+	zbx_vector_uint64_clear(&itemids);	/* item ids that are not disabled and not deleted in DB */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1382,7 +1382,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		DCinventory_value_add(&inventory_values, &items[i], h);
 
-		zbx_vector_uint64_append(&ids, items[i].itemid);
+		zbx_vector_uint64_append(&itemids, items[i].itemid);
 	}
 
 	zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1395,11 +1395,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	/* disable processing of deleted and disabled items by setting ZBX_DC_FLAG_UNDEF flag */
 	for (i = 0; i < history_num; i++)
 	{
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_bsearch(&itemids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			history[i].flags |= ZBX_DC_FLAG_UNDEF;
 	}
 
-	zbx_vector_uint64_destroy(&ids);
+	zbx_vector_uint64_destroy(&itemids);
 
 	DCset_delta_items(&delta_history);
 
