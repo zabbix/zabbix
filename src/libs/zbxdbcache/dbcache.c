@@ -214,7 +214,7 @@ static size_t		string_values_alloc = 0, string_values_offset = 0;
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
 
-static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num);
+static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
 static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
@@ -2951,25 +2951,25 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
  *                                                                            *
  * Purpose: adds item values to the history cache                             *
  *                                                                            *
- * Parameters: item_values      - [IN] the item values to add                 *
- *             item_values_num  - [IN] the number of item values to add       *
+ * Parameters: values     - [IN] the item values to add                       *
+ *             values_num - [IN] the number of item values to add             *
  *                                                                            *
  * Comments: If the history cache is full this function will wait until       *
  *           history syncers processes values freeing enough space to store   *
  *           the new value.                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num)
+static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 {
 	dc_item_value_t	*item_value;
 	int		i;
 	zbx_hc_item_t	*item;
 
-	for (i = 0; i < item_values_num; i++)
+	for (i = 0; i < values_num; i++)
 	{
 		zbx_hc_data_t	*data = NULL;
 
-		item_value = &item_values[i];
+		item_value = &values[i];
 
 		while (SUCCEED != hc_clone_history_data(&data, item_value))
 		{
