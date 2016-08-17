@@ -154,7 +154,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 	}
 
 	/* iterate through address numbers (bit groups) */
-	for (index = 0; ptr < end && index <= 4; address = ptr + 1)
+	for (index = 0; ptr < end && index < 4; address = ptr + 1)
 	{
 		if (NULL == (ptr = strchr(address, '.')))
 			ptr = end;
@@ -245,7 +245,7 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 	}
 
 	/* iterate through address numbers (bit groups) */
-	for (index = 0; ptr < end && index <= 8; address = ptr + 1)
+	for (index = 0; ptr < end && index < 8; address = ptr + 1)
 	{
 		if (NULL == (ptr = strchr(address, ':')))
 			ptr = end;
