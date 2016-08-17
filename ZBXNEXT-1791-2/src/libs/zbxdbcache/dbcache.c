@@ -366,10 +366,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock, inserts_num = 0, ids_alloc, ids_num = 0, trends_to = *trends_num;
+	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
-	zbx_uint64_t	*ids = NULL, itemid;
+	zbx_uint64_t	*itemids = NULL, itemid;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 	zbx_db_insert_t	db_insert;
@@ -391,8 +391,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			assert(0);
 	}
 
-	ids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+	itemids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
+	itemids = zbx_malloc(itemids, itemids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
 	{
@@ -406,16 +406,16 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (0 != trend->disable_from)
 			continue;
 
-		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
+		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 
-		if (ZBX_HC_SYNC_MAX == ids_num)
+		if (ZBX_HC_SYNC_MAX == itemids_num)
 		{
 			trends_to = i + 1;
 			break;
 		}
 	}
 
-	if (0 != ids_num)
+	if (0 != itemids_num)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -424,20 +424,20 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				" where clock>=%d and",
 				table_name, clock);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
-			uint64_array_remove(ids, &ids_num, &itemid, 1);
+			uint64_array_remove(itemids, &itemids_num, &itemid, 1);
 		}
 		DBfree_result(result);
 
-		while (0 != ids_num)
+		while (0 != itemids_num)
 		{
-			itemid = ids[--ids_num];
+			itemid = itemids[--itemids_num];
 
 			for (i = 0; i < trends_to; i++)
 			{
@@ -465,10 +465,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (0 != trend->disable_from && trend->disable_from <= clock)
 			continue;
 
-		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
+		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 	}
 
-	if (0 != ids_num)
+	if (0 != itemids_num)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -477,7 +477,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				" where clock=%d and",
 				table_name, clock);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
 		result = DBselect("%s", sql);
 
@@ -580,7 +580,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			DBexecute("%s", sql);
 	}
 
-	zbx_free(ids);
+	zbx_free(itemids);
 
 	/* if 'trends' is not a primary trends buffer */
 	if (0 != update_cache)
