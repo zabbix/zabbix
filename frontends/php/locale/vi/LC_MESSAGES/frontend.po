@@ -6612,7 +6612,7 @@ msgid "Hosts in maintenance"
 msgstr "Host trong bảo trì"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Thông tin các host"
 
 #: include/views/monitoring.overview.items.php:50
@@ -13997,11 +13997,11 @@ msgid "This month"
 msgstr "Tháng này"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "Cột screen này không được để trống. Xóa nó?"
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "Hàng screen này không được để trống. Xóa chúng?"
 
 #: srv_status.php:35
@@ -14436,16 +14436,16 @@ msgstr "Các trigger đã bị xóa"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Thông tin các trigger"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Tổng quan các trigger"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Trạng thái các trigger"
 
 #: include/menu.inc.php:159

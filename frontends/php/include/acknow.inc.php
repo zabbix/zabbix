@@ -36,23 +36,25 @@ function get_last_event_by_triggerid($triggerId) {
 /**
  * Get acknowledgement table.
  *
- * @param array $acknowledges
- * @param array $acknowledges['clock']
- * @param array $acknowledges['alias']
- * @param array $acknowledges['name']
- * @param array $acknowledges['surname']
- * @param array $acknowledges['message']
+ * @param array  $acknowledges
+ * @param string $acknowledges[]['clock']
+ * @param string $acknowledges[]['alias']
+ * @param string $acknowledges[]['name']
+ * @param string $acknowledges[]['surname']
+ * @param string $acknowledges[]['message']
+ * @param string $acknowledges[]['action']
  *
  * @return CTableInfo
  */
 function makeAckTab($acknowledges) {
-	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message'), _('User action')]);
 
 	foreach ($acknowledges as $acknowledge) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
 			getUserFullname($acknowledge),
-			zbx_nl2br($acknowledge['message'])
+			zbx_nl2br($acknowledge['message']),
+			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
 		]);
 	}
 

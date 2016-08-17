@@ -3929,6 +3929,7 @@ static void	DCsync_corr_conditions(DB_RESULT result)
 		condition->type = type;
 		dc_corr_condition_init_data(condition, found, row + 3);
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->conditions, condition);
 	}
 
@@ -4014,14 +4015,15 @@ static void	DCsync_corr_operations(DB_RESULT result)
 		operation->correlationid = correlationid;
 		operation->type = type;
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->operations, operation);
 	}
 
-	/* remove deleted correlation oeprations */
+	/* remove deleted correlation operations */
 
 	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_iter_reset(&config->corr_conditions, &iter);
+	zbx_hashset_iter_reset(&config->corr_operations, &iter);
 
 	while (NULL != (operation = zbx_hashset_iter_next(&iter)))
 	{
@@ -4728,6 +4730,13 @@ void	DCsync_configuration(void)
 			config->actions.num_data, config->actions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __function_name,
 			config->action_conditions.num_data, config->action_conditions.num_slots);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __function_name,
+			config->correlations.num_data, config->correlations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __function_name,
+			config->corr_conditions.num_data, config->corr_conditions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
+			config->corr_operations.num_data, config->corr_operations.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{

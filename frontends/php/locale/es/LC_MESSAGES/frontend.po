@@ -6673,7 +6673,7 @@ msgid "Hosts in maintenance"
 msgstr ""
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Información de los equipos"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14075,11 +14075,11 @@ msgid "This month"
 msgstr "Este mes"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr ""
 
 #: srv_status.php:35
@@ -14518,16 +14518,16 @@ msgstr "Iniciadores eliminados"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Información de los iniciadores"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Vistazo general de los iniciadores"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr ""
 
 #: include/menu.inc.php:159

@@ -60,6 +60,12 @@ $fields = [
 	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+													]),
+													null
+												],
 	// filter
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -216,6 +222,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$comments = getRequest('comments', '');
 	$correlation_mode = getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
 	$correlation_tag = getRequest('correlation_tag', '');
+	$manual_close = getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED);
 	$status = getRequest('status', TRIGGER_STATUS_ENABLED);
 
 	if (hasRequest('add')) {
@@ -228,6 +235,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'priority' => $priority,
 			'comments' => $comments,
 			'tags' => $tags,
+			'manual_close' => $manual_close,
 			'dependencies' => $dependencies,
 			'status' => $status
 		];
@@ -251,7 +259,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -314,6 +322,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			CArrayHelper::sort($tags, ['tag', 'value']);
 			if (array_values($db_tags) !== array_values($tags)) {
 				$trigger['tags'] = $tags;
+			}
+
+			if ($db_trigger['manual_close'] != $manual_close) {
+				$trigger['manual_close'] = $manual_close;
 			}
 
 			$db_dependencies = $db_trigger['dependencies'];
@@ -502,6 +514,8 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.massdelete' && 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -514,6 +528,7 @@ if (hasRequest('action') && getRequest('action') == 'trigger.massupdateform' && 
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
+		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => null,
@@ -540,7 +555,8 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
-		'correlation_tag' => getRequest('correlation_tag', '')
+		'correlation_tag' => getRequest('correlation_tag', ''),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	];
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
@@ -571,8 +587,6 @@ else {
 		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
 	}
-
-	$config = select_config();
 
 	$data = [
 		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),

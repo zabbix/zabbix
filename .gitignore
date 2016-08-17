@@ -308,6 +308,9 @@ src/zabbix_server/selfmon/Makefile.in
 src/zabbix_server/snmptrapper/.deps
 src/zabbix_server/snmptrapper/Makefile
 src/zabbix_server/snmptrapper/Makefile.in
+src/zabbix_server/taskmanager/.deps
+src/zabbix_server/taskmanager/Makefile
+src/zabbix_server/taskmanager/Makefile.in
 src/zabbix_server/timer/.deps
 src/zabbix_server/timer/Makefile
 src/zabbix_server/timer/Makefile.in
