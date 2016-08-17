@@ -3,6 +3,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-11081] fixed compilation error with curl library (Sergejs)
 ..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
 ..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
