@@ -6721,7 +6721,7 @@ msgid "Hosts in maintenance"
 msgstr "Hosty v údržbe"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
-msgid "Hosts info"
+msgid "Host info"
 msgstr "Info o hostovi"
 
 #: include/views/monitoring.overview.items.php:50
@@ -14141,11 +14141,11 @@ msgid "This month"
 msgstr "Tento mesiac"
 
 #: include/classes/screens/CScreenBuilder.php:611
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "Tento stĺpec obrazovky nie je prázdny. Aj tak zmazať?"
 
 #: include/classes/screens/CScreenBuilder.php:565
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "Tento riadok obrazovky nie je prázdny. Aj tak zmazať?"
 
 #: srv_status.php:35
@@ -14588,16 +14588,16 @@ msgstr "Spúšťače zmazané"
 
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
-msgid "Triggers info"
+msgid "Trigger info"
 msgstr "Informácie o spúšťačoch"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
-msgid "Triggers overview"
+msgid "Trigger overview"
 msgstr "Prehľad spúšťačov"
 
 #: include/views/common.filter.trigger.php:33
-msgid "Triggers status"
+msgid "Trigger status"
 msgstr "Stav spúšťačov"
 
 #: include/menu.inc.php:159

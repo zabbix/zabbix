@@ -2170,7 +2170,7 @@ int	DCsync_history(int sync_type, int *total_num)
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
 			/*   DCflush_nextchecks() */
-			if (0 != process_trigger_events(&trigger_diff, &triggerids))
+			if (0 != process_trigger_events(&trigger_diff, &triggerids, ZBX_EVENTS_PROCESS_CORRELATION))
 			{
 				DCconfig_triggers_apply_changes(&trigger_diff);
 				zbx_save_trigger_changes(&trigger_diff);

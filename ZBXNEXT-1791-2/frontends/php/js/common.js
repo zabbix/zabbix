@@ -200,7 +200,7 @@ function close_window() {
 }
 
 function Confirm(msg) {
-	return confirm(msg, 'title');
+	return confirm(msg);
 }
 
 function create_var(form_name, var_name, var_value, doSubmit) {
