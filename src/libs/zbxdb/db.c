@@ -2157,12 +2157,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; '\0' != *s;)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */
