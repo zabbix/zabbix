@@ -486,27 +486,28 @@ ul.top-nav-icons {
 .header-title {
 	position: relative;
 	width: 100%;
-	padding: 0 0 6px 0;
-	margin: 0 0 10px 0;
-	text-align: right;
-	border-bottom: 1px solid $ui-border-color;
+	margin: 0 0 7px 0;
 
 	h1 {
-		text-align: left;
-	}
-
-	form {
 		display: inline-block;
 	}
 
-	ul {
+	.cell {
 
-		li {
-			display: inline-block;
-			vertical-align: top;
-			position: relative;
-			padding: 0 0 0 10px;
+		&:last-child {
+			text-align: right;
 		}
+	}
+}
+
+.header-btns {
+
+	li {
+		display: inline-block;
+		//float: left;
+		vertical-align: top;
+		//position: relative;
+		padding: 0 0 0 10px;
 	}
 }
 
@@ -2503,6 +2504,59 @@ $form-icon-btn: (
 		&.suggest-hover {
 			background-color: $action-hover-color;
 		}
+	}
+}
+
+.header-dropdown {
+	position: relative;
+	margin-right: 20px;
+	color: $font-color;
+	cursor: pointer;
+
+	&::after {
+		content: '';
+		position: absolute;
+		display: block;
+		width: 7px;
+		height: 7px;
+		top: 20%;
+		right: -18px;
+		border-left: 2px solid $font-color;
+		border-bottom: 2px solid $font-color;
+		@include transform(translate3d(-50%, -50%, 0) rotate(-45deg));
+	}
+}
+
+a.header-dropdown {
+	border: none;
+	color: $font-color;
+}
+
+.header-dropdown-list {
+	padding: 5px 8px;
+	font-size: $font-h4-size;
+	@extend .action-menu;
+
+	.action-menu-item {
+		padding: 0 8px;
+		margin: 0 -8px;
+		height: 26px;
+		line-height: 26px;
+	}
+
+	&::before, &::after {
+		content: '';
+		position: absolute;
+		top: -10px;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid darken($action-border-color, 1%);
+		@extend %arrow;
+	}
+
+	&::after {
+		top: -9px;
+		border-bottom-color: $ui-bg-color;
 	}
 }
 
