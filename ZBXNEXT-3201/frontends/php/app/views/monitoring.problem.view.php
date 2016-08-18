@@ -212,34 +212,42 @@ if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 	$filter->addNavigator();
 }
 
-$data_filter = [
-	'show' => $data['filter']['show'],
-	'groupids' => $data['filter']['groupids'],
-	'hostids' => $data['filter']['hostids'],
-	'application' => $data['filter']['application'],
-	'triggerids' => $data['filter']['triggerids'],
-	'problem' => $data['filter']['problem'],
-	'severity' => $data['filter']['severity'],
-	'inventory' => $data['filter']['inventory'],
-	'tags' => $data['filter']['tags'],
-	'maintenance' => $data['filter']['maintenance'],
-	'unacknowledged' => $data['filter']['unacknowledged']
+$options = [
+	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
+	'mode' => SCREEN_MODE_JS,
+	'dataId' => 'problem',
+	'page' => $data['page'],
+	'data' => [
+		'fullscreen' => $data['fullscreen'],
+		'sort' => $data['sort'],
+		'sortorder' => $data['sortorder'],
+		'page' => $data['page'],
+		'filter' => [
+			'show' => $data['filter']['show'],
+			'groupids' => $data['filter']['groupids'],
+			'hostids' => $data['filter']['hostids'],
+			'application' => $data['filter']['application'],
+			'triggerids' => $data['filter']['triggerids'],
+			'problem' => $data['filter']['problem'],
+			'severity' => $data['filter']['severity'],
+			'inventory' => $data['filter']['inventory'],
+			'tags' => $data['filter']['tags'],
+			'maintenance' => $data['filter']['maintenance'],
+			'unacknowledged' => $data['filter']['unacknowledged']
+		]
+	]
 ];
 
 switch ($data['filter']['show']) {
 	case TRIGGERS_OPTION_RECENT_PROBLEM:
 	case TRIGGERS_OPTION_IN_PROBLEM:
-		$data_filter += [
-			'age_state' => $data['filter']['age_state'],
-			'age' => $data['filter']['age']
-		];
+		$options['data']['filter']['age_state'] = $data['filter']['age_state'];
+		$options['data']['filter']['age'] = $data['filter']['age'];
 		break;
 
 	case TRIGGERS_OPTION_ALL:
-		$data_filter += [
-			'period' => $data['filter']['period'],
-			'stime' => $data['filter']['stime']
-		];
+		$options['period'] = $data['filter']['period'];
+		$options['stime'] = $data['filter']['stime'];
 		break;
 }
 
@@ -256,23 +264,7 @@ switch ($data['filter']['show']) {
 			)
 	)
 	->addItem($filter)
-	->addItem(
-		CScreenBuilder::getScreen([
-			'resourcetype' => SCREEN_RESOURCE_PROBLEM,
-			'mode' => SCREEN_MODE_JS,
-			'dataId' => 'problem',
-			'page' => $data['page'],
-			'data' => [
-				'fullscreen' => $data['fullscreen'],
-				'sort' => $data['sort'],
-				'sortorder' => $data['sortorder'],
-				'page' => $data['page'],
-				'filter' => $data_filter
-			],
-			'period' => $data['filter']['period'],
-			'stime' => $data['filter']['stime']
-		])->get()
-	)
+	->addItem(CScreenBuilder::getScreen($options)->get())
 	->show();
 
 // activating blinking
