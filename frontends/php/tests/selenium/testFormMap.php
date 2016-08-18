@@ -34,6 +34,12 @@ class testFormMap extends CWebTest {
 			['75x75', 1, 1],
 			['100x100', 1, 1],
 
+			['20x20', 1, 0],
+			['40x40', 1, 0],
+			['50x50', 1, 0],
+			['75x75', 1, 0],
+			['100x100', 1, 0],
+
 			['20x20', 0, 1],
 			['40x40', 0, 1],
 			['50x50', 0, 1],
@@ -44,13 +50,7 @@ class testFormMap extends CWebTest {
 			['40x40', 0, 0],
 			['50x50', 0, 0],
 			['75x75', 0, 0],
-			['100x100', 0, 0],
-
-			['20x20', 1, 0],
-			['40x40', 1, 0],
-			['50x50', 1, 0],
-			['75x75', 1, 0],
-			['100x100', 1, 0]
+			['100x100', 0, 0]
 		];
 	}
 
@@ -70,6 +70,7 @@ class testFormMap extends CWebTest {
 		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->zbxTestLogin('sysmaps.php');
+		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkTextWait($map_name);
 		$this->zbxTestClickWait('edit');
 
@@ -96,6 +97,7 @@ class testFormMap extends CWebTest {
 
 		// selecting new grid size
 		$this->zbxTestDropdownSelect('gridsize', $gridSize);
+		$this->zbxTestAssertElementValue('gridsize', strstr($gridSize, 'x', true));
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
@@ -125,7 +127,7 @@ class testFormMap extends CWebTest {
 		// checking if all options remain as they were set
 		$this->assertTrue(
 			$this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == substr($gridSize, 0, strpos($gridSize, 'x'))
-			);
+		);
 
 		if ($showGrid) {
 			$this->zbxTestTextPresent('Shown');
