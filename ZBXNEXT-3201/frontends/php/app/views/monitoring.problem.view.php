@@ -19,6 +19,9 @@
 **/
 
 
+if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+	$this->addJsFile('class.calendar.js');
+}
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('multiselect.js');
@@ -33,6 +36,7 @@ $filter_column1 = (new CFormList())
 		(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
 			->addValue(_('Recent problems'), TRIGGERS_OPTION_RECENT_PROBLEM)
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
+			->addValue(_('History'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
 			->setFocused(true)
 	)
@@ -57,39 +61,7 @@ $filter_column1 = (new CFormList())
 					'&real_hosts=1&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
-
-if ($data['config']['event_ack_enable']) {
-	$filter_column1->addRow(_('Show unacknowledged only'),
-		(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
-	);
-}
-
-$filter_column1
-	->addRow(_('Minimum trigger severity'),
-		new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
-	);
-$filter_age = (new CNumericBox('filter_age', $data['filter']['age'], 3, false, false, false))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-if ($data['filter']['age_state'] == 0) {
-	$filter_age->setAttribute('disabled', 'disabled');
-}
-
-$filter_column1
-	->addRow(_('Age less than'), [
-		(new CCheckBox('filter_age_state'))
-			->setChecked($data['filter']['age_state'] == 1)
-			->onClick('javascript: this.checked ? $("filter_age").enable() : $("filter_age").disable()'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$filter_age,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		_('days')
-	])
-	->addRow(_('Problem'),
-		(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
-
-$filter_column2 = (new CFormList())
+	)
 	->addRow(_('Application'), [
 		(new CTextBox('filter_application', $data['filter']['application']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
@@ -107,6 +79,43 @@ $filter_column2 = (new CFormList())
 				'");'
 			)
 			->addClass(ZBX_STYLE_BTN_GREY)
+	])
+	->addRow(_('Trigger'),
+		(new CMultiSelect([
+			'name' => 'filter_triggerids[]',
+			'objectName' => 'triggers',
+			'objectOptions' => [
+				'monitored' => true
+			],
+			'data' => $data['filter']['triggers'],
+			'popup' => [
+				'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
+					'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Problem'),
+		(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Minimum trigger severity'),
+		new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
+	);
+
+$filter_age = (new CNumericBox('filter_age', $data['filter']['age'], 3, false, false, false))
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+if ($data['filter']['age_state'] == 0) {
+	$filter_age->setAttribute('disabled', 'disabled');
+}
+
+$filter_column1
+	->addRow(_('Age less than'), [
+		(new CCheckBox('filter_age_state'))
+			->setChecked($data['filter']['age_state'] == 1)
+			->onClick('javascript: this.checked ? $("filter_age").enable() : $("filter_age").disable()'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$filter_age,
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		_('days')
 	]);
 
 $filter_inventory = $data['filter']['inventory'];
@@ -137,11 +146,12 @@ $filter_inventory_table->addRow(
 			->addClass('element-table-add')
 	))->setColSpan(3)
 );
-$filter_column2->addRow(_('Host inventory'),
-	(new CDiv($filter_inventory_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-);
+$filter_column2 = (new CFormList())
+	->addRow(_('Host inventory'),
+		(new CDiv($filter_inventory_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	);
 
 $filter_tags = $data['filter']['tags'];
 if (!$filter_tags) {
@@ -185,6 +195,54 @@ $filter_column2
 		(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
 	);
 
+if ($data['config']['event_ack_enable']) {
+	$filter_column2->addRow(_('Show unacknowledged only'),
+		(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
+	);
+}
+
+$filter = (new CFilter('web.problem.filter.state'))
+	->addVar('action', 'problem.view')
+	->addVar('fullscreen', $data['fullscreen'])
+	->addVar('page', $data['page'])
+	->addColumn($filter_column1)
+	->addColumn($filter_column2);
+
+if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+	$filter->addNavigator();
+}
+
+$data_filter = [
+	'show' => $data['filter']['show'],
+	'groupids' => $data['filter']['groupids'],
+	'hostids' => $data['filter']['hostids'],
+	'application' => $data['filter']['application'],
+	'triggerids' => $data['filter']['triggerids'],
+	'problem' => $data['filter']['problem'],
+	'severity' => $data['filter']['severity'],
+	'inventory' => $data['filter']['inventory'],
+	'tags' => $data['filter']['tags'],
+	'maintenance' => $data['filter']['maintenance'],
+	'unacknowledged' => $data['filter']['unacknowledged']
+];
+
+switch ($data['filter']['show']) {
+	case TRIGGERS_OPTION_RECENT_PROBLEM:
+	case TRIGGERS_OPTION_IN_PROBLEM:
+		$data_filter += [
+			'age_state' => $data['filter']['age_state'],
+			'age' => $data['filter']['age']
+		];
+		break;
+
+	case TRIGGERS_OPTION_ALL:
+		$data_filter += [
+			'period' => $data['filter']['period'],
+			'stime' => $data['filter']['stime']
+		];
+		break;
+}
+
 (new CWidget())
 	->setTitle(_('Problems'))
 	->setControls(
@@ -197,14 +255,7 @@ $filter_column2
 					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			)
 	)
-	->addItem(
-		(new CFilter('web.problem.filter.state'))
-			->addVar('action', 'problem.view')
-			->addVar('fullscreen', $data['fullscreen'])
-			->addVar('page', $data['page'])
-			->addColumn($filter_column1)
-			->addColumn($filter_column2)
-	)
+	->addItem($filter)
 	->addItem(
 		CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_PROBLEM,
@@ -216,7 +267,7 @@ $filter_column2
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder'],
 				'page' => $data['page'],
-				'filter' => $data['filter']
+				'filter' => $data_filter
 			]
 		])->get()
 	)
@@ -224,3 +275,26 @@ $filter_column2
 
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
+
+if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+	$stime = zbxDateToTime($data['filter']['stime']);
+	$timeline = [
+		'period' => $data['filter']['period'],
+		'starttime' => date(TIMESTAMP_FORMAT, $stime + $data['filter']['period'] - ZBX_MAX_PERIOD),
+		'usertime' => date(TIMESTAMP_FORMAT, $stime + $data['filter']['period'])
+	];
+
+	$objData = [
+		'id' => 'timeline_1',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.problem.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+	];
+
+	$this->addPostJS('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+	$this->addPostJS('timeControl.processObjects();');
+}

@@ -186,10 +186,8 @@ switch ($data['method']) {
 			if ($data['mode'] == SCREEN_MODE_JS) {
 				$result = $screen;
 			}
-			else {
-				if (is_object($screen)) {
-					$result = $screen->toString();
-				}
+			elseif (is_object($screen)) {
+				$result = $screen->toString();
 			}
 		}
 		break;
@@ -316,9 +314,10 @@ switch ($data['method']) {
 
 			case 'triggers':
 				$triggers = API::Trigger()->get([
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => ['triggerid', 'description'],
 					'selectHosts' => ['name'],
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);

@@ -277,6 +277,14 @@ class CScreenBuilder {
 				return new CScreenHttpTest($options);
 
 			case SCREEN_RESOURCE_PROBLEM:
+				if (array_key_exists('period', $options)) {
+					$options['data']['filter']['period'] = $options['period'];
+					unset($options['period']);
+				}
+				if (array_key_exists('stime', $options)) {
+					$options['data']['filter']['stime'] = $options['stime'];
+					unset($options['stime']);
+				}
 				return new CScreenProblem($options);
 
 			default:
