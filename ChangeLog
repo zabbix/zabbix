@@ -5,6 +5,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11098] corrected log messages about completion of the trend data synchronization (Sergejs)
 ........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
 ....I..... [ZBX-11081] fixed compilation error with curl library (Sergejs)
@@ -61,6 +62,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
 ....I..... [ZBX-11081] fixed compilation error with curl library (Sergejs)
 ..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
