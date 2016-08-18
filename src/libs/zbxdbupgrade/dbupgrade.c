@@ -348,6 +348,7 @@ static int	DBreorg_table(const char *table_name)
 
 	return FAIL;
 #else
+	ZBX_UNUSED(table_name);
 	return SUCCEED;
 #endif
 }

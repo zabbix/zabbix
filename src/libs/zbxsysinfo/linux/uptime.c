@@ -25,6 +25,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
+	ZBX_UNUSED(request);
+
 	if (0 != sysinfo(&info))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));

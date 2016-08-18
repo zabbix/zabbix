@@ -33,6 +33,8 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 
+	ZBX_UNUSED(request);
+
 	if (-1 == uname(&name))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));

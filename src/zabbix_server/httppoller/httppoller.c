@@ -46,7 +46,7 @@ extern int		server_num, process_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_minnextcheck(int now)
+static int	get_minnextcheck()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -131,7 +131,7 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 		httptests_count += process_httptests(process_num, now);
 		total_sec += zbx_time() - sec;
 
-		nextcheck = get_minnextcheck(now);
+		nextcheck = get_minnextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)

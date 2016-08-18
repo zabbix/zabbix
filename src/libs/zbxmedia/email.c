@@ -344,6 +344,9 @@ static int	smtp_debug_function(CURL *easyhandle, curl_infotype type, char *data,
 {
 	const char	labels[3] = {'*', '<', '>'};
 
+	ZBX_UNUSED(easyhandle);
+	ZBX_UNUSED(userptr);
+
 	if (CURLINFO_TEXT != type && CURLINFO_HEADER_IN != type && CURLINFO_HEADER_OUT != type)
 		goto out;
 
