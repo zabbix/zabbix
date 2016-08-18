@@ -1037,6 +1037,8 @@ ROW   |23628 |5   |                 |                                           
 ROW   |23635 |5   |                 |                                                           |10084 |Zabbix vmware cache, % free                                      |zabbix[vmware,buffer,pfree]                                                    |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |23634     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 ROW   |23662 |5   |                 |                                                           |10084 |Zabbix value cache operating mode                                |zabbix[vcache,cache,mode]                                                      |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23661     |15        |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 ROW   |23664 |5   |                 |                                                           |10084 |Zabbix $4 $2 processes, in %                                     |zabbix[process,task manager,avg,busy]                                          |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |23663     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
+ROW   |23665 |0   |                 |                                                           |10081 |Windows services discovery                                       |service.discovery                                                              |60   |90     |0     |0     |4         |             |        |0         |0    |                   |0                   |                     |                     |       |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |1    |NULL       |    |Discovery of Windows services of different types as defined in global regular expressions "Windows service names for discovery" and "Windows service startup states for discovery".                                                                                                                                                                                                                                                       |0             |0       |0                  |0                  |                  |1       |
+ROW   |23666 |0   |                 |                                                           |10081 |State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME})      |service.info[{#SERVICE.NAME},state]                                            |60   |90     |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |3         |          |                                                                                    |                |0        |0       |           |           |         |          |2    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 
 TABLE |media_type
 FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|
@@ -1417,6 +1419,7 @@ ROW   |13516    |{12945}>0                     |Host name of zabbix_agentd was c
 ROW   |13537    |{12966}<25                    |Less than 25% free in the vmware cache                              |   |0     |3       |                                                                                                                                      |13536     |0   |0    |0            |                   |0               |               |0           |
 ROW   |13558    |{13161}=1                     |Zabbix value cache working in low memory mode                       |   |0     |4       |                                                                                                                                      |13557     |0   |0    |0            |                   |0               |               |0           |
 ROW   |13560    |{13197}>75                    |Zabbix task manager processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |13559     |0   |0    |1            |{13197}<65         |0               |               |0           |
+ROW   |13561    |{13221}<>0                    |Service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})|   |0     |3       |                                                                                                                                      |NULL      |0   |2    |0            |                   |0               |               |0           |
 
 TABLE |trigger_depends
 FIELDS|triggerdepid|triggerid_down|triggerid_up|
@@ -1784,6 +1787,7 @@ ROW   |13217     |23343 |13530    |avg     |10m      |
 ROW   |13218     |23344 |13531    |avg     |10m      |
 ROW   |13219     |23345 |13532    |avg     |10m      |
 ROW   |13220     |23346 |13533    |avg     |10m      |
+ROW   |13221     |23666 |13561    |last    |         |
 
 TABLE |graphs
 FIELDS|graphid|name                                    |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
@@ -3233,6 +3237,8 @@ FIELDS|regexpid|name                              |test_string|
 ROW   |1       |File systems for discovery        |ext3       |
 ROW   |2       |Network interfaces for discovery  |eth0       |
 ROW   |3       |Storage devices for SNMP discovery|/boot      |
+ROW   |4       |Windows service names for discovery|SysmonLog      |
+ROW   |5       |Windows service startup states for discovery|automatic      |
 
 TABLE |expressions
 FIELDS|expressionid|regexpid|expression                                                                                                                                                           |expression_type|exp_delimiter|case_sensitive|
@@ -3240,6 +3246,8 @@ ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;jfs&pipe
 ROW   |2           |2       |^lo$                                                                                                                                                                 |4              |,            |1             |
 ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                       |4              |,            |1             |
 ROW   |4           |2       |^Software Loopback Interface                                                                                                                                         |4              |,            |1             |
+ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                        |4              |,            |1             |
+ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                 |3              |,            |1             |
 
 TABLE |item_discovery
 FIELDS|itemdiscoveryid|itemid|parent_itemid|
@@ -3371,6 +3379,7 @@ ROW   |208            |23607 |23600        |
 ROW   |209            |23608 |23600        |
 ROW   |218            |23632 |23631        |
 ROW   |219            |23633 |23631        |
+ROW   |220            |23666 |23665        |
 
 TABLE |host_discovery
 FIELDS|hostid|parent_hostid|parent_itemid|
@@ -3431,4 +3440,11 @@ ROW   |17              |22760 |8       |{#SNMPVALUE}|@Storage devices for SNMP d
 ROW   |18              |22767 |8       |{#SNMPVALUE}|@Storage devices for SNMP discovery|
 ROW   |19              |23278 |8       |{#IFNAME}   |@Network interfaces for discovery  |
 ROW   |20              |23279 |8       |{#FSTYPE}   |@File systems for discovery        |
+ROW   |21              |23665 |8       |{#SERVICE.NAME}|@Windows service names for discovery|
+ROW   |22              |23665 |8       |{#SERVICE.STARTUPNAME}|@Windows service startup states for discovery|
+
+TABLE |application_prototype
+FIELDS|application_prototypeid|itemid|templateid|name                                   |
+ROW   |1                      |23665 |NULL      |Startup {#SERVICE.STARTUPNAME} services|
+
 
