@@ -322,31 +322,26 @@ sub create_graph
 	my @hostids = ();
 	my @gitems = ();
 
-	my @color_map = ('EC414E', '68BC57', '4A89CB', 'F89749', '8C4F9A');
+	my @color_map = ('1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0',
+			'5CCD18', 'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434',
+			'790E1F', '87AC4D', 'E89DF4');
 	my @color_tmp = @color_map;
-
-	my $autocolor;
-
-	$autocolor = 1 if ($items_count > scalar(@color_map));
 
 	foreach (@{$items})
 	{
 		my $options = $_;
 
-		if (!$autocolor)
+		if (scalar(@color_tmp) == 0)
 		{
-			if (scalar(@color_tmp) == 0)
-			{
-				@color_tmp = @color_map;
-			}
-
-			my $color = shift @color_tmp;
-
-			$options->{'color'} = $color;
+			@color_tmp = @color_map;
 		}
 
-		push @gitems, $options;
-		push @hostids, $_->{'hostid'};
+		my $color = shift(@color_tmp);
+
+		$options->{'color'} = $color;
+
+		push(@gitems, $options);
+		push(@hostids, $_->{'hostid'});
 	}
 
 	my $result = $zabbix->get('graph', {'hostids' => [@hostids], 'filter' => {'name' => $name}});
