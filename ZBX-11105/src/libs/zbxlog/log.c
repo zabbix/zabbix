@@ -667,6 +667,8 @@ char	*strerror_from_system(unsigned long error)
 
 	return utf8_string;
 #else
+	ZBX_UNUSED(error);
+
 	return zbx_strerror(errno);
 #endif	/* _WINDOWS */
 }

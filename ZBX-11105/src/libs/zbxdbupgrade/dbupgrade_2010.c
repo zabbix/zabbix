@@ -37,6 +37,7 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 
 	return DBmodify_field_type(table_name, &field);
 #else
+	ZBX_UNUSED(table_name);
 	return SUCCEED;
 #endif
 }
@@ -1672,6 +1673,9 @@ static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, 
 {
 	char	*param;
 	int	ret;
+
+	ZBX_UNUSED(key_type);
+	ZBX_UNUSED(cb_data);
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
 		return SUCCEED;

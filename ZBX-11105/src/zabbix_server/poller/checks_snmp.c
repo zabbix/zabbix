@@ -76,12 +76,11 @@
  *                                                                            *
  * Parameters: arg   - [IN] an user argument passed to zbx_snmp_walk()        *
  *                          function                                          *
- *             oid   - [IN] the OID the walk function is looking for          *
  *             index - [IN] the index of found OID                            *
  *             value - [IN] the OID value                                     *
  *                                                                            *
  ******************************************************************************/
-typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *oid, const char *index, const char *value);
+typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *index, const char *value);
 
 typedef struct
 {
@@ -1193,7 +1192,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
 						NULL != GET_STR_RESULT(&snmp_result))
 				{
-					walk_cb_func(walk_cb_arg, OID, snmp_oid, snmp_result.str);
+					walk_cb_func(walk_cb_arg, snmp_oid, snmp_result.str);
 				}
 				else
 				{
@@ -1733,7 +1732,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	free_request(&data->request);
 }
 
-static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *index, const char *value)
+static void	zbx_snmp_walk_discovery_cb(void *arg, const char *index, const char *value)
 {
 	zbx_snmp_ddata_t	*data = (zbx_snmp_ddata_t *)arg;
 	zbx_snmp_dobject_t	*obj;

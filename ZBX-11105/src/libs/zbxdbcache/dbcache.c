@@ -1576,7 +1576,7 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int htext_num)
+static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
 	zbx_db_insert_t	db_insert;
@@ -1610,7 +1610,7 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlog_num)
+static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num)
 {
 	int			i;
 	zbx_db_insert_t		db_insert;
@@ -1704,11 +1704,11 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	/* history_text */
 	if (0 != htext_num)
-		dc_add_history_text(history, history_num, htext_num);
+		dc_add_history_text(history, history_num);
 
 	/* history_log */
 	if (0 != hlog_num)
-		dc_add_history_log(history, history_num, hlog_num);
+		dc_add_history_log(history, history_num);
 
 	/* update value cache */
 	if (ZBX_DB_OK <= rc && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) &&
