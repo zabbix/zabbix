@@ -268,7 +268,9 @@ switch ($data['filter']['show']) {
 				'sortorder' => $data['sortorder'],
 				'page' => $data['page'],
 				'filter' => $data_filter
-			]
+			],
+			'period' => $data['filter']['period'],
+			'stime' => $data['filter']['stime']
 		])->get()
 	)
 	->show();
