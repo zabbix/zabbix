@@ -53,15 +53,19 @@ class CProblem extends CApiService {
 			'eventids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'applicationids'			=> null,
 			'objectids'					=> null,
 
 			'editable'					=> null,
 			'source'					=> EVENT_SOURCE_TRIGGERS,
 			'object'					=> EVENT_OBJECT_TRIGGER,
+			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
 			'time_from'					=> null,
 			'time_till'					=> null,
+			'eventid_from'				=> null,
+			'eventid_till'				=> null,
 			'acknowledged'				=> null,
 			'tags'						=> null,
 			'recent'					=> null,
@@ -90,6 +94,8 @@ class CProblem extends CApiService {
 		$sqlParts['where'][] = 'p.source='.zbx_dbstr($options['source']);
 		$sqlParts['where'][] = 'p.object='.zbx_dbstr($options['object']);
 
+		$sub_sql_parts = [];
+
 		// triggers
 		if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 			// specific triggers
@@ -104,11 +110,8 @@ class CProblem extends CApiService {
 			}
 			// all triggers
 			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM triggers t'.
-					' WHERE p.objectid=t.triggerid'.
-					')';
+				$sub_sql_parts['from']['t'] = 'triggers t';
+				$sub_sql_parts['where']['p-t'] = 'p.objectid=t.triggerid';
 			}
 			else {
 				$sqlParts['where'][] = 'EXISTS ('.
@@ -150,11 +153,8 @@ class CProblem extends CApiService {
 			}
 			// all items or lld rules
 			elseif ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE p.objectid=i.itemid'.
-					')';
+				$sub_sql_parts['from']['i'] = 'items i';
+				$sub_sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
 			}
 			else {
 				$sqlParts['where'][] = 'EXISTS ('.
@@ -183,8 +183,6 @@ class CProblem extends CApiService {
 			zbx_value2array($options['objectids']);
 			$sqlParts['where'][] = dbConditionInt('p.objectid', $options['objectids']);
 		}
-
-		$sub_sql_parts = [];
 
 		// groupids
 		if ($options['groupids'] !== null) {
@@ -228,6 +226,40 @@ class CProblem extends CApiService {
 				$sub_sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
 				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
+		}
+
+		// applicationids
+		if ($options['applicationids'] !== null) {
+			zbx_value2array($options['applicationids']);
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sub_sql_parts['from']['f'] = 'functions f';
+				$sub_sql_parts['from']['ia'] = 'items_applications ia';
+				$sub_sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
+				$sub_sql_parts['where']['f-ia'] = 'f.itemid=ia.itemid';
+				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+			}
+			// items
+			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
+				$sub_sql_parts['from']['ia'] = 'items_applications ia';
+				$sub_sql_parts['where']['p-ia'] = 'p.objectid=ia.itemid';
+				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+			}
+			// ignore this filter for lld rules
+		}
+
+		// severities
+		if ($options['severities'] !== null) {
+			zbx_value2array($options['severities']);
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sub_sql_parts['from']['t'] = 'triggers t';
+				$sub_sql_parts['where']['p-t'] = 'p.objectid=t.triggerid';
+				$sub_sql_parts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+			}
+			// ignore this filter for items and lld rules
 		}
 
 		if ($sub_sql_parts) {
@@ -287,6 +319,16 @@ class CProblem extends CApiService {
 		// time_till
 		if ($options['time_till'] !== null) {
 			$sqlParts['where'][] = 'p.clock<='.zbx_dbstr($options['time_till']);
+		}
+
+		// eventid_from
+		if ($options['eventid_from'] !== null) {
+			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
+		}
+
+		// eventid_till
+		if ($options['eventid_till'] !== null) {
+			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 
 		// search
