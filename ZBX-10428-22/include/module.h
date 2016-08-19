@@ -27,7 +27,7 @@
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
-#define get_rparam(request, num)	(request->nparam > num ? request->params[num] : NULL)
+char	*get_rparam(AGENT_REQUEST *request, int num);
 
 /* flags for command */
 #define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */
@@ -91,45 +91,25 @@ AGENT_RESULT;
 
 /* SET RESULT */
 
-#define SET_UI64_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_UINT64,		\
-	(res)->ui64 = (zbx_uint64_t)(val)	\
-)
+void	SET_UI64_RESULT(AGENT_RESULT *res, zbx_uint64_t val);
 
-#define SET_DBL_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_DOUBLE,		\
-	(res)->dbl = (double)(val)		\
-)
+void	SET_DBL_RESULT(AGENT_RESULT *res, double val);
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_STR_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_STRING,		\
-	(res)->str = (char *)(val)		\
-)
+void	SET_STR_RESULT(AGENT_RESULT *res, char *val);
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_TEXT_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_TEXT,			\
-	(res)->text = (char *)(val)		\
-)
+void	SET_TEXT_RESULT(AGENT_RESULT *res, char *val);
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->logs = (zbx_log_t **)(val)	\
+	(res)->logs = val			\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_MSG_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_MESSAGE,		\
-	(res)->msg = (char *)(val)		\
-)
+void	SET_MSG_RESULT(AGENT_RESULT *res, char *val);
 
 #define SYSINFO_RET_OK		0
 #define SYSINFO_RET_FAIL	1

@@ -253,6 +253,36 @@ void	init_result(AGENT_RESULT *result)
 	result->msg = NULL;
 }
 
+void	SET_UI64_RESULT(AGENT_RESULT *res, zbx_uint64_t val)
+{
+	res->type |= AR_UINT64;
+	res->ui64 = val;
+}
+
+void	SET_DBL_RESULT(AGENT_RESULT *res, double val)
+{
+	res->type |= AR_DOUBLE;
+	res->dbl = val;
+}
+
+void	SET_STR_RESULT(AGENT_RESULT *res, char *val)
+{
+	res->type |= AR_STRING;
+	res->str = val;
+}
+
+void	SET_TEXT_RESULT(AGENT_RESULT *res, char *val)
+{
+	res->type |= AR_TEXT;
+	res->text = val;
+}
+
+void	SET_MSG_RESULT(AGENT_RESULT *res, char *val)
+{
+	res->type |= AR_MESSAGE;
+	res->msg = val;
+}
+
 static void	zbx_log_clean(zbx_log_t *log)
 {
 	zbx_free(log->source);
@@ -297,6 +327,14 @@ void	init_request(AGENT_REQUEST *request)
 	request->params = NULL;
 	request->lastlogsize = 0;
 	request->mtime = 0;
+}
+
+char	*get_rparam(AGENT_REQUEST *request, int num)
+{
+	if (request->nparam > num)
+		return request->params[num];
+
+	return NULL;
 }
 
 /******************************************************************************
