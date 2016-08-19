@@ -707,6 +707,7 @@ define('GROUP_DEBUG_MODE_ENABLED',	1);
 define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
 define('PERM_DENY',			0);
+define('PERM_NONE',			-1);
 
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);

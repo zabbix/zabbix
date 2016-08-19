@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of user groups');
 $page['file'] = 'usergrps.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -62,15 +63,15 @@ $fields = [
 	'delete_selected' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'del_user_group' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'del_user_media' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'del_read_only' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'del_read_write' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'del_deny' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'del_group_user' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_read_only' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_read_write' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_deny' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'change_password' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
+	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'groupids_subgroups' => [T_ZBX_STR, O_OPT, null,		 null,	null],
+	'permissions' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
+	'group_permissions' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
@@ -121,65 +122,24 @@ elseif (hasRequest('action')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['del_deny']) && isset($_REQUEST['right_to_del']['deny'])) {
-	$_REQUEST['group_rights'] = getRequest('group_rights', []);
-
-	foreach ($_REQUEST['right_to_del']['deny'] as $name) {
-		if (!isset($_REQUEST['group_rights'][$name])) {
-			continue;
-		}
-
-		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_DENY) {
-			unset($_REQUEST['group_rights'][$name]);
-		}
-	}
-}
-elseif (isset($_REQUEST['del_read_only']) && isset($_REQUEST['right_to_del']['read_only'])) {
-	$_REQUEST['group_rights'] = getRequest('group_rights', []);
-
-	foreach ($_REQUEST['right_to_del']['read_only'] as $name) {
-		if (!isset($_REQUEST['group_rights'][$name])) {
-			continue;
-		}
-
-		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_READ) {
-			unset($_REQUEST['group_rights'][$name]);
-		}
-	}
-}
-elseif (isset($_REQUEST['del_read_write']) && isset($_REQUEST['right_to_del']['read_write'])) {
-	$_REQUEST['group_rights'] = getRequest('group_rights', []);
-
-	foreach ($_REQUEST['right_to_del']['read_write'] as $name) {
-		if (!isset($_REQUEST['group_rights'][$name])) {
-			continue;
-		}
-
-		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_READ_WRITE) {
-			unset($_REQUEST['group_rights'][$name]);
-		}
-	}
-}
-elseif (isset($_REQUEST['new_right'])) {
-	$_REQUEST['group_rights'] = getRequest('group_rights', []);
-
-	foreach ($_REQUEST['new_right'] as $id => $right) {
-		$_REQUEST['group_rights'][$id] = [
-			'name' => $right['name'],
-			'permission' => $right['permission'],
-			'id' => $id
-		];
-	}
-}
-elseif (hasRequest('add') || hasRequest('update')) {
+if (hasRequest('add') || hasRequest('update')) {
 	$userGroup = [
 		'name' => getRequest('gname'),
 		'users_status' => getRequest('users_status'),
 		'gui_access' => getRequest('gui_access'),
 		'debug_mode' => getRequest('debug_mode'),
 		'userids' => getRequest('group_users', []),
-		'rights' => array_values(getRequest('group_rights', []))
+		'rights' => [],
 	];
+
+	foreach (getRequest('group_rights', []) as $rights) {
+		if ($rights['rights'] != PERM_NONE) {
+			$userGroup['rights'][] = [
+				'id' => $rights['host_groupid'],
+				'permission' => $rights['rights']
+			];
+		}
+	}
 
 	DBstart();
 
@@ -230,7 +190,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'usergroup.massdelete' && hasRequest('group_groupid')) {
+elseif (hasRequest('action') && getRequest('action') === 'usergroup.massdelete' && hasRequest('group_groupid')) {
 	$groupIds = getRequest('group_groupid');
 	$groups = [];
 
@@ -262,7 +222,7 @@ elseif (hasRequest('action') && getRequest('action') == 'usergroup.massdelete' &
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'usergroup.set_gui_access') {
+elseif (hasRequest('action') && getRequest('action') === 'usergroup.set_gui_access') {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
@@ -383,24 +343,31 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.m
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 	$data = [
 		'usrgrpid' => getRequest('usrgrpid'),
 		'form' => getRequest('form'),
+		'name' => getRequest('gname', ''),
+		'users_status' => hasRequest('form_refresh') ? getRequest('users_status') : GROUP_STATUS_ENABLED,
+		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
+		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
+		'group_users' => getRequest('group_users', []),
+		'new_permission' => getRequest('new_permission', PERM_NONE),
 		'form_refresh' => getRequest('form_refresh', 0)
 	];
 
-	if (isset($_REQUEST['usrgrpid'])) {
+	if (hasRequest('usrgrpid')) {
 		$data['usrgrp'] = reset($dbUserGroup);
 	}
 
-	if (isset($_REQUEST['usrgrpid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['name'] = $data['usrgrp']['name'];
-		$data['users_status'] = $data['usrgrp']['users_status'];
-		$data['gui_access'] = $data['usrgrp']['gui_access'];
-		$data['debug_mode'] = $data['usrgrp']['debug_mode'];
+	$group_rights = [];
 
-		// group users
+	if (hasRequest('usrgrpid')) {
+		// User group exists, but there might be no permissions set yet.
+		$data['name'] = getRequest('gname', $data['usrgrp']['name']);
+		$data['users_status'] = getRequest('users_status', $data['usrgrp']['users_status']);
+		$data['gui_access'] = getRequest('gui_access', $data['usrgrp']['gui_access']);
+		$data['debug_mode'] = getRequest('debug_mode', $data['usrgrp']['debug_mode']);
 		$data['group_users'] = [];
 
 		$dbUsers = DBselect(
@@ -413,31 +380,193 @@ if (isset($_REQUEST['form'])) {
 			$data['group_users'][$dbUser['userid']] = $dbUser['userid'];
 		}
 
-		// group rights
-		$data['group_rights'] = [];
+		$data['group_users'] = array_unique(array_merge($data['group_users'], getRequest('group_users', [])));
 
-		$dbRights = DBselect(
-			'SELECT r.*,g.name'.
+		$db_rights = DBselect(
+			'SELECT r.rightid,r.permission,r.groupid AS user_groupid,g.groupid AS host_groupid,g.name'.
 			' FROM groups g'.
-				' LEFT JOIN rights r ON r.id=g.groupid'.
-			' WHERE r.groupid='.zbx_dbstr($data['usrgrpid'])
+				' LEFT JOIN rights r ON r.id=g.groupid AND r.groupid='.zbx_dbstr($data['usrgrpid'])
 		);
 
-		while ($dbRight = DBfetch($dbRights)) {
-			$data['group_rights'][$dbRight['id']] = [
-				'permission' => $dbRight['permission'],
-				'name' => $dbRight['name'],
-				'id' => $dbRight['id']
+		while ($db_right = DBfetch($db_rights)) {
+			$group_rights[$db_right['name']] = [
+				'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
+				'name' => $db_right['name'],
+				'host_groupid' => $db_right['host_groupid']
 			];
 		}
+
+		$data['group_rights'] = $group_rights;
 	}
 	else {
-		$data['name'] = getRequest('gname', '');
-		$data['users_status'] = getRequest('users_status', GROUP_STATUS_ENABLED);
-		$data['gui_access'] = getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM);
-		$data['debug_mode'] = getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED);
-		$data['group_users'] = getRequest('group_users', []);
-		$data['group_rights'] = getRequest('group_rights', []);
+		// User group does not exist, no permissions exist, get all host groups and set all permissions to NONE.
+		$host_groups = API::HostGroup()->get(['groupid', 'name']);
+
+		// $group_rights is required for comparison when adding new elements to list.
+		foreach ($host_groups as $host_group) {
+			$group_rights[$host_group['name']] = [
+				'rights' => PERM_NONE,
+				'name' => $host_group['name'],
+				'host_groupid' => $host_group['groupid']
+			];
+		}
+
+		$data['group_rights'] = $group_rights;
+	}
+
+	if (hasRequest('add_permission')) {
+		// Add new permission with submit().
+
+		// Host group IDs (Parent1, Parent2/Child1) from multiselect.
+		$ms_ids = getRequest('groupids', []);
+
+		// Host group ID parents (Parent1/*, Parent2/Child1/*) from multiselect.
+		$ms_groupids = getRequest('groupids_subgroups', []);
+
+		// Host group ID parents (Parent1/*, Parent2/Child1/*) from the permission list.
+		$ls_groupids = getRequest('group_permissions', []);
+
+		// Add new permission to host group IDs that were selected from multiselect.
+		$new_permissions = array_fill(0, count($ms_ids), $data['new_permission']);
+		$ms_ids = array_combine($ms_ids, $new_permissions);
+
+		$new_permissions_groups = array_fill(0, count($ms_groupids), $data['new_permission']);
+		$ms_groupids = array_combine($ms_groupids, $new_permissions_groups);
+
+		// Filter only parent IDs (Parent1/*, Parent2/Child1/*) from list.
+		$ls_parentids = array_diff_key($ls_groupids, $ms_groupids);
+
+		$new_ls_groupids = findParentAndChildsForUpdate($ls_parentids, $group_rights);
+
+		/* Host group IDs (Parent1, Parent2/Child1) from the permission list to overwrite Host group ID parents
+		 *(Parent1/*, Parent2/Child1/*) from the permission list and keys are preserved.
+		 * array() + array() and array_merge() don't work here.
+		 */
+		foreach (getRequest('permissions', []) as $groupid => $perm) {
+			$new_ls_groupids[$groupid] = $perm;
+		}
+
+		// Get all child IDs for overwriting.
+		$new_ms_groupids = findParentAndChildsForUpdate($ms_groupids, []);
+
+		// Similary merge all other IDs from multiselect. Multiselect IDs have higher priority.
+		foreach ($new_ms_groupids as $groupid => $perm) {
+			$new_ls_groupids[$groupid] = $perm;
+		}
+
+		foreach (array_diff_key($ms_ids, $ms_groupids) as $groupid => $perm) {
+			$new_ls_groupids[$groupid] = $perm;
+		}
+
+		foreach ($group_rights as $name => $rights) {
+			$group_rights[$name] = [
+				'rights' => array_key_exists($rights['host_groupid'], $new_ls_groupids)
+					? $new_ls_groupids[$rights['host_groupid']]
+					: $rights['rights'],
+				'name' => $name,
+				'host_groupid' => $rights['host_groupid']
+			];
+		}
+
+		// Needs to be saved after recalculation.
+		$data['group_rights'] = $group_rights;
+	}
+	elseif (hasRequest('form_refresh')) {
+		// Tried to submit() form, but got error and the permission list was changed. Build new list according to changes.
+		$new_ls_groupids = findParentAndChildsForUpdate(getRequest('group_permissions', []),
+			getRequest('group_rights', [])
+		);
+
+		foreach (getRequest('permissions', []) as $groupid => $perm) {
+			$new_ls_groupids[$groupid] = $perm;
+		}
+
+		foreach ($group_rights as $name => $rights) {
+			$group_rights[$name] = [
+				'rights' => array_key_exists($rights['host_groupid'], $new_ls_groupids)
+					? $new_ls_groupids[$rights['host_groupid']]
+					: $rights['rights'],
+				'name' => $name,
+				'host_groupid' => $rights['host_groupid']
+			];
+		}
+
+		// Needs to be saved after recalculation.
+		$data['group_rights'] = $group_rights;
+	}
+
+	//  If all groups have same permissions, show only * and the maximum permission.
+	$data['same_permissions'] = true;
+	$data['permission_all'] = PERM_NONE;
+	$data['permissions'] = [];
+
+	if ($group_rights) {
+		order_result($group_rights, 'name');
+
+		// Group name and permission list.
+		$list = [];
+
+		foreach ($group_rights as $group) {
+			$parent = findParentAndRightsByName($group['name'], $group_rights);
+
+			if ($parent === false) {
+				if ($group['rights'] != PERM_NONE) {
+					$list[$group['name']] = [
+						'name' => $group['name'],
+						'rights' => $group['rights'],
+						'host_groupid' => $group['host_groupid']
+					];
+
+					$data['same_permissions'] = false;
+				}
+			}
+			else {
+				if ($group['rights'] == $parent['rights']) {
+					if ($group['rights'] != PERM_NONE && array_key_exists($parent['name'], $list)
+							&& substr($list[$parent['name']]['name'], -2) !== '/*') {
+						$list[$parent['name']]['name'] .= '/*';
+					}
+				}
+				else {
+					$data['same_permissions'] = false;
+
+					if ($group['rights'] != PERM_NONE) {
+						$list[$group['name']] = [
+							'name' => $group['name'],
+							'rights' => $group['rights'],
+							'host_groupid' => $group['host_groupid']
+						];
+					}
+					else {
+						if (array_key_exists($parent['name'], $list)
+								&& substr($list[$parent['name']]['name'], -2) !== '/*') {
+							$list[$parent['name']]['name'] .= '/*';
+						}
+
+						$list[$group['name']] = [
+							'name' => $group['name'],
+							'rights' => $group['rights'],
+							'host_groupid' => $group['host_groupid']
+						];
+					}
+				}
+			}
+		}
+
+		// Get max permission to display in case if all permissions are the same.
+		if ($data['same_permissions']) {
+			foreach ($list as $elem) {
+				if ($elem['rights'] > $data['permission_all']) {
+					$data['permission_all'] = $elem['rights'];
+				}
+			}
+
+			// Display only * (with max found permission if same), and no list.
+			unset($list);
+		}
+		else {
+			$data['permissions'] = $list;
+		}
 	}
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
