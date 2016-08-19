@@ -353,14 +353,13 @@ if (hasRequest('form')) {
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
 		'group_users' => getRequest('group_users', []),
 		'new_permission' => getRequest('new_permission', PERM_NONE),
-		'form_refresh' => getRequest('form_refresh', 0)
+		'form_refresh' => getRequest('form_refresh', 0),
+		'group_rights' => [],
 	];
 
 	if (hasRequest('usrgrpid')) {
 		$data['usrgrp'] = reset($dbUserGroup);
 	}
-
-	$group_rights = [];
 
 	if (hasRequest('usrgrpid')) {
 		// User group exists, but there might be no permissions set yet.
@@ -389,29 +388,27 @@ if (hasRequest('form')) {
 		);
 
 		while ($db_right = DBfetch($db_rights)) {
-			$group_rights[$db_right['name']] = [
+			$data['group_rights'][$db_right['name']] = [
 				'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
 				'name' => $db_right['name'],
 				'host_groupid' => $db_right['host_groupid']
 			];
 		}
 
-		$data['group_rights'] = $group_rights;
+		$data['group_rights'] = getRequest('group_rights', $data['group_rights']);
 	}
 	else {
 		// User group does not exist, no permissions exist, get all host groups and set all permissions to NONE.
 		$host_groups = API::HostGroup()->get(['groupid', 'name']);
 
-		// $group_rights is required for comparison when adding new elements to list.
+		// $data['group_rights'] is required for comparison when adding new elements to list.
 		foreach ($host_groups as $host_group) {
-			$group_rights[$host_group['name']] = [
+			$data['group_rights'][$host_group['name']] = [
 				'rights' => PERM_NONE,
 				'name' => $host_group['name'],
 				'host_groupid' => $host_group['groupid']
 			];
 		}
-
-		$data['group_rights'] = $group_rights;
 	}
 
 	if (hasRequest('add_permission')) {
@@ -436,7 +433,7 @@ if (hasRequest('form')) {
 		// Filter only parent IDs (Parent1/*, Parent2/Child1/*) from list.
 		$ls_parentids = array_diff_key($ls_groupids, $ms_groupids);
 
-		$new_ls_groupids = findParentAndChildsForUpdate($ls_parentids, $group_rights);
+		$new_ls_groupids = findParentAndChildsForUpdate($ls_parentids, $data['group_rights']);
 
 		/* Host group IDs (Parent1, Parent2/Child1) from the permission list to overwrite Host group ID parents
 		 *(Parent1/*, Parent2/Child1/*) from the permission list and keys are preserved.
@@ -458,8 +455,8 @@ if (hasRequest('form')) {
 			$new_ls_groupids[$groupid] = $perm;
 		}
 
-		foreach ($group_rights as $name => $rights) {
-			$group_rights[$name] = [
+		foreach ($data['group_rights'] as $name => $rights) {
+			$data['group_rights'][$name] = [
 				'rights' => array_key_exists($rights['host_groupid'], $new_ls_groupids)
 					? $new_ls_groupids[$rights['host_groupid']]
 					: $rights['rights'],
@@ -467,9 +464,6 @@ if (hasRequest('form')) {
 				'host_groupid' => $rights['host_groupid']
 			];
 		}
-
-		// Needs to be saved after recalculation.
-		$data['group_rights'] = $group_rights;
 	}
 	elseif (hasRequest('form_refresh')) {
 		// Tried to submit() form, but got error and the permission list was changed. Build new list according to changes.
@@ -481,8 +475,8 @@ if (hasRequest('form')) {
 			$new_ls_groupids[$groupid] = $perm;
 		}
 
-		foreach ($group_rights as $name => $rights) {
-			$group_rights[$name] = [
+		foreach ($data['group_rights'] as $name => $rights) {
+			$data['group_rights'][$name] = [
 				'rights' => array_key_exists($rights['host_groupid'], $new_ls_groupids)
 					? $new_ls_groupids[$rights['host_groupid']]
 					: $rights['rights'],
@@ -490,9 +484,6 @@ if (hasRequest('form')) {
 				'host_groupid' => $rights['host_groupid']
 			];
 		}
-
-		// Needs to be saved after recalculation.
-		$data['group_rights'] = $group_rights;
 	}
 
 	//  If all groups have same permissions, show only * and the maximum permission.
@@ -500,14 +491,14 @@ if (hasRequest('form')) {
 	$data['permission_all'] = PERM_NONE;
 	$data['permissions'] = [];
 
-	if ($group_rights) {
-		order_result($group_rights, 'name');
+	if ($data['group_rights']) {
+		order_result($data['group_rights'], 'name');
 
 		// Group name and permission list.
 		$list = [];
 
-		foreach ($group_rights as $group) {
-			$parent = findParentAndRightsByName($group['name'], $group_rights);
+		foreach ($data['group_rights'] as $group) {
+			$parent = findParentAndRightsByName($group['name'], $data['group_rights']);
 
 			if ($parent === false) {
 				if ($group['rights'] != PERM_NONE) {
@@ -570,9 +561,6 @@ if (hasRequest('form')) {
 	}
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
-
-	// sort group rights
-	order_result($data['group_rights'], 'name');
 
 	// get users
 	if ($data['selected_usrgrp'] > 0) {
