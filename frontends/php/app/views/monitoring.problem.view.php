@@ -255,6 +255,7 @@ switch ($data['filter']['show']) {
 	->setTitle(_('Problems'))
 	->setControls(
 		(new CForm('get'))
+			->cleanItems()
 			->addVar('action', 'problem.view')
 			->addVar('fullscreen', $data['fullscreen'])
 			->addVar('page', $data['page'])
