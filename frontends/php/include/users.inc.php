@@ -274,11 +274,17 @@ function findParentAndRightsByName($name, array $group_rights) {
  * Find parent and childs IDs by given host group IDs. If $group_rights is set, check that childs have same rights as
  * parent and onlt then overwrite them. If no $group_rights is set, overwrite them independely.
  *
- * @param array $parentids		An array of host group IDs. (parentids)
- * @param array $group_rights	An array of host group names and current rights. Example:
- *									$group_rights[<host_group_name>][<rights>] => -1
- *									$group_rights[<host_group_name>][<name>] => Zabbix servers/*
- *									$group_rights[<host_group_name>][<host_groupid>] = 4
+ * @param array $parentids				An array of host group IDs. (parentids)
+ * @param array $group_rights			An array of host group names and current rights. Example:
+ *											$group_rights[<Zabbix servers>][<name>] => Zabbix servers
+ *											$group_rights[<Zabbix servers>][<rights>] => -1
+ *											$group_rights[<Zabbix servers>][<host_groupid>] = 4
+ *											$group_rights[<Zabbix servers/My Server>][<name>] => Zabbix servers/My Server
+ *											$group_rights[<Zabbix servers/My Server>][<rights>] => -1
+ *											$group_rights[<Zabbix servers/My Server>][<host_groupid>] = 5
+ *											$group_rights[<Linux servers>][<name>] => Linux servers
+ *											$group_rights[<Linux servers>][<rights>] => 3
+ *											$group_rights[<Linux servers>][<host_groupid>] = 6
  *
  * @return array
  */
@@ -349,4 +355,74 @@ function permissionText($perm) {
 		case PERM_DENY: return _('Deny');
 		case PERM_NONE: return _('None');
 	}
+}
+
+/**
+ * Create host group permission hierarchical list.
+ *
+ * @param array $group_rights			An array of host group names and current rights. Example:
+ *											$group_rights[<Zabbix servers>][<name>] => Zabbix servers
+ *											$group_rights[<Zabbix servers>][<rights>] => -1
+ *											$group_rights[<Zabbix servers>][<host_groupid>] = 4
+ *											$group_rights[<Zabbix servers/My Server>][<name>] => Zabbix servers/My Server
+ *											$group_rights[<Zabbix servers/My Server>][<rights>] => -1
+ *											$group_rights[<Zabbix servers/My Server>][<host_groupid>] = 5
+ *											$group_rights[<Linux servers>][<name>] => Linux servers
+ *											$group_rights[<Linux servers>][<rights>] => 3
+ *											$group_rights[<Linux servers>][<host_groupid>] = 6
+ *
+ * @return array						Returns hierarchical list and flag as second array parameter
+ *										(true, if all permissions are the same).
+ */
+function createPermissionList(array $group_rights) {
+	// Group name and permission list.
+	$same_permissions = true;
+	$list = [];
+
+	foreach ($group_rights as $group) {
+		$parent = findParentAndRightsByName($group['name'], $group_rights);
+
+		if ($parent === false) {
+			if ($group['rights'] != PERM_NONE) {
+				$list[$group['name']] = [
+					'name' => $group['name'],
+					'rights' => $group['rights'],
+					'host_groupid' => $group['host_groupid']
+				];
+			}
+		}
+		else {
+			if ($group['rights'] == $parent['rights']) {
+				if ($group['rights'] != PERM_NONE && array_key_exists($parent['name'], $list)
+						&& substr($list[$parent['name']]['name'], -2) !== '/*') {
+					$list[$parent['name']]['name'] .= '/*';
+				}
+			}
+			else {
+				$same_permissions = false;
+
+				if ($group['rights'] != PERM_NONE) {
+					$list[$group['name']] = [
+						'name' => $group['name'],
+						'rights' => $group['rights'],
+						'host_groupid' => $group['host_groupid']
+					];
+				}
+				else {
+					if (array_key_exists($parent['name'], $list)
+							&& substr($list[$parent['name']]['name'], -2) !== '/*') {
+						$list[$parent['name']]['name'] .= '/*';
+					}
+
+					$list[$group['name']] = [
+						'name' => $group['name'],
+						'rights' => $group['rights'],
+						'host_groupid' => $group['host_groupid']
+					];
+				}
+			}
+		}
+	}
+
+	return [$list, $same_permissions];
 }

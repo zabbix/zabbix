@@ -32,7 +32,10 @@
 function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = [
 		'is_profile' => $isProfile,
-		'config' => $config
+		'config' => $config,
+		'same_permissions' => true,
+		'permission_all' => PERM_NONE,
+		'permissions' => []
 	];
 
 	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
@@ -156,110 +159,69 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		]);
 		order_result($data['groups'], 'name');
 
-		$group_ids = array_values($data['user_groups']);
-		if (count($group_ids) == 0) {
-			$group_ids = [-1];
-		}
-		$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
+		$groupids = array_values($data['user_groups']);
+		$sql = '';
+		$i = 0;
+		$cnt = count($groupids);
 
-		// deny beat all, read-write beat read
-		$tmp_permissions = [];
+		foreach ($groupids as $groupid) {
+			$sql .= 'SELECT r.rightid,r.permission,r.groupid AS user_groupid,g.groupid AS host_groupid,g.name'.
+					' FROM groups g'.
+					' LEFT JOIN rights r ON r.id=g.groupid AND r.groupid='.zbx_dbstr($groupid);
+
+			if ($i + 1 != $cnt) {
+				$sql .= ' UNION ';
+			}
+
+			$i++;
+		}
+
+		$db_rights = DBselect($sql);
+
+		// Deny beats all, read-write beats read.
+		$group_rights = [];
 		while ($db_right = DBfetch($db_rights)) {
-			if (isset($tmp_permissions[$db_right['id']]) && $tmp_permissions[$db_right['id']] != PERM_DENY) {
-				$tmp_permissions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
-					? PERM_DENY
-					: max($tmp_permissions[$db_right['id']], $db_right['permission']);
+			if (array_key_exists($db_right['name'], $group_rights)
+					&& $group_rights[$db_right['name']]['rights'] != PERM_DENY) {
+				if ($db_right['permission'] == PERM_DENY) {
+					$group_rights[$db_right['name']]['rights'] = PERM_DENY;
+				}
+				else {
+					$group_rights[$db_right['name']]['rights'] = ($db_right['rightid'] == 0)
+						? PERM_NONE
+						: max($group_rights[$db_right['name']]['rights'], $db_right['permission']);
+				}
 			}
 			else {
-				$tmp_permissions[$db_right['id']] = $db_right['permission'];
+				$group_rights[$db_right['name']] = [
+					'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
+					'name' => $db_right['name'],
+					'host_groupid' => $db_right['host_groupid']
+				];
 			}
 		}
 
-		$data['user_rights'] = [];
-		foreach ($tmp_permissions as $id => $permission) {
-			array_push($data['user_rights'], ['id' => $id, 'permission' => $permission]);
+		order_result($group_rights, 'name');
+
+		list($list, $data['same_permissions']) = createPermissionList($group_rights);
+
+		// Get max permission to display in case if all permissions are the same.
+		if ($data['same_permissions']) {
+			foreach ($list as $elem) {
+				if ($elem['rights'] > $data['permission_all']) {
+					$data['permission_all'] = $elem['rights'];
+				}
+			}
+
+			// Display only * (with max found permission if same), and no list.
+			unset($list);
+		}
+		else {
+			$data['permissions'] = $list;
 		}
 	}
 
 	return $data;
-}
-
-function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
-	// group
-	$lists['group']['label']		= _('Host groups');
-	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
-	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
-	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
-
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY);
-
-	foreach ($groups as $group) {
-		switch($group['permission']) {
-			case PERM_READ:
-				$list_name = 'read_only';
-				break;
-			case PERM_READ_WRITE:
-				$list_name = 'read_write';
-				break;
-			default:
-				$list_name = 'deny';
-		}
-		$lists['group'][$list_name]->addItem($group['groupid'], $group['name']);
-	}
-	unset($groups);
-
-	// host
-	$lists['host']['label']		= _('Hosts');
-	$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
-	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
-	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
-
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY);
-
-	foreach ($hosts as $host) {
-		switch($host['permission']) {
-			case PERM_READ:
-				$list_name = 'read_only';
-				break;
-			case PERM_READ_WRITE:
-				$list_name = 'read_write';
-				break;
-			default:
-				$list_name = 'deny';
-		}
-		if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
-			$host['host_name'] = $host['host'];
-		}
-		$lists['host'][$list_name]->addItem($host['hostid'], $host['host_name']);
-	}
-	unset($hosts);
-
-	// display
-	if (empty($rightsFormList)) {
-		$rightsFormList = new CFormList('rightsFormList');
-	}
-	$isHeaderDisplayed = false;
-	foreach ($lists as $list) {
-		$sLabel = '';
-		$row = new CRow();
-		foreach ($list as $class => $item) {
-			if (is_string($item)) {
-				$sLabel = $item;
-			}
-			else {
-				$row->addItem((new CCol($item))->addClass($class));
-			}
-		}
-
-		$table = new CTable();
-		if (!$isHeaderDisplayed) {
-			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
-			$isHeaderDisplayed = true;
-		}
-		$table->addRow($row);
-		$rightsFormList->addRow($sLabel, $table);
-	}
-	return $rightsFormList;
 }
 
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {

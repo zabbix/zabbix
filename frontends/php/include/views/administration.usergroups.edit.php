@@ -94,14 +94,7 @@ $permissions_table = (new CTable())
 	->setHeader([_('Host group'), _('Permissions')]);
 
 if ($data['same_permissions']) {
-	$permissions_table->addRow(['*', ($data['permission_all'] == PERM_DENY)
-		? _('Deny')
-		: ($data['permission_all'] == PERM_READ)
-			? _('Read')
-			: ($data['permission_all'] == PERM_READ_WRITE)
-				? _('Read-write')
-				: _('None')
-	]);
+	$permissions_table->addRow(['*', permissionText($data['permission_all'])]);
 }
 else {
 	$permissions_table->addRow(['*', _('None')]);
