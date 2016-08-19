@@ -44,6 +44,8 @@ my $epp_valuemapid = 21;
 
 info("fixing items...");
 db_exec("update items set name='DNS test',key_='rsm.dns[{\$RSM.TLD}]' where key_='rsm.dns.udp[{\$RSM.TLD}]'");
+db_exec("update items set name='RDDS43 update time' where key_='rsm.slv.rdds43.upd'");
+db_exec("update items set name='DNS UDP update time' where key_='rsm.slv.dns.udp.upd'");
 db_exec("delete from items where key_='rsm.dns.tcp[{\$RSM.TLD}]'");
 $rows_ref = db_select("select 1 from applications where name='DNS' limit 1");
 if (0 == @{$rows_ref})
@@ -69,17 +71,25 @@ __bulk_macro_create($global_macros, undef);	# do not force update
 my $tlds_ref = get_tlds('epp');
 my @items_to_create;
 my @items_to_update;
-my @hostids;
+my @tmpl_hostids;
 my $applications;
 foreach (@{$tlds_ref})
 {
 	$tld = $_;
 
-	push(@hostids, get_hostid("Template $tld"));
+	my ($rdds43, $rdds80, $rdap) = get_macro_rdds_enabled();
+
+	my $hostid = get_hostid("$tld");
+	my $tmpl_hostid = get_hostid("Template $tld");
+
+	__create_slv_monthly('DNS update time', 'rsm.slv.dns.upd', $hostid);
+	__create_slv_monthly('DNS TCP update time', 'rsm.slv.dns.tcp.upd', $hostid);
+
+	push(@tmpl_hostids, $tmpl_hostid);
 }
 undef($tld);
 
-my $items_ref = get_items_by_hostids(\@hostids, 'rsm.dns.udp.upd[', 0, 1);	# incomplete key, with keys
+my $items_ref = get_items_by_hostids(\@tmpl_hostids, 'rsm.dns.udp.upd[', 0, 1);	# incomplete key, with keys
 
 foreach my $item_ref (@{$items_ref})
 {
@@ -426,8 +436,6 @@ sub __create_slv_monthly($$$$$)
 	my $test_name = shift;
 	my $key_base = shift;
 	my $hostid = shift;
-	my $host_name = shift;
-	my $macro = shift;
 
 	my $applicationid = __get_application_id($hostid, APP_SLV_MONTHLY);
 

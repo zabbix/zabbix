@@ -19,6 +19,24 @@ use RSMSLV;
 use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
 use TLDs;
 
+sub __get_host_macro($$$)
+{
+	my $hostid = shift;
+	my $m = shift;
+	my $optional = shift;
+
+	my $rows_ref = db_select("select value from hostmacro where hostid=$hostid and macro='$m'");
+
+	if (0 == scalar(@$rows_ref))
+	{
+		fail("cannot find macro '$m'") unless ($optional);
+
+		return undef;
+	}
+
+	return $rows_ref->[0]->[0];
+}
+
 parse_opts();
 
 setopt('nolog');
@@ -40,7 +58,60 @@ if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 set_slv_config($config);
 db_connect();
 
-my $tlds_ref = get_tlds();
+print("Fixing TLD macros RDDS.ENABLED...\n");
+my $tlds_ref = get_tlds(ENABLED_DNS);
+foreach (@{$tlds_ref})
+{
+	$tld = $_;	# set globally
+
+	my $templateid = get_hostid("Template $tld");
+
+	my $rdds = __get_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}', 1);	# optional
+
+	next unless (defined($rdds));
+
+	if ($rdds)
+	{
+		__create_macro('{$RSM.TLD.RDDS43.ENABLED}', 1, $templateid, undef);	# templated, do not force update
+		__create_macro('{$RSM.TLD.RDDS80.ENABLED}', 1, $templateid, undef);	# templated, do not force update
+	}
+	else
+	{
+		__create_macro('{$RSM.TLD.RDDS43.ENABLED}', 0, $templateid, undef);	# templated, do not force update
+		__create_macro('{$RSM.TLD.RDDS80.ENABLED}', 0, $templateid, undef);	# templated, do not force update
+	}
+
+	__create_macro('{$RSM.TLD.RDAP.ENABLED}', 0, $templateid, undef);		# templated, do not force update
+
+	__delete_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}');
+}
+undef($tld);
+
+print("Fixing probe macros RDDS.ENABLED...\n");
+my $probes_ref = get_probes(ENABLED_DNS);
+foreach my $host (keys(%{$probes_ref}))
+{
+	my $templateid = get_hostid("Template $host");
+
+	my $rdds = __get_host_macro($templateid, '{$RSM.RDDS.ENABLED}', 1);	# optional
+
+	next unless (defined($rdds));
+
+	if ($rdds)
+	{
+		__create_macro('{$RSM.RDDS43.ENABLED}', 1, $templateid, undef);	# templated, do not force update
+		__create_macro('{$RSM.RDDS80.ENABLED}', 1, $templateid, undef);	# templated, do not force update
+	}
+	else
+	{
+		__create_macro('{$RSM.RDDS43.ENABLED}', 0, $templateid, undef);	# templated, do not force update
+		__create_macro('{$RSM.RDDS80.ENABLED}', 0, $templateid, undef);	# templated, do not force update
+	}
+
+	__create_macro('{$RSM.RDAP.ENABLED}', 0, $templateid, undef);		# templated, do not force update
+
+	__delete_host_macro($templateid, '{$RSM.RDDS.ENABLED}');
+}
 
 if (0)
 {
@@ -407,6 +478,24 @@ sub __create_macro
 	return $result;
 }
 
+sub __delete_host_macro
+{
+	my $templateid = shift;
+	my $name = shift;
+
+	my ($macroid, $result);
+
+	$result = $zabbix->get('usermacro', {'output' => 'extend', 'hostids' => $templateid, 'filter' => {'macro' => $name}});
+
+	return if (!exists($result->{'hostmacroid'}));
+
+	$macroid = $result->{'hostmacroid'};
+
+	$zabbix->remove('usermacro', [$macroid]);
+
+	return $macroid;
+}
+
 sub __create_slv_item
 {
 	my $name = shift;
@@ -491,19 +580,18 @@ sub __create_slv_monthly($$$$$)
 		__create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,   [$applicationid]);
 		__create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,   [$applicationid]);
 		__create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
+
+		if ($host_name)
+		{
+			my $options = {
+				'description' => $test_name . ' < ' . $macro . '%',
+				'expression' => '{'.$host_name.':'.$key_base.'.pfailed.last(0)}<'.$macro,
+				'priority' => '4'
+			};
+
+			__create_trigger($options);
+		}
 	}
-}
-
-sub __get_host_macro($$)
-{
-	my $hostid = shift;
-	my $m = shift;
-
-	my $rows_ref = db_select("select value from hostmacro where hostid=$hostid and macro='$m'");
-
-	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
-
-	return $rows_ref->[0]->[0];
 }
 
 sub __create_missing_slv_montly_items_and_triggers
@@ -526,16 +614,21 @@ sub __create_missing_slv_montly_items_and_triggers
 
 		my $templateid = $rows_ref->[0]->[0];
 
-		my $rdds_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}');
-		my $epp_enabled = __get_host_macro($templateid, '{$RSM.TLD.EPP.ENABLED}');
+		my $rdds43_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDDS43.ENABLED}', 0);	# not optional
+		my $rdds80_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDDS80.ENABLED}', 0);	# not optional
+		my $rdap_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDAP.ENABLED}', 0);		# not optional
+
+		my $rdds_enabled = $rdds43_enabled || $rdds80_enabled || $rdap_enabled;
+
+		my $epp_enabled = __get_host_macro($templateid, '{$RSM.TLD.EPP.ENABLED}', 0);
 
 		__create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid, $tld, '{$RSM.SLV.DNS.UDP.RTT}');
 		__create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid, $tld, '{$RSM.SLV.DNS.TCP.RTT}');
 
 		# create Service downtime triggers
 		my @services = ('dns');
-		push(@services, 'rdds') if ($rdds_enabled == 1);
-		push(@services, 'epp') if ($epp_enabled == 1);
+		push(@services, 'rdds') if ($rdds_enabled);
+		push(@services, 'epp') if ($epp_enabled);
 
 		foreach my $service (@services)
 		{
@@ -550,19 +643,43 @@ sub __create_missing_slv_montly_items_and_triggers
 			__create_trigger($options);
 		}
 
-		if ($rdds_enabled == 1)
+		if ($rdds_enabled)
 		{
-			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
-			__create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
+			__create_slv_monthly("RDDS Query RTT", "rsm.slv.rdds.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
+
+			if ($rdds43_enabled)
+			{
+				__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, 0, 0);	# no trigger
+			}
+
+			if ($rdds80_enabled)
+			{
+				__create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, 0, 0);	# no trigger
+			}
+
+			if ($rdap_enabled)
+			{
+				__create_slv_monthly("RDAP Query RTT", "rsm.slv.rdap.rtt", $hostid, 0, 0);	# no trigger
+			}
 		}
 
-		if ($epp_enabled == 1)
+		if ($epp_enabled)
 		{
 			__create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
 
-			if ($rdds_enabled == 1)
+			if ($rdds_enabled && ($rdds43_enabled || $rdap_enabled))
 			{
-				__create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}');
+				__create_slv_monthly("RDDS update time", "rsm.slv.rdds.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}');
+
+				if ($rdds43_enabled)
+				{
+					__create_slv_monthly("RDDS43 update time", "rsm.slv.rdds43.upd", $hostid, 0, 0);	# no trigger
+				}
+
+				if ($rdap_enabled)
+				{
+					__create_slv_monthly("RDAP update time", "rsm.slv.rdap.upd", $hostid, 0, 0);		# no trigger
+				}
 			}
 
 			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $tld, '{$RSM.SLV.EPP.LOGIN}');

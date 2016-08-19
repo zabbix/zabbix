@@ -32,7 +32,7 @@ my $delay = get_macro_dns_delay($now);
 my ($month_from, undef, $value_ts) = get_month_bounds($now, $delay);
 my $month_till = cycle_end($value_ts, $delay);
 
-my $tlds_ref = get_tlds();
+my $tlds_ref = get_tlds(ENABLED_DNS);
 
 my $tld_index = 0;
 my $tld_count = scalar(@{$tlds_ref});

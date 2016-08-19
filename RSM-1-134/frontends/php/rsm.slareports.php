@@ -153,6 +153,10 @@ if ($data['filter_search']) {
 			}
 		}
 
+		// Remove key duplicates.
+		$item_keys = array_unique($item_keys);
+		$macro_keys = array_unique($macro_keys);
+
 		// Get items.
 		$items = API::Item()->get(array(
 			'output' => array('itemid', 'name', 'key_', 'value_type'),
@@ -285,9 +289,10 @@ if ($data['filter_search']) {
 			}
 
 			if ($item_values) {
-				CArrayHelper::sort($item_hystory, 'clock');
-				$from = date('Y-m-d H:i:s', $item_hystory[0]);
-				$to = date('Y-m-d H:i:s', end($item_hystory));
+				CArrayHelper::sort($item_values, array('clock'));
+				$from = date('Y-m-d H:i:s', $item_values[0]['clock']);
+				$last_hystory_value = end($item_values);
+				$to = date('Y-m-d H:i:s', $last_hystory_value['clock']);
 			}
 			else {
 				$from = '-';

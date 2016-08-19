@@ -121,18 +121,18 @@ foreach my $service (keys(%{$services}))
 	}
 }
 
-my $all_probes_ref = get_probes();	# we need to have the details of specified probe
+my $probes_ref = get_probes(ENABLED_DNS);	# we need to have the details of specified probe
 
 if (opt('probe'))
 {
-	my $temp = $all_probes_ref;
+	my $temp = $probes_ref;
 
-	undef($all_probes_ref);
+	undef($probes_ref);
 
-	$all_probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
+	$probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
 }
 
-my $probe_times_ref = get_probe_times($from, $till, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $probes_ref);
 
 if (opt('debug'))
 {
@@ -166,7 +166,7 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = get_tlds();
+	$tlds_ref = get_tlds(ENABLED_DNS);
 }
 
 db_disconnect();
@@ -280,7 +280,7 @@ sub __validate_input
 
 		my $probe = getopt('probe');
 
-		my $probes_ref = get_probes();
+		my $probes_ref = get_probes(ENABLED_DNS);
 		my $valid = 0;
 
 		foreach my $name (keys(%$probes_ref))

@@ -31,27 +31,29 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $service_type, $delay);
+my ($key, $service_option, $delay);
 
 if (getopt('service') eq 'dns')
 {
+	$service_option = ENABLED_DNS;
 	$key = 'rsm.slv.dns.avail';
 	$delay = get_macro_dns_delay();
 }
 elsif (getopt('service') eq 'dns-ns')
 {
+	$service_option = ENABLED_DNS;
 	$key = 'rsm.slv.dns.ns.avail[';
 	$delay = get_macro_dns_delay();
 }
 elsif (getopt('service') eq 'rdds')
 {
-	$service_type = 'rdds';
+	$service_option = ENABLED_RDDS;
 	$key = 'rsm.slv.rdds.avail';
 	$delay = get_macro_rdds_delay();
 }
 elsif (getopt('service') eq 'epp')
 {
-	$service_type = 'epp';
+	$service_option = ENABLED_EPP;
 	$key = 'rsm.slv.epp.avail';
 	$delay = get_macro_epp_delay();
 }
@@ -65,7 +67,7 @@ my ($from, $till) = get_default_period(time() - $delay - AVAIL_SHIFT_BACK, $dela
 
 info('selected period: ', selected_period($from, $till));
 
-my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_option);
 
 foreach (@$tlds_ref)
 {

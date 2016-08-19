@@ -24,9 +24,9 @@
 
 #define ZBX_EC_NOERROR	0
 
-/* item values indicating an error code: */
-/* -1   .. -199    internal monitoring software errors */
-/* -200 .. -999    service errors (registry operator fault), except -208, -250 and -500 */
+/* item values indicating an error code: NB! KEEP THIS IN SYNC WITH checks_simple_rsm.c and RSMSLV.pm */
+/* -1   .. -199, -208, -250, -500	internal monitoring software errors                           */
+/* -200 .. -999				service errors (registry operator fault)                      */
 
 /* internal */
 #define ZBX_EC_INTERNAL			-1	/* general internal error */

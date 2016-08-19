@@ -30,9 +30,8 @@ db_connect();
 my $from = truncate_from(getopt('from'));
 my $till = truncate_till(getopt('till'));
 
-my $probes_ref = get_probes();
-
-$result = get_probe_times($from, $till, $probes_ref);
+my $probes_ref = get_probes(ENABLED_DNS);
+my $result = get_probe_times($from, $till, $probes_ref);
 
 my $printed = 0;
 foreach my $probe (keys(%$probes_ref))

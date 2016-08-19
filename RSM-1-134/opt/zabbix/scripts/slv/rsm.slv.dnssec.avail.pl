@@ -42,7 +42,7 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds();
+        $tlds_ref = get_tlds(ENABLED_DNSSEC);
 }
 
 while ($period > 0)

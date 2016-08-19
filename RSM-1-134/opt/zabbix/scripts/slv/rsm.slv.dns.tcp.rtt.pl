@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS TCP monthly Name Server resolution RTT
+# TCP DNS Resolution RTT
 
 BEGIN
 {
@@ -14,15 +14,25 @@ use RSM;
 use RSMSLV;
 use Parallel;
 
-use constant VALUE_INVALID	=> -1;	# used internally
-
-my $cfg_key_in = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
-my $cfg_keys_out =
+my $keys =
 {
-	'failed'	=> 'rsm.slv.dns.tcp.rtt.failed',
-	'max'		=> 'rsm.slv.dns.tcp.rtt.max',
-	'avg'		=> 'rsm.slv.dns.tcp.rtt.avg',
-	'pfailed'	=> 'rsm.slv.dns.tcp.rtt.pfailed'
+	'services' =>
+	[
+		{
+			'service' => 'DNS',
+			'keys' =>
+			{
+				'in' => 'rsm.dns.tcp.rtt[{$RSM.TLD},',
+				'out' =>
+				{
+					'failed'	=> 'rsm.slv.dns.tcp.rtt.failed',
+					'max'		=> 'rsm.slv.dns.tcp.rtt.max',
+					'avg'		=> 'rsm.slv.dns.tcp.rtt.avg',
+					'pfailed'	=> 'rsm.slv.dns.tcp.rtt.pfailed'
+				}
+			}
+		}
+	]
 };
 
 parse_opts('tld=s', 'now=i');
@@ -43,12 +53,17 @@ db_connect();
 my $cfg_max_value = get_macro_dns_tcp_rtt_low();
 my $delay = get_macro_dns_delay($now);
 
-my ($from, $month_till, $value_ts) = get_month_bounds($now, $delay);
+my ($month_from, $month_till, $value_ts) = get_month_bounds($now, $delay);
 my $cycle_till = cycle_end($value_ts, $delay);
 
-my $probes_ref = get_probes();
+my $left_cycles = get_num_cycles($cycle_till + 1, $month_till, $delay);
+my ($probes_ipv4, $probes_ipv6) = get_ipv_probes();
 
-my $probe_times_ref = get_probe_times($from, $cycle_till, $probes_ref);
+my $left_ipv4_cycles = $left_cycles * $probes_ipv4;
+my $left_ipv6_cycles = $left_cycles * $probes_ipv6;
+
+my $probes_ref = get_probes(ENABLED_DNS);
+my $probe_times_ref = get_probe_times($month_from, $cycle_till, $probes_ref);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -59,23 +74,19 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds();
+        $tlds_ref = get_tlds(ENABLED_DNS);
 }
-
-my ($probes_ipv4, $probes_ipv6) = get_ipv_probes();
-my $month_cycles = get_num_cycles($from, $month_till, $delay);
-
-my $month_ipv4_cycles = $month_cycles * $probes_ipv4;
-my $month_ipv6_cycles = $month_cycles * $probes_ipv6;
 
 if (opt('debug'))
 {
 	dbg("$probes_ipv4 probes with IPv4 enabled");
 	dbg("$probes_ipv6 probes with IPv6 enabled");
-	dbg("$month_cycles month cycles");
+	dbg("$left_cycles month cycles left");
 	dbg("delay: ", friendly_delay($delay));
-	dbg("period: ", selected_period($from, $cycle_till), ", value ts: ", ts_full($value_ts));
+	dbg("period: ", selected_period($month_from, $cycle_till), ", value ts: ", ts_full($value_ts));
 }
+
+my ($ipv4_addresses, $ipv6_addresses);
 
 my $tld_index = 0;
 my $tld_count = scalar(@{$tlds_ref});
@@ -100,44 +111,29 @@ while ($tld_index < $tld_count)
 
 		db_connect();
 
-		my $test_key = $cfg_keys_out->{'failed'};
-		my $result;
+		# NB! These variables are global and are used in max_tests().
+		$ipv4_addresses = 0;
+		$ipv6_addresses = 0;
 
-		if (!opt('dry-run'))
+		my $key_in = $keys->{'services'}->[0]->{'keys'}->{'in'};
+		my $nsips_ref = get_templated_nsips($tld, $key_in);
+
+		foreach my $nsip (@$nsips_ref)
 		{
-			if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
+			my $ip_version = get_ip_version(get_ip_from_nsip($nsip));
+
+			if ($ip_version == 4)
 			{
-				wrn("configuration error: DNS NS monthly RTT item not found (\"$test_key\")");
-				exit(0);
+				$ipv4_addresses++;
 			}
-
-			exit(0) if (uint_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
+			else
+			{
+				$ipv6_addresses++;
+			}
 		}
 
-		$result = process_slv_ns_monthly($tld, $cfg_key_in, $from, $cycle_till, $value_ts, $delay,
-			$probe_times_ref, \&check_item_value);
-
-		init_values();
-
-		if (!$result->{'total_tests'})
-		{
-			wrn("no values found in the database for a given period");
-			exit(0);
-		}
-
-		my $failed = $result->{'failed_tests'};
-		my $pfailed = (sprintf("%.3f", $result->{'total_tests'} ?
-			$result->{'failed_tests'} * 100 / $result->{'total_tests'} : 0));
-		my $avg = (sprintf("%.3f", $result->{'successful_tests'} ?
-			$result->{'successful_accum'} / $result->{'successful_tests'} : VALUE_INVALID));
-		my $max = $month_ipv4_cycles * $result->{'ipv4_addresses'} + $month_ipv6_cycles * $result->{'ipv6_addresses'};
-
-		push_value($tld, $cfg_keys_out->{'failed'},  $value_ts, $failed,  "failed tests (total: ", $result->{'total_tests'}, ")");
-		push_value($tld, $cfg_keys_out->{'avg'},     $value_ts, $avg,     "average RTT") unless ($avg == VALUE_INVALID);
-		push_value($tld, $cfg_keys_out->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
-		push_value($tld, $cfg_keys_out->{'max'},     $value_ts, $max,     "max tests per month");
-
-		send_values();
+		process_slv_monthly($tld, $month_from, $cycle_till, $value_ts, $delay, $probe_times_ref, $keys,
+			'TCP DNS Resolution RTT', \&check_item_value, \&max_tests);
 
 		exit(0);
 	}
@@ -161,4 +157,11 @@ sub check_item_value
 	my $value = shift;
 
 	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? E_FAIL : SUCCESS;
+}
+
+sub max_tests
+{
+	my $tests_performed = shift;
+
+	return $tests_performed + ($left_ipv4_cycles * $ipv4_addresses) + ($left_ipv6_cycles * $ipv6_addresses);
 }

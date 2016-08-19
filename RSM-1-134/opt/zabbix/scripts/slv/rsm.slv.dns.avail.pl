@@ -45,12 +45,13 @@ if (opt('tld'))
 }
 else
 {
-	$tlds_ref = get_tlds();
+	$tlds_ref = get_tlds(ENABLED_DNS);
 }
 
 my $times_from = get_cycle_bounds($now - $delay, $delay);
 my $times_till = ($times_from + $delay + $delay * $cycles - 1);
-my $probe_times_ref = get_probe_times($times_from, $times_till);
+my $probes_ref = get_probes(ENABLED_DNS);
+my $probe_times_ref = get_probe_times($times_from, $times_till, $probes_ref);
 
 my $tld_index = 0;
 my $tld_count = scalar(@{$tlds_ref});

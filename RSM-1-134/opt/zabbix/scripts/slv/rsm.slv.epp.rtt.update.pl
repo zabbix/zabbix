@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# EPP Transform-Command monthly RTT
+# EPP transform-command RTT
 
 BEGIN
 {
@@ -14,15 +14,25 @@ use RSM;
 use RSMSLV;
 use Parallel;
 
-use constant VALUE_INVALID	=> -1;	# used internally
-
-my $cfg_key_in = 'rsm.epp.rtt[{$RSM.TLD},update]';
-my $cfg_keys_out =
+my $keys =
 {
-	'failed'	=> 'rsm.slv.epp.rtt.update.failed',
-	'max'		=> 'rsm.slv.epp.rtt.update.max',
-	'avg'		=> 'rsm.slv.epp.rtt.update.avg',
-	'pfailed'	=> 'rsm.slv.epp.rtt.update.pfailed'
+	'services' =>
+	[
+		{
+			'service' => 'EPP',
+			'keys' =>
+			{
+				'in' => 'rsm.epp.rtt[{$RSM.TLD},update]',
+				'out' =>
+				{
+					'failed'	=> 'rsm.slv.epp.rtt.update.failed',
+					'max'		=> 'rsm.slv.epp.rtt.update.max',
+					'avg'		=> 'rsm.slv.epp.rtt.update.avg',
+					'pfailed'	=> 'rsm.slv.epp.rtt.update.pfailed'
+				}
+			}
+		}
+	]
 };
 
 parse_opts('tld=s', 'now=i');
@@ -43,13 +53,15 @@ db_connect();
 my $cfg_max_value = get_macro_epp_rtt_low('update');
 my $delay = get_macro_epp_delay($now);
 
-my ($from, $month_till, $value_ts) = get_month_bounds($now, $delay);
+my ($month_from, $month_till, $value_ts) = get_month_bounds($now, $delay);
 my $cycle_till = cycle_end($value_ts, $delay);
 
-my $probes_ref = get_probes();
+my $left_cycles = get_num_cycles($cycle_till + 1, $month_till, $delay);
+
+my $probes_ref = get_probes(ENABLED_EPP);
 my $probe_count = scalar(keys(%{$probes_ref}));
 
-my $probe_times_ref = get_probe_times($from, $cycle_till, $probes_ref);
+my $probe_times_ref = get_probe_times($month_from, $cycle_till, $probes_ref);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -60,16 +72,13 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds('EPP');
+        $tlds_ref = get_tlds(ENABLED_EPP);
 }
-
-my $month_cycles = get_num_cycles($from, $month_till, $delay);
 
 if (opt('debug'))
 {
-	dbg("$month_cycles month cycles");
 	dbg("delay: ", friendly_delay($delay));
-	dbg("period: ", selected_period($from, $cycle_till), ", value ts: ", ts_full($value_ts));
+	dbg("period: ", selected_period($month_from, $cycle_till), ", value ts: ", ts_full($value_ts));
 }
 
 my $tld_index = 0;
@@ -95,44 +104,8 @@ while ($tld_index < $tld_count)
 
 		db_connect();
 
-		my $test_key = $cfg_keys_out->{'failed'};
-		my $result;
-
-		if (!opt('dry-run'))
-		{
-			if (get_lastclock($tld, $test_key, \$result) != SUCCESS)
-			{
-				wrn("configuration error: EPP monthly update RTT item not found (\"$test_key\")");
-				exit(0);
-			}
-
-			exit(0) if (uint_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
-		}
-
-		$result = process_slv_monthly($tld, $cfg_key_in, $from, $cycle_till, $value_ts, $delay,
-			$probe_times_ref, \&check_item_value);
-
-		init_values();
-
-		if (!$result->{'total_tests'})
-		{
-			wrn("no values found in the database for a given period");
-			exit(0);
-		}
-
-		my $failed = $result->{'failed_tests'};
-		my $pfailed = (sprintf("%.3f", $result->{'total_tests'} ?
-			$result->{'failed_tests'} * 100 / $result->{'total_tests'} : 0));
-		my $avg = (sprintf("%.3f", $result->{'successful_tests'} ?
-			$result->{'successful_accum'} / $result->{'successful_tests'} : VALUE_INVALID));
-		my $max = $month_cycles * $probe_count;
-
-		push_value($tld, $cfg_keys_out->{'failed'},  $value_ts, $failed,  "failed tests (total: ", $result->{'total_tests'}, ")");
-		push_value($tld, $cfg_keys_out->{'avg'},     $value_ts, $avg,     "average RTT") unless ($avg == VALUE_INVALID);
-		push_value($tld, $cfg_keys_out->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
-		push_value($tld, $cfg_keys_out->{'max'},     $value_ts, $max,     "max tests per month");
-
-		send_values();
+		process_slv_monthly($tld, $month_from, $cycle_till, $value_ts, $delay, $probe_times_ref, $keys,
+			'EPP transform-command RTT', \&check_item_value, \&max_tests);
 
 		exit(0);
 	}
@@ -156,4 +129,11 @@ sub check_item_value
 	my $value = shift;
 
 	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? E_FAIL : SUCCESS;
+}
+
+sub max_tests
+{
+	my $tests_performed = shift;
+
+	return $tests_performed + ($left_cycles * $probe_count);
 }

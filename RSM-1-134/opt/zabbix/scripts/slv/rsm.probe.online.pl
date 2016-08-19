@@ -32,16 +32,18 @@ my $value_ts = $from;
 
 dbg("selected period: ", selected_period($from, $till), ", with value timestamp: ", ts_full($value_ts));
 
-my $all_probes_ref = get_probes();
+my $probes_ref = get_probes(ENABLED_DNS);
 
-my $probe_times_ref = get_probe_times2($from, $till, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $probes_ref);
 my @online_probes = keys(%{$probe_times_ref});
 
 init_values();
 
-foreach my $probe (keys(%$all_probes_ref))
+foreach my $probe (keys(%$probes_ref))
 {
 	my $itemid = get_probe_online_key_itemid($probe);
+
+	fail(rsm_slv_error()) unless ($itemid);
 
 	next if (!opt('dry-run') && uint_value_exists($value_ts, $itemid) == SUCCESS);
 

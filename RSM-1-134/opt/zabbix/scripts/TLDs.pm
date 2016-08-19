@@ -10,7 +10,7 @@ use base 'Exporter';
 our @EXPORT = qw(zbx_connect check_api_error get_proxies_list
 		create_probe_status_host
 		create_probe_template create_probe_status_template create_host create_group create_template create_item create_trigger create_macro update_root_servers
-		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host
+		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host create_graph
 		remove_templates remove_hosts remove_hostgroups remove_probes remove_items
 		disable_host disable_hosts bulk_macro_create get_global_macros
 		disable_items disable_triggers get_triggers_by_itemid
@@ -308,6 +308,61 @@ sub update_root_servers {
     }
 
     return '"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"';
+}
+
+sub create_graph
+{
+	my $name = shift;
+	my $items = shift;
+
+	my $items_count = scalar(@{$items});
+
+	return if ($items_count == 0);
+
+	my @hostids = ();
+	my @gitems = ();
+
+	my @color_map = ('EC414E', '68BC57', '4A89CB', 'F89749', '8C4F9A');
+	my @color_tmp = @color_map;
+
+	my $autocolor;
+
+	$autocolor = 1 if ($items_count > scalar(@color_map));
+
+	foreach (@{$items})
+	{
+		my $options = $_;
+
+		if (!$autocolor)
+		{
+			if (scalar(@color_tmp) == 0)
+			{
+				@color_tmp = @color_map;
+			}
+
+			my $color = shift @color_tmp;
+
+			$options->{'color'} = $color;
+		}
+
+		push @gitems, $options;
+		push @hostids, $_->{'hostid'};
+	}
+
+	my $result = $zabbix->get('graph', {'hostids' => [@hostids], 'filter' => {'name' => $name}});
+
+	if (exists($result->{'graphid'}))
+	{
+		$result = $zabbix->update('graph', {'graphid' => $result->{'graphid'}, 'name' => $name,
+				'gitems' => [@gitems]});
+	}
+	else
+	{
+		$result = $zabbix->create('graph', {'name' => $name, 'gitems' => [@gitems], 'width' => 900,
+				'height' => 200});
+	}
+
+	return $result;
 }
 
 sub create_host {

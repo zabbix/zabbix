@@ -1607,9 +1607,9 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM		*items = NULL;
 	zbx_ns_t	*nss = NULL;
 	size_t		i, j, items_num = 0, nss_num = 0;
-	int		ipv4_enabled, ipv6_enabled, ipv_flags = 0, dnssec_enabled, epp_enabled, minns, test_result, upd,
-			dns_test_step, dns_test_upd_step, dns_test_rec_step, max_test_step, max_upd_step, max_rec_step,
-			*upd_ptr = NULL, ret = SYSINFO_RET_FAIL;
+	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, minns, test_result, upd, dns_test_step,
+			dns_test_upd_step, dns_test_rec_step, max_test_step, max_upd_step, max_rec_step, *upd_ptr = NULL,
+			ret = SYSINFO_RET_FAIL;
 
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
@@ -1699,11 +1699,6 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	if (0 != ipv4_enabled)
-		ipv_flags |= ZBX_FLAG_IPV4_ENABLED;
-	if (0 != ipv6_enabled)
-		ipv_flags |= ZBX_FLAG_IPV6_ENABLED;
-
 	get_dns_test_data(item->host.hostid, &dns_test_step, &dns_test_upd_step, &dns_test_rec_step, &dbrec_found);
 
 	/* adjust steps according to possible macro value changes */
@@ -1732,8 +1727,8 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	for (idx = UDP_PROTO_IDX; idx <= TCP_PROTO_IDX; idx++)
 	{
-		char		proto = protos[idx].proto, keybuf[12];	/* rsm.dns.[udp|tcp] */
-		int		res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
+		char	proto = protos[idx].proto, keybuf[12];	/* rsm.dns.(udp|tcp) */
+		int	res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
 
 		if (0 != dns_test_step)
 		{
@@ -2120,9 +2115,6 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 
 	for (ipv = ipvs; NULL != ipv->name; ipv++)
 	{
-		if (0 == (ipv_flags & ipv->flag))
-			continue;
-
 		if (NULL == (pkt = ldns_resolver_query(res, host_rdf, ipv->rr_type, LDNS_RR_CLASS_IN, LDNS_RD)))
 		{
 			zbx_snprintf(err, err_size, "cannot resolve host \"%s\" to %s address", host, ipv->name);
@@ -2157,7 +2149,8 @@ static int	zbx_resolve_host(const ldns_resolver *res, const char *host, zbx_vect
 			goto out;
 		}
 
-		if (NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, ipv->rr_type, LDNS_SECTION_ANSWER)))
+		if (0 != (ipv_flags & ipv->flag) &&
+				NULL != (rrset = ldns_pkt_rr_list_by_type(pkt, ipv->rr_type, LDNS_SECTION_ANSWER)))
 		{
 			rr_count = ldns_rr_list_rr_count(rrset);
 
