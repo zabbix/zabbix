@@ -141,8 +141,11 @@ $overviewFormList->addRow(_('Monitoring'),
 			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
 			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].url_param('groupid')
 		),
-		new CLink(_('Events'),
-			'events.php?hostid='.$data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS
+		new CLink(_('Problems'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_hostids[]', $data['host']['hostid'])
+				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid'))

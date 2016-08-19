@@ -118,7 +118,11 @@ switch ($data['method']) {
 					}
 
 					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
-					$url_events = 'events.php?filter_set=1&triggerid='.$event['objectid'].'&source='.EVENT_SOURCE_TRIGGERS;
+					$url_events = (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_triggerids[]', $event['objectid'])
+						->setArgument('filter_set', '1')
+						->getUrl();
 					$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
 
 					$result[$number] = [

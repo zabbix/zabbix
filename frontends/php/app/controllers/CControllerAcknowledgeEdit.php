@@ -41,7 +41,6 @@ class CControllerAcknowledgeEdit extends CController {
 			$backurl = $this->getInput('backurl', 'tr_status.php');
 
 			switch (parse_url($backurl, PHP_URL_PATH)) {
-				case 'events.php':
 				case 'overview.php':
 				case 'screenedit.php':
 				case 'screens.php':

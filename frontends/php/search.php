@@ -127,7 +127,7 @@ $table = (new CTableInfo())
 		_('DNS'),
 		_('Latest data'),
 		_('Triggers'),
-		_('Events'),
+		_('Problems'),
 		_('Graphs'),
 		_('Screens'),
 		_('Web'),
@@ -231,7 +231,12 @@ foreach ($hosts as $hnum => $host) {
 		$hostdns,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
-		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
+		new CLink(_('Problems'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
 		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
@@ -283,7 +288,7 @@ $table = (new CTableInfo())
 		_('Host group'),
 		_('Latest data'),
 		_('Triggers'),
-		_('Events'),
+		_('Problems'),
 		_('Graphs'),
 		_('Web'),
 		$admin ? _('Hosts') : null,
@@ -333,7 +338,12 @@ foreach ($hostGroups as $hnum => $group) {
 		$hgroup_link,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
-		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
+		new CLink(_('Problems'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_groupids[]', $hostgroupid)
+				->setArgument('filter_set', '1')
+		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
 		$hostsLink,
