@@ -106,7 +106,7 @@ class CScreenProblem extends CScreenBase {
 	 * @return array
 	 */
 	private function getDataEvents(array $filter_groupids = null, array $filter_hostids = null,
-			array $filter_applicationids = null, $eventid_till = null) {
+			array $filter_applicationids = null, array $filter_triggerids = null, $eventid_till = null) {
 		$options = [
 			'output' => ['eventid', 'objectid', 'clock', 'ns'],
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -117,7 +117,7 @@ class CScreenProblem extends CScreenBase {
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
 			'applicationids' => $filter_applicationids,
-			'objectids' => $this->data['filter']['triggerids'] ? $this->data['filter']['triggerids'] : null,
+			'objectids' => $filter_triggerids,
 			'eventid_till' => $eventid_till,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
@@ -148,7 +148,7 @@ class CScreenProblem extends CScreenBase {
 	 * @return array
 	 */
 	private function getDataProblems(array $filter_groupids = null, array $filter_hostids = null,
-			array $filter_applicationids = null, $eventid_till = null) {
+			array $filter_applicationids = null, array $filter_triggerids = null, $eventid_till = null) {
 		$options = [
 			'output' => ['eventid', 'objectid', 'clock', 'ns'],
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -157,7 +157,7 @@ class CScreenProblem extends CScreenBase {
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
 			'applicationids' => $filter_applicationids,
-			'objectids' => $this->data['filter']['triggerids'] ? $this->data['filter']['triggerids'] : null,
+			'objectids' => $filter_triggerids,
 			'eventid_till' => $eventid_till,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
@@ -193,6 +193,7 @@ class CScreenProblem extends CScreenBase {
 		$filter_groupids = $this->data['filter']['groupids'] ? $this->data['filter']['groupids'] : null;
 		$filter_hostids = $this->data['filter']['hostids'] ? $this->data['filter']['hostids'] : null;
 		$filter_applicationids = null;
+		$filter_triggerids = $this->data['filter']['triggerids'] ? $this->data['filter']['triggerids'] : null;
 
 		if ($this->data['filter']['inventory']) {
 			$options = [
@@ -222,6 +223,24 @@ class CScreenProblem extends CScreenBase {
 			$filter_hostids = null;
 		}
 
+		if ($this->data['filter']['problem'] !== '') {
+			$triggerids = array_keys(API::Trigger()->get([
+				'output' => [],
+				'groupids' => $filter_groupids,
+				'hostids' => $filter_hostids,
+				'applicationids' => $filter_applicationids,
+				'search' => ['description' => $this->data['filter']['problem']],
+				'preservekeys' => true
+			]));
+
+			$filter_triggerids = ($filter_triggerids !== null)
+				? array_intersect($filter_triggerids, $triggerids)
+				: $triggerids;
+			$filter_groupids = null;
+			$filter_hostids = null;
+			$filter_applicationids = null;
+		}
+
 		$data = [
 			'problems' => [],
 			'triggers' => []
@@ -232,8 +251,12 @@ class CScreenProblem extends CScreenBase {
 
 		do {
 			$problems = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
-				? $this->getDataEvents($filter_groupids, $filter_hostids, $filter_applicationids, $eventid_till)
-				: $this->getDataProblems($filter_groupids, $filter_hostids, $filter_applicationids, $eventid_till);
+				? $this->getDataEvents($filter_groupids, $filter_hostids, $filter_applicationids, $filter_triggerids,
+					$eventid_till
+				)
+				: $this->getDataProblems($filter_groupids, $filter_hostids, $filter_applicationids, $filter_triggerids,
+					$eventid_till
+				);
 
 			$end_of_data = (count($problems) < $this->config['search_limit'] + 1);
 
@@ -259,9 +282,6 @@ class CScreenProblem extends CScreenBase {
 						'skipDependent' => true,
 						'preservekeys' => true
 					];
-					if ($this->data['filter']['problem'] !== '') {
-						$options['search'] = ['description' => $this->data['filter']['problem']];
-					}
 					if ($this->data['filter']['maintenance'] == 0) {
 						$options['maintenance'] = false;
 					}
