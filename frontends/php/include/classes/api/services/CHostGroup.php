@@ -802,6 +802,11 @@ class CHostGroup extends CApiService {
 							$error = true;
 							break 2;
 						}
+						elseif ($name[$pos + 1] === '/') {
+							$pos++;
+							$error = true;
+							break 2;
+						}
 					}
 					break;
 
