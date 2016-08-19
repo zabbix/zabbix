@@ -263,7 +263,7 @@ function findParentAndRightsByName($name, array $group_rights) {
 			return $group_rights[$parent];
 		}
 		else {
-			return find_parent($parent, $group_rights);
+			return findParentAndRightsByName($parent, $group_rights);
 		}
 	}
 
@@ -328,4 +328,25 @@ function findParentAndChildsForUpdate(array $parentids, array $group_rights = []
 	}
 
 	return $result;
+}
+
+/**
+ * Get textual representation of given permission.
+ *
+ * @param string $perm			Numerical value of permission.
+ *									Possible values are:
+ *									 3 - PERM_READ_WRITE,
+ *									 2 - PERM_READ,
+ *									 0 - PERM_DENY,
+ *									-1 - PERM_NONE;
+ *
+ * @return string
+ */
+function permissionText($perm) {
+	switch ($perm) {
+		case PERM_READ_WRITE: return _('Read-write');
+		case PERM_READ: return _('Read');
+		case PERM_DENY: return _('Deny');
+		case PERM_NONE: return _('None');
+	}
 }
