@@ -2139,12 +2139,12 @@ sub process_slv_monthly($$$$$$$$$$)
 		my $successful_cycle_tests = $result->{'successful_cycle_tests'};
 		my $successful_cycle_accum = $result->{'successful_cycle_accum'};
 
+		my $max = $max_tests_ref->($total_tests, $service);
+
 		my $failed = $total_tests - $successful_tests;
 		my $avg = ($successful_cycle_tests ? sprintf("%.3f",
 			($successful_cycle_accum / $successful_cycle_tests)) : undef);
-		my $pfailed = ($total_tests ? sprintf("%.3f", ($failed * 100 / $total_tests)) : 0);
-
-		my $max = $max_tests_ref->($total_tests, $service);
+		my $pfailed = ($max ? sprintf("%.3f", ($failed * 100 / $max)) : 0);
 
 		my $k = $service_ref->{'keys'}->{'out'};
 
@@ -2171,12 +2171,13 @@ sub process_slv_monthly($$$$$$$$$$)
 		my $successful_tests = $totals->{'successful_tests'};
 		my $successful_cycle_tests = $totals->{'successful_cycle_tests'};
 		my $successful_cycle_accum = $totals->{'successful_cycle_accum'};
+
 		my $max = $totals->{'max'};
 
 		my $failed = $total_tests - $successful_tests;
 		my $avg = ($successful_cycle_tests ? sprintf("%.3f",
 			($successful_cycle_accum / $successful_cycle_tests)) : undef);
-		my $pfailed = ($total_tests ? sprintf("%.3f", ($failed * 100 / $total_tests)) : 0);
+		my $pfailed = ($max ? sprintf("%.3f", ($failed * 100 / $max)) : 0);
 
 		my $k = $keys->{'totals'};
 
