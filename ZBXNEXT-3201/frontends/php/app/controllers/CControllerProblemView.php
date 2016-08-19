@@ -32,6 +32,7 @@ class CControllerProblemView extends CController {
 		}
 
 		$fields = [
+			'action' =>					'string',
 			'sort' =>					'in clock,host,priority,problem',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
@@ -222,6 +223,7 @@ class CControllerProblemView extends CController {
 		 * Display
 		 */
 		$data = [
+			'action' => $this->getInput('action'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'uncheck' => $this->hasInput('uncheck'),
@@ -280,6 +282,10 @@ class CControllerProblemView extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));
+		if ($data['action'] == 'problem.view.csv') {
+			$response->setFileName('zbx_problems_export.csv');
+		}
+
 		$this->setResponse($response);
 	}
 }

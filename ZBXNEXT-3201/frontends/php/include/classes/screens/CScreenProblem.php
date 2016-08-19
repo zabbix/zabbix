@@ -515,130 +515,203 @@ class CScreenProblem extends CScreenBase {
 
 		$data = $this->makeData($data);
 
-		$url_form = clone $url;
+		$actions = makeEventsActions(array_keys($data['problems']));
+		if ($data['problems']) {
+			$triggers_hosts = getTriggersHostsList($data['triggers']);
+		}
 
-		$form = (new CForm('get', 'zabbix.php'))
-			->setName('problem')
-			->cleanItems()
-			->addVar('backurl',
-				$url_form
-					->setArgument('uncheck', '1')
-					->getUrl()
-			);
+		if ($this->data['action'] === 'problem.view') {
+			$url_form = clone $url;
 
-		if ($this->config['event_ack_enable']) {
-			$header_check_box = (new CColHeader(
-				(new CCheckBox('all_eventids'))
-					->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH);
+			$form = (new CForm('get', 'zabbix.php'))
+				->setName('problem')
+				->cleanItems()
+				->addVar('backurl',
+					$url_form
+						->setArgument('uncheck', '1')
+						->getUrl()
+				);
+
+			if ($this->config['event_ack_enable']) {
+				$header_check_box = (new CColHeader(
+					(new CCheckBox('all_eventids'))
+						->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH);
+			}
+			else {
+				$header_check_box = null;
+			}
+
+			$link = $url->getUrl();
+
+			// create table
+			$table = (new CTableInfo())
+				->setHeader([
+					$header_check_box,
+					make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
+					make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
+						->addClass(ZBX_STYLE_CELL_WIDTH),
+					(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
+					_('Status'),
+					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+					make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
+					_('Duration'),
+					$this->config['event_ack_enable'] ? _('Ack') : null,
+					_('Actions'),
+					_('Tags')
+				]);
+
+			if ($this->config['event_ack_enable']) {
+				$url->setArgument('uncheck', '1');
+				$url->setArgument('page', $this->data['page']);
+				$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
+			}
+			$tags = makeEventsTags($data['problems']);
+			if ($data['problems']) {
+				$triggers_hosts = makeTriggersHostsList($triggers_hosts);
+			}
+
+			foreach ($data['problems'] as $problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+
+				$cell_clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+						'tr_events.php?triggerid='.$problem['objectid'].'&eventid='.$problem['eventid']);
+				$cell_r_clock = $problem['r_eventid'] != 0
+					? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']),
+						'tr_events.php?triggerid='.$problem['objectid'].'&eventid='.$problem['r_eventid'])
+					: '';
+
+				if ($problem['r_eventid'] != 0) {
+					$value = TRIGGER_VALUE_FALSE;
+					$value_str = _('RESOLVED');
+				}
+				else {
+					$in_closing = false;
+
+					if ($this->config['event_ack_enable']) {
+						foreach ($problem['acknowledges'] as $acknowledge) {
+							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+								$in_closing = true;
+								break;
+							}
+						}
+					}
+
+					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				}
+
+				$cell_status = new CSpan($value_str);
+
+				// Add colors and blinking to span depending on configuration and trigger parameters.
+				addTriggerValueStyle($cell_status, $value,
+					($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
+				);
+
+				$description = CMacrosResolverHelper::resolveEventDescription(
+					$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
+				);
+
+				$table->addRow([
+					$this->config['event_ack_enable']
+						? new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])
+						: null,
+					getSeverityCell($trigger['priority'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
+					(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
+					(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
+					$cell_status,
+					$triggers_hosts[$trigger['triggerid']],
+					(new CSpan($description))
+						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
+						->addClass(ZBX_STYLE_LINK_ACTION),
+					($problem['r_eventid'] != 0)
+						? zbx_date2age($problem['clock'], $problem['r_clock'])
+						: zbx_date2age($problem['clock']),
+					$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+					array_key_exists($problem['eventid'], $actions)
+						? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
+						: '',
+					$tags[$problem['eventid']]
+				]);
+			}
+
+			$footer = null;
+			if ($this->config['event_ack_enable']) {
+				$footer = new CActionButtonList('action', 'eventids', [
+					'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
+				]);
+			}
+
+			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
-			$header_check_box = null;
-		}
+			$csv = [];
 
-		$link = $url->getUrl();
-
-		// create table
-		$table = (new CTableInfo())
-			->setHeader([
-				$header_check_box,
-				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'], $link),
-				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link)
-					->addClass(ZBX_STYLE_CELL_WIDTH),
-				(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
+			$csv[] = [
+				_('Severity'),
+				_('Time'),
+				_('Recovery time'),
 				_('Status'),
-				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
-				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
+				_('Host'),
+				_('Problem'),
 				_('Duration'),
 				$this->config['event_ack_enable'] ? _('Ack') : null,
 				_('Actions'),
 				_('Tags')
-			]);
+			];
 
-		// actions
-		$actions = makeEventsActions(array_keys($data['problems']));
-		if ($this->config['event_ack_enable']) {
-			$url->setArgument('uncheck', '1');
-			$url->setArgument('page', $this->data['page']);
-			$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
-		}
-		$tags = makeEventsTags($data['problems']);
-		if ($data['problems']) {
-			$triggers_hosts = makeTriggersHostsList(getTriggersHostsList($data['triggers']));
-		}
+			$tags = makeEventsTags($data['problems'], false);
 
-		foreach ($data['problems'] as $problem) {
-			$trigger = $data['triggers'][$problem['objectid']];
+			foreach ($data['problems'] as $problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
 
-			$cell_clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-					'tr_events.php?triggerid='.$problem['objectid'].'&eventid='.$problem['eventid']);
-			$cell_r_clock = $problem['r_eventid'] != 0
-				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']),
-					'tr_events.php?triggerid='.$problem['objectid'].'&eventid='.$problem['r_eventid'])
-				: '';
+				if ($problem['r_eventid'] != 0) {
+					$value_str = _('RESOLVED');
+				}
+				else {
+					$in_closing = false;
 
-			if ($problem['r_eventid'] != 0) {
-				$value = TRIGGER_VALUE_FALSE;
-				$value_str = _('RESOLVED');
-			}
-			else {
-				$in_closing = false;
-
-				if ($this->config['event_ack_enable']) {
-					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-							$in_closing = true;
-							break;
+					if ($this->config['event_ack_enable']) {
+						foreach ($problem['acknowledges'] as $acknowledge) {
+							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+								$in_closing = true;
+								break;
+							}
 						}
 					}
+
+					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 				}
 
-				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-				$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				$hosts = [];
+				foreach ($triggers_hosts[$trigger['triggerid']] as $trigger_host) {
+					$hosts[] = $trigger_host['name'];
+				}
+
+				$csv[] = [
+					getSeverityName($trigger['priority'], $this->config),
+					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+					($problem['r_eventid'] != 0)
+						? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
+						: '',
+					$value_str,
+					implode(', ', $hosts),
+					CMacrosResolverHelper::resolveEventDescription(
+						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
+					),
+					($problem['r_eventid'] != 0)
+						? zbx_date2age($problem['clock'], $problem['r_clock'])
+						: zbx_date2age($problem['clock']),
+					$this->config['event_ack_enable'] ? ($problem['acknowledges'] ? _('Yes') : _('No')) : null,
+					array_key_exists($problem['eventid'], $actions)
+						? strip_tags($actions[$problem['eventid']])
+						: '',
+					implode(', ', $tags[$problem['eventid']])
+				];
 			}
 
-			$cell_status = new CSpan($value_str);
-
-			// Add colors and blinking to span depending on configuration and trigger parameters.
-			addTriggerValueStyle($cell_status, $value,
-				($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-				$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
-			);
-
-			$description = CMacrosResolverHelper::resolveEventDescription(
-				$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-			);
-
-			$table->addRow([
-				$this->config['event_ack_enable']
-					? new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])
-					: null,
-				getSeverityCell($trigger['priority'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
-				(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
-				(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
-				$cell_status,
-				$triggers_hosts[$trigger['triggerid']],
-				(new CSpan($description))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-					->addClass(ZBX_STYLE_LINK_ACTION),
-				($problem['r_eventid'] != 0)
-					? zbx_date2age($problem['clock'], $problem['r_clock'])
-					: zbx_date2age($problem['clock']),
-				$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
-				array_key_exists($problem['eventid'], $actions)
-					? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
-					: '',
-				$tags[$problem['eventid']]
-			]);
+			return zbx_toCSV($csv);
 		}
-
-		$footer = null;
-		if ($this->config['event_ack_enable']) {
-			$footer = new CActionButtonList('action', 'eventids', [
-				'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
-			]);
-		}
-
-		return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 	}
 }

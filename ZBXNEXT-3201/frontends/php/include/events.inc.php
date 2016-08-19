@@ -535,10 +535,11 @@ function makeAcknowledgesTable($acknowledges, $users) {
  * @param array  $events[]['tags']
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
+ * @param bool   $html
  *
  * @return CTableInfo
  */
-function makeEventsTags($events) {
+function makeEventsTags($events, $html = true) {
 	$tags = [];
 
 	foreach ($events as $event) {
@@ -548,13 +549,13 @@ function makeEventsTags($events) {
 		$tags_count = 0;
 
 		foreach ($event['tags'] as $tag) {
-			if ($tags_count++ == EVENTS_LIST_TAGS_COUNT) {
+			if ($html && $tags_count++ == EVENTS_LIST_TAGS_COUNT) {
 				$tags[$event['eventid']][] = '&nbsp;&hellip;';
 				break;
 			}
 			else {
-				$tags[$event['eventid']][] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
-					->addClass(ZBX_STYLE_TAG);
+				$value = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
+				$tags[$event['eventid']][] = $html ? (new CSpan($value))->addClass(ZBX_STYLE_TAG) : $value;
 			}
 		}
 	}
