@@ -181,9 +181,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'popup.php'
-				],
-				[
-					'url' => 'popup_right.php'
 				]
 			]
 		],
