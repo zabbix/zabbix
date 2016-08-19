@@ -233,3 +233,99 @@ function getUserFullname($userData) {
 
 	return zbx_empty($fullname) ? $userData['alias'] : $userData['alias'].' ('.$fullname.')';
 }
+
+/**
+ * Find the parent with rights recursively by given host group name.
+ *
+ * @param string $name				Host group name.
+ * @param array $group_rights		An array of host group names and current rights. Example:
+ *										$group_rights[<host_group_name>][<rights>] => -1
+ *										$group_rights[<host_group_name>][<name>] => Zabbix servers/*
+ *										$group_rights[<host_group_name>][<host_groupid>] = 4
+ *
+ *
+ * @return mixed					Return array of rights, name and host group ID if success. Return false if no parent exists.
+ */
+function findParentAndRightsByName($name, array $group_rights) {
+	$names = explode('/', $name);
+	$parent = '';
+	$cnt = count($names) - 1;
+
+	if ($cnt > 0) {
+		for ($i = 0; $i < $cnt; $i++) {
+			$parent .= $names[$i];
+			if ($i + 1 != $cnt) {
+				$parent .= '/';
+			}
+		}
+
+		if (array_key_exists($parent, $group_rights)) {
+			return $group_rights[$parent];
+		}
+		else {
+			return find_parent($parent, $group_rights);
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Find parent and childs IDs by given host group IDs. If $group_rights is set, check that childs have same rights as
+ * parent and onlt then overwrite them. If no $group_rights is set, overwrite them independely.
+ *
+ * @param array $parentids		An array of host group IDs. (parentids)
+ * @param array $group_rights	An array of host group names and current rights. Example:
+ *									$group_rights[<host_group_name>][<rights>] => -1
+ *									$group_rights[<host_group_name>][<name>] => Zabbix servers/*
+ *									$group_rights[<host_group_name>][<host_groupid>] = 4
+ *
+ * @return array
+ */
+function findParentAndChildsForUpdate(array $parentids, array $group_rights = []) {
+	$compare_parent_rights = false;
+
+	if ($group_rights) {
+		$compare_parent_rights = true;
+	}
+
+	$host_groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => array_keys($parentids)
+	]);
+
+	$result = [];
+
+	foreach ($host_groups as $host_group) {
+		if ($compare_parent_rights) {
+			$parent_rights = $group_rights[$host_group['name']]['rights'];
+		}
+
+		$new_rights = $parentids[$host_group['groupid']];
+
+		$childs = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'search' => ['name' => $host_group['name'].'/'],
+			'startSearch' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($childs as $child) {
+			if ($compare_parent_rights) {
+				$old_rights = $group_rights[$child['name']]['rights'];
+
+				if ($old_rights == $parent_rights) {
+					$result[$child['groupid']] = $new_rights;
+				}
+			}
+			else {
+				$result[$child['groupid']] = $new_rights;
+			}
+
+		}
+
+		$result[$host_group['groupid']] = $new_rights;
+	}
+
+	return $result;
+}
