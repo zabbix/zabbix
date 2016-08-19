@@ -393,11 +393,7 @@ function createPermissionList(array $group_rights) {
 		}
 		else {
 			if ($group['rights'] == $parent['rights']) {
-				if ($group['rights'] != PERM_NONE && array_key_exists($parent['name'], $list)
-						&& substr($list[$parent['name']]['name'], -2) !== '/*') {
-					$list[$parent['name']]['name'] .= '/*';
-				}
-				elseif (array_key_exists($parent['name'], $list)
+				if (array_key_exists($parent['name'], $list)
 						&& substr($list[$parent['name']]['name'], -2) !== '/*') {
 					$list[$parent['name']]['name'] .= '/*';
 				}
