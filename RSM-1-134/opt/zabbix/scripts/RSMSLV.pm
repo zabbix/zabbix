@@ -5017,20 +5017,22 @@ sub __get_macro
 {
 	my $m = shift;
 	my $search_tld = shift;
-	my $hostid = shift;	# optionally specify hostid of Template
+	my $templateid = shift;	# optionally specify ID of a Template
 
-	if ($tld && $search_tld)
+	if ($search_tld)
 	{
-		$hostid = get_hostid("Template $tld") unless ($hostid);
+		fail("cannot get TLD macro \"$m\": TLD not specified") if (!$templateid && !$tld);
 
-		my $value = __get_host_macro($hostid, $m, 1);	# optional
+		$templateid = get_hostid("Template $tld") unless ($templateid);
 
-		return $value if ($value);
+		my $value = __get_host_macro($templateid, $m, 1);	# optional
+
+		return $value if (defined($value));
 	}
 
 	my $rows_ref = db_select("select value from globalmacro where macro='$m'");
 
-	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
+	fail("cannot find global macro '$m'") unless (1 == scalar(@$rows_ref));
 
 	return $rows_ref->[0]->[0];
 }
