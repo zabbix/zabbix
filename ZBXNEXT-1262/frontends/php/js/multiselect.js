@@ -268,9 +268,10 @@ jQuery(function($) {
 						return false;
 					}
 
-					var search = input.val();
+					var search = removeSubGroupPostfix(input.val());
 
-					if (!empty(search)) {
+					// Replace trailing slashes to check if search term contains anything else.
+					if (!empty(search.replace(/\/+$/, ''))) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
@@ -299,7 +300,7 @@ jQuery(function($) {
 											dataType: 'json',
 											cache: false,
 											data: {
-												search: removeSubgroupPostfix(values.search),
+												search: removeSubGroupPostfix(values.search),
 												limit: getLimit(values, options)
 											},
 											success: function(data) {
@@ -333,7 +334,7 @@ jQuery(function($) {
 								}
 								else {
 									// Try to select by search string if nothing was selected.
-									var search = removeSubgroupPostfix(values.search);
+									var search = removeSubGroupPostfix(values.search);
 
 									if (typeof(values.available_names[search]) !== 'undefined') {
 										select(values.available_names[search].id, obj, values, options);
@@ -718,7 +719,7 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
-			if (hasSubgroupPostfix(item.name)) {
+			if (hasSubGroupPostfix(item.name)) {
 				// Add hidden input.
 				obj.append($('<input>', {
 					type: 'hidden',
@@ -839,7 +840,7 @@ jQuery(function($) {
 
 	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			var search = removeSubgroupPostfix(values.search);
+			var search = removeSubGroupPostfix(values.search);
 
 			if (typeof(values.available_names[search]) !== 'undefined') {
 				var tmp_item = values.available_names[search];
@@ -1004,15 +1005,15 @@ jQuery(function($) {
 		return length;
 	}
 
-	function removeSubgroupPostfix(str) {
-		if (hasSubgroupPostfix(str)) {
+	function removeSubGroupPostfix(str) {
+		if (hasSubGroupPostfix(str)) {
 			str = str.slice(0, -2);
 		}
 
 		return str;
 	}
 
-	function hasSubgroupPostfix(str) {
+	function hasSubGroupPostfix(str) {
 		if ('/*' === str.slice(-2)) {
 			return true;
 		}
