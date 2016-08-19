@@ -132,7 +132,33 @@ if (hasRequest('add') || hasRequest('update')) {
 		'rights' => [],
 	];
 
-	foreach (getRequest('group_rights', []) as $rights) {
+	$group_rights = getRequest('group_rights', []);
+
+	// Host group ID parents (Parent1/*, Parent2/Child1/*) from the permission list.
+	$ls_groupids = getRequest('group_permissions', []);
+
+	// Filter only parent IDs (Parent1/*, Parent2/Child1/*) from list.
+	$new_ls_groupids = findParentAndChildsForUpdate($ls_groupids, $group_rights);
+
+	/* Host group IDs (Parent1, Parent2/Child1) from the permission list to overwrite Host group ID parents
+	 *(Parent1/*, Parent2/Child1/*) from the permission list and keys are preserved.
+	 * array() + array() and array_merge() don't work here.
+	 */
+	foreach (getRequest('permissions', []) as $groupid => $perm) {
+		$new_ls_groupids[$groupid] = $perm;
+	}
+
+	foreach ($group_rights as $name => $rights) {
+		$group_rights[$name] = [
+			'rights' => array_key_exists($rights['host_groupid'], $new_ls_groupids)
+				? $new_ls_groupids[$rights['host_groupid']]
+				: $rights['rights'],
+			'name' => $name,
+			'host_groupid' => $rights['host_groupid']
+		];
+	}
+
+	foreach ($group_rights as $rights) {
 		if ($rights['rights'] != PERM_NONE) {
 			$userGroup['rights'][] = [
 				'id' => $rights['host_groupid'],
@@ -495,54 +521,7 @@ if (hasRequest('form')) {
 		order_result($data['group_rights'], 'name');
 
 		// Group name and permission list.
-		$list = [];
-
-		foreach ($data['group_rights'] as $group) {
-			$parent = findParentAndRightsByName($group['name'], $data['group_rights']);
-
-			if ($parent === false) {
-				if ($group['rights'] != PERM_NONE) {
-					$list[$group['name']] = [
-						'name' => $group['name'],
-						'rights' => $group['rights'],
-						'host_groupid' => $group['host_groupid']
-					];
-
-					$data['same_permissions'] = false;
-				}
-			}
-			else {
-				if ($group['rights'] == $parent['rights']) {
-					if ($group['rights'] != PERM_NONE && array_key_exists($parent['name'], $list)
-							&& substr($list[$parent['name']]['name'], -2) !== '/*') {
-						$list[$parent['name']]['name'] .= '/*';
-					}
-				}
-				else {
-					$data['same_permissions'] = false;
-
-					if ($group['rights'] != PERM_NONE) {
-						$list[$group['name']] = [
-							'name' => $group['name'],
-							'rights' => $group['rights'],
-							'host_groupid' => $group['host_groupid']
-						];
-					}
-					else {
-						if (array_key_exists($parent['name'], $list)
-								&& substr($list[$parent['name']]['name'], -2) !== '/*') {
-							$list[$parent['name']]['name'] .= '/*';
-						}
-
-						$list[$group['name']] = [
-							'name' => $group['name'],
-							'rights' => $group['rights'],
-							'host_groupid' => $group['host_groupid']
-						];
-					}
-				}
-			}
-		}
+		list($list, $data['same_permissions']) = createPermissionList($data['group_rights']);
 
 		// Get max permission to display in case if all permissions are the same.
 		if ($data['same_permissions']) {
