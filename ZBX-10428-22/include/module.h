@@ -27,8 +27,6 @@
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
-char	*get_rparam(AGENT_REQUEST *request, int num);
-
 /* flags for command */
 #define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */
 #define CF_MODULE		0x02	/* item is defined in a loadable module */
@@ -53,6 +51,8 @@ typedef struct
 	int		mtime;
 }
 AGENT_REQUEST;
+
+char	*get_rparam(AGENT_REQUEST *request, int num);
 
 typedef struct
 {
