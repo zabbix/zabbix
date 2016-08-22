@@ -337,7 +337,7 @@ jQuery(function($) {
 									var search = removeSubGroupPostfix(values.search);
 
 									if (typeof(values.available_names[search]) !== 'undefined') {
-										select(values.available_names[search].id, obj, values, options);
+										select(0, obj, values, options);
 									}
 								}
 
@@ -842,16 +842,20 @@ jQuery(function($) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
 			var search = removeSubGroupPostfix(values.search);
 
-			if (typeof(values.available_names[search]) !== 'undefined') {
-				var tmp_item = values.available_names[search];
-
-				// Copy search string to name in case it has subgroups postfix.
-				tmp_item.name = values.search;
-
-				addSelected(tmp_item, obj, values, options);
+			if (id > 0) {
+				addSelected(values.available[id], obj, values, options);
 			}
 			else {
-				addSelected(values.available[id], obj, values, options);
+				var search = removeSubGroupPostfix(values.search);
+
+				if (typeof(values.available_names[search]) !== 'undefined') {
+					var tmp_item = values.available_names[search];
+
+					// Copy search string to name in case it has subgroups postfix.
+					tmp_item.name = values.search;
+
+					addSelected(tmp_item, obj, values, options);
+				}
 			}
 
 			hideAvailable(obj);
