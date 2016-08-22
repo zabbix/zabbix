@@ -385,9 +385,11 @@ if (hasRequest('form')) {
 			: $data['usrgrp']['users_status'];
 		$data['gui_access'] = getRequest('gui_access', $data['usrgrp']['gui_access']);
 		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $data['usrgrp']['debug_mode'];
-		$group_users = getRequest('group_users', []);
 
-		if (!hasRequest('form_refresh') && !$group_users) {
+		if (hasRequest('form_refresh')) {
+			$data['group_users'] = getRequest('group_users', []);
+		}
+		else {
 			$data['group_users'] = [];
 
 			$dbUsers = DBselect(
@@ -399,10 +401,6 @@ if (hasRequest('form')) {
 			while ($dbUser = DBfetch($dbUsers)) {
 				$data['group_users'][] = $dbUser['userid'];
 			}
-		}
-
-		if (hasRequest('form_refresh')) {
-			$data['group_users'] = $group_users;
 		}
 
 		$db_rights = DBselect(
