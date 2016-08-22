@@ -280,7 +280,12 @@ if ($data['action'] == 'problem.view') {
 	$this->addPostJS('jqBlink.blink();');
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+		$time = time();
 		$stime = zbxDateToTime($data['filter']['stime']);
+		if ($stime > $time - $data['filter']['period']) {
+			$stime = $time - $data['filter']['period'];
+		}
+
 		$timeline = [
 			'period' => $data['filter']['period'],
 			'starttime' => date(TIMESTAMP_FORMAT, $stime + $data['filter']['period'] - ZBX_MAX_PERIOD),
