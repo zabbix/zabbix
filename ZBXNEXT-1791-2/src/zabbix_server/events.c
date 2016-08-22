@@ -910,7 +910,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		pos = token.token.r;
 	}
 
-	if (SUCCEED == evaluate(&result, expression, NULL, 0))
+	if (SUCCEED == evaluate(&result, expression, NULL, 0, NULL))
 		ret = zbx_double_compare(result, 1);
 out:
 	zbx_free(expression);
