@@ -633,12 +633,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $triggerIds
 	 */
 	protected function deleteByIds(array $triggerIds) {
-		// others idx should be deleted as well if they arise at some point
-		DB::delete('profiles', [
-			'idx' => 'web.events.filter.triggerid',
-			'value_id' => $triggerIds
-		]);
-
 		DB::delete('sysmaps_elements', [
 			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER

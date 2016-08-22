@@ -108,12 +108,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
+		$this->zbxTestAssertElementValue('default_theme', 'dark-theme');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('dark-theme');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->zbxTestDropdownSelect('default_theme', 'Blue');
+		$this->zbxTestAssertElementValue('default_theme', 'blue-theme');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');
