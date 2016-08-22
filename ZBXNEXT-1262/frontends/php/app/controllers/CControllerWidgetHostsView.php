@@ -54,9 +54,29 @@ class CControllerWidgetHostsView extends CController {
 			}
 			else {
 				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hideHostGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+				$subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value');
+				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+				$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide_subgroupids'), 'value');
 
-				if ($hideHostGroupIds) {
+				if ($subgroupids) {
+					$filter['groupids'] = array_merge(
+						$subgroupids,
+						array_keys(findParentAndChildsForUpdate(array_combine($subgroupids, $subgroupids)))
+					);
+
+					$filter['groupids'] = array_unique($filter['groupids']);
+				}
+
+				if ($hide_subgroupids) {
+					$hide_groupids = array_merge(
+						$hide_groupids,
+						array_keys(findParentAndChildsForUpdate(array_combine($hide_subgroupids, $hide_subgroupids)))
+					);
+
+					$hide_groupids = array_unique($hide_groupids);
+				}
+
+				if ($hide_groupids) {
 					// get all groups if no selected groups defined
 					if (!$filter['groupids']) {
 						$dbHostGroups = API::HostGroup()->get([
@@ -65,7 +85,7 @@ class CControllerWidgetHostsView extends CController {
 						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
 					}
 
-					$filter['groupids'] = array_diff($filter['groupids'], $hideHostGroupIds);
+					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
 
 					// get available hosts
 					$dbAvailableHosts = API::Host()->get([
@@ -76,7 +96,7 @@ class CControllerWidgetHostsView extends CController {
 
 					$dbDisabledHosts = API::Host()->get([
 						'output' => ['hostid'],
-						'groupids' => $hideHostGroupIds
+						'groupids' => $hide_groupids
 					]);
 					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
