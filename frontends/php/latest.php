@@ -117,10 +117,21 @@ $applications = $items = $hostScripts = [];
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
+	$groupids = $filter['groupids'];
+
+	if ($filter['subgroups']) {
+		$groupids = array_merge(
+			$groupids,
+			array_keys(findParentAndChildsForUpdate(array_combine($filter['subgroups'], $filter['subgroups'])))
+		);
+
+		$groupids = array_unique($groupids);
+	}
+
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
 		'hostids' => $filter['hostids'],
-		'groupids' => $filter['groupids'],
+		'groupids' => $groupids,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'with_monitored_items' => true,
 		'preservekeys' => true
