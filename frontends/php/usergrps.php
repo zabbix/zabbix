@@ -59,7 +59,7 @@ $fields = [
 	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'groupids_subgroups' => [T_ZBX_STR, O_OPT, null,		 null,	null],
+	'groupids_subgroupids' => [T_ZBX_STR, O_OPT, null,		 null,	null],
 	'permissions' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'group_permissions' =>	[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
@@ -438,7 +438,7 @@ if (hasRequest('form')) {
 		$ms_ids = getRequest('groupids', []);
 
 		// Host group ID parents (Parent1/*, Parent2/Child1/*) from multiselect.
-		$ms_groupids = getRequest('groupids_subgroups', []);
+		$ms_groupids = getRequest('groupids_subgroupids', []);
 
 		// Host group ID parents (Parent1/*, Parent2/Child1/*) from the permission list.
 		$ls_groupids = getRequest('group_permissions', []);
