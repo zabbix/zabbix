@@ -385,20 +385,24 @@ if (hasRequest('form')) {
 			: $data['usrgrp']['users_status'];
 		$data['gui_access'] = getRequest('gui_access', $data['usrgrp']['gui_access']);
 		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $data['usrgrp']['debug_mode'];
-		$data['group_users'] = [];
+		$group_users = getRequest('group_users', []);
 
-		$dbUsers = DBselect(
-			'SELECT DISTINCT u.userid '.
-			' FROM users u,users_groups ug '.
-			' WHERE u.userid=ug.userid '.
-				' AND ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
-		);
-		while ($dbUser = DBfetch($dbUsers)) {
-			$data['group_users'][$dbUser['userid']] = $dbUser['userid'];
+		if (!hasRequest('form_refresh') && !$group_users) {
+			$data['group_users'] = [];
+
+			$dbUsers = DBselect(
+				'SELECT ug.userid'.
+				' FROM users_groups ug '.
+				' WHERE ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
+			);
+
+			while ($dbUser = DBfetch($dbUsers)) {
+				$data['group_users'][] = $dbUser['userid'];
+			}
 		}
 
 		if (hasRequest('form_refresh')) {
-			$data['group_users'] =  getRequest('group_users', []);
+			$data['group_users'] = $group_users;
 		}
 
 		$db_rights = DBselect(
