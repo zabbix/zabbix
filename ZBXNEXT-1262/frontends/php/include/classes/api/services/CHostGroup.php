@@ -358,7 +358,53 @@ class CHostGroup extends CApiService {
 
 		$this->validateCreate($groups);
 
-		$groupids = DB::insert('groups', $groups);
+		$groupids = [];
+		$groupids_with_rights = [];
+		$parent_childs = [];
+
+		foreach ($groups as $group) {
+			$new_groupids = DB::insert('groups', [$group]);
+			$groupid = reset($new_groupids);
+			$groupids[] = $groupid;
+
+			$name_parts = explode('/', $group['name']);
+			if (count($name_parts) > 1) {
+				array_pop($name_parts);
+				$parents = $this->get([
+					'output' => ['groupid'],
+					'filter' => ['name' => implode('/', $name_parts)],
+					'limit' => 1
+				]);
+
+				if ($parents) {
+					$parent = reset($parents);
+					$groupids_with_rights[$groupid] = $parent['groupid'];
+					$parent_childs[$parent['groupid']][] = $groupid;
+				}
+			}
+		}
+
+		if ($groupids_with_rights) {
+			$rights = DBSelect(
+				'SELECT r.groupid, r.permission, r.id'.
+				' FROM rights r'.
+				' WHERE '.dbConditionInt('r.id', $groupids_with_rights)
+			);
+
+			$rights_to_insert = [];
+
+			while ($right = DBfetch($rights)) {
+				foreach ($parent_childs[$right['id']] as $parent_child) {
+					$rights_to_insert[] = [
+						'groupid' => $right['groupid'],
+						'permission' => $right['permission'],
+						'id' => $parent_child
+					];
+				}
+			}
+
+			DB::insert('rights', $rights_to_insert);
+		}
 
 		return ['groupids' => $groupids];
 	}
