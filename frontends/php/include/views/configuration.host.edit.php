@@ -88,9 +88,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
-	$new_group = (new CTextBox('newgroup', $data['newgroup']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('maxlength', 64);
+	$new_group = (new CTextBox('newgroup', $data['newgroup']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$new_group_label = _('New group');
 	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 		$new_group_label .= ' '._('(Only super admins can create groups)');
