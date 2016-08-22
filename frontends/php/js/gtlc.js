@@ -504,7 +504,7 @@ var CScrollBar = Class.create({
 			this.appendCalendars();
 
 			// after px2sec is set. important!
-			this.position.bar = getDimensions(this.bar);
+			this.position.bar = getDimensions(this.dom.bar);
 			this.setBarPosition();
 			this.setGhostByBar();
 			this.setTabInfo();

@@ -18,34 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+header('Content-Type: text/csv; charset=UTF-8');
+header('Content-Disposition: attachment; filename="'.$data['page']['file'].'"');
 
-class CControllerResponseData extends CControllerResponse {
-
-	private $data;
-	private $title = null;
-	private $file_name = null;
-
-	public function __construct($data) {
-		$this->data = $data;
-	}
-
-	public function getData() {
-		return $this->data;
-	}
-
-	public function setTitle($title) {
-		$this->title = $title;
-	}
-
-	public function getTitle() {
-		return $this->title;
-	}
-
-	public function setFileName($file_name) {
-		$this->file_name = $file_name;
-	}
-
-	public function getFileName() {
-		return $this->file_name;
-	}
-}
+echo $data['main_block'];
