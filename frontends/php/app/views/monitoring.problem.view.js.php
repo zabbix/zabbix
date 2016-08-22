@@ -31,10 +31,19 @@
 	?>
 </script>
 <script type="text/javascript">
-	(function($) {
+	jQuery(function($) {
 		$(function() {
 			$('#filter-inventory').dynamicRows({ template: '#filter-inventory-row' });
 			$('#filter-tags').dynamicRows({ template: '#filter-tag-row' });
 		});
-	})(jQuery);
+
+		$('#filter_show').change(function() {
+			var	filter_show = jQuery('input[name=filter_show]:checked').val();
+
+			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
+				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
+		});
+
+		$('#filter_show').trigger('change');
+	});
 </script>
