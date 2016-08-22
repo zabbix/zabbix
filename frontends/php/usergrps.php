@@ -435,32 +435,19 @@ if (hasRequest('form')) {
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
 
-		// Host group IDs (Parent1, Parent2/Child1) from multiselect.
+		// Host group IDs (Parent1, Parent2/Child1) from multiselect. Add host group IDs as keys and permission as value.
 		$ms_ids = getRequest('groupids', []);
+		$ms_ids = array_fill_keys($ms_ids, $data['new_permission']);
 
-		// Host group ID parents (Parent1/*, Parent2/Child1/*) from multiselect.
+		// Host group ID parents (Parent1/*, Parent2/Child1/*) from multiselect. Add host group IDs as keys and permission as value.
 		$ms_groupids = getRequest('groupids_subgroupids', []);
+		$ms_groupids = array_fill_keys($ms_groupids, $data['new_permission']);
 
 		// Host group ID parents (Parent1/*, Parent2/Child1/*) from the permission list.
 		$ls_groupids = getRequest('group_permissions', []);
 
-		/* Add new permission to host group IDs that were selected from multiselect.
-		 * "IF" clause is work around for PHP < 5.6).
-		 */
-		if ($ms_ids) {
-			$new_permissions = array_fill(0, count($ms_ids), $data['new_permission']);
-			$ms_ids = array_combine($ms_ids, $new_permissions);
-		}
-
-		// "IF" clause is work around for PHP < 5.6).
-		if ($ms_groupids) {
-			$new_permissions_groups = array_fill(0, count($ms_groupids), $data['new_permission']);
-			$ms_groupids = array_combine($ms_groupids, $new_permissions_groups);
-		}
-
 		// Filter only parent IDs (Parent1/*, Parent2/Child1/*) from list.
 		$ls_parentids = array_diff_key($ls_groupids, $ms_groupids);
-
 		$new_ls_groupids = findParentAndChildsForUpdate($ls_parentids, $data['group_rights']);
 
 		/* Host group IDs (Parent1, Parent2/Child1) from the permission list to overwrite Host group ID parents
