@@ -14,6 +14,7 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
+....I....T [ZBX-10476] extended 'Template OS Windows' template by 'service.discovery' LLD (Sergejs)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11098] corrected log messages about completion of the trend data synchronization (Sergejs)
