@@ -397,7 +397,9 @@ if (hasRequest('form')) {
 			$data['group_users'][$dbUser['userid']] = $dbUser['userid'];
 		}
 
-		$data['group_users'] = array_unique(array_merge($data['group_users'], getRequest('group_users', [])));
+		if (hasRequest('form_refresh')) {
+			$data['group_users'] =  getRequest('group_users', []);
+		}
 
 		$db_rights = DBselect(
 			'SELECT r.rightid,r.permission,r.groupid AS user_groupid,g.groupid AS host_groupid,g.name'.
