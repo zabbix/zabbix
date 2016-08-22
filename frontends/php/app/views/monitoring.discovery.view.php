@@ -19,8 +19,8 @@
 **/
 
 
-$this->addJsFile('js/gtlc.js');
-$this->addJsFile('js/flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('flickerfreescreen.js');
 
 $widget = (new CWidget())->setTitle(_('Status of discovery'));
 

@@ -361,11 +361,10 @@ class CMenuPopupHelper {
 	 * @param string $acknowledge['eventid']			event ID
 	 * @param string $acknowledge['screenid']			screen ID (optional)
 	 * @param string $acknowledge['backurl']			return URL (optional)
-	 * @param string $eventTime							event navigation time parameter (optional)
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null, $eventTime = null) {
+	public static function getTrigger(array $trigger, array $acknowledge = null) {
 		$hosts = [];
 		$showEvents = true;
 
@@ -406,27 +405,17 @@ class CMenuPopupHelper {
 		$data = [
 			'type' => 'trigger',
 			'triggerid' => $trigger['triggerid'],
-			'items' => $items
+			'items' => $items,
+			'showEvents' => $showEvents,
+			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;
 		}
 
-		if ($eventTime !== null) {
-			$data['eventTime'] = $eventTime;
-		}
-
 		if ($trigger['url'] !== '') {
 			$data['url'] = $trigger['url'];
-		}
-
-		if ($showEvents) {
-			$data['showEvents'] = true;
-		}
-		if (in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
-				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$data['configuration'] = true;
 		}
 
 		return $data;
