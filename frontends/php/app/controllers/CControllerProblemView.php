@@ -268,16 +268,9 @@ class CControllerProblemView extends CController {
 			$data['filter']['period'] = $this->getInput('period',
 				CProfile::get('web.problem.timeline.period', ZBX_PERIOD_DEFAULT)
 			);
-			$data['filter']['stime'] = zbxDateToTime($this->getInput('stime',
+			$data['filter']['stime'] = $this->getInput('stime',
 				CProfile::get('web.problem.timeline.stime', date(TIMESTAMP_FORMAT, time()))
-			));
-
-			$time = time();
-
-			if ($data['filter']['stime'] > $time - $data['filter']['period']) {
-				$data['filter']['stime'] = $time - $data['filter']['period'];
-			}
-			$data['filter']['stime'] = date(TIMESTAMP_FORMAT, $data['filter']['stime']);
+			);
 		}
 
 		$response = new CControllerResponseData($data);
