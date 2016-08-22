@@ -384,7 +384,7 @@ if (hasRequest('form')) {
 			? getRequest('users_status')
 			: $data['usrgrp']['users_status'];
 		$data['gui_access'] = getRequest('gui_access', $data['usrgrp']['gui_access']);
-		$data['debug_mode'] = getRequest('debug_mode', $data['usrgrp']['debug_mode']);
+		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $data['usrgrp']['debug_mode'];
 		$data['group_users'] = [];
 
 		$dbUsers = DBselect(
