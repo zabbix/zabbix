@@ -139,12 +139,12 @@ $new_permissions_table = (new CTable())
 				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CRadioButtonList('new_permission', (int) $data['new_permission']))
+		(new CCol((new CRadioButtonList('new_permission', (int) $data['new_permission']))
 			->addValue(_('Read-write'), PERM_READ_WRITE)
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Deny'), PERM_DENY)
 			->addValue(_('None'), PERM_NONE)
-			->setModern(true)
+			->setModern(true)))->setAttribute('style', 'vertical-align: top')
 	])
 	->addRow([(new CSubmit('add_permission', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -153,8 +153,6 @@ $permissionsFormList->addRow(null,
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
-
-
 
 // append form lists to tab
 $userGroupTab = (new CTabView())
