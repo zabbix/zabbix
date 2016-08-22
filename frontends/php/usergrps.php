@@ -449,12 +449,19 @@ if (hasRequest('form')) {
 		// Host group ID parents (Parent1/*, Parent2/Child1/*) from the permission list.
 		$ls_groupids = getRequest('group_permissions', []);
 
-		// Add new permission to host group IDs that were selected from multiselect.
-		$new_permissions = array_fill(0, count($ms_ids), $data['new_permission']);
-		$ms_ids = array_combine($ms_ids, $new_permissions);
+		/* Add new permission to host group IDs that were selected from multiselect.
+		 * "IF" clause is work around for PHP < 5.6).
+		 */
+		if ($ms_ids) {
+			$new_permissions = array_fill(0, count($ms_ids), $data['new_permission']);
+			$ms_ids = array_combine($ms_ids, $new_permissions);
+		}
 
-		$new_permissions_groups = array_fill(0, count($ms_groupids), $data['new_permission']);
-		$ms_groupids = array_combine($ms_groupids, $new_permissions_groups);
+		// "IF" clause is work around for PHP < 5.6).
+		if ($ms_groupids) {
+			$new_permissions_groups = array_fill(0, count($ms_groupids), $data['new_permission']);
+			$ms_groupids = array_combine($ms_groupids, $new_permissions_groups);
+		}
 
 		// Filter only parent IDs (Parent1/*, Parent2/Child1/*) from list.
 		$ls_parentids = array_diff_key($ls_groupids, $ms_groupids);
