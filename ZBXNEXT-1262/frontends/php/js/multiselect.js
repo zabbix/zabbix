@@ -642,6 +642,10 @@ jQuery(function($) {
 		}
 
 		if (!empty(data)) {
+			if (values.search.slice(-1) === '/') {
+				data = data.concat([{name: values.search + '*', id: 0}]);
+			}
+
 			$.each(data, function(i, item) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
 					if (typeof values.available[item.id] === 'undefined'
@@ -723,7 +727,7 @@ jQuery(function($) {
 				// Add hidden input.
 				obj.append($('<input>', {
 					type: 'hidden',
-					name: options.name.slice(0, -2) + '_subgroups[]',
+					name: options.name.slice(0, -2) + '_subgroupids[]',
 					value: item.id
 				}));
 			}
@@ -840,8 +844,6 @@ jQuery(function($) {
 
 	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			var search = removeSubGroupPostfix(values.search);
-
 			if (id > 0) {
 				addSelected(values.available[id], obj, values, options);
 			}

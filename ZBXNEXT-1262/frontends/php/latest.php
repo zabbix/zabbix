@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groupids_subgroups' => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'groupids_subgroupids' => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -78,7 +78,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.application', getRequest('application', ''), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.latest.filter.subgroups', getRequest('groupids_subgroups', []), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.subgroupids', getRequest('groupids_subgroupids', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
@@ -88,7 +88,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.latest.filter.show_details');
 	CProfile::delete('web.latest.filter.application');
 	CProfile::deleteIdx('web.latest.filter.groupids');
-	CProfile::deleteIdx('web.latest.filter.subgroups');
+	CProfile::deleteIdx('web.latest.filter.subgroupids');
 	CProfile::deleteIdx('web.latest.filter.hostids');
 	DBend();
 }
@@ -99,7 +99,7 @@ $filter = [
 	'showDetails' => CProfile::get('web.latest.filter.show_details'),
 	'application' => CProfile::get('web.latest.filter.application', ''),
 	'groupids' => CProfile::getArray('web.latest.filter.groupids'),
-	'subgroups' => CProfile::getArray('web.latest.filter.subgroups', []),
+	'subgroupids' => CProfile::getArray('web.latest.filter.subgroupids', []),
 	'hostids' => CProfile::getArray('web.latest.filter.hostids')
 ];
 
@@ -119,10 +119,10 @@ $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filt
 if ($filterSet) {
 	$groupids = $filter['groupids'];
 
-	if ($filter['subgroups']) {
+	if ($filter['subgroupids']) {
 		$groupids = array_merge(
 			$groupids,
-			array_keys(findParentAndChildsForUpdate(array_combine($filter['subgroups'], $filter['subgroups'])))
+			array_keys(findParentAndChildsForUpdate(array_combine($filter['subgroupids'], $filter['subgroupids'])))
 		);
 
 		$groupids = array_unique($groupids);
@@ -302,7 +302,7 @@ if ($filter['groupids'] !== null) {
 		'preservekeys' => true
 	]);
 
-	foreach ($filter['subgroups'] as $subgroup) {
+	foreach ($filter['subgroupids'] as $subgroup) {
 		if (array_key_exists($subgroup, $filterGroups)) {
 			$filterGroups[$subgroup]['name'] .= '/*';
 		}
