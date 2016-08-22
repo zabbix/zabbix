@@ -384,7 +384,7 @@ A.F.I..... [ZBXNEXT-3007] implemented support of public and private maps with ab
 ...G...... [ZBX-10063] improved net.if.* on Windows to get values from 64-bit counters if available (Sandis)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 ........S. [ZBXNEXT-3055] changed LLD lost resources deletion time calculation logic to avoid issues with invalid discovery item time stamps (gleb)
-A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
+A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, Sasha)
 ....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
