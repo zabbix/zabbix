@@ -388,6 +388,7 @@ if (hasRequest('form')) {
 
 		if (hasRequest('form_refresh')) {
 			$data['group_users'] = getRequest('group_users', []);
+			$data['group_rights'] = getRequest('group_rights', []);
 		}
 		else {
 			$data['group_users'] = [];
@@ -401,23 +402,21 @@ if (hasRequest('form')) {
 			while ($dbUser = DBfetch($dbUsers)) {
 				$data['group_users'][] = $dbUser['userid'];
 			}
+
+			$db_rights = DBselect(
+				'SELECT r.rightid,r.permission,g.groupid,g.name'.
+				' FROM groups g'.
+					' LEFT JOIN rights r ON r.id=g.groupid AND r.groupid='.zbx_dbstr($data['usrgrpid'])
+			);
+
+			while ($db_right = DBfetch($db_rights)) {
+				$data['group_rights'][$db_right['name']] = [
+					'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
+					'name' => $db_right['name'],
+					'host_groupid' => $db_right['groupid']
+				];
+			}
 		}
-
-		$db_rights = DBselect(
-			'SELECT r.rightid,r.permission,r.groupid AS user_groupid,g.groupid AS host_groupid,g.name'.
-			' FROM groups g'.
-				' LEFT JOIN rights r ON r.id=g.groupid AND r.groupid='.zbx_dbstr($data['usrgrpid'])
-		);
-
-		while ($db_right = DBfetch($db_rights)) {
-			$data['group_rights'][$db_right['name']] = [
-				'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
-				'name' => $db_right['name'],
-				'host_groupid' => $db_right['host_groupid']
-			];
-		}
-
-		$data['group_rights'] = getRequest('group_rights', $data['group_rights']);
 	}
 	else {
 		// User group does not exist, no permissions exist, get all host groups and set all permissions to NONE.
