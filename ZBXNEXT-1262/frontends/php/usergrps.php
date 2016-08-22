@@ -380,7 +380,9 @@ if (hasRequest('form')) {
 	if (hasRequest('usrgrpid')) {
 		// User group exists, but there might be no permissions set yet.
 		$data['name'] = getRequest('gname', $data['usrgrp']['name']);
-		$data['users_status'] = getRequest('users_status', $data['usrgrp']['users_status']);
+		$data['users_status'] = hasRequest('form_refresh')
+			? getRequest('users_status')
+			: $data['usrgrp']['users_status'];
 		$data['gui_access'] = getRequest('gui_access', $data['usrgrp']['gui_access']);
 		$data['debug_mode'] = getRequest('debug_mode', $data['usrgrp']['debug_mode']);
 		$data['group_users'] = [];
