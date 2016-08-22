@@ -378,6 +378,7 @@ function createPermissionList(array $group_rights) {
 	// Group name and permission list.
 	$same_permissions = true;
 	$list = [];
+	$prev = null;
 
 	foreach ($group_rights as $group) {
 		$parent = findParentAndRightsByName($group['name'], $group_rights);
@@ -389,6 +390,10 @@ function createPermissionList(array $group_rights) {
 					'rights' => $group['rights'],
 					'host_groupid' => $group['host_groupid']
 				];
+
+				if ($prev !== null && $prev != $group['rights']) {
+					$same_permissions = false;
+				}
 			}
 		}
 		else {
@@ -422,6 +427,8 @@ function createPermissionList(array $group_rights) {
 				}
 			}
 		}
+
+		$prev = $group['rights'];
 	}
 
 	return [$list, $same_permissions];
