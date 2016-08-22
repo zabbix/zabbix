@@ -123,7 +123,7 @@ if ($data['action'] == 'problem.view') {
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
-		->addRow(_('Trigger'),
+		->addRow(_('Triggers'),
 			(new CMultiSelect([
 				'name' => 'filter_triggerids[]',
 				'objectName' => 'triggers',
