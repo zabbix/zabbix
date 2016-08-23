@@ -32,10 +32,7 @@
 function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = [
 		'is_profile' => $isProfile,
-		'config' => $config,
-		'same_permissions' => true,
-		'permission_all' => PERM_NONE,
-		'permissions' => []
+		'config' => $config
 	];
 
 	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
@@ -159,65 +156,17 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		]);
 		order_result($data['groups'], 'name');
 
-		$groupids = array_values($data['user_groups']);
-		$sql = '';
-		$i = 0;
-		$cnt = count($groupids);
-
-		foreach ($groupids as $groupid) {
-			$sql .= 'SELECT r.rightid,r.permission,r.groupid AS user_groupid,g.groupid AS host_groupid,g.name'.
-					' FROM groups g'.
-					' LEFT JOIN rights r ON r.id=g.groupid AND r.groupid='.zbx_dbstr($groupid);
-
-			if ($i + 1 != $cnt) {
-				$sql .= ' UNION ';
-			}
-
-			$i++;
-		}
-
-		$db_rights = DBselect($sql);
-
-		// Deny beats all, read-write beats read.
-		$group_rights = [];
-		while ($db_right = DBfetch($db_rights)) {
-			if (array_key_exists($db_right['name'], $group_rights)
-					&& $group_rights[$db_right['name']]['rights'] != PERM_DENY) {
-				if ($db_right['permission'] == PERM_DENY) {
-					$group_rights[$db_right['name']]['rights'] = PERM_DENY;
-				}
-				else {
-					$group_rights[$db_right['name']]['rights'] = ($db_right['rightid'] == 0)
-						? PERM_NONE
-						: max($group_rights[$db_right['name']]['rights'], $db_right['permission']);
-				}
-			}
-			else {
-				$group_rights[$db_right['name']] = [
-					'rights' => ($db_right['rightid'] == 0) ? PERM_NONE : $db_right['permission'],
-					'name' => $db_right['name'],
-					'host_groupid' => $db_right['host_groupid']
-				];
-			}
-		}
-
-		order_result($group_rights, 'name');
-
-		list($list, $data['same_permissions']) = createPermissionList($group_rights);
-
-		// Get max permission to display in case if all permissions are the same.
-		if ($data['same_permissions']) {
-			foreach ($list as $elem) {
-				if ($elem['rights'] > $data['permission_all']) {
-					$data['permission_all'] = $elem['rights'];
-				}
-			}
-
-			// Display only * (with max found permission if same), and no list.
-			unset($list);
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$data['groups_rights'] = [
+				'0' => [
+					'permission' => PERM_READ_WRITE,
+					'name' => '',
+					'grouped' => '1'
+				]
+			];
 		}
 		else {
-			$data['permissions'] = $list;
+			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($data['user_groups']));
 		}
 	}
 

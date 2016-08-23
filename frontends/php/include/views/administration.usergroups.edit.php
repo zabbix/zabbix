@@ -24,9 +24,9 @@ $widget = (new CWidget())->setTitle(_('User groups'));
 // create form
 $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
-	->addVar('form', $data['form'])
-	->addVar('group_rights', $data['group_rights']);
-if (isset($data['usrgrpid'])) {
+	->addVar('form', $data['form']);
+//	->addVar('group_rights', $data['group_rights']);
+if ($data['usrgrpid'] != 0) {
 	$userGroupForm->addVar('usrgrpid', $data['usrgrpid']);
 }
 
@@ -55,7 +55,7 @@ foreach ($data['users'] as $user) {
 $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), [_('Other groups'), SPACE, $groupsComboBox]));
 
 // append frontend and user status to from list
-$isGranted = isset($data['usrgrpid']) ? granted2update_group($data['usrgrpid']) : true;
+$isGranted = ($data['usrgrpid'] != 0) ? granted2update_group($data['usrgrpid']) : true;
 if ($isGranted) {
 	$userGroupFormList->addRow(_('Frontend access'), new CComboBox('gui_access', $data['gui_access'], null, [
 		GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
@@ -93,34 +93,28 @@ $permissions_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host group'), _('Permissions')]);
 
-if ($data['same_permissions']) {
-	$permissions_table->addRow(['*', permissionText($data['permission_all'])]);
-}
-else {
-	$permissions_table->addRow(['*', _('None')]);
+foreach ($data['groups_rights'] as $groupid => $group_rights) {
+	if ($groupid == 0) {
+		$permissions_table->addRow(['*', permissionText($group_rights['permission'])]);
+		$userGroupForm->addVar('groups_rights['.$groupid.'][grouped]', $group_rights['grouped']);
+		$userGroupForm->addVar('groups_rights['.$groupid.'][permission]', $group_rights['permission']);
+	}
+	else {
+		$group_name = $group_rights['name'];
+		if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+			$userGroupForm->addVar('groups_rights['.$groupid.'][grouped]', $group_rights['grouped']);
 
-	foreach ($data['permissions'] as $permission) {
-		if (substr($permission['name'], -2) === '/*') {
-			$permissions_table->addRow([$permission['name'],
-				(new CRadioButtonList('group_permissions['.$permission['host_groupid'].']', (int) $permission['rights']))
-					->addValue(_('Read-write'), PERM_READ_WRITE)
-					->addValue(_('Read'), PERM_READ)
-					->addValue(_('Deny'), PERM_DENY)
-					->addValue(_('None'), PERM_NONE)
-					->setModern(true)
+			$group_name .= '/*';
+		}
 
-			]);
-		}
-		else {
-			$permissions_table->addRow([$permission['name'],
-				(new CRadioButtonList('permissions['.$permission['host_groupid'].']', (int) $permission['rights']))
-					->addValue(_('Read-write'), PERM_READ_WRITE)
-					->addValue(_('Read'), PERM_READ)
-					->addValue(_('Deny'), PERM_DENY)
-					->addValue(_('None'), PERM_NONE)
-					->setModern(true)
-			]);
-		}
+		$permissions_table->addRow([$group_name,
+			(new CRadioButtonList('groups_rights['.$groupid.'][permission]', (int) $group_rights['permission']))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true)
+		]);
 	}
 }
 
@@ -141,7 +135,7 @@ $new_permissions_table = (new CTable())
 					'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CCol((new CRadioButtonList('new_permission', (int) $data['new_permission']))
+		(new CCol((new CRadioButtonList('new_permission', PERM_NONE))
 			->addValue(_('Read-write'), PERM_READ_WRITE)
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Deny'), PERM_DENY)
@@ -165,7 +159,7 @@ if (!$data['form_refresh']) {
 }
 
 // append buttons to form
-if (isset($data['usrgrpid'])) {
+if ($data['usrgrpid'] != 0) {
 	$userGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
