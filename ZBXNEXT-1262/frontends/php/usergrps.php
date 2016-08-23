@@ -368,8 +368,9 @@ if (hasRequest('form')) {
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
 		'new_permission' => getRequest('new_permission', PERM_NONE),
-		'form_refresh' => getRequest('form_refresh', 0),
-		'group_rights' => [],
+		'group_rights' => hasRequest('form_refresh') ? getRequest('group_rights', []) : [],
+		'group_users' => hasRequest('form_refresh') ? getRequest('group_users', []) : [],
+		'form_refresh' => getRequest('form_refresh', 0)
 	];
 
 	if (hasRequest('usrgrpid')) {
@@ -382,13 +383,7 @@ if (hasRequest('form')) {
 		$data['gui_access'] = getRequest('gui_access', $db_user_group['gui_access']);
 		$data['debug_mode'] = hasRequest('form_refresh') ? getRequest('debug_mode') : $db_user_group['debug_mode'];
 
-		if (hasRequest('form_refresh')) {
-			$data['group_users'] = getRequest('group_users', []);
-			$data['group_rights'] = getRequest('group_rights', []);
-		}
-		else {
-			$data['group_users'] = [];
-
+		if (!hasRequest('form_refresh')) {
 			$dbUsers = DBselect(
 				'SELECT ug.userid'.
 				' FROM users_groups ug'.
