@@ -94,6 +94,8 @@ $permissions_table = (new CTable())
 	->setHeader([_('Host group'), _('Permissions')]);
 
 foreach ($data['groups_rights'] as $groupid => $group_rights) {
+	$userGroupForm->addVar('groups_rights['.$groupid.'][name]', $group_rights['name']);
+
 	if ($groupid == 0) {
 		$permissions_table->addRow(['*', permissionText($group_rights['permission'])]);
 		$userGroupForm->addVar('groups_rights['.$groupid.'][grouped]', $group_rights['grouped']);
