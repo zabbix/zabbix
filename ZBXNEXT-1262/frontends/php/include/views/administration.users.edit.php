@@ -395,18 +395,15 @@ if (!$data['is_profile']) {
 		->setHeader([_('Host group'), _('Permissions')]);
 
 	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-		$permissions_table->addRow(['*', _('Read-write')]);
+		$permissions_table->addRow(['*', permissionText(PERM_READ_WRITE)]);
 	}
 	else {
-		if ($data['same_permissions']) {
-			$permissions_table->addRow(['*', permissionText($data['permission_all'])]);
-		}
-		else {
-			$permissions_table->addRow(['*', _('None')]);
-
-			foreach ($data['permissions'] as $permission) {
-				$permissions_table->addRow([$permission['name'], permissionText($permission['rights'])]);
+		foreach ($data['groups_rights'] as $groupid => $group_rights) {
+			$group_name = $group_rights['name'];
+			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+				$group_name .= ($groupid == 0) ? '*' : '/*';
 			}
+			$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
 		}
 	}
 
