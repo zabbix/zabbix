@@ -252,17 +252,19 @@ jQuery(function($) {
 				})
 				.attr('placeholder', options.labels['type here to search'])
 				.on('keyup change', function(e) {
+					if (typeof(e.which) === 'undefined') {
+						return false;
+					}
+
 					switch (e.which) {
 						case KEY.ARROW_DOWN:
 						case KEY.ARROW_LEFT:
 						case KEY.ARROW_RIGHT:
 						case KEY.ARROW_UP:
 							return false;
-					}
-
-					if (e.which == KEY.ESCAPE) {
-						cleanSearchInput(obj);
-						return false;
+						case KEY.ARROW_UP:
+							cleanSearchInput(obj);
+							return false;
 					}
 
 					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
