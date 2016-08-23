@@ -320,7 +320,7 @@ class CEvent extends CApiService {
 					$tag['value'] = str_replace('%', '!%', $tag['value']);
 					$tag['value'] = str_replace('_', '!_', $tag['value']);
 					$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-					$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+					$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
 				}
 
 				$sqlParts['where'][] = 'EXISTS ('.
