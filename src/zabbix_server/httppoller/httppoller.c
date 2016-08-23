@@ -46,7 +46,7 @@ extern int		server_num, process_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_minnextcheck()
+static int	get_minnextcheck(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
