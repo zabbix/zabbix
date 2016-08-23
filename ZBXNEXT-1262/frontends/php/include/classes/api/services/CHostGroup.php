@@ -649,7 +649,17 @@ class CHostGroup extends CApiService {
 		]);
 
 		DB::delete('profiles', [
+			'idx' => 'web.dashconf.groups.subgroupids',
+			'value_id' => $groupids
+		]);
+
+		DB::delete('profiles', [
 			'idx' => 'web.dashconf.groups.hide.groupids',
+			'value_id' => $groupids
+		]);
+
+		DB::delete('profiles', [
+			'idx' => 'web.dashconf.groups.hide.subgroupids',
 			'value_id' => $groupids
 		]);
 
