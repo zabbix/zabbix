@@ -329,37 +329,27 @@ $widget = (new CWidget())
 $filterForm = (new CFilter('web.latest.filter.state'))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
-$filterColumn1 = new CFormList();
-$filterColumn1->addRow(
-	_('Host groups'),
-	(new CMultiSelect(
-		[
-			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $multiSelectHostGroupData,
-			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1'
-			]
-	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn1->addRow(
-		_('Hosts'),
-		(new CMultiSelect(
-			[
-				'name' => 'hostids[]',
-				'objectName' => 'hosts',
-				'data' => $multiSelectHostData,
-				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
-				]
-			]
-		))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn1->addRow(
-	_('Application'),
-	[
+$filterColumn1 = (new CFormList())
+	->addRow(_('Host groups'), (new CMultiSelect([
+		'name' => 'groupids[]',
+		'objectName' => 'hostGroup',
+		'data' => $multiSelectHostGroupData,
+		'nested' => true,
+		'popup' => [
+			'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
+				'&srcfld1=groupid&multiselect=1'
+		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Hosts'), (new CMultiSelect([
+		'name' => 'hostids[]',
+		'objectName' => 'hosts',
+		'data' => $multiSelectHostData,
+		'popup' => [
+			'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
+				'&real_hosts=1&multiselect=1'
+		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
@@ -367,25 +357,18 @@ $filterColumn1->addRow(
 			->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 				'&with_applications=1&dstfrm=zbx_filter");'
 			)
-	]
-);
+	]);
 
-$filterColumn2 = new CFormList();
-$filterColumn2->addRow(
-	_('Name'),
-	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn2->addRow(
-	_('Show items without data'),
-	(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
-);
-$filterColumn2->addRow(
-	_('Show details'),
-	(new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1)
-);
+$filterColumn2 = (new CFormList())
+	->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+	->addRow(_('Show items without data'),
+		(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
+	)
+	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 
-$filterForm->addColumn($filterColumn1);
-$filterForm->addColumn($filterColumn2);
+$filterForm
+	->addColumn($filterColumn1)
+	->addColumn($filterColumn2);
 
 $widget->addItem($filterForm);
 // End of Filter
