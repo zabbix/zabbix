@@ -156,6 +156,7 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
+	 * @param bool   options['nested']				allow to select subgroups
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
@@ -186,6 +187,7 @@ jQuery(function($) {
 			disabled: false,
 			selectedLimit: 0,
 			limit: 20,
+			nested: false,
 			popup: []
 		};
 		options = $.extend({}, defaults, options);
@@ -294,15 +296,21 @@ jQuery(function($) {
 
 										values.isAjaxLoaded = false;
 
+										var request_data = {
+											search: values.search,
+											imit: getLimit(values, options)
+										}
+
+										if (options.nested) {
+											request_data.nested = options.nested;
+										}
+
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: {
-												search: values.search,
-												limit: getLimit(values, options)
-											},
+											data: request_data,
 											success: function(data) {
 												values.isAjaxLoaded = true;
 
@@ -708,7 +716,7 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
-			if (hasSubGroupPostfix(item.name)) {
+			if (hasSubGroupPostfix(item.name) && options.nested) {
 				// Add hidden input.
 				obj.append($('<input>', {
 					type: 'hidden',

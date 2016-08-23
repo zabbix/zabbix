@@ -209,7 +209,8 @@ switch ($data['method']) {
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
-				if (array_key_exists('search', $data)) {
+				if (array_key_exists('nested', $data) && array_key_exists('search', $data)) {
+					// Search for parent hostgroup if nesting is allowed.
 					$name = $data['search'];
 
 					$search_parent = false;
