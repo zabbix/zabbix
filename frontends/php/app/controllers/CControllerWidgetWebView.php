@@ -49,9 +49,29 @@ class CControllerWidgetWebView extends CController {
 			}
 			else {
 				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hideHostGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+				$subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value');
+				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+				$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value');
 
-				if ($hideHostGroupIds) {
+				if ($subgroupids) {
+					$filter['groupids'] = array_merge(
+						$subgroupids,
+						array_keys(findParentAndChildsForUpdate(array_combine($subgroupids, $subgroupids)))
+					);
+
+					$filter['groupids'] = array_unique($filter['groupids']);
+				}
+
+				if ($hide_subgroupids) {
+					$hide_groupids = array_merge(
+						$hide_groupids,
+						array_keys(findParentAndChildsForUpdate(array_combine($hide_subgroupids, $hide_subgroupids)))
+					);
+
+					$hide_groupids = array_unique($hide_groupids);
+				}
+
+				if ($hide_groupids) {
 					// get all groups if no selected groups defined
 					if (!$filter['groupids']) {
 						$dbHostGroups = API::HostGroup()->get([
@@ -60,7 +80,7 @@ class CControllerWidgetWebView extends CController {
 						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
 					}
 
-					$filter['groupids'] = array_diff($filter['groupids'], $hideHostGroupIds);
+					$filter['groupids'] = array_diff($filter['groupids'], $hide_groupids);
 
 					// get available hosts
 					$dbAvailableHosts = API::Host()->get([
@@ -70,18 +90,16 @@ class CControllerWidgetWebView extends CController {
 					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
 
 					$dbDisabledHosts = API::Host()->get([
-						'groupids' => $hideHostGroupIds,
+						'groupids' => $hide_groupids,
 						'output' => ['hostid']
 					]);
 					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
 					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
 				}
-				else {
-					if (!$filter['groupids']) {
-						// null mean all groups
-						$filter['groupids'] = null;
-					}
+				elseif (!$filter['groupids']) {
+					// null mean all groups
+					$filter['groupids'] = null;
 				}
 			}
 
