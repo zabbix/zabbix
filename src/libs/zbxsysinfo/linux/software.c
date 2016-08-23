@@ -46,8 +46,8 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*type, line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
+	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL, find_param = 0, found_petty_name = FAIL;
 	FILE	*f = NULL;
 
 	if (1 < request->nparam)
@@ -78,7 +78,24 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(type, "name"))
 	{
-		if (NULL == (f = fopen(SW_OS_NAME, "r")))
+		/* firstly need to check option PRETTY_NAME in /etc/os-release */
+		/* if cannot find it, get value from /etc/issue.net            */
+		if (NULL != (f = fopen(SW_OS_NAME_RELEASE, "r")))
+		{
+			while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
+			{
+				if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME, strlen(SW_OS_OPTION_PRETTY_NAME)))
+					continue;
+
+				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line))
+				{
+					found_petty_name = SUCCEED;
+					break;
+				}
+			}
+		}
+
+		if (FAIL == found_petty_name && NULL == (f = fopen(SW_OS_NAME, "r")))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_NAME ": %s",
 					zbx_strerror(errno)));
@@ -91,7 +108,7 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (NULL != fgets(line, sizeof(line), f))
+	if (SUCCEED == found_petty_name || NULL != fgets(line, sizeof(line), f))
 	{
 		ret = SYSINFO_RET_OK;
 		zbx_rtrim(line, ZBX_WHITESPACE);
