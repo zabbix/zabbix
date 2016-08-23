@@ -209,6 +209,46 @@ switch ($data['method']) {
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
+				if (array_key_exists('search', $data)) {
+					$name = $data['search'];
+
+					$search_parent = false;
+					$add_asterisk = false;
+
+					if (substr($name, -2) === '/*') {
+						$name = substr($name, 0, -2);
+						$search_parent = true;
+					}
+					elseif (substr($name, -1) === '/') {
+						$name = substr($name, 0, -1);
+						$search_parent = true;
+						$add_asterisk = true;
+					}
+
+					if ($search_parent && strlen($name) > 0) {
+						$parent = API::HostGroup()->get([
+							'output' => ['groupid', 'name'],
+							'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
+							'filter' => ['name' => $name],
+							'limit' => 1
+						]);
+
+						if ($parent) {
+							$parent = reset($parent);
+							$parent['name'] = $data['search'];
+
+							if ($add_asterisk) {
+								$parent['name'] .= '*';
+							}
+
+							$result[] = [
+								'id' => $parent['groupid'],
+								'name' => $parent['name']
+							];
+						}
+					}
+				}
+
 				$hostGroups = API::HostGroup()->get([
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => ['groupid', 'name'],

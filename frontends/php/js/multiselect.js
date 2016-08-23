@@ -268,10 +268,10 @@ jQuery(function($) {
 						return false;
 					}
 
-					var search = removeSubGroupPostfix(input.val());
+					var search = input.val();
 
 					// Replace trailing slashes to check if search term contains anything else.
-					if (!empty(search.replace(/\/+$/, ''))) {
+					if (!empty(search)) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
@@ -300,7 +300,7 @@ jQuery(function($) {
 											dataType: 'json',
 											cache: false,
 											data: {
-												search: removeSubGroupPostfix(values.search),
+												search: values.search,
 												limit: getLimit(values, options)
 											},
 											success: function(data) {
@@ -329,17 +329,7 @@ jQuery(function($) {
 							if (!empty(input.val())) {
 								var selected = $('.available li.suggest-hover', obj);
 
-								if (selected.length > 0) {
-									select(selected.data('id'), obj, values, options);
-								}
-								else {
-									// Try to select by search string if nothing was selected.
-									var search = removeSubGroupPostfix(values.search);
-
-									if (typeof(values.available_names[search]) !== 'undefined') {
-										select(0, obj, values, options);
-									}
-								}
+								select(selected.data('id'), obj, values, options);
 
 								// stop form submit
 								cancelEvent(e);
@@ -642,17 +632,12 @@ jQuery(function($) {
 		}
 
 		if (!empty(data)) {
-			if (values.search.slice(-1) === '/') {
-				data = data.concat([{name: values.search + '*', id: 0}]);
-			}
-
 			$.each(data, function(i, item) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
 					if (typeof values.available[item.id] === 'undefined'
 							&& typeof values.selected[item.id] === 'undefined'
 							&& typeof values.ignored[item.id] === 'undefined') {
 						values.available[item.id] = item;
-						values.available_names[item.name] = item;
 					}
 				}
 				else {
@@ -844,21 +829,7 @@ jQuery(function($) {
 
 	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			if (id > 0) {
-				addSelected(values.available[id], obj, values, options);
-			}
-			else {
-				var search = removeSubGroupPostfix(values.search);
-
-				if (typeof(values.available_names[search]) !== 'undefined') {
-					var tmp_item = values.available_names[search];
-
-					// Copy search string to name in case it has subgroups postfix.
-					tmp_item.name = values.search;
-
-					addSelected(tmp_item, obj, values, options);
-				}
-			}
+			addSelected(values.available[id], obj, values, options);
 
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
@@ -881,6 +852,21 @@ jQuery(function($) {
 
 		available.fadeIn(0);
 		available.scrollTop(0);
+
+		if (objectLength(values.available) != 0) {
+			// remove selected item selected state
+			if ($('.selected li.selected', obj).length > 0) {
+				$('.selected li.selected', obj).removeClass('selected');
+			}
+
+			// pre-select first available
+			if ($('li', available).length > 0) {
+				if ($('li.suggest-hover', available).length > 0) {
+					$('li.suggest-hover', available).removeClass('suggest-hover');
+				}
+				$('li:first-child', available).addClass('suggest-hover');
+			}
+		}
 	}
 
 	function hideAvailable(obj) {
@@ -891,7 +877,6 @@ jQuery(function($) {
 		$('.multiselect-matches', obj).remove();
 		$('.available ul', obj).remove();
 		values.available = {};
-		values.available_names = {};
 		values.isMoreMatchesFound = false;
 	}
 
@@ -1009,14 +994,6 @@ jQuery(function($) {
 		}
 
 		return length;
-	}
-
-	function removeSubGroupPostfix(str) {
-		if (hasSubGroupPostfix(str)) {
-			str = str.slice(0, -2);
-		}
-
-		return str;
 	}
 
 	function hasSubGroupPostfix(str) {
