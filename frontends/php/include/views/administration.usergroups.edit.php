@@ -135,8 +135,10 @@ $new_permissions_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
+			'nested' => true,
 			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
+				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().
+					'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol((new CRadioButtonList('new_permission', (int) $data['new_permission']))

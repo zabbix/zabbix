@@ -27,67 +27,60 @@ $filterForm = (new CFilter('web.toptriggers.filter.state'))
 	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
 	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
-$filterColumn1 = new CFormList();
-$filterColumn2 = new CFormList();
+$filterColumn2 = (new CFormList())
+	->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']))
+	->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']))
+	->addRow(null, [
+		new CHorList([
+			(new CButton(null, _('Today')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_TODAY.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Yesterday')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Current week')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Current month')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Current year')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		]),
+		new CHorList([
+			(new CButton(null, _('Last week')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Last month')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton(null, _('Last year')))
+				->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		])
+	]);
 
-$filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
-$filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
-$filterColumn2->addRow(null, [
-	new CHorList([
-		(new CButton(null, _('Today')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_TODAY.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Yesterday')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Current week')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Current month')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Current year')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]),
-	new CHorList([
-		(new CButton(null, _('Last week')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Last month')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton(null, _('Last year')))
-			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	])
-]);
-
-$filterColumn1->addRow(
-	_('Host groups'),
-	(new CMultiSelect([
+$filterColumn1 = (new CFormList())
+	->addRow(_('Host groups'), (new CMultiSelect([
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['multiSelectHostGroupData'],
+		'nested' => true,
 		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
 				'&srcfld1=groupid&multiselect=1'
-		]
-	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-
-$filterColumn1->addRow(
-	_('Hosts'),
-	(new CMultiSelect([
+		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Hosts'), (new CMultiSelect([
 		'name' => 'hostids[]',
 		'objectName' => 'hosts',
 		'data' => $this->data['multiSelectHostData'],
 		'popup' => [
 			'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
 				'&real_hosts=1&multiselect=1'
-		]
-	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
+		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	);
 
 // severities
 $severity_columns = [0 => [], 1 => []];
