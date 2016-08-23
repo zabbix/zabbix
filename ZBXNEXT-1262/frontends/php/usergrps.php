@@ -367,7 +367,6 @@ if (hasRequest('form')) {
 		'users_status' => hasRequest('form_refresh') ? getRequest('users_status') : GROUP_STATUS_ENABLED,
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
 		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
-		'group_users' => getRequest('group_users', []),
 		'new_permission' => getRequest('new_permission', PERM_NONE),
 		'form_refresh' => getRequest('form_refresh', 0),
 		'group_rights' => [],
@@ -395,7 +394,7 @@ if (hasRequest('form')) {
 
 			$dbUsers = DBselect(
 				'SELECT ug.userid'.
-				' FROM users_groups ug '.
+				' FROM users_groups ug'.
 				' WHERE ug.usrgrpid='.zbx_dbstr($data['usrgrpid'])
 			);
 
