@@ -262,7 +262,7 @@ jQuery(function($) {
 						case KEY.ARROW_RIGHT:
 						case KEY.ARROW_UP:
 							return false;
-						case KEY.ARROW_UP:
+						case KEY.ESCAPE:
 							cleanSearchInput(obj);
 							return false;
 					}
