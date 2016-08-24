@@ -295,20 +295,25 @@ function collapseHostGroupRights(array $groups_rights) {
 
 		$permissions[$group_rights['permission']] = true;
 
-		$pos = strrpos($group_rights['name'], '/');
-		$parent_group_name = ($pos === false) ? '' : substr($group_rights['name'], 0, $pos);
+		$parent_group_name = $group_rights['name'];
 
-		if (!array_key_exists($parent_group_name, $groups)) {
-			continue;
+		do {
+			$pos = strrpos($parent_group_name, '/');
+			$parent_group_name = ($pos === false) ? '' : substr($parent_group_name, 0, $pos);
+
+			if (array_key_exists($parent_group_name, $groups)) {
+				$parent_group_rights = &$groups_rights[$groups[$parent_group_name]];
+
+				if ($parent_group_rights['permission'] == $group_rights['permission']) {
+					$parent_group_rights['grouped'] = '1';
+					unset($groups_rights[$groupid]);
+				}
+				unset($parent_group_rights);
+
+				break;
+			}
 		}
-
-		$parent_group_rights = &$groups_rights[$groups[$parent_group_name]];
-
-		if ($parent_group_rights['permission'] == $group_rights['permission']) {
-			$parent_group_rights['grouped'] = '1';
-			unset($groups_rights[$groupid]);
-		}
-		unset($parent_group_rights);
+		while ($parent_group_name !== '');
 	}
 
 	if (count($permissions) == 1) {
@@ -378,7 +383,7 @@ function applyHostGroupRights(array $groups_rights, array $groupids = [], array 
 
 		do {
 			$pos = strrpos($parent_group_name, '/');
-			$parent_group_name = ($pos === false) ? '' : substr($ex_group_rights['name'], 0, $pos);
+			$parent_group_name = ($pos === false) ? '' : substr($parent_group_name, 0, $pos);
 
 			if (array_key_exists($parent_group_name, $ex_groups)
 					&& array_key_exists($ex_groups[$parent_group_name], $groups_rights)) {
