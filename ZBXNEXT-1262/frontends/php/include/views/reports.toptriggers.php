@@ -21,11 +21,50 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$topTriggers = (new CWidget())->setTitle(_('100 busiest triggers'));
-
 $filterForm = (new CFilter('web.toptriggers.filter.state'))
 	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
 	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
+
+// severities
+$severity_columns = [0 => [], 1 => []];
+
+foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+	$severity_columns[$severity % 2][] = new CLabel([
+		(new CCheckBox('severities['.$severity.']'))
+			->setChecked(in_array($severity, $this->data['filter']['severities'])),
+		getSeverityName($severity, $this->data['config'])
+	], 'severities['.$severity.']');
+}
+
+$filterColumn1 = (new CFormList())
+	->addRow(_('Host groups'),
+		(new CMultiSelect([
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $this->data['multiSelectHostGroupData'],
+			'nested' => true,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Hosts'),
+		(new CMultiSelect([
+			'name' => 'hostids[]',
+			'objectName' => 'hosts',
+			'data' => $this->data['multiSelectHostData'],
+			'popup' => [
+				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
+					'&real_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Severity'),
+		(new CTable())
+			->addRow($severity_columns[0])
+			->addRow($severity_columns[1])
+	);
 
 $filterColumn2 = (new CFormList())
 	->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']))
@@ -61,49 +100,9 @@ $filterColumn2 = (new CFormList())
 		])
 	]);
 
-$filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'), (new CMultiSelect([
-		'name' => 'groupids[]',
-		'objectName' => 'hostGroup',
-		'data' => $this->data['multiSelectHostGroupData'],
-		'nested' => true,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1'
-		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow(_('Hosts'), (new CMultiSelect([
-		'name' => 'hostids[]',
-		'objectName' => 'hosts',
-		'data' => $this->data['multiSelectHostData'],
-		'popup' => [
-			'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-				'&real_hosts=1&multiselect=1'
-		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
-
-// severities
-$severity_columns = [0 => [], 1 => []];
-
-for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severity_columns[$severity % 2][] = new CLabel([
-		(new CCheckBox('severities['.$severity.']'))
-			->setChecked(in_array($severity, $this->data['filter']['severities'])),
-		getSeverityName($severity, $this->data['config'])
-	], 'severities['.$severity.']');
-}
-
-$filterColumn1->addRow(_('Severity'),
-	(new CTable())
-		->addRow($severity_columns[0])
-		->addRow($severity_columns[1])
-);
-
 $filterForm
 	->addColumn($filterColumn1)
 	->addColumn($filterColumn2);
-
-$topTriggers->addItem($filterForm);
 
 // table
 $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);
@@ -130,6 +129,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	]);
 }
 
-$topTriggers->addItem($table);
-
-return $topTriggers;
+return (new CWidget())
+	->setTitle(_('100 busiest triggers'))
+	->addItem($filterForm)
+	->addItem($table);

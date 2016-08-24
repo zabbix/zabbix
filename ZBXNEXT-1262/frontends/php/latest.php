@@ -326,24 +326,28 @@ $filterForm = (new CFilter('web.latest.filter.state'))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'), (new CMultiSelect([
-		'name' => 'groupids[]',
-		'objectName' => 'hostGroup',
-		'data' => $multiSelectHostGroupData,
-		'nested' => true,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1'
-		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	->addRow(_('Host groups'),
+		(new CMultiSelect([
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $multiSelectHostGroupData,
+			'nested' => true,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'), (new CMultiSelect([
-		'name' => 'hostids[]',
-		'objectName' => 'hosts',
-		'data' => $multiSelectHostData,
-		'popup' => [
-			'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-				'&real_hosts=1&multiselect=1'
-		]]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	->addRow(_('Hosts'),
+		(new CMultiSelect([
+			'name' => 'hostids[]',
+			'objectName' => 'hosts',
+			'data' => $multiSelectHostData,
+			'popup' => [
+				'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
+					'&real_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
