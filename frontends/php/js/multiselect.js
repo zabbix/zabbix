@@ -305,7 +305,7 @@ jQuery(function($) {
 
 										var request_data = {
 											search: values.search,
-											imit: getLimit(values, options)
+											limit: getLimit(values, options)
 										}
 
 										if (options.nested) {
@@ -432,7 +432,7 @@ jQuery(function($) {
 								var selected = $('.available li.suggest-hover', obj);
 
 								if (selected.length === 0) {
-									// Select lasts element.
+									// Select last element.
 									var prev = $('ul.multiselect-suggest li:last-child', obj);
 
 									prev.addClass('suggest-hover');
@@ -453,7 +453,7 @@ jQuery(function($) {
 									}
 								}
 
-								// Position cursor to the end of search input.
+								// Position cursor at the end of search input.
 								cancelEvent(e);
 								$('input[type="text"]', obj).focus();
 							}
