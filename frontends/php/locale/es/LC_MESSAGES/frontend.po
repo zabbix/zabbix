@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-24 18:52+0300\n"
-"PO-Revision-Date: 2016-02-10 20:50+0300\n"
+"PO-Revision-Date: 2016-08-23 06:34+0300\n"
 "Last-Translator: Oscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455130239.0\n"
+"X-POOTLE-MTIME: 1471926854.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -68,7 +68,7 @@ msgstr[1] "%1$s ítems"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Línea: %2$s | Columna: %3$s]"
 
 #: include/views/configuration.item.edit.php:437
 #: include/views/configuration.item.edit.php:460
@@ -138,7 +138,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:537
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - indefinidamente)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -711,12 +711,12 @@ msgstr "Todos los mapas"
 #: include/views/configuration.trigger.prototype.edit.php:473
 #: include/views/configuration.triggers.edit.php:474
 msgid "All problems"
-msgstr ""
+msgstr "Todos los problemas"
 
 #: include/views/configuration.trigger.prototype.edit.php:474
 #: include/views/configuration.triggers.edit.php:475
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Todos los problemas si los valores coinciden"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -734,7 +734,7 @@ msgstr "Todas las plantillas"
 #: include/views/configuration.trigger.prototype.edit.php:516
 #: include/views/configuration.triggers.edit.php:525
 msgid "Allow manual close"
-msgstr ""
+msgstr "Permitir cierre manual"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:504
@@ -1209,7 +1209,7 @@ msgstr "CERT"
 #: include/classes/screens/CScreenProblem.php:601
 #: include/classes/screens/CScreenProblem.php:684
 msgid "CLOSING"
-msgstr ""
+msgstr "CERRANDO"
 
 #: triggers.php:567
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1316,12 +1316,12 @@ msgstr "No se pudo agregar la aplicación"
 
 #: correlation.php:146
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "No se pudo agregar la correlación"
 
 #: correlation.php:228 correlation.php:238 correlation.php:244
 #: correlation.php:264 correlation.php:268 correlation.php:281
 msgid "Cannot add correlation condition"
-msgstr ""
+msgstr "No se pudo agregar la condición de correlación"
 
 #: include/classes/api/services/CTrigger.php:953
 #: include/classes/api/services/CTriggerPrototype.php:832
@@ -1472,7 +1472,7 @@ msgstr "No se pudo agregar el escenario web"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "No puede llamar al método \"%1$s.%2$s\" sin parámetros."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -1514,7 +1514,7 @@ msgstr "No se pudo clonar los prototipos de disparador."
 #: include/classes/api/services/CEvent.php:828
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "No se pudo cerrar el problema: %1$s."
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
@@ -1523,20 +1523,20 @@ msgstr "No se pudo conectar a la base de datos."
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudieron copiar la gráfica"
+msgstr[1] "No se pudieron copiar las gráficas"
 
 #: items.php:986
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo copiar el monitor"
+msgstr[1] "No se pudo copiar los monitores"
 
 #: triggers.php:501
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo copiar el iniciador"
+msgstr[1] "No se pudieron copiar los iniciadores"
 
 #: include/triggers.inc.php:367
 #, c-format
@@ -1612,7 +1612,7 @@ msgstr[1] "No es posible eliminar la aplicación"
 
 #: correlation.php:162
 msgid "Cannot delete correlation"
-msgstr ""
+msgstr "No se pudo borrar la correlación"
 
 #: include/classes/api/services/CTrigger.php:857
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -1755,7 +1755,7 @@ msgstr "No es posible eliminar las acciones seleccionadas"
 
 #: correlation.php:374
 msgid "Cannot delete selected correlations"
-msgstr ""
+msgstr "No se pudo borrar las correlaciones seleccionadas"
 
 #: services.php:117
 msgid "Cannot delete service"
@@ -1848,8 +1848,8 @@ msgstr[1] "No se pudo desactivar las acciones"
 #: correlation.php:361
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo desactivar la correlación"
+msgstr[1] "No se pudo desactivar las correlaciones"
 
 #: discoveryconf.php:211 host_discovery.php:357
 msgid "Cannot disable discovery rule"
@@ -1929,8 +1929,8 @@ msgstr[1] "No se pudo habilitar las acciones"
 #: correlation.php:360
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo habilitar la correlación"
+msgstr[1] "No se pudieron habilitar las correlaciones"
 
 #: discoveryconf.php:210 host_discovery.php:356
 msgid "Cannot enable discovery rule"
@@ -2229,13 +2229,13 @@ msgstr "No se puede procesar aplicaciones desde diferentes equipos o plantillas.
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "No se pudo leer el JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "No se pudo leer el XML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2489,7 +2489,7 @@ msgstr "No se pudo actualizar la configuración"
 
 #: correlation.php:140
 msgid "Cannot update correlation"
-msgstr ""
+msgstr "No se pudo actualizar la correlación"
 
 #: usergrps.php:334
 msgid "Cannot update debug mode"
@@ -2646,7 +2646,7 @@ msgstr "No es posible actualizar el iniciador"
 #: include/classes/api/services/CTriggerGeneral.php:1604
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335
 msgid "Cannot update trigger prototype"
@@ -2655,7 +2655,7 @@ msgstr "No se pudo actualizar el prototipo de disparador"
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se pudo actualizar el prototipo de iniciador \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:390
 msgid "Cannot update trigger prototypes"
@@ -2940,17 +2940,17 @@ msgstr "Cerrar el constructor de expresiones"
 
 #: include/correlation.inc.php:70
 msgid "Close new event"
-msgstr ""
+msgstr "Cerrar nuevo evento"
 
 #: include/correlation.inc.php:69
 msgid "Close old events"
-msgstr ""
+msgstr "Cerrar eventos antiguos"
 
 #: app/views/monitoring.acknowledge.edit.php:42
 #: app/views/monitoring.acknowledge.edit.php:79 include/acknow.inc.php:57
 #: include/events.inc.php:523
 msgid "Close problem"
-msgstr ""
+msgstr "Cerrar problema"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:170
 msgid "Collapse"
@@ -3039,7 +3039,7 @@ msgstr "La condición \"%2$s\" no está siendo usada en la fórmula \"%3$s\" de 
 #: include/classes/api/services/CCorrelation.php:1242
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
-msgstr ""
+msgstr "La condición \"%2$s\" no es usada en la fórmula \"%3$s\" para la correlación \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #, c-format
@@ -3054,7 +3054,7 @@ msgstr "La condición \"%2$s\" usada en la fórmula \"%3$s\" de la acción \"%1$
 #: include/classes/api/services/CCorrelation.php:1230
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
-msgstr ""
+msgstr "La condición \"%2$s\" usada en la fórmula \"%3$s\" para la correlación \"%1$s\" no está definida."
 
 #: include/classes/api/services/CDiscoveryRule.php:971
 #, c-format
@@ -3072,7 +3072,7 @@ msgstr "Condiciones"
 #: include/classes/api/services/CCorrelation.php:1160
 #, c-format
 msgid "Conditions duplicates for correlation \"%1$s\"."
-msgstr ""
+msgstr "Condiciones duplicadas para la correlación \"%1$s\"."
 
 #: include/menu.inc.php:187 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
@@ -3205,7 +3205,7 @@ msgstr "Configuración de plantillas"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr "Configuración de visualización de disparadores"
+msgstr "Configuración de visualización de iniciadores"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
@@ -3455,7 +3455,7 @@ msgstr "Crear fondo"
 
 #: include/views/configuration.correlation.list.php:27
 msgid "Create correlation"
-msgstr ""
+msgstr "Crear correlación"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -4082,7 +4082,7 @@ msgstr "¿Desea eliminar la acción actual?"
 
 #: include/views/configuration.correlation.edit.php:249
 msgid "Delete current correlation?"
-msgstr ""
+msgstr "¿Borrar la correlación actual?"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:358
@@ -4173,7 +4173,7 @@ msgstr "¿Desea eliminar las aplicaciones seleccionadas?"
 
 #: include/views/configuration.correlation.list.php:121
 msgid "Delete selected correlations?"
-msgstr ""
+msgstr "¿Borrar las correlaciones seleccionadas?"
 
 #: include/views/configuration.discovery.list.php:88
 #: include/views/configuration.host.discovery.list.php:152
@@ -4840,9 +4840,8 @@ msgstr "Espacio en disco en bytes o porcentaje del total. Devuelve entero para b
 
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:559
-#, fuzzy
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr "Estadísticas de escritura en disco. Devuelve entero si tipo es sectores, operaciones, bytes; decimal si tipo es sps, ops, bps"
+msgstr "Estadísticas de escritura en disco. Devuelve un valor de tipo entero en sectores, operaciones y bytes; valor de tipo real para sps, ops y bps (sectores por segundo, operaciones por segundo y bytes por segundo)"
 
 #: adm.triggerdisplayoptions.php:43
 #: include/views/administration.general.trigger.options.edit.php:65
@@ -5357,7 +5356,7 @@ msgstr "¿Desea activar los equipos monitorizados por los proxis seleccionados?"
 #: include/views/administration.general.housekeeper.edit.php:100
 #: include/views/administration.general.housekeeper.edit.php:116
 msgid "Enable internal housekeeping"
-msgstr "Activar limpieza interna"
+msgstr "Activar mantenimiento interno"
 
 #: include/views/configuration.action.list.php:123
 msgid "Enable selected actions?"
@@ -5764,7 +5763,7 @@ msgstr "Pantallas favoritas"
 
 #: jsLoader.php:190
 msgid "Favourite simple graphs"
-msgstr "Gráficas simples favoritas"
+msgstr "Gráficas sencillas favoritas"
 
 #: jsLoader.php:191
 msgid "Favourite slide shows"
@@ -6542,12 +6541,12 @@ msgstr "Eliminar el histórico puede llevarse tiempo. ¿Continuar?"
 
 #: adm.housekeeper.php:57
 msgid "History data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos históricos"
 
 #: include/profiles.inc.php:150
 #, c-format
 msgid "History data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos históricos (en días) \"%1$s\"."
 
 #: include/classes/screens/CScreenEvents.php:68 include/screens.inc.php:32
 msgid "History of events"
@@ -6884,7 +6883,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:93
 #: app/views/monitoring.widget.hosts.view.php:383
 msgid "Host status"
-msgstr ""
+msgstr "Estado del host"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -6970,7 +6969,7 @@ msgstr ""
 #: include/views/monitoring.overview.triggers.php:84
 #: include/views/monitoring.screen.constructor.edit.php:656
 msgid "Hosts location"
-msgstr ""
+msgstr "Posición del host"
 
 #: hosts.php:399
 msgid "Hosts updated"
@@ -7093,12 +7092,12 @@ msgstr "Servicio TI"
 
 #: adm.housekeeper.php:45
 msgid "IT service data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de servicios TI"
 
 #: include/profiles.inc.php:141
 #, c-format
 msgid "IT service data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de servicios TI (en días) \"%1$s\"."
 
 #: include/views/configuration.services.child.list.php:24
 msgid "IT service dependencies"
@@ -8073,12 +8072,12 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1780
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
-msgstr ""
+msgstr "Estado incorrecto del host \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:179
 #, c-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Estado incorrecto del prototipo de host \"%1$s\"."
 
 #: include/classes/api/services/CService.php:998
 #, c-format
@@ -8476,7 +8475,7 @@ msgstr ""
 
 #: include/views/administration.general.housekeeper.edit.php:44
 msgid "Internal data storage period (in days)"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos internos (en días)"
 
 #: include/classes/api/services/CGraphGeneral.php:480
 #: include/classes/api/services/CGraphGeneral.php:614
@@ -8495,7 +8494,7 @@ msgstr ""
 
 #: adm.housekeeper.php:35
 msgid "Internal event and alert data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de eventos y alertas internas"
 
 #: include/profiles.inc.php:126
 #, c-format
@@ -8787,14 +8786,14 @@ msgstr "¿Está conectado?"
 
 #: include/blocks.inc.php:626 include/blocks.inc.php:794
 msgid "Issue"
-msgstr ""
+msgstr "Problema"
 
 #: app/views/administration.proxy.edit.php:117
 #: include/views/configuration.host.edit.php:792
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
-msgstr ""
+msgstr "Emisor"
 
 #: include/classes/api/services/CUser.php:139
 msgid "It is not possible to filter by user password."
@@ -9203,8 +9202,8 @@ msgstr "Último"
 #, c-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Último %1$d problema"
+msgstr[1] "Últimos %1$d problemas"
 
 #: popup_trexpr.php:286
 msgid "Last (most recent) T value is < N"
@@ -9835,16 +9834,16 @@ msgstr ""
 
 #: adm.gui.php:43 include/views/administration.general.gui.edit.php:47
 msgid "Max count of elements to show inside table cell"
-msgstr ""
+msgstr "Número máximo de elementos a mostrar dentro de la celda de tabla"
 
 #: include/profiles.inc.php:177
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr ""
+msgstr "Número máximo de elementos a mostrar dentro de la celda de tabla \"%1$s\"."
 
 #: adm.gui.php:50 include/views/administration.general.gui.edit.php:56
 msgid "Max count of events per trigger to show"
-msgstr ""
+msgstr "Número máximo de eventos por iniciador a mostrar"
 
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:351
@@ -10312,16 +10311,16 @@ msgstr ""
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period (in days)"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de descubrimiento de red (en días)"
 
 #: adm.housekeeper.php:38
 msgid "Network discovery event and alert data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de alertas y eventos de descubrimiento de red"
 
 #: include/profiles.inc.php:131
 #, c-format
 msgid "Network discovery event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de alertas y eventos de descubrimiento de red (en días) \"%1$s\"."
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:391
@@ -10687,7 +10686,7 @@ msgstr ""
 
 #: include/blocks.inc.php:114
 msgid "No graphs added."
-msgstr ""
+msgstr "No se agregaron gráficas."
 
 #: include/classes/api/services/CHost.php:1610
 #: include/classes/api/services/CHost.php:1768
@@ -10808,7 +10807,7 @@ msgstr ""
 
 #: include/blocks.inc.php:172
 msgid "No maps added."
-msgstr ""
+msgstr "No se agregaron mapas."
 
 #: include/classes/html/CMultiSelect.php:50 jsLoader.php:173
 msgid "No matches found"
@@ -10971,7 +10970,7 @@ msgstr ""
 
 #: include/blocks.inc.php:251
 msgid "No screens added."
-msgstr ""
+msgstr "No se agregaron pantallas."
 
 #: include/classes/api/services/CAction.php:1553
 msgid "No script specified for action operation command."
@@ -12908,7 +12907,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:903
 msgid "Returns current maintenance status of the host."
-msgstr ""
+msgstr "Devuelve el estado de mantenimiento actual del host."
 
 #: include/classes/items/CHelpItems.php:923
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
@@ -13401,7 +13400,7 @@ msgstr ""
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
 msgid "Search/Filter elements limit"
-msgstr ""
+msgstr "Límite de elementos en búsqueda/filtro"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
 msgid "Second"
@@ -13748,12 +13747,12 @@ msgstr ""
 
 #: adm.gui.php:47 include/views/administration.general.gui.edit.php:53
 msgid "Show events not older than (in days)"
-msgstr ""
+msgstr "Mostrar eventos no más antiguos de (en días)"
 
 #: include/profiles.inc.php:165
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "Mostrar eventos no más antiguos de (en días) \"%1$s\"."
 
 #: app/views/monitoring.problem.view.php:237
 #: include/views/common.filter.trigger.php:149
@@ -13763,7 +13762,7 @@ msgstr ""
 
 #: latest.php:357
 msgid "Show items without data"
-msgstr ""
+msgstr "Mostrar monitores sin datos"
 
 #: include/views/configuration.graph.edit.php:89
 msgid "Show legend"
@@ -13811,7 +13810,7 @@ msgstr "Mostrar valor"
 
 #: adm.gui.php:53 include/views/administration.general.gui.edit.php:59
 msgid "Show warning if Zabbix server is down"
-msgstr ""
+msgstr "Mostrar una advertencia si el servidor Zabbix está caído"
 
 #: include/views/configuration.graph.edit.php:97
 msgid "Show working time"
@@ -14853,12 +14852,12 @@ msgstr ""
 
 #: adm.housekeeper.php:62
 msgid "Trend data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de tendencias"
 
 #: include/profiles.inc.php:153
 #, c-format
 msgid "Trend data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de tendencias (en días) \"%1$s\"."
 
 #: disc_prototypes.php:170 items.php:58
 msgid "Trend storage period"
@@ -14930,7 +14929,7 @@ msgstr[1] ""
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de iniciadores (en días)"
 
 #: triggers.php:370
 msgid "Trigger deleted"
@@ -14950,7 +14949,7 @@ msgstr[1] ""
 #: include/views/administration.general.trigger.options.edit.php:25
 #: include/views/administration.general.trigger.options.edit.php:83
 msgid "Trigger displaying options"
-msgstr ""
+msgstr "Opciones de visualización de iniciadores"
 
 #: triggers.php:453
 msgid "Trigger enabled"
@@ -14960,12 +14959,12 @@ msgstr[1] ""
 
 #: adm.housekeeper.php:32
 msgid "Trigger event and alert data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de eventos y alertas"
 
 #: include/profiles.inc.php:123
 #, c-format
 msgid "Trigger event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de eventos y alertas (en días) \"%1$s\"."
 
 #: include/views/configuration.triggers.expression.php:124
 msgid "Trigger expression condition"
@@ -15150,7 +15149,7 @@ msgstr "Iniciadores eliminados"
 
 #: include/menu.inc.php:161
 msgid "Triggers top 100"
-msgstr ""
+msgstr "Top 100 iniciadores"
 
 #: include/views/monitoring.dashconf.php:105
 msgid "Triggers with severity"
@@ -15662,7 +15661,7 @@ msgstr "Actualizado"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "Actualizado el estado del host \"%1$s\"."
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:385
@@ -15953,12 +15952,12 @@ msgstr "Perfil de usuario"
 
 #: adm.housekeeper.php:53
 msgid "User session data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de sesión de usuario"
 
 #: include/profiles.inc.php:147
 #, c-format
 msgid "User session data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de sesión de usuario (en días) \"%1$s\"."
 
 #: include/views/administration.general.housekeeper.edit.php:86
 msgid "User sessions"

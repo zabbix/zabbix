@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-24 18:52+0300\n"
-"PO-Revision-Date: 2016-04-12 02:55+0300\n"
+"PO-Revision-Date: 2016-08-23 08:13+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1460422503.000000\n"
+"X-POOTLE-MTIME: 1471932821.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -111,7 +111,7 @@ msgstr[0] "%1$s 초"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s번의 로그인 시도 실패가 있었습니다. 마지막 로그인 시도 실패는 %3$s %2$s %1$s 입니다."
+msgstr[0] "%4$s 의 로그인 시도 실패가 있었습니다. 마지막 시도 실패는 %3$s %2$s %1$s 에 있었습니다."
 
 #: include/classes/screens/CScreenDiscovery.php:220
 #, c-format
@@ -127,7 +127,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:537
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - 무한)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -698,12 +698,12 @@ msgstr "모든 맵"
 #: include/views/configuration.trigger.prototype.edit.php:473
 #: include/views/configuration.triggers.edit.php:474
 msgid "All problems"
-msgstr ""
+msgstr "모든 장애"
 
 #: include/views/configuration.trigger.prototype.edit.php:474
 #: include/views/configuration.triggers.edit.php:475
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "태그 값이 일치하는 모든 장애"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -721,7 +721,7 @@ msgstr "모든 템플릿"
 #: include/views/configuration.trigger.prototype.edit.php:516
 #: include/views/configuration.triggers.edit.php:525
 msgid "Allow manual close"
-msgstr ""
+msgstr "수동으로 클로즈 허가"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:504
@@ -1193,7 +1193,7 @@ msgstr "증명서"
 #: include/classes/screens/CScreenProblem.php:601
 #: include/classes/screens/CScreenProblem.php:684
 msgid "CLOSING"
-msgstr ""
+msgstr "클로즈"
 
 #: triggers.php:567
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1299,12 +1299,12 @@ msgstr "애플리케이션을 추가할 수 없습니다"
 
 #: correlation.php:146
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "상관관계를 추가할 수 없습니다"
 
 #: correlation.php:228 correlation.php:238 correlation.php:244
 #: correlation.php:264 correlation.php:268 correlation.php:281
 msgid "Cannot add correlation condition"
-msgstr ""
+msgstr "상관관계의 조건을 추가할 수 없습니다"
 
 #: include/classes/api/services/CTrigger.php:953
 #: include/classes/api/services/CTriggerPrototype.php:832
@@ -1497,7 +1497,7 @@ msgstr "트리거 프로토타입을 복제할 수 없습니다."
 #: include/classes/api/services/CEvent.php:828
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "장애를 클로즈할 수 없습니다 : %1$s."
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
@@ -1506,17 +1506,17 @@ msgstr "데이터베이스에 접속할 수 없습니다."
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
+msgstr[0] "그래프를 복사할 수 없습니다"
 
 #: items.php:986
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
+msgstr[0] "아이템을 복사할 수 없습니다"
 
 #: triggers.php:501
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
+msgstr[0] "트리거를 복사할 수 없습니다"
 
 #: include/triggers.inc.php:367
 #, c-format
@@ -1591,7 +1591,7 @@ msgstr[0] "애플리케이션을 삭제할 수 없습니다"
 
 #: correlation.php:162
 msgid "Cannot delete correlation"
-msgstr ""
+msgstr "상관관계를 삭제할 수 없습니다"
 
 #: include/classes/api/services/CTrigger.php:857
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -1729,7 +1729,7 @@ msgstr "선택한 액션을 삭제할 수 없습니다"
 
 #: correlation.php:374
 msgid "Cannot delete selected correlations"
-msgstr ""
+msgstr "선택한 상관관계를 삭제할 수 없습니다"
 
 #: services.php:117
 msgid "Cannot delete service"
@@ -1820,7 +1820,7 @@ msgstr[0] "액션을 비활성화 할 수 없습니다."
 #: correlation.php:361
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
+msgstr[0] "상관관계를 비활성화 할 수 없습니다"
 
 #: discoveryconf.php:211 host_discovery.php:357
 msgid "Cannot disable discovery rule"
@@ -1889,7 +1889,7 @@ msgstr[0] "액션(action)을 가동 시킬 수 없습니다."
 #: correlation.php:360
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
+msgstr[0] "상관관계를 활성화 할 수 없습니다"
 
 #: discoveryconf.php:210 host_discovery.php:356
 msgid "Cannot enable discovery rule"
@@ -2176,13 +2176,13 @@ msgstr "다른 호스트 혹은 템플릿의 어플리케이션을 처리할 수
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "JSON을 읽을 수 없습니다: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr "XML: %1$s을 읽을 수 없습니다."
+msgstr "XML: %1$s 을 읽을 수 없습니다."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2210,7 +2210,7 @@ msgstr "커맨드를 송신할 수 없습니다. Zabbix서버 \"%1$s\"와의 접
 #: include/classes/api/services/CAction.php:2381
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "액션 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CApplication.php:300
 #, c-format
@@ -2220,12 +2220,12 @@ msgstr "어플리케이션 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 #: include/classes/api/services/CGraphGeneral.php:472
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "그래프 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CGraphGeneral.php:476
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CHostGroup.php:370
 #, c-format
@@ -2251,7 +2251,7 @@ msgstr "트리거\"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 #: include/classes/api/services/CTriggerGeneral.php:498
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "트리거 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CItemPrototype.php:304
 #, c-format
@@ -2343,12 +2343,12 @@ msgstr "어플리케이션 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 #: include/classes/api/services/CGraphGeneral.php:606
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "그래프 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
 #: include/classes/api/services/CGraphGeneral.php:610
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "그래프 프로토타입 \"%2$s\"의 \"%1$s\"을 갱신할 수 없습니다."
 
 #: include/classes/api/services/CHostGroup.php:432
 #, c-format
@@ -2363,12 +2363,12 @@ msgstr "아이템 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 #: include/classes/api/services/CTriggerGeneral.php:647
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr ""
+msgstr "템플릿 트리거 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:653
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "템플릿의 트리거 프로토타입 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:646
 #, c-format
@@ -2378,7 +2378,7 @@ msgstr "트리거 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 #: include/classes/api/services/CTriggerGeneral.php:652
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "트리거 프로토타입 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:1785
 #, c-format
@@ -2436,7 +2436,7 @@ msgstr "설정을 갱신할 수 없습니다"
 
 #: correlation.php:140
 msgid "Cannot update correlation"
-msgstr ""
+msgstr "상관관계를 갱신할 수 없습니다"
 
 #: usergrps.php:334
 msgid "Cannot update debug mode"
@@ -2593,7 +2593,7 @@ msgstr "트리거를 갱신할 수 없습니다"
 #: include/classes/api/services/CTriggerGeneral.php:1604
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "트리거 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 
 #: trigger_prototypes.php:335
 msgid "Cannot update trigger prototype"
@@ -2602,7 +2602,7 @@ msgstr "트리거 프로토타입을 갱신할 수 없습니다"
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr ""
+msgstr "트리거 프로토타입 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 
 #: trigger_prototypes.php:390
 msgid "Cannot update trigger prototypes"
@@ -2886,17 +2886,17 @@ msgstr "조건식 빌더를 닫는다"
 
 #: include/correlation.inc.php:70
 msgid "Close new event"
-msgstr ""
+msgstr "새 이벤트를 닫기"
 
 #: include/correlation.inc.php:69
 msgid "Close old events"
-msgstr ""
+msgstr "오래된 이벤트를 닫기"
 
 #: app/views/monitoring.acknowledge.edit.php:42
 #: app/views/monitoring.acknowledge.edit.php:79 include/acknow.inc.php:57
 #: include/events.inc.php:523
 msgid "Close problem"
-msgstr ""
+msgstr "장애의 클로즈"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:170
 msgid "Collapse"
@@ -2985,7 +2985,7 @@ msgstr "액션\"%1$s\"의 조건 \"%2$s\"는 식 \"%3$s\"에서 이용되지 않
 #: include/classes/api/services/CCorrelation.php:1242
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계 \"%1$s\"의 조건 \"%2$s\"는 조건식 \"%3$s\" 안에서 사용할 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #, c-format
@@ -3000,7 +3000,7 @@ msgstr "액션\"%1$s\"의 식 \"%3$s\"내에서 이용되어 있는 조건 \"%2$
 #: include/classes/api/services/CCorrelation.php:1230
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
-msgstr ""
+msgstr "상관관계 \"%1$s\"의 조건식 \"%3$s\"에서 사용되고 있는 조건 \"%2$s\"는 설정되어 있지 않습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:971
 #, c-format
@@ -3018,7 +3018,7 @@ msgstr "조건"
 #: include/classes/api/services/CCorrelation.php:1160
 #, c-format
 msgid "Conditions duplicates for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계 \"%1$s\"의 실행조건이 중복되어 있습니다."
 
 #: include/menu.inc.php:187 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
@@ -3327,45 +3327,45 @@ msgstr[0] "항목 %1$s를 복사..."
 
 #: include/views/configuration.correlation.edit.php:236
 msgid "Correlation"
-msgstr ""
+msgstr "상관관계"
 
 #: include/classes/api/services/CCorrelation.php:559
 #: include/classes/api/services/CCorrelation.php:748
 #, c-format
 msgid "Correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "상관관계 \"%1$s\"는 이미 존재합니다."
 
 #: correlation.php:145
 msgid "Correlation added"
-msgstr ""
+msgstr "상관관계를 추가하였습니다"
 
 #: correlation.php:162
 msgid "Correlation deleted"
-msgstr ""
+msgstr "상관관계를 삭제하였습니다"
 
 #: correlation.php:358
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
-msgstr[0] ""
+msgstr[0] "상관관계를 비활성화하였습니다"
 
 #: correlation.php:357
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
-msgstr[0] ""
+msgstr[0] "상관관계를 활성화하였습니다"
 
 #: include/classes/api/services/CCorrelation.php:529
 #, c-format
 msgid "Correlation is missing parameters: %1$s"
-msgstr ""
+msgstr "상관관계가 파라미터에 설정되어있지 않습니다: %1$s"
 
 #: include/classes/api/services/CCorrelation.php:538
 #: include/classes/api/services/CCorrelation.php:717
 msgid "Correlation name cannot be empty."
-msgstr ""
+msgstr "상관관계의 이름은 필수입니다."
 
 #: correlation.php:139
 msgid "Correlation updated"
-msgstr ""
+msgstr "상관관계를 갱신하였습니다"
 
 #: include/classes/api/services/CImage.php:350
 msgid "Could not save image!"
@@ -3398,7 +3398,7 @@ msgstr "배경 작성"
 
 #: include/views/configuration.correlation.list.php:27
 msgid "Create correlation"
-msgstr ""
+msgstr "상관관계의 작성"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3709,7 +3709,7 @@ msgstr "Dark"
 #: app/views/monitoring.dashboard.view.php:156 include/menu.inc.php:46
 #: include/views/monitoring.dashconf.php:22
 msgid "Dashboard"
-msgstr "대시보드"
+msgstr "대쉬보드"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
@@ -3717,7 +3717,7 @@ msgstr "대시보드 설정"
 
 #: include/views/monitoring.dashconf.php:48
 msgid "Dashboard filter"
-msgstr "대시보드 필터"
+msgstr "대쉬보드 필터"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:347
 #: include/views/js/monitoring.sysmaps.js.php:427
@@ -4025,7 +4025,7 @@ msgstr "현재 액션을 삭제하시겠습니까?"
 
 #: include/views/configuration.correlation.edit.php:249
 msgid "Delete current correlation?"
-msgstr ""
+msgstr "현재의 상관관계를 삭제하시겠습니다?"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:358
@@ -4116,7 +4116,7 @@ msgstr "선택한 어플리케이션을 삭제하시겠습니까?"
 
 #: include/views/configuration.correlation.list.php:121
 msgid "Delete selected correlations?"
-msgstr ""
+msgstr "선택한 상관관계를 삭제하시겠습니까?"
 
 #: include/views/configuration.discovery.list.php:88
 #: include/views/configuration.host.discovery.list.php:152
@@ -4473,11 +4473,11 @@ msgstr "아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차�
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr "최신값과 최소값이 다름 N = 1, 그 외의 경우 N = 0 (=조건)"
+msgstr "최신값과 이전값이 다름 N = 1, 그 외의 경우 N = 0 (=조건)"
 
 #: popup_trexpr.php:282
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr "최신값과 최소값이 다름 N = 1, 그 외의 경우 N = 0 (#조건)"
+msgstr "최신값과 이전값이 다름 N = 1, 그 외의 경우 N = 0 (#조건)"
 
 #: popup_trexpr.php:242
 msgid "Difference between last and previous value is < N"
@@ -4561,7 +4561,7 @@ msgstr "선택한 어플리케이션을 비활성으로 하시겠습니까?"
 
 #: include/views/configuration.correlation.list.php:120
 msgid "Disable selected correlations?"
-msgstr ""
+msgstr "선택한 상관관계를 비활성으로 하시겠습니까?"
 
 #: include/views/configuration.discovery.list.php:87
 #: include/views/configuration.host.discovery.list.php:149
@@ -4867,13 +4867,13 @@ msgstr "드롭다운의 선택을 보존한다 \"%1$s\""
 #: include/classes/api/services/CCorrelation.php:1297
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "상관관계 \"%3$s\"의 \"%1$s\"의 값 \"%2$s\"가 중복됩니다."
 
 #: include/classes/api/services/CCorrelation.php:546
 #: include/classes/api/services/CCorrelation.php:732
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
-msgstr ""
+msgstr "상관관계의 \"%1$s\"의 값 \"%2$s\"가 중복되었습니다."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5089,7 +5089,7 @@ msgstr "색의 설정이 공백입니다."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Empty correlation ID."
-msgstr ""
+msgstr "상관관계ID가 입력되지 않았습니다."
 
 #: include/classes/api/services/CAction.php:2267
 #, c-format
@@ -5303,7 +5303,7 @@ msgstr "선택한 어플리케이션을 활성화 하시겠습니까?"
 
 #: include/views/configuration.correlation.list.php:119
 msgid "Enable selected correlations?"
-msgstr ""
+msgstr "선택한 상관관계를 활성화 하시겠습니까?"
 
 #: include/views/configuration.discovery.list.php:86
 #: include/views/configuration.host.discovery.list.php:146
@@ -5441,7 +5441,7 @@ msgstr[0] "장애대응 완료"
 #: app/controllers/CControllerAcknowledgeEdit.php:210
 #: app/views/monitoring.acknowledge.edit.php:91
 msgid "Event acknowledgements"
-msgstr ""
+msgstr "장애대응 코멘트 입력"
 
 #: include/profiles.inc.php:162
 #, c-format
@@ -5451,11 +5451,11 @@ msgstr "이벤트 장애대응 코멘트 \"%1$s\"."
 #: include/menu.inc.php:236
 #: include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
-msgstr ""
+msgstr "이벤트 상관관계"
 
 #: correlation.php:26 include/views/configuration.correlation.edit.php:24
 msgid "Event correlation rules"
-msgstr ""
+msgstr "이벤트 상관관계 규칙"
 
 #: tr_events.php:30 tr_events.php:110 tr_events.php:135
 msgid "Event details"
@@ -5483,7 +5483,7 @@ msgstr "이벤트 소스의 상세 정보"
 
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr ""
+msgstr "이벤트 태그의 짝"
 
 #: include/actions.inc.php:60
 msgid "Event type"
@@ -5579,11 +5579,11 @@ msgstr "분해도 그래프"
 #: include/views/monitoring.screen.list.php:109
 #: include/views/monitoring.sysmap.list.php:81
 msgid "Export"
-msgstr "가져오기"
+msgstr "내보내기"
 
 #: app/views/monitoring.problem.view.php:268
 msgid "Export to CSV"
-msgstr "CSV 가져오기"
+msgstr "CSV 내보내기"
 
 #: include/views/administration.general.iconmap.edit.php:48
 #: include/views/administration.general.regularexpressions.edit.php:44
@@ -5624,7 +5624,7 @@ msgstr "조건식 빌더"
 #: include/forms.inc.php:1554 include/forms.inc.php:1559
 #: include/forms.inc.php:1567
 msgid "Expression syntax error."
-msgstr ""
+msgstr "조건식의 syntax 에러."
 
 #: include/views/administration.general.regularexpressions.edit.php:43
 #: include/views/administration.general.regularexpressions.edit.php:117
@@ -5993,7 +5993,7 @@ msgstr "일반"
 #: include/events.inc.php:231 include/events.inc.php:234
 #: include/events.inc.php:239
 msgid "Generated by"
-msgstr ""
+msgstr "Generated by"
 
 #: chart4.php:170 chart5.php:220
 #, c-format
@@ -6040,7 +6040,7 @@ msgstr "다음 페이지로 이동"
 
 #: app/views/system.warning.php:26 include/func.inc.php:1691
 msgid "Go to dashboard"
-msgstr "대시보드로 이동"
+msgstr "대쉬보드로 이동"
 
 #: include/httptest.inc.php:288
 msgid "Google Chrome"
@@ -6115,7 +6115,7 @@ msgstr "그래프를 추가하였습니다"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
+msgstr[0] "그래프를 복사하였습니다"
 
 #: graphs.php:292
 msgid "Graph deleted"
@@ -6273,7 +6273,7 @@ msgstr "호스트 프로토타입에서 이용되고 있기 때문에 그룹\"%1
 #: include/classes/api/services/CHostGroup.php:570
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr ""
+msgstr "상관관계의 조건에서 사용되고 있는 그룹 \"%1$s\"은 삭제할 수 없습니다."
 
 #: include/classes/import/importers/CTemplateImporter.php:245
 #, c-format
@@ -7484,7 +7484,7 @@ msgstr "액션의 실행스탭기간이 올바르지 않습니다."
 #: include/classes/api/services/CAction.php:1457
 #, c-format
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
-msgstr ""
+msgstr "이벤트 소스 \"%2$s\" 에 의해 실행되는 액션의 타입 \"%1$s\"가 올바르지 않습니다."
 
 #: include/classes/api/services/CAction.php:1688
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -7613,7 +7613,7 @@ msgstr "디스커버리 규칙 \"%1$s\"의 조건식이 올바르지 않습니�
 
 #: include/classes/api/services/CCorrelation.php:690
 msgid "Incorrect correlation ID."
-msgstr ""
+msgstr "상관관계ID가 올바르지 않습니다."
 
 #: include/classes/api/services/CAction.php:2218
 #, c-format
@@ -7623,7 +7623,7 @@ msgstr "액션 \"%1$s\"의 커스텀 조건식 \"%2$s\"이 올바르지 않습�
 #: include/classes/api/services/CCorrelation.php:1186
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
-msgstr ""
+msgstr "상관관계 \"%1$s\"의 커스텀 조건식 \"%2$s\"이 올바르지 않습니다: %3$s."
 
 #: include/classes/api/services/CDiscoveryRule.php:970
 #, c-format
@@ -7674,7 +7674,7 @@ msgstr "디스커버리 규칙 \"%1$s\"의 필터 조건식ID가 올바르지 �
 #: include/classes/api/services/CCorrelation.php:1219
 #, c-format
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계 \"%1$s\"의 필터 조건식ID가 올바르지 않습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:992
 #, c-format
@@ -7924,7 +7924,7 @@ msgstr "서비스 \"%1$s\"의 상위가 올바르지 않습니다."
 
 #: include/classes/api/services/CService.php:980
 msgid "Incorrect parent service."
-msgstr "부모 서비스가 올바르지 않습니다."
+msgstr "상위 서비스가 올바르지 않습니다."
 
 #: discoveryconf.php:102 include/classes/api/services/CDRule.php:453
 msgid "Incorrect port range."
@@ -7983,7 +7983,7 @@ msgstr "서비스 시간의 종류가 올바르지 않습니다."
 #: include/classes/api/services/CService.php:950
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
-msgstr "서비스 \"%1$s\" 의 정렬이 올바르지 않습니다."
+msgstr "서비스 \"%1$s\"의 정렬이 올바르지 않습니다."
 
 #: include/classes/api/services/CEvent.php:423
 #: include/classes/api/services/CProblem.php:390
@@ -8088,7 +8088,7 @@ msgstr "액션\"%1$s\"의 계산 타입이 올바르지 않습니다."
 #: include/classes/api/services/CCorrelation.php:618
 #, c-format
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계 \"%1$s의 계산타입이 올바르지 않습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:958
 #, c-format
@@ -8182,7 +8182,7 @@ msgstr "부호없는 정수 항목\"%2$s\"의 값 \"%1$s\"가 올바르지 않�
 #: include/classes/api/services/CCorrelation.php:1285
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "상관관계 \"%3$s\"의 필드 \"%2$s\"의 값 \"%1$s\"이 올바르지 않습니다."
 
 #: include/classes/api/services/CMediatype.php:237
 #: include/classes/api/services/CMediatype.php:253
@@ -8672,7 +8672,7 @@ msgstr "2번째의 파라미터가 올바르지 않습니다."
 #: include/classes/import/validators/CXmlValidator.php:64
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "태그 \"%1$s\"가 올바르지 않습니다: %2$s"
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8784,7 +8784,7 @@ msgstr "아이템을 추가하였습니다"
 #: items.php:985
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
+msgstr[0] "아이템을 복사하였습니다"
 
 #: app/views/administration.proxy.list.php:63
 msgid "Item count"
@@ -9664,7 +9664,7 @@ msgstr "맵의 요소"
 
 #: sysmap.php:83
 msgid "Map is updated! Return?"
-msgstr "맵이 갱신되었습니다! 전 화면으로 돌아가시겠습니까?"
+msgstr "맵이 갱신되었습니다! 되돌리시겠습니까?"
 
 #: include/views/monitoring.sysmap.edit.php:178
 msgid "Map label type"
@@ -10091,7 +10091,7 @@ msgstr "Mozilla Firefox"
 #: include/views/configuration.trigger.prototype.edit.php:467
 #: include/views/configuration.triggers.edit.php:468
 msgid "Multiple"
-msgstr ""
+msgstr "복수"
 
 #: include/triggers.inc.php:1113
 msgid "Multiple PROBLEM events"
@@ -10298,16 +10298,16 @@ msgstr "새 요소"
 
 #: include/correlation.inc.php:51 include/correlation.inc.php:204
 msgid "New event host group"
-msgstr ""
+msgstr "새로운 이벤트의 호스트그룹"
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:199
 #: include/correlation.inc.php:223
 msgid "New event tag"
-msgstr ""
+msgstr "새로운 이벤트의 태그"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr ""
+msgstr "새로운 이벤트 태그의 값"
 
 #: include/views/configuration.host.edit.php:94
 #: include/views/configuration.template.edit.php:124
@@ -10320,7 +10320,7 @@ msgstr "새 호스트 그룹작성"
 
 #: include/views/configuration.correlation.edit.php:221
 msgid "New operation"
-msgstr ""
+msgstr "새 실행내용"
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "New regular expression"
@@ -10362,12 +10362,12 @@ msgstr "아니오"
 #: include/classes/api/services/CCorrelation.php:1269
 #, c-format
 msgid "No \"%1$s\" given for correlation \"%2$s\"."
-msgstr ""
+msgstr "상관관계 \"%2$s\"에 \"%1$s\"가 정의되어 있지 않습니다."
 
 #: include/classes/api/services/CCorrelation.php:688
 #, c-format
 msgid "No \"%1$s\" given for correlation."
-msgstr ""
+msgstr "상관관계에 \"%1$s\"가 정의되어 있지 않습니다."
 
 #: include/classes/api/services/CGraphPrototype.php:39
 #, c-format
@@ -10509,7 +10509,7 @@ msgstr "실행하는 액션 커맨드 타입이 설정되어 있지 않습니다
 #: include/classes/api/services/CCorrelation.php:998
 #, c-format
 msgid "No condition type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계\"%1$s\"에 조건의 타입이 정의되어 있지 않습니다."
 
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.correlation.edit.php:42
@@ -10727,7 +10727,7 @@ msgstr "조건에 일치하는 데이터가 없습니다"
 #: include/classes/api/services/CCorrelation.php:1276
 #, c-format
 msgid "No operation type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "상관관계 \"%1$s\"에 실행내용 타입이 정의되어 있지 않습니다."
 
 #: slides.php:92
 msgid "No permissions"
@@ -11013,7 +11013,7 @@ msgstr "통지"
 
 #: include/actions.inc.php:808
 msgid "Notify all who received any messages regarding the problem before"
-msgstr ""
+msgstr "이전의 장애 메세지를 보낸 곳에 알림"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -11039,7 +11039,7 @@ msgstr "호스트상의 유효 아이템 수."
 
 #: include/blocks.inc.php:479 include/blocks.inc.php:480
 msgid "Number of hosts (enabled/disabled/templates)"
-msgstr "호스트 수 (활성/비활성/템플릿)"
+msgstr "호스트수 (활성/비활성/템플릿)"
 
 #: include/blocks.inc.php:487
 msgid "Number of items (enabled/disabled/not supported)"
@@ -11059,15 +11059,15 @@ msgstr "from에서 to까지의 시간이 늦는 큐의 아이템수."
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Number of matching lines since the last check of the item with log rotation support. Returns integer"
-msgstr ""
+msgstr "로그 로테이션에 대응한 아이템의 마지막 체크로부터 일치하는 행. Integer를 리턴."
 
 #: include/classes/items/CHelpItems.php:367
 msgid "Number of matching lines since the last check of the item. Returns integer"
-msgstr ""
+msgstr "아이템을 마지막으로 체크한 때부터 일치하는 행. Integer를 리턴."
 
 #: include/classes/items/CHelpItems.php:911
 msgid "Number of monitored hosts"
-msgstr "감시호스트 수"
+msgstr "감시호스트수"
 
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:383
@@ -11231,12 +11231,12 @@ msgstr "정상"
 #: include/views/configuration.trigger.prototype.edit.php:471
 #: include/views/configuration.triggers.edit.php:472
 msgid "OK event closes"
-msgstr ""
+msgstr "정상 이벤트를 닫기"
 
 #: include/views/configuration.trigger.prototype.edit.php:264
 #: include/views/configuration.triggers.edit.php:279
 msgid "OK event generation"
-msgstr ""
+msgstr "정상 이벤트를 생성"
 
 #: include/hosts.inc.php:299
 msgid "OOB IP address"
@@ -11296,11 +11296,11 @@ msgstr "OK"
 #: include/correlation.inc.php:49 include/correlation.inc.php:194
 #: include/correlation.inc.php:209 include/correlation.inc.php:216
 msgid "Old event tag"
-msgstr ""
+msgstr "오래된 이벤트 태그"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr ""
+msgstr "오래된 이벤트 태그 값"
 
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47 jsLoader.php:137
@@ -11424,7 +11424,7 @@ msgstr[0] "선택된 이벤트만"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
-msgstr ""
+msgstr "최고관리자만 상관관계를 작성할 수 있습니다."
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11432,7 +11432,7 @@ msgstr "최고관리자만 값의 맵을 작성할 수 있습니다."
 
 #: include/classes/api/services/CCorrelation.php:474
 msgid "Only super admins can delete correlations."
-msgstr ""
+msgstr "최고관리자만 상관관계를 삭제할 수 있습니다."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
@@ -11440,7 +11440,7 @@ msgstr "최고관리자만 값의 맵을 삭제할 수 있습니다."
 
 #: include/classes/api/services/CCorrelation.php:679
 msgid "Only super admins can update correlations."
-msgstr ""
+msgstr "최고관리자만 상관관계를 갱신할 수 있습니다."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
@@ -11817,7 +11817,7 @@ msgstr "장애"
 #: include/views/configuration.trigger.prototype.edit.php:464
 #: include/views/configuration.triggers.edit.php:465
 msgid "PROBLEM event generation mode"
-msgstr ""
+msgstr "장애 이벤트의 생성모드"
 
 #: app/views/administration.proxy.edit.php:100
 #: app/views/administration.proxy.edit.php:107
@@ -11954,7 +11954,7 @@ msgstr "패스워드를 설정해주십시오"
 
 #: actionconf.php:88 include/views/configuration.action.edit.php:388
 msgid "Pause operations while in maintenance"
-msgstr ""
+msgstr "메인터넌스 기간 내 실행내용 보류"
 
 #: include/classes/debug/CProfiler.php:137
 #, c-format
@@ -12238,7 +12238,7 @@ msgstr "장애의 표시"
 #: include/triggers.inc.php:1105
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
-msgstr ""
+msgstr "장애의 조건식"
 
 #: jsrpc.php:116
 msgid "Problem on"
@@ -12375,7 +12375,7 @@ msgstr "갱신 대기 아이템의 큐"
 #: include/classes/screens/CScreenProblem.php:586
 #: include/classes/screens/CScreenProblem.php:670
 msgid "RESOLVED"
-msgstr ""
+msgstr "해결됨"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12422,7 +12422,7 @@ msgstr "수신 값"
 #: app/views/monitoring.problem.view.php:80
 #: include/views/common.filter.trigger.php:36
 msgid "Recent problems"
-msgstr ""
+msgstr "최근 장애"
 
 #: include/views/administration.auditacts.list.php:27
 msgid "Recipient"
@@ -12455,21 +12455,21 @@ msgstr "복구"
 #: include/views/configuration.triggers.edit.php:347 trigger_prototypes.php:39
 #: trigger_prototypes.php:51 triggers.php:42 triggers.php:54
 msgid "Recovery expression"
-msgstr ""
+msgstr "복구조건식"
 
 #: include/forms.inc.php:1594 include/forms.inc.php:1599
 #: include/forms.inc.php:1607
 msgid "Recovery expression syntax error."
-msgstr ""
+msgstr "복구조건식의 syntax 에러"
 
 #: include/views/configuration.action.edit.php:1654
 msgid "Recovery operations"
-msgstr ""
+msgstr "복구시 실행내용"
 
 #: include/classes/screens/CScreenProblem.php:554
 #: include/classes/screens/CScreenProblem.php:654
 msgid "Recovery time"
-msgstr ""
+msgstr "복구시각"
 
 #: include/views/administration.users.edit.php:180 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
@@ -12712,7 +12712,7 @@ msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값
 
 #: include/blocks.inc.php:507
 msgid "Required server performance, new values per second"
-msgstr "1초간의 감시항목 수 (Zabbix 서버 요구 성능)"
+msgstr "1초간의 감시항목수(Zabbix서버의 요구 퍼포먼스)"
 
 #: include/views/configuration.httpconf.popup.php:108
 msgid "Required status codes"
@@ -13430,7 +13430,7 @@ msgstr "선택한 이벤트와 모든 커맨트 미입력 이벤트"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
-msgstr ""
+msgstr "선택한 상관관계를 삭제하였습니다"
 
 #: include/views/js/monitoring.sysmaps.js.php:209
 msgid "Selected elements"
@@ -13455,7 +13455,7 @@ msgstr "다른 미디어만 사용"
 
 #: include/actions.inc.php:1067
 msgid "Send recovery message"
-msgstr ""
+msgstr "복구 메세지를 송신"
 
 #: include/views/administration.users.edit.php:200 popup_media.php:134
 msgid "Send to"
@@ -13705,7 +13705,7 @@ msgstr[0] "미대응을 표시 (%1$s 일)"
 
 #: app/views/monitoring.problem.view.php:242
 msgid "Show unacknowledged only"
-msgstr ""
+msgstr "대응하지 않은 항목만 표시하기"
 
 #: include/views/configuration.item.edit.php:503
 #: include/views/configuration.item.massupdate.php:452
@@ -13752,7 +13752,7 @@ msgstr "심플그래프 프로토타입"
 #: include/views/configuration.trigger.prototype.edit.php:466
 #: include/views/configuration.triggers.edit.php:467
 msgid "Single"
-msgstr ""
+msgstr "싱글"
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -14210,7 +14210,7 @@ msgstr "시스템 통계값. integer 혹은 float로 리턴"
 #: app/views/monitoring.dashboard.view.php:88
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
-msgstr "시스템 상태"
+msgstr "시스템상태"
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:507
@@ -14268,16 +14268,16 @@ msgstr "태그"
 #: include/classes/api/services/CTriggerGeneral.php:269
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr ""
+msgstr "값 \"%2$s\"의 태그 %1$s\"는 이미 존재합니다."
 
 #: include/views/configuration.trigger.prototype.edit.php:479
 #: include/views/configuration.triggers.edit.php:480
 msgid "Tag for matching"
-msgstr ""
+msgstr "매칭을 위한 태그"
 
 #: include/actions.inc.php:63
 msgid "Tag value"
-msgstr ""
+msgstr "태그 값"
 
 #: app/views/monitoring.problem.view.php:232
 #: include/classes/screens/CScreenProblem.php:561
@@ -14285,7 +14285,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:509
 #: include/views/configuration.triggers.edit.php:518
 msgid "Tags"
-msgstr ""
+msgstr "태그"
 
 #: include/views/configuration.action.edit.php:796
 #: include/views/configuration.action.edit.php:1485
@@ -14808,7 +14808,7 @@ msgstr "트리거 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 #: include/classes/api/services/CTriggerGeneral.php:1531
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "트리거 \"%1$s\"는 링크되어 있는 다른 템플릿에 포함됩니다."
 
 #: include/classes/import/CConfigurationImport.php:1445
 #, c-format
@@ -14826,7 +14826,7 @@ msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수
 #: triggers.php:500
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
+msgstr[0] "트리거를 복사하였습니다"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -14913,12 +14913,12 @@ msgstr "트리거 프로토타입"
 #: include/classes/api/services/CTriggerGeneral.php:297
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "트리거 프로토타입 \"%1$s\"는 이미 \"%2$s\"에 존재합니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:1535
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "트리거 프로토타입 \"%1$s\"는 링크되어있는 다른 템플릿에 포함되어있습니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:1454
 #, c-format
@@ -14982,7 +14982,7 @@ msgstr "트리거 프로토타입을 갱신하였습니다"
 
 #: include/classes/api/services/CTriggerGeneral.php:461
 msgid "Trigger recovery expression must contain at least one host:key reference."
-msgstr ""
+msgstr "트리거 복구조건식에는 적어도 하나의 host:key에 참조가 필요합니다."
 
 #: include/html.inc.php:838
 #: include/views/administration.general.triggerSeverity.edit.php:25
@@ -15692,7 +15692,7 @@ msgstr "유저 \"%s\"에 유저 그룹을 설정해 주십시오."
 #: app/views/monitoring.acknowledge.edit.php:35 include/acknow.inc.php:50
 #: include/events.inc.php:514
 msgid "User action"
-msgstr ""
+msgstr "유저 액션"
 
 #: users.php:253
 msgid "User added"
@@ -15820,7 +15820,7 @@ msgstr "사용자는 그룹\"%s\"의 멤버가 됨에 따라 자기자신의 Web
 #: include/classes/api/services/CUser.php:303
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "사용자는 그룹\"%s\"의 멤버가 되었으므로 자기자신의 시스템 상태를 변경할 수 없습니다."
+msgstr "사용자는 그룹\"%s\"의 멤버가 되었으므로 자기자신의 시스템상태를 변경할 수 없습니다."
 
 #: disc_prototypes.php:76 host_discovery.php:63
 #: include/views/configuration.action.edit.php:856
@@ -16342,7 +16342,7 @@ msgstr "Web시나리오\"%1$s\"는 이미 존재합니다."
 #: include/classes/import/CConfigurationImport.php:1218
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "\"%2$s\"상의 Web시나리오 \"%1$s\": 어플리케이션 \"%3$s\"이 존재하지 않습니다."
 
 #: httpconf.php:201
 msgid "Web scenario added"
@@ -16559,7 +16559,7 @@ msgstr "서비스 \"%1$s\"를 위한 시간의 설정이 올바르지 않습니�
 #: include/classes/api/services/CTriggerGeneral.php:497
 #: include/classes/api/services/CTriggerGeneral.php:651
 msgid "Wrong fields for trigger prototype."
-msgstr ""
+msgstr "트리거 프로토타입의 설정이 올바르지 않습니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:492
 #: include/classes/api/services/CTriggerGeneral.php:645
@@ -16857,7 +16857,7 @@ msgstr "숫자로 지정해주세요"
 
 #: include/classes/validators/CNewValidator.php:272
 msgid "a time is expected"
-msgstr ""
+msgstr "시간으로 지정해주세요."
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -17023,7 +17023,7 @@ msgstr "esc_step_from과 esc_step_to는 상호설정할 필요가 있습니다."
 
 #: include/classes/api/services/CEvent.php:821
 msgid "event is not in PROBLEM state"
-msgstr ""
+msgstr "이벤트는 장애상태가 아닙니다."
 
 #: include/views/inventory.host.list.php:48
 msgid "exactly"
@@ -17201,7 +17201,7 @@ msgstr "유효한 LDAP서버가 필요합니다."
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr "\"%1$s\"에서 \"%2$s\"의 값으로 설정해주세요"
+msgstr "\"%1$s\"에서 \"%2$s\"의 수치로 설정해주세요"
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:176
 msgid "new"
@@ -17216,7 +17216,7 @@ msgstr "신규"
 #: include/correlation.inc.php:211
 #: include/views/configuration.correlation.edit.php:135
 msgid "new event tag"
-msgstr ""
+msgstr "새로운 이벤트의 태그"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2098
 #: include/classes/graphdraw/CPieGraphDraw.php:316
@@ -17274,7 +17274,7 @@ msgstr "off"
 
 #: include/views/configuration.correlation.edit.php:138
 msgid "old event tag"
-msgstr ""
+msgstr "오래된 이벤트 태그"
 
 #: include/classes/setup/CFrontendSetup.php:312
 #: include/classes/setup/CFrontendSetup.php:329
@@ -17352,7 +17352,7 @@ msgstr "짧은 설명"
 #: include/classes/api/services/CTriggerGeneral.php:778
 #: include/classes/api/services/CTriggerGeneral.php:796
 msgid "should be empty"
-msgstr ""
+msgstr "비워주십시오"
 
 #: include/views/monitoring.sysmap.edit.php:128
 msgid "show icon mappings"
@@ -17374,7 +17374,7 @@ msgstr "값 매핑의 표시"
 #: include/views/configuration.triggers.edit.php:493
 #: include/views/js/configuration.triggers.edit.js.php:6
 msgid "tag"
-msgstr ""
+msgstr "태그"
 
 #: include/classes/api/services/CHostBase.php:50
 #, c-format
@@ -17395,15 +17395,15 @@ msgstr "트리거"
 
 #: include/classes/api/services/CEvent.php:828
 msgid "trigger does not allow manual closing"
-msgstr ""
+msgstr "트리거는 수동 클로즈가 허가되어 있지 않습니다."
 
 #: include/classes/api/services/CTriggerGeneral.php:1461
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr ""
+msgstr "트리거 프로토타입은 다른 템플릿이나 호스트에 이동할 수 없습니다"
 
 #: include/classes/api/services/CTriggerGeneral.php:1606
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr ""
+msgstr "링크가 있는 트리거는 다른 템플릿이나 호스트로 이동할 수 없습니다"
 
 #: include/classes/html/CMultiSelect.php:52 jsLoader.php:175
 msgid "type here to search"
@@ -17413,7 +17413,7 @@ msgstr "검색 문자열을 입력"
 #: include/classes/api/services/CTriggerGeneral.php:810
 #: include/classes/validators/CTagValidator.php:61
 msgid "unacceptable characters are used"
-msgstr ""
+msgstr "사용할 수 없는 문자가 사용되어 있습니다."
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2196
 msgid "unexpected end of interval"
@@ -17453,7 +17453,7 @@ msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
 #: include/classes/api/services/CTriggerGeneral.php:825
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "값 \"%1$s\"가 잘못되었습니다"
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
