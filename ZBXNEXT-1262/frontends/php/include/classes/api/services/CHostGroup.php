@@ -848,26 +848,25 @@ class CHostGroup extends CApiService {
 		$len = strlen($name);
 
 		foreach (['/', '*'] as $char) {
-			$pos = strpos($name, $char);
-
 			switch ($char) {
 				case '/':
 					// Forward slash cannot be first character or last.
-					if ($pos !== false) {
-						if ($pos == 0 || $pos == $len - 1) {
-							$error = true;
-							break 2;
-						}
-						elseif ($name[$pos + 1] === '/') {
-							$pos++;
-							$error = true;
-							break 2;
-						}
+					if (substr($name, 0, 1) === $char) {
+						$pos = 0;
+						$error = true;
+						break 2;
+					}
+					elseif (substr($name, -1, 1) === $char) {
+						$pos = $len - 1;
+						$error = true;
+						break 2;
 					}
 					break;
 
 				case '*':
 					// Asterisk is not allowed at all.
+					$pos = strpos($name, $char);
+
 					if ($pos !== false) {
 						$error = true;
 						break 2;

@@ -685,7 +685,6 @@ jQuery(function($) {
 			});
 		}
 
-
 		// write more matches found label
 		if (values.isMoreMatchesFound) {
 			var div = $('<div>', {
