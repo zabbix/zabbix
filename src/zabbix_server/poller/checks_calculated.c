@@ -343,7 +343,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	int			ret;
 	char			error[MAX_STRING_LEN];
 	double			value;
-	zbx_vector_ptr_t	unknown_msgs;		/* pointers to error messages */
+	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __function_name,
 			dc_item->key_orig, dc_item->params);
