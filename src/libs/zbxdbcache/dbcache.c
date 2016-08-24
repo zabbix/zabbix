@@ -869,8 +869,14 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
+		/* Skip items with no values but include NOTSUPPORTED items in trigger calculation. */
+		/* There are cases when NOTSUPPORTED items in triggers produce legitimate, meaningful values. */
+
+		if ((0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags)) &&
+				ITEM_STATE_NOTSUPPORTED != h->state)
+		{
 			continue;
+		}
 
 		itemids[item_num] = h->itemid;
 		timespecs[item_num] = h->ts;
