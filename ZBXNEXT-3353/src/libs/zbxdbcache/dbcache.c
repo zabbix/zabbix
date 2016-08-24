@@ -3544,6 +3544,24 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_next_history_index                                           *
+ *                                                                            *
+ * Purpose: move index to the next position in history array skipping meta    *
+ *          information updates, notsupported items and low-level discovery   *
+ *                                                                            *
+ * Parameters: history     - [IN] array of history data                       *
+ *             history_num - [IN] number of history structures                *
+ *             index       - [IN/OUT] current position in history array       *
+ *                                                                            *
+ * Return value: SUCCEED - index was moved to the next position               *
+ *               FAIL    - there is no more history data to export            *
+ *                                                                            *
+ * Comments: internal helper function for implementation of public API        *
+ *           zabbix_get_vector_element() for ZBX_HANDLE_HISTORY type handles  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_next_history_index(zbx_dc_history_t history, int history_num, int *index)
 {
 	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history;
@@ -3565,6 +3583,23 @@ int	zbx_next_history_index(zbx_dc_history_t history, int history_num, int *index
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_history_field                                            *
+ *                                                                            *
+ * Purpose: get the value of specified field of history array element         *
+ *                                                                            *
+ * Parameters: history     - [IN] array of history data                       *
+ *             index       - [IN] current position in history array           *
+ *             label       - [IN] requested field                             *
+ *             res         - [OUT] field value                                *
+ *                                                                            *
+ * Comments: internal helper function for implementation of public API        *
+ *           zabbix_get_object_member() for ZBX_HANDLE_HISTORY_RECORD and     *
+ *           ZBX_HANDLE_HISTORY_RECORD_VALUELOG type handles and their        *
+ *           respective labels (except ZABBIX_HISTORY_RECORD_VALUETYPE)       *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_get_history_field(zbx_dc_history_t history, int index, zabbix_label_t label, zabbix_basic_t *res)
 {
 	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history + index;
@@ -3617,6 +3652,23 @@ void	zbx_get_history_field(zbx_dc_history_t history, int index, zabbix_label_t l
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_history_type                                             *
+ *                                                                            *
+ * Purpose: get the type of history array element                             *
+ *                                                                            *
+ * Parameters: history     - [IN] array of history data                       *
+ *             index       - [IN] current position in history array           *
+ *                                                                            *
+ * Return value: one of ZABBIX_TYPE_* codes                                   *
+ *                                                                            *
+ * Comments: internal helper function for implementation of public API        *
+ *           zabbix_get_object_member() for ZBX_HANDLE_HISTORY_RECORD type    *
+ *           handles and their labels ZABBIX_HISTORY_RECORD_VALUE and         *
+ *           ZABBIX_HISTORY_RECORD_VALUETYPE                                  *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	zbx_get_history_type(zbx_dc_history_t history, int index)
 {
 	ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history + index;
