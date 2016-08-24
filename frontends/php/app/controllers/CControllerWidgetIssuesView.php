@@ -47,18 +47,14 @@ class CControllerWidgetIssuesView extends CController {
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
 			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value');
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-				$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value');
-
-				if ($subgroupids) {
-					$filter['groupids'] = getMultiselectGroupIds($filter['groupids'] , $subgroupids);
-				}
-
-				if ($hide_subgroupids) {
-					$hide_groupids = getMultiselectGroupIds($hide_groupids , $hide_subgroupids);
-				}
+				$filter['groupids'] = getMultiselectGroupIds(
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value'),
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value')
+				);
+				$hide_groupids = getMultiselectGroupIds(
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value'),
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value')
+				);
 
 				if (!$filter['groupids']) {
 					// null mean all groups

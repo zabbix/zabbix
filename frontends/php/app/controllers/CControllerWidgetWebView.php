@@ -48,18 +48,14 @@ class CControllerWidgetWebView extends CController {
 				$filter['groupids'] = null;
 			}
 			else {
-				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value');
-				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-				$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value');
-
-				if ($subgroupids) {
-					$filter['groupids'] = getMultiselectGroupIds($filter['groupids'] , $subgroupids);
-				}
-
-				if ($hide_subgroupids) {
-					$hide_groupids = getMultiselectGroupIds($hide_groupids , $hide_subgroupids);
-				}
+				$filter['groupids'] = getMultiselectGroupIds(
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value'),
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value')
+				);
+				$hide_groupids = getMultiselectGroupIds(
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value'),
+					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value')
+				);
 
 				if ($hide_groupids) {
 					// get all groups if no selected groups defined
