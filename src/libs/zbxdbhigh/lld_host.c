@@ -190,7 +190,7 @@ static void	lld_group_free(zbx_lld_group_t *group)
  ******************************************************************************/
 static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid,
 		char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
-		char inventory_mode, unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
+		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
 	const char	*__function_name = "lld_hosts_get";
@@ -2870,7 +2870,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 			inventory_mode = (char)atoi(row[4]);
 
 		lld_hosts_get(parent_hostid, &hosts, proxy_hostid, ipmi_authtype, ipmi_privilege, ipmi_username,
-				ipmi_password, inventory_mode, tls_connect, tls_accept, tls_issuer, tls_subject,
+				ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
 				tls_psk_identity, tls_psk);
 
 		lld_simple_groups_get(parent_hostid, &groupids);
