@@ -3,6 +3,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
