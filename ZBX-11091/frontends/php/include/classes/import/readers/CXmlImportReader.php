@@ -51,90 +51,95 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = $this->xmlToArray($xml);
-
+		$data = $this->xml_to_array($xml);
 		$xml->close();
 		return $data;
 	}
 
 	/**
-	 * Method for processing xml dom nodes.
-	 * Element attributes will be stored as siblings of child elements.
+	 * Method for recursive processing of xml dom nodes.
 	 *
 	 * @param XMLReader $xml
+	 * @param string    $path
 	 *
-	 * @throws Exception
-	 *
-	 * @return array
+	 * @return array|string
 	 */
-	protected function xmlToArray(XMLReader $xml) {
-		$nodes = [];
-		$data = [];
-		$data_alias = [&$data];
-		$depth = $xml->depth;
+	protected function xml_to_array(XMLReader $xml, $path = '') {
+		$data = null;
 
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					$is_deeper = bccomp($xml->depth, $depth);
-					$depth = $xml->depth;
-
-					if ($is_deeper == 1) {
-						$data_alias[$depth] = &$data_alias[$depth - 1][$node_name];
-
-						if ($data_alias[$depth] === null) {
-							$data_alias[$depth] = [];
-						}
+					if ($data === null) {
+						$data = [];
 					}
-					elseif ($is_deeper == 0 && !is_array($data_alias[$depth])) {
-						array_splice($nodes, $depth);
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', implode('/', $nodes),
-							_s('unexpected text "%1$s"', trim($data_alias[$depth]))
+					elseif (!is_array($data)) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
+							_s('unexpected text "%1$s"', trim($data))
 						));
 					}
 
 					$node_name = $xml->name;
-					$nodes[$depth] = $node_name;
-
-					if(array_key_exists($node_name, $data_alias[$depth])) {
-						// Add identifier number for repeated element keys.
-
-						$count = count($data_alias[$depth]);
-
-						while (array_key_exists($node_name . $count, $data_alias[$depth])) {
-							$count++;
-						}
-
-						$node_name .= $count;
-						$nodes[$depth] .= '('.$count.')';
+					$sub_path = $path.'/'.$node_name;
+					if (array_key_exists($node_name, $data)) {
+						$node_name .= count($data);
+						$sub_path .= '('.count($data).')';
 					}
 
+					/*
+					 * A special case for 1.8 import where attributes are still used attributes must be added to the
+					 * array as if they where child elements.
+					 */
 					if ($xml->hasAttributes) {
-						// Add all attributes as elements.
-
 						while ($xml->moveToNextAttribute()) {
-							$data_alias[$depth][$node_name][$xml->name] = $xml->value;
+							$data[$node_name][$xml->name] = $xml->value;
+						}
+
+						/*
+						 * We assume that an element with attributes always contains child elements, not a text node
+						 * works for 1.8 XML.
+						 */
+						$child_data = $this->xml_to_array($xml, $sub_path);
+						if (is_array($child_data)) {
+							foreach ($child_data as $child_node_name => $child_node_value) {
+								if (array_key_exists($child_node_name, $data[$node_name])) {
+									$child_node_name .= count($data[$node_name]);
+								}
+								$data[$node_name][$child_node_name] = $child_node_value;
+							}
+						}
+						elseif ($child_data !== '') {
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
+								_s('unexpected text "%1$s"', trim($child_data))
+							));
 						}
 					}
 					else {
-						$data_alias[$depth][$node_name] = $xml->isEmptyElement ? '' : null;
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $sub_path);
 					}
 					break;
 
 				case XMLReader::TEXT:
-					$is_deeper = bccomp($xml->depth, $depth);
-					$depth = $xml->depth;
-					$data_alias[$depth] = &$data_alias[$depth - 1][$node_name];
-
-					if ($is_deeper != 1 || count($data_alias[$depth])) {
-						array_splice($nodes, $depth);
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', implode('/', $nodes),
+					if ($data === null) {
+						$data = $xml->value;
+					}
+					elseif (is_array($data)) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 							_s('unexpected text "%1$s"', trim($xml->value))
 						));
 					}
 
-					$data_alias[$depth] = ($xml->hasValue) ? $xml->value : '';
 					break;
+
+				case XMLReader::END_ELEMENT:
+					/*
+					 * For tags with empty value: <dns></dns>.
+					 */
+					if ($data === null) {
+						$data = '';
+					}
+
+					return $data;
 			}
 		}
 
