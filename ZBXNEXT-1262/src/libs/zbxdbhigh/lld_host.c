@@ -1182,7 +1182,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
  ******************************************************************************/
 static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 {
-	const char			*__function_name = "lld_groups_save_rights";
+	const char		*__function_name = "lld_groups_save_rights";
 
 	int			i, permission;
 	DB_ROW			row;
@@ -1193,7 +1193,6 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 	zbx_lld_group_t		*group;
 	zbx_vector_str_t	group_names;
 	zbx_db_insert_t		db_insert;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
