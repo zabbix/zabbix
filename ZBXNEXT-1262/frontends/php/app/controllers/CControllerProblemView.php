@@ -52,7 +52,10 @@ class CControllerProblemView extends CController {
 			'filter_inventory' =>		'array',
 			'filter_tags' =>			'array',
 			'filter_maintenance' =>		'in 1',
-			'filter_groupids_subgroups' => 'array_id'
+			'filter_groupids_subgroupids' => 'array_id',
+			'filter_unacknowledged' =>	'in 1',
+			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
+			'stime' =>					'time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -105,7 +108,7 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::updateArray('web.problem.filter.subgroups', $this->getInput('filter_groupids_subgroups', []),
+			CProfile::updateArray('web.problem.filter.subgroupids', $this->getInput('filter_groupids_subgroupids', []),
 				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray('web.problem.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
@@ -167,7 +170,8 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.tags.tag');
 			CProfile::deleteIdx('web.problem.filter.tags.value');
 			CProfile::delete('web.problem.filter.maintenance');
-			CProfile::deleteIdx('web.problem.filter.subgroups');
+			CProfile::deleteIdx('web.problem.filter.subgroupids');
+			CProfile::delete('web.problem.filter.unacknowledged');
 		}
 
 		$config = select_config();
@@ -184,14 +188,37 @@ class CControllerProblemView extends CController {
 				'preservekeys' => true
 			]), ['groupid' => 'id']);
 
-			$subgroups = CProfile::getArray('web.problem.filter.subgroups', []);
+			$subgroupids = CProfile::getArray('web.problem.filter.subgroupids', []);
 
-			foreach ($subgroups as $subgroup) {
-				if (array_key_exists($subgroup, $groups)) {
-					$groups[$subgroup]['name'] .= '/*';
+			foreach ($subgroupids as $subgroupid) {
+				if (array_key_exists($subgroupid, $groups)) {
+					$groups[$subgroupid]['name'] .= '/*';
 				}
 			}
+
+			if ($subgroupids) {
+				$filter_groupids = getMultiselectGroupIds($filter_groupids , $subgroupids);
+			}
 		}
+
+		$filter_triggers = $filter_triggerids
+			? CArrayHelper::renameObjectsKeys(API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'selectHosts' => ['name'],
+				'triggerids' => $filter_triggerids,
+				'monitored' => true
+			]), ['triggerid' => 'id', 'description' => 'name'])
+			: [];
+
+		CArrayHelper::sort($filter_triggers, [
+			['field' => 'name', 'order' => ZBX_SORT_UP]
+		]);
+
+		foreach ($filter_triggers as &$filter_trigger) {
+			$filter_trigger['prefix'] = $filter_trigger['hosts'][0]['name'].NAME_DELIMITER;
+			unset($filter_trigger['hosts']);
+		}
+		unset($filter_trigger);
 
 		$severities = [];
 		foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
@@ -252,7 +279,7 @@ class CControllerProblemView extends CController {
 				'inventory' => $filter_inventory,
 				'tags' => $filter_tags,
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
-				'subgroups' => CProfile::getArray('web.problem.filter.subgroups', [])
+				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0)
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']
