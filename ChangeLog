@@ -3,6 +3,7 @@ Changes for 3.2.0alpha3
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-11105] fixed compiler warnings regarding unused function parameters (Sandis)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 
 --------------------------------------------------------------------------------
