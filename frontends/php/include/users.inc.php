@@ -235,7 +235,11 @@ function getUserFullname($userData) {
 }
 
 /**
+ * Returns the list of permissions to the host groups for selected user groups.
+ *
  * @param string $usrgrpid
+ *
+ * @return array
  */
 function getHostGroupsRights(array $usrgrpids = []) {
 	$groups_rights = [
@@ -273,9 +277,13 @@ function getHostGroupsRights(array $usrgrpids = []) {
 }
 
 /**
+ * Returns the sorted list of permissions to the host groups in collapsed form.
+ *
  * @param array  $groups_rights
  * @param string $groups_rights[<groupid>]['name']
  * @param int    $groups_rights[<groupid>]['permission']
+ *
+ * @return array
  */
 function collapseHostGroupRights(array $groups_rights) {
 	$groups = [];
@@ -327,6 +335,8 @@ function collapseHostGroupRights(array $groups_rights) {
 }
 
 /**
+ * Applies new permissions to the host groups.
+ *
  * @param array  $groups_rights
  * @param string $groups_rights[<groupid>]['name']
  * @param int    $groups_rights[<groupid>]['permission']
@@ -334,6 +344,8 @@ function collapseHostGroupRights(array $groups_rights) {
  * @param array  $groupids
  * @param array  $groupids_subgroupids
  * @param int    $new_permission
+ *
+ * @return array
  */
 function applyHostGroupRights(array $groups_rights, array $groupids = [], array $groupids_subgroupids = [],
 		$new_permission = PERM_NONE) {
