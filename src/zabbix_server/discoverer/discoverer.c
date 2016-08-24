@@ -548,7 +548,7 @@ static void	process_rule(DB_DRULE *drule)
 			}
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				discovery_update_host(&dhost, ip, host_status, now);
+				discovery_update_host(&dhost, host_status, now);
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule, ip, dns, host_status, now);
 
@@ -731,7 +731,7 @@ static int	process_discovery(int now)
 	return rule_count;	/* performance metric */
 }
 
-static int	get_minnextcheck(int now)
+static int	get_minnextcheck(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -808,7 +808,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		rule_count += process_discovery(now);
 		total_sec += zbx_time() - sec;
 
-		nextcheck = get_minnextcheck(now);
+		nextcheck = get_minnextcheck();
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)

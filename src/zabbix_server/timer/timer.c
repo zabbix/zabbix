@@ -264,7 +264,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
+static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 {
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -549,7 +549,7 @@ static int	process_maintenance(void)
 	}
 	DBfree_result(result);
 
-	ret = update_maintenance_hosts(hm, hm_count, (int)now);
+	ret = update_maintenance_hosts(hm, hm_count);
 
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);

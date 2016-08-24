@@ -1733,10 +1733,12 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	free_request(&data->request);
 }
 
-static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *index, const char *value)
+static void	zbx_snmp_walk_discovery_cb(void *arg, const char *oid, const char *index, const char *value)
 {
 	zbx_snmp_ddata_t	*data = (zbx_snmp_ddata_t *)arg;
 	zbx_snmp_dobject_t	*obj;
+
+	ZBX_UNUSED(oid);
 
 	if (NULL == (obj = zbx_hashset_search(&data->objects, &index)))
 	{
