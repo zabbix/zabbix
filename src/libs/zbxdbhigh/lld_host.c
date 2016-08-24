@@ -1175,6 +1175,102 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_groups_save_rights                                           *
+ *                                                                            *
+ * Parameters: groups - [IN] list of new groups                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
+{
+	const char			*__function_name = "lld_groups_save_rights";
+
+	int			i, permission;
+	DB_ROW			row;
+	DB_RESULT		result;
+	char			*ptr, *name, *sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0, len, offset;
+	zbx_uint64_t		usergroupid;
+	zbx_lld_group_t		*group;
+	zbx_vector_str_t	group_names;
+	zbx_db_insert_t		db_insert;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_str_create(&group_names);
+
+	/* make a list of direct parent group names) */
+	for (i = 0; i < groups->values_num; i++)
+	{
+		group = (zbx_lld_group_t *)groups->values[i];
+
+		if (NULL == (ptr = strrchr(group->name, '/')))
+			continue;
+
+		name = zbx_strdup(NULL, group->name);
+		name[ptr - group->name] = '\0';
+
+		if (FAIL != zbx_vector_str_search(&group_names, name, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		{
+			zbx_free(name);
+			continue;
+		}
+
+		zbx_vector_str_append(&group_names, name);
+	}
+
+	if (0 == group_names.values_num)
+		goto out;
+
+	zbx_vector_str_sort(&group_names, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "id", "permission", "groupid", NULL);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select g.name,r.permission,r.groupid from groups g"
+				" left join rights r on r.id=g.groupid"
+				" where");
+
+	DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char **)group_names.values,
+			group_names.values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		len = strlen(row[0]);
+		permission = atoi(row[1]);
+		ZBX_STR2UINT64(usergroupid, row[2]);
+
+		for (i = 0; i < groups->values_num; i++)
+		{
+			group = (zbx_lld_group_t *)groups->values[i];
+
+			if (NULL == (ptr = strrchr(group->name, '/')))
+				continue;
+
+			offset = ptr - group->name;
+
+			if (len != offset || 0 != strncmp(row[0], group->name, offset))
+				continue;
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), group->groupid, permission, usergroupid);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "rightid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(sql);
+	zbx_vector_str_clear_ext(&group_names, zbx_ptr_free);
+out:
+	zbx_vector_str_destroy(&group_names);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_groups_save                                                  *
  *                                                                            *
  * Parameters: groups           - [IN/OUT] list of groups; should be sorted   *
@@ -1187,7 +1283,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 {
 	const char			*__function_name = "lld_groups_save";
 
-	int				i, j, new_groups = 0, upd_groups = 0;
+	int				i, j, new_groups_num = 0, upd_groups_num = 0;
 	zbx_lld_group_t			*group;
 	zbx_lld_group_prototype_t	*group_prototype;
 	zbx_lld_host_t			*host;
@@ -1195,6 +1291,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 	char				*sql = NULL, *name_esc, *name_proto_esc;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t			db_insert, db_insert_gdiscovery;
+	zbx_vector_ptr_t		new_groups;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1206,27 +1303,29 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 			continue;
 
 		if (0 == group->groupid)
-			new_groups++;
+			new_groups_num++;
 		else if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
-			upd_groups++;
+			upd_groups_num++;
 	}
 
-	if (0 == new_groups && 0 == upd_groups)
+	if (0 == new_groups_num && 0 == upd_groups_num)
 		goto out;
 
 	DBbegin();
 
-	if (0 != new_groups)
+	if (0 != new_groups_num)
 	{
-		groupid = DBget_maxid_num("groups", new_groups);
+		groupid = DBget_maxid_num("groups", new_groups_num);
 
 		zbx_db_insert_prepare(&db_insert, "groups", "groupid", "name", "flags", NULL);
 
 		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupid", "parent_group_prototypeid",
 				"name", NULL);
+
+		zbx_vector_ptr_create(&new_groups);
 	}
 
-	if (0 != upd_groups)
+	if (0 != upd_groups_num)
 	{
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
@@ -1263,6 +1362,8 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 				/* hosts will be linked to a new host groups */
 				zbx_vector_uint64_append(&host->new_groupids, group->groupid);
 			}
+
+			zbx_vector_ptr_append(&new_groups, group);
 		}
 		else
 		{
@@ -1304,20 +1405,23 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 		}
 	}
 
-	if (0 != upd_groups)
+	if (0 != upd_groups_num)
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}
 
-	if (0 != new_groups)
+	if (0 != new_groups_num)
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 
 		zbx_db_insert_execute(&db_insert_gdiscovery);
 		zbx_db_insert_clean(&db_insert_gdiscovery);
+
+		lld_groups_save_rights(&new_groups);
+		zbx_vector_ptr_destroy(&new_groups);
 	}
 
 	DBcommit();
