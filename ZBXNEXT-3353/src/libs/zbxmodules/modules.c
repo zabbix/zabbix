@@ -65,7 +65,7 @@ static const char * const	error_messages[] =
 	"unknown error"								/* ZBX_MAX_ERROR		7 */
 };
 
-const char * const	zabbix_error_message(zabbix_error_t error)
+const char	*zabbix_error_message(zabbix_error_t error)
 {
 /* refers to the last error in error_messages */
 #define ZBX_MAX_ERROR	7

@@ -74,7 +74,7 @@ zabbix_basic_t;
 
 unsigned char	zabbix_version(void);
 
-const char * const	zabbix_error_message(zabbix_error_t error);
+const char	*zabbix_error_message(zabbix_error_t error);
 
 zabbix_error_t	zabbix_get_object_member(zabbix_handle_t object, zabbix_label_t label, void *buffer);
 zabbix_error_t	zabbix_get_vector_element(zabbix_handle_t vector, void *buffer);
