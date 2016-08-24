@@ -379,7 +379,7 @@ if (!$filterSet) {
 }
 
 $toggle_all = (new CColHeader(
-	(new CDiv())
+	(new CSimpleButton())
 		->addClass(ZBX_STYLE_TREEVIEW)
 		->addClass('app-list-toggle-all')
 		->addItem(new CSpan())
@@ -592,7 +592,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	// add toggle row
 	$table->addRow([
-		(new CDiv())
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->addClass('app-list-toggle')
 			->setAttribute('data-app-id', $dbApp['applicationid'])
@@ -763,7 +763,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	// add toggle row
 	$table->addRow([
-		(new CDiv())
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->addClass('app-list-toggle')
 			->setAttribute('data-host-id', $host['hostid'])

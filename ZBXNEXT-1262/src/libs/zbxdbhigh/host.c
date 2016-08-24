@@ -1004,15 +1004,13 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	int			i;
-	zbx_vector_uint64_t	profileids, selementids;
-	const char		*profile_idx = "web.events.filter.triggerid";
+	zbx_vector_uint64_t	selementids;
 
 	if (0 == triggerids->values_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&selementids);
 
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
@@ -1032,15 +1030,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
-	DBget_profiles_by_source_idxs_values(&profileids, NULL, &profile_idx, 1, triggerids);
-	if (0 != profileids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
-				profileids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
@@ -1052,7 +1041,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	DBexecute("%s", sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
 }

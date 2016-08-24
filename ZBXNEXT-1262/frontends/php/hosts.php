@@ -582,7 +582,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$dbTriggers = API::Trigger()->get([
 				'output' => ['triggerid'],
 				'hostids' => $srcHostId,
-				'inherited' => false
+				'inherited' => false,
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 			]);
 
 			if ($dbTriggers) {
