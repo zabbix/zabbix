@@ -121,7 +121,7 @@ if ($filterSet) {
 	$groupids = $filter['groupids'];
 
 	if ($filter['subgroupids']) {
-		$groupids = getMultiselectGroupIds($groupids , $filter['subgroupids']);
+		$groupids = getMultiselectGroupIds($groupids, $filter['subgroupids']);
 	}
 
 	$hosts = API::Host()->get([

@@ -158,6 +158,7 @@ class CControllerProblemView extends CController {
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
 			CProfile::deleteIdx('web.problem.filter.groupids');
+			CProfile::deleteIdx('web.problem.filter.subgroupids');
 			CProfile::deleteIdx('web.problem.filter.hostids');
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
@@ -170,7 +171,6 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.tags.tag');
 			CProfile::deleteIdx('web.problem.filter.tags.value');
 			CProfile::delete('web.problem.filter.maintenance');
-			CProfile::deleteIdx('web.problem.filter.subgroupids');
 			CProfile::delete('web.problem.filter.unacknowledged');
 		}
 
@@ -188,17 +188,15 @@ class CControllerProblemView extends CController {
 				'preservekeys' => true
 			]), ['groupid' => 'id']);
 
-			$subgroupids = CProfile::getArray('web.problem.filter.subgroupids', []);
+			$filter_subgroupids = CProfile::getArray('web.problem.filter.subgroupids', []);
 
-			foreach ($subgroupids as $subgroupid) {
-				if (array_key_exists($subgroupid, $groups)) {
-					$groups[$subgroupid]['name'] .= '/*';
+			foreach ($filter_subgroupids as $groupid) {
+				if (array_key_exists($groupid, $groups)) {
+					$groups[$groupid]['name'] .= '/*';
 				}
 			}
 
-			if ($subgroupids) {
-				$filter_groupids = getMultiselectGroupIds($filter_groupids , $subgroupids);
-			}
+			$filter_groupids = getMultiselectGroupIds($filter_groupids , $filter_subgroupids);
 		}
 
 		$filter_triggers = $filter_triggerids

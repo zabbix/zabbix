@@ -155,10 +155,7 @@ if ($hostids) {
 }
 
 if ($groupids) {
-	if ($subgroupids) {
-		$groupids = getMultiselectGroupIds($groupids , $subgroupids);
-	}
-
+	$groupids = getMultiselectGroupIds($groupids, $subgroupids);
 	$inGroups = ' AND '.dbConditionInt('hgg.groupid', $groupids);
 }
 
