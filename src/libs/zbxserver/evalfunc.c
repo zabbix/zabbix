@@ -2799,3 +2799,35 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluatable_for_notsupported                                     *
+ *                                                                            *
+ * Purpose: check is function to be evaluated for NOTSUPPORTED items          *
+ *                                                                            *
+ * Parameters: fn - [IN] function name                                        *
+ *                                                                            *
+ * Return value: SUCCEED - do evaluate the function for NOTSUPPORTED items    *
+ *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
+ *                                                                            *
+ ******************************************************************************/
+int	evaluatable_for_notsupported(const char *fn)
+{
+	/* functions date(), dayofmonth(), dayofweek(), now(), time() and nodata() are exceptions, */
+	/* they should be evaluated for NOTSUPPORTED items, too */
+
+	if ('n' != *fn && 'd' != *fn && 't' != *fn)
+		return FAIL;
+
+	if (('n' == *fn) && (0 == strcmp(fn, "nodata") || 0 == strcmp(fn, "now")))
+		return SUCCEED;
+
+	if (('d' == *fn) && (0 == strcmp(fn, "dayofweek") || 0 == strcmp(fn, "dayofmonth") || 0 == strcmp(fn, "date")))
+		return SUCCEED;
+
+	if (0 == strcmp(fn, "time"))
+		return SUCCEED;
+
+	return FAIL;
+}
