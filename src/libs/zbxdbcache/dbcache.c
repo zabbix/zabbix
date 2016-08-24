@@ -814,7 +814,7 @@ static void	DCsync_trends()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, cache->trends_num);
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data...");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data...");
 
 	LOCK_TRENDS;
 
@@ -834,7 +834,7 @@ static void	DCsync_trends()
 
 	zbx_free(trends);
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data done");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data done");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

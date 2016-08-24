@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.2.0alpha2');
+define('ZABBIX_VERSION',		'3.2.0alpha3');
 define('ZABBIX_API_VERSION',	'3.2.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
 define('ZABBIX_DB_VERSION',		3010077);
@@ -1175,6 +1175,7 @@ define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');

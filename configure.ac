@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.2.0alpha2])
+AC_INIT([Zabbix],[3.2.0alpha3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -1459,7 +1459,7 @@ fi
 if test "x$found_curl" = "xyes"; then
 	have_web_monitoring="cURL"
 fi
-CFLAGS="$LIBCURL_CPPFLAGS $CFLAGS"
+CFLAGS="$LIBCURL_CFLAGS $CFLAGS"
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"

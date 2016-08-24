@@ -3929,6 +3929,7 @@ static void	DCsync_corr_conditions(DB_RESULT result)
 		condition->type = type;
 		dc_corr_condition_init_data(condition, found, row + 3);
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->conditions, condition);
 	}
 
@@ -4014,14 +4015,15 @@ static void	DCsync_corr_operations(DB_RESULT result)
 		operation->correlationid = correlationid;
 		operation->type = type;
 
+		/* cleared in DCsync_correlations() */
 		zbx_vector_ptr_append(&correlation->operations, operation);
 	}
 
-	/* remove deleted correlation oeprations */
+	/* remove deleted correlation operations */
 
 	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_iter_reset(&config->corr_conditions, &iter);
+	zbx_hashset_iter_reset(&config->corr_operations, &iter);
 
 	while (NULL != (operation = zbx_hashset_iter_next(&iter)))
 	{
@@ -4728,6 +4730,13 @@ void	DCsync_configuration(void)
 			config->actions.num_data, config->actions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __function_name,
 			config->action_conditions.num_data, config->action_conditions.num_slots);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __function_name,
+			config->correlations.num_data, config->correlations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __function_name,
+			config->corr_conditions.num_data, config->corr_conditions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
+			config->corr_operations.num_data, config->corr_operations.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -7784,26 +7793,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 			/* Store time at which no-data maintenance ended for the host (either */
 			/* because no-data maintenance ended or because maintenance type was */
 			/* changed to normal), this is needed for nodata() trigger function. */
-			/* Also, recalculate "nextcheck" time for items for which we usually */
-			/* update it upon receiving a value (i.e., items without a poller). */
-
-			ZBX_DC_ITEM		*dc_item;
-			zbx_hashset_iter_t	iter;
-
 			dc_host->data_expected_from = now;
-
-			zbx_hashset_iter_reset(&config->items, &iter);
-
-			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
-			{
-				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
-					continue;
-
-				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
-					continue;
-
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
-			}
 		}
 
 		dc_host->maintenance_status = maintenance_status;
@@ -8592,7 +8582,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	int			now, nitems = 0;
+	int			now, nitems = 0, data_expected_from;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -8624,6 +8614,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		{
 			case ITEM_TYPE_ZABBIX:
 				if (HOST_AVAILABLE_TRUE != dc_host->available)
+					continue;
+				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
+					data_expected_from = dc_host->data_expected_from;
+				if (data_expected_from + dc_item->delay > now)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
