@@ -25,7 +25,6 @@ $widget = (new CWidget())->setTitle(_('User groups'));
 $userGroupForm = (new CForm())
 	->setName('userGroupsForm')
 	->addVar('form', $data['form']);
-//	->addVar('group_rights', $data['group_rights']);
 if ($data['usrgrpid'] != 0) {
 	$userGroupForm->addVar('usrgrpid', $data['usrgrpid']);
 }
