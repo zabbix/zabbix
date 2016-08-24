@@ -52,23 +52,23 @@ unsigned char	zabbix_version(void)
 	return ZABBIX_VERSION_MAJOR * 10 + ZABBIX_VERSION_MINOR;
 }
 
-/* the order of messages MUST match the order of return code defines in module.h */
-static const char * const	error_messages[] =
-{
-	"call was successful",							/* ZABBIX_SUCCESS		0 */
-	"vector iteration reached its end",					/* ZABBIX_END_OF_VECTOR		1 */
-	"provided handle wasn't created properly or its lifetime has expired",	/* ZABBIX_INVALID_HANDLE	2 */
-	"provided handle is not an object handle",				/* ZABBIX_NOT_AN_OBJECT		3 */
-	"provided handle is not a vector handle",				/* ZABBIX_NOT_A_VECTOR		4 */
-	"object has no member associated with provided label",			/* ZABBIX_NO_SUCH_MEMBER	5 */
-	"internal error, please report to Zabbix developers",			/* ZABBIX_INTERNAL_ERROR	6 */
-	"unknown error"								/* ZBX_MAX_ERROR		7 */
-};
-
 const char	*zabbix_error_message(zabbix_error_t error)
 {
 /* refers to the last error in error_messages */
 #define ZBX_MAX_ERROR	7
+
+	/* the order of messages MUST match the order of return code defines in module.h */
+	static const char * const	error_messages[ZBX_MAX_ERROR] =
+	{
+		"call was successful",							/* 0 ZABBIX_SUCCESS */
+		"vector iteration reached its end",					/* 1 ZABBIX_END_OF_VECTOR */
+		"provided handle wasn't created properly or its lifetime has expired",	/* 2 ZABBIX_INVALID_HANDLE */
+		"provided handle is not an object handle",				/* 3 ZABBIX_NOT_AN_OBJECT */
+		"provided handle is not a vector handle",				/* 4 ZABBIX_NOT_A_VECTOR */
+		"object has no member associated with provided label",			/* 5 ZABBIX_NO_SUCH_MEMBER */
+		"internal error, please report to Zabbix developers",			/* 6 ZABBIX_INTERNAL_ERROR */
+		"unknown error"								/* 7 ZBX_MAX_ERROR */
+	};
 
 	if (ZABBIX_SUCCESS <= error && error < ZBX_MAX_ERROR)
 		return error_messages[error];

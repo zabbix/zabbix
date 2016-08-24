@@ -52,6 +52,7 @@ zabbix_basic_t;
 #define ZABBIX_NOT_A_VECTOR	4
 #define ZABBIX_NO_SUCH_MEMBER	5
 #define ZABBIX_INTERNAL_ERROR	6
+/* NB! don't forget to update zabbix_error_message() and ZBX_MAX_ERROR in modules.c when adding new error codes */
 
 /* object labels */
 #define ZABBIX_HISTORY_RECORD_ITEMID			1
