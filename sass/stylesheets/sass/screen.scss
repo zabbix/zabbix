@@ -1383,10 +1383,6 @@ footer {
 	position: relative;
 	border: 1px solid $table-border-color;
 	@include box-sizing(border-box);
-
-	.multiselect-wrapper {
-		margin-top: -.3em;
-	}
 }
 
 .drag-drop-area {
