@@ -668,7 +668,7 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 	}
 	else
 		zbx_create_sqlite3_mutex();
-#else
+#else	/* not HAVE_SQLITE3 */
 	ZBX_UNUSED(dbname);
 	ZBX_UNUSED(db_schema);
 #endif	/* HAVE_SQLITE3 */
