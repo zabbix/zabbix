@@ -666,7 +666,9 @@ char	*strerror_from_system(unsigned long error)
 	zbx_rtrim(utf8_string, "\r\n ");
 
 	return utf8_string;
-#else
+#else	/* not _WINDOWS */
+	ZBX_UNUSED(error);
+
 	return zbx_strerror(errno);
 #endif	/* _WINDOWS */
 }
