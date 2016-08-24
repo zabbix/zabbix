@@ -132,17 +132,20 @@ $new_permissions_table = (new CTable())
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'nested' => true,
+			'styles' => ['margin-top' => '-.3em'],
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm='.$userGroupForm->getName().
 					'&dstfld1=groupids_&srcfld1=groupid&multiselect=1'
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CCol((new CRadioButtonList('new_permission', PERM_NONE))
-			->addValue(_('Read-write'), PERM_READ_WRITE)
-			->addValue(_('Read'), PERM_READ)
-			->addValue(_('Deny'), PERM_DENY)
-			->addValue(_('None'), PERM_NONE)
-			->setModern(true)))->setAttribute('style', 'vertical-align: top')
+		(new CCol(
+			(new CRadioButtonList('new_permission', PERM_NONE))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true)
+		))->setAttribute('style', 'vertical-align: top')
 	])
 	->addRow([(new CSubmit('add_permission', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 

@@ -161,6 +161,9 @@ jQuery(function($) {
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
+	 * @param string options['styles']				additional style for .multiselect-wrapper (optional)
+	 * @param string options['styles']['property']
+	 * @param string options['styles']['value']
 	 *
 	 * @return object
 	 */
@@ -188,7 +191,8 @@ jQuery(function($) {
 			selectedLimit: 0,
 			limit: 20,
 			nested: false,
-			popup: []
+			popup: [],
+			styles: []
 		};
 		options = $.extend({}, defaults, options);
 
@@ -229,7 +233,8 @@ jQuery(function($) {
 
 			// add wrap
 			obj.wrap(jQuery('<div>', {
-				'class': 'multiselect-wrapper'
+				'class': 'multiselect-wrapper',
+				css: options.styles
 			}));
 
 			// selected
