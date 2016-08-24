@@ -389,7 +389,7 @@ function applyHostGroupRights(array $groups_rights, array $groupids = [], array 
 					&& array_key_exists($ex_groups[$parent_group_name], $groups_rights)) {
 				$parent_group_rights = $groups_rights[$ex_groups[$parent_group_name]];
 
-				if ($parent_group_rights['grouped']) {
+				if (array_key_exists('grouped', $parent_group_rights) && $parent_group_rights['grouped']) {
 					$ex_group_rights['permission'] = $parent_group_rights['permission'];
 					break;
 				}
