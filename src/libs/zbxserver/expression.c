@@ -3976,13 +3976,14 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __function_name, ifuncs->num_data);
 }
 
-static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
+static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t *unknown_msgs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
 	DC_ITEM			*items = NULL;
 	char			value[MAX_BUFFER_LEN], *error = NULL;
 	int			i, k;
+	int			unknown_idx = 0;	/* index in vector of error messages 'unknown_msgs' */
 	zbx_ifunc_t		*ifunc;
 	zbx_func_t		*func;
 	zbx_uint64_t		*itemids = NULL;
@@ -4009,6 +4010,9 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 	{
 		for (k = 0; k < ifunc->functions.values_num; k++)
 		{
+			int	ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
+			char	*unknown_msg;
+
 			func = (zbx_func_t *)ifunc->functions.values[k];
 
 			if (SUCCEED != errcodes[i])
@@ -4018,6 +4022,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 						func->function, func->parameter);
 				continue;
 			}
+
+			/* do not evaluate if the item is disabled or belongs to a disabled host */
 
 			if (ITEM_STATUS_ACTIVE != items[i].status)
 			{
@@ -4035,36 +4041,64 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 				continue;
 			}
 
+			/* If the item is NOTSUPPORTED then evaluation is allowed for:   */
+			/*   - time-based functions and nodata(). Their values can be    */
+			/*     evaluated to regular numbers even for NOTSUPPORTED items. */
+			/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
+
 			if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
 					FAIL == evaluatable_for_notsupported(func->function))
 			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-						" item is not supported.",
+				/* compose and store 'unknown' message for future use */
+				unknown_msg = zbx_dsprintf(NULL,
+						"Cannot evaluate function \"%s:%s.%s(%s)\": item is not supported.",
 						items[i].host.host, items[i].key_orig, func->function, func->parameter);
-				continue;
+
+				zbx_free(func->error);
+				zbx_vector_ptr_append(unknown_msgs, unknown_msg);
+				unknown_idx++;
+				ret_unknown = 1;
 			}
 
-			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter,
-					func->timespec.sec, &error))
+			if (0 == ret_unknown && SUCCEED != evaluate_function(value, &items[i], func->function,
+					func->parameter, func->timespec.sec, &error))
 			{
+				/* compose and store error message for future use */
 				if (NULL != error)
 				{
-					func->error = zbx_dsprintf(func->error,
+					unknown_msg = zbx_dsprintf(NULL,
 							"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
 							items[i].host.host, items[i].key_orig, func->function,
 							func->parameter, error);
+
+					zbx_free(func->error);
 					zbx_free(error);
 				}
 				else
 				{
-					func->error = zbx_dsprintf(func->error,
+					unknown_msg = zbx_dsprintf(NULL,
 							"Cannot evaluate function \"%s:%s.%s(%s)\".",
 							items[i].host.host, items[i].key_orig,
 							func->function, func->parameter);
+
+					zbx_free(func->error);
 				}
+
+				zbx_vector_ptr_append(unknown_msgs, unknown_msg);
+				unknown_idx++;
+				ret_unknown = 1;
+			}
+
+			if (0 == ret_unknown)
+			{
+				func->value = zbx_strdup(func->value, value);
 			}
 			else
-				func->value = zbx_strdup(func->value, value);
+			{
+				/* write a special token of unknown value with 'unknown' message number, like */
+				/* ZBX_UNKNOWN0, ZBX_UNKNOWN1 etc. not wrapped in () */
+				func->value = zbx_dsprintf(func->value, ZBX_UNKNOWN_STR "%d", unknown_idx - 1);
+			}
 		}
 	}
 
@@ -4253,13 +4287,15 @@ static void	zbx_free_item_functions(zbx_hashset_t *ifuncs)
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
  * Parameters: triggers - array of DC_TRIGGER structures                      *
+ *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
+ *                            items and failed functions                      *
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers)
+static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *unknown_msgs)
 {
 	const char		*__function_name = "substitute_functions";
 
@@ -4280,7 +4316,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers)
 
 	if (0 != ifuncs.num_data)
 	{
-		zbx_evaluate_item_functions(&ifuncs);
+		zbx_evaluate_item_functions(&ifuncs, unknown_msgs);
 		zbx_substitute_functions_results(&ifuncs, triggers);
 	}
 
@@ -4311,6 +4347,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	DC_TRIGGER		*tr;
 	int			i;
 	double			expr_result;
+	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
 	char			err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
@@ -4342,7 +4379,11 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		}
 	}
 
-	substitute_functions(triggers);
+	/* Assumption: most often there will be no NOTSUPPORTED items and function errors. */
+	/* Therefore initialize error messages vector but do not reserve any space. */
+	zbx_vector_ptr_create(&unknown_msgs);
+
+	substitute_functions(triggers, &unknown_msgs);
 
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)
@@ -4352,7 +4393,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		if (NULL != tr->new_error)
 			continue;
 
-		if (SUCCEED != evaluate(&expr_result, tr->expression, err, sizeof(err), NULL))
+		if (SUCCEED != evaluate(&expr_result, tr->expression, err, sizeof(err), &unknown_msgs))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
@@ -4376,7 +4417,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 			}
 
 			/* processing recovery expression mode */
-			if (SUCCEED != evaluate(&expr_result, tr->recovery_expression, err, sizeof(err), NULL))
+			if (SUCCEED != evaluate(&expr_result, tr->recovery_expression, err, sizeof(err), &unknown_msgs))
 			{
 				tr->new_error = zbx_strdup(tr->new_error, err);
 				tr->new_value = TRIGGER_VALUE_UNKNOWN;
@@ -4393,6 +4434,9 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		/* no changes, keep the old value */
 		tr->new_value = TRIGGER_VALUE_NONE;
 	}
+
+	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&unknown_msgs);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
