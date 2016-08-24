@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-24 18:52+0300\n"
-"PO-Revision-Date: 2016-04-20 12:09+0300\n"
+"PO-Revision-Date: 2016-08-22 12:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1461146983.000000\n"
+"X-POOTLE-MTIME: 1471860167.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -138,7 +138,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:537
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinito)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -711,12 +711,12 @@ msgstr "Tutte le mappe"
 #: include/views/configuration.trigger.prototype.edit.php:473
 #: include/views/configuration.triggers.edit.php:474
 msgid "All problems"
-msgstr ""
+msgstr "Tutti i problemi"
 
 #: include/views/configuration.trigger.prototype.edit.php:474
 #: include/views/configuration.triggers.edit.php:475
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Tutti i problemi se il valore del tag trova riscontro"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -734,7 +734,7 @@ msgstr "Tutti i template"
 #: include/views/configuration.trigger.prototype.edit.php:516
 #: include/views/configuration.triggers.edit.php:525
 msgid "Allow manual close"
-msgstr ""
+msgstr "Consenti chiusura manuale"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:504
@@ -1209,7 +1209,7 @@ msgstr "CERT"
 #: include/classes/screens/CScreenProblem.php:601
 #: include/classes/screens/CScreenProblem.php:684
 msgid "CLOSING"
-msgstr ""
+msgstr "Chiusura"
 
 #: triggers.php:567
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1316,12 +1316,12 @@ msgstr "Impossibile aggiungere l'applicazione"
 
 #: correlation.php:146
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Impossibile aggiungere correllazione"
 
 #: correlation.php:228 correlation.php:238 correlation.php:244
 #: correlation.php:264 correlation.php:268 correlation.php:281
 msgid "Cannot add correlation condition"
-msgstr ""
+msgstr "Impossibile aggiungere condizione di correlazione "
 
 #: include/classes/api/services/CTrigger.php:953
 #: include/classes/api/services/CTriggerPrototype.php:832
@@ -1472,7 +1472,7 @@ msgstr "Impossibile aggiungere scenario web"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr "Impossibile chiamare il metodo \"%1$s.%2$s\" senza parametri."
+msgstr "Impossibile invocare il metodo  \"%1$s.%2$s\" senza parametri."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -1514,7 +1514,7 @@ msgstr "Impossibile clonare prototipi di trigger."
 #: include/classes/api/services/CEvent.php:828
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Impossibile chiudere il problema: %1$s."
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
@@ -1523,20 +1523,20 @@ msgstr "Non è possibile connettersi al database."
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Non è possibile copiare il grafico"
+msgstr[1] "Non è possibile copiare i grafici"
 
 #: items.php:986
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Non è possibile copiare l'item"
+msgstr[1] "Non è possibile copiare gli item"
 
 #: triggers.php:501
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Non è possibile copiare il trigger"
+msgstr[1] "Non è possibile copiare i trigger"
 
 #: include/triggers.inc.php:367
 #, c-format
@@ -1612,7 +1612,7 @@ msgstr[1] "Impossibile cancellare l'applicazione"
 
 #: correlation.php:162
 msgid "Cannot delete correlation"
-msgstr ""
+msgstr "Impossibile cancellare corellazione"
 
 #: include/classes/api/services/CTrigger.php:857
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -1755,7 +1755,7 @@ msgstr "Impossibile rimuovere azioni selezionate."
 
 #: correlation.php:374
 msgid "Cannot delete selected correlations"
-msgstr ""
+msgstr "Impossibile cancellare le correlazioni selezionate"
 
 #: services.php:117
 msgid "Cannot delete service"
@@ -1848,8 +1848,8 @@ msgstr[1] "Impossibile disabilitare le azioni"
 #: correlation.php:361
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile disabilitare correlazione"
+msgstr[1] "Impossibile disabilitare correlazioni"
 
 #: discoveryconf.php:211 host_discovery.php:357
 msgid "Cannot disable discovery rule"
@@ -1929,8 +1929,8 @@ msgstr[1] "Impossibile abilitare le azioni"
 #: correlation.php:360
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossibile abilitare correlazione"
+msgstr[1] "Impossibile abilitare correlazioni"
 
 #: discoveryconf.php:210 host_discovery.php:356
 msgid "Cannot enable discovery rule"
@@ -2229,7 +2229,7 @@ msgstr "Non è possibile processare applicazioni provenienti da host o template 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "Non è possibile leggere il JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -2263,7 +2263,7 @@ msgstr "Impossibile inviare comando, controlla connessione al server Zabbix \"%1
 #: include/classes/api/services/CAction.php:2381
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Impossibile definire \"%1$s\" per l'azione \"%2$s\"."
 
 #: include/classes/api/services/CApplication.php:300
 #, c-format
@@ -2273,12 +2273,12 @@ msgstr "Impossibile impostare \"%1$s\" per l'applicazione \"%2$s\"."
 #: include/classes/api/services/CGraphGeneral.php:472
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "Impossibile definire \"%1$s\" per il grafico \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:476
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Impossibile definire %1$s\" per il grafico prototipo \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:370
 #, c-format
@@ -2304,7 +2304,7 @@ msgstr "Impossibile impostare \"%1$s\" per il trigger \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:498
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "Impossibile definire \"%1$s\" per il trigger prototipo \"%2$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:304
 #, c-format
@@ -2396,12 +2396,12 @@ msgstr "Impossibile aggiornare \"%1$s\" per applicazione \"%2$s\"."
 #: include/classes/api/services/CGraphGeneral.php:606
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il grafico \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:610
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il grafico prototipo \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:432
 #, c-format
@@ -2416,12 +2416,12 @@ msgstr "Impossibile aggiornare \"%1$s\" per l'item \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:647
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il template trigger \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:653
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il template trigger prototipo \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:646
 #, c-format
@@ -2431,7 +2431,7 @@ msgstr "Impossibile aggiornare \"%1$s\" per il trigger \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:652
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il trigger prototipo \"%2$s\"."
 
 #: include/classes/api/services/CHost.php:1785
 #, c-format
@@ -2489,7 +2489,7 @@ msgstr "Impossibile aggiornare la configurazione"
 
 #: correlation.php:140
 msgid "Cannot update correlation"
-msgstr ""
+msgstr "Impossibile aggiornare correlazione"
 
 #: usergrps.php:334
 msgid "Cannot update debug mode"
@@ -2646,7 +2646,7 @@ msgstr "Impossibile aggiornare il trigger"
 #: include/classes/api/services/CTriggerGeneral.php:1604
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "Impossibile aggiornare trigger \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335
 msgid "Cannot update trigger prototype"
@@ -2655,7 +2655,7 @@ msgstr "Impossibile aggiornare trigger prototipo"
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr ""
+msgstr "Impossibile aggiornare trigger prototipo \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:390
 msgid "Cannot update trigger prototypes"
@@ -2939,17 +2939,17 @@ msgstr "Chiudi costruttore di espressioni"
 
 #: include/correlation.inc.php:70
 msgid "Close new event"
-msgstr ""
+msgstr "Chiudi nuovo evento"
 
 #: include/correlation.inc.php:69
 msgid "Close old events"
-msgstr ""
+msgstr "Chiudi vecchi eventi"
 
 #: app/views/monitoring.acknowledge.edit.php:42
 #: app/views/monitoring.acknowledge.edit.php:79 include/acknow.inc.php:57
 #: include/events.inc.php:523
 msgid "Close problem"
-msgstr ""
+msgstr "Problema chiuso"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:170
 msgid "Collapse"
@@ -3038,7 +3038,7 @@ msgstr "Condizione \"%2$s\" non è utilizzata nella formula \"%3$s\" per l'azion
 #: include/classes/api/services/CCorrelation.php:1242
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
-msgstr ""
+msgstr "Condizione \"%2$s\" non utilizzata nella formula \"%3$s\" per correlazione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #, c-format
@@ -3053,7 +3053,7 @@ msgstr "Condizione \"%2$s\" non è utilizzata nella formula \"%3$s\" per l'azion
 #: include/classes/api/services/CCorrelation.php:1230
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
-msgstr ""
+msgstr "Condizione \"%2$s\" utilizzata nella formula \"%3$s\" per correlazione \"%1$s\" non è definita."
 
 #: include/classes/api/services/CDiscoveryRule.php:971
 #, c-format
@@ -3071,7 +3071,7 @@ msgstr "Condizioni"
 #: include/classes/api/services/CCorrelation.php:1160
 #, c-format
 msgid "Conditions duplicates for correlation \"%1$s\"."
-msgstr ""
+msgstr "Condizioni duplicate per la correlazione \"%1$s\"."
 
 #: include/menu.inc.php:187 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
@@ -3381,47 +3381,47 @@ msgstr[1] "Copia %1$s elementi verso..."
 
 #: include/views/configuration.correlation.edit.php:236
 msgid "Correlation"
-msgstr ""
+msgstr "Correlazione"
 
 #: include/classes/api/services/CCorrelation.php:559
 #: include/classes/api/services/CCorrelation.php:748
 #, c-format
 msgid "Correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "Correlazione \"%1$s\" già esistente."
 
 #: correlation.php:145
 msgid "Correlation added"
-msgstr ""
+msgstr "Correlazione aggiunta"
 
 #: correlation.php:162
 msgid "Correlation deleted"
-msgstr ""
+msgstr "Correlazione cancellata"
 
 #: correlation.php:358
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Correlazione disabilitata"
+msgstr[1] "Correlazioni disabilitate"
 
 #: correlation.php:357
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Correlazione abilitata"
+msgstr[1] "Correlazioni abilitate"
 
 #: include/classes/api/services/CCorrelation.php:529
 #, c-format
 msgid "Correlation is missing parameters: %1$s"
-msgstr ""
+msgstr "Correlazione con parametri mancanti: %1$s"
 
 #: include/classes/api/services/CCorrelation.php:538
 #: include/classes/api/services/CCorrelation.php:717
 msgid "Correlation name cannot be empty."
-msgstr ""
+msgstr "Nome correlazione non può essere vuoto."
 
 #: correlation.php:139
 msgid "Correlation updated"
-msgstr ""
+msgstr "Correlazione aggiornata"
 
 #: include/classes/api/services/CImage.php:350
 msgid "Could not save image!"
@@ -3454,7 +3454,7 @@ msgstr "Crea background"
 
 #: include/views/configuration.correlation.list.php:27
 msgid "Create correlation"
-msgstr ""
+msgstr "Crea correlazione"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -4081,7 +4081,7 @@ msgstr "Rimuovere azione corrente?"
 
 #: include/views/configuration.correlation.edit.php:249
 msgid "Delete current correlation?"
-msgstr ""
+msgstr "Cancella attuale correlazione?"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:358
@@ -4172,7 +4172,7 @@ msgstr "Rimuovere applicazioni selezionate?"
 
 #: include/views/configuration.correlation.list.php:121
 msgid "Delete selected correlations?"
-msgstr ""
+msgstr "Cancella correlazioni selezionate?"
 
 #: include/views/configuration.discovery.list.php:88
 #: include/views/configuration.host.discovery.list.php:152
@@ -4618,7 +4618,7 @@ msgstr "Disabilitare applicazioni selezionate?"
 
 #: include/views/configuration.correlation.list.php:120
 msgid "Disable selected correlations?"
-msgstr ""
+msgstr "Disabilita correlazioni selezionate?"
 
 #: include/views/configuration.discovery.list.php:87
 #: include/views/configuration.host.discovery.list.php:149
@@ -4925,13 +4925,13 @@ msgstr "Ricorda selezionato \"%1$s\" nel menù a discesa."
 #: include/classes/api/services/CCorrelation.php:1297
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "Duplicato \"%1$s\" valore \"%2$s\" per correlazione \"%3$s\"."
 
 #: include/classes/api/services/CCorrelation.php:546
 #: include/classes/api/services/CCorrelation.php:732
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
-msgstr ""
+msgstr "Duplicato \"%1$s\" valore \"%2$s\" for correlazione."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5147,7 +5147,7 @@ msgstr "Colore vuoto."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Empty correlation ID."
-msgstr ""
+msgstr "ID correlazione vuoto."
 
 #: include/classes/api/services/CAction.php:2267
 #, c-format
@@ -5361,7 +5361,7 @@ msgstr "Abilitare applicazioni selezionate?"
 
 #: include/views/configuration.correlation.list.php:119
 msgid "Enable selected correlations?"
-msgstr ""
+msgstr "Abilitare correlazione selezionate?"
 
 #: include/views/configuration.discovery.list.php:86
 #: include/views/configuration.host.discovery.list.php:146
@@ -5500,7 +5500,7 @@ msgstr[1] "Eventi presi in carico"
 #: app/controllers/CControllerAcknowledgeEdit.php:210
 #: app/views/monitoring.acknowledge.edit.php:91
 msgid "Event acknowledgements"
-msgstr ""
+msgstr "Evento accettato (acknowledge)"
 
 #: include/profiles.inc.php:162
 #, c-format
@@ -5510,11 +5510,11 @@ msgstr "Acknowledge evento \"%1$s\"."
 #: include/menu.inc.php:236
 #: include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
-msgstr ""
+msgstr "Correlazione eventi"
 
 #: correlation.php:26 include/views/configuration.correlation.edit.php:24
 msgid "Event correlation rules"
-msgstr ""
+msgstr "Regole correlazione eventi"
 
 #: tr_events.php:30 tr_events.php:110 tr_events.php:135
 msgid "Event details"
@@ -5540,9 +5540,10 @@ msgstr "Sorgente evento"
 msgid "Event source details"
 msgstr "Dettagli sorgente evento"
 
+# Need to find a better translation
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr ""
+msgstr "Coppia tag eventi"
 
 #: include/actions.inc.php:60
 msgid "Event type"
@@ -5683,7 +5684,7 @@ msgstr "Costruttore di espressioni"
 #: include/forms.inc.php:1554 include/forms.inc.php:1559
 #: include/forms.inc.php:1567
 msgid "Expression syntax error."
-msgstr ""
+msgstr "Errore sintassi espressione."
 
 #: include/views/administration.general.regularexpressions.edit.php:43
 #: include/views/administration.general.regularexpressions.edit.php:117
@@ -6052,7 +6053,7 @@ msgstr "Generale"
 #: include/events.inc.php:231 include/events.inc.php:234
 #: include/events.inc.php:239
 msgid "Generated by"
-msgstr ""
+msgstr "Generato da"
 
 #: chart4.php:170 chart5.php:220
 #, c-format
@@ -6174,8 +6175,8 @@ msgstr "Grafico aggiunto"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Grafico copiato"
+msgstr[1] "Grafici copiati"
 
 #: graphs.php:292
 msgid "Graph deleted"
@@ -6333,7 +6334,7 @@ msgstr "Il gruppo \"%1$s\" non può esser rimosso, perchè è utilizzato da un p
 #: include/classes/api/services/CHostGroup.php:570
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr ""
+msgstr "Gruppo \"%1$s\" non può essere cancellato , perché viene utilizzato in una condizione di correlazione ."
 
 #: include/classes/import/importers/CTemplateImporter.php:245
 #, c-format
@@ -7550,7 +7551,7 @@ msgstr "Durata degli step errata per l'operazione dell'azione."
 #: include/classes/api/services/CAction.php:1457
 #, c-format
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
-msgstr ""
+msgstr "Non corretta azione tipo operazione \"%1$s\"  per origine evento \"%2$s\"."
 
 #: include/classes/api/services/CAction.php:1688
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -7679,7 +7680,7 @@ msgstr "Condizioni non corrette per la regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CCorrelation.php:690
 msgid "Incorrect correlation ID."
-msgstr ""
+msgstr "ID di correlazione non corretta."
 
 #: include/classes/api/services/CAction.php:2218
 #, c-format
@@ -7689,7 +7690,7 @@ msgstr "Espressione personalizzata non corretta \"%2$s\" per l'azione \"%1$s\": 
 #: include/classes/api/services/CCorrelation.php:1186
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
-msgstr ""
+msgstr "Espressione personalizzata non corretta \"%2$s\"  per la correlazione \"%1$s\": %3$s."
 
 #: include/classes/api/services/CDiscoveryRule.php:970
 #, c-format
@@ -7737,10 +7738,11 @@ msgstr "Filtro errato \"condizione ID formula\" per azione \"%1$s\"."
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Filtro errato \"condizione ID formula\" per la regola di discovery \"%1$s\"."
 
+# Not so much clear
 #: include/classes/api/services/CCorrelation.php:1219
-#, c-format
+#, fuzzy, c-format
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
-msgstr ""
+msgstr "ID formula per filtro condizione non corretto per la correlazione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:992
 #, c-format
@@ -8154,7 +8156,7 @@ msgstr "Tipo non corretto di calcolo per l'azione \"%1$s\"."
 #: include/classes/api/services/CCorrelation.php:618
 #, c-format
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
-msgstr ""
+msgstr "Tipo di calcolo non corretto per la correlazione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:958
 #, c-format
@@ -8248,7 +8250,7 @@ msgstr "Valore \"%1$s\" errato per il campo int senza segno \"%2$s\"."
 #: include/classes/api/services/CCorrelation.php:1285
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "Valore non corretto \"%1$s\" nel campo \"%2$s\" per la correlazione \"%3$s\"."
 
 #: include/classes/api/services/CMediatype.php:237
 #: include/classes/api/services/CMediatype.php:253
@@ -8738,7 +8740,7 @@ msgstr "Secondo parametro non valido."
 #: include/classes/import/validators/CXmlValidator.php:64
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Tag non valido \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8850,8 +8852,8 @@ msgstr "Item aggiunto"
 #: items.php:985
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Item copiato"
+msgstr[1] "Item copiati"
 
 #: app/views/administration.proxy.list.php:63
 msgid "Item count"
@@ -10168,7 +10170,7 @@ msgstr "Mozilla Firefox"
 #: include/views/configuration.trigger.prototype.edit.php:467
 #: include/views/configuration.triggers.edit.php:468
 msgid "Multiple"
-msgstr ""
+msgstr "Multiplo"
 
 #: include/triggers.inc.php:1113
 msgid "Multiple PROBLEM events"
@@ -10375,16 +10377,16 @@ msgstr "Nuovo elemento"
 
 #: include/correlation.inc.php:51 include/correlation.inc.php:204
 msgid "New event host group"
-msgstr ""
+msgstr "Nuovo evento gruppo host"
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:199
 #: include/correlation.inc.php:223
 msgid "New event tag"
-msgstr ""
+msgstr "Nuovo tag evento"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr ""
+msgstr "Nuovo valore tag evento"
 
 #: include/views/configuration.host.edit.php:94
 #: include/views/configuration.template.edit.php:124
@@ -10397,7 +10399,7 @@ msgstr "Nuovo gruppo host"
 
 #: include/views/configuration.correlation.edit.php:221
 msgid "New operation"
-msgstr ""
+msgstr "Nuova operazione"
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "New regular expression"
@@ -10437,14 +10439,14 @@ msgstr "No"
 #: include/classes/api/services/CCorrelation.php:1110
 #: include/classes/api/services/CCorrelation.php:1211
 #: include/classes/api/services/CCorrelation.php:1269
-#, c-format
+#, fuzzy, c-format
 msgid "No \"%1$s\" given for correlation \"%2$s\"."
-msgstr ""
+msgstr "Nessun \"%1$s\" fornito per la correlazione \"%2$s\"."
 
 #: include/classes/api/services/CCorrelation.php:688
 #, c-format
 msgid "No \"%1$s\" given for correlation."
-msgstr ""
+msgstr "Nessun \"%1$s\" fornito per la correlazione."
 
 #: include/classes/api/services/CGraphPrototype.php:39
 #, c-format
@@ -10586,7 +10588,7 @@ msgstr "Nessun tipo di comando specificato per l'operazione dell'azione."
 #: include/classes/api/services/CCorrelation.php:998
 #, c-format
 msgid "No condition type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "Nessun tipo di condizione fornita per la correlazione \"%1$s\"."
 
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.correlation.edit.php:42
@@ -10804,7 +10806,7 @@ msgstr "Nessuna corrispondenza trovata"
 #: include/classes/api/services/CCorrelation.php:1276
 #, c-format
 msgid "No operation type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "Nessun tipo operazione fornita per la correlazione \"%1$s\"."
 
 #: slides.php:92
 msgid "No permissions"
@@ -11090,7 +11092,7 @@ msgstr "Notifiche"
 
 #: include/actions.inc.php:808
 msgid "Notify all who received any messages regarding the problem before"
-msgstr ""
+msgstr "Notificare a tutti coloro che hanno ricevuto un messaggio riguardante il problema precedente"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -11136,11 +11138,11 @@ msgstr "Numero di item all'interno della coda che sono in ritardo da a secondi, 
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Number of matching lines since the last check of the item with log rotation support. Returns integer"
-msgstr ""
+msgstr "Numero di linee corrispondenti dopo l'ultimo controllo dell'item con il supporto alla rotazione dei log. Restituisce intero"
 
 #: include/classes/items/CHelpItems.php:367
 msgid "Number of matching lines since the last check of the item. Returns integer"
-msgstr ""
+msgstr "Numero di linee corrispondenti dall'ultimo controllo dell'item. Restituisce intero"
 
 #: include/classes/items/CHelpItems.php:911
 msgid "Number of monitored hosts"
@@ -11308,12 +11310,13 @@ msgstr "OK"
 #: include/views/configuration.trigger.prototype.edit.php:471
 #: include/views/configuration.triggers.edit.php:472
 msgid "OK event closes"
-msgstr ""
+msgstr "Chiudere eventi in OK"
 
+# Not so much clear
 #: include/views/configuration.trigger.prototype.edit.php:264
 #: include/views/configuration.triggers.edit.php:279
 msgid "OK event generation"
-msgstr ""
+msgstr "Generazione eventi OK"
 
 #: include/hosts.inc.php:299
 msgid "OOB IP address"
@@ -11373,11 +11376,11 @@ msgstr "Ok"
 #: include/correlation.inc.php:49 include/correlation.inc.php:194
 #: include/correlation.inc.php:209 include/correlation.inc.php:216
 msgid "Old event tag"
-msgstr ""
+msgstr "Vecchio tag evento"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr ""
+msgstr "Vecchio valore tag evento"
 
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47 jsLoader.php:137
@@ -11502,7 +11505,7 @@ msgstr[1] "Solo eventi selezionati"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
-msgstr ""
+msgstr "Solo gli super admin possono creare correlazioni."
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11510,7 +11513,7 @@ msgstr "Solo il super admin puo' creare le mappe valore."
 
 #: include/classes/api/services/CCorrelation.php:474
 msgid "Only super admins can delete correlations."
-msgstr ""
+msgstr "Solo gli super admin possono cancellare le correlazioni."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
@@ -11518,7 +11521,7 @@ msgstr "Solo il super admin puo' cancellare le mappe valore."
 
 #: include/classes/api/services/CCorrelation.php:679
 msgid "Only super admins can update correlations."
-msgstr ""
+msgstr "Solo gli super admin possono aggiornare le correlazioni."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
@@ -11895,7 +11898,7 @@ msgstr "PROBLEMA"
 #: include/views/configuration.trigger.prototype.edit.php:464
 #: include/views/configuration.triggers.edit.php:465
 msgid "PROBLEM event generation mode"
-msgstr ""
+msgstr "modalità di generazione eventi PROBLEM"
 
 #: app/views/administration.proxy.edit.php:100
 #: app/views/administration.proxy.edit.php:107
@@ -12032,7 +12035,7 @@ msgstr "La password non deve esser vuota"
 
 #: actionconf.php:88 include/views/configuration.action.edit.php:388
 msgid "Pause operations while in maintenance"
-msgstr ""
+msgstr "Ferma le operazioni durante la manutenzione"
 
 #: include/classes/debug/CProfiler.php:137
 #, c-format
@@ -12315,8 +12318,9 @@ msgstr "Mostra problema"
 
 #: include/triggers.inc.php:1105
 #: include/views/js/configuration.triggers.edit.js.php:39
+#, fuzzy
 msgid "Problem expression"
-msgstr ""
+msgstr "Espressione problema"
 
 #: jsrpc.php:116
 msgid "Problem on"
@@ -12454,7 +12458,7 @@ msgstr "Coda degli item da aggiornare"
 #: include/classes/screens/CScreenProblem.php:586
 #: include/classes/screens/CScreenProblem.php:670
 msgid "RESOLVED"
-msgstr ""
+msgstr "RISOLTO"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12501,7 +12505,7 @@ msgstr "Valore ricevuto"
 #: app/views/monitoring.problem.view.php:80
 #: include/views/common.filter.trigger.php:36
 msgid "Recent problems"
-msgstr ""
+msgstr "Problemi recenti"
 
 #: include/views/administration.auditacts.list.php:27
 msgid "Recipient"
@@ -12534,21 +12538,21 @@ msgstr "Ripristino"
 #: include/views/configuration.triggers.edit.php:347 trigger_prototypes.php:39
 #: trigger_prototypes.php:51 triggers.php:42 triggers.php:54
 msgid "Recovery expression"
-msgstr ""
+msgstr "Espressione di recovery"
 
 #: include/forms.inc.php:1594 include/forms.inc.php:1599
 #: include/forms.inc.php:1607
 msgid "Recovery expression syntax error."
-msgstr ""
+msgstr "Errore di sintassi sull'espressione di recovery."
 
 #: include/views/configuration.action.edit.php:1654
 msgid "Recovery operations"
-msgstr ""
+msgstr "Operazioni di recovery"
 
 #: include/classes/screens/CScreenProblem.php:554
 #: include/classes/screens/CScreenProblem.php:654
 msgid "Recovery time"
-msgstr ""
+msgstr "Periodo di recovery"
 
 #: include/views/administration.users.edit.php:180 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
@@ -13511,7 +13515,7 @@ msgstr "Selezionati e tutti gli eventi non riconosciuti"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
-msgstr ""
+msgstr "Correlazioni selezionate cancellate"
 
 #: include/views/js/monitoring.sysmaps.js.php:209
 msgid "Selected elements"
@@ -13536,7 +13540,7 @@ msgstr "Invia solo a"
 
 #: include/actions.inc.php:1067
 msgid "Send recovery message"
-msgstr ""
+msgstr "Invia messaggio di recovery"
 
 #: include/views/administration.users.edit.php:200 popup_media.php:134
 msgid "Send to"
@@ -13788,7 +13792,7 @@ msgstr[1] "Mostra unacknowledged (%1$s giorni)"
 
 #: app/views/monitoring.problem.view.php:242
 msgid "Show unacknowledged only"
-msgstr ""
+msgstr "Mostra sono unacknowledged"
 
 #: include/views/configuration.item.edit.php:503
 #: include/views/configuration.item.massupdate.php:452
@@ -13835,7 +13839,7 @@ msgstr "Prototipo grafico semplice"
 #: include/views/configuration.trigger.prototype.edit.php:466
 #: include/views/configuration.triggers.edit.php:467
 msgid "Single"
-msgstr ""
+msgstr "Singolo"
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -14351,16 +14355,16 @@ msgstr "Tag"
 #: include/classes/api/services/CTriggerGeneral.php:269
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr ""
+msgstr "Tag \"%1$s\" con valore \"%2$s\" già presente."
 
 #: include/views/configuration.trigger.prototype.edit.php:479
 #: include/views/configuration.triggers.edit.php:480
 msgid "Tag for matching"
-msgstr ""
+msgstr "Tag per corrispondenza"
 
 #: include/actions.inc.php:63
 msgid "Tag value"
-msgstr ""
+msgstr "Valore tag"
 
 #: app/views/monitoring.problem.view.php:232
 #: include/classes/screens/CScreenProblem.php:561
@@ -14368,7 +14372,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:509
 #: include/views/configuration.triggers.edit.php:518
 msgid "Tags"
-msgstr ""
+msgstr "Tag"
 
 #: include/views/configuration.action.edit.php:796
 #: include/views/configuration.action.edit.php:1485
@@ -14894,7 +14898,7 @@ msgstr "Il trigger \"%1$s\" esiste già su \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1531
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "Trigger \"%1$s\" appartiene a template con diversi collegamenti."
 
 #: include/classes/import/CConfigurationImport.php:1445
 #, c-format
@@ -14912,8 +14916,8 @@ msgstr "Un trigger non può dipendere da un trigger che deriva da esso."
 #: triggers.php:500
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Trigger copiato"
+msgstr[1] "Trigger copiati"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -15002,12 +15006,12 @@ msgstr "Prototipo trigger"
 #: include/classes/api/services/CTriggerGeneral.php:297
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Trigger prototipo \"%1$s\" esiste già \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1535
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "Trigger prototipo \"%1$s\" appartiene a template con diversi collegamenti."
 
 #: include/classes/api/services/CTriggerGeneral.php:1454
 #, c-format
@@ -15073,7 +15077,7 @@ msgstr "Prototipi Trigger aggiornati"
 
 #: include/classes/api/services/CTriggerGeneral.php:461
 msgid "Trigger recovery expression must contain at least one host:key reference."
-msgstr ""
+msgstr "L'espressione di recovery trigger deve contenere almeno una referenza ad un host:key."
 
 #: include/html.inc.php:838
 #: include/views/administration.general.triggerSeverity.edit.php:25
@@ -16433,10 +16437,11 @@ msgstr "Lo scenario web \"%1$s\" esiste già sull'host \"%2$s\"."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Lo scenario Web \"%1$s\" esiste già."
 
+# Not so much clear
 #: include/classes/import/CConfigurationImport.php:1218
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "Scenario Web \"%1$s\" su \"%2$s\": applicazione \"%3$s\" non esistente."
 
 #: httpconf.php:201
 msgid "Web scenario added"
@@ -16655,7 +16660,7 @@ msgstr "Campi errati per l'orario del servizio \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:497
 #: include/classes/api/services/CTriggerGeneral.php:651
 msgid "Wrong fields for trigger prototype."
-msgstr ""
+msgstr "Campi errati per trigger prototipo."
 
 #: include/classes/api/services/CTriggerGeneral.php:492
 #: include/classes/api/services/CTriggerGeneral.php:645
@@ -16673,7 +16678,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr "XML è vuoto"
+msgstr "XML vuoto"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16949,7 +16954,7 @@ msgstr "E' prevista una stringa di caratteri"
 #: include/classes/api/services/CDRule.php:307
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr "È previsto un valore numerico"
+msgstr "è previsto un valore numerico"
 
 #: include/classes/validators/CNewValidator.php:272
 msgid "a time is expected"
@@ -17296,7 +17301,7 @@ msgstr "deve essere un utente LDAP valido"
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr "deve essese compreso tra \"%1$s\" e \"%2$s\""
+msgstr "deve essere tra \"%1$s\" e \"%2$s\""
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:176
 msgid "new"
@@ -17311,7 +17316,7 @@ msgstr "nuovo"
 #: include/correlation.inc.php:211
 #: include/views/configuration.correlation.edit.php:135
 msgid "new event tag"
-msgstr ""
+msgstr "Nuovo tag evento"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2098
 #: include/classes/graphdraw/CPieGraphDraw.php:316
@@ -17447,7 +17452,7 @@ msgstr "breve descrizione"
 #: include/classes/api/services/CTriggerGeneral.php:778
 #: include/classes/api/services/CTriggerGeneral.php:796
 msgid "should be empty"
-msgstr ""
+msgstr "dovrebbe essere vuoto"
 
 #: include/views/monitoring.sysmap.edit.php:128
 msgid "show icon mappings"
@@ -17469,7 +17474,7 @@ msgstr "mostra mappature valori"
 #: include/views/configuration.triggers.edit.php:493
 #: include/views/js/configuration.triggers.edit.js.php:6
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: include/classes/api/services/CHostBase.php:50
 #, c-format
@@ -17494,11 +17499,11 @@ msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1461
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr ""
+msgstr "trigger prototipo non può essere spostato in un altro template o host"
 
 #: include/classes/api/services/CTriggerGeneral.php:1606
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr ""
+msgstr "trigger con collegamenti non può essere spostato ad un altro template o host"
 
 #: include/classes/html/CMultiSelect.php:52 jsLoader.php:175
 msgid "type here to search"
@@ -17508,7 +17513,7 @@ msgstr "digita qui per cercare"
 #: include/classes/api/services/CTriggerGeneral.php:810
 #: include/classes/validators/CTagValidator.php:61
 msgid "unacceptable characters are used"
-msgstr ""
+msgstr "sono utilizzati caratteri non permessi"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2196
 msgid "unexpected end of interval"
@@ -17533,7 +17538,7 @@ msgstr "tag \"%1$s\" non previsto"
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr "testo non previsto \"%1$s\""
+msgstr "valore testo non previsto \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:532
 #: include/classes/api/services/CHost.php:1535
@@ -17548,7 +17553,7 @@ msgstr "testo non previsto \"%1$s\""
 #: include/classes/api/services/CTriggerGeneral.php:825
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "Valore non previsto \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407

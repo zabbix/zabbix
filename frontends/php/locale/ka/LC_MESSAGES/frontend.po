@@ -410,7 +410,7 @@ msgstr "მოქმედება განახლდა"
 #: include/views/monitoring.slideconf.list.php:58
 #: include/views/monitoring.sysmap.list.php:51
 msgid "Actions"
-msgstr "ქმედება"
+msgstr "მოქმედებები"
 
 #: app/views/administration.proxy.edit.php:83
 #: app/views/administration.proxy.list.php:42
@@ -709,11 +709,11 @@ msgstr ""
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr "ყველა ეკრანი"
+msgstr ""
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr "ყველა სლაიდშოუ"
+msgstr ""
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -3031,7 +3031,7 @@ msgstr ""
 #: include/menu.inc.php:187 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
 msgid "Configuration"
-msgstr "კონფიგურაცია"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
@@ -4400,7 +4400,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:128
 #: include/views/monitoring.triggerComment.php:38 tr_status.php:288
 msgid "Description"
-msgstr "აღწერა"
+msgstr ""
 
 #: include/views/monitoring.triggerComment.php:42
 #, c-format
@@ -4635,7 +4635,7 @@ msgstr ""
 #: adm.triggerseverities.php:40 adm.triggerseverities.php:41
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Disaster"
-msgstr "კატასტროფა"
+msgstr ""
 
 #: include/discovery.inc.php:138
 msgid "Discovered"
@@ -5811,12 +5811,12 @@ msgstr ""
 #: include/classes/html/CFilter.php:84 include/classes/html/CFilter.php:93
 #: include/views/monitoring.dashconf.php:126
 msgid "Filter"
-msgstr "ფილტრი"
+msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:338
 #: include/views/configuration.host.discovery.edit.php:347
 msgid "Filters"
-msgstr "ფილტრები"
+msgstr ""
 
 #: popup_trexpr.php:382
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
@@ -6259,7 +6259,7 @@ msgstr ""
 #: include/views/monitoring.screen.php:69
 #: include/views/monitoring.slides.php:73 popup.php:500 tr_status.php:206
 msgid "Group"
-msgstr "ჯგუფი"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:522
 #, c-format
@@ -6302,7 +6302,7 @@ msgstr ""
 #: hostgroups.php:37 include/views/administration.usergroups.edit.php:37
 #: include/views/configuration.hostgroups.edit.php:40 usergrps.php:40
 msgid "Group name"
-msgstr "ჯგუფის სახელი"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:387
 #: include/classes/api/services/CHostPrototype.php:394
@@ -6336,7 +6336,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:118
 #: include/views/conf.import.php:28
 msgid "Groups"
-msgstr "ჯგუფები"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:187
 msgid "Groups in maintenance"
@@ -6438,7 +6438,7 @@ msgstr ""
 #: adm.triggerseverities.php:38 adm.triggerseverities.php:39
 #: include/views/administration.general.triggerSeverity.edit.php:60
 msgid "High"
-msgstr "მაღალი"
+msgstr ""
 
 #: app/views/monitoring.acknowledge.edit.php:46
 #: app/views/monitoring.problem.view.php:82 history.php:27
@@ -6475,7 +6475,7 @@ msgstr ""
 
 #: include/classes/screens/CScreenEvents.php:68 include/screens.inc.php:32
 msgid "History of events"
-msgstr "მოვლენების ისტორია"
+msgstr ""
 
 #: disc_prototypes.php:165 items.php:50
 msgid "History storage period"
@@ -6542,7 +6542,7 @@ msgstr ""
 #: search.php:125 tr_status.php:207 tr_status.php:286
 msgid "Host"
 msgid_plural "Hosts"
-msgstr[0] "ჰოსტი"
+msgstr[0] ""
 
 #: include/classes/api/services/CHost.php:857
 #: include/classes/api/services/CTemplate.php:428
@@ -6609,7 +6609,7 @@ msgstr[0] ""
 #: include/views/js/monitoring.sysmaps.js.php:74 jsLoader.php:144
 #: report2.php:306 report2.php:326 search.php:288
 msgid "Host group"
-msgstr "ჰოსტების ჯგუფი"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:378
 #: include/classes/api/services/CHostGroup.php:391
@@ -6661,7 +6661,7 @@ msgstr ""
 #: include/views/reports.toptriggers.php:67 latest.php:312 popup.php:47
 #: search.php:356
 msgid "Host groups"
-msgstr "ჰოსტების ჯგუფები"
+msgstr ""
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
 msgid "Host info"
@@ -8298,13 +8298,13 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:88 latest.php:408
 #: tr_status.php:281
 msgid "Info"
-msgstr "ინფო"
+msgstr ""
 
 #: adm.triggerseverities.php:32 adm.triggerseverities.php:33
 #: include/items.inc.php:31
 #: include/views/administration.general.triggerSeverity.edit.php:39
 msgid "Information"
-msgstr "საინფორმაციო"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:455
@@ -8682,7 +8682,7 @@ msgstr ""
 #: include/menu.inc.php:129
 #: include/views/configuration.host.massupdate.php:388
 msgid "Inventory"
-msgstr "ინვენტარიზაცია"
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1027
 #, c-format
@@ -9108,7 +9108,7 @@ msgstr ""
 #: include/forms.inc.php:1924 include/func.inc.php:1553
 #: include/maintenances.inc.php:115
 msgid "Last"
-msgstr "ბოლო"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
@@ -9151,7 +9151,7 @@ msgstr ""
 
 #: include/blocks.inc.php:628 include/blocks.inc.php:629 tr_status.php:282
 msgid "Last change"
-msgstr "უკანასკნელი ცვლილება"
+msgstr ""
 
 #: include/views/monitoring.screen.constructor.edit.php:442
 msgid "Last change (descending)"
@@ -9950,7 +9950,7 @@ msgstr ""
 
 #: app/views/monitoring.map.view.php:35
 msgid "Minimum severity"
-msgstr "მინიმალური სირთულე"
+msgstr ""
 
 #: include/classes/screens/CScreenBase.php:490 include/graphs.inc.php:397
 #, c-format
@@ -9982,7 +9982,7 @@ msgstr ""
 
 #: include/forms.inc.php:2032
 msgid "Minutes"
-msgstr "წუთი"
+msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:74
 msgid "Missing \"gitemid\" field for item."
@@ -10056,7 +10056,7 @@ msgstr ""
 
 #: include/menu.inc.php:38 include/views/inventory.host.view.php:134
 msgid "Monitoring"
-msgstr "მონიტორინგი"
+msgstr ""
 
 #: app/views/report.services.php:55 include/forms.inc.php:1907 report4.php:145
 msgid "Month"
@@ -10308,7 +10308,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:94
 #: include/views/configuration.template.edit.php:124
 msgid "New group"
-msgstr "ახალი ჯგუფი"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:133
 msgid "New host group"
@@ -12675,7 +12675,7 @@ msgstr ""
 
 #: include/menu.inc.php:144
 msgid "Reports"
-msgstr "პატაკები"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:161
 #: include/views/configuration.httpconf.edit.php:163
@@ -13207,7 +13207,7 @@ msgstr ""
 #: include/views/monitoring.slides.php:44 popup.php:83 popup.php:107
 #: search.php:132 search.php:241 search.php:413 search.php:450 search.php:470
 msgid "Screens"
-msgstr "ეკრანები"
+msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:61
 #: app/views/administration.mediatype.edit.php:42
@@ -13600,11 +13600,11 @@ msgstr ""
 #: include/views/reports.toptriggers.php:116 popup.php:1063 tr_logform.php:371
 #: tr_status.php:279
 msgid "Severity"
-msgstr "სირთულე"
+msgstr ""
 
 #: include/views/monitoring.screen.constructor.edit.php:443
 msgid "Severity (descending)"
-msgstr "სირთულე (კლებადობით)"
+msgstr ""
 
 #: include/views/monitoring.screen.edit.php:208
 #: include/views/monitoring.slideconf.edit.php:256
@@ -14092,7 +14092,7 @@ msgstr ""
 
 #: include/forms.inc.php:593
 msgid "Subfilter"
-msgstr "ქვეფილტრი"
+msgstr ""
 
 #: include/views/administration.auditacts.list.php:77
 #: include/views/configuration.action.edit.php:692
@@ -14636,7 +14636,7 @@ msgstr ""
 #: include/views/configuration.triggers.expression.php:93 jsLoader.php:134
 #: popup_trexpr.php:33 popup_trexpr.php:130
 msgid "Time"
-msgstr "დრო"
+msgstr ""
 
 #: include/views/monitoring.screen.constructor.edit.php:460
 msgid "Time (ascending)"
@@ -14988,7 +14988,7 @@ msgstr ""
 
 #: include/actions.inc.php:41 include/views/administration.users.edit.php:361
 msgid "Trigger severity"
-msgstr "ტრიგერის სირთულე"
+msgstr ""
 
 #: include/views/common.filter.trigger.php:33
 msgid "Trigger status"
@@ -15046,7 +15046,7 @@ msgstr ""
 
 #: include/views/monitoring.dashconf.php:105
 msgid "Triggers with severity"
-msgstr "ტრიგერები სირთულით"
+msgstr ""
 
 #: queue.php:287
 msgid "Truncated"
@@ -15575,7 +15575,7 @@ msgstr ""
 #: include/classes/screens/CScreenTriggersOverview.php:82
 #, c-format
 msgid "Updated: %s"
-msgstr "განახლდა: %s"
+msgstr ""
 
 #: include/classes/api/managers/CApplicationManager.php:123
 #, c-format
@@ -15642,7 +15642,7 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:200 popup_media.php:136
 msgid "Use if severity"
-msgstr "გამოიყენე, თუ სირთულე"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:61
 msgid "Used in actions"
@@ -16109,7 +16109,7 @@ msgstr ""
 #: tr_testexpr.php:50
 #, c-format
 msgid "Value"
-msgstr "მნიშვნელობა"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:693
 #: include/classes/api/services/CMap.php:1120
@@ -16228,7 +16228,7 @@ msgstr ""
 
 #: include/views/monitoring.history.php:79
 msgid "Values"
-msgstr "მნიშვნელობები"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:107
 #: include/views/configuration.httpconf.popup.php:94
@@ -16285,12 +16285,12 @@ msgstr ""
 #: include/views/administration.general.triggerSeverity.edit.php:46
 #: include/views/general.warning.php:21
 msgid "Warning"
-msgstr "საყურადღებო"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:173
 msgctxt "setup"
 msgid "Warning"
-msgstr "გაფრთხილება"
+msgstr ""
 
 #: jsLoader.php:166
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -16315,7 +16315,7 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:22
 #: include/views/configuration.httpconf.list.php:42
 msgid "Web monitoring"
-msgstr "ვებ მონიტორინგი"
+msgstr ""
 
 #: httpconf.php:183 httpconf.php:331 httpconf.php:388 httpconf.php:439
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:414
@@ -16727,7 +16727,7 @@ msgstr ""
 
 #: include/users.inc.php:55
 msgid "Zabbix Admin"
-msgstr "Zabbix-ის ადმინისტრატორი"
+msgstr ""
 
 #: app/views/layout.htmlpage.menu.php:36
 msgid "Zabbix Share"
@@ -16878,11 +16878,11 @@ msgstr ""
 #: report2.php:236 report2.php:255 report2.php:288 report2.php:314
 #: report2.php:330 report4.php:89 report4.php:266
 msgid "all"
-msgstr "ყველა"
+msgstr ""
 
 #: include/actions.inc.php:563 include/actions.inc.php:722
 msgid "all media"
-msgstr "ყველა მატარებელი"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:431
 #: include/classes/api/services/CDRule.php:438
@@ -16921,7 +16921,7 @@ msgstr ""
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
 msgid "avg"
-msgstr "საშ"
+msgstr ""
 
 #: include/views/administration.general.trigger.options.edit.php:37
 #: include/views/administration.general.trigger.options.edit.php:45
@@ -17161,7 +17161,7 @@ msgstr ""
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
 msgid "max"
-msgstr "მაქს"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2004
 #: include/classes/graphdraw/CLineGraphDraw.php:2017
@@ -17169,17 +17169,17 @@ msgstr "მაქს"
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
 msgid "min"
-msgstr "მინ"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:375
 msgid "minimum 60 seconds"
-msgstr "მინიმუმ 60 წამი"
+msgstr ""
 
 #: include/html.inc.php:761 include/html.inc.php:784
 #: include/views/configuration.services.edit.php:273
 #: include/views/configuration.services.edit.php:281
 msgid "mm"
-msgstr "მინიმუმ 60 წამი"
+msgstr ""
 
 #: include/func.inc.php:567
 msgctxt "millisecond short"
@@ -17232,7 +17232,7 @@ msgstr ""
 #: include/classes/pagefilter/CPageFilter.php:787 include/forms.inc.php:1085
 #: include/views/monitoring.screen.php:60 slides.php:196
 msgid "not selected"
-msgstr "არაა არჩეული"
+msgstr ""
 
 #: jsLoader.php:96
 msgid "now"
@@ -17469,7 +17469,7 @@ msgstr ""
 #: include/views/js/configuration.triggers.edit.js.php:9
 #: include/views/js/hostmacros.js.php:11
 msgid "value"
-msgstr "მნიშვნელობა"
+msgstr ""
 
 #: include/actions.inc.php:582 include/actions.inc.php:600
 #: include/actions.inc.php:741 include/actions.inc.php:759
