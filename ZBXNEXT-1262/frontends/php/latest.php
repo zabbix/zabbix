@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/groups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -120,12 +121,7 @@ if ($filterSet) {
 	$groupids = $filter['groupids'];
 
 	if ($filter['subgroupids']) {
-		$groupids = array_merge(
-			$groupids,
-			array_keys(findParentAndChildsForUpdate(array_combine($filter['subgroupids'], $filter['subgroupids'])))
-		);
-
-		$groupids = array_unique($groupids);
+		$groupids = getMultiselectGroupIds($groupids , $filter['subgroupids']);
 	}
 
 	$hosts = API::Host()->get([

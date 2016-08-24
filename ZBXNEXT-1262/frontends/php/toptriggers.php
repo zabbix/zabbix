@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/groups.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('100 busiest triggers');
@@ -155,12 +156,7 @@ if ($hostids) {
 
 if ($groupids) {
 	if ($subgroupids) {
-		$groupids = array_merge(
-			$groupids,
-			array_keys(findParentAndChildsForUpdate(array_combine($groupids, $groupids)))
-		);
-
-		$groupids = array_unique($groupids);
+		$groupids = getMultiselectGroupIds($groupids , $subgroupids);
 	}
 
 	$inGroups = ' AND '.dbConditionInt('hgg.groupid', $groupids);

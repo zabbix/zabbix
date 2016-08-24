@@ -54,21 +54,11 @@ class CControllerWidgetWebView extends CController {
 				$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value');
 
 				if ($subgroupids) {
-					$filter['groupids'] = array_merge(
-						$subgroupids,
-						array_keys(findParentAndChildsForUpdate(array_combine($subgroupids, $subgroupids)))
-					);
-
-					$filter['groupids'] = array_unique($filter['groupids']);
+					$filter['groupids'] = getMultiselectGroupIds($filter['groupids'] , $subgroupids);
 				}
 
 				if ($hide_subgroupids) {
-					$hide_groupids = array_merge(
-						$hide_groupids,
-						array_keys(findParentAndChildsForUpdate(array_combine($hide_subgroupids, $hide_subgroupids)))
-					);
-
-					$hide_groupids = array_unique($hide_groupids);
+					$hide_groupids = getMultiselectGroupIds($hide_groupids , $hide_subgroupids);
 				}
 
 				if ($hide_groupids) {
