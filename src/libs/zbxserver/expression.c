@@ -3983,7 +3983,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 	DC_ITEM			*items = NULL;
 	char			value[MAX_BUFFER_LEN], *error = NULL;
 	int			i, k;
-	int			unknown_idx = 0;	/* index in vector of error messages 'unknown_msgs' */
 	zbx_ifunc_t		*ifunc;
 	zbx_func_t		*func;
 	zbx_uint64_t		*itemids = NULL;
@@ -4056,7 +4055,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 
 				zbx_free(func->error);
 				zbx_vector_ptr_append(unknown_msgs, unknown_msg);
-				unknown_idx++;
 				ret_unknown = 1;
 			}
 
@@ -4085,7 +4083,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 				}
 
 				zbx_vector_ptr_append(unknown_msgs, unknown_msg);
-				unknown_idx++;
 				ret_unknown = 1;
 			}
 
@@ -4097,7 +4094,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 			{
 				/* write a special token of unknown value with 'unknown' message number, like */
 				/* ZBX_UNKNOWN0, ZBX_UNKNOWN1 etc. not wrapped in () */
-				func->value = zbx_dsprintf(func->value, ZBX_UNKNOWN_STR "%d", unknown_idx - 1);
+				func->value = zbx_dsprintf(func->value, ZBX_UNKNOWN_STR "%d",
+						unknown_msgs->values_num - 1);
 			}
 		}
 	}
