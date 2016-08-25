@@ -850,7 +850,9 @@ class CHostGroup extends CApiService {
 		foreach (['/', '*'] as $char) {
 			switch ($char) {
 				case '/':
-					// Forward slash cannot be first character or last.
+					// Forward slash cannot be first character, last or repeat in the middle multiple times.
+					$pos = strpos($name, $char);
+
 					if (substr($name, 0, 1) === $char) {
 						$pos = 0;
 						$error = true;
@@ -858,6 +860,11 @@ class CHostGroup extends CApiService {
 					}
 					elseif (substr($name, -1, 1) === $char) {
 						$pos = $len - 1;
+						$error = true;
+						break 2;
+					}
+					elseif ($pos !== false && $name[$pos + 1] === $char) {
+						$pos++;
 						$error = true;
 						break 2;
 					}
