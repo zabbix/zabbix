@@ -4035,7 +4035,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 				continue;
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
+					FAIL == evaluatable_for_notsupported(func->function))
 			{
 				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
 						" item is not supported.",
@@ -4546,13 +4547,10 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
  *                                                                            *
  * Parameters: data      - [IN/OUT] the expression containing lld macro       *
  *             token     - [IN/OUT] the token with user macro location data   *
- *             flags     - [IN] the flags passed to                           *
- *                                  subtitute_discovery_macros() function     *
  *             jp_row    - [IN] discovery data                                *
  *                                                                            *
  ******************************************************************************/
-static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
-		struct zbx_json_parse *jp_row)
+static void	process_user_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
 {
 	int			force_quote;
 	size_t			context_r;
@@ -4678,7 +4676,7 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
-					process_user_macro_token(data, &token, flags, jp_row);
+					process_user_macro_token(data, &token, jp_row);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
@@ -4735,6 +4733,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
 	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
+
+	ZBX_UNUSED(num);
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
 		return ret;
