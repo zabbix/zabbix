@@ -231,7 +231,8 @@ switch ($data['method']) {
 							'output' => ['groupid', 'name'],
 							'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
 							'search' => ['name' => $name],
-							'searchWildcardsEnabled' => true,
+							'startSearch' => true,
+							'sortfield' => ['name'],
 							'limit' => 1
 						]);
 
