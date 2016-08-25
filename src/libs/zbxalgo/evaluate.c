@@ -730,8 +730,16 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		/* Map Unknown result to error. Callers currently do not operate with ZBX_UNKNOWN. */
 		if (NULL != unknown_msgs)
 		{
-			zbx_snprintf(error, max_error_len, "Cannot evaluate expression: \"%s\".",
-					unknown_msgs->values[unknown_idx]);
+			if (unknown_msgs->values_num > unknown_idx)
+			{
+				zbx_snprintf(error, max_error_len, "Cannot evaluate expression: \"%s\".",
+						unknown_msgs->values[unknown_idx]);
+			}
+			else
+			{
+				zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unsupported"
+						" ZBX_UNKNOWN%d value.", unknown_idx);
+			}
 		}
 		else
 		{
