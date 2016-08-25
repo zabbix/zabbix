@@ -82,14 +82,16 @@ class CEvent extends CApiService {
 		];
 
 		$defOptions = [
+			'eventids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'applicationids'			=> null,
 			'objectids'					=> null,
-			'eventids'					=> null,
+
 			'editable'					=> null,
 			'object'					=> EVENT_OBJECT_TRIGGER,
 			'source'					=> EVENT_SOURCE_TRIGGERS,
-			'acknowledged'				=> null,
+			'severities'				=> null,
 			'nopermissions'				=> null,
 			// filter
 			'value'						=> null,
@@ -97,6 +99,8 @@ class CEvent extends CApiService {
 			'time_till'					=> null,
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
+			'acknowledged'				=> null,
+			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -121,6 +125,10 @@ class CEvent extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
+
+		// source and object
+		$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['source']);
+		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['object']);
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -211,58 +219,92 @@ class CEvent extends CApiService {
 			}
 		}
 
+		$sub_sql_parts = [];
+
 		// groupids
-		if (!is_null($options['groupids'])) {
+		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
-				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sub_sql_parts['from']['f'] = 'functions f';
+				$sub_sql_parts['from']['i'] = 'items i';
+				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
-				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+				$sub_sql_parts['from']['i'] = 'items i';
+				$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sub_sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sub_sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sub_sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 		}
 
 		// hostids
-		if (!is_null($options['hostids'])) {
+		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
 
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-				$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sub_sql_parts['from']['f'] = 'functions f';
+				$sub_sql_parts['from']['i'] = 'items i';
+				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sub_sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+				$sub_sql_parts['from']['i'] = 'items i';
+				$sub_sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sub_sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 		}
 
-		// object
-		if (!is_null($options['object'])) {
-			$sqlParts['where']['o'] = 'e.object='.zbx_dbstr($options['object']);
+		// applicationids
+		if ($options['applicationids'] !== null) {
+			zbx_value2array($options['applicationids']);
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sub_sql_parts['from']['f'] = 'functions f';
+				$sub_sql_parts['from']['ia'] = 'items_applications ia';
+				$sub_sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sub_sql_parts['where']['f-ia'] = 'f.itemid=ia.itemid';
+				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+			}
+			// items
+			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
+				$sub_sql_parts['from']['ia'] = 'items_applications ia';
+				$sub_sql_parts['where']['e-ia'] = 'e.objectid=ia.itemid';
+				$sub_sql_parts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
+			}
+			// ignore this filter for lld rules
 		}
 
-		// source
-		if (!is_null($options['source'])) {
-			$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['source']);
+		// severities
+		if ($options['severities'] !== null) {
+			zbx_value2array($options['severities']);
+
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sub_sql_parts['from']['t'] = 'triggers t';
+				$sub_sql_parts['where']['e-t'] = 'e.objectid=t.triggerid';
+				$sub_sql_parts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+			}
+			// ignore this filter for items and lld rules
+		}
+
+		if ($sub_sql_parts) {
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM '.implode(',', $sub_sql_parts['from']).
+				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
+			')';
 		}
 
 		// acknowledged
@@ -270,23 +312,44 @@ class CEvent extends CApiService {
 			$sqlParts['where'][] = 'e.acknowledged='.($options['acknowledged'] ? 1 : 0);
 		}
 
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			foreach ($options['tags'] as $tag) {
+				if ($tag['value'] !== '') {
+					$tag['value'] = str_replace('!', '!!', $tag['value']);
+					$tag['value'] = str_replace('%', '!%', $tag['value']);
+					$tag['value'] = str_replace('_', '!_', $tag['value']);
+					$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
+					$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
+				}
+
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag et'.
+					' WHERE e.eventid=et.eventid'.
+						' AND et.tag='.zbx_dbstr($tag['tag']).
+						$tag['value'].
+				')';
+			}
+		}
+
 		// time_from
-		if (!is_null($options['time_from'])) {
+		if ($options['time_from'] !== null) {
 			$sqlParts['where'][] = 'e.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
-		if (!is_null($options['time_till'])) {
+		if ($options['time_till'] !== null) {
 			$sqlParts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// eventid_from
-		if (!is_null($options['eventid_from'])) {
+		if ($options['eventid_from'] !== null) {
 			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
 		}
 
 		// eventid_till
-		if (!is_null($options['eventid_till'])) {
+		if ($options['eventid_till'] !== null) {
 			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 

@@ -50,7 +50,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'zabbix.php',
 					'action' => 'problem.view',
 					'active_if' => ['problem.view'],
-					'label' => _('Problems')
+					'label' => _('Problems'),
+					'sub_pages' => ['tr_events.php']
 				],
 				[
 					'url' => 'overview.php',
@@ -73,11 +74,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'active_if' => ['acknowledge.edit'],
 					'label' => _('Triggers'),
 					'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
-				],
-				[
-					'url' => 'events.php',
-					'label' => _('Events'),
-					'sub_pages' => ['tr_events.php']
 				],
 				[
 					'url' => 'charts.php',
@@ -181,9 +177,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'popup.php'
-				],
-				[
-					'url' => 'popup_right.php'
 				]
 			]
 		],

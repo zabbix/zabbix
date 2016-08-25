@@ -60,8 +60,9 @@ class testZBX6648 extends CWebTest {
 	 * @dataProvider zbx_data
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
-		$this->zbxTestLogin('events.php');
-		$this->zbxTestDropdownSelectWait('source', 'Trigger');
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestClickXpathWait("//div[@id='filter_triggerids_']/..//button");
+		$this->zbxTestSwitchToNewWindow();
 
 		switch ($zbx_data['triggers']) {
 			case 'both' :

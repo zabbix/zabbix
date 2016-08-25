@@ -181,46 +181,6 @@ function trigger_value2str($value = null) {
 	}
 }
 
-function discovery_value($val = null) {
-	$array = [
-		DOBJECT_STATUS_UP => _('UP'),
-		DOBJECT_STATUS_DOWN => _('DOWN'),
-		DOBJECT_STATUS_DISCOVER => _('DISCOVERED'),
-		DOBJECT_STATUS_LOST => _('LOST')
-	];
-
-	if (is_null($val)) {
-		return $array;
-	}
-	elseif (isset($array[$val])) {
-		return $array[$val];
-	}
-	else {
-		return _('Unknown');
-	}
-}
-
-function discovery_value_style($val) {
-	switch ($val) {
-		case DOBJECT_STATUS_UP:
-			$style = ZBX_STYLE_GREEN;
-			break;
-		case DOBJECT_STATUS_DOWN:
-			$style = ZBX_STYLE_RED;
-			break;
-		case DOBJECT_STATUS_DISCOVER:
-			$style = ZBX_STYLE_GREEN;
-			break;
-		case DOBJECT_STATUS_LOST:
-			$style = ZBX_STYLE_GREY;
-			break;
-		default:
-			$style = '';
-	}
-
-	return $style;
-}
-
 function getParentHostsByTriggers($triggers) {
 	$hosts = [];
 	$triggerParent = [];

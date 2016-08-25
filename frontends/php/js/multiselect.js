@@ -156,10 +156,14 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
+	 * @param bool   options['nested']				allow to select subgroups
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
+	 * @param string options['styles']				additional style for .multiselect-wrapper (optional)
+	 * @param string options['styles']['property']
+	 * @param string options['styles']['value']
 	 *
 	 * @return object
 	 */
@@ -186,7 +190,9 @@ jQuery(function($) {
 			disabled: false,
 			selectedLimit: 0,
 			limit: 20,
-			popup: []
+			nested: false,
+			popup: [],
+			styles: []
 		};
 		options = $.extend({}, defaults, options);
 
@@ -227,7 +233,8 @@ jQuery(function($) {
 
 			// add wrap
 			obj.wrap(jQuery('<div>', {
-				'class': 'multiselect-wrapper'
+				'class': 'multiselect-wrapper',
+				css: options.styles
 			}));
 
 			// selected
@@ -250,9 +257,19 @@ jQuery(function($) {
 				})
 				.attr('placeholder', options.labels['type here to search'])
 				.on('keyup change', function(e) {
-					if (e.which == KEY.ESCAPE) {
-						cleanSearchInput(obj);
+					if (typeof(e.which) === 'undefined') {
 						return false;
+					}
+
+					switch (e.which) {
+						case KEY.ARROW_DOWN:
+						case KEY.ARROW_LEFT:
+						case KEY.ARROW_RIGHT:
+						case KEY.ARROW_UP:
+							return false;
+						case KEY.ESCAPE:
+							cleanSearchInput(obj);
+							return false;
 					}
 
 					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
@@ -261,6 +278,8 @@ jQuery(function($) {
 					}
 
 					var search = input.val();
+
+					// Replace trailing slashes to check if search term contains anything else.
 					if (!empty(search)) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
@@ -284,15 +303,21 @@ jQuery(function($) {
 
 										values.isAjaxLoaded = false;
 
+										var request_data = {
+											search: values.search,
+											limit: getLimit(values, options)
+										}
+
+										if (options.nested) {
+											request_data.nested = options.nested;
+										}
+
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: {
-												search: values.search,
-												limit: getLimit(values, options)
-											},
+											data: request_data,
 											success: function(data) {
 												values.isAjaxLoaded = true;
 
@@ -319,9 +344,7 @@ jQuery(function($) {
 							if (!empty(input.val())) {
 								var selected = $('.available li.suggest-hover', obj);
 
-								if (selected.length > 0) {
-									select(selected.data('id'), obj, values, options);
-								}
+								select(selected.data('id'), obj, values, options);
 
 								// stop form submit
 								cancelEvent(e);
@@ -406,29 +429,61 @@ jQuery(function($) {
 
 						case KEY.ARROW_UP:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									prev = selected.prev();
+								var selected = $('.available li.suggest-hover', obj);
 
-								if (prev.length > 0) {
-									selected.removeClass('suggest-hover');
+								if (selected.length === 0) {
+									// Select last element.
+									var prev = $('ul.multiselect-suggest li:last-child', obj);
+
 									prev.addClass('suggest-hover');
+									$('input[type="text"]', obj).val(prev.attr('data-name'));
+								}
+								else {
+									selected.removeClass('suggest-hover');
+
+									var prev = selected.prev();
+
+									if (prev.length > 0) {
+										prev.addClass('suggest-hover');
+										$('input[type="text"]', obj).val(prev.attr('data-name'));
+									}
+									else {
+										// Select search input.
+										$('input[type="text"]', obj).val(values.search);
+									}
 								}
 
-								scrollAvailable(obj);
+								// Position cursor at the end of search input.
+								cancelEvent(e);
+								$('input[type="text"]', obj).focus();
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									next = selected.next();
+								var selected = $('.available li.suggest-hover', obj);
 
-								if (next.length > 0) {
-									selected.removeClass('suggest-hover');
+								if (selected.length === 0) {
+									// Select first element.
+									var next = $('ul.multiselect-suggest li:first-child', obj);
+
+									$('input[type="text"]', obj).val(next.attr('data-name'));
 									next.addClass('suggest-hover');
 								}
+								else {
+									selected.removeClass('suggest-hover');
 
-								scrollAvailable(obj);
+									var next = selected.next();
+
+									if (next.length > 0) {
+										next.addClass('suggest-hover');
+										$('input[type="text"]', obj).val(next.attr('data-name'));
+									}
+									else {
+										// Select search input.
+										$('input[type="text"]', obj).val(values.search);
+									}
+								}
 							}
 							break;
 
@@ -635,7 +690,6 @@ jQuery(function($) {
 			});
 		}
 
-
 		// write more matches found label
 		if (values.isMoreMatchesFound) {
 			var div = $('<div>', {
@@ -668,6 +722,15 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
+			if (hasSubGroupPostfix(item.name) && options.nested) {
+				// Add hidden input.
+				obj.append($('<input>', {
+					type: 'hidden',
+					name: options.name.slice(0, -2) + '_subgroupids[]',
+					value: item.id
+				}));
+			}
+
 			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
 			});
@@ -678,6 +741,8 @@ jQuery(function($) {
 				});
 			}
 
+			var postfix = '';
+
 			var li = $('<li>', {
 				'data-id': item.id
 			}).append(
@@ -685,7 +750,7 @@ jQuery(function($) {
 					'class': 'subfilter-enabled'
 				})
 					.append($('<span>', {
-						text: prefix + item.name
+						text: prefix + item.name + postfix
 					}))
 					.append(close_btn)
 			);
@@ -724,7 +789,8 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
-			'data-id': item.id
+			'data-id': item.id,
+			'data-name': item.name
 		})
 		.click(function() {
 			select(item.id, obj, values, options);
@@ -778,6 +844,7 @@ jQuery(function($) {
 	function select(id, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
 			addSelected(values.available[id], obj, values, options);
+
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
@@ -941,5 +1008,13 @@ jQuery(function($) {
 		}
 
 		return length;
+	}
+
+	function hasSubGroupPostfix(str) {
+		if ('/*' === str.slice(-2)) {
+			return true;
+		}
+
+		return false;
 	}
 });

@@ -217,9 +217,9 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 				"h.maintenance_type,h.maintenance_from"
 			" from maintenances_hosts mh,hosts h"
 			" where mh.hostid=h.hostid"
-				" and h.status=%d"
+				" and h.status in (%d,%d)"
 				" and mh.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			maintenanceid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -242,9 +242,9 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 			" from maintenances_groups mg,hosts_groups hg,hosts h"
 			" where mg.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
-				" and h.status=%d"
+				" and h.status in (%d,%d)"
 				" and mg.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			maintenanceid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -264,7 +264,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
+static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 {
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -549,7 +549,7 @@ static int	process_maintenance(void)
 	}
 	DBfree_result(result);
 
-	ret = update_maintenance_hosts(hm, hm_count, (int)now);
+	ret = update_maintenance_hosts(hm, hm_count);
 
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);

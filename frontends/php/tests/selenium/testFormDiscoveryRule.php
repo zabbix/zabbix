@@ -645,7 +645,10 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestAssertVisibleId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestTabSwitch('Filters');
+		$this->zbxTestClickWait('tab_macroTab');
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != 'Filters') {
+			$this->zbxTestTabSwitch('Filters');
+		}
 
 		$this->zbxTestTextPresent('Filters');
 		$this->zbxTestTextPresent('Type of calculation');

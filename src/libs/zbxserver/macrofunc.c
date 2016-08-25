@@ -54,7 +54,7 @@ static int	macrofunc_regsub(zbx_function_t *func, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Function: macrofunc_regsub                                                 *
+ * Function: macrofunc_iregsub                                                *
  *                                                                            *
  * Purpose: calculates case insensitive regular expression substitution       *
  *                                                                            *

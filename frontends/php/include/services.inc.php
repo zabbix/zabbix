@@ -215,7 +215,10 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				$caption,
 				' - ',
 				new CLink($trigger['description'],
-					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_triggerids[]', $trigger['triggerid'])
+						->setArgument('filter_set', '1')
 				)
 			];
 		}
@@ -227,7 +230,10 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				$reason[] = ', ';
 			}
 			$reason[] = new CLink($problemTrigger['description'],
-				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_triggerids[]', $problemTrigger['triggerid'])
+					->setArgument('filter_set', '1')
 			);
 		}
 

@@ -513,6 +513,9 @@ class testFormWeb extends CWebTest {
 		}
 
 		$this->zbxTestClickWait('tab_authenticationTab');
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != 'Authentication' ) {
+			$this->zbxTestTabSwitch('Authentication');
+		}
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
