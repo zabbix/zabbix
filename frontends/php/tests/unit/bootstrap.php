@@ -45,6 +45,7 @@ $autoloader = new CAutoloader([
 	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../include/classes/validators',
 	__DIR__.'/../../include/classes/validators/action',
+	__DIR__.'/../../include/classes/validators/hostgroup',
 	__DIR__.'/../../include/classes/validators/object',
 	__DIR__.'/../../include/classes/triggers',
 	__DIR__.'/../../include/classes/import',

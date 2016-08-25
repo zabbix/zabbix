@@ -1,6 +1,7 @@
 Changes for 3.2.0alpha3
 
 New features:
+A.F.I...S. [ZBXNEXT-1262] added support of nested host groups (Gunars, Ivo, Oleg, Sasha, wiper)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 ........S. [ZBXNEXT-1791] enabled evaluation of nodata() and time-based functions for not supported items in trigger expressions and calculated items (Andris, wiper)
 
