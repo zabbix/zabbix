@@ -181,9 +181,8 @@ static void	lld_group_free(zbx_lld_group_t *group)
 typedef struct
 {
 	char				*name;
-	/* permission pair (usergroupid, permission) */
+	/* permission pair (usrgrpid, permission) */
 	zbx_vector_uint64_pair_t	rights;
-
 	/* reference to the inherited rights */
 	zbx_vector_uint64_pair_t	*prights;
 }
@@ -1342,7 +1341,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 		if (FAIL == (i = zbx_vector_ptr_search(&group_rights, &rights_local, lld_group_rights_compare)))
 			i = lld_group_rights_append(&group_rights, row[0]);
 
-		rights = group_rights.values[i];
+		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
 		rights->prights = &rights->rights;
 
 		ZBX_STR2UINT64(pair.first, row[2]);
@@ -1391,7 +1390,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 		if (FAIL == (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
 			continue;
 
-		rights = group_rights.values[j];
+		rights = (zbx_lld_group_rights_t *)group_rights.values[j];
 
 		if (NULL == rights->prights)
 			continue;
