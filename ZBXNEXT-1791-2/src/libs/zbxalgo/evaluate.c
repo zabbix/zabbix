@@ -111,7 +111,6 @@ static double	evaluate_number(int *unknown_idx)
 
 		ptr = p0;
 
-		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_INFINITY;
 	}
 
