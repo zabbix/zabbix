@@ -897,7 +897,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+#endif
+#ifndef _WINDOWS
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);
@@ -1060,8 +1062,9 @@ void	zbx_free_service_resources(void)
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
-#else
-	unload_modules();
+#endif
+#ifndef _WINDOWS
+	zbx_unload_modules();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
@@ -1156,7 +1159,7 @@ int	main(int argc, char **argv)
 			zbx_set_common_signal_handlers();
 #endif
 #ifndef _WINDOWS
-			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
+			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
@@ -1173,7 +1176,7 @@ int	main(int argc, char **argv)
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif
 #ifndef _WINDOWS
-			unload_modules();
+			zbx_unload_modules();
 #endif
 			free_metrics();
 			alias_list_free();

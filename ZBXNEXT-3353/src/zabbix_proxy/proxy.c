@@ -891,7 +891,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	get_history_field = zbx_get_history_field;
 	get_history_type = zbx_get_history_type;
 
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);
@@ -1093,7 +1093,7 @@ void	zbx_on_exit(void)
 
 	free_selfmon_collector();
 
-	unload_modules();
+	zbx_unload_modules();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

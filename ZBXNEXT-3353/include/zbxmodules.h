@@ -22,8 +22,8 @@
 
 #include	"dbcache.h"
 
-int	load_modules(const char *path, char **file_names, int timeout, int verbose);
-void	unload_modules();
+int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose);
+void	zbx_unload_modules();
 
 void	zbx_sync_history_with_modules(zbx_dc_history_t history, int history_num);
 
