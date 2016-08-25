@@ -1587,6 +1587,20 @@ static int	DBpatch_3010076(void)
 	return FAIL;
 }
 
+static int	DBpatch_3010077(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("groups", &field);
+}
+
+static int	DBpatch_3010078(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_prototype", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1668,5 +1682,7 @@ DBPATCH_ADD(3010073, 0, 1)
 DBPATCH_ADD(3010074, 0, 1)
 DBPATCH_ADD(3010075, 0, 1)
 DBPATCH_ADD(3010076, 0, 0)
+DBPATCH_ADD(3010077, 0, 1)
+DBPATCH_ADD(3010078, 0, 1)
 
 DBPATCH_END()
