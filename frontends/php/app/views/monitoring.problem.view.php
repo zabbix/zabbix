@@ -81,7 +81,6 @@ if ($data['action'] == 'problem.view') {
 				->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
 				->addValue(_('History'), TRIGGERS_OPTION_ALL)
 				->setModern(true)
-				->setFocused(true)
 		)
 		->addRow(_('Host groups'),
 			(new CMultiSelect([
