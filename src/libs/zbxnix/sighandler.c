@@ -45,7 +45,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			sig, get_signal_name(sig),
 			SIG_CHECKED_FIELD(siginfo, si_code),
 			SIG_CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
-	print_fatal_info(sig, siginfo, context);
+	print_fatal_info(context);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();

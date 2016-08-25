@@ -202,7 +202,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function, const char *parameters,
+static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameters,
 		time_t now, char **error)
 {
 	const char		*__function_name = "evaluate_LOGEVENTID";
@@ -276,7 +276,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char		*__function_name = "evaluate_LOGSOURCE";
 
@@ -323,14 +323,12 @@ out:
  * Purpose: evaluate function 'logseverity' for the item                      *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - ignored                                            *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function, const char *parameters,
-		time_t now)
+static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, time_t now)
 {
 	const char		*__function_name = "evaluate_LOGSEVERITY";
 
@@ -490,7 +488,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, time_t now,
 		char **error)
 {
 	const char			*__function_name = "evaluate_COUNT";
@@ -771,7 +769,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_SUM";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -850,7 +848,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AVG(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_AVG";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -932,7 +930,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LAST";
 	int				arg1, flag, ret = FAIL;
@@ -997,7 +995,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_MIN";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -1084,7 +1082,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MAX(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_MAX";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -1187,7 +1185,7 @@ static int	__history_record_uint64_compare(const zbx_history_record_t *d1, const
  *               FAIL    - failed to evaluate function                        *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function, const char *parameters,
+static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameters,
 		time_t now, char **error)
 {
 	const char			*__function_name = "evaluate_PERCENTILE";
@@ -1282,7 +1280,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_DELTA";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -1381,7 +1379,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, const char *parameters, char **error)
+static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, char **error)
 {
 	const char			*__function_name = "evaluate_NODATA";
 	int				arg1, flag, now, ret = FAIL;
@@ -1455,7 +1453,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, time_t now)
 {
 	const char			*__function_name = "evaluate_ABSCHANGE";
 	int				ret = FAIL;
@@ -1529,7 +1527,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_CHANGE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_CHANGE(char *value, DC_ITEM *item, time_t now)
 {
 	const char			*__function_name = "evaluate_CHANGE";
 	int				ret = FAIL;
@@ -1600,7 +1598,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_DIFF(char *value, DC_ITEM *item, time_t now)
 {
 	const char			*__function_name = "evaluate_DIFF";
 	int				ret = FAIL;
@@ -1819,7 +1817,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_STRLEN";
 	int		ret = FAIL;
@@ -1830,7 +1828,7 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *function, con
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto clean;
 
-	if (SUCCEED == evaluate_LAST(value, item, "last", parameters, now))
+	if (SUCCEED == evaluate_LAST(value, item, parameters, now))
 	{
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
 		ret = SUCCEED;
@@ -1854,7 +1852,7 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char		*__function_name = "evaluate_FUZZYTIME";
 
@@ -1928,7 +1926,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_BAND(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_BAND(char *value, DC_ITEM *item, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_BAND";
 	char		*last_parameters = NULL;
@@ -1953,7 +1951,7 @@ static int	evaluate_BAND(char *value, DC_ITEM *item, const char *function, const
 	last_parameters = zbx_strdup(NULL, parameters);
 	remove_param(last_parameters, 2);
 
-	if (SUCCEED == evaluate_LAST(value, item, "last", last_parameters, now))
+	if (SUCCEED == evaluate_LAST(value, item, last_parameters, now))
 	{
 		ZBX_STR2UINT64(last_uint64, value);
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
@@ -1980,7 +1978,7 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters, time_t now,
 		char **error)
 {
 	const char			*__function_name = "evaluate_FORECAST";
@@ -2115,7 +2113,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters, time_t now,
 		char **error)
 {
 	const char			*__function_name = "evaluate_TIMELEFT";
@@ -2258,43 +2256,43 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 
 	if (0 == strcmp(function, "last"))
 	{
-		ret = evaluate_LAST(value, item, function, parameter, now);
+		ret = evaluate_LAST(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "prev"))
 	{
-		ret = evaluate_LAST(value, item, "last", "#2", now);
+		ret = evaluate_LAST(value, item, "#2", now);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
-		ret = evaluate_MIN(value, item, function, parameter, now);
+		ret = evaluate_MIN(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "max"))
 	{
-		ret = evaluate_MAX(value, item, function, parameter, now);
+		ret = evaluate_MAX(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "avg"))
 	{
-		ret = evaluate_AVG(value, item, function, parameter, now);
+		ret = evaluate_AVG(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "sum"))
 	{
-		ret = evaluate_SUM(value, item, function, parameter, now);
+		ret = evaluate_SUM(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "percentile"))
 	{
-		ret = evaluate_PERCENTILE(value, item, function, parameter, now, error);
+		ret = evaluate_PERCENTILE(value, item, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "count"))
 	{
-		ret = evaluate_COUNT(value, item, function, parameter, now, error);
+		ret = evaluate_COUNT(value, item, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "delta"))
 	{
-		ret = evaluate_DELTA(value, item, function, parameter, now);
+		ret = evaluate_DELTA(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, error);
+		ret = evaluate_NODATA(value, item, parameter, error);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
@@ -2322,15 +2320,15 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "abschange"))
 	{
-		ret = evaluate_ABSCHANGE(value, item, function, parameter, now);
+		ret = evaluate_ABSCHANGE(value, item, now);
 	}
 	else if (0 == strcmp(function, "change"))
 	{
-		ret = evaluate_CHANGE(value, item, function, parameter, now);
+		ret = evaluate_CHANGE(value, item, now);
 	}
 	else if (0 == strcmp(function, "diff"))
 	{
-		ret = evaluate_DIFF(value, item, function, parameter, now);
+		ret = evaluate_DIFF(value, item, now);
 	}
 	else if (0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
 	{
@@ -2338,7 +2336,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "strlen"))
 	{
-		ret = evaluate_STRLEN(value, item, function, parameter, now);
+		ret = evaluate_STRLEN(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "now"))
 	{
@@ -2347,31 +2345,31 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "fuzzytime"))
 	{
-		ret = evaluate_FUZZYTIME(value, item, function, parameter, now);
+		ret = evaluate_FUZZYTIME(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "logeventid"))
 	{
-		ret = evaluate_LOGEVENTID(value, item, function, parameter, now, error);
+		ret = evaluate_LOGEVENTID(value, item, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "logseverity"))
 	{
-		ret = evaluate_LOGSEVERITY(value, item, function, parameter, now);
+		ret = evaluate_LOGSEVERITY(value, item, now);
 	}
 	else if (0 == strcmp(function, "logsource"))
 	{
-		ret = evaluate_LOGSOURCE(value, item, function, parameter, now);
+		ret = evaluate_LOGSOURCE(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "band"))
 	{
-		ret = evaluate_BAND(value, item, function, parameter, now);
+		ret = evaluate_BAND(value, item, parameter, now);
 	}
 	else if (0 == strcmp(function, "forecast"))
 	{
-		ret = evaluate_FORECAST(value, item, function, parameter, now, error);
+		ret = evaluate_FORECAST(value, item, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "timeleft"))
 	{
-		ret = evaluate_TIMELEFT(value, item, function, parameter, now, error);
+		ret = evaluate_TIMELEFT(value, item, parameter, now, error);
 	}
 	else
 	{
