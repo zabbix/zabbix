@@ -159,7 +159,7 @@ function insert_show_color_picker_javascript() {
 		$table[] = (new CDiv($row))->addClass(ZBX_STYLE_COLOR_PICKER);
 	}
 
-	$cancel = (new CSpan())
+	$cancel = (new CSimpleButton())
 		->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
 		->onClick('javascript: hide_color_picker();');
 

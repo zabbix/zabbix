@@ -251,15 +251,15 @@ $triggerForm = (new CForm('get', 'zabbix.php'))
 $switcherName = 'trigger_switchers';
 
 if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
-	$showHideAllDiv = (new CColHeader(
-		(new CDiv())
+	$showHideAllButton = (new CColHeader(
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->setId($switcherName)
 			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 else {
-	$showHideAllDiv = null;
+	$showHideAllButton = null;
 }
 
 if ($config['event_ack_enable']) {
@@ -274,7 +274,7 @@ else {
 
 $triggerTable = (new CTableInfo())
 	->setHeader([
-		$showHideAllDiv,
+		$showHideAllButton,
 		$headerCheckBox,
 		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 		_('Status'),
@@ -622,15 +622,15 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
-		$openOrCloseDiv = $trigger['events']
-			? (new CDiv())
+		$openOrCloseButton = $trigger['events']
+			? (new CSimpleButton())
 				->addClass(ZBX_STYLE_TREEVIEW)
 				->setAttribute('data-switcherid', $trigger['triggerid'])
 				->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
 			: '';
 	}
 	else {
-		$openOrCloseDiv = null;
+		$openOrCloseButton = null;
 	}
 
 	// comments
@@ -644,7 +644,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	$triggerTable->addRow([
-		$openOrCloseDiv,
+		$openOrCloseButton,
 		$ack_checkbox,
 		getSeverityCell($trigger['priority'], $config, null, !$trigger['value']),
 		$statusSpan,
@@ -652,8 +652,10 @@ foreach ($triggers as $trigger) {
 		($trigger['lastchange'] == 0)
 			? _('Never')
 			: new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
-				'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
-					'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_triggerids[]', $trigger['triggerid'])
+					->setArgument('filter_set', '1')
 			),
 		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,

@@ -193,6 +193,10 @@ static int	tm_process_tasks()
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				ret = tm_try_task_close_problem(taskid);
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				ret = FAIL;
+				break;
 		}
 
 		if (FAIL != ret)
@@ -221,8 +225,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	sec1 = zbx_time();
 	sec2 = sec1;
 
-	if (0 == (sleeptime = ZBX_TASKMANAGER_TIMEOUT - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT))
-		sleeptime = ZBX_TASKMANAGER_TIMEOUT;
+	sleeptime = ZBX_TASKMANAGER_TIMEOUT - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 

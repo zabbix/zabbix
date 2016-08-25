@@ -1570,6 +1570,37 @@ static int	DBpatch_3010075(void)
 	return DBadd_field("problem", &field);
 }
 
+static int	DBpatch_3010076(void)
+{
+	const char	*sql = "delete from profiles where idx in ("
+			"'web.events.discovery.period',"
+			"'web.events.filter.state',"
+			"'web.events.filter.triggerid',"
+			"'web.events.source',"
+			"'web.events.timelinefixed',"
+			"'web.events.trigger.period'"
+		")";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3010077(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("groups", &field);
+}
+
+static int	DBpatch_3010078(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_prototype", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1650,5 +1681,8 @@ DBPATCH_ADD(3010072, 0, 1)
 DBPATCH_ADD(3010073, 0, 1)
 DBPATCH_ADD(3010074, 0, 1)
 DBPATCH_ADD(3010075, 0, 1)
+DBPATCH_ADD(3010076, 0, 0)
+DBPATCH_ADD(3010077, 0, 1)
+DBPATCH_ADD(3010078, 0, 1)
 
 DBPATCH_END()

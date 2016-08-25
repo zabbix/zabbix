@@ -277,6 +277,12 @@ class CScreenBuilder {
 				return new CScreenHttpTest($options);
 
 			case SCREEN_RESOURCE_PROBLEM:
+				if (array_key_exists('period', $options)) {
+					$options['data']['filter']['period'] = $options['period'];
+				}
+				if (array_key_exists('stime', $options)) {
+					$options['data']['filter']['stime'] = $options['stime'];
+				}
 				return new CScreenProblem($options);
 
 			default:
@@ -568,7 +574,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 					if (!$emptyScreenRow) {
-						$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
+						$link->addConfirmation(_('This screen row is not empty. Delete it?'));
 					}
 				}
 
@@ -614,7 +620,7 @@ class CScreenBuilder {
 						->addSID();
 
 					if (array_key_exists($i, $emptyScreenColumns)) {
-						$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
+						$link->addConfirmation(_('This screen column is not empty. Delete it?'));
 					}
 				}
 

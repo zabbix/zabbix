@@ -23,6 +23,7 @@ class CControllerResponseData extends CControllerResponse {
 
 	private $data;
 	private $title = null;
+	private $file_name = null;
 
 	public function __construct($data) {
 		$this->data = $data;
@@ -38,5 +39,13 @@ class CControllerResponseData extends CControllerResponse {
 
 	public function getTitle() {
 		return $this->title;
+	}
+
+	public function setFileName($file_name) {
+		$this->file_name = $file_name;
+	}
+
+	public function getFileName() {
+		return $this->file_name;
 	}
 }

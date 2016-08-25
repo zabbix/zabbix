@@ -2953,15 +2953,13 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
  *                                                                            *
  * Parameters: item_prototypes    - [IN] the item prototypes                  *
  *             items              - [IN] the items                            *
- *             applications       - [IN] the applications                     *
  *             applications_index - [IN] the application index by             *
  *                                       prototype id and lld row             *
  *             items_applications - [IN/OUT] the item-application links       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *items,
-		const zbx_vector_ptr_t *applications, zbx_hashset_t *applications_index,
-		zbx_hashset_t *items_applications)
+		zbx_hashset_t *applications_index, zbx_hashset_t *items_applications)
 {
 	const char			*__function_name = "lld_items_applications_make";
 	int				i, j, index;
@@ -3179,7 +3177,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 	lld_items_validate(hostid, &items, error);
 
 	lld_items_applications_get(lld_ruleid, &items_applications);
-	lld_items_applications_make(&item_prototypes, &items, &applications, &applications_index, &items_applications);
+	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);
 
 	DBbegin();
 

@@ -128,16 +128,17 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('multiplier');
 		$this->zbxTestInputTypeOverwrite('delay', '33');
 		$this->zbxTestInputTypeOverwrite('formula', 3);
-		$this->zbxTestInputType('history', '54');
-		$this->zbxTestInputType('trends', '55');
+		$this->zbxTestInputTypeOverwrite('history', '54');
+		$this->zbxTestInputTypeOverwrite('trends', '55');
 		$this->zbxTestInputType('description', 'description');
-		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
 
 		switch ($result) {
 			case TEST_GOOD:
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add item']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
@@ -498,6 +499,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph');
 		$this->zbxTestInputTypeOverwrite('width', '950');
 		$this->zbxTestInputTypeOverwrite('height', '250');
+		if ($this->zbxTestGetValue("//input[@id='height']") != '250') {
+				$this->zbxTestInputTypeOverwrite('height', '250');
+		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);

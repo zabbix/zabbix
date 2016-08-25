@@ -389,6 +389,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3001, dbname);
 	}
 #elif defined(HAVE_MYSQL)
+	ZBX_UNUSED(dbschema);
+
 	if (NULL == (conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
@@ -424,6 +426,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
+	ZBX_UNUSED(dbschema);
+
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
 	if (NULL == getenv("NLS_LANG"))
 		putenv("NLS_LANG=.UTF8");
@@ -575,6 +579,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 out:
 #elif defined(HAVE_SQLITE3)
+	ZBX_UNUSED(dbschema);
+
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
@@ -662,6 +668,9 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 	}
 	else
 		zbx_create_sqlite3_mutex();
+#else	/* not HAVE_SQLITE3 */
+	ZBX_UNUSED(dbname);
+	ZBX_UNUSED(db_schema);
 #endif	/* HAVE_SQLITE3 */
 }
 
@@ -2164,12 +2173,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; '\0' != *s;)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */

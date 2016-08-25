@@ -1820,7 +1820,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		if (isset($data['name'])){
-			$this->zbxTestInputType('name', $data['name']);
+			$this->zbxTestInputTypeWait('name', $data['name']);
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
@@ -1837,7 +1837,7 @@ class testFormAction extends CWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-						$this->zbxTestInputType('new_condition_value', $condition['value']);
+						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
 						$this->zbxTestClickWait('add_condition');
 						switch($condition['type']){
 							case 'Application':
@@ -1886,11 +1886,11 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTabSwitch('Operations');
 
 			if (isset($data['def_shortdata'])){
-				$this->zbxTestInputType('def_shortdata', $data['def_shortdata']);
+				$this->zbxTestInputTypeWait('def_shortdata', $data['def_shortdata']);
 			}
 
 			if (isset($data['def_longdata'])){
-				$this->zbxTestInputType('def_longdata', $data['def_longdata']);
+				$this->zbxTestInputTypeWait('def_longdata', $data['def_longdata']);
 			}
 
 			foreach ($data['operations'] as $operation) {
@@ -1929,6 +1929,7 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
+			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
 			$this->zbxTestClickWait('search');
 		}
 
@@ -1938,6 +1939,7 @@ class testFormAction extends CWebTest {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestCheckHeader('Actions');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
 				$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');

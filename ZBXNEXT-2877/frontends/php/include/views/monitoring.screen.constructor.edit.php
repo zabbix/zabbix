@@ -742,14 +742,12 @@ if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourc
 	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
-// append tabs to form
-$screenTab = new CTabView();
-$screenTab->setAttribute('style', 'text-align: left;');
-$screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList);
+// append list to form
+$form->addItem($screenFormList);
 
 // append buttons to form
 if (isset($_REQUEST['screenitemid'])) {
-	$screenTab->setFooter(makeFormFooter(
+	$form->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CButtonDelete(null, url_params(['form', 'screenid', 'templateid', 'screenitemid'])),
@@ -758,12 +756,10 @@ if (isset($_REQUEST['screenitemid'])) {
 	));
 }
 else {
-	$screenTab->setFooter(makeFormFooter(
+	$form->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_params(['screenid', 'templateid']))]
 	));
 }
-
-$form->addItem($screenTab);
 
 return $form;

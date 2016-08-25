@@ -845,7 +845,8 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
-			$this->zbxTestInputType('name', $data['name']);
+			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
 
@@ -859,6 +860,7 @@ class testFormGraph extends CWebTest {
 				$this->zbxTestLaunchPopup('add_item');
 				$link = $item['itemName'];
 
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -928,6 +930,7 @@ class testFormGraph extends CWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
 
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -944,6 +947,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestClickWait('yaxis_max');
 			$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup_item');
 
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -953,13 +957,14 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestWaitWindowClose();
 			$ymax_name = $data['ymax_name'];
 			$ymax_nameValue = $this->zbxTestGetValue("//input[@id='ymax_name']");
-			$this->assertEquals($ymax_nameValue, $this->host.": $ymax_name");
+			$this->assertEquals($this->host.": $ymax_name", $ymax_nameValue);
 		}
 
 		$this->zbxTestClickWait('add');
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add graph']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');

@@ -745,8 +745,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 		// clock
 		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
-			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&period='.ZBX_PERIOD_DEFAULT.
-				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange'])
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_triggerids[]', $trigger['triggerid'])
+				->setArgument('filter_set', '1')
 		);
 
 		// actions

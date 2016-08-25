@@ -82,7 +82,7 @@ struct	_DC_TRIGGER;
 #define TAG_NAME_LEN			255
 #define TAG_VALUE_LEN			255
 
-#define GROUP_NAME_LEN			64
+#define GROUP_NAME_LEN			255
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)

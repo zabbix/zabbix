@@ -371,13 +371,11 @@ if (isset($userMediaFormList)) {
 	$userTab->addTab('mediaTab', _('Media'), $userMediaFormList);
 }
 
-if (!$this->data['is_profile']) {
-	/*
-	 * Permissions tab
-	 */
+// Permissions tab.
+if (!$data['is_profile']) {
 	$permissionsFormList = new CFormList('permissionsFormList');
 
-	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();', [
+	$userTypeComboBox = new CComboBox('user_type', $data['user_type'], 'submit();', [
 		USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
 		USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
 		USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
@@ -386,17 +384,40 @@ if (!$this->data['is_profile']) {
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), [$userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))]);
-		$userForm->addVar('user_type', $this->data['user_type']);
+		$userForm->addVar('user_type', $data['user_type']);
 	}
 	else {
 		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
 	}
 
-	$permissionsFormList = getPermissionsFormList($this->data['user_rights'], $this->data['user_type'], $permissionsFormList);
-	$permissionsFormList->addInfo(_('Permissions can be assigned for user groups only.'));
+	$permissions_table = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Host group'), _('Permissions')]);
+
+	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+		$permissions_table->addRow(['*', permissionText(PERM_READ_WRITE)]);
+	}
+	else {
+		foreach ($data['groups_rights'] as $groupid => $group_rights) {
+			$group_name = $group_rights['name'];
+			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+				$group_name .= ($groupid == 0) ? '*' : '/*';
+			}
+			$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
+		}
+	}
+
+	$permissionsFormList
+		->addRow(_('Permissions'),
+			(new CDiv($permissions_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addInfo(_('Permissions can be assigned for user groups only.'));
 
 	$userTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 }
+
 if (isset($userMessagingFormList)) {
 	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);
 }
