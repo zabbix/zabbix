@@ -35,7 +35,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestAssertElementPresentId('btn1');
 		$this->zbxTestAssertElementPresentXpath("//button[@name='filter_set']");
 		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
-		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient(s)', 'Message', 'Status', 'Info']);
+		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient', 'Message', 'Status', 'Info']);
 
 	}
 
