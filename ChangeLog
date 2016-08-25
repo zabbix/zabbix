@@ -20,6 +20,7 @@ Bug fixes:
 .......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ...G...PS. [ZBX-11105] fixed compiler warnings regarding unused function parameters (Sandis)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0alpha2
@@ -32,7 +33,6 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars,
 
 Bug fixes:
 ....I....T [ZBX-10476] extended 'Template OS Windows' template by 'service.discovery' LLD (Sergejs)
-........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11098] corrected log messages about completion of the trend data synchronization (Sergejs)
 ........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
