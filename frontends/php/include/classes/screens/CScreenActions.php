@@ -126,7 +126,7 @@ class CScreenActions extends CScreenBase {
 				($sortfield === 'clock') ? [('Time'), $sort_div] : _('Time'),
 				_('Action'),
 				($sortfield === 'description') ? [_('Type'), $sort_div] : _('Type'),
-				($sortfield === 'sendto') ? [_('Recipient(s)'), $sort_div] : _('Recipient(s)'),
+				($sortfield === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
 				_('Message'),
 				($sortfield === 'status') ? [_('Status'), $sort_div] : _('Status'),
 				_('Info')

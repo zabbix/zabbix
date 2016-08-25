@@ -1276,7 +1276,7 @@ function getActionMessages(array $alerts) {
 	]);
 
 	$table = (new CTableInfo())->setHeader([
-		_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient(s)'), _('Message'), _('Info')
+		_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient'), _('Message'), _('Info')
 	]);
 
 	foreach ($alerts as $alert) {
