@@ -40,6 +40,8 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 {
 	size_t	r_size = size * nmemb;
 
+	ZBX_UNUSED(userdata);
+
 	/* first piece of data */
 	if (NULL == page.data)
 	{
@@ -55,6 +57,9 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 
 static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
+	ZBX_UNUSED(ptr);
+	ZBX_UNUSED(userdata);
+
 	return size * nmemb;
 }
 

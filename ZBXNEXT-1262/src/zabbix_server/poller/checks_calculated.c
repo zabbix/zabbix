@@ -20,6 +20,7 @@
 #include "checks_calculated.h"
 #include "zbxserver.h"
 #include "log.h"
+#include "../../libs/zbxserver/evalfunc.h"
 
 typedef struct
 {
@@ -249,7 +250,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			break;
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state)
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(f->func))
 		{
 			zbx_snprintf(error, max_error_len,
 					"Cannot evaluate function \"%s(%s)\": item \"%s:%s\" not supported.",

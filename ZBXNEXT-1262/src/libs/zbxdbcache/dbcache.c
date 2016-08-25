@@ -869,7 +869,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
+		if (0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
 			continue;
 
 		itemids[item_num] = h->itemid;
@@ -1197,8 +1197,6 @@ notsupported:
 
 			update_cache = 1;
 		}
-
-		DCadd_nextcheck(item->itemid, &h->ts, h->value_orig.err);
 
 		if (0 != update_cache)
 			DCconfig_set_item_db_state(item->itemid, h->state, h->value_orig.err);
@@ -1576,7 +1574,7 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int htext_num)
+static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
 	zbx_db_insert_t	db_insert;
@@ -1610,7 +1608,7 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlog_num)
+static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num)
 {
 	int			i;
 	zbx_db_insert_t		db_insert;
@@ -1704,11 +1702,11 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	/* history_text */
 	if (0 != htext_num)
-		dc_add_history_text(history, history_num, htext_num);
+		dc_add_history_text(history, history_num);
 
 	/* history_log */
 	if (0 != hlog_num)
-		dc_add_history_log(history, history_num, hlog_num);
+		dc_add_history_log(history, history_num);
 
 	/* update value cache */
 	if (ZBX_DB_OK <= rc && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) &&
@@ -2162,12 +2160,10 @@ int	DCsync_history(int sync_type, int *total_num)
 			DCmass_add_history(history, history_num);
 			DCmass_update_triggers(history, history_num, &trigger_diff);
 			DCmass_update_trends(history, history_num);
-			DCflush_nextchecks(&trigger_diff);
 
 			/* processing of events, generated in functions: */
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
-			/*   DCflush_nextchecks() */
 			if (0 != process_trigger_events(&trigger_diff, &triggerids, ZBX_EVENTS_PROCESS_CORRELATION))
 			{
 				DCconfig_triggers_apply_changes(&trigger_diff);
