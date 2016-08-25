@@ -25,91 +25,91 @@ class CHostGroupNameValidatorTest extends PHPUnit_Framework_TestCase {
 		return [
 			[
 				'name' => [],
-				'message' => 'Incorrect value for field "name": must be a string.'
+				'message' => 'must be a string'
 			],
 			[
 				'name' => null,
-				'message' => 'Incorrect value for field "name": must be a string.'
+				'message' => 'must be a string'
 			],
 			[
 				'name' => false,
-				'message' => 'Incorrect value for field "name": must be a string.'
+				'message' => 'must be a string'
 			],
 			[
 				'name' => 1.2,
-				'message' => 'Incorrect value for field "name": must be a string.'
+				'message' => 'must be a string'
 			],
 			[
 				'name' => '',
-				'message' => 'Incorrect value for field "name": cannot be empty.',
+				'message' => 'cannot be empty',
 			],
 			[
 				'name' => '/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/".'
+				'message' => 'invalid group name "/"'
 			],
 			[
 				'name' => '/A',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/A".'
+				'message' => 'invalid group name "/A"'
 			],
 			[
 				'name' => '/AAA',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/AAA".'
+				'message' => 'invalid group name "/AAA"'
 			],
 			[
 				'name' => 'A/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/".'
+				'message' => 'invalid group name "A/"'
 			],
 			[
 				'name' => 'AAA/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/".'
+				'message' => 'invalid group name "AAA/"'
 			],
 			[
 				'name' => '/AAA/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/AAA/".'
+				'message' => 'invalid group name "/AAA/"'
 			],
 			[
 				'name' => 'A/B/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/".'
+				'message' => 'invalid group name "A/B/"'
 			],
 			[
 				'name' => 'A/B/C/',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/".'
+				'message' => 'invalid group name "A/B/C/"'
 			],
 			[
 				'name' => 'A/B//C',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "//C".'
+				'message' => 'invalid group name "A/B//C"'
 			],
 			[
 				'name' => 'A/B/////C',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/////C".'
+				'message' => 'invalid group name "A/B/////C"'
 			],
 			[
 				'name' => 'A////B/C',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "////B/C".'
+				'message' => 'invalid group name "A////B/C"'
 			],
 			[
 				'name' => 'AAAA////BBB/C',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "////BBB/C".'
+				'message' => 'invalid group name "AAAA////BBB/C"'
 			],
 			[
 				'name' => 'AAAA/BBBB/////CCC',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "/////CCC".'
+				'message' => 'invalid group name "AAAA/BBBB/////CCC"'
 			],
 			[
 				'name' => '*',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "*".'
+				'message' => 'invalid group name "*"'
 			],
 			[
 				'name' => 'A*',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "*".'
+				'message' => 'invalid group name "A*"'
 			],
 			[
 				'name' => 'A/*',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "*".'
+				'message' => 'invalid group name "A/*"'
 			],
 			[
 				'name' => '*A',
-				'message' => 'Incorrect value for field "name": incorrect syntax near "*A".'
+				'message' => 'invalid group name "*A"'
 			]
 		];
 	}
