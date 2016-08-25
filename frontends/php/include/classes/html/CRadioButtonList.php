@@ -30,7 +30,6 @@ class CRadioButtonList extends CList {
 	private $enabled;
 	private $values;
 	private $modern;
-	private $focused;
 
 	public function __construct($name, $value) {
 		parent::__construct();
@@ -41,7 +40,6 @@ class CRadioButtonList extends CList {
 		$this->enabled = true;
 		$this->values = [];
 		$this->modern = false;
-		$this->focused = false;
 		$this->setId(zbx_formatDomId($name));
 	}
 
@@ -85,8 +83,6 @@ class CRadioButtonList extends CList {
 			);
 		}
 
-		$focused = $this->focused;
-
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
@@ -98,10 +94,6 @@ class CRadioButtonList extends CList {
 				->setId($value['id']);
 			if ($value['value'] === $this->value) {
 				$radio->setAttribute('checked', 'checked');
-			}
-			if ($focused) {
-				$radio->setAttribute('autofocus', 'autofocus');
-				$focused = false;
 			}
 
 			if ($this->modern) {
