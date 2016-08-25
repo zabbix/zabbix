@@ -47,7 +47,7 @@ $auditTable = (new CTableInfo())
 		_('Time'),
 		_('Action'),
 		_('Type'),
-		_('Recipient(s)'),
+		_('Recipient'),
 		_('Message'),
 		_('Status'),
 		_('Info')
