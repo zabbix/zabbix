@@ -1024,12 +1024,51 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_validate_group_name                                          *
+ *                                                                            *
+ * Purpose: validate group name                                               *
+ *                                                                            *
+ * Return value: SUCCEED - the group name is valid                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_group_name(const char *name)
+{
+	/* group name cannot be empty */
+	if ('\0' == *name)
+		return FAIL;
+
+	/* group name must contain valid utf8 characters */
+	if (SUCCEED != zbx_is_utf8(name))
+		return FAIL;
+
+	/* group name cannot exceed field limits */
+	if (GROUP_NAME_LEN < zbx_strlen_utf8(name))
+		return FAIL;
+
+	/* group name contain an asterisk (*) */
+	if (NULL != strchr(name, '*'))
+		return FAIL;
+
+	/* group name cannot contain trailing and leading slashes (/) */
+	if ('/' == *name || '/' == name[strlen(name) - 1])
+		return FAIL;
+
+	/* group name cannot contain several slashes (/) in a row */
+	if (NULL != strstr(name, "//"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_groups_validate                                              *
  *                                                                            *
  * Parameters: groups - [IN] list of groups; should be sorted by groupid      *
  *                                                                            *
  ******************************************************************************/
-void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
+static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 {
 	const char		*__function_name = "lld_groups_validate";
 
@@ -1057,12 +1096,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 			continue;
 
-		/* group name is valid utf8 sequence and has a valid length */
-		if (SUCCEED == zbx_is_utf8(group->name) && '\0' != *group->name &&
-				GROUP_NAME_LEN >= zbx_strlen_utf8(group->name))
-		{
+		if (SUCCEED == lld_validate_group_name(group->name))
 			continue;
-		}
 
 		zbx_replace_invalid_utf8(group->name);
 		*error = zbx_strdcatf(*error, "Cannot %s group: invalid group name \"%s\".\n",
