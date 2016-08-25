@@ -51,7 +51,7 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = $this->xmlToArray($xml);
+		$data = self::xmlToArray($xml);
 		$xml->close();
 
 		return $data;
@@ -68,7 +68,7 @@ class CXmlImportReader extends CImportReader {
 	 *
 	 * @return array|string
 	 */
-	public function xmlToArray(XMLReader $xml, $path = '') {
+	protected static function xmlToArray(XMLReader $xml, $path = '') {
 		$data = null;
 
 		while ($xml->read()) {
@@ -105,26 +105,24 @@ class CXmlImportReader extends CImportReader {
 						 * We assume that an element with attributes never contains text node
 						 * works for 1.8 XML.
 						 */
-						if (!$xml->isEmptyElement) {
-							$child_data = $this->xmlToArray($xml, $sub_path);
+						$child_data = $xml->isEmptyElement ? '' : self::xmlToArray($xml, $sub_path);
 
-							if (!is_array($child_data)) {
-								throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
-									_s('unexpected text "%1$s"', trim($child_data))
-								));
-							}
-
+						if (is_array($child_data)) {
 							foreach ($child_data as $child_node_name => $child_node_value) {
 								if (array_key_exists($child_node_name, $data[$node_name])) {
 									$child_node_name .= count($data[$node_name]);
 								}
-
 								$data[$node_name][$child_node_name] = $child_node_value;
 							}
 						}
+						elseif ($child_data !== '') {
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
+								_s('unexpected text "%1$s"', trim($child_data))
+							));
+						}
 					}
 					else {
-						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
+						$data[$node_name] = $xml->isEmptyElement ? '' : self::xmlToArray($xml, $sub_path);
 					}
 					break;
 
