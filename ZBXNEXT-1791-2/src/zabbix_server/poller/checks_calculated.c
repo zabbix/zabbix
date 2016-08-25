@@ -168,7 +168,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 	function_t	*f = NULL;
 	char		*buf, replace[16], *errstr = NULL;
 	int		i, ret = SUCCEED;
-	int		unknown_idx = 0;		/* index in vector of error messages 'unknown_msgs' */
 	time_t		now;
 	zbx_host_key_t	*keys = NULL;
 	DC_ITEM		*items = NULL;
@@ -271,7 +270,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 					f->func, f->params, f->host, f->key);
 
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
-			unknown_idx++;
 			ret_unknown = 1;
 		}
 
@@ -294,7 +292,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			}
 
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
-			unknown_idx++;
 			ret_unknown = 1;
 		}
 
@@ -310,7 +307,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			{
 				/* write a special token of unknown value with 'unknown' message number, like */
 				/* ZBX_UNKNOWN0, ZBX_UNKNOWN1 etc. not wrapped in () */
-				wrapped = zbx_dsprintf(NULL, ZBX_UNKNOWN_STR "%d", unknown_idx - 1);
+				wrapped = zbx_dsprintf(NULL, ZBX_UNKNOWN_STR "%d", unknown_msgs->values_num - 1);
 			}
 
 			zbx_free(f->value);
