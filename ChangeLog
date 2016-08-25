@@ -1,8 +1,12 @@
 Changes for 3.2.0alpha3
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+........S. [ZBXNEXT-1791] enabled evaluation of nodata() and time-based functions for not supported items in trigger expressions and calculated items (Andris, wiper)
 
 Bug fixes:
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
+...G...PS. [ZBX-11105] fixed compiler warnings regarding unused function parameters (Sandis)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 
 --------------------------------------------------------------------------------
@@ -74,6 +78,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)

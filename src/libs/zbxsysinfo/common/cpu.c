@@ -43,6 +43,8 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json			json;
 	int				i, ret = SYSINFO_RET_FAIL;
 
+	ZBX_UNUSED(request);
+
 	zbx_vector_uint64_pair_create(&cpus);
 
 	if (SUCCEED != get_cpus(&cpus))
