@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-11045] fixed action audit log "Recipient" column name (Sasha)
+A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0beta1
