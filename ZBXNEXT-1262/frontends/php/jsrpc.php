@@ -236,12 +236,10 @@ switch ($data['method']) {
 							'limit' => 1
 						]);
 
-						if ($parent) {
-							$parent = reset($parent);
-
+						if ($parent && $parent[0]['name'] === $name) {
 							$result[] = [
-								'id' => $parent['groupid'],
-								'name' => $parent['name'].'/*'
+								'id' => $parent[0]['groupid'],
+								'name' => $parent[0]['name'].'/*'
 							];
 						}
 					}
