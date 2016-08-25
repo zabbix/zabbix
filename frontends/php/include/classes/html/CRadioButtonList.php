@@ -114,11 +114,4 @@ class CRadioButtonList extends CList {
 
 		return parent::toString($destroy);
 	}
-
-	public function setFocused($focused) {
-		$this->focused = $focused;
-
-		return $this;
-	}
-
 }
