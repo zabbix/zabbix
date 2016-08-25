@@ -31,7 +31,7 @@ class CHostGroupNameValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($name) {
-		if (!is_string($name) && !is_int($name)) {
+		if (!is_string($name)) {
 			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('must be a string')));
 
 			return false;
@@ -43,66 +43,9 @@ class CHostGroupNameValidator extends CValidator {
 			return false;
 		}
 
-		$error = false;
-		$len = strlen($name);
-
-		foreach (['/', '*'] as $char) {
-			switch ($char) {
-				case '/':
-					$groups = explode($char, $name);
-					$cnt = count($groups);
-					foreach ($groups as $i => $group) {
-						if (!$group) {
-							unset($groups[$i]);
-						}
-					}
-
-					$expected_cnt = count($groups);
-
-					if ($cnt != $expected_cnt) {
-						$str = '';
-						for ($i = 0; $i < $cnt; $i++) {
-							if (array_key_exists($i, $groups)) {
-								$str .= $groups[$i].'/';
-							}
-							else {
-								$pos = strlen($str) - 1;
-								if ($pos == -1) {
-									$pos = 0;
-								}
-
-								$error = true;
-								break 3;
-							}
-						}
-					}
-					break;
-
-				case '*':
-					$pos = strpos($name, $char);
-
-					if ($pos !== false) {
-						$error = true;
-						break 2;
-					}
-			}
-		}
-
-		if ($error) {
-			for ($i = $pos, $chunk = '', $max_chunk_size = 50; isset($name[$i]); $i++) {
-				if (0x80 != (0xc0 & ord($name[$i])) && $max_chunk_size-- == 0) {
-					break;
-				}
-				$chunk .= $name[$i];
-			}
-
-			if (isset($name[$i])) {
-				$chunk .= ' ...';
-			}
-
-			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name',
-				_s('incorrect syntax near "%1$s"', $chunk)
-			));
+		if ($name[0] === '/' || substr($name, -1) === '/' || strpos($name, '//') !== false
+			|| strpos($name, '*') !== false) {
+			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('unacceptable characters are used')));
 
 			return false;
 		}
