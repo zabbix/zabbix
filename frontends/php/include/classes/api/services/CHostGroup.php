@@ -712,7 +712,7 @@ class CHostGroup extends CApiService {
 			}
 
 			// Check allowed characters in host group name.
-			$this->checkDeniedChars($group['name']);
+			$this->checkValidator($group['name'], new CHostGroupNameValidator());
 
 			$this->checkNoParameters($group, ['internal'], _('Cannot set "%1$s" for host group "%2$s".'),
 				$group['name']
@@ -789,7 +789,8 @@ class CHostGroup extends CApiService {
 					);
 				}
 
-				$this->checkDeniedChars($group['name']);
+				// Check allowed characters in host group name.
+				$this->checkValidator($group['name'], new CHostGroupNameValidator());
 
 				if ($db_groups[$group['groupid']]['name'] !== $group['name']) {
 					$check_names[] = $group;
@@ -832,70 +833,6 @@ class CHostGroup extends CApiService {
 
 			// Cannot update discovered host groups.
 			$this->checkPartialValidator($group, $update_discovered_validator, $db_groups[$group['groupid']]);
-		}
-	}
-
-	/**
-	 * Check the host group name for invalid characters. Character / are not allwed in the beginning and in the end.
-	 * Characer * is not allowed in any place.
-	 *
-	 * @param string $name					Host group name.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkDeniedChars($name) {
-		$error = false;
-		$len = strlen($name);
-
-		foreach (['/', '*'] as $char) {
-			switch ($char) {
-				case '/':
-					// Forward slash cannot be first character, last or repeat in the middle multiple times.
-					$pos = strpos($name, $char);
-
-					if (substr($name, 0, 1) === $char) {
-						$pos = 0;
-						$error = true;
-						break 2;
-					}
-					elseif (substr($name, -1, 1) === $char) {
-						$pos = $len - 1;
-						$error = true;
-						break 2;
-					}
-					elseif ($pos !== false && $name[$pos + 1] === $char) {
-						$pos++;
-						$error = true;
-						break 2;
-					}
-					break;
-
-				case '*':
-					// Asterisk is not allowed at all.
-					$pos = strpos($name, $char);
-
-					if ($pos !== false) {
-						$error = true;
-						break 2;
-					}
-			}
-		}
-
-		if ($error) {
-			for ($i = $pos, $chunk = '', $max_chunk_size = 50; isset($name[$i]); $i++) {
-				if (0x80 != (0xc0 & ord($name[$i])) && $max_chunk_size-- == 0) {
-					break;
-				}
-				$chunk .= $name[$i];
-			}
-
-			if (isset($name[$i])) {
-				$chunk .= ' ...';
-			}
-
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'name', _s('incorrect syntax near "%1$s"', $chunk))
-			);
 		}
 	}
 
