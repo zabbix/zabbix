@@ -47,18 +47,28 @@ zbx_module_t;
 
 static zbx_module_t	*modules = NULL;
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: public API function, see documentation for more details          *
+ *                                                                            *
+ ******************************************************************************/
 unsigned char	zabbix_version(void)
 {
 	return ZABBIX_VERSION_MAJOR * 10 + ZABBIX_VERSION_MINOR;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: public API function, see documentation for more details          *
+ *                                                                            *
+ ******************************************************************************/
 const char	*zabbix_error_message(zabbix_error_t error)
 {
 /* refers to the last error in error_messages */
 #define ZBX_MAX_ERROR	7
 
 	/* the order of messages MUST match the order of return code defines in module.h */
-	static const char * const	error_messages[ZBX_MAX_ERROR] =
+	static const char * const	error_messages[ZBX_MAX_ERROR + 1] =
 	{
 		"call was successful",							/* 0 ZABBIX_SUCCESS */
 		"vector iteration reached its end",					/* 1 ZABBIX_END_OF_VECTOR */
@@ -166,7 +176,7 @@ out:
  *               FAIL - loading of modules failed                             *
  *                                                                            *
  ******************************************************************************/
-int	load_modules(const char *path, char **file_names, int timeout, int verbose)
+int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose)
 {
 	const char	*__function_name = "load_modules";
 
@@ -383,7 +393,7 @@ void	zbx_sync_history_with_modules(zbx_dc_history_t history, int history_num)
  *          It is called on process shutdown.                                 *
  *                                                                            *
  ******************************************************************************/
-void	unload_modules()
+void	zbx_unload_modules()
 {
 	const char	*__function_name = "unload_modules";
 
@@ -421,6 +431,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: public API function, see documentation for more details          *
+ *                                                                            *
+ ******************************************************************************/
 zabbix_error_t	zabbix_get_object_member(zabbix_handle_t object, zabbix_label_t label, void *buffer)
 {
 	zabbix_basic_t	res;
@@ -504,6 +519,11 @@ zabbix_error_t	zabbix_get_object_member(zabbix_handle_t object, zabbix_label_t l
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: public API function, see documentation for more details          *
+ *                                                                            *
+ ******************************************************************************/
 zabbix_error_t	zabbix_get_vector_element(zabbix_handle_t vector, void *buffer)
 {
 	zabbix_basic_t	res;
