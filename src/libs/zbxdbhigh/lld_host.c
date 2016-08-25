@@ -180,7 +180,7 @@ static void	lld_group_free(zbx_lld_group_t *group)
 
 typedef struct
 {
-	const char			*name;
+	char				*name;
 	/* permission pair (usergroupid, permission) */
 	zbx_vector_uint64_pair_t	rights;
 
@@ -1248,7 +1248,7 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 	zbx_lld_group_rights_t	*rights;
 
 	rights = (zbx_lld_group_rights_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_rights_t));
-	rights->name = name;
+	rights->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_pair_create(&rights->rights);
 	rights->prights = NULL;
 
@@ -1266,6 +1266,7 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
  ******************************************************************************/
 static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
 {
+	zbx_free(rights->name);
 	zbx_vector_uint64_pair_destroy(&rights->rights);
 	zbx_free(rights);
 }
@@ -1339,15 +1340,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 	{
 		rights_local.name = row[0];
 		if (FAIL == (i = zbx_vector_ptr_search(&group_rights, &rights_local, lld_group_rights_compare)))
-		{
-			if (FAIL == (i = zbx_vector_str_search(&group_names, row[0], ZBX_DEFAULT_STR_COMPARE_FUNC)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			i = lld_group_rights_append(&group_rights, group_names.values[i]);
-		}
+			i = lld_group_rights_append(&group_rights, row[0]);
 
 		rights = group_rights.values[i];
 		rights->prights = &rights->rights;
