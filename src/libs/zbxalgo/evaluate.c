@@ -294,6 +294,9 @@ static double	evaluate_term6(int *unknown_idx)
 	if (ZBX_INFINITY == (result = evaluate_term7(&res_idx)))
 		return ZBX_INFINITY;
 
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
+
 	/* if evaluate_term7() returns ZBX_UNKNOWN then continue as with regular number */
 
 	while ('*' == *ptr || '/' == *ptr)
@@ -367,6 +370,9 @@ static double	evaluate_term5(int *unknown_idx)
 	if (ZBX_INFINITY == (result = evaluate_term6(&res_idx)))
 		return ZBX_INFINITY;
 
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
+
 	/* if evaluate_term6() returns ZBX_UNKNOWN then continue as with regular number */
 
 	while ('+' == *ptr || '-' == *ptr)
@@ -417,6 +423,9 @@ static double	evaluate_term4(int *unknown_idx)
 
 	if (ZBX_INFINITY == (result = evaluate_term5(&res_idx)))
 		return ZBX_INFINITY;
+
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
 
 	/* if evaluate_term5() returns ZBX_UNKNOWN then continue as with regular number */
 
@@ -491,6 +500,9 @@ static double	evaluate_term3(int *unknown_idx)
 	if (ZBX_INFINITY == (result = evaluate_term4(&res_idx)))
 		return ZBX_INFINITY;
 
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
+
 	/* if evaluate_term4() returns ZBX_UNKNOWN then continue as with regular number */
 
 	while (1)
@@ -551,6 +563,9 @@ static double	evaluate_term2(int *unknown_idx)
 
 	if (ZBX_INFINITY == (result = evaluate_term3(&res_idx)))
 		return ZBX_INFINITY;
+
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
 
 	/* if evaluate_term3() returns ZBX_UNKNOWN then continue as with regular number */
 
@@ -626,6 +641,9 @@ static double	evaluate_term1(int *unknown_idx)
 
 	if (ZBX_INFINITY == (result = evaluate_term2(&res_idx)))
 		return ZBX_INFINITY;
+
+	if (ZBX_UNKNOWN == result)
+		*unknown_idx = res_idx;
 
 	/* if evaluate_term2() returns ZBX_UNKNOWN then continue as with regular number */
 
