@@ -674,6 +674,8 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$host_group_name_validator = new CHostGroupNameValidator();
+
 		foreach ($groups as $group) {
 			// Validate required fields and check if "name" is not empty.
 			if (!is_array($group)) {
@@ -689,7 +691,11 @@ class CHostGroup extends CApiService {
 			}
 
 			// Check if host group name is valid.
-			$this->checkValidator($group['name'], new CHostGroupNameValidator());
+			if (!$host_group_name_validator->validate($group['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError())
+				);
+			}
 
 			$this->checkNoParameters($group, ['internal'], _('Cannot set "%1$s" for host group "%2$s".'),
 				$group['name']
@@ -747,6 +753,7 @@ class CHostGroup extends CApiService {
 		]);
 
 		$check_names = [];
+		$host_group_name_validator = new CHostGroupNameValidator();
 
 		foreach ($groups as $group) {
 			if (!array_key_exists($group['groupid'], $db_groups)) {
@@ -757,7 +764,11 @@ class CHostGroup extends CApiService {
 
 			// Check if host group name is valid.
 			if (array_key_exists('name', $group)) {
-				$this->checkValidator($group['name'], new CHostGroupNameValidator());
+				if (!$host_group_name_validator->validate($group['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError())
+					);
+				}
 
 				if ($db_groups[$group['groupid']]['name'] !== $group['name']) {
 					$check_names[] = $group;
