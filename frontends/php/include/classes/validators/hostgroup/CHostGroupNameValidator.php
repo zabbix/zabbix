@@ -32,20 +32,20 @@ class CHostGroupNameValidator extends CValidator {
 	 */
 	public function validate($name) {
 		if (!is_string($name)) {
-			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('must be a string')));
+			$this->setError(_('must be a string'));
 
 			return false;
 		}
 
 		if ($name === '') {
-			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty')));
+			$this->setError(_('cannot be empty'));
 
 			return false;
 		}
 
 		if ($name[0] === '/' || substr($name, -1) === '/' || strpos($name, '//') !== false
-			|| strpos($name, '*') !== false) {
-			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('unacceptable characters are used')));
+				|| strpos($name, '*') !== false) {
+			$this->setError(_s('invalid group name "%1$s"', $name));
 
 			return false;
 		}
