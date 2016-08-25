@@ -125,6 +125,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f;
 	struct zbx_json	j;
 
+	ZBX_UNUSED(request);
+
 	if (NULL == (f = fopen("/proc/mounts", "r")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));

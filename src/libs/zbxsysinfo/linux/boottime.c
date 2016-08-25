@@ -28,6 +28,8 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 	unsigned long	value;
 
+	ZBX_UNUSED(request);
+
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));

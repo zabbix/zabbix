@@ -8617,9 +8617,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 					continue;
 				break;
 			case ITEM_TYPE_ZABBIX_ACTIVE:
-				if (host->data_expected_from > (data_expected_from = item->data_expected_from))
-					data_expected_from = host->data_expected_from;
-				if (data_expected_from + item->delay > now)
+				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
+					data_expected_from = dc_host->data_expected_from;
+				if (data_expected_from + dc_item->delay > now)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:

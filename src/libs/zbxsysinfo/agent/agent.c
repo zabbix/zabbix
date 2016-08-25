@@ -37,6 +37,8 @@ ZBX_METRIC	parameters_agent[] =
 
 static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
+
 	SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
 
 	return SYSINFO_RET_OK;
@@ -44,6 +46,8 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
+
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
@@ -51,6 +55,8 @@ static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
+
 	SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
 
 	return SYSINFO_RET_OK;
