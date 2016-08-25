@@ -22,28 +22,27 @@
 class CHostGroupNameValidator extends CValidator {
 
 	/**
-	 * Error message.
+	 * Checks if host group name is string or at least an integer, is not empty. Check if name contains forward slashes
+	 * and asterisks. Slashes cannot be first character, last or repeat in the middle multiple times. Asterisks are not
+	 * allowed at all.
 	 *
-	 * @var string
-	 */
-	public $message;
-
-	/**
-	 * Error message details.
-	 *
-	 * @var string
-	 */
-	public $message_details;
-
-	/**
-	 * Checks if host group name contains forward slashes and asterisks. Slashes cannot be first character, last or
-	 * repeat in the middle multiple times. Asterisks are not allowed at all.
-	 *
-	 * @param string $name				Host group name.
+	 * @param mixed $name				Host group name.
 	 *
 	 * @return bool
 	 */
 	public function validate($name) {
+		if (!is_string($name) && !is_int($name)) {
+			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('must be a string')));
+
+			return false;
+		}
+
+		if ($name === '') {
+			$this->error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty')));
+
+			return false;
+		}
+
 		$error = false;
 		$len = strlen($name);
 

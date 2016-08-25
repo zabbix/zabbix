@@ -701,17 +701,7 @@ class CHostGroup extends CApiService {
 				);
 			}
 
-			// Validate "name" field.
-			if (is_array($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif ($group['name'] === '' || $group['name'] === null || $group['name'] === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
-				);
-			}
-
-			// Check allowed characters in host group name.
+			// Check if host group name is valid.
 			$this->checkValidator($group['name'], new CHostGroupNameValidator());
 
 			$this->checkNoParameters($group, ['internal'], _('Cannot set "%1$s" for host group "%2$s".'),
@@ -778,18 +768,8 @@ class CHostGroup extends CApiService {
 				);
 			}
 
-			// Validate "name" field (optional).
+			// Check if host group name is valid.
 			if (array_key_exists('name', $group)) {
-				if (is_array($group['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif ($group['name'] === '' || $group['name'] === null || $group['name'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
-					);
-				}
-
-				// Check allowed characters in host group name.
 				$this->checkValidator($group['name'], new CHostGroupNameValidator());
 
 				if ($db_groups[$group['groupid']]['name'] !== $group['name']) {
