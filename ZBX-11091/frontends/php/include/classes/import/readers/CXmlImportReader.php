@@ -51,20 +51,24 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = $this->xml_to_array($xml);
+		$data = $this->xmlToArray($xml);
 		$xml->close();
+
 		return $data;
 	}
 
 	/**
 	 * Method for recursive processing of xml dom nodes.
+	 * Node attributes will be stored in array as siblings of child elements.
 	 *
 	 * @param XMLReader $xml
 	 * @param string    $path
 	 *
+	 * @throws Exception
+	 *
 	 * @return array|string
 	 */
-	protected function xml_to_array(XMLReader $xml, $path = '') {
+	public function xmlToArray(XMLReader $xml, $path = '') {
 		$data = null;
 
 		while ($xml->read()) {
@@ -82,6 +86,8 @@ class CXmlImportReader extends CImportReader {
 					$node_name = $xml->name;
 					$sub_path = $path.'/'.$node_name;
 					if (array_key_exists($node_name, $data)) {
+						// Add identifier number for repeated element keys.
+
 						$node_name .= count($data);
 						$sub_path .= '('.count($data).')';
 					}
@@ -96,26 +102,29 @@ class CXmlImportReader extends CImportReader {
 						}
 
 						/*
-						 * We assume that an element with attributes always contains child elements, not a text node
+						 * We assume that an element with attributes never contains text node
 						 * works for 1.8 XML.
 						 */
-						$child_data = $this->xml_to_array($xml, $sub_path);
-						if (is_array($child_data)) {
+						if (!$xml->isEmptyElement) {
+							$child_data = $this->xmlToArray($xml, $sub_path);
+
+							if (!is_array($child_data)) {
+								throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
+									_s('unexpected text "%1$s"', trim($child_data))
+								));
+							}
+
 							foreach ($child_data as $child_node_name => $child_node_value) {
 								if (array_key_exists($child_node_name, $data[$node_name])) {
 									$child_node_name .= count($data[$node_name]);
 								}
+
 								$data[$node_name][$child_node_name] = $child_node_value;
 							}
 						}
-						elseif ($child_data !== '') {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
-								_s('unexpected text "%1$s"', trim($child_data))
-							));
-						}
 					}
 					else {
-						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $sub_path);
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
 					}
 					break;
 
