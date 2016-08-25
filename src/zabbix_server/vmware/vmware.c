@@ -472,6 +472,9 @@ static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 	if (NULL != hv->clusterid)
 		__vm_mem_free_func(hv->clusterid);
 
+	if (NULL != hv->datacenter_name)
+		__vm_mem_free_func(hv->datacenter_name);
+
 	__vm_mem_free_func(hv);
 }
 
@@ -728,6 +731,7 @@ static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
 	hv->id = vmware_shared_strdup(src->id);
 	hv->details = vmware_shared_strdup(src->details);
 	hv->clusterid = vmware_shared_strdup(src->clusterid);
+	hv->datacenter_name = vmware_shared_strdup(src->datacenter_name);
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_ptr_append(&hv->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
@@ -844,6 +848,7 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 	zbx_free(hv->id);
 	zbx_free(hv->details);
 	zbx_free(hv->clusterid);
+	zbx_free(hv->datacenter_name);
 	zbx_free(hv);
 }
 
@@ -1754,7 +1759,7 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		char **data, char **error)
 {
-#	define ZBX_POST_hv_DETAILS 								\
+#	define ZBX_POST_HV_DETAILS 								\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrieveProperties>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
@@ -1785,7 +1790,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_hv_DETAILS,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS,
 			vmware_service_objects[service->type].property_collector, hvid);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
@@ -1808,6 +1813,114 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		goto out;
 
 	*data = zbx_strdup(NULL, page.data);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_hv_get_datacenter_name                                    *
+ *                                                                            *
+ * Purpose: gets the vmware hypervisor datacenter name                        *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             hv           - [IN/OUT] the vmware hypervisor                  *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vmware_hv_t *hv, char **error)
+{
+#	define ZBX_POST_HV_DATACENTER_NAME									\
+		ZBX_POST_VSPHERE_HEADER										\
+			"<ns0:RetrieveProperties>"								\
+				"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
+				"<ns0:specSet>"									\
+					"<ns0:propSet>"								\
+						"<ns0:type>Datacenter</ns0:type>"				\
+						"<ns0:pathSet>name</ns0:pathSet>"				\
+					"</ns0:propSet>"							\
+					"<ns0:objectSet>"							\
+						"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
+						"<ns0:skip>false</ns0:skip>"					\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentObject</ns0:name>"			\
+							"<ns0:type>HostSystem</ns0:type>"			\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentComputeResource</ns0:name>"	\
+							"</ns0:selectSet>"					\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentComputeResource</ns0:name>"		\
+							"<ns0:type>ComputeResource</ns0:type>"			\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentFolder</ns0:name>"			\
+							"<ns0:type>Folder</ns0:type>"				\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentComputeResource</ns0:name>"	\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+					"</ns0:objectSet>"							\
+				"</ns0:specSet>"								\
+			"</ns0:RetrieveProperties>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_hv_get_datacenter_name";
+
+	char		tmp[MAX_STRING_LEN];
+	int		err, opt, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() id:'%s'", __function_name, hv->id);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
+			vmware_service_objects[service->type].property_collector, hv->id);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+		goto out;
+
+	if (NULL == (hv->datacenter_name = zbx_xml_read_value(page.data, "/*/*/*/*/*/*[local-name()='val']")))
+		hv->datacenter_name = zbx_strdup(NULL, "");
+
 
 	ret = SUCCEED;
 out:
@@ -1861,10 +1974,11 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 	hv->uuid = value;
 	hv->id = zbx_strdup(NULL, id);
 
+	if (SUCCEED != vmware_hv_get_datacenter_name(service, easyhandle, hv, error))
+		goto out;
+
 	if (NULL != (value = zbx_xml_read_value(hv->details, "//*[@type='ClusterComputeResource']")))
-	{
 		hv->clusterid = value;
-	}
 
 	zbx_xml_read_values(hv->details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 
