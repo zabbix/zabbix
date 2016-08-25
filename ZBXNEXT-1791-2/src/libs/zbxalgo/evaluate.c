@@ -109,6 +109,8 @@ static double	evaluate_number(int *unknown_idx)
 			return ZBX_UNKNOWN;
 		}
 
+		ptr = p0;
+
 		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_INFINITY;
 	}
