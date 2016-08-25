@@ -99,6 +99,20 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
+/******************************************************************************
+ *                                                                            *
+ * Macro: ZBX_UNUSED                                                          *
+ *                                                                            *
+ * Purpose: silences compiler warning about unused function parameter         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      var       - [IN] the unused parameter                                 *
+ *                                                                            *
+ * Comments: Use only on unused, non-volatile function parameters!            *
+ *                                                                            *
+ ******************************************************************************/
+#define ZBX_UNUSED(var) (void)(var)
+
 typedef struct
 {
 	int	sec;	/* seconds */

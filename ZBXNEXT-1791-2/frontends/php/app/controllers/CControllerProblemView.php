@@ -178,6 +178,7 @@ class CControllerProblemView extends CController {
 			? CArrayHelper::renameObjectsKeys(API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'selectHosts' => ['name'],
+				'expandDescription' => true,
 				'triggerids' => $filter_triggerids,
 				'monitored' => true
 			]), ['triggerid' => 'id', 'description' => 'name'])

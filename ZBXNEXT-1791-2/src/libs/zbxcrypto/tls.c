@@ -264,6 +264,8 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 		zabbix_log(LOG_LEVEL_TRACE, "OpenSSL debug: state=0x%x \"%s\"", (unsigned int)SSL_state(ssl),
 				SSL_state_string_long(ssl));
 	}
+#else
+	ZBX_UNUSED(ssl);
 #endif
 	if (0 != (where & SSL_CB_ALERT))	/* alert sent or received */
 	{
@@ -1282,6 +1284,9 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
 {
 	const char	*__function_name = "zbx_psk_client_cb";
 
+	ZBX_UNUSED(ssl);
+	ZBX_UNUSED(hint);
+
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name,
@@ -1338,6 +1343,8 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	size_t		psk_len = 0;
 	int		psk_bin_len;
 	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
+
+	ZBX_UNUSED(ssl);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, identity);
