@@ -1,6 +1,7 @@
 Changes for 3.2.0beta1
 
 New features:
+........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items (Andris, wiper)
 ........S. [ZBXNEXT-2877] added datacenter name to vmware hypervisors and virtual machines (wiper)
 A.F.I...S. [ZBXNEXT-1262] added support of nested host groups (Gunars, Ivo, Oleg, Sasha, wiper)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)

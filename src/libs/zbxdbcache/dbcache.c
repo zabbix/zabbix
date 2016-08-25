@@ -104,7 +104,7 @@ typedef struct
 	unsigned char	keep_trends;
 	unsigned char	state;
 }
-ZBX_DC_HISTORY;
+ZBX_DC_HISTORY;		/* structure for copying data about one item from history cache to temporary array */
 
 typedef struct
 {
@@ -214,7 +214,7 @@ static size_t		string_values_alloc = 0, string_values_offset = 0;
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
 
-static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num);
+static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
 static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
@@ -366,10 +366,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock, inserts_num = 0, ids_alloc, ids_num = 0, trends_to = *trends_num;
+	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
-	zbx_uint64_t	*ids = NULL, itemid;
+	zbx_uint64_t	*itemids = NULL, itemid;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 	zbx_db_insert_t	db_insert;
@@ -391,8 +391,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			assert(0);
 	}
 
-	ids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+	itemids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
+	itemids = zbx_malloc(itemids, itemids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
 	{
@@ -406,16 +406,16 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (0 != trend->disable_from)
 			continue;
 
-		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
+		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 
-		if (ZBX_HC_SYNC_MAX == ids_num)
+		if (ZBX_HC_SYNC_MAX == itemids_num)
 		{
 			trends_to = i + 1;
 			break;
 		}
 	}
 
-	if (0 != ids_num)
+	if (0 != itemids_num)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -424,20 +424,20 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				" where clock>=%d and",
 				table_name, clock);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
-			uint64_array_remove(ids, &ids_num, &itemid, 1);
+			uint64_array_remove(itemids, &itemids_num, &itemid, 1);
 		}
 		DBfree_result(result);
 
-		while (0 != ids_num)
+		while (0 != itemids_num)
 		{
-			itemid = ids[--ids_num];
+			itemid = itemids[--itemids_num];
 
 			for (i = 0; i < trends_to; i++)
 			{
@@ -465,10 +465,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (0 != trend->disable_from && trend->disable_from <= clock)
 			continue;
 
-		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
+		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 	}
 
-	if (0 != ids_num)
+	if (0 != itemids_num)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -477,7 +477,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				" where clock=%d and",
 				table_name, clock);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
 		result = DBselect("%s", sql);
 
@@ -580,7 +580,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			DBexecute("%s", sql);
 	}
 
-	zbx_free(ids);
+	zbx_free(itemids);
 
 	/* if 'trends' is not a primary trends buffer */
 	if (0 != update_cache)
@@ -805,7 +805,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_trends()
+static void	DCsync_trends(void)
 {
 	const char		*__function_name = "DCsync_trends";
 	zbx_hashset_iter_t	iter;
@@ -862,8 +862,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * history_num);
-	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * history_num);
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
+	timespecs = zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1073,7 +1073,7 @@ static void	DCcalculate_item_delta_uint64(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 	}
 }
 
-zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM *item, ZBX_DC_HISTORY *h)
+static zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM *item, ZBX_DC_HISTORY *h)
 {
 	zbx_item_history_value_t	*deltaitem;
 
@@ -1105,7 +1105,7 @@ zbx_item_history_value_t	*DCget_deltaitem(zbx_hashset_t *delta_history, DC_ITEM 
  * Purpose: 1) generate sql for updating item in database                     *
  *          2) calculate item delta value                                     *
  *          3) add events (item supported/not supported)                      *
- *          4) update cache (requeue item, add nextcheck)                     *
+ *          4) update cache (requeue item)                                    *
  *                                                                            *
  * Parameters: item - [IN/OUT] item reference                                 *
  *             h    - [IN/OUT] a reference to history cache value             *
@@ -1314,37 +1314,39 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	const char		*__function_name = "DCmass_update_items";
 
 	size_t			sql_offset = 0;
-	ZBX_DC_HISTORY		*h;
-	zbx_vector_uint64_t	ids;
+	zbx_vector_uint64_t	itemids;
 	DC_ITEM			*items = NULL;
-	int			i, j, *errcodes = NULL;
+	int			i, *errcodes = NULL;
 	zbx_hashset_t		delta_history = {NULL};
 	zbx_vector_ptr_t	inventory_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * history_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * history_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)history_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)history_num);
 	zbx_hashset_create(&delta_history, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&inventory_values);
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, history_num);
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_reserve(&itemids, history_num);
 
 	for (i = 0; i < history_num; i++)
-		zbx_vector_uint64_append(&ids, history[i].itemid);
+		zbx_vector_uint64_append(&itemids, history[i].itemid);
 
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DCconfig_get_items_by_itemids(items, ids.values, errcodes, history_num);
-	DCget_delta_items(&delta_history, &ids);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
+	DCget_delta_items(&delta_history, &itemids);
 
-	zbx_vector_uint64_clear(&ids);	/* item ids that are not disabled and not deleted in DB */
+	zbx_vector_uint64_clear(&itemids);	/* item ids that are not disabled and not deleted in DB */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < history_num; i++)
 	{
+		ZBX_DC_HISTORY	*h;
+		int		j;
+
 		if (SUCCEED != errcodes[i])
 			continue;
 
@@ -1380,7 +1382,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		DCinventory_value_add(&inventory_values, &items[i], h);
 
-		zbx_vector_uint64_append(&ids, items[i].itemid);
+		zbx_vector_uint64_append(&itemids, items[i].itemid);
 	}
 
 	zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1393,11 +1395,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	/* disable processing of deleted and disabled items by setting ZBX_DC_FLAG_UNDEF flag */
 	for (i = 0; i < history_num; i++)
 	{
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_bsearch(&itemids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			history[i].flags |= ZBX_DC_FLAG_UNDEF;
 	}
 
-	zbx_vector_uint64_destroy(&ids);
+	zbx_vector_uint64_destroy(&itemids);
 
 	DCset_delta_items(&delta_history);
 
@@ -2060,7 +2062,10 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 int	DCsync_history(int sync_type, int *total_num)
 {
 	const char		*__function_name = "DCsync_history";
-	static ZBX_DC_HISTORY	*history = NULL;
+
+	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history cache are */
+							/* copied into to process triggers, trends etc and finally */
+							/* write into db */
 	int			history_num, candidate_num, next_sync = 0;
 	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
@@ -2132,13 +2137,13 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		LOCK_CACHE;
 
-		hc_pop_items(&history_items);
+		hc_pop_items(&history_items);		/* select and take items out of history cache */
 
 		if (0 != history_items.values_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
 
-			/* there are unavailable items, push them back in history queue */
+			/* if there are unavailable items, push them back in history queue */
 			if (history_num != history_items.values_num)
 				hc_push_busy_items(&history_items);
 		}
@@ -2150,7 +2155,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		if (0 == history_num)
 			break;
 
-		hc_get_item_values(history, &history_items);
+		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
 		DBbegin();
 
@@ -2185,7 +2190,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		LOCK_CACHE;
 
-		next_sync = hc_push_processed_items(&history_items);
+		next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
 		cache->history_num -= history_num;
 
 		UNLOCK_CACHE;
@@ -2277,7 +2282,7 @@ static void	dc_string_buffer_realloc(size_t len)
 	string_values = zbx_realloc(string_values, string_values_alloc);
 }
 
-static dc_item_value_t	*dc_local_get_history_slot()
+static dc_item_value_t	*dc_local_get_history_slot(void)
 {
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
 		dc_flush_history();
@@ -2594,7 +2599,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	}
 }
 
-void	dc_flush_history()
+void	dc_flush_history(void)
 {
 	if (0 == item_values_num)
 		return;
@@ -2945,25 +2950,25 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
  *                                                                            *
  * Purpose: adds item values to the history cache                             *
  *                                                                            *
- * Parameters: item_values      - [IN] the item values to add                 *
- *             item_values_num  - [IN] the number of item values to add       *
+ * Parameters: values     - [IN] the item values to add                       *
+ *             values_num - [IN] the number of item values to add             *
  *                                                                            *
  * Comments: If the history cache is full this function will wait until       *
  *           history syncers processes values freeing enough space to store   *
  *           the new value.                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num)
+static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 {
 	dc_item_value_t	*item_value;
 	int		i;
 	zbx_hc_item_t	*item;
 
-	for (i = 0; i < item_values_num; i++)
+	for (i = 0; i < values_num; i++)
 	{
 		zbx_hc_data_t	*data = NULL;
 
-		item_value = &item_values[i];
+		item_value = &values[i];
 
 		while (SUCCEED != hc_clone_history_data(&data, item_value))
 		{
@@ -3248,7 +3253,7 @@ static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num)
 
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
-static void	init_trend_cache()
+static void	init_trend_cache(void)
 {
 	const char	*__function_name = "init_trend_cache";
 	key_t		trend_shm_key;
@@ -3298,7 +3303,7 @@ static void	init_trend_cache()
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	init_database_cache()
+void	init_database_cache(void)
 {
 	const char	*__function_name = "init_database_cache";
 	key_t		hc_shm_key, hc_index_shm_key;
@@ -3364,7 +3369,7 @@ void	init_database_cache()
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all()
+static void	DCsync_all(void)
 {
 	int	sync_num;
 
@@ -3386,7 +3391,7 @@ static void	DCsync_all()
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	free_database_cache()
+void	free_database_cache(void)
 {
 	const char	*__function_name = "free_database_cache";
 
@@ -3496,12 +3501,12 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  *          on interfaces without enabled items                               *
  *                                                                            *
  ******************************************************************************/
-void	DCupdate_hosts_availability()
+void	DCupdate_hosts_availability(void)
 {
 	const char		*__function_name = "DCupdate_hosts_availability";
 	zbx_vector_ptr_t	hosts;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql_buf = NULL;
+	size_t			sql_buf_alloc = 0, sql_buf_offset = 0;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -3512,24 +3517,27 @@ void	DCupdate_hosts_availability()
 		goto out;
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBbegin_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+				hosts.values[i]))
+		{
+			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
+		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBend_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 
-	if (16 < sql_offset)
-		DBexecute("%s", sql);
+	if (16 < sql_buf_offset)
+		DBexecute("%s", sql_buf);
 
 	DBcommit();
 
-	zbx_free(sql);
+	zbx_free(sql_buf);
 out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);
