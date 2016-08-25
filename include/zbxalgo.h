@@ -336,7 +336,11 @@ unsigned int	zbx_isqrt32(unsigned int value);
 
 /* expression evaluation */
 
-int	evaluate(double *value, const char *expression, char *error, int max_error_len);
+#define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
+#define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
+
+int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
+		zbx_vector_ptr_t *unknown_msgs);
 
 /* forecasting */
 
