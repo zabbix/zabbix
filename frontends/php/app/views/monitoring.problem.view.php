@@ -88,6 +88,7 @@ if ($data['action'] == 'problem.view') {
 				'name' => 'filter_groupids[]',
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
+				'nested' => true,
 				'popup' => [
 					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
 						'&srcfld1=groupid&multiselect=1'
@@ -189,12 +190,6 @@ if ($data['action'] == 'problem.view') {
 				->addClass('element-table-add')
 		))->setColSpan(3)
 	);
-	$filter_column2 = (new CFormList())
-		->addRow(_('Host inventory'),
-			(new CDiv($filter_inventory_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		);
 
 	$filter_tags = $data['filter']['tags'];
 	if (!$filter_tags) {
@@ -228,12 +223,9 @@ if ($data['action'] == 'problem.view') {
 				->addClass('element-table-add')
 		))->setColSpan(3)
 	);
-	$filter_column2
-		->addRow(_('Tags'),
-			(new CDiv($filter_tags_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		)
+	$filter_column2 = (new CFormList())
+		->addRow(_('Host inventory'), $filter_inventory_table)
+		->addRow(_('Tags'), $filter_tags_table)
 		->addRow(_('Show hosts in maintenance'),
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1)
 		);

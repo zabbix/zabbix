@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/groups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -37,6 +38,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'groupids_subgroupids' => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -77,6 +79,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.application', getRequest('application', ''), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.subgroupids', getRequest('groupids_subgroupids', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
@@ -86,6 +89,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.latest.filter.show_details');
 	CProfile::delete('web.latest.filter.application');
 	CProfile::deleteIdx('web.latest.filter.groupids');
+	CProfile::deleteIdx('web.latest.filter.subgroupids');
 	CProfile::deleteIdx('web.latest.filter.hostids');
 	DBend();
 }
@@ -96,6 +100,7 @@ $filter = [
 	'showDetails' => CProfile::get('web.latest.filter.show_details'),
 	'application' => CProfile::get('web.latest.filter.application', ''),
 	'groupids' => CProfile::getArray('web.latest.filter.groupids'),
+	'subgroupids' => CProfile::getArray('web.latest.filter.subgroupids', []),
 	'hostids' => CProfile::getArray('web.latest.filter.hostids')
 ];
 
@@ -113,10 +118,16 @@ $applications = $items = $hostScripts = [];
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
+	$groupids = $filter['groupids'];
+
+	if ($filter['subgroupids']) {
+		$groupids = getMultiselectGroupIds($groupids, $filter['subgroupids']);
+	}
+
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
 		'hostids' => $filter['hostids'],
-		'groupids' => $filter['groupids'],
+		'groupids' => $groupids,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'with_monitored_items' => true,
 		'preservekeys' => true
@@ -283,8 +294,15 @@ $multiSelectHostGroupData = [];
 if ($filter['groupids'] !== null) {
 	$filterGroups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids']
+		'groupids' => $filter['groupids'],
+		'preservekeys' => true
 	]);
+
+	foreach ($filter['subgroupids'] as $subgroup) {
+		if (array_key_exists($subgroup, $filterGroups)) {
+			$filterGroups[$subgroup]['name'] .= '/*';
+		}
+	}
 
 	foreach ($filterGroups as $group) {
 		$multiSelectHostGroupData[] = [
@@ -307,37 +325,31 @@ $widget = (new CWidget())
 $filterForm = (new CFilter('web.latest.filter.state'))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
-$filterColumn1 = new CFormList();
-$filterColumn1->addRow(
-	_('Host groups'),
-	(new CMultiSelect(
-		[
+$filterColumn1 = (new CFormList())
+	->addRow(_('Host groups'),
+		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $multiSelectHostGroupData,
+			'nested' => true,
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
 			]
-	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn1->addRow(
-		_('Hosts'),
-		(new CMultiSelect(
-			[
-				'name' => 'hostids[]',
-				'objectName' => 'hosts',
-				'data' => $multiSelectHostData,
-				'popup' => [
-					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1'
-				]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Hosts'),
+		(new CMultiSelect([
+			'name' => 'hostids[]',
+			'objectName' => 'hosts',
+			'data' => $multiSelectHostData,
+			'popup' => [
+				'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
+					'&real_hosts=1&multiselect=1'
 			]
-		))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn1->addRow(
-	_('Application'),
-	[
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
@@ -345,25 +357,18 @@ $filterColumn1->addRow(
 			->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 				'&with_applications=1&dstfrm=zbx_filter");'
 			)
-	]
-);
+	]);
 
-$filterColumn2 = new CFormList();
-$filterColumn2->addRow(
-	_('Name'),
-	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-$filterColumn2->addRow(
-	_('Show items without data'),
-	(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
-);
-$filterColumn2->addRow(
-	_('Show details'),
-	(new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1)
-);
+$filterColumn2 = (new CFormList())
+	->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+	->addRow(_('Show items without data'),
+		(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
+	)
+	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 
-$filterForm->addColumn($filterColumn1);
-$filterForm->addColumn($filterColumn2);
+$filterForm
+	->addColumn($filterColumn1)
+	->addColumn($filterColumn2);
 
 $widget->addItem($filterForm);
 // End of Filter

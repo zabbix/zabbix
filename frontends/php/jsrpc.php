@@ -211,6 +211,40 @@ switch ($data['method']) {
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
+				if (array_key_exists('nested', $data) && array_key_exists('search', $data)) {
+					// Search for parent hostgroup if nesting is allowed.
+					$name = $data['search'];
+
+					$search_parent = false;
+
+					if (substr($name, -2) === '/*') {
+						$name = substr($name, 0, -2);
+						$search_parent = true;
+					}
+					elseif (substr($name, -1) === '/') {
+						$name = substr($name, 0, -1);
+						$search_parent = true;
+					}
+
+					if ($search_parent && strlen($name) > 0) {
+						$parent = API::HostGroup()->get([
+							'output' => ['groupid', 'name'],
+							'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
+							'search' => ['name' => $name],
+							'startSearch' => true,
+							'sortfield' => ['name'],
+							'limit' => 1
+						]);
+
+						if ($parent && $parent[0]['name'] === $name) {
+							$result[] = [
+								'id' => $parent[0]['groupid'],
+								'name' => $parent[0]['name'].'/*'
+							];
+						}
+					}
+				}
+
 				$hostGroups = API::HostGroup()->get([
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => ['groupid', 'name'],
