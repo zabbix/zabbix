@@ -323,12 +323,12 @@ class CProblem extends CApiService {
 
 		// eventid_from
 		if ($options['eventid_from'] !== null) {
-			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
+			$sqlParts['where'][] = 'p.eventid>='.zbx_dbstr($options['eventid_from']);
 		}
 
 		// eventid_till
 		if ($options['eventid_till'] !== null) {
-			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
+			$sqlParts['where'][] = 'p.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 
 		// search
