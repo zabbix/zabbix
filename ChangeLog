@@ -3,7 +3,7 @@ Changes for 3.2.0beta2
 New features:
 
 Bug fixes:
-....I....T [ZBX-10476] fixed 'service.discovery' LLD in template 'Template OS Windows' (Sergejs)
+....I....T [ZBX-10476] fixed several issues with 'service.discovery' lld rule in template 'Template OS Windows' (Sergejs)
 ........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 ..F....... [ZBX-11045] fixed action audit log "Recipient" column name (Sasha)
 A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sasha)
