@@ -3,6 +3,7 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
