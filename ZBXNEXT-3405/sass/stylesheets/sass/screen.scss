@@ -679,7 +679,7 @@ footer {
 
 	td {
 		padding: 6px 5px;
-		vertical-align: middle;
+		//vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -907,6 +907,71 @@ footer {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+// Timeline in table view
+.timeline-date {
+	text-align: right;
+	white-space: nowrap;
+	border-bottom-color: $transparent !important;
+}
+
+tr.timeline-period {
+
+	&:hover {
+		background-color: $ui-bg-color !important;
+	}
+
+	span {
+		position: absolute;
+		top: 4px;
+		left: 46%;
+		height: 18px;
+		line-height: 18px;
+		white-space: nowrap;
+		padding: 0 4px;
+		display: inline-block;
+		background-color: $ui-bg-color;
+		border: 1px solid darken($table-border-color, 5%);
+		@include border-radius(2px);
+		@include transform(translateX(-46%));
+	}
+}
+
+.timeline-axis {
+	@extend %timeline-td;
+	padding: 6px 0 !important;
+	border-right: 1px solid darken($table-border-color, 5%);
+}
+
+.timeline-dot {
+
+	&::after {
+		content: '';
+		position: absolute;
+		display: block;
+		top: 10px;
+		right: -5px;
+		width: 5px;
+		height: 5px;
+		border: 2px solid $ui-bg-color;
+		border-radius: 100%;
+		background-color: $form-border-color;
+	}
+}
+
+.timeline-th {
+	text-align: right !important;
+}
+
+.timeline-td {
+	@extend %timeline-td;
+	padding: 6px 2px !important;
+}
+
+%timeline-td {
+	position: relative;
+	border-bottom-color: $transparent !important;
 }
 
 // Filters
