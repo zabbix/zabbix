@@ -1424,7 +1424,7 @@ ROW   |13516    |{12945}>0                     |Host name of zabbix_agentd was c
 ROW   |13537    |{12966}<25                    |Less than 25% free in the vmware cache                                                                 |   |0     |3       |                                                                                                                                      |13536     |0   |0    |0            |                   |0               |               |0           |
 ROW   |13558    |{13161}=1                     |Zabbix value cache working in low memory mode                                                          |   |0     |4       |                                                                                                                                      |13557     |0   |0    |0            |                   |0               |               |0           |
 ROW   |13560    |{13197}>75                    |Zabbix task manager processes more than 75% busy                                                       |   |0     |3       |                                                                                                                                      |13559     |0   |0    |1            |{13197}<65         |0               |               |0           |
-ROW   |13561    |{13221}=0                     |Service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})|   |0     |3       |                                                                                                                                      |NULL      |0   |2    |0            |                   |0               |               |0           |
+ROW   |13561    |{13221}<>0                    |Service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})|   |0     |3       |                                                                                                                                      |NULL      |0   |2    |0            |                   |0               |               |0           |
 
 TABLE |trigger_depends
 FIELDS|triggerdepid|triggerid_down|triggerid_up|
@@ -1792,7 +1792,7 @@ ROW   |13217     |23343 |13530    |avg     |10m      |
 ROW   |13218     |23344 |13531    |avg     |10m      |
 ROW   |13219     |23345 |13532    |avg     |10m      |
 ROW   |13220     |23346 |13533    |avg     |10m      |
-ROW   |13221     |23666 |13561    |max     |#3       |
+ROW   |13221     |23666 |13561    |min     |#3       |
 
 TABLE |graphs
 FIELDS|graphid|name                                    |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
