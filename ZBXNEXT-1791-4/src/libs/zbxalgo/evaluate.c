@@ -737,8 +737,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 			}
 			else
 			{
-				zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unsupported"
-						" ZBX_UNKNOWN%d value.", unknown_idx);
+				zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unsupported "
+						ZBX_UNKNOWN_STR "%d value.", unknown_idx);
 			}
 		}
 		else
