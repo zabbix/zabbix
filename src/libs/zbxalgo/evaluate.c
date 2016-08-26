@@ -717,11 +717,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	if ('\0' != *ptr && ZBX_INFINITY != *value)
 	{
-		if (NULL != error)
-		{
-			zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".",
-					ptr);
-		}
+		zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".", ptr);
 		*value = ZBX_INFINITY;
 	}
 
