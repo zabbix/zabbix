@@ -3,6 +3,7 @@ Changes for 3.2.0beta2
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 ..F....... [ZBX-11045] fixed action audit log "Recipient" column name (Sasha)
 A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sasha)
 
@@ -90,6 +91,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 .......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
@@ -1541,6 +1543,7 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
