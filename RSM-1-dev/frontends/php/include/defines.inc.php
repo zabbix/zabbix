@@ -969,13 +969,38 @@ define('RSM_SLV_RDDS_AVAIL',				'rsm.slv.rdds.avail');
 define('RSM_SLV_EPP_AVAIL',					'rsm.slv.epp.avail');
 define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
 
-define('RSM_SLA_GRAPH_DNS_SERVICE_AVAILABILITY',	'DNS Service Availability');
-define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH1',	'Per test cycle, average expressed in ms');
-define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH2',	'Maximum expected number of tests per month');
+// SLA reports graph names
+define('DNS_SERVICE_AVAILABILITY_GRAPH_1',		'DNS Service Availability - Accumulated minutes of downtime');
+define('DNS_NS_AVAILABILITY_GRAPH_1',			'DNS NS availability 1 Service Availability');
+define('DNS_NS_AVAILABILITY_GRAPH_2',			'DNS NS availability 2');
+define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_1',	'DNS TCP Resolution RTT - Average');
+define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_2',	'DNS TCP Resolution RTT - Ratio of Failed tests');
+define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_1',	'DNS UDP Resolution RTT - Average');
+define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_2',	'DNS UDP Resolution RTT - Ratio of Failed tests');
+define('DNS_UPDATE_TIME_GRAPH_1',				'DNS Update Time – Average');
+define('DNS_UPDATE_TIME_GRAPH_2',				'DNS Update Time – Ratio of Failed tests');
+define('RDDS_AVAILABILITY_GRAPH_1',				'RDDS Availability – Accumulated minutes of downtime');
+define('RDDS_QUERY_RTT_GRAPH_1',				'RDDS Query RTT – Average');
+define('RDDS_QUERY_RTT_GRAPH_2',				'RDDS Query RTT – Ratio of Failed tests');
+define('RDDS_43_QUERY_RTT_GRAPH_1',				'RDDS 43 Query RTT – Average');
+define('RDDS_80_QUERY_RTT_GRAPH_1',				'RDDS 80 Query RTT – Average');
+define('RDDS_UPDATE_TIME_GRAPH_1',				'RDDS Update Time – Average');
+define('RDDS_UPDATE_TIME_GRAPH_2',				'RDDS Update Time – Ratio of Failed tests');
+define('EPP_SERVICE_AVAILABILITY_GRAPH_1',		'EPP Service Availability – Accumulated minutes of downtime');
+define('EPP_SESSION_COMMAND_RTT_GRAPH_1',		'EPP Session-Command RTT – Average');
+define('EPP_SESSION_COMMAND_RTT_GRAPH_2',		'EPP Session-Command RTT – Ratio of Failed tests');
+define('EPP_TRANSFORM_COMMAND_RTT_GRAPH_1',		'EPP Transform-Command RTT – Average');
+define('EPP_TRANSFORM_COMMAND_RTT_GRAPH_2',		'EPP Transform-Command RTT – Ratio of Failed tests');
+define('EPP_QUERY_COMMAND_RTT_GRAPH_1',			'EPP Query-Command RTT – Average');
+define('EPP_QUERY_COMMAND_RTT_GRAPH_2',			'EPP Query-Command RTT – Ratio of Failed tests');
 
-define('RSM_SLA_SCREEN_TYPE_GRAPH1',		0);
-define('RSM_SLA_SCREEN_TYPE_GRAPH2',		1);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_1',		0);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_2',		1);
 define('RSM_SLA_SCREEN_TYPE_SCREEN',		2);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_3',		3);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_4',		4);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_5',		5);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_6',		6);
 
 // SLA monitoring incident status
 define('INCIDENT_ACTIVE',			0);
