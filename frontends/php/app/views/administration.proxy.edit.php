@@ -79,10 +79,12 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Proxy mode'), new CComboBox('status', $data['status'], null, [
-		HOST_STATUS_PROXY_ACTIVE => _('Active'),
-		HOST_STATUS_PROXY_PASSIVE => _('Passive')
-	]))
+	->addRow(_('Proxy mode'),
+		(new CRadioButtonList('status', (int) $data['status']))
+			->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
+			->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+			->setModern(true)
+	)
 	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
 	->addRow(_('Hosts'), $hosts_tween_box->get(_('Proxy hosts'), _('Other hosts')))
 	->addRow(_('Description'),

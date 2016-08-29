@@ -1,6 +1,7 @@
 Changes for 3.2.0beta2
 
 New features:
+..F....... [ZBXNEXT-3409] replaced drop-down controls with modern radio buttons in several forms (Alexei)
 
 Bug fixes:
 ....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
