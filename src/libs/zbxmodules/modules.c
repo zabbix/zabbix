@@ -195,7 +195,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: load_modules                                                     *
+ * Function: zbx_load_modules                                                 *
  *                                                                            *
  * Purpose: load loadable modules (dynamic libraries)                         *
  *          It skips a module in case of any errors                           *
@@ -209,9 +209,9 @@ out:
  *               FAIL - loading of modules failed                             *
  *                                                                            *
  ******************************************************************************/
-int	load_modules(const char *path, char **file_names, int timeout, int verbose)
+int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose)
 {
-	const char	*__function_name = "load_modules";
+	const char	*__function_name = "zbx_load_modules";
 
 	char		**file_name, *buffer = NULL;
 	void		*lib;
@@ -328,15 +328,15 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: unload_modules                                                   *
+ * Function: zbx_unload_modules                                               *
  *                                                                            *
  * Purpose: Unload already loaded loadable modules (dynamic libraries).       *
  *          It is called on process shutdown.                                 *
  *                                                                            *
  ******************************************************************************/
-void	unload_modules()
+void	zbx_unload_modules()
 {
-	const char	*__function_name = "unload_modules";
+	const char	*__function_name = "zbx_unload_modules";
 
 	int		(*func_uninit)(void);
 	zbx_module_t	*module;

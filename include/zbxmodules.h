@@ -68,7 +68,7 @@ extern zbx_history_string_cb_t	*history_string_cbs;
 extern zbx_history_text_cb_t	*history_text_cbs;
 extern zbx_history_log_cb_t	*history_log_cbs;
 
-int	load_modules(const char *path, char **file_names, int timeout, int verbose);
-void	unload_modules();
+int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose);
+void	zbx_unload_modules();
 
 #endif
