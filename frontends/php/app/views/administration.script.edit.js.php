@@ -3,7 +3,7 @@
 		// type change
 		jQuery('#type')
 			.change(function() {
-				var type = jQuery(this).val(),
+				var type = jQuery('input[name=type]:checked').val(),
 					command_ipmi = jQuery('#commandipmi'),
 					command = jQuery('#command');
 
