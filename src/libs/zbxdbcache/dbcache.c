@@ -31,6 +31,8 @@
 #include "memalloc.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
+#include "zbxmodules.h"
+#include "module.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -2048,6 +2050,116 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCmodule_prepare_history                                         *
+ *                                                                            *
+ * Purpose: prepare history data to share them with loadable modules, sort    *
+ *          data by type skipping low-level discovery data, meta information  *
+ *          updates and notsupported items                                    *
+ *                                                                            *
+ * Parameters: history            - [IN] array of history data                *
+ *             history_num        - [IN] number of history structures         *
+ *             history_<type>     - [OUT] array of historical data of a       *
+ *                                  specific data type                        *
+ *             history_<type>_num - [OUT] number of values of a specific      *
+ *                                  data type                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
+		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
+		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
+		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num)
+{
+	ZBX_DC_HISTORY		*h;
+	ZBX_HISTORY_FLOAT	*h_float;
+	ZBX_HISTORY_INTEGER	*h_integer;
+	ZBX_HISTORY_STRING	*h_string;
+	ZBX_HISTORY_TEXT	*h_text;
+	ZBX_HISTORY_LOG		*h_log;
+	int			i;
+
+	*history_float_num = 0;
+	*history_integer_num = 0;
+	*history_string_num = 0;
+	*history_text_num = 0;
+	*history_log_num = 0;
+
+	for (i = 0; i < history_num; i++)
+	{
+		h = &history[i];
+
+		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
+			continue;
+
+		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
+			continue;
+
+		if (0 != (h->flags & ZBX_DC_FLAG_LLD))
+			continue;
+
+		switch (h->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				if (NULL == history_float_cbs)
+					continue;
+
+				h_float = &history_float[(*history_float_num)++];
+				h_float->itemid = h->itemid;
+				h_float->clock = h->ts.sec;
+				h_float->ns = h->ts.ns;
+				h_float->value = h->value.dbl;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				if (NULL == history_integer_cbs)
+					continue;
+
+				h_integer = &history_integer[(*history_integer_num)++];
+				h_integer->itemid = h->itemid;
+				h_integer->clock = h->ts.sec;
+				h_integer->ns = h->ts.ns;
+				h_integer->value = h->value.ui64;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				if (NULL == history_string_cbs)
+					continue;
+
+				h_string = &history_string[(*history_string_num)++];
+				h_string->itemid = h->itemid;
+				h_string->clock = h->ts.sec;
+				h_string->ns = h->ts.ns;
+				h_string->value = h->value_orig.str;
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				if (NULL == history_text_cbs)
+					continue;
+
+				h_text = &history_text[(*history_text_num)++];
+				h_text->itemid = h->itemid;
+				h_text->clock = h->ts.sec;
+				h_text->ns = h->ts.ns;
+				h_text->value = h->value_orig.str;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (NULL == history_log_cbs)
+					continue;
+
+				h_log = &history_log[(*history_log_num)++];
+				h_log->itemid = h->itemid;
+				h_log->clock = h->ts.sec;
+				h_log->ns = h->ts.ns;
+				h_log->value = h->value_orig.str;
+				h_log->source = h->value.str;
+				h_log->timestamp = h->timestamp;
+				h_log->logeventid = h->logeventid;
+				h_log->severity = h->severity;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_history                                                   *
  *                                                                            *
  * Purpose: writes updates and new data from pool to database                 *
@@ -2061,16 +2173,22 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 int	DCsync_history(int sync_type, int *total_num)
 {
-	const char		*__function_name = "DCsync_history";
+	const char			*__function_name = "DCsync_history";
 
-	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history cache are */
-							/* copied into to process triggers, trends etc and finally */
-							/* write into db */
-	int			history_num, candidate_num, next_sync = 0;
-	time_t			sync_start, now;
-	zbx_vector_uint64_t	triggerids;
-	zbx_vector_ptr_t	history_items, trigger_diff;
-	zbx_binary_heap_t	tmp_history_queue;
+	static ZBX_DC_HISTORY		*history = NULL;	/* array of structures where item data from history  */
+								/* cache are copied into to process triggers, trends */
+								/* etc and finally write into db */
+	static ZBX_HISTORY_FLOAT	*history_float;
+	static ZBX_HISTORY_INTEGER	*history_integer;
+	static ZBX_HISTORY_STRING	*history_string;
+	static ZBX_HISTORY_TEXT		*history_text;
+	static ZBX_HISTORY_LOG		*history_log;
+	int				history_num, candidate_num, next_sync = 0, history_float_num,
+					history_integer_num, history_string_num, history_text_num, history_log_num;
+	time_t				sync_start, now;
+	zbx_vector_uint64_t		triggerids;
+	zbx_vector_ptr_t		history_items, trigger_diff;
+	zbx_binary_heap_t		tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -2119,6 +2237,21 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	if (NULL == history)
 		history = zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
+
+	if (NULL == history_float && NULL != history_float_cbs)
+		history_float = zbx_malloc(history_float, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
+
+	if (NULL == history_integer && NULL != history_integer_cbs)
+		history_integer = zbx_malloc(history_integer, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
+
+	if (NULL == history_string && NULL != history_string_cbs)
+		history_string = zbx_malloc(history_string, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
+
+	if (NULL == history_text && NULL != history_text_cbs)
+		history_text = zbx_malloc(history_text, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
+
+	if (NULL == history_log && NULL != history_log_cbs)
+		history_log = zbx_malloc(history_log, ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
@@ -2197,6 +2330,85 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		*total_num += history_num;
 		candidate_num = history_items.values_num;
+
+		DCmodule_prepare_history(history, history_num, history_float, &history_float_num, history_integer,
+				&history_integer_num, history_string, &history_string_num, history_text,
+				&history_text_num, history_log, &history_log_num);
+
+		if (0 != history_float_num)
+		{
+			int	i;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing float history data with modules...");
+
+			for (i = 0; NULL != history_float_cbs[i].module; i++)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_float_cbs[i].module->name);
+				history_float_cbs[i].history_float_cb(history_float, history_float_num);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "synced %d float values with modules", history_float_num);
+		}
+
+		if (0 != history_integer_num)
+		{
+			int	i;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing integer history data with modules...");
+
+			for (i = 0; NULL != history_integer_cbs[i].module; i++)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_integer_cbs[i].module->name);
+				history_integer_cbs[i].history_integer_cb(history_integer, history_integer_num);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "synced %d integer values with modules", history_integer_num);
+		}
+
+		if (0 != history_string_num)
+		{
+			int	i;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing string history data with modules...");
+
+			for (i = 0; NULL != history_string_cbs[i].module; i++)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_string_cbs[i].module->name);
+				history_string_cbs[i].history_string_cb(history_string, history_string_num);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "synced %d string values with modules", history_string_num);
+		}
+
+		if (0 != history_text_num)
+		{
+			int	i;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing text history data with modules...");
+
+			for (i = 0; NULL != history_text_cbs[i].module; i++)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_text_cbs[i].module->name);
+				history_text_cbs[i].history_text_cb(history_text, history_text_num);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "synced %d text values with modules", history_text_num);
+		}
+
+		if (0 != history_log_num)
+		{
+			int	i;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "syncing log history data with modules...");
+
+			for (i = 0; NULL != history_log_cbs[i].module; i++)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_log_cbs[i].module->name);
+				history_log_cbs[i].history_log_cb(history_log, history_log_num);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "synced %d log values with modules", history_log_num);
+		}
 
 		now = time(NULL);
 
