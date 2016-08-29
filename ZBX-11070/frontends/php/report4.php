@@ -119,27 +119,19 @@ else {
 	$header = [];
 	$users = [];
 
-	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$db_users = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
-			'sortfield' => 'alias'
-		]);
-	}
-	else{
+	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 		$user_groups = API::UserGroup()->get([
+			'output' => [],
 			'userids' => CWebUser::$data['userid'],
-			'selectUsers' => ['userid', 'alias', 'name', 'surname']
+			'preservekeys' => true
 		]);
-
-		$db_users = [];
-		foreach ($user_groups as $user_group) {
-			foreach ($user_group['users'] as $user) {
-				$db_users[$user['alias']] = $user;
-			}
-		}
-
-		ksort($db_users);
 	}
+
+	$db_users = API::User()->get(
+		['output' => ['userid', 'alias', 'name', 'surname']]
+		+ (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN ? ['usrgrpids' => array_keys($user_groups)] : [])
+		+ ['sortfield' => 'alias']
+	);
 
 	foreach ($db_users as $user_data) {
 		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
