@@ -3676,20 +3676,6 @@ tr.cursor-move {
 	@extend %overflow-ellipsis;
 }
 
-.list-hor-min-width {
-
-	li {
-		display: inline-block;
-		min-width: 1.4em;
-		margin-right: .4em;
-
-		&:last-child {
-			min-width: auto;
-			margin-right: 0;
-		}
-	}
-}
-
 .uppercase {
 	text-transform: $font-transform;
 }
