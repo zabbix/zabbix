@@ -1089,6 +1089,7 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['add_opcondition'])) {
+			$this->zbxTestClickWait('search');
 			$this->zbxTestClickWait('new_opcondition');
 			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('new_opcondition_conditiontype'));
 			$add_opcondition = $data['add_opcondition'];
@@ -1976,7 +1977,6 @@ class testFormAction extends CWebTest {
 	}
 
 	public function testFormAction_Create() {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
@@ -2096,7 +2096,6 @@ class testFormAction extends CWebTest {
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
 		$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testFormAction_Teardown() {

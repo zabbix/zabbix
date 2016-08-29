@@ -482,8 +482,6 @@ class testTemplateInheritance extends CWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
-
 		$this->zbxTestLogin('templates.php');
 
 		// create a graph
@@ -555,7 +553,6 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->templateName);
 
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**

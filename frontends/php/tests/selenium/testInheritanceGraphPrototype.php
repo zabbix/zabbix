@@ -105,7 +105,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
@@ -138,7 +137,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testInheritanceGraphPrototype_restore() {
