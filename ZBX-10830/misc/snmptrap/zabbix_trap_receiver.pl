@@ -87,7 +87,7 @@ sub zabbix_receiver
 	print OUTPUT_FILE "PDU INFO:\n";
 	foreach my $key(keys(%pdu_info))
 	{
-		if (( $pdu_info{$key} !~ /^[0-9A-Za-z]/i ) && ( $pdu_info{$key} ne "" ))
+		if (( $pdu_info{$key} !~ /^[[:print:]]+$/ ) && ( $pdu_info{$key} ne "" ))
 		{
 			my $OctetAsHex = unpack('H*',$pdu_info{$key}) ;	# convert octet string to hex
 			$pdu_info{$key} = "0x$OctetAsHex" ;		# apply 0x prefix for consistency
