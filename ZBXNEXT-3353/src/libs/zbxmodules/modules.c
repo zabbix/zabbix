@@ -24,14 +24,21 @@
 #include "log.h"
 #include "sysinfo.h"
 
-#define ZBX_MODULE_FUNC_INIT		"zbx_module_init"
-#define ZBX_MODULE_FUNC_API_VERSION	"zbx_module_api_version"
-#define ZBX_MODULE_FUNC_ITEM_LIST	"zbx_module_item_list"
-#define ZBX_MODULE_FUNC_ITEM_PROCESS	"zbx_module_item_process"
-#define ZBX_MODULE_FUNC_ITEM_TIMEOUT	"zbx_module_item_timeout"
-#define ZBX_MODULE_FUNC_UNINIT		"zbx_module_uninit"
+#define ZBX_MODULE_FUNC_INIT			"zbx_module_init"
+#define ZBX_MODULE_FUNC_API_VERSION		"zbx_module_api_version"
+#define ZBX_MODULE_FUNC_ITEM_LIST		"zbx_module_item_list"
+#define ZBX_MODULE_FUNC_ITEM_PROCESS		"zbx_module_item_process"
+#define ZBX_MODULE_FUNC_ITEM_TIMEOUT		"zbx_module_item_timeout"
+#define ZBX_MODULE_FUNC_UNINIT			"zbx_module_uninit"
+#define ZBX_MODULE_FUNC_HISTORY_WRITE_CBS	"zbx_module_history_write_cbs"
 
-static void	**modules = NULL;
+static zbx_module_t	*modules = NULL;
+
+zbx_history_float_cb_t		*history_float_cbs = NULL;
+zbx_history_integer_cb_t	*history_integer_cbs = NULL;
+zbx_history_string_cb_t		*history_string_cbs = NULL;
+zbx_history_text_cb_t		*history_text_cbs = NULL;
+zbx_history_log_cb_t		*history_log_cbs = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -40,38 +47,146 @@ static void	**modules = NULL;
  * Purpose: Add module to the list of loaded modules (dynamic libraries).     *
  *          It skips a module if it is already registered.                    *
  *                                                                            *
- * Parameters: module - library handler                                       *
+ * Parameters: lib  - module library                                          *
+ *             name - module name                                             *
  *                                                                            *
  * Return value: SUCCEED - if module is successfully registered               *
  *               FAIL - if module is already registered                       *
  *                                                                            *
  ******************************************************************************/
-static int	register_module(void *module)
+static int	register_module(void *lib, char *name)
 {
-	const char	*__function_name = "register_module";
+	const char		*__function_name = "register_module";
 
-	int		i = 0, ret = FAIL;
+	ZBX_HISTORY_WRITE_CBS	(*func_history_write_cbs)(void);
+	ZBX_HISTORY_WRITE_CBS	history_write_cbs;
+	int			i = 0, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == modules)
 	{
-		modules = zbx_malloc(modules, sizeof(void *));
-		modules[0] = NULL;
+		modules = zbx_malloc(modules, sizeof(zbx_module_t));
+		modules[0].lib = NULL;
 	}
 
-	while (NULL != modules[i])
+	while (NULL != modules[i].lib)
 	{
-		if (module == modules[i])	/* a module is already registered */
+		if (lib == modules[i].lib)	/* a module is already registered */
 			goto out;
 		i++;
 	}
 
-	modules = zbx_realloc(modules, (i + 2) * sizeof(void *));
-	modules[i] = module;
-	modules[i + 1] = NULL;
+	modules = zbx_realloc(modules, (i + 2) * sizeof(zbx_module_t));
+	modules[i].lib = lib;
+	modules[i].name = zbx_strdup(NULL, name);
+	modules[i + 1].lib = NULL;
 
 	ret = SUCCEED;
+
+	/* module successfully registered, now comes optional part */
+
+	func_history_write_cbs = (ZBX_HISTORY_WRITE_CBS (*)(void))dlsym(lib, ZBX_MODULE_FUNC_HISTORY_WRITE_CBS);
+
+	if (NULL == func_history_write_cbs)
+		goto out;
+
+	history_write_cbs = func_history_write_cbs();
+
+	if (NULL != history_write_cbs.history_float_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_float_cbs)
+		{
+			history_float_cbs = zbx_malloc(history_float_cbs, sizeof(zbx_history_float_cb_t));
+			history_float_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_float_cbs[j].module)
+			j++;
+
+		history_float_cbs = zbx_realloc(history_float_cbs, (j + 2) * sizeof(zbx_history_float_cb_t));
+		history_float_cbs[j].module = &modules[i];
+		history_float_cbs[j].history_float_cb = history_write_cbs.history_float_cb;
+		history_float_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_integer_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_integer_cbs)
+		{
+			history_integer_cbs = zbx_malloc(history_integer_cbs, sizeof(zbx_history_integer_cb_t));
+			history_integer_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_integer_cbs[j].module)
+			j++;
+
+		history_integer_cbs = zbx_realloc(history_integer_cbs, (j + 2) * sizeof(zbx_history_integer_cb_t));
+		history_integer_cbs[j].module = &modules[i];
+		history_integer_cbs[j].history_integer_cb = history_write_cbs.history_integer_cb;
+		history_integer_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_string_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_string_cbs)
+		{
+			history_string_cbs = zbx_malloc(history_string_cbs, sizeof(zbx_history_string_cb_t));
+			history_string_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_string_cbs[j].module)
+			j++;
+
+		history_string_cbs = zbx_realloc(history_string_cbs, (j + 2) * sizeof(zbx_history_string_cb_t));
+		history_string_cbs[j].module = &modules[i];
+		history_string_cbs[j].history_string_cb = history_write_cbs.history_string_cb;
+		history_string_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_text_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_text_cbs)
+		{
+			history_text_cbs = zbx_malloc(history_text_cbs, sizeof(zbx_history_text_cb_t));
+			history_text_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_text_cbs[j].module)
+			j++;
+
+		history_text_cbs = zbx_realloc(history_text_cbs, (j + 2) * sizeof(zbx_history_text_cb_t));
+		history_text_cbs[j].module = &modules[i];
+		history_text_cbs[j].history_text_cb = history_write_cbs.history_text_cb;
+		history_text_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_log_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_log_cbs)
+		{
+			history_log_cbs = zbx_malloc(history_log_cbs, sizeof(zbx_history_log_cb_t));
+			history_log_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_log_cbs[j].module)
+			j++;
+
+		history_log_cbs = zbx_realloc(history_log_cbs, (j + 2) * sizeof(zbx_history_log_cb_t));
+		history_log_cbs[j].module = &modules[i];
+		history_log_cbs[j].history_log_cb = history_write_cbs.history_log_cb;
+		history_log_cbs[j + 1].module = NULL;
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -101,9 +216,9 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 	char		**file_name, *buffer = NULL;
 	void		*lib;
 	char		full_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
-	int		(*func_init)(), (*func_version)();
-	ZBX_METRIC	*(*func_list)();
-	void		(*func_timeout)();
+	int		(*func_init)(void), (*func_version)(void);
+	ZBX_METRIC	*(*func_list)(void);
+	void		(*func_timeout)(int);
 	int		i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -129,7 +244,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 			goto fail;
 		}
 
-		if (ZBX_MODULE_API_VERSION_ONE != (i = func_version()))
+		if (ZBX_MODULE_API_VERSION != (i = func_version()))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "unsupported module \"%s\" version: %d", *file_name, i);
 			dlclose(lib);
@@ -153,7 +268,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 		}
 
 		/* the function is optional, zabbix will load the module even if it is missing */
-		func_timeout = (void (*)(void))dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
+		func_timeout = (void (*)(int))dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
 		if (NULL == func_timeout)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_TIMEOUT "()\""
@@ -171,7 +286,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 			continue;
 		}
 
-		if (SUCCEED == register_module(lib))
+		if (SUCCEED == register_module(lib, *file_name))
 		{
 			ZBX_METRIC	*metrics;
 
@@ -223,8 +338,8 @@ void	unload_modules()
 {
 	const char	*__function_name = "unload_modules";
 
-	int		(*func_uninit)();
-	void		**module;
+	int		(*func_uninit)(void);
+	zbx_module_t	*module;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -232,24 +347,28 @@ void	unload_modules()
 	if (NULL == modules)
 		goto out;
 
-	for (module = modules; NULL != *module; module++)
+	for (module = modules; NULL != module->lib; module++)
 	{
-		func_uninit = (int (*)(void))dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
+		func_uninit = (int (*)(void))dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT);
+
 		if (NULL == func_uninit)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT "()\" function: %s",
 					dlerror());
-			dlclose(*module);
-			continue;
 		}
-
-		if (ZBX_MODULE_OK != func_uninit())
+		else if (ZBX_MODULE_OK != func_uninit())
 			zabbix_log(LOG_LEVEL_WARNING, "uninitialization failed");
 
-		dlclose(*module);
+		dlclose(module->lib);
+		zbx_free(module->name);
 	}
 
 	zbx_free(modules);
+	zbx_free(history_float_cbs);
+	zbx_free(history_integer_cbs);
+	zbx_free(history_string_cbs);
+	zbx_free(history_text_cbs);
+	zbx_free(history_log_cbs);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
