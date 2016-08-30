@@ -280,7 +280,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	int		i = 0;
 	ZBX_ODBC_RESULT	result = NULL;
 	SQLRETURN	rc;
-	SQLINTEGER	*ColLenArray = NULL;
+	SQLLEN		*ColLenArray = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
 
@@ -303,7 +303,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * (size_t)pdbh->col_num);
 	memset(pdbh->data_len, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
 
-	ColLenArray = (SQLINTEGER *) zbx_malloc(ColLenArray, pdbh->col_num * sizeof(SQLINTEGER));
+	ColLenArray = (SQLLEN *) zbx_malloc(ColLenArray, pdbh->col_num * sizeof(SQLLEN));
 	memset(ColLenArray, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
