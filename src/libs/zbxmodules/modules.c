@@ -347,6 +347,12 @@ void	zbx_unload_modules()
 	if (NULL == modules)
 		goto out;
 
+	zbx_free(history_float_cbs);
+	zbx_free(history_integer_cbs);
+	zbx_free(history_string_cbs);
+	zbx_free(history_text_cbs);
+	zbx_free(history_log_cbs);
+
 	for (module = modules; NULL != module->lib; module++)
 	{
 		func_uninit = (int (*)(void))dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT);
@@ -364,11 +370,6 @@ void	zbx_unload_modules()
 	}
 
 	zbx_free(modules);
-	zbx_free(history_float_cbs);
-	zbx_free(history_integer_cbs);
-	zbx_free(history_string_cbs);
-	zbx_free(history_text_cbs);
-	zbx_free(history_log_cbs);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
