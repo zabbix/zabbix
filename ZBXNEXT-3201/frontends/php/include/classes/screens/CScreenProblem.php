@@ -515,7 +515,7 @@ class CScreenProblem extends CScreenBase {
 
 		$data = $this->makeData($data);
 
-		$actions = makeEventsActions(array_keys($data['problems']));
+		$actions = makeEventsActions($data['problems'], true);
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
@@ -572,7 +572,7 @@ class CScreenProblem extends CScreenBase {
 				$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 			}
 
-			foreach ($data['problems'] as $problem) {
+			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
 
 				$cell_clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
@@ -630,8 +630,8 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
-					array_key_exists($problem['eventid'], $actions)
-						? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
+					array_key_exists($eventid, $actions)
+						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
 					$tags[$problem['eventid']]
 				]);

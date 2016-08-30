@@ -151,7 +151,7 @@ class CScreenActions extends CScreenBase {
 					->addClass(ZBX_STYLE_YELLOW);
 			}
 			else {
-				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
+				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid'] != 0

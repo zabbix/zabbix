@@ -69,7 +69,7 @@ foreach ($this->data['alerts'] as $alert) {
 		]))->addClass(ZBX_STYLE_YELLOW);
 	}
 	else {
-		$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
+		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)

@@ -333,11 +333,12 @@ function make_system_status($filter, $backurl) {
 		'preservekeys' => true
 	]);
 
-	$eventIds = [];
+	$events = [];
 
 	foreach ($triggers as $triggerId => $trigger) {
 		if ($trigger['lastEvent']) {
-			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
+			$eventid = $trigger['lastEvent']['eventid'];
+			$events[$eventid] = ['eventid' => $eventid];
 		}
 
 		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
@@ -345,17 +346,17 @@ function make_system_status($filter, $backurl) {
 	}
 
 	// get acknowledges
-	if ($eventIds) {
+	if ($events) {
 		$eventAcknowledges = API::Event()->get([
 			'output' => ['eventid'],
-			'eventids' => $eventIds,
+			'eventids' => array_keys($events),
 			'select_acknowledges' => ['eventid', 'clock', 'message', 'action', 'alias', 'name', 'surname'],
 			'preservekeys' => true
 		]);
 	}
 
 	// actions
-	$actions = makeEventsActions($eventIds);
+	$actions = makeEventsActions($events);
 
 	// triggers
 	foreach ($triggers as $trigger) {
@@ -589,30 +590,31 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// get acknowledges
 	$hostids = [];
-	$eventids = [];
+	$events = [];
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			$hostids[$host['hostid']] = true;
 		}
 
 		if ($trigger['lastEvent']) {
-			$eventids[] = $trigger['lastEvent']['eventid'];
+			$eventid = $trigger['lastEvent']['eventid'];
+			$events[$eventid] = ['eventid' => $eventid];
 		}
 	}
 
 	$config = select_config();
 
-	if ($config['event_ack_enable'] && $eventids) {
+	if ($config['event_ack_enable'] && $events) {
 		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
-			'eventids' => $eventids,
+			'eventids' => array_keys($events),
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
 	}
 
 	// actions
-	$actions = makeEventsActions($eventids);
+	$actions = makeEventsActions($events);
 
 	// indicator of sort field
 	if ($show_sort_indicator) {
