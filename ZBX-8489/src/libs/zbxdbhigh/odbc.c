@@ -323,7 +323,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	{
 		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], ColLenArray[i]);
 		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				ColLenArray[i] + 1, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
+				ColLenArray[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot bind column in ODBC result"))
 		{
 			goto end;
