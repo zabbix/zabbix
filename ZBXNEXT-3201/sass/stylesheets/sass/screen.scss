@@ -2115,6 +2115,23 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
+.icon-info {
+	position: absolute;
+	min-height: 1em;
+	margin-top: -12px;
+	cursor: pointer;
+
+	&::before {
+		content: '';
+		position: absolute;
+		display: block;
+		width: 2px;
+		height: 10px;
+		left: 6px;
+		background: url(../img/icon-sprite.svg) no-repeat -53px -661px;
+	}
+}
+
 // Sign in, Installation
 
 .setup-container  {
@@ -3060,10 +3077,16 @@ a.blue {
 	@extend %status;
 }
 
+.status-dark-grey {
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	@extend %status;
+}
+
 .status-yellow {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
-	background-color: darken(desaturate($alt-yellow, 10%), 16%);
+	border: 1px solid darken(desaturate($alt-yellow, 9%), 20%);
+	background-color: darken(desaturate($alt-yellow, 9%), 18%);
 	@extend %status;
 }
 
@@ -3090,7 +3113,7 @@ a.blue {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 0.7em;
+	min-width: .7em;
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
