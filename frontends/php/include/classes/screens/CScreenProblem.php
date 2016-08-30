@@ -274,7 +274,9 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags'],
+						'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
+							'priority', 'url', 'flags'
+						],
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
@@ -472,6 +474,20 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
+		if ($this->data['filter']['details'] == 1) {
+			foreach ($data['triggers'] as &$trigger) {
+				$trigger['expression_html'] = $trigger['expression'];
+				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
+			}
+			unset($trigger);
+
+			$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
+				'html' => true,
+				'resolve_usermacros' => true,
+				'resolve_macros' => true,
+				'sources' => ['expression_html', 'recovery_expression_html']
+			]);
+		}
 		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 		// get additional data
@@ -610,9 +626,27 @@ class CScreenProblem extends CScreenBase {
 					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
 				);
 
-				$description = CMacrosResolverHelper::resolveEventDescription(
-					$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-				);
+				$description = [
+					(new CSpan(CMacrosResolverHelper::resolveEventDescription(
+						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
+					)))
+						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+				];
+
+				if ($this->data['filter']['details'] == 1) {
+					$description[] = BR();
+
+					if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+						$description[] = [_('Problem'), ': ', $trigger['expression_html'], BR()];
+						$description[] = [_('Recovery'), ': ', $trigger['recovery_expression_html']];
+					}
+					else {
+						$description[] = $trigger['expression_html'];
+					}
+				}
+
+
 
 				$table->addRow([
 					$this->config['event_ack_enable']
@@ -623,9 +657,7 @@ class CScreenProblem extends CScreenBase {
 					(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
 					$cell_status,
 					$triggers_hosts[$trigger['triggerid']],
-					(new CSpan($description))
-						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-						->addClass(ZBX_STYLE_LINK_ACTION),
+					$description,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
