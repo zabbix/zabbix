@@ -1523,7 +1523,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = new CLink(_('First'), $url->getUrl());
+			$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
@@ -1550,7 +1550,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = new CLink(_('Last'), $url->getUrl());
+			$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
 		}
 	}
 
