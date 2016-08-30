@@ -195,11 +195,11 @@ ZBX_HISTORY_LOG;
 
 typedef struct
 {
-	void	(*history_float_cb)(ZBX_HISTORY_FLOAT *, int);
-	void	(*history_integer_cb)(ZBX_HISTORY_INTEGER *, int);
-	void	(*history_string_cb)(ZBX_HISTORY_STRING *, int);
-	void	(*history_text_cb)(ZBX_HISTORY_TEXT *, int);
-	void	(*history_log_cb)(ZBX_HISTORY_LOG *, int);
+	void	(*history_float_cb)(ZBX_HISTORY_FLOAT *history, int history_num);
+	void	(*history_integer_cb)(ZBX_HISTORY_INTEGER *history, int history_num);
+	void	(*history_string_cb)(ZBX_HISTORY_STRING *history, int history_num);
+	void	(*history_text_cb)(ZBX_HISTORY_TEXT *history, int history_num);
+	void	(*history_log_cb)(ZBX_HISTORY_LOG *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 
