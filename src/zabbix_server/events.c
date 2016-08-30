@@ -875,7 +875,7 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
  ******************************************************************************/
 static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event, int old_value)
 {
-	char			*expression, *value;
+	char			*expression, *value, error[256];
 	zbx_token_t		token;
 	int			pos = 0, ret = FAIL;
 	zbx_uint64_t		conditionid;
@@ -910,7 +910,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		pos = token.token.r;
 	}
 
-	if (SUCCEED == evaluate(&result, expression, NULL, 0, NULL))
+	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
 		ret = zbx_double_compare(result, 1);
 out:
 	zbx_free(expression);
