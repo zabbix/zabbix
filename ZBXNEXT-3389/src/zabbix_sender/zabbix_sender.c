@@ -495,9 +495,10 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 
 		if (*buffer_alloc - buffer_offset < len + 1)
 		{
-			*buffer_alloc = (buffer_offset + len + 1) * 1.5;
+			*buffer_alloc = (buffer_offset + len + 1) * 3 / 2;
 			*buffer = zbx_realloc(*buffer, *buffer_alloc);
 		}
+
 		memcpy(*buffer + buffer_offset, tmp, len);
 		buffer_offset += len;
 		(*buffer)[buffer_offset] = '\0';
@@ -514,8 +515,8 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 int	main(int argc, char **argv)
 {
 	FILE			*in;
-	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
-				*key_value = NULL, clock[32];
+	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], *key_value = NULL,
+				clock[32];
 	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL;
 	size_t			in_line_alloc = MAX_BUFFER_LEN, key_value_alloc = 0;
 	double			last_send = 0;
@@ -574,6 +575,7 @@ int	main(int argc, char **argv)
 		}
 
 		in_line = zbx_malloc(NULL, in_line_alloc);
+
 		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
