@@ -314,7 +314,6 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		{
 			goto end;
 		}
-		ColLenArray[i] = ALIGNBUF(ColLenArray[i]);
 	}
 
 	pdbh->row_data = zbx_malloc(pdbh->row_data, ColLenArray[pdbh->col_num - 1] + ALIGNBUF(sizeof(SQLINTEGER)));
