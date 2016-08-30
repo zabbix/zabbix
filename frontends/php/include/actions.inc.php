@@ -1442,10 +1442,14 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 }
 
 /**
+ * Get list of event actions.
+ *
  * @param array  $problems
  * @param string $problems[]['eventid']
  * @param string $problems[]['r_eventid']  (optional) recovery event ID
  * @param bool   $display_recovery_alerts             include recovery events
+ *
+ * @return array
  */
 function makeEventsActions(array $problems, $display_recovery_alerts = false) {
 	if (!$problems) {
