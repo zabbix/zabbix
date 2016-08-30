@@ -39,8 +39,7 @@ foreach ($data['g_triggerid'] as $triggerid) {
 }
 
 $triggersFormList = (new CFormList('triggersFormList'))
-	->addRow(
-		[_('Severity'), SPACE,
+	->addRow([_('Severity'), SPACE,
 			(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
 				->setChecked(isset($data['visible']['priority']))
 		],
@@ -104,6 +103,52 @@ $triggersFormList->addRow(
 	],
 	$dependenciesDiv
 );
+
+$tags_table = (new CTable())->setId('tbl_tags');
+
+foreach ($data['tags'] as $tag_key => $tag) {
+	$tags_table->addRow([
+		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tags['.$tag_key.'][value]', $tag['value']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		(new CCol(
+			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+}
+
+$tags_table->setFooter(new CCol(
+	(new CButton('tag_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+));
+
+$triggersFormList
+	->addRow([_('Replace tags'), SPACE,
+			(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
+				->setChecked(isset($data['visible']['tags']))
+		],
+		(new CDiv([$tags_table]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setId('tags_div')
+	)
+	->addRow([_('Allow manual close'), SPACE,
+			(new CVisibilityBox('visible[manual_close]', 'manual_close_div', _('Original')))
+				->setChecked(isset($data['visible']['manual_close']))
+		],
+		(new CDiv(
+			(new CRadioButtonList('manual_close', (int) $data['manual_close']))
+				->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+				->addValue(_('Yes'), ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+				->setModern(true)
+		))->setId('manual_close_div')
+	);
 
 $triggersTab = new CTabView();
 $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
