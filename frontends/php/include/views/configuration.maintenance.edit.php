@@ -32,18 +32,18 @@ if (isset($this->data['maintenanceid'])) {
 /*
  * Maintenance tab
  */
-$maintenanceFormList = new CFormList('maintenanceFormList');
-$maintenanceFormList->addRow(_('Name'),
-	(new CTextBox('mname', $this->data['mname']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus')
-);
-$maintenanceFormList->addRow(_('Maintenance type'),
-	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, [
-		MAINTENANCE_TYPE_NORMAL => _('With data collection'),
-		MAINTENANCE_TYPE_NODATA => _('No data collection')
-	])
-);
+$maintenanceFormList = (new CFormList('maintenanceFormList'))
+	->addRow(_('Name'),
+		(new CTextBox('mname', $this->data['mname']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Maintenance type'),
+		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
+			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
+			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
+			->setModern(true)
+	);
 
 // active since
 if (isset($_REQUEST['active_since'])) {

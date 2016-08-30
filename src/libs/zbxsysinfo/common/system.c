@@ -66,12 +66,12 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	ZBX_UNUSED(request);
-
 #ifdef _WINDOWS
 	char		counter_path[64];
 	AGENT_REQUEST	request_tmp;
 	int		ret;
+
+	ZBX_UNUSED(request);
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_TERMINAL_SERVICES, PCI_TOTAL_SESSIONS);
 
@@ -85,6 +85,8 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return ret;
 #else
+	ZBX_UNUSED(request);
+
 	return EXECUTE_INT("who | wc -l", result);
 #endif
 }
