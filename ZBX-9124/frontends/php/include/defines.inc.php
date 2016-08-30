@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.2.0alpha3');
+define('ZABBIX_VERSION',		'3.2.0beta2');
 define('ZABBIX_API_VERSION',	'3.2.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010075);
+define('ZABBIX_DB_VERSION',		3010079);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -707,6 +707,7 @@ define('GROUP_DEBUG_MODE_ENABLED',	1);
 define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
 define('PERM_DENY',			0);
+define('PERM_NONE',			-1);
 
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);

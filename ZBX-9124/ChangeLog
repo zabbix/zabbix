@@ -1,8 +1,32 @@
-Changes for 3.2.0alpha3
+Changes for 3.2.0beta2
 
 New features:
+..F....... [ZBXNEXT-3409] replaced drop-down controls with modern radio buttons in several forms (Alexei)
 
 Bug fixes:
+...G...... [ZBX-9124] changed getting OS name by item system.sw.os[name] (Sergejs)
+....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
+....I....T [ZBX-10476] fixed several issues with 'service.discovery' lld rule in template 'Template OS Windows' (Sergejs)
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+..F....... [ZBX-11045] fixed action audit log "Recipient" column name (Sasha)
+A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.0beta1
+
+New features:
+........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items (Andris, wiper)
+........S. [ZBXNEXT-2877] added datacenter name to vmware hypervisors and virtual machines (wiper)
+A.F.I...S. [ZBXNEXT-1262] added support of nested host groups (Gunars, Ivo, Oleg, Sasha, wiper)
+A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+........S. [ZBXNEXT-1791] enabled evaluation of nodata() and time-based functions for not supported items in trigger expressions and calculated items (Andris, wiper)
+
+Bug fixes:
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
+...G...PS. [ZBX-11105] fixed compiler warnings regarding unused function parameters (Sandis)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+....I....T [ZBX-10476] extended 'Template OS Windows' template by 'service.discovery' LLD (Sergejs)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0alpha2
@@ -14,7 +38,6 @@ A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars,
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
 
 Bug fixes:
-........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11098] corrected log messages about completion of the trend data synchronization (Sergejs)
 ........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
@@ -72,6 +95,9 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
 ........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
@@ -1521,6 +1547,8 @@ Changes for 2.2.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
 ........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
 ........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
 ........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)

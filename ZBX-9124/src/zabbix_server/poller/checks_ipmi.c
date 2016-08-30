@@ -450,6 +450,8 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
+	ZBX_UNUSED(raw_value);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 != err)
@@ -857,6 +859,8 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 	const char	*__function_name = "sensor_change";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	ZBX_UNUSED(ent);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	/* ignore non-readable sensors (e.g. Event-only) */
@@ -885,6 +889,8 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 	const char	*__function_name = "control_change";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	ZBX_UNUSED(ent);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	switch (op)
@@ -909,6 +915,8 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 	const char	*__function_name = "entity_change";
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
+
+	ZBX_UNUSED(domain);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
@@ -946,6 +954,10 @@ static void	setup_done(ipmi_domain_t *domain, int err, unsigned int conn_num, un
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
 
+	ZBX_UNUSED(conn_num);
+	ZBX_UNUSED(port_num);
+	ZBX_UNUSED(still_connected);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	if (0 != err)
@@ -973,6 +985,8 @@ static void	domain_up(ipmi_domain_t *domain, void *cb_data)
 	const char	*__function_name = "domain_up";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	ZBX_UNUSED(domain);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p, host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	h->domain_up = 1;
@@ -984,6 +998,8 @@ static void	domain_up(ipmi_domain_t *domain, void *cb_data)
 static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_type_e log_type, va_list ap)
 {
 	char	type[8], str[MAX_STRING_LEN];
+
+	ZBX_UNUSED(handler);
 
 	switch (log_type)
 	{

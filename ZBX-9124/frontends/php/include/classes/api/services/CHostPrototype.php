@@ -112,6 +112,7 @@ class CHostPrototype extends CHostBase {
 		// group validators
 		$groupLinkValidator = new CSchemaValidator($this->getGroupLinkSchema());
 		$groupPrototypeValidator = new CSchemaValidator($this->getGroupPrototypeSchema());
+		$host_group_name_validator = new CHostGroupNameValidator();
 
 		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -129,8 +130,15 @@ class CHostPrototype extends CHostBase {
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
+					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
+					$groupPrototypeValidator->setObjectName($name);
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+
+					if (!$host_group_name_validator->validate($name)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
+						));
+					}
 				}
 			}
 		}
@@ -395,6 +403,8 @@ class CHostPrototype extends CHostBase {
 			'messageInvalid' => _('Incorrect group prototype ID.')
 		]));
 
+		$host_group_name_validator = new CHostGroupNameValidator();
+
 		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
@@ -413,8 +423,15 @@ class CHostPrototype extends CHostBase {
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
+					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
+					$groupPrototypeValidator->setObjectName($name);
 					$this->checkPartialValidator($groupPrototype, $groupPrototypeValidator);
+
+					if (!$host_group_name_validator->validate($name)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
+						));
+					}
 				}
 			}
 		}

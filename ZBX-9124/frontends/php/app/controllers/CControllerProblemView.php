@@ -52,6 +52,7 @@ class CControllerProblemView extends CController {
 			'filter_inventory' =>		'array',
 			'filter_tags' =>			'array',
 			'filter_maintenance' =>		'in 1',
+			'filter_groupids_subgroupids' => 'array_id',
 			'filter_unacknowledged' =>	'in 1',
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
 			'stime' =>					'time'
@@ -107,6 +108,9 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
+			CProfile::updateArray('web.problem.filter.subgroupids', $this->getInput('filter_groupids_subgroupids', []),
+				PROFILE_TYPE_ID
+			);
 			CProfile::updateArray('web.problem.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 			CProfile::update('web.problem.filter.application', $this->getInput('filter_application', ''),
 				PROFILE_TYPE_STR
@@ -154,6 +158,7 @@ class CControllerProblemView extends CController {
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
 			CProfile::deleteIdx('web.problem.filter.groupids');
+			CProfile::deleteIdx('web.problem.filter.subgroupids');
 			CProfile::deleteIdx('web.problem.filter.hostids');
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
@@ -174,10 +179,31 @@ class CControllerProblemView extends CController {
 		$filter_hostids = CProfile::getArray('web.problem.filter.hostids', []);
 		$filter_triggerids = CProfile::getArray('web.problem.filter.triggerids', []);
 
+		$groups = [];
+
+		if ($filter_groupids) {
+			$groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter_groupids,
+				'preservekeys' => true
+			]), ['groupid' => 'id']);
+
+			$filter_subgroupids = CProfile::getArray('web.problem.filter.subgroupids', []);
+
+			foreach ($filter_subgroupids as $groupid) {
+				if (array_key_exists($groupid, $groups)) {
+					$groups[$groupid]['name'] .= '/*';
+				}
+			}
+
+			$filter_groupids = getMultiselectGroupIds($filter_groupids , $filter_subgroupids);
+		}
+
 		$filter_triggers = $filter_triggerids
 			? CArrayHelper::renameObjectsKeys(API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'selectHosts' => ['name'],
+				'expandDescription' => true,
 				'triggerids' => $filter_triggerids,
 				'monitored' => true
 			]), ['triggerid' => 'id', 'description' => 'name'])
@@ -232,17 +258,12 @@ class CControllerProblemView extends CController {
 			'filter' => [
 				'show' => CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM),
 				'groupids' => $filter_groupids,
-				'groups' => $filter_groupids
-					? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'groupids' => $filter_groupids,
-					]), ['groupid' => 'id'])
-					: [],
+				'groups' => $groups,
 				'hostids' => $filter_hostids,
 				'hosts' => $filter_hostids
 					? CArrayHelper::renameObjectsKeys(API::Host()->get([
 						'output' => ['hostid', 'name'],
-						'hostids' => $filter_hostids,
+						'hostids' => $filter_hostids
 					]), ['hostid' => 'id'])
 					: [],
 				'application' => CProfile::get('web.problem.filter.application', ''),

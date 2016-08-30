@@ -511,7 +511,7 @@ class CScreenProblem extends CScreenBase {
 		$data = $this->getData();
 		$data = $this->sortData($data);
 
-		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, $url);
+		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
 
 		$data = $this->makeData($data);
 
@@ -542,7 +542,9 @@ class CScreenProblem extends CScreenBase {
 				$header_check_box = null;
 			}
 
-			$link = $url->getUrl();
+			$link = $url
+				->setArgument('page', $this->data['page'])
+				->getUrl();
 
 			// create table
 			$table = (new CTableInfo())
@@ -563,7 +565,6 @@ class CScreenProblem extends CScreenBase {
 
 			if ($this->config['event_ack_enable']) {
 				$url->setArgument('uncheck', '1');
-				$url->setArgument('page', $this->data['page']);
 				$acknowledges = makeEventsAcknowledges($data['problems'], $url->getUrl());
 			}
 			$tags = makeEventsTags($data['problems']);

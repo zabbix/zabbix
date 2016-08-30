@@ -1408,7 +1408,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 
 	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
 	{
-		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error)))
+		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
 
 		zbx_free(expression);
