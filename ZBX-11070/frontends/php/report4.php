@@ -119,7 +119,7 @@ else {
 	$header = [];
 	$users = [];
 	$options = [
-		'output' => ['userid', 'alias', 'name', 'surname']
+		'output' => ['userid', 'alias', 'name', 'surname'],
 		'sortfield' => 'alias'
 	];
 
