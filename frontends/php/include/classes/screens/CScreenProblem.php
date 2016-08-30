@@ -601,6 +601,7 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
+					$value_clock = $problem['r_clock'];
 				}
 				else {
 					$in_closing = false;
@@ -616,13 +617,13 @@ class CScreenProblem extends CScreenBase {
 
 					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+					$value_clock = $in_closing ? time() : $problem['clock'];
 				}
 
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value,
-					($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+				addTriggerValueStyle($cell_status, $value, $value_clock,
 					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
 				);
 
@@ -645,8 +646,6 @@ class CScreenProblem extends CScreenBase {
 						$description[] = $trigger['expression_html'];
 					}
 				}
-
-
 
 				$table->addRow([
 					$this->config['event_ack_enable']
