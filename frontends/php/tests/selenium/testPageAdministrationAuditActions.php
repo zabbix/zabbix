@@ -64,7 +64,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 			$status = 'Sent';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] == 0) {
-			$status = 'Not sent';
+			$status = 'Failed';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] <> 0) {
 			$status = 'In progress';

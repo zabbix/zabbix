@@ -263,7 +263,7 @@ function make_small_eventlist($startEvent, $backurl) {
 		'object' => EVENT_OBJECT_TRIGGER,
 		'objectids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'value', 'acknowledged'],
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN,
@@ -276,9 +276,9 @@ function make_small_eventlist($startEvent, $backurl) {
 	];
 	CArrayHelper::sort($events, $sortFields);
 
-	$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
+	$actions = makeEventsActions($events);
 
-	foreach ($events as $event) {
+	foreach ($events as $index => $event) {
 		$lclock = $clock;
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$clock = $event['clock'];
@@ -309,8 +309,9 @@ function make_small_eventlist($startEvent, $backurl) {
 			$duration,
 			zbx_date2age($event['clock']),
 			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null,
-			(new CCol(isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ''))
-				->addClass(ZBX_STYLE_NOWRAP)
+			array_key_exists($index, $actions)
+				? (new CCol($actions[$index]))->addClass(ZBX_STYLE_NOWRAP)
+				: ''
 		]);
 	}
 
