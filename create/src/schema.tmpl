@@ -99,7 +99,7 @@ INDEX		|5		|maintenanceid
 
 TABLE|groups|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|name
@@ -107,7 +107,7 @@ INDEX		|1		|name
 TABLE|group_prototype|group_prototypeid|ZBX_DATA
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NULL		|0			|2|groups	|		|RESTRICT
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|group_prototype|group_prototypeid
 INDEX		|1		|hostid
@@ -1454,4 +1454,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010075	|3010076
+ROW		|3010079	|3010079

@@ -36,7 +36,6 @@ $column1 = (new CFormList())
 			->addValue(_('Recent problems'), TRIGGERS_OPTION_RECENT_PROBLEM)
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
 			->setModern(true)
-			->setFocused(true)
 	);
 
 // ack status

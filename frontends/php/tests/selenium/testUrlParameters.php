@@ -695,49 +695,70 @@ class testUrlParameters extends CWebTest {
 				]
 			],
 			[
-				'title' => 'Latest events [refreshed every 30 sec.]',
+				'title' => '404 Not Found',
+				'check_server_name' => false,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'events.php',
+						'text_not_present' => 'Events',
+						'text_present' => [
+							'Not Found',
+						]
+					],
+					[
+						'url' => 'events.php?triggerid=13491',
+						'text_not_present' => 'Events',
+						'text_present' => [
+							'Not Found'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Problems',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'events.php?triggerid=13491',
-						'text_present' => 'Events'
+						'url' => 'zabbix.php?action=problem.view',
+						'text_present' => 'Problems'
 					],
 					[
-						'url' => 'events.php?triggerid=9999999',
-						'text_not_present' => 'Events',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'events.php?triggerid=abc',
-						'text_not_present' => 'Events',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "triggerid" is not integer.'
-						]
-					],
-					[
-						'url' => 'events.php?triggerid=',
-						'text_not_present' => 'Events',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "triggerid" is not integer.'
-						]
-					],
-					[
-						'url' => 'events.php?triggerid=-1',
-						'text_not_present' => 'Events',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "triggerid" field.'
-						]
-					],
-					[
-						'url' => 'events.php',
-						'text_present' => 'Events'
+						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=13491',
+						'text_present' => 'Problems'
 					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => false,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=abc',
+						'text_not_present' => 'Problems',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Controller: problem.view'
+							]
+					],
+					[
+						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=',
+						'text_not_present' => 'Problems',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Controller: problem.view'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=-1',
+						'text_not_present' => 'Problems',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Controller: problem.view'
+						]
+					],
 				]
 			],
 			[

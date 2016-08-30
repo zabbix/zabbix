@@ -79,6 +79,8 @@ ZBX_METRIC	parameters_common[] =
 
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
+
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check."));
 
 	return SYSINFO_RET_FAIL;

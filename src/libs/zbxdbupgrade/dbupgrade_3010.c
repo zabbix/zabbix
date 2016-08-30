@@ -1587,6 +1587,61 @@ static int	DBpatch_3010076(void)
 	return FAIL;
 }
 
+static int	DBpatch_3010077(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("groups", &field);
+}
+
+static int	DBpatch_3010078(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_prototype", &field);
+}
+
+static int	DBpatch_3010079(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select p.eventid,e.clock,e.ns"
+			" from problem p,events e"
+			" where p.eventid=e.eventid"
+				" and p.clock=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update problem set clock=%s,ns=%s where eventid=%s;\n",
+				row[1], row[2], row[0]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1668,5 +1723,8 @@ DBPATCH_ADD(3010073, 0, 1)
 DBPATCH_ADD(3010074, 0, 1)
 DBPATCH_ADD(3010075, 0, 1)
 DBPATCH_ADD(3010076, 0, 0)
+DBPATCH_ADD(3010077, 0, 1)
+DBPATCH_ADD(3010078, 0, 1)
+DBPATCH_ADD(3010079, 0, 1)
 
 DBPATCH_END()

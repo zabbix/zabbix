@@ -5101,7 +5101,12 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 						SCREEN_RESOURCE_TRIGGER_OVERVIEW};
 	zbx_uint64_t		resource_types_update[] = {SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO,
 						SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS};
-	const char		*profile_idxs[] = {"web.dashconf.groups.groupids", "web.dashconf.groups.hide.groupids"};
+	const char		*profile_idxs[] = {
+						"web.dashconf.groups.groupids",
+						"web.dashconf.groups.subgroupids",
+						"web.dashconf.groups.hide.groupids",
+						"web.dashconf.groups.hide.subgroupids"
+					};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
 

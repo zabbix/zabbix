@@ -6299,7 +6299,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
  *          program exit                                                      *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_unlock_all_triggers()
+void	DCconfig_unlock_all_triggers(void)
 {
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hashset_iter_t	iter;
@@ -6336,14 +6336,19 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 	for (i = 0; i < itemids_num; i++)
 	{
+		/* skip items which are not in configuration cache and items without triggers */
+
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
 			continue;
+
+		/* process all triggers for the specified item */
 
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 		{
 			if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
 				continue;
 
+			/* find trigger by id or create a new record in hashset if not found */
 			trigger = DCfind_id(trigger_info, dc_trigger->triggerid, sizeof(DC_TRIGGER), &found);
 
 			if (0 == found)
@@ -6351,6 +6356,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 				DCget_trigger(trigger, dc_trigger, expand);
 				zbx_vector_ptr_append(trigger_order, trigger);
 			}
+
+			/* copy latest change timestamp and error message */
 
 			if (trigger->timespec.sec < timespecs[i].sec ||
 					(trigger->timespec.sec == timespecs[i].sec &&
@@ -7793,26 +7800,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 			/* Store time at which no-data maintenance ended for the host (either */
 			/* because no-data maintenance ended or because maintenance type was */
 			/* changed to normal), this is needed for nodata() trigger function. */
-			/* Also, recalculate "nextcheck" time for items for which we usually */
-			/* update it upon receiving a value (i.e., items without a poller). */
-
-			ZBX_DC_ITEM		*dc_item;
-			zbx_hashset_iter_t	iter;
-
 			dc_host->data_expected_from = now;
-
-			zbx_hashset_iter_reset(&config->items, &iter);
-
-			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
-			{
-				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
-					continue;
-
-				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
-					continue;
-
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
-			}
 		}
 
 		dc_host->maintenance_status = maintenance_status;
@@ -8601,7 +8589,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	int			now, nitems = 0;
+	int			now, nitems = 0, data_expected_from;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -8633,6 +8621,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		{
 			case ITEM_TYPE_ZABBIX:
 				if (HOST_AVAILABLE_TRUE != dc_host->available)
+					continue;
+				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
+					data_expected_from = dc_host->data_expected_from;
+				if (data_expected_from + dc_item->delay > now)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
