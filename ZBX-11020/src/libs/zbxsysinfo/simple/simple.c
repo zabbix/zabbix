@@ -265,7 +265,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	else
 		strscpy(ip, ip_str);
 
-	if (NULL != port_str && SUCCEED != is_ushort(port_str, &port))
+	if (NULL != port_str && '\0' != *port_str && SUCCEED != is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
 		return ret;

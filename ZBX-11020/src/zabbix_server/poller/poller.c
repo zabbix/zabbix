@@ -109,6 +109,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and i.type in (%s)"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
+				" and t.flags in (%d,%d)"
 				" and h.hostid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" and not exists ("
@@ -139,6 +140,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_STATE_NORMAL,
 			failed_type_buf,
 			TRIGGER_STATUS_ENABLED,
+			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
 			hostid,
 			HOST_STATUS_MONITORED,
 			failed_type_buf,

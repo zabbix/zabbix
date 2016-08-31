@@ -1,10 +1,21 @@
 Changes for 2.2.15rc1
 
 New features:
+...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
+.......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
+........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
-..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
