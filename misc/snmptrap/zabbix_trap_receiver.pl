@@ -71,7 +71,8 @@ sub zabbix_receiver
 
 	# get the host name
 	my $hostname = $pdu_info{'receivedfrom'} || 'unknown';
-	if ($hostname ne 'unknown') {
+	if ($hostname ne 'unknown')
+	{
 		$hostname =~ /\[(.*?)\].*/;                    # format: "UDP: [127.0.0.1]:41070->[127.0.0.1]"
 		$hostname = $1 || 'unknown';
 	}
@@ -87,6 +88,12 @@ sub zabbix_receiver
 	print OUTPUT_FILE "PDU INFO:\n";
 	foreach my $key(keys(%pdu_info))
 	{
+		if ($pdu_info{$key} !~ /^[[:print:]]*$/)
+		{
+			my $OctetAsHex = unpack('H*', $pdu_info{$key});	# convert octet string to hex
+			$pdu_info{$key} = "0x$OctetAsHex";		# apply 0x prefix for consistency
+		}
+
 		printf OUTPUT_FILE "  %-30s %s\n", $key, $pdu_info{$key};
 	}
 
