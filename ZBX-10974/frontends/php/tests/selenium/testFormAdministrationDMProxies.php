@@ -374,6 +374,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
 
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent(['Update', 'Clone', 'Delete', 'Cancel']);
 
 		$this->zbxTestClickButtonText('Delete');

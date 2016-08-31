@@ -512,10 +512,13 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementNotPresentId('update');
 		}
 
-		$this->zbxTestTabSwitch('Authentication');
+		$this->zbxTestClickWait('tab_authenticationTab');
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != 'Authentication' ) {
+			$this->zbxTestTabSwitch('Authentication');
+		}
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestAssertVisibleId('authentication');
 		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM']);
 
 		if (isset($data['authentication'])) {
@@ -580,9 +583,9 @@ class testFormWeb extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkText($this->host);
-		$this->zbxTestClickLinkText('Web scenarios');
-		$this->zbxTestClickLinkText($name);
+		$this->zbxTestClickLinkTextWait($this->host);
+		$this->zbxTestClickLinkTextWait('Web scenarios');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent('Web scenario updated');
@@ -1545,6 +1548,7 @@ class testFormWeb extends CWebTest {
 			}
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Web scenarios');
+			$this->zbxTestCheckHeader('Web monitoring');
 			$this->zbxTestTextPresent($name);
 		}
 

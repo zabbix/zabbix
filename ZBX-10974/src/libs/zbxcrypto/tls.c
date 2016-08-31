@@ -4512,7 +4512,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 				zbx_tls_cert_error_msg((unsigned int)s->tls_ctx->ctx->session_negotiate->verify_result,
 						error);
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);

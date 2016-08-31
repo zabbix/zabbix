@@ -14153,11 +14153,11 @@ msgid "This month"
 msgstr "Tento mesiac"
 
 #: include/classes/screens/CScreenBuilder.php:614
-msgid "This screen-column is not empty. Delete it?"
+msgid "This screen column is not empty. Delete it?"
 msgstr "Tento stĺpec obrazovky nie je prázdny. Aj tak zmazať?"
 
 #: include/classes/screens/CScreenBuilder.php:568
-msgid "This screen-row is not empty. Delete it?"
+msgid "This screen row is not empty. Delete it?"
 msgstr "Tento riadok obrazovky nie je prázdny. Aj tak zmazať?"
 
 #: srv_status.php:35

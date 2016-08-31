@@ -1089,7 +1089,9 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['add_opcondition'])) {
+			$this->zbxTestClickWait('search');
 			$this->zbxTestClickWait('new_opcondition');
+			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('new_opcondition_conditiontype'));
 			$add_opcondition = $data['add_opcondition'];
 		}
 		else {
@@ -1675,7 +1677,6 @@ class testFormAction extends CWebTest {
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
-
 	public static function create() {
 		return [
 			[[
@@ -1841,15 +1842,15 @@ class testFormAction extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		if (isset($data['name'])){
-			$this->zbxTestInputType('name', $data['name']);
+			$this->zbxTestInputTypeWait('name', $data['name']);
 		}
 
 		if (isset($data['def_shortdata'])){
-			$this->zbxTestInputType('def_shortdata', $data['def_shortdata']);
+			$this->zbxTestInputTypeWait('def_shortdata', $data['def_shortdata']);
 		}
 
 		if (isset($data['def_longdata'])){
-			$this->zbxTestInputType('def_longdata', $data['def_longdata']);
+			$this->zbxTestInputTypeWait('def_longdata', $data['def_longdata']);
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
@@ -1867,7 +1868,7 @@ class testFormAction extends CWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-						$this->zbxTestInputType('new_condition_value', $condition['value']);
+						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
 						$this->zbxTestClickWait('add_condition');
 						switch($condition['type']){
 							case 'Application':
@@ -1926,13 +1927,13 @@ class testFormAction extends CWebTest {
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 						$this->zbxTestClickWait('all_usrgrps');
 						$this->zbxTestClick('select');
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+						$this->zbxTestSwitchToNewWindow();
 						$this->zbxTestClickWait('all_users');
 						$this->zbxTestClick('select');
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', $operation['media']);
 						break;
@@ -1941,20 +1942,18 @@ class testFormAction extends CWebTest {
 						$this->zbxTestClickXpathWait('//*[@id="opcmdEditForm"]//button[@id="save"]');
 						$this->zbxTestInputType('new_operation_opcommand_command', $operation['command']);
 						break;
-					case 'Remote command':
-						$this->zbxTestClickXpathWait('//tr[@id="opCmdListFooter"]//button[@id="add"]');
-						break;
 				}
 				$this->zbxTestClickWait('add_operation');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
 		}
 
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
+			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
+			$this->zbxTestClickWait('search');
 		}
-
-		$this->zbxTestClickWait('search');
 
 		$this->zbxTestClickWait('add');
 
@@ -1962,6 +1961,7 @@ class testFormAction extends CWebTest {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
 				$this->zbxTestCheckHeader('Actions');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
 				$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
@@ -2004,17 +2004,17 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestClickWait('new_operation');
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('usrgrps_7');
 		$this->zbxTestClickWait('usrgrps_11');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
-		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickWait('users_1');
 		$this->zbxTestClick('select');
-		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
 		$this->zbxTestClick('add_operation');
@@ -2035,9 +2035,12 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
 
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait('Simple form test host');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 // add target group Zabbix servers
@@ -2045,8 +2048,11 @@ class testFormAction extends CWebTest {
 		$this->zbxTestDropdownSelect('opCmdTarget', 'Host group');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
+
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
+		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command');

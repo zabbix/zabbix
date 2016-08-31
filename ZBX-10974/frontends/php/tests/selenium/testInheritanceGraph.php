@@ -59,9 +59,9 @@ class testInheritanceGraph extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -107,8 +107,8 @@ class testInheritanceGraph extends CWebTest {
 
 		foreach ($data['addItems'] as $item) {
 			$this->zbxTestLaunchPopup('add_item');
-			$this->zbxTestClickLinkText($item['itemName']);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestClickLinkTextWait($item['itemName']);
+			$this->zbxTestWaitWindowClose();
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 

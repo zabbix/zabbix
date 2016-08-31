@@ -1314,8 +1314,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$intervals = [
 			['main' => SEC_PER_MIN / 2, 'sub' => SEC_PER_MIN / 60],		// 30 seconds and 1 second
 			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// 60 seconds and 5 seconds
-			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minuts and 10 seconds
-			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minuts and 30 seconds
+			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minutes and 10 seconds
+			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minutes and 30 seconds
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],				// 1 hour and 1 minute
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],			// 1 hour and 2 minutes
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],			// 1 hour and 5 minutes

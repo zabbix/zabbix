@@ -100,7 +100,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 				]
 		);
 
-		$this->zbxTestInputType('alias', 'guest');
+		$this->zbxTestInputTypeWait('alias', 'guest');
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('No data found.');
 

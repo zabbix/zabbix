@@ -134,7 +134,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->zbxTestClick('tab_test');
+		$this->zbxTestClickWait('tab_test');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
 		$this->zbxTestTextPresent('TRUE');
 	}
@@ -143,7 +143,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClick('tab_test');
+		$this->zbxTestClickWait('tab_test');
 
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
@@ -155,7 +155,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClick('clone');
+		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputType('name', $this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Regular expression added');
@@ -168,7 +168,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestInputType('name', $this->regexp.'2');
+		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Regular expression updated');
 
@@ -181,7 +181,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp2);
 
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
