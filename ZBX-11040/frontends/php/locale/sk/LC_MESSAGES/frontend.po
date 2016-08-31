@@ -5727,7 +5727,7 @@ msgstr "Fínsky (fi_FI)"
 msgid "First"
 msgstr "Prvý"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "Prvá"

@@ -5664,7 +5664,7 @@ msgstr ""
 msgid "First"
 msgstr "Első"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr ""

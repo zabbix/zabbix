@@ -5613,7 +5613,7 @@ msgstr "フィンランド語 (fi_FI)"
 msgid "First"
 msgstr "第1週"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "最初"

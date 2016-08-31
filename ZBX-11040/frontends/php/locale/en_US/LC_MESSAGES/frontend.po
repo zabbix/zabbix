@@ -5668,7 +5668,7 @@ msgstr "Finnish (fi_FI)"
 msgid "First"
 msgstr "First"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "First"

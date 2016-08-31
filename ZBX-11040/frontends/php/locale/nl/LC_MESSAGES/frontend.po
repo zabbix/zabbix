@@ -5671,7 +5671,7 @@ msgstr "Fins (fi_FI)"
 msgid "First"
 msgstr "Eerst"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "Eerst"

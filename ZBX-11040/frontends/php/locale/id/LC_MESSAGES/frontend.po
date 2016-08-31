@@ -5618,7 +5618,7 @@ msgstr "Finnish (fi_FI)"
 msgid "First"
 msgstr "Pertama"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "Pertama"

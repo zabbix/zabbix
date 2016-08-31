@@ -5692,7 +5692,7 @@ msgstr "Finnisch (fi_FI)"
 msgid "First"
 msgstr "Ersten"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "Erste"

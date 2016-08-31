@@ -5680,7 +5680,7 @@ msgstr "Φινλανδικά (fi_FI)"
 msgid "First"
 msgstr "Πρώτο"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "Πρώτο"

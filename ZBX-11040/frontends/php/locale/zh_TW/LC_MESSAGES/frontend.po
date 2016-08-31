@@ -5621,7 +5621,7 @@ msgstr "芬蘭語 (fi_FI)"
 msgid "First"
 msgstr "首"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "First"
 msgstr "首"
