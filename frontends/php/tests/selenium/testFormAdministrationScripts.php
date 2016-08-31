@@ -82,7 +82,8 @@ class testFormAdministrationScripts extends CWebTest {
 
 		$this->zbxTestTextPresent(['Type']);
 		$this->zbxTestAssertElementPresentId('type');
-		$this->zbxTestDropdownHasOptions('type', ['IPMI', 'Script']);
+		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_0']", 'IPMI');
+		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_1']", 'Script');
 
 		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
 		$this->zbxTestAssertElementPresentId('execute_on_0');
@@ -104,7 +105,8 @@ class testFormAdministrationScripts extends CWebTest {
 
 		$this->zbxTestTextPresent(['Required host permissions']);
 		$this->zbxTestAssertElementPresentId('host_access');
-		$this->zbxTestDropdownHasOptions('host_access', ['Read', 'Write']);
+		$this->zbxTestAssertElementText("//ul[@id='host_access']//label[@for='host_access_0']", 'Read');
+		$this->zbxTestAssertElementText("//ul[@id='host_access']//label[@for='host_access_1']", 'Write');
 
 		$this->zbxTestTextPresent(['Enable confirmation']);
 		$this->zbxTestAssertElementPresentId('enable_confirmation');
@@ -132,7 +134,7 @@ class testFormAdministrationScripts extends CWebTest {
 					$this->zbxTestInputType($field['name'], $field['value']);
 					break;
 				case 'select':
-					$this->zbxTestDropdownSelect($field['name'], $field['value']);
+					$this->zbxTestClickXpathWait("//ul[@id='".$field['name']."']//label[text()='".$field['value']."']");
 					break;
 				case 'check':
 					$this->zbxTestCheckboxSelect($field['name']);
@@ -157,7 +159,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		if ($resultSave) {
-			$this->zbxTestTextPresent('Script added');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Script added');
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach ($dbres as $field => $value) {
@@ -165,7 +167,7 @@ class testFormAdministrationScripts extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('Cannot add script');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add script');
 			$this->assertEquals($DBhash, DBhash($sql));
 		}
 	}
