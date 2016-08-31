@@ -727,6 +727,9 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		{
 			if (0 > unknown_idx)
 			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_WARNING, "%s() internal error: " ZBX_UNKNOWN_STR " index:%d"
+						" expression:'%s'", __function_name, unknown_idx, expression);
 				zbx_snprintf(error, max_error_len, "Internal error: " ZBX_UNKNOWN_STR " index %d."
 						" Please report this to Zabbix developers.", unknown_idx);
 			}
