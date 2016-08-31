@@ -280,7 +280,7 @@ class CPageFilter {
 	/**
 	 * Retrieve objects stored in the user profile.
 	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
-	 * otherwise - from the web.*.objectid field, depending on the use of the 'individial' option.
+	 * otherwise - from the web.*.objectid field, depending on the use of the 'individual' option.
 	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
 	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
 	 *
