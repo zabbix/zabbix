@@ -5610,8 +5610,12 @@ msgstr "종료"
 msgid "Finnish (fi_FI)"
 msgstr "핀란드어 (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "첫번째"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "첫번째"
 
@@ -8771,8 +8775,12 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "최근"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
 msgid "Last"
 msgstr "최근"
 

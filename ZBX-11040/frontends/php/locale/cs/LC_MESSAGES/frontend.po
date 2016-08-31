@@ -5721,8 +5721,12 @@ msgstr "Dokončit"
 msgid "Finnish (fi_FI)"
 msgstr "Finsky (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "První"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "První"
 
@@ -8906,8 +8910,12 @@ msgstr "Umístění popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "Poslední"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
 msgid "Last"
 msgstr "Poslední"
 

@@ -5665,8 +5665,12 @@ msgstr "Termina"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandese (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Primo"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "Primo"
 
@@ -8838,8 +8842,12 @@ msgstr "Posizione etichetta"
 msgid "Language"
 msgstr "Lingua"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "Ultimo"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
 msgid "Last"
 msgstr "Ultimo"
 

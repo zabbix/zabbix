@@ -5668,8 +5668,12 @@ msgstr "Fim"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandês (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Primeiro"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "Primeiro"
 
@@ -8849,10 +8853,14 @@ msgstr "Localização do texto"
 msgid "Language"
 msgstr "Idioma"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Última"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Último"
 
 #: app/views/monitoring.dashboard.view.php:108
 #: app/views/monitoring.widget.issues.view.php:25

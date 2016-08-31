@@ -5617,8 +5617,12 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "首"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "首"
 
@@ -8780,8 +8784,12 @@ msgstr "標示位置"
 msgid "Language"
 msgstr "語言"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "末"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 

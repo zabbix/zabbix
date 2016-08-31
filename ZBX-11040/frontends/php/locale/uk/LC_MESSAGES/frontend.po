@@ -5721,10 +5721,14 @@ msgstr "Завершити"
 msgid "Finnish (fi_FI)"
 msgstr "Фінська (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Перший"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
+msgid "First"
+msgstr "Перша"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -8906,10 +8910,14 @@ msgstr "Розміщення ярлика"
 msgid "Language"
 msgstr "Мова"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Останній"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Остання"
 
 #: app/views/monitoring.dashboard.view.php:108
 #: app/views/monitoring.widget.issues.view.php:25

@@ -5660,10 +5660,14 @@ msgstr "Vége"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Első"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
+msgid "First"
+msgstr ""
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -8834,10 +8838,14 @@ msgstr "Cimke elhelyezkedése"
 msgid "Language"
 msgstr "Nyelv"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Utolsó"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
+msgid "Last"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:108
 #: app/views/monitoring.widget.issues.view.php:25

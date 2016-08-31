@@ -5730,8 +5730,12 @@ msgstr "Sfârșit"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandeză (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Primul"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "Primul"
 
@@ -8917,8 +8921,12 @@ msgstr "Locație etichetă"
 msgid "Language"
 msgstr "Limbă"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "Ultima"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
 msgid "Last"
 msgstr "Ultima"
 

@@ -5681,8 +5681,12 @@ msgstr "Завърши"
 msgid "Finnish (fi_FI)"
 msgstr "Финландски (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Първи"
+
+#: include/func.inc.php:1843
+msgctxt "page navigation"
 msgid "First"
 msgstr "Първи"
 
@@ -8861,10 +8865,14 @@ msgstr "Разположение на етикет"
 msgid "Language"
 msgstr "Език"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Последно"
+
+#: include/func.inc.php:1883
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Последна"
 
 #: app/views/monitoring.dashboard.view.php:108
 #: app/views/monitoring.widget.issues.view.php:25
