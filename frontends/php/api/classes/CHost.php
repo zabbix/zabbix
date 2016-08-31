@@ -916,10 +916,18 @@ class CHost extends CHostGeneral {
 			if (!empty($host['inventory'])) {
 				$hostInventory = $host['inventory'];
 				$hostInventory['hostid'] = $hostid;
-				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])
-					? $host['inventory_mode']
-					: HOST_INVENTORY_MANUAL;
+				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			}
+			else {
+				$hostInventory = [];
+			}
 
+			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$hostInventory['hostid'] = $hostid;
+				$hostInventory['inventory_mode'] = $host['inventory_mode'];
+			}
+
+			if ($hostInventory) {
 				DB::insert('host_inventory', array($hostInventory), false);
 			}
 		}
