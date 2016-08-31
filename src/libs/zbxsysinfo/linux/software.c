@@ -98,6 +98,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 
+		zbx_fclose(f);
+
 		if (FAIL == line_read && NULL == (f = fopen(SW_OS_NAME, "r")))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_NAME ": %s",
