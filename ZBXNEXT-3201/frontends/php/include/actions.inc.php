@@ -1306,6 +1306,11 @@ function getActionMessages(array $alerts) {
 			? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 			: $alert['sendto'];
 
+		$info_icons = [];
+		if ($alert['error'] !== '') {
+			$info_icons[] = makeErrorIcon($alert['error']);
+		}
+
 		$table->addRow([
 			$alert['esc_step'],
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
@@ -1314,7 +1319,7 @@ function getActionMessages(array $alerts) {
 			$retries,
 			$recipient,
 			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+			makeInformationList($info_icons)
 		]);
 	}
 
@@ -1420,6 +1425,11 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 					$message = '';
 			}
 
+			$info_icons = [];
+			if ($alert['error'] !== '') {
+				$info_icons[] = makeErrorIcon($alert['error']);
+			}
+
 			$table->addRow([
 				$actions_on,
 				$alert['esc_step'],
@@ -1427,7 +1437,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 				$user,
 				$message,
 				$status_str,
-				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+				makeInformationList($info_icons)
 			]);
 
 			$actions_on = null;

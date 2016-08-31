@@ -158,6 +158,11 @@ class CScreenActions extends CScreenBase {
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
+			$info_icons = [];
+			if ($alert['error'] !== '') {
+				$info_icons[] = makeErrorIcon($alert['error']);
+			}
+
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$actions[$alert['actionid']]['name'],
@@ -165,7 +170,7 @@ class CScreenActions extends CScreenBase {
 				$recipient,
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
 				$status,
-				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+				makeInformationList($info_icons)
 			]);
 		}
 

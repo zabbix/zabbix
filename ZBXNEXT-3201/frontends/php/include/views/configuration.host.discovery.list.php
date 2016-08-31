@@ -81,15 +81,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// info
 	if ($data['showInfoColumn']) {
+		$info_icons = [];
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info = makeErrorIcon($discovery['error']);
+			$info_icons[] = makeErrorIcon($discovery['error']);
 		}
-		else {
-			$info = '';
-		}
-	}
-	else {
-		$info = null;
 	}
 
 	// host prototype link
@@ -130,7 +125,7 @@ foreach ($data['discoveries'] as $discovery) {
 		($discovery['delay'] === '') ? '' : convertUnitsS($discovery['delay']),
 		item_type2str($discovery['type']),
 		$status,
-		$info
+		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
 
