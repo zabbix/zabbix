@@ -730,6 +730,7 @@ clean:
 	{
 		if (0 == lastfailedstep)
 		{
+			/* we don't have name of the step, try to fetch or set to NULL if fail */
 			/* we are here either because cURL initialization failed */
 			/* or we have been compiled without cURL library */
 
@@ -745,11 +746,19 @@ clean:
 				process_step_data(httpstep.httpstepid, &stat, &ts);
 			}
 			else
+			{
+				httpstep.name = NULL;
 				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
-				httpstep.name, httptest->httptest.name, host->name, err_str);
+		if(NULL != httpstep.name)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
+					httpstep.name, httptest->httptest.name, host->name, err_str);
+		}
+
+
 	}
 	DBfree_result(result);
 
