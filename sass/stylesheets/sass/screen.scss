@@ -542,7 +542,7 @@ article {
 		}
 
 		.rel-container {
-			margin: 0 13px 0 0;
+			margin: 0;
 		}
 	}
 
@@ -2120,11 +2120,11 @@ $form-icon-btn: (
 }
 
 .icon-info {
-	position: absolute;
+	position: relative;
 	width: 8px;
 	height: 11px;
 	cursor: pointer;
-	margin: -12px 0 0 0;
+	margin: -12px 0 -4px 0;
 
 	&::before {
 		content: '';
@@ -3697,8 +3697,12 @@ tr.cursor-move {
 	display: inline-block;
 	white-space: nowrap;
 
-	.icon-info + .icon-info {
-		left: 24px;
+	.icon-info {
+		margin-right: 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
 	}
 }
 
