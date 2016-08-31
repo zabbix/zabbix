@@ -96,9 +96,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 					break;
 				}
 			}
+			zbx_fclose(f);
 		}
-
-		zbx_fclose(f);
 
 		if (FAIL == line_read && NULL == (f = fopen(SW_OS_NAME, "r")))
 		{
