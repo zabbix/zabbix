@@ -3666,6 +3666,7 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-width: 16px;
 }
 
 .server-name {
