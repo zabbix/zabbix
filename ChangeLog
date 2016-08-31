@@ -1,6 +1,7 @@
 Changes for 2.2.15rc1
 
 New features:
+...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
