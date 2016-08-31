@@ -919,7 +919,7 @@ class CHost extends CHostGeneral {
 				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
 			}
 			else {
-				$hostInventory = [];
+				$hostInventory = array();
 			}
 
 			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
