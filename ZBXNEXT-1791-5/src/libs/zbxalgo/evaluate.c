@@ -313,12 +313,12 @@ static double	evaluate_term6(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)		/* (anything) * Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (ZBX_UNKNOWN == result)		/* Unknown * known */
 			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
 			}
 			else
 				result *= operand;
@@ -336,12 +336,12 @@ static double	evaluate_term6(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)		/* (anything) / Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (ZBX_UNKNOWN == result)		/* Unknown / known */
 			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
 			}
 			else
 				result /= operand;
@@ -386,12 +386,12 @@ static double	evaluate_term5(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) +/- Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown +/- known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else
 		{
@@ -455,12 +455,12 @@ static double	evaluate_term4(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) < Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown < known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else
 		{
@@ -526,12 +526,12 @@ static double	evaluate_term3(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) = Unknown, (anything) <> Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown = known, Unknown <> known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else if ('=' == op)
 		{
@@ -580,6 +580,7 @@ static double	evaluate_term2(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)				/* Unknown and Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (SUCCEED == zbx_double_compare(operand, 0.0))	/* Unknown and 0 */
@@ -587,10 +588,7 @@ static double	evaluate_term2(int *unknown_idx)
 				result = 0.0;
 			}
 			else							/* Unknown and 1 */
-			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
-			}
 		}
 		else if (ZBX_UNKNOWN == operand)
 		{
@@ -601,6 +599,7 @@ static double	evaluate_term2(int *unknown_idx)
 			else							/* 1 and Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 		}
@@ -658,6 +657,7 @@ static double	evaluate_term1(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)				/* Unknown or Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (SUCCEED != zbx_double_compare(operand, 0.0))	/* Unknown or 1 */
@@ -665,10 +665,7 @@ static double	evaluate_term1(int *unknown_idx)
 				result = 1;
 			}
 			else							/* Unknown or 0 */
-			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
-			}
 		}
 		else if (ZBX_UNKNOWN == operand)
 		{
@@ -679,6 +676,7 @@ static double	evaluate_term1(int *unknown_idx)
 			else							/* 0 or Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 		}
