@@ -504,18 +504,15 @@ foreach ($items as $key => $item){
 
 	if ($filter['showDetails']) {
 		// item key
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);
 
-		// info
+		$info_icons = [];
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = makeErrorIcon($item['error']);
-		}
-		else {
-			$info = '';
+			$info_icons[] = makeErrorIcon($item['error']);
 		}
 
 		// trend value
@@ -543,7 +540,7 @@ foreach ($items as $key => $item){
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions,
-			$info
+			makeInformationList($info_icons)
 		]);
 	}
 	else {
@@ -685,18 +682,15 @@ foreach ($items as $item) {
 	$host = $hosts[$item['hostid']];
 	if ($filter['showDetails']) {
 		// item key
-		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);
 
-		// info
+		$info_icons = [];
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = makeErrorIcon($item['error']);
-		}
-		else {
-			$info = '';
+			$info_icons[] = makeErrorIcon($item['error']);
 		}
 
 		// trend value
@@ -724,7 +718,7 @@ foreach ($items as $item) {
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$actions,
-			$info
+			makeInformationList($info_icons)
 		]);
 	}
 	else {

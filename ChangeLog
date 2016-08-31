@@ -1,6 +1,10 @@
 Changes for 3.2.0beta2
 
 New features:
+..F....... [ZBXNEXT-3201] added icon in Monitoring->Problems view to show who close problem; implemented new information icons (Pavel, Sasha)
+..F....... [ZBXNEXT-3201] added blinking on CLOSING state in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added "Show details" filter option in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added displaying of recovery actions in Monitoring->Problem view (Sasha)
 ..F....... [ZBXNEXT-3409] replaced drop-down controls with modern radio buttons in several forms (Alexei)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
