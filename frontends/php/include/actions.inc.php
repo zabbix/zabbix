@@ -1564,11 +1564,14 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false) {
 					$status_str = (new CSpan(_('Failures')))->addClass(ZBX_STYLE_RED);
 			}
 
-			$problems[$index] = $status_str
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setHint(
-					makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
-				);
+			$problems[$index] = [
+				$status_str
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->setHint(
+						makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
+					),
+				CViewHelper::showNum(count($event_alerts) + count($r_event_alerts))
+			];
 		}
 		else {
 			unset($problems[$index]);
