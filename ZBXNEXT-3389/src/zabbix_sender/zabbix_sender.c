@@ -503,7 +503,7 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 		buffer_offset += len;
 		(*buffer)[buffer_offset] = '\0';
 	}
-	while (0 < len && '\n' != tmp[len - 1]);
+	while (MAX_BUFFER_LEN - 1 == len && '\n' != tmp[len - 1]);
 
 	return *buffer;
 }
