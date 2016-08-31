@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+........S. [ZBX-11148] fixed suppressing of escalations when an event is closed by event correlation operation 'close new' (wiper)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 ...G...... [ZBX-9124] changed getting OS name by item system.sw.os[name] (Sergejs)
 ....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
