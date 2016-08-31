@@ -65,7 +65,7 @@
 	<div class="header-title table">
   <div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div></div>
-		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
 	<div class="filter-btn-container">
 	<button type="button" class="filter-trigger">Filter<span class="arrow-down"></span></button>
 	</div>
@@ -100,11 +100,11 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="" class="green link-action">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><a href="">Some linksdf sdfsdsfsfssff</a></td>
+				<td><div class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><div class="rel-container"><span class="icon-depend-down cursor-pointer"></span></div><a href="">Some linksdf sdfsdsfsfssff</a></td>
 			</tr>
 			<tr class="row-selected">
 				<td><input type="checkbox" checked></td>
-				<td><span class="rel-container"><a href="">Some linksdf sdfsdsfsfssff</a><span class="icon-maint cursor-pointer"></span></span><span class="rel-container"><a href="">Some linksdf sdfsdsfsfssff</a><span class="icon-maint cursor-pointer"></span></span></td>
+				<td><div class="rel-container"><a href="">Some linksdf sdfsdsfsfssff</a><span class="icon-maint cursor-pointer"></span></span><div class="rel-container"><a href="">Some linksdf sdfsdsfsfssff</a><span class="icon-maint cursor-pointer"></span></div></td>
 				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
 				<td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
@@ -114,7 +114,7 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="" class="red link-action">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+				<td><div class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><div class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox"></td>
@@ -128,7 +128,7 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="" class="orange link-action">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+				<td><div class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox"></td>
@@ -254,7 +254,7 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-info status-dark-grey" title="Information"></span></span></td>
+				<td><div class="rel-container"><span class="icon-info status-dark-grey" title="Information"></span></div></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox"></td>
@@ -268,11 +268,11 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-info status-green" title="Information"></span></span></td>
+				<td><div class="rel-container"><span class="icon-info status-green" title="Information"></span></div></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox"></td>
-				<td><span class="rel-container"><button class="icon-wzrd-action"></button></span></td>
+				<td><div class="rel-container"><button class="icon-wzrd-action"></button></span></td>
 				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
 				<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
@@ -282,11 +282,11 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-info status-yellow" title="Information"></span></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox"></td>
-				<td><span class="rel-container"><button class="icon-wzrd-action"></button></span></td>
+				<td><div class="rel-container"><button class="icon-wzrd-action"></button></span></td>
 				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
 				<td><a href="">Triggers</a>&nbsp;<sup>35</sup></td>
@@ -296,7 +296,7 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="rel-container"><span class="icon-info status-red" title="Information"></span></span></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 		</tbody>
 	</table>

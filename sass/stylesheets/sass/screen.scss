@@ -533,12 +533,16 @@ article {
 			padding: 4px 7px;
 		}
 
-		.status-container {
+		.status-container, .rel-container {
 			margin: 0 5px 0 0;
 
 			span {
 				padding: 2px 3px 1px 3px;
 			}
+		}
+
+		.rel-container {
+			margin: 0 13px 0 0;
 		}
 	}
 
@@ -2117,18 +2121,20 @@ $form-icon-btn: (
 
 .icon-info {
 	position: absolute;
-	min-height: 1em;
-	margin-top: -12px;
+	width: 8px;
+	height: 11px;
 	cursor: pointer;
+	margin: -12px 0 0 0;
 
 	&::before {
 		content: '';
+		display: inline-block;
 		position: absolute;
-		display: block;
-		width: 2px;
-		height: 10px;
-		left: 6px;
-		background: url(../img/icon-sprite.svg) no-repeat -53px -661px;
+		top: 0;
+		left: 0;
+		width: 14px;
+		height: 14px;
+		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
 	}
 }
 
@@ -3689,6 +3695,11 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	white-space: nowrap;
+
+	.icon-info + .icon-info {
+		left: 24px;
+	}
 }
 
 .server-name {
