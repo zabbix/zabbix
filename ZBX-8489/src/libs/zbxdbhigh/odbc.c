@@ -25,9 +25,6 @@
 
 #define ODBC_ERR_MSG_LEN	255
 
-#define ALIGNSIZE		4
-#define ALIGNBUF(Length)	Length % ALIGNSIZE ? Length + ALIGNSIZE - (Length % ALIGNSIZE) : Length
-
 static char	zbx_last_odbc_strerror[ODBC_ERR_MSG_LEN];
 
 const char	*get_last_odbc_strerror(void)
@@ -280,7 +277,6 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	int		i = 0;
 	ZBX_ODBC_RESULT	result = NULL;
 	SQLRETURN	rc;
-	SQLLEN		*ColLenArray = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
 
@@ -300,16 +296,12 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		goto end;
 	}
 
-	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * (size_t)pdbh->col_num);
-	memset(pdbh->data_len, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
-
-	ColLenArray = (SQLLEN *) zbx_malloc(ColLenArray, pdbh->col_num * sizeof(SQLLEN));
-	memset(ColLenArray, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
+	pdbh->data_len = (SQLLEN *)zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
 		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_DESC_OCTET_LENGTH, NULL, 0,
-				NULL, (SQLLEN *)&ColLenArray[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
+				NULL, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot execute ODBC query"))
 		{
 			goto end;
@@ -320,9 +312,9 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
-		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], ColLenArray[i]);
+		pdbh->row_data[i] = zbx_malloc(NULL, pdbh->data_len[i]);
 		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				ColLenArray[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
+				pdbh->data_len[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot bind column in ODBC result"))
 		{
 			goto end;
