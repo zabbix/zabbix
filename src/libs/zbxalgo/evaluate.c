@@ -288,7 +288,7 @@ static double	evaluate_term6(int *unknown_idx)
 {
 	char	op;
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -1, oper_idx = -2;	/* set invalid values to catch errors */
 
 	if (ZBX_INFINITY == (result = evaluate_term7(&res_idx)))
 		return ZBX_INFINITY;
@@ -313,12 +313,12 @@ static double	evaluate_term6(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)		/* (anything) * Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (ZBX_UNKNOWN == result)		/* Unknown * known */
 			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
 			}
 			else
 				result *= operand;
@@ -336,12 +336,12 @@ static double	evaluate_term6(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)		/* (anything) / Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (ZBX_UNKNOWN == result)		/* Unknown / known */
 			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
 			}
 			else
 				result /= operand;
@@ -364,7 +364,7 @@ static double	evaluate_term5(int *unknown_idx)
 {
 	char	op;
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -3, oper_idx = -4;	/* set invalid values to catch errors */
 
 	if (ZBX_INFINITY == (result = evaluate_term6(&res_idx)))
 		return ZBX_INFINITY;
@@ -386,12 +386,12 @@ static double	evaluate_term5(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) +/- Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown +/- known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else
 		{
@@ -418,7 +418,7 @@ static double	evaluate_term4(int *unknown_idx)
 {
 	char	op;
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -5, oper_idx = -6;	/* set invalid values to catch errors */
 
 	if (ZBX_INFINITY == (result = evaluate_term5(&res_idx)))
 		return ZBX_INFINITY;
@@ -455,12 +455,12 @@ static double	evaluate_term4(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) < Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown < known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else
 		{
@@ -494,7 +494,7 @@ static double	evaluate_term3(int *unknown_idx)
 {
 	char	op;
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -7, oper_idx = -8;	/* set invalid values to catch errors */
 
 	if (ZBX_INFINITY == (result = evaluate_term4(&res_idx)))
 		return ZBX_INFINITY;
@@ -526,12 +526,12 @@ static double	evaluate_term3(int *unknown_idx)
 		if (ZBX_UNKNOWN == operand)		/* (anything) = Unknown, (anything) <> Unknown */
 		{
 			*unknown_idx = oper_idx;
+			res_idx = oper_idx;
 			result = ZBX_UNKNOWN;
 		}
 		else if (ZBX_UNKNOWN == result)		/* Unknown = known, Unknown <> known */
 		{
 			*unknown_idx = res_idx;
-			result = ZBX_UNKNOWN;
 		}
 		else if ('=' == op)
 		{
@@ -558,7 +558,7 @@ static double	evaluate_term3(int *unknown_idx)
 static double	evaluate_term2(int *unknown_idx)
 {
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -9, oper_idx = -10;	/* set invalid values to catch errors */
 
 	if (ZBX_INFINITY == (result = evaluate_term3(&res_idx)))
 		return ZBX_INFINITY;
@@ -580,6 +580,7 @@ static double	evaluate_term2(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)				/* Unknown and Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (SUCCEED == zbx_double_compare(operand, 0.0))	/* Unknown and 0 */
@@ -587,10 +588,7 @@ static double	evaluate_term2(int *unknown_idx)
 				result = 0.0;
 			}
 			else							/* Unknown and 1 */
-			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
-			}
 		}
 		else if (ZBX_UNKNOWN == operand)
 		{
@@ -601,6 +599,7 @@ static double	evaluate_term2(int *unknown_idx)
 			else							/* 1 and Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 		}
@@ -628,7 +627,7 @@ static double	evaluate_term2(int *unknown_idx)
 static double	evaluate_term1(int *unknown_idx)
 {
 	double	result, operand;
-	int	res_idx, oper_idx;
+	int	res_idx = -11, oper_idx = -12;	/* set invalid values to catch errors */
 
 	level++;
 
@@ -658,6 +657,7 @@ static double	evaluate_term1(int *unknown_idx)
 			if (ZBX_UNKNOWN == operand)				/* Unknown or Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 			else if (SUCCEED != zbx_double_compare(operand, 0.0))	/* Unknown or 1 */
@@ -665,10 +665,7 @@ static double	evaluate_term1(int *unknown_idx)
 				result = 1;
 			}
 			else							/* Unknown or 0 */
-			{
 				*unknown_idx = res_idx;
-				result = ZBX_UNKNOWN;
-			}
 		}
 		else if (ZBX_UNKNOWN == operand)
 		{
@@ -679,6 +676,7 @@ static double	evaluate_term1(int *unknown_idx)
 			else							/* 0 or Unknown */
 			{
 				*unknown_idx = oper_idx;
+				res_idx = oper_idx;
 				result = ZBX_UNKNOWN;
 			}
 		}
@@ -703,7 +701,8 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		zbx_vector_ptr_t *unknown_msgs)
 {
 	const char	*__function_name = "evaluate";
-	int		unknown_idx;			/* index of message in 'unknown_msgs' vector */
+	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
+						/* to catch errors */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
 
@@ -726,7 +725,15 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		/* Map Unknown result to error. Callers currently do not operate with ZBX_UNKNOWN. */
 		if (NULL != unknown_msgs)
 		{
-			if (unknown_msgs->values_num > unknown_idx)
+			if (0 > unknown_idx)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_WARNING, "%s() internal error: " ZBX_UNKNOWN_STR " index:%d"
+						" expression:'%s'", __function_name, unknown_idx, expression);
+				zbx_snprintf(error, max_error_len, "Internal error: " ZBX_UNKNOWN_STR " index %d."
+						" Please report this to Zabbix developers.", unknown_idx);
+			}
+			else if (unknown_msgs->values_num > unknown_idx)
 			{
 				zbx_snprintf(error, max_error_len, "Cannot evaluate expression: \"%s\".",
 						unknown_msgs->values[unknown_idx]);
