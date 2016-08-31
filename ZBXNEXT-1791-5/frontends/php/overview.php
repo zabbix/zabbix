@@ -64,6 +64,9 @@ if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']
 
 $config = select_config();
 if (hasRequest('filter_set')) {
+	CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update('web.overview.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.overview.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		PROFILE_TYPE_INT
@@ -74,13 +77,6 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
-
-	// show triggers
-	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
-	// whole page inaccessible on large installations.
-	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-		CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
-	}
 
 	// ack status
 	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
@@ -128,12 +124,7 @@ if (hasRequest('view_style')) {
 }
 $viewStyle = CProfile::get('web.overview.view_style', STYLE_TOP);
 
-if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
-	$showTriggers = TRIGGERS_OPTION_ALL;
-}
-else {
-	$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-}
+$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 
 /*
  * Display
