@@ -94,6 +94,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
 
 	if ($this->data['showInfoColumn']) {
+		$info_icons = [];
 		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
 			$lastData = $httpTestsLastData[$httpTestId];
 
@@ -109,14 +110,8 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
-			$infoIcon = makeErrorIcon($errorMessage);
+			$info_icons[] = makeErrorIcon($errorMessage);
 		}
-		else {
-			$infoIcon = '';
-		}
-	}
-	else {
-		$infoIcon = null;
 	}
 
 	$httpTable->addRow([
@@ -141,7 +136,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
 			->addSID(),
-		$infoIcon
+		$this->data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
 
