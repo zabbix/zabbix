@@ -1261,7 +1261,6 @@ function zbx_toArray($value) {
 		return $value;
 	}
 
-	$result = [];
 	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
@@ -1271,6 +1270,9 @@ function zbx_toArray($value) {
 		}
 		elseif (!empty($value)) {
 			$result = [$value];
+		}
+		else {
+			$result = [];
 		}
 	}
 	else {
@@ -1285,7 +1287,6 @@ function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = [];
 
 	if (!is_array($value)) {
 		$result = [$value];
@@ -1294,6 +1295,8 @@ function zbx_objectValues($value, $field) {
 		$result = [$value[$field]];
 	}
 	else {
+		$result = [];
+
 		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = $val;
