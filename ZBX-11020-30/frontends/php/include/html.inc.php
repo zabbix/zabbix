@@ -569,7 +569,7 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 	}
 
 	return (new CList())
-		->addClass('table-forms')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addItem([
 			(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 			(new CDiv($other_buttons))

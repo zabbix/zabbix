@@ -1463,9 +1463,9 @@ function getPageNumber() {
 }
 
 /**
- * Returns paging line.
+ * Returns paging line and recursively slice $items of current page.
  *
- * @param array  $items				list of items
+ * @param array  $items				list of elements
  * @param string $sortorder			the order in which items are sorted ASC or DESC
  * @param CUrl $url					URL object containing arguments and query
  *
@@ -1474,8 +1474,20 @@ function getPageNumber() {
 function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
-	$rowsPerPage = CWebUser::$data['rows_per_page'];
+	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
+	$config = select_config();
+
 	$itemsCount = count($items);
+	$limit_exceeded = ($config['search_limit'] < $itemsCount);
+	$offset = 0;
+
+	if ($limit_exceeded) {
+		if ($sortorder == ZBX_SORT_DOWN) {
+			$offset = $itemsCount - $config['search_limit'];
+		}
+		$itemsCount = $config['search_limit'];
+	}
+
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 	$currentPage = getPageNumber();
 
@@ -1486,7 +1498,6 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		$currentPage = $pagesCount;
 	}
 
-	$start = ($currentPage - 1) * $rowsPerPage;
 	$tags = [];
 
 	if ($pagesCount > 1) {
@@ -1500,7 +1511,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 		}
 
-		// viewed pages (better to use not odd)
+		// viewed pages (better to use odd)
 		$pagingNavRange = 11;
 
 		$endPage = $currentPage + floor($pagingNavRange / 2);
@@ -1546,34 +1557,23 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 		}
 	}
 
+	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
+	$start = ($currentPage - 1) * $rowsPerPage;
+	$end = $start + $rowsPerPage;
+
+	if ($end > $itemsCount) {
+		$end = $itemsCount;
+	}
+
 	if ($pagesCount == 1) {
-		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
+		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$config = select_config();
-
-		$end = $start + $rowsPerPage;
-		if ($end > $itemsCount) {
-			$end = $itemsCount;
-		}
-		$total = $itemsCount;
-
-		if ($config['search_limit'] < $itemsCount) {
-			if ($sortorder == ZBX_SORT_UP) {
-				array_pop($items);
-			}
-			else {
-				array_shift($items);
-			}
-
-			$total .= '+';
-		}
-
 		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
-	// trim array with items to contain items for current page
-	$items = array_slice($items, $start, $rowsPerPage, true);
+	// Trim array with elements to contain elements for current page.
+	$items = array_slice($items, $start + $offset, $end - $start, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
@@ -1772,9 +1772,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	if ($show_close_box) {
-		$msg_box->addItem((new CSpan())
+		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
+			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 

@@ -63,9 +63,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent('Graph prototype updated');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -105,10 +105,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
@@ -138,7 +137,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	public function testInheritanceGraphPrototype_restore() {

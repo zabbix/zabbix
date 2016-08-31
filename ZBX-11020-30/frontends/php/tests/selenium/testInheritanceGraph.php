@@ -59,9 +59,9 @@ class testInheritanceGraph extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}

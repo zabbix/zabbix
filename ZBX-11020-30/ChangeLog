@@ -1,8 +1,31 @@
 Changes for 3.0.5rc1
 
 New features:
+...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
+........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+.......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
+...G...PS. [ZBX-11100] fixed minor bugs and use of magic numbers in IP range parsers (Sergejs)
+........S. [ZBX-11072] fixed problem with string truncation for IBM DB2 databases which contain the char '\r' (Sergejs)
+....I..... [ZBX-11081] fixed compilation error with curl library (Sergejs)
+..F....... [ZBX-10901] added missing highlighting for some UI elements in focused state (asaveljevs, Pavel)
+..F....... [ZBXNEXT-3351] decreased padding in screens to make them more compact (asaveljevs, Pavel)
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+....I..PS. [ZBX-11073] fixed compilation with Net-SNMP library support (gleb)
+..F....... [ZBX-10263] fixed incorrect record count in getPagingLine() when search limit is reached (Cemeris)
+..F....... [ZBX-10621] fixed hanging of dragged widget while updating content (Alexei)
+..F....... [ZBX-10621] removed excessive white space in dashboard (Alexei, Pavel)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+........S. [ZBX-10971] fixed memory leak when action is removed from configuration (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+...G...... [ZBX-11015] fixed proc.cpu.util for non-privileged agent on Solaris (Sandis)
 ........S. [ZBX-10753] fixed server reconnection attempts to MySQL on start and while running in case MySQL stopped or restarting (viktors)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10504] reduced padding around graphs to account for decreased padding in CSS (asaveljevs)
@@ -369,7 +392,7 @@ A.F.I..... [ZBXNEXT-3007] implemented support of public and private maps with ab
 ...G...... [ZBX-10063] improved net.if.* on Windows to get values from 64-bit counters if available (Sandis)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 ........S. [ZBXNEXT-3055] changed LLD lost resources deletion time calculation logic to avoid issues with invalid discovery item time stamps (gleb)
-A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
+A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, Sasha)
 ....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
@@ -404,7 +427,7 @@ Bug fixes:
 ..F....... [ZBX-10139] fixed possible PHP and SQL errors on the dashdoard and screens (Sasha)
 ..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
 ..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
-........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting discovered host triggers and graphs with their prototypes (gleb)
 ...G...... [ZBX-10033] fixed Windows agent printing an incorrect error message in case of abandoned lock (Sandis)
 ...G...... [ZBX-10034] fixed agent start-up failures within Windows session due to common locks abandoned by other agents (Sandis)
 ..F....... [ZBX-10036] fixed showing all hosts in dashboard last 20 issues when trigger expression contains several hosts (Gunars)
@@ -719,7 +742,7 @@ A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method 
 ..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
 ..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
 ..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
-........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting discovered host triggers and graphs with their prototypes (gleb)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -1434,10 +1457,20 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.15rc1
 
 New features:
+...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
+........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
-..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris) 
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
