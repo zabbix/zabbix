@@ -240,6 +240,42 @@ function make_event_details($event, $trigger, $backurl) {
 		}
 	}
 
+	if ($event['tags']) {
+		CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+		$tags[$event['eventid']] = [];
+
+		$tags_count = count($event['tags']);
+		$tags_shown = array_slice($event['tags'], 0, EVENTS_LIST_TAGS_COUNT);
+
+		foreach ($tags_shown as $tag) {
+			$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
+			$tags[$event['eventid']][] = (new CSpan($value))
+				->addClass(ZBX_STYLE_TAG)
+				->setHint($value);
+		}
+
+		if ($tags_count > count($tags_shown)) {
+			$tags_hidden = array_slice($event['tags'], -$tags_count + EVENTS_LIST_TAGS_COUNT);
+			$hint_content = [];
+
+			foreach ($tags_hidden as $tag) {
+				$value = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
+				$hint_content[$event['eventid']][] = (new CSpan($value))
+					->addClass(ZBX_STYLE_TAG)
+					->setHint($value);
+			}
+
+			$tags[$event['eventid']][] = (new CSpan(
+				(new CButton(null))
+					->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+					->setHint(new CDiv($hint_content), '', true, 'max-width: 500px')
+				))->addClass(ZBX_STYLE_REL_CONTAINER);
+		}
+
+		$table->addRow([_('Tags'), $tags]);
+	}
+
 	return $table;
 }
 
