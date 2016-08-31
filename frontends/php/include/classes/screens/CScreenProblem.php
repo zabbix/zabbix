@@ -388,7 +388,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private function getExDataEvents(array $eventids) {
 		$options = [
-			'output' => ['eventid', 'r_eventid'],
+			'output' => ['eventid', 'r_eventid', 'correlationid', 'userid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -434,7 +434,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private function getExDataProblems(array $eventids) {
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'r_clock'],
+			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -497,6 +497,9 @@ class CScreenProblem extends CScreenBase {
 			? $this->getExDataEvents($eventids)
 			: $this->getExDataProblems($eventids);
 
+		$correlationids = [];
+		$userids = [];
+
 		foreach ($problems_data as $problem_data) {
 			$problem = &$data['problems'][$problem_data['eventid']];
 
@@ -506,8 +509,34 @@ class CScreenProblem extends CScreenBase {
 				$problem['acknowledges'] = $problem_data['acknowledges'];
 			}
 			$problem['tags'] = $problem_data['tags'];
+			$problem['correlationid'] = $problem_data['correlationid'];
+			$problem['userid'] = $problem_data['userid'];
+
+			if ($problem['correlationid'] != 0) {
+				$correlationids[$problem['correlationid']] = true;
+			}
+			if ($problem['userid'] != 0) {
+				$userids[$problem['userid']] = true;
+			}
+
 			unset($problem);
 		}
+
+		$data['correlations'] = $correlationids
+			? API::Correlation()->get([
+				'output' => ['name'],
+				'correlationids' => array_keys($correlationids),
+				'preservekeys' => true
+			])
+			: [];
+
+		$data['users'] = $userids
+			? API::User()->get([
+				'output' => ['alias', 'name', 'surname'],
+				'userids' => array_keys($userids),
+				'preservekeys' => true
+			])
+			: [];
 
 		return $data;
 	}
@@ -571,6 +600,7 @@ class CScreenProblem extends CScreenBase {
 						->addClass(ZBX_STYLE_CELL_WIDTH),
 					(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 					_('Status'),
+					_('Info'),
 					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 					make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
 					_('Duration'),
@@ -627,6 +657,27 @@ class CScreenProblem extends CScreenBase {
 					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
 				);
 
+				// Info.
+				$info_icons = [];
+				if ($problem['r_eventid'] != 0) {
+					if ($problem['correlationid'] != 0) {
+						$info_icons[] = makeWarningIcon(
+							array_key_exists($problem['correlationid'], $data['correlations'])
+								? _s('Resolved by correlation rule "%1$s".',
+									$data['correlations'][$problem['correlationid']]['name']
+								)
+								: _('Resolved by correlation rule.')
+						);
+					}
+					elseif ($problem['userid'] != 0) {
+						$info_icons[] = makeWarningIcon(
+							array_key_exists($problem['userid'], $data['users'])
+								? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
+								: _('Resolved by user.')
+						);
+					}
+				}
+
 				$description = [
 					(new CSpan(CMacrosResolverHelper::resolveEventDescription(
 						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
@@ -655,6 +706,7 @@ class CScreenProblem extends CScreenBase {
 					(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
 					(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
 					$cell_status,
+					$info_icons,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
 					($problem['r_eventid'] != 0)
