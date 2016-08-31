@@ -701,9 +701,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 		array_pop($host_list);
 
 		// unknown triggers
-		$unknown = '';
+		$info_icons = [];
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = makeUnknownIcon($trigger['error']);
+			$info_icons[] = makeUnknownIcon($trigger['error']);
 		}
 
 		// trigger has events
@@ -763,7 +763,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			$description,
 			$clock,
 			zbx_date2age($trigger['lastchange']),
-			$unknown,
+			makeInformationList($info_icons),
 			$ack,
 			(new CCol($action_hint))->addClass(ZBX_STYLE_NOWRAP)
 		]);
@@ -809,9 +809,9 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 		)));
 
 		// unknown triggers
-		$unknown = '';
+		$info_icons = [];
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = makeUnknownIcon($trigger['error']);
+			$info_icons[] = makeUnknownIcon($trigger['error']);
 		}
 
 		// ack
@@ -833,7 +833,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 			$trigger['hosts'][0]['name'],
 			getSeverityCell($trigger['priority'], $config, $description),
 			zbx_date2age($trigger['lastchange']),
-			$unknown,
+			makeInformationList($info_icons),
 			$ack,
 			(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
 		]);

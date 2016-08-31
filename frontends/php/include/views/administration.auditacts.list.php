@@ -89,11 +89,9 @@ foreach ($this->data['alerts'] as $alert) {
 			zbx_nl2br($alert['message'])
 		];
 
-	if (zbx_empty($alert['error'])) {
-		$info = '';
-	}
-	else {
-		$info = makeErrorIcon($alert['error']);
+	$info_icons = [];
+	if ($alert['error'] !== '') {
+		$info_icons[] = makeErrorIcon($alert['error']);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
@@ -107,7 +105,7 @@ foreach ($this->data['alerts'] as $alert) {
 		$recipient,
 		$message,
 		$status,
-		$info
+		makeInformationList($info_icons)
 	]);
 }
 

@@ -643,12 +643,17 @@ foreach ($triggers as $trigger) {
 			: new CLink(_('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid']);
 	}
 
+	$info_icons = [];
+	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
+		$info_icons[] = makeUnknownIcon($trigger['error']);
+	}
+
 	$triggerTable->addRow([
 		$openOrCloseButton,
 		$ack_checkbox,
 		getSeverityCell($trigger['priority'], $config, null, !$trigger['value']),
 		$statusSpan,
-		($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? makeUnknownIcon($trigger['error']) : '',
+		makeInformationList($info_icons),
 		($trigger['lastchange'] == 0)
 			? _('Never')
 			: new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),

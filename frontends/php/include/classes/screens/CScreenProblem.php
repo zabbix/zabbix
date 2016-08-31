@@ -661,7 +661,7 @@ class CScreenProblem extends CScreenBase {
 				$info_icons = [];
 				if ($problem['r_eventid'] != 0) {
 					if ($problem['correlationid'] != 0) {
-						$info_icons[] = makeWarningIcon(
+						$info_icons[] = makeInformationIcon(
 							array_key_exists($problem['correlationid'], $data['correlations'])
 								? _s('Resolved by correlation rule "%1$s".',
 									$data['correlations'][$problem['correlationid']]['name']
@@ -670,7 +670,7 @@ class CScreenProblem extends CScreenBase {
 						);
 					}
 					elseif ($problem['userid'] != 0) {
-						$info_icons[] = makeWarningIcon(
+						$info_icons[] = makeInformationIcon(
 							array_key_exists($problem['userid'], $data['users'])
 								? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
 								: _('Resolved by user.')
@@ -706,7 +706,7 @@ class CScreenProblem extends CScreenBase {
 					(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
 					(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
 					$cell_status,
-					$info_icons,
+					makeInformationList($info_icons),
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
 					($problem['r_eventid'] != 0)
