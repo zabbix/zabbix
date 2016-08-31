@@ -1395,7 +1395,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) ||
+			0 == arg1)	/* time period equal to 0 is invalid */
 	{
 		*error = zbx_strdup(*error, "invalid first parameter");
 		goto out;
