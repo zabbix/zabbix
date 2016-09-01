@@ -167,7 +167,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		ns;
-	char		*value;
+	const char	*value;
 }
 ZBX_HISTORY_STRING;
 
@@ -176,7 +176,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		ns;
-	char		*value;
+	const char	*value;
 }
 ZBX_HISTORY_TEXT;
 
@@ -185,8 +185,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		ns;
-	char		*value;
-	char		*source;
+	const char	*value;
+	const char	*source;
 	int		timestamp;
 	int		logeventid;
 	int		severity;
@@ -195,11 +195,11 @@ ZBX_HISTORY_LOG;
 
 typedef struct
 {
-	void	(*history_float_cb)(ZBX_HISTORY_FLOAT *history, int history_num);
-	void	(*history_integer_cb)(ZBX_HISTORY_INTEGER *history, int history_num);
-	void	(*history_string_cb)(ZBX_HISTORY_STRING *history, int history_num);
-	void	(*history_text_cb)(ZBX_HISTORY_TEXT *history, int history_num);
-	void	(*history_log_cb)(ZBX_HISTORY_LOG *history, int history_num);
+	void	(*history_float_cb)(const ZBX_HISTORY_FLOAT *history, int history_num);
+	void	(*history_integer_cb)(const ZBX_HISTORY_INTEGER *history, int history_num);
+	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
+	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
+	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 

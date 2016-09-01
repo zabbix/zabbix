@@ -30,35 +30,35 @@ zbx_module_t;
 typedef struct
 {
 	zbx_module_t	*module;
-	void		(*history_float_cb)(ZBX_HISTORY_FLOAT *, int);
+	void		(*history_float_cb)(const ZBX_HISTORY_FLOAT *, int);
 }
 zbx_history_float_cb_t;
 
 typedef struct
 {
 	zbx_module_t	*module;
-	void		(*history_integer_cb)(ZBX_HISTORY_INTEGER *, int);
+	void		(*history_integer_cb)(const ZBX_HISTORY_INTEGER *, int);
 }
 zbx_history_integer_cb_t;
 
 typedef struct
 {
 	zbx_module_t	*module;
-	void		(*history_string_cb)(ZBX_HISTORY_STRING *, int);
+	void		(*history_string_cb)(const ZBX_HISTORY_STRING *, int);
 }
 zbx_history_string_cb_t;
 
 typedef struct
 {
 	zbx_module_t	*module;
-	void		(*history_text_cb)(ZBX_HISTORY_TEXT *, int);
+	void		(*history_text_cb)(const ZBX_HISTORY_TEXT *, int);
 }
 zbx_history_text_cb_t;
 
 typedef struct
 {
 	zbx_module_t	*module;
-	void		(*history_log_cb)(ZBX_HISTORY_LOG *, int);
+	void		(*history_log_cb)(const ZBX_HISTORY_LOG *, int);
 }
 zbx_history_log_cb_t;
 
