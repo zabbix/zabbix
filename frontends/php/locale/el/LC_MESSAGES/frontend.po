@@ -12849,7 +12849,7 @@ msgid "Search pattern is empty"
 msgstr "Το σχέδιο αναζήτησης είναι άδειο"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Limit for selected elements"
+msgid "Limit for search and filter results"
 msgstr "Όριο στοιχείων Αναζήτησης/Φίλτρου"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112

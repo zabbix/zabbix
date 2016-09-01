@@ -12833,8 +12833,8 @@ msgid "Search pattern is empty"
 msgstr "Search pattern is empty"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Limit for selected elements"
-msgstr "Limit for selected elements"
+msgid "Limit for search and filter results"
+msgstr "Limit for search and filter results"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
 msgid "Second"
