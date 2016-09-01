@@ -49,7 +49,7 @@ static ZBX_METRIC keys[] =
  *               MUST be compiled with the same version of this header file   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_module_api_version()
+int	zbx_module_api_version(void)
 {
 	return ZBX_MODULE_API_VERSION;
 }
@@ -77,7 +77,7 @@ void	zbx_module_item_timeout(int timeout)
  * Return value: list of item keys                                            *
  *                                                                            *
  ******************************************************************************/
-ZBX_METRIC	*zbx_module_item_list()
+ZBX_METRIC	*zbx_module_item_list(void)
 {
 	return keys;
 }
@@ -174,7 +174,7 @@ static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
  * Comment: the module won't be loaded in case of ZBX_MODULE_FAIL             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_module_init()
+int	zbx_module_init(void)
 {
 	/* initialization for dummy.random */
 	srand(time(NULL));
@@ -193,7 +193,7 @@ int	zbx_module_init()
  *               ZBX_MODULE_FAIL - function failed                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_module_uninit()
+int	zbx_module_uninit(void)
 {
 	return ZBX_MODULE_OK;
 }
@@ -213,7 +213,7 @@ int	zbx_module_uninit()
  *             history_num - number of elements in history array              *
  *                                                                            *
  ******************************************************************************/
-static void	dummy_history_float_cb(ZBX_HISTORY_FLOAT *history, int history_num)
+static void	dummy_history_float_cb(const ZBX_HISTORY_FLOAT *history, int history_num)
 {
 	int	i;
 
@@ -223,7 +223,7 @@ static void	dummy_history_float_cb(ZBX_HISTORY_FLOAT *history, int history_num)
 	}
 }
 
-static void	dummy_history_integer_cb(ZBX_HISTORY_INTEGER *history, int history_num)
+static void	dummy_history_integer_cb(const ZBX_HISTORY_INTEGER *history, int history_num)
 {
 	int	i;
 
@@ -233,7 +233,7 @@ static void	dummy_history_integer_cb(ZBX_HISTORY_INTEGER *history, int history_n
 	}
 }
 
-static void	dummy_history_string_cb(ZBX_HISTORY_STRING *history, int history_num)
+static void	dummy_history_string_cb(const ZBX_HISTORY_STRING *history, int history_num)
 {
 	int	i;
 
@@ -243,7 +243,7 @@ static void	dummy_history_string_cb(ZBX_HISTORY_STRING *history, int history_num
 	}
 }
 
-static void	dummy_history_text_cb(ZBX_HISTORY_TEXT *history, int history_num)
+static void	dummy_history_text_cb(const ZBX_HISTORY_TEXT *history, int history_num)
 {
 	int	i;
 
@@ -253,7 +253,7 @@ static void	dummy_history_text_cb(ZBX_HISTORY_TEXT *history, int history_num)
 	}
 }
 
-static void	dummy_history_log_cb(ZBX_HISTORY_LOG *history, int history_num)
+static void	dummy_history_log_cb(const ZBX_HISTORY_LOG *history, int history_num)
 {
 	int	i;
 
