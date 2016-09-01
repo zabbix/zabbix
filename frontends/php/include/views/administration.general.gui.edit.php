@@ -41,7 +41,7 @@ $guiTab = (new CFormList())
 			_('remember selected')
 		], 'dropdown_first_remember')
 	])
-	->addRow(_('Limit for selected elements'),
+	->addRow(_('Limit for search and filter results'),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Max count of elements to show inside table cell'),

@@ -37,7 +37,7 @@ $fields = [
 	],
 	'dropdown_first_remember'	=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('remember selected')],
 	'search_limit'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})',
-		_('Limit for selected elements')
+		_('Limit for search and filter results')
 	],
 	'max_in_table'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
 		_('Max count of elements to show inside table cell')
