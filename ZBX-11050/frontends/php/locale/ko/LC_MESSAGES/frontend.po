@@ -12762,7 +12762,7 @@ msgid "Search pattern is empty"
 msgstr "검색패턴이 공백입니다"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Limit for selected elements"
+msgid "Limit for search and filter results"
 msgstr "검색/필터 항목의 상한치"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112

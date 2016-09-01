@@ -12773,7 +12773,7 @@ msgid "Search pattern is empty"
 msgstr "搜尋式樣是空白"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Limit for selected elements"
+msgid "Limit for search and filter results"
 msgstr "搜尋/過濾組件限制"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
