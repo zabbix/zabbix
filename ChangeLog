@@ -3,6 +3,7 @@ Changes for 3.2.0beta3
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3101] fixed undefined index when adding a message to user in action operations (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0beta2
