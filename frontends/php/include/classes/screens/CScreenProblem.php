@@ -388,7 +388,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private function getExDataEvents(array $eventids) {
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'correlationid', 'userid'],
+			'output' => ['eventid', 'r_eventid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -409,7 +409,7 @@ class CScreenProblem extends CScreenBase {
 
 		$r_events = $r_eventids
 			? API::Event()->get([
-				'output' => ['clock'],
+				'output' => ['clock', 'correlationid', 'userid'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
@@ -418,9 +418,16 @@ class CScreenProblem extends CScreenBase {
 			: [];
 
 		foreach ($events as &$event) {
-			$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
-				? $r_events[$event['r_eventid']]['clock']
-				: 0;
+			if (array_key_exists($event['r_eventid'], $r_events)) {
+				$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
+				$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
+				$event['userid'] = $r_events[$event['r_eventid']]['userid'];
+			}
+			else {
+				$event['r_clock'] = 0;
+				$event['correlationid'] = 0;
+				$event['userid'] = 0;
+			}
 		}
 		unset($event);
 
