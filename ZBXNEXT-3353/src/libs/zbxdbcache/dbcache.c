@@ -2075,6 +2075,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	ZBX_HISTORY_STRING	*h_string;
 	ZBX_HISTORY_TEXT	*h_text;
 	ZBX_HISTORY_LOG		*h_log;
+	static char		*empty_str = "";
 	int			i;
 
 	*history_float_num = 0;
@@ -2147,7 +2148,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->clock = h->ts.sec;
 				h_log->ns = h->ts.ns;
 				h_log->value = h->value_orig.str;
-				h_log->source = h->value.str;
+				h_log->source = (NULL != h->value.str ? h->value.str : empty_str);
 				h_log->timestamp = h->timestamp;
 				h_log->logeventid = h->logeventid;
 				h_log->severity = h->severity;
