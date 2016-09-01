@@ -585,7 +585,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							$result[$i][$j][] = BR();
 						}
 
-						if (array_key_exists('opmessage', $operation) && $operation['opmessage_grp']) {
+						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
 							$user_groups_list = [];
 
 							foreach ($operation['opmessage_grp'] as $userGroup) {
