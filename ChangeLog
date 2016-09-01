@@ -1,10 +1,22 @@
+Changes for 3.2.0beta3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 3.2.0beta2
 
 New features:
+..F....... [ZBXNEXT-3201] added icon in Monitoring->Problems view to show who close problem; implemented new information icons (Pavel, Sasha)
+..F....... [ZBXNEXT-3201] added blinking on CLOSING state in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added "Show details" filter option in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added displaying of recovery actions in Monitoring->Problem view (Sasha)
 ..F....... [ZBXNEXT-3409] replaced drop-down controls with modern radio buttons in several forms (Alexei)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+........S. [ZBX-11148] fixed suppressing of escalations when an event is closed by event correlation operation 'close new' (wiper)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 ...G...... [ZBX-9124] changed getting OS name by item system.sw.os[name] (Sergejs)
 ....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
@@ -17,7 +29,7 @@ A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sas
 Changes for 3.2.0beta1
 
 New features:
-........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items (Andris, wiper)
+........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items; thanks to users alix and Calimero for patch (Andris, wiper)
 ........S. [ZBXNEXT-2877] added datacenter name to vmware hypervisors and virtual machines (wiper)
 A.F.I...S. [ZBXNEXT-1262] added support of nested host groups (Gunars, Ivo, Oleg, Sasha, wiper)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)

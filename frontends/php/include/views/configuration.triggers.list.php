@@ -160,15 +160,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	// info
 	if ($this->data['showInfoColumn']) {
+		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info = makeErrorIcon($trigger['error']);
+			$info_icons[] = makeErrorIcon($trigger['error']);
 		}
-		else {
-			$info = '';
-		}
-	}
-	else {
-		$info = null;
 	}
 
 	// status
@@ -213,7 +208,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expression,
 		$status,
-		$info
+		$this->data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
 
