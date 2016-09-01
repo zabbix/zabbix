@@ -636,6 +636,15 @@ footer {
 			}
 		}
 
+		&.timeline-axis {
+			border-bottom: 2px solid darken($table-border-color, 5%) !important;
+			border-right-color: $transparent;
+		}
+
+		&.timeline-td {
+			border-bottom: 2px solid darken($table-border-color, 5%) !important;
+		}
+
 		a {
 			display: block;
 			position: relative;
@@ -667,7 +676,7 @@ footer {
 			background-color: $ui-hover-color;
 
 			.timeline-axis {
-				background-color: $ui-bg-color;
+				background-color:  $ui-bg-color;
 			}
 
 			.timeline-date {
@@ -675,7 +684,7 @@ footer {
 			}
 
 			.timeline-td {
-				background-color: $ui-bg-color;
+				background-color: $ui-bg-color!important;
 			}
 		}
 
@@ -951,15 +960,15 @@ tr.timeline-period {
 	span {
 		position: absolute;
 		z-index: 100;
-		top: 4px;
+		top: 5px;
 		left: 46%;
 		height: 18px;
 		line-height: 18px;
 		white-space: nowrap;
 		padding: 0 4px;
 		display: inline-block;
-		background-color: $ui-bg-color;
-		border: 1px solid darken($table-border-color, 5%);
+		color: $font-alt-color;
+		background-color: $table-border-color;
 		@include border-radius(2px);
 		@include transform(translateX(-46%));
 	}
@@ -984,18 +993,18 @@ tr.timeline-period {
 		height: 5px;
 		border: 2px solid $ui-bg-color;
 		@include border-radius(100%);
-		background-color: $form-border-color;
+		background-color: $btn-bg-color;
 	}
 }
 
 .timeline-td {
 	@extend %timeline-td;
-	padding: 6px .15em !important;
+	padding: 6px .25em !important;
 }
 
 %timeline-td {
 	position: relative;
-	border-bottom-color: $transparent !important;
+	border-bottom-color: $ui-bg-color !important;
 }
 
 // Filters
