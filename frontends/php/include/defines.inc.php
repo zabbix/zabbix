@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.2.0beta2');
+define('ZABBIX_VERSION',		'3.2.0beta3');
 define('ZABBIX_API_VERSION',	'3.2.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010078);
+define('ZABBIX_DB_VERSION',		3010079);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -1184,6 +1184,7 @@ define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
+define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
@@ -1193,7 +1194,6 @@ define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
-define('ZBX_STYLE_LIST_HOR_MIN_WIDTH', 'list-hor-min-width');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
@@ -1253,6 +1253,7 @@ define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
+define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
