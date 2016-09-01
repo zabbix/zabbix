@@ -282,7 +282,7 @@ class CLineGraphDraw extends CGraphDraw {
 					' GROUP BY itemid,'.$calc_field
 				);
 
-				if (!self::hasScheduling($this->items[$i]['intervals']) || $this->items[$i]['delay'] != 0) {
+				if (!$this->hasSchedulingIntervals($this->items[$i]['intervals']) || $this->items[$i]['delay'] != 0) {
 					$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
 				}
 			}
@@ -2658,7 +2658,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
-						|| (self::hasScheduling($this->items[$item]['intervals']) && $delay == 0)) {
+						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
 					$draw = true;
 				}
 				else {
@@ -2732,7 +2732,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 *
 	 * @return bool
 	 */
-	protected static function hasScheduling($intervals) {
+	private function hasSchedulingIntervals($intervals) {
 		foreach ($intervals as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
 				return true;
