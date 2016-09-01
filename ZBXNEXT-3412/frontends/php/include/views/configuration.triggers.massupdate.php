@@ -96,8 +96,7 @@ $dependenciesDiv = (new CDiv([
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setId('dependencies_div');
 
-$triggersFormList->addRow(
-	[_('Replace dependencies'), SPACE,
+$triggersFormList->addRow([_('Replace dependencies'), SPACE,
 		(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
 			->setChecked(isset($data['visible']['dependencies']))
 	],
