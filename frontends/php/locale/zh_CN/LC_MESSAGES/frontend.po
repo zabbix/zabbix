@@ -5264,7 +5264,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "于所选的群组中启用调试模式?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "启用事件确认"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -13309,7 +13309,7 @@ msgid "Search pattern is empty"
 msgstr "查找式样为空"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "搜索/过滤组件限制"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
