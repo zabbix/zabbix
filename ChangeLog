@@ -3,6 +3,7 @@ Changes for 3.2.0beta3
 New features:
 
 Bug fixes:
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
 ..F....... [ZBXNEXT-3101] fixed undefined index when adding a message to user in action operations (Gunars)
 
 --------------------------------------------------------------------------------
@@ -116,6 +117,7 @@ Bug fixes:
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 .......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
 ........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 .......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
