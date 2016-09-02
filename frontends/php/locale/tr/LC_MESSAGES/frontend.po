@@ -5320,7 +5320,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Seçilen gruplarda hata ayıklama modu etkinleştirilsin mi?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Olay onaylarını etkinleştir"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -13387,7 +13387,7 @@ msgid "Search pattern is empty"
 msgstr "Arama şekil düzeni boş"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Ara/Filtrele elemanları limiti"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
