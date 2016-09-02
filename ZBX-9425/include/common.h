@@ -681,7 +681,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 typedef struct
 {
 	zbx_uint64_t	userid;
-	char		*name;
 	unsigned char	type;
 }
 zbx_user_t;
