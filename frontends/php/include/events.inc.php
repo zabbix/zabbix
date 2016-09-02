@@ -573,10 +573,11 @@ function makeEventsTags($events, $html = true) {
 			}
 
 			if ($tags_count > count($tags_shown)) {
-				$tags_hidden = array_slice($event['tags'], -$tags_count + EVENTS_LIST_TAGS_COUNT);
+				// Display all tags in hint box.
+
 				$hint_content = [];
 
-				foreach ($tags_hidden as $tag) {
+				foreach ($event['tags'] as $tag) {
 					$value = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
 					$hint_content[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
