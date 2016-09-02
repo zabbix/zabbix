@@ -1,8 +1,14 @@
 Changes for 3.2.0beta3
 
 New features:
+..F....... [ZBXNEXT-3416] implemented event hidden tag display with hint box when there are more than 3 tags and better display of long tags and added event tag display in event details widget (Ivo)
+..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
+..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)
+..F....... [ZBX-11050] changed translation strings "Enable event acknowledges" => "Enable event acknowledgement" and "Search/Filter elements limit" => "Limit for search and filter results" (Cemeris)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
+..F....... [ZBXNEXT-3101] fixed undefined index when adding a message to user in action operations (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0beta2
@@ -110,11 +116,13 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)
 ..F....... [ZBX-8801] made "Trigger status" be always remembered in "Monitoring" -> "Triggers" and "Monitoring" -> "Overview", even if "All" (asaveljevs)
 ..F....... [ZBX-10974] fixed filter being reset when moving to a different page in "Monitoring" -> "Triggers" (asaveljevs)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 .......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
 ........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 .......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)

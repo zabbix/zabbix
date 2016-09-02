@@ -365,22 +365,51 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	$visible = getRequest('visible', []);
 
 	if ($visible) {
-		$triggersToUpdate = [];
+		$triggerids = getRequest('g_triggerid');
+		$triggers_to_update = [];
 
-		foreach (getRequest('g_triggerid') as $triggerId) {
-			$trigger = ['triggerid' => $triggerId];
+		$triggers = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'templateid'],
+			'triggerids' => $triggerids,
+			'preservekeys' => true
+		]);
 
-			if (isset($visible['priority'])) {
-				$trigger['priority'] = getRequest('priority');
+		if ($triggers) {
+			$tags = getRequest('tags', []);
+
+			// Remove empty new tag lines.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
 			}
-			if (isset($visible['dependencies'])) {
-				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-			}
 
-			$triggersToUpdate[] = $trigger;
+			foreach ($triggerids as $triggerid) {
+				if (array_key_exists($triggerid, $triggers)) {
+					$trigger = ['triggerid' => $triggerid];
+
+					if (array_key_exists('priority', $visible)) {
+						$trigger['priority'] = getRequest('priority');
+					}
+
+					if (array_key_exists('dependencies', $visible)) {
+						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+					}
+
+					if (array_key_exists('tags', $visible)) {
+						$trigger['tags'] = $tags;
+					}
+
+					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+						$trigger['manual_close'] = getRequest('manual_close');
+					}
+
+					$triggers_to_update[] = $trigger;
+				}
+			}
 		}
 
-		$result = (bool) API::TriggerPrototype()->update($triggersToUpdate);
+		$result = (bool) API::TriggerPrototype()->update($triggers_to_update);
 	}
 
 	if ($result) {
