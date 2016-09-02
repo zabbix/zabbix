@@ -1,10 +1,27 @@
+Changes for 3.2.0beta3
+
+New features:
+..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
+
+Bug fixes:
+..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)
+..F....... [ZBX-11050] changed translation strings "Enable event acknowledges" => "Enable event acknowledgement" and "Search/Filter elements limit" => "Limit for search and filter results" (Cemeris)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
+..F....... [ZBXNEXT-3101] fixed undefined index when adding a message to user in action operations (Gunars)
+
+--------------------------------------------------------------------------------
 Changes for 3.2.0beta2
 
 New features:
+..F....... [ZBXNEXT-3201] added icon in Monitoring->Problems view to show who close problem; implemented new information icons (Pavel, Sasha)
+..F....... [ZBXNEXT-3201] added blinking on CLOSING state in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added "Show details" filter option in Monitoring->Problems view (Sasha)
+..F....... [ZBXNEXT-3201] added displaying of recovery actions in Monitoring->Problem view (Sasha)
 ..F....... [ZBXNEXT-3409] replaced drop-down controls with modern radio buttons in several forms (Alexei)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+........S. [ZBX-11148] fixed suppressing of escalations when an event is closed by event correlation operation 'close new' (wiper)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 ...G...... [ZBX-9124] changed getting OS name by item system.sw.os[name] (Sergejs)
 ....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
@@ -17,7 +34,7 @@ A......... [ZBXNEXT-3201] fixed possible SQL errors in problem.get() method (Sas
 Changes for 3.2.0beta1
 
 New features:
-........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items (Andris, wiper)
+........S. [ZBXNEXT-1791] added evaluation of logical expressions with unsupported items in trigger expressions and calculated items; thanks to users alix and Calimero for patch (Andris, wiper)
 ........S. [ZBXNEXT-2877] added datacenter name to vmware hypervisors and virtual machines (wiper)
 A.F.I...S. [ZBXNEXT-1262] added support of nested host groups (Gunars, Ivo, Oleg, Sasha, wiper)
 A.F....... [ZBX-1357] updated Chinese (China), Czech, English (United States), French, Georgian, German, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Turkish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
@@ -98,11 +115,13 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)
 ..F....... [ZBX-8801] made "Trigger status" be always remembered in "Monitoring" -> "Triggers" and "Monitoring" -> "Overview", even if "All" (asaveljevs)
 ..F....... [ZBX-10974] fixed filter being reset when moving to a different page in "Monitoring" -> "Triggers" (asaveljevs)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 .......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
 ........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
 .......P.. [ZBX-11109] fixed processing of parameter HousekeepingFrequency=0 in proxy (Sergejs)
 ........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)

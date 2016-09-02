@@ -533,12 +533,16 @@ article {
 			padding: 4px 7px;
 		}
 
-		.status-container {
+		.status-container, .rel-container {
 			margin: 0 5px 0 0;
 
 			span {
 				padding: 2px 3px 1px 3px;
 			}
+		}
+
+		.rel-container {
+			margin: 0;
 		}
 	}
 
@@ -2115,6 +2119,25 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
+.icon-info {
+	position: relative;
+	width: 8px;
+	height: 11px;
+	cursor: pointer;
+	margin: -12px 0 -4px 0;
+
+	&::before {
+		content: '';
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 14px;
+		height: 14px;
+		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
+	}
+}
+
 // Sign in, Installation
 
 .setup-container  {
@@ -3060,10 +3083,16 @@ a.blue {
 	@extend %status;
 }
 
+.status-dark-grey {
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	@extend %status;
+}
+
 .status-yellow {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
-	background-color: darken(desaturate($alt-yellow, 10%), 16%);
+	border: 1px solid darken(desaturate($alt-yellow, 9%), 20%);
+	background-color: darken(desaturate($alt-yellow, 9%), 18%);
 	@extend %status;
 }
 
@@ -3090,7 +3119,7 @@ a.blue {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 0.7em;
+	min-width: .7em;
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
@@ -3667,6 +3696,15 @@ tr.cursor-move {
 	position: relative;
 	display: inline-block;
 	min-width: 16px;
+	white-space: nowrap;
+
+	.icon-info {
+		margin-right: 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }
 
 .server-name {
@@ -3675,20 +3713,6 @@ tr.cursor-move {
 	white-space: nowrap;
 	overflow: hidden;
 	@extend %overflow-ellipsis;
-}
-
-.list-hor-min-width {
-
-	li {
-		display: inline-block;
-		min-width: 1.4em;
-		margin-right: .4em;
-
-		&:last-child {
-			min-width: auto;
-			margin-right: 0;
-		}
-	}
 }
 
 .uppercase {

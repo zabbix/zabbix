@@ -62,8 +62,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertElementPresentId('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
 		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
-		$this->zbxTestAssertElementPresentId('status');
-		$this->zbxTestDropdownHasOptions('status', ['Active', 'Passive']);
+		$this->zbxTestAssertElementText("//ul[@id='status']//label[@for='status_0']", 'Active');
+		$this->zbxTestAssertElementText("//ul[@id='status']//label[@for='status_1']", 'Passive');
 		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
 		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
 		$this->zbxTestAssertElementPresentId('add');
@@ -72,7 +72,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// Switch to passive mode
-		$this->zbxTestDropdownSelectWait('status', 'Passive');
+		$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_1']");
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ip'));
 		$this->zbxTestTextPresent('Proxy name');
 		$this->zbxTestTextPresent('Proxy mode');
 		$this->zbxTestTextPresent('Interface');
@@ -212,15 +213,15 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestInputType('host', $name);
 		switch ($mode) {
 			case HOST_STATUS_PROXY_ACTIVE:
-				$this->zbxTestDropdownSelectWait('status', 'Active');
+				$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_0']");
 				break;
 
 			case HOST_STATUS_PROXY_PASSIVE:
-				$this->zbxTestDropdownSelectWait('status', 'Passive');
-				$this->zbxTestInputType('ip', $ip);
-				$this->zbxTestInputType('dns', $dns);
+				$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_1']");
+				$this->zbxTestInputTypeOverwrite('ip', $ip);
+				$this->zbxTestInputTypeOverwrite('dns', $dns);
 // TODO connect_to is not supported yet
-				$this->zbxTestInputType('port', $port);
+				$this->zbxTestInputTypeOverwrite('port', $port);
 				break;
 		}
 
@@ -232,7 +233,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestClickButton('proxy.create');
 		switch ($expected) {
 			case PROXY_GOOD:
-				$this->zbxTestTextPresent('Proxy added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy added');
 				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestCheckHeader('Proxies');
 				$this->zbxTestTextPresent(['Mode', 'Name', 'Encryption','Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
