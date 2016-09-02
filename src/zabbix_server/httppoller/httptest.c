@@ -359,7 +359,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
 	char		*err_str = NULL;
-	int		lastfailedstep;
+	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
 	zbx_httpstat_t	stat;
 	double		speed_download = 0;
@@ -373,8 +373,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
 			__function_name, httptest->httptest.httptestid, httptest->httptest.name);
-
-	lastfailedstep = 0;
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects,"
@@ -730,11 +728,12 @@ clean:
 	{
 		if (0 == lastfailedstep)
 		{
-			/* we don't have name of the step, try to fetch or set to NULL if fail */
 			/* we are here either because cURL initialization failed */
 			/* or we have been compiled without cURL library */
 
 			lastfailedstep = 1;
+
+			/* we don't have name of the step, try to fetch it */
 
 			if (NULL != (row = DBfetch(result)))
 			{
@@ -754,13 +753,11 @@ clean:
 			}
 		}
 
-		if(NULL != httpstep.name)
+		if (NULL != httpstep.name)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
-					httpstep.name, httptest->httptest.name, host->name, err_str);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\""
+					": %s", httpstep.name, httptest->httptest.name, host->name, err_str);
 		}
-
-
 	}
 	DBfree_result(result);
 
