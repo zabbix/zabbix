@@ -1,6 +1,7 @@
 Changes for 3.2.0beta3
 
 New features:
+..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
 ..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)

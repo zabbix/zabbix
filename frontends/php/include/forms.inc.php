@@ -1256,6 +1256,8 @@ function getTriggerMassupdateFormData() {
 		'visible' => getRequest('visible', []),
 		'priority' => getRequest('priority', ''),
 		'dependencies' => getRequest('dependencies', []),
+		'tags' => getRequest('tags', []),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
@@ -1292,6 +1294,10 @@ function getTriggerMassupdateFormData() {
 	unset($dependency);
 
 	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }
