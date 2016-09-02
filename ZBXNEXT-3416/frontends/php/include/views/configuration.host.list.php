@@ -173,11 +173,9 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates[] = $caption;
 	}
 
+	$info_icons = [];
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
-		$lifetime_indicator = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
-	}
-	else {
-		$lifetime_indicator = '';
+		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 
 	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
@@ -257,7 +255,7 @@ foreach ($data['hosts'] as $host) {
 		$status,
 		getHostAvailabilityTable($host),
 		$encryption,
-		$lifetime_indicator
+		makeInformationList($info_icons)
 	]);
 }
 
