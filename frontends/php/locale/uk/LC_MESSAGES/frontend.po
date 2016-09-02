@@ -5379,7 +5379,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Активувати діагностичний режим для вибраних груп?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Активувати підтвердження подій"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -13469,7 +13469,7 @@ msgid "Search pattern is empty"
 msgstr "Шаблон пошуку пустий"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Ліміт елементів в пошуку/фільтрі"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
