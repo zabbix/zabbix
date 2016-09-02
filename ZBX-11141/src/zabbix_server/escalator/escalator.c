@@ -1679,6 +1679,7 @@ static void	escalation_log_cancel_warning(DB_ESCALATION *escalation, const char 
  *                                                                            *
  * Parameters: escalation - [IN/OUT] the escalation to cancel                 *
  *             action     - [IN]     the action                               *
+ *             event      - [IN]     the event                                *
  *             error      - [IN]     the error message                        *
  *                                                                            *
  ******************************************************************************/
