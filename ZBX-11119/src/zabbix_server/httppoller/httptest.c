@@ -747,6 +747,8 @@ clean:
 			}
 			else
 			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": %s",
+						httptest->httptest.name, host->name, err_str);
 				httpstep.name = NULL;
 				THIS_SHOULD_NEVER_HAPPEN;
 			}
