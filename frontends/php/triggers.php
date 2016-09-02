@@ -389,13 +389,22 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 		$triggers_to_update = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => [],
+			'output' => ['triggerid', 'templateid'],
 			'triggerids' => $triggerids,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
 		if ($triggers) {
+			$tags = getRequest('tags', []);
+
+			// Remove empty new tag lines.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
+			}
+
 			foreach ($triggerids as $triggerid) {
 				if (array_key_exists($triggerid, $triggers)) {
 					$trigger = ['triggerid' => $triggerid];
@@ -406,6 +415,14 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 
 					if (array_key_exists('dependencies', $visible)) {
 						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+					}
+
+					if (array_key_exists('tags', $visible)) {
+						$trigger['tags'] = $tags;
+					}
+
+					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+						$trigger['manual_close'] = getRequest('manual_close');
 					}
 
 					$triggers_to_update[] = $trigger;
@@ -519,7 +536,7 @@ $config = select_config();
 /*
  * Display
  */
-if (hasRequest('action') && getRequest('action') == 'trigger.massupdateform' && hasRequest('g_triggerid')) {
+if (hasRequest('action') && getRequest('action') === 'trigger.massupdateform' && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'trigger.massupdate';
 	$triggersView = new CView('configuration.triggers.massupdate', $data);
