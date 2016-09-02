@@ -1716,6 +1716,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *                                                                            *
  * Parameters: escalation - [IN/OUT] the escalation to execute                *
  *             action     - [IN]     the action                               *
+ *             event      - [IN]     the event                                *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event)
@@ -1738,6 +1739,8 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  * Parameters: escalation - [IN/OUT] the escalation to recovery               *
  *             action     - [IN]     the action                               *
+ *             event      - [IN]     the event                                *
+ *             r_event    - [IN]     the recovery event                       *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
