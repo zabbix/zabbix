@@ -5320,7 +5320,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Abilitare modalità per i gruppi selezionati?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Abilita acknowledge eventi"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -13391,7 +13391,7 @@ msgid "Search pattern is empty"
 msgstr "Il pattern di ricerca è vuoto"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Limite Cerca/Filtra elementi"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112

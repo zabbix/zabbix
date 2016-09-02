@@ -3,6 +3,7 @@ Changes for 3.2.0beta3
 New features:
 
 Bug fixes:
+..F....... [ZBX-11050] changed translation strings "Enable event acknowledges" => "Enable event acknowledgement" and "Search/Filter elements limit" => "Limit for search and filter results" (Cemeris)
 ..F....... [ZBX-11071] fixed closing success and error messages in IE (Cemeris)
 ..F....... [ZBXNEXT-3101] fixed undefined index when adding a message to user in action operations (Gunars)
 
