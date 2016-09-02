@@ -1261,7 +1261,6 @@ function zbx_toArray($value) {
 		return $value;
 	}
 
-	$result = [];
 	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
@@ -1271,6 +1270,9 @@ function zbx_toArray($value) {
 		}
 		elseif (!empty($value)) {
 			$result = [$value];
+		}
+		else {
+			$result = [];
 		}
 	}
 	else {
@@ -1285,7 +1287,6 @@ function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = [];
 
 	if (!is_array($value)) {
 		$result = [$value];
@@ -1294,6 +1295,8 @@ function zbx_objectValues($value, $field) {
 		$result = [$value[$field]];
 	}
 	else {
+		$result = [];
+
 		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = $val;
@@ -1668,7 +1671,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-		// url to redirect the user to after he loggs in
+		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
 		$url = urlencode($url->toString());
 
@@ -1771,7 +1774,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
+			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 

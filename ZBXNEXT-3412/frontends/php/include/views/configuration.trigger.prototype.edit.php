@@ -167,10 +167,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$allowed_testing = true;
 	if ($data['expression_tree']) {
 		foreach ($data['expression_tree'] as $i => $e) {
-			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
@@ -183,7 +181,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// templated trigger
@@ -219,7 +217,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
@@ -366,15 +364,13 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	if ($data['recovery_expression_tree']) {
 		foreach ($data['recovery_expression_tree'] as $i => $e) {
-			if (!isset($e['recovery_expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
-				if (is_array($e['recovery_expression']['levelErrors'])) {
-					foreach ($e['recovery_expression']['levelErrors'] as $expVal => $errTxt) {
+				if (is_array($e['expression']['levelErrors'])) {
+					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
 						if ($errors) {
 							$errors[] = BR();
 						}
@@ -382,7 +378,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// templated trigger
@@ -418,7 +414,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
