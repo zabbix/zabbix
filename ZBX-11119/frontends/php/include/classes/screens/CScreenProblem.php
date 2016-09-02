@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -274,7 +274,9 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags'],
+						'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
+							'priority', 'url', 'flags'
+						],
 						'selectHosts' => ['hostid', 'name', 'status'],
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
@@ -386,7 +388,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private function getExDataEvents(array $eventids) {
 		$options = [
-			'output' => ['eventid', 'r_eventid'],
+			'output' => ['eventid', 'r_eventid', 'correlationid', 'userid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -432,7 +434,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private function getExDataProblems(array $eventids) {
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'r_clock'],
+			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -472,6 +474,20 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
+		if ($this->data['filter']['details'] == 1) {
+			foreach ($data['triggers'] as &$trigger) {
+				$trigger['expression_html'] = $trigger['expression'];
+				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
+			}
+			unset($trigger);
+
+			$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
+				'html' => true,
+				'resolve_usermacros' => true,
+				'resolve_macros' => true,
+				'sources' => ['expression_html', 'recovery_expression_html']
+			]);
+		}
 		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 		// get additional data
@@ -480,6 +496,9 @@ class CScreenProblem extends CScreenBase {
 		$problems_data = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
 			? $this->getExDataEvents($eventids)
 			: $this->getExDataProblems($eventids);
+
+		$correlationids = [];
+		$userids = [];
 
 		foreach ($problems_data as $problem_data) {
 			$problem = &$data['problems'][$problem_data['eventid']];
@@ -490,8 +509,34 @@ class CScreenProblem extends CScreenBase {
 				$problem['acknowledges'] = $problem_data['acknowledges'];
 			}
 			$problem['tags'] = $problem_data['tags'];
+			$problem['correlationid'] = $problem_data['correlationid'];
+			$problem['userid'] = $problem_data['userid'];
+
+			if ($problem['correlationid'] != 0) {
+				$correlationids[$problem['correlationid']] = true;
+			}
+			if ($problem['userid'] != 0) {
+				$userids[$problem['userid']] = true;
+			}
+
 			unset($problem);
 		}
+
+		$data['correlations'] = $correlationids
+			? API::Correlation()->get([
+				'output' => ['name'],
+				'correlationids' => array_keys($correlationids),
+				'preservekeys' => true
+			])
+			: [];
+
+		$data['users'] = $userids
+			? API::User()->get([
+				'output' => ['alias', 'name', 'surname'],
+				'userids' => array_keys($userids),
+				'preservekeys' => true
+			])
+			: [];
 
 		return $data;
 	}
@@ -515,7 +560,7 @@ class CScreenProblem extends CScreenBase {
 
 		$data = $this->makeData($data);
 
-		$actions = makeEventsActions(array_keys($data['problems']));
+		$actions = makeEventsActions($data['problems'], true);
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
@@ -555,6 +600,7 @@ class CScreenProblem extends CScreenBase {
 						->addClass(ZBX_STYLE_CELL_WIDTH),
 					(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 					_('Status'),
+					_('Info'),
 					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 					make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder'], $link),
 					_('Duration'),
@@ -572,7 +618,7 @@ class CScreenProblem extends CScreenBase {
 				$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 			}
 
-			foreach ($data['problems'] as $problem) {
+			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
 
 				$cell_clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
@@ -585,6 +631,7 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
+					$value_clock = $problem['r_clock'];
 				}
 				else {
 					$in_closing = false;
@@ -600,19 +647,56 @@ class CScreenProblem extends CScreenBase {
 
 					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+					$value_clock = $in_closing ? time() : $problem['clock'];
 				}
 
 				$cell_status = new CSpan($value_str);
 
 				// Add colors and blinking to span depending on configuration and trigger parameters.
-				addTriggerValueStyle($cell_status, $value,
-					($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+				addTriggerValueStyle($cell_status, $value, $value_clock,
 					$this->config['event_ack_enable'] ? (bool) $problem['acknowledges'] : false
 				);
 
-				$description = CMacrosResolverHelper::resolveEventDescription(
-					$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
-				);
+				// Info.
+				$info_icons = [];
+				if ($problem['r_eventid'] != 0) {
+					if ($problem['correlationid'] != 0) {
+						$info_icons[] = makeInformationIcon(
+							array_key_exists($problem['correlationid'], $data['correlations'])
+								? _s('Resolved by correlation rule "%1$s".',
+									$data['correlations'][$problem['correlationid']]['name']
+								)
+								: _('Resolved by correlation rule.')
+						);
+					}
+					elseif ($problem['userid'] != 0) {
+						$info_icons[] = makeInformationIcon(
+							array_key_exists($problem['userid'], $data['users'])
+								? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
+								: _('Resolved by user.')
+						);
+					}
+				}
+
+				$description = [
+					(new CSpan(CMacrosResolverHelper::resolveEventDescription(
+						$trigger + ['clock' => $problem['clock'], 'ns' => $problem['ns']]
+					)))
+						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+				];
+
+				if ($this->data['filter']['details'] == 1) {
+					$description[] = BR();
+
+					if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+						$description[] = [_('Problem'), ': ', $trigger['expression_html'], BR()];
+						$description[] = [_('Recovery'), ': ', $trigger['recovery_expression_html']];
+					}
+					else {
+						$description[] = $trigger['expression_html'];
+					}
+				}
 
 				$table->addRow([
 					$this->config['event_ack_enable']
@@ -622,16 +706,15 @@ class CScreenProblem extends CScreenBase {
 					(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
 					(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
 					$cell_status,
+					makeInformationList($info_icons),
 					$triggers_hosts[$trigger['triggerid']],
-					(new CSpan($description))
-						->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
-						->addClass(ZBX_STYLE_LINK_ACTION),
+					$description,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$this->config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
-					array_key_exists($problem['eventid'], $actions)
-						? (new CCol($actions[$problem['eventid']]))->addClass(ZBX_STYLE_NOWRAP)
+					array_key_exists($eventid, $actions)
+						? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
 						: '',
 					$tags[$problem['eventid']]
 				]);
