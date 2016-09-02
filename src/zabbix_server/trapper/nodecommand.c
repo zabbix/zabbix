@@ -25,40 +25,6 @@
 #include "log.h"
 #include "../scripts.h"
 
-static int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid)
-{
-	const char	*__function_name = "DBget_user_by_active_session";
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", sessionid);
-
-	result = DBselect(
-		"select u.userid,u.name,u.type"
-			" from sessions s, users u"
-		" where s.userid=u.userid"
-			" and s.sessionid='%s'"
-			" and s.status=%d",
-		sessionid, ZBX_SESSION_ACTIVE);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_DBROW2UINT64(user->userid, row[0]);
-		user->name = zbx_strdup(user->name, row[1]);
-		user->type = (unsigned char)atoi(row[2]);
-
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-
 /******************************************************************************
  *                                                                            *
  * Function: execute_script                                                   *
@@ -85,12 +51,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 
 	if (SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
 	{
-		zbx_snprintf(error, sizeof(error), "Unknown Host ID [" ZBX_FS_UI64 "].", hostid);
+		zbx_strlcpy(error, "Unknown host identifier", sizeof(error));
 		goto fail;
 	}
-	if (SUCCEED != (rc = DBget_user_by_active_session(&user, sessionid)))
+	if (SUCCEED != (rc = zbx_sql_get_user_by_active_session(&user, sessionid)))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot find active Session ID [" ZBX_FS_UI64 "].", sessionid);
+		zbx_strlcpy(error, "Active session identifier is missing", sizeof(error));
 		goto fail;
 	}
 

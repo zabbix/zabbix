@@ -254,11 +254,11 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		script->type = (unsigned char)atoi(row[0]);
-		script->execute_on = (unsigned char)atoi(row[1]);
+		ZBX_STR2UCHAR(script->type, row[0]);
+		ZBX_STR2UCHAR(script->execute_on, row[1]);
 		script->command = zbx_strdup(script->command, row[2]);
 		ZBX_DBROW2UINT64(*groupid, row[3]);
-		script->host_access = (unsigned char)atoi(row[4]);
+		ZBX_STR2UCHAR(script->host_access, row[4]);
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -268,7 +268,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 	return ret;
 }
 
-static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, char *error, size_t max_error_len)
+static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
 	const char	*__function_name = "check_script_permissions";
 	DB_RESULT	result;
@@ -288,10 +288,8 @@ static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, c
 			hostid, groupid);
 
 	if (NULL == DBfetch(result))
-	{
-		zbx_strlcpy(error, "Insufficient permissions. Host is not in an allowed host group.", max_error_len);
 		ret = FAIL;
-	}
+
 	DBfree_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -299,8 +297,7 @@ exit:
 	return ret;
 }
 
-static int	check_user_permissions(zbx_uint64_t userid, DC_HOST *host, zbx_script_t *script, char *error,
-			size_t max_error_len)
+static int	check_user_permissions(zbx_uint64_t userid, DC_HOST *host, zbx_script_t *script)
 {
 	const char	*__function_name = "check_user_permissions";
 	int		ret = SUCCEED;
@@ -326,11 +323,7 @@ static int	check_user_permissions(zbx_uint64_t userid, DC_HOST *host, zbx_script
 		script->host_access);
 
 	if (NULL == (row = DBfetch(result)))
-	{
-		zbx_strlcpy(error, "Insufficient permissions. User doesn't have the permission to execute the script.",
-				max_error_len);
 		ret = FAIL;
-	}
 
 	DBfree_result(result);
 
@@ -432,26 +425,20 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
 			{
-				zbx_snprintf(error, max_error_len,
-						"Unknown Script ID [" ZBX_FS_UI64 "]", script->scriptid);
+				zbx_strlcpy(error, "Unknown script identifier", max_error_len);
 				break;
 			}
-			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid,
-					error, max_error_len))
+			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
-				zbx_snprintf(error, max_error_len,
-					"Host ID [" ZBX_FS_UI64 "] is not in"
-					" an allowed host group ID [" ZBX_FS_UI64 "]",
-					host->hostid, groupid);
+				zbx_strlcpy(error, "Script does not have permission to execute on the host",
+						max_error_len);
 				break;
 			}
 			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
-				SUCCEED != check_user_permissions(user->userid, host, script, error, max_error_len))
+				SUCCEED != check_user_permissions(user->userid, host, script))
 			{
-				zbx_snprintf(error, max_error_len,
-					"User ID [" ZBX_FS_UI64 "] doesn't have the permission"
-					" to execute the script ID [" ZBX_FS_UI64 "]",
-					user->userid, script->scriptid);
+				zbx_strlcpy(error, "User does not have permission to execute this script on the host",
+						max_error_len);
 				break;
 			}
 
