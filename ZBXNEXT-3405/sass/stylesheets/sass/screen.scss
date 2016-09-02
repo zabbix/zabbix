@@ -636,14 +636,14 @@ footer {
 			}
 		}
 
-		&.timeline-axis {
-			border-bottom: 2px solid darken($table-border-color, 5%) !important;
-			border-right-color: $transparent;
-		}
+		//&.timeline-axis {
+		//	border-bottom: 2px solid darken($table-border-color, 5%) !important;
+		//	border-right-color: $transparent;
+		//}
 
-		&.timeline-td {
-			border-bottom: 2px solid darken($table-border-color, 5%) !important;
-		}
+		//&.timeline-td {
+		//	border-bottom: 2px solid darken($table-border-color, 5%) !important;
+		//}
 
 		a {
 			display: block;
@@ -999,6 +999,10 @@ tr.timeline-period {
 
 .timeline-td {
 	@extend %timeline-td;
+	padding: 6px .25em !important;
+}
+
+.timeline-th {
 	padding: 6px .25em !important;
 }
 
