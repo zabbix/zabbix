@@ -5269,7 +5269,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "於所選的群組中啟用除錯模式?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "啟用事件知悉"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -13317,7 +13317,7 @@ msgid "Search pattern is empty"
 msgstr "搜尋式樣是空白"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "搜尋/過濾組件限制"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
