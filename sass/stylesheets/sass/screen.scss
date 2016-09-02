@@ -3695,6 +3695,7 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-width: 16px;
 	white-space: nowrap;
 
 	.icon-info {
