@@ -88,6 +88,12 @@ static ZBX_DC_IDS	*ids = NULL;
 #define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
 #define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
 #define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
+#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
+#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
+
+#define ZBX_DC_FLAGS_NOT_FOR_HISTORY	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOHISTORY)
+#define ZBX_DC_FLAGS_NOT_FOR_TRENDS	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOTRENDS)
+#define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
 
 typedef struct
 {
@@ -102,8 +108,6 @@ typedef struct
 	int		mtime;
 	unsigned char	value_type;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
-	unsigned char	keep_history;
-	unsigned char	keep_trends;
 	unsigned char	state;
 }
 ZBX_DC_HISTORY;		/* structure for copying data about one item from history cache to temporary array */
@@ -760,10 +764,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_trends)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
 			continue;
 
 		DCadd_trend(h, &trends, &trends_alloc, &trends_num);
@@ -1375,9 +1376,14 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_STATE_NORMAL == h->state && h->value_type != items[i].value_type)
 			continue;
 
-		h->keep_history = (0 != items[i].history);
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-			h->keep_trends = (0 != items[i].trends);
+		if (0 == items[i].history)
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
+
+		if ((ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type) &&
+				0 == items[i].trends)
+		{
+			h->flags |= ZBX_DC_FLAG_NOTRENDS;
+		}
 
 		DCadd_update_item_sql(&sql_offset, &items[i], h, &delta_history);
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -1487,13 +1493,10 @@ static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
-			continue;
-
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
+			continue;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.dbl);
@@ -1521,13 +1524,10 @@ static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
-			continue;
-
 		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+			continue;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.ui64);
@@ -1555,13 +1555,10 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
-			continue;
-
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
+			continue;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
@@ -1589,13 +1586,10 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
-			continue;
-
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
+			continue;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
@@ -1624,13 +1618,10 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
-			continue;
-
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
+			continue;
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
@@ -1666,10 +1657,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
-
-		if (0 == h->keep_history)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
 		switch (h->value_type)
@@ -1728,10 +1716,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		{
 			ZBX_DC_HISTORY	*h = &history[i];
 
-			if (0 == h->keep_history)
-				continue;
-
-			if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
+			if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 				continue;
 
 			switch (h->value_type)
@@ -2087,13 +2072,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	{
 		h = &history[i];
 
-		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
-			continue;
-
-		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
-			continue;
-
-		if (0 != (h->flags & ZBX_DC_FLAG_LLD))
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
 		switch (h->value_type)
@@ -3225,8 +3204,6 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->ts = data->ts;
 	history->state = data->state;
 	history->flags = data->flags;
-	history->keep_history = 0;
-	history->keep_trends = 0;
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
