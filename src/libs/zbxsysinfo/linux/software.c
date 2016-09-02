@@ -49,7 +49,7 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL, find_param = 0, line_read = FAIL;
+	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
 	FILE	*f = NULL;
 
 	if (1 < request->nparam)
