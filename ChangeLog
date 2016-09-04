@@ -24,6 +24,7 @@ New features:
 Bug fixes:
 ........S. [ZBX-11148] fixed suppressing of escalations when an event is closed by event correlation operation 'close new' (wiper)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
+.......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
 ...G...... [ZBX-9124] changed getting OS name by item system.sw.os[name] (Sergejs)
 ....I..... [ZBX-11132] added database patch to fill all required fields in "problem" table (wiper)
