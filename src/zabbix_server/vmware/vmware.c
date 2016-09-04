@@ -1921,7 +1921,6 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 	if (NULL == (hv->datacenter_name = zbx_xml_read_value(page.data, "/*/*/*/*/*/*[local-name()='val']")))
 		hv->datacenter_name = zbx_strdup(NULL, "");
 
-
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
