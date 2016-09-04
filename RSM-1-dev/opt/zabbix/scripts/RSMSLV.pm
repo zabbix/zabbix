@@ -1198,18 +1198,33 @@ sub tld_service_enabled
 	return SUCCESS if (!defined($service_type) || ($service_type eq 'DNS'));
 
 	my $host = "Template $tld";
-	my $macro = "{\$RSM.TLD.$service_type.ENABLED}";
+
+	my $macro_condition;
+	if ($service_type eq 'RDDS')
+	{
+		$macro_condition = "hm.macro='{\$RSM.TLD.$service_type.ENABLED}'";
+	}
+	else
+	{
+		$macro_condition = "hm.macro in ('{\$RSM.TLD.RDDS43.ENABLED}','{\$RSM.TLD.RDDS80.ENABLED}'".
+				",'{\$RSM.TLD.RDAP.ENABLED}')";
+	}
 
 	my $rows_ref = db_select(
 		"select hm.value".
 		" from hosts h,hostmacro hm".
 		" where h.hostid=hm.hostid".
-			" and h.host='$host'".
-			" and hm.macro='$macro'");
+		" and h.host='$host'".
+		" and $macro_condition");
 
-	fail("macro \"$macro\" does not exist at host \"$host\"") if (scalar(@$rows_ref) == 0);
+	fail("no macros found using condition \"$macro_condition\" at host \"$host\"") if (scalar(@$rows_ref) == 0);
 
-	return ($rows_ref->[0]->[0] == 0 ? E_FAIL : SUCCESS);
+	foreach my $row_ref (@{$rows_ref})
+	{
+		return SUCCESS if ($row_ref->[0] == 1);
+	}
+
+	return E_FAIL;
 }
 
 sub handle_db_error

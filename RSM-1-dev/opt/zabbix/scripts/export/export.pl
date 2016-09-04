@@ -84,7 +84,7 @@ if (opt('debug'))
 # consider only tests that started within given period
 my $cfg_dns_minns;
 my $cfg_dns_minonline;
-foreach my $service (keys(%{$services}))
+foreach my $service (sort(keys(%{$services})))
 {
 	dbg("$service") if (opt('debug'));
 
@@ -344,7 +344,7 @@ sub __get_delays
 	my $cfg_dns_delay = undef;
 	my $services = shift;
 
-	foreach my $service (keys(%$services))
+	foreach my $service (sort(keys(%$services)))
 	{
 		if ($service eq 'dns' || $service eq 'dnssec')
 		{
@@ -372,7 +372,7 @@ sub __get_keys
 {
 	my $services = shift;
 
-	foreach my $service (keys(%$services))
+	foreach my $service (sort(keys(%$services)))
 	{
 		if ($service eq 'dns' || $service eq 'dnssec')
 		{
@@ -406,7 +406,7 @@ sub __get_valuemaps
 
 	my $cfg_dns_valuemaps;
 
-	foreach my $service (keys(%{$services}))
+	foreach my $service (sort(keys(%{$services})))
 	{
 		if ($service eq 'dns' || $service eq 'dnssec')
 		{
@@ -448,7 +448,7 @@ sub __get_test_data
 	my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref,
 		$probe_dns_results_ref, $result);
 
-	foreach my $service (keys(%{$services}))
+	foreach my $service (sort(keys(%{$services})))
 	{
 		next if (tld_service_enabled($tld, $service) != SUCCESS);
 
