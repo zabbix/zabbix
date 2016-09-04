@@ -1202,12 +1202,12 @@ sub tld_service_enabled
 	my $macro_condition;
 	if ($service_type eq 'RDDS')
 	{
-		$macro_condition = "hm.macro='{\$RSM.TLD.$service_type.ENABLED}'";
+		$macro_condition = "hm.macro in ('{\$RSM.TLD.RDDS43.ENABLED}','{\$RSM.TLD.RDDS80.ENABLED}'".
+				",'{\$RSM.TLD.RDAP.ENABLED}')";
 	}
 	else
 	{
-		$macro_condition = "hm.macro in ('{\$RSM.TLD.RDDS43.ENABLED}','{\$RSM.TLD.RDDS80.ENABLED}'".
-				",'{\$RSM.TLD.RDAP.ENABLED}')";
+		$macro_condition = "hm.macro='{\$RSM.TLD.$service_type.ENABLED}'";
 	}
 
 	my $rows_ref = db_select(
