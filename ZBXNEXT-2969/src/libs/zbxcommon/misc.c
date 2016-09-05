@@ -2126,14 +2126,15 @@ int	is_double(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint_suffix                                                   *
+ * Function: is_time_suffix                                                   *
  *                                                                            *
- * Purpose: check if the string is unsigned integer                           *
+ * Purpose: check if the string is a non-negative integer with or without     *
+ *          supported time suffix                                             *
  *                                                                            *
- * Parameters: str   - string to check                                        *
- *             value - a pointer to converted value (optional)                *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] a pointer to converted value (optional)          *
  *                                                                            *
- * Return value: SUCCEED - the string is unsigned integer                     *
+ * Return value: SUCCEED - the string is valid and within reasonable limits   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
@@ -2141,22 +2142,22 @@ int	is_double(const char *str)
  * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_suffix(const char *str, unsigned int *value)
+int	is_time_suffix(const char *str, int *value)
 {
-	const unsigned int	max_uint = ~0U;
-	unsigned int		value_uint = 0, c, factor = 1;
+	const int	max = 0x7fffffff;	/* minimum acceptable value for INT_MAX is 2 147 483 647 */
+	int		value_tmp = 0, c, factor = 1;
 
-	if ('\0' == *str || '0' > *str || *str > '9')
+	if ('\0' == *str || 0 == isdigit(*str))
 		return FAIL;
 
 	while ('\0' != *str && 0 != isdigit(*str))
 	{
-		c = (unsigned int)(unsigned char)(*str - '0');
+		c = (int)(unsigned char)(*str - '0');
 
-		if ((max_uint - c) / 10 < value_uint)
+		if ((max - c) / 10 < value_tmp)
 			return FAIL;	/* overflow */
 
-		value_uint = value_uint * 10 + c;
+		value_tmp = value_tmp * 10 + c;
 
 		str++;
 	}
@@ -2189,11 +2190,11 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	if ('\0' != *str)
 		return FAIL;
 
-	if (max_uint / factor < value_uint)
+	if (max / factor < value_tmp)
 		return FAIL;	/* overflow */
 
 	if (NULL != value)
-		*value = value_uint * factor;
+		*value = value_tmp * factor;
 
 	return SUCCEED;
 }

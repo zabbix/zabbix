@@ -54,14 +54,14 @@ static int	__get_function_parameter_int(zbx_uint64_t hostid, const char *paramet
 		}
 		else if ('-' == *parameter)
 		{
-			if (SUCCEED == is_uint_suffix(parameter + 1, (unsigned int *)value) && 0 <= *value)
+			if (SUCCEED == is_time_suffix(parameter + 1, value))
 			{
 				*value = -(*value);
 				*flag = ZBX_FLAG_SEC;
 				ret = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
+		else if (SUCCEED == is_time_suffix(parameter, value))
 		{
 			*flag = ZBX_FLAG_SEC;
 			ret = SUCCEED;
