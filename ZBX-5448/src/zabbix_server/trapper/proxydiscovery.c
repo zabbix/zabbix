@@ -74,14 +74,14 @@ void	send_discovery_data(zbx_sock_t *sock)
 	zbx_uint64_t	lastid;
 	int		records;
 	char		*info = NULL, *error = NULL;
-
+	int  records_processed;
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	records = proxy_get_dhis_data(&j, &lastid);
+	records = proxy_get_dhis_data(&j, &lastid, &records_processed);
 
 	zbx_json_close(&j);
 

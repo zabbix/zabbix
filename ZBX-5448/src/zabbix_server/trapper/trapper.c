@@ -120,14 +120,14 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 	zbx_uint64_t	lastid;
 	int		records;
 	char		*info = NULL, *error = NULL;
-
+	int records_processed;
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	records = proxy_get_hist_data(&j, &lastid);
+	records = proxy_get_hist_data(&j, &lastid, &records_processed);
 
 	zbx_json_close(&j);
 
@@ -146,7 +146,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 		goto out;
 	}
 
-	if (0 != records)
+	if (0 != lastid)	/* records can be 0 while id shall be moved, because some data is skipped */
 		proxy_set_hist_lastid(lastid);
 out:
 	zbx_json_free(&j);
