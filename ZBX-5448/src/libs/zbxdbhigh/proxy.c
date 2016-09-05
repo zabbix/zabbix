@@ -1725,7 +1725,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid, int * records_processed)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid, int *records_processed)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
@@ -1811,7 +1811,7 @@ try_again:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
+static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
 {
 	const char			*__function_name = "proxy_get_history_data";
 
@@ -1976,17 +1976,17 @@ try_again:
 	return records;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
 {
 	return proxy_get_history_data(j, lastid, records_processed);
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
 {
 	return proxy_get_history_data_simple(j, &dht, lastid, records_processed);
 }
 
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
 {
 	return proxy_get_history_data_simple(j, &areg, lastid, records_processed);
 }
