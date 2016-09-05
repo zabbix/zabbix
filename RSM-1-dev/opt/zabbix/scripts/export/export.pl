@@ -465,14 +465,14 @@ sub __get_test_data
 		my $itemid_avail = get_itemid_by_hostid($hostid, $key_avail);
 		if (!$itemid_avail)
 		{
-			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
+			wrn("configuration error: service $service enabled but ", rsm_slv_error());
 			next;
 		}
 
 		my $itemid_rollweek = get_itemid_by_hostid($hostid, $key_rollweek);
 		if (!$itemid_rollweek)
 		{
-			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
+			wrn("configuration error: service $service enabled but ", rsm_slv_error());
 			next;
 		}
 
@@ -733,6 +733,12 @@ sub __get_test_data
 			{
 				my $cycle_ref = $result->{$tld}->{$service}->{'cycles'}->{$cycleclock};
 
+				if (!defined($cycle_ref->{'status'}))
+				{
+					wrn("no status of $service cycle rolling week (", ts_full($cycleclock), ")!");
+					next;
+				}
+
 				my %nscycle;	# for Name Server cycle
 
 				my $eventid = '';
@@ -879,6 +885,13 @@ sub __get_test_data
 
 							if ($interface eq 'DNS')
 							{
+
+								if (!defined($target_status))
+								{
+									wrn("no status of $interface NS test (", ts_full($cycleclock), ")!");
+									next;
+								}
+
 								# Name Server (target) test
 								dw_append_csv(DATA_NSTEST, [
 										      $probe_id,
@@ -919,6 +932,12 @@ sub __get_test_data
 
 								my $ns_id = dw_get_id(ID_NS_NAME, $ns);
 								my $ip_id = dw_get_id(ID_NS_IP, $ip);
+
+								if (!defined($nscyclestatus))
+								{
+									wrn("no status of $interface cycle (", ts_full($cycleclock), ")!");
+									next;
+								}
 
 								# Name Server availability cycle
 								dw_append_csv(DATA_CYCLE, [

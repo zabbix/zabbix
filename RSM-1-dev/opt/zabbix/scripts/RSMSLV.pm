@@ -1198,8 +1198,8 @@ sub tld_service_enabled
 	return SUCCESS if (!defined($service_type) || ($service_type eq 'DNS'));
 
 	my $host = "Template $tld";
-
 	my $macro_condition;
+
 	if ($service_type eq 'RDDS')
 	{
 		$macro_condition = "hm.macro in ('{\$RSM.TLD.RDDS43.ENABLED}','{\$RSM.TLD.RDDS80.ENABLED}'".
@@ -1214,8 +1214,8 @@ sub tld_service_enabled
 		"select hm.value".
 		" from hosts h,hostmacro hm".
 		" where h.hostid=hm.hostid".
-		" and h.host='$host'".
-		" and $macro_condition");
+			" and h.host='$host'".
+			" and $macro_condition");
 
 	fail("no macros found using condition \"$macro_condition\" at host \"$host\"") if (scalar(@$rows_ref) == 0);
 
