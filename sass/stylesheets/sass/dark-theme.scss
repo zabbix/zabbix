@@ -126,6 +126,13 @@ $clock-lines-color: #4f4f4f;
 	border-color: lighten($table-border-color, 3%) !important;
 }
 
+tr.timeline-period {
+
+	span {
+		border-color: darken(desaturate($btn-bg-color, 4%), 18%) !important
+	}
+}
+
 .timeline-axis {
 	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
 
