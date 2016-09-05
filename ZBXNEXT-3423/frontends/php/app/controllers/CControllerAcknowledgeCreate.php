@@ -25,7 +25,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$fields = [
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
-			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
+			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
 			'close_problem' =>		'db acknowledges.action|in '.
 										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
 			'backurl' =>			'string'
@@ -69,8 +69,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$result = true;
 
 		// Select events with trigger IDs only if there is a need to close problems or to find related all other events.
-		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $acknowledge_type == ZBX_ACKNOWLEDGE_ALL
-				|| $close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
 			// Get trigger IDs for selected events.
 			$events = API::Event()->get([
 				'output' => ['eventid', 'objectid'],
@@ -155,8 +154,8 @@ class CControllerAcknowledgeCreate extends CController {
 			]);
 		}
 
-		// If previous action was success and there is a need to acknowledge all other events.
-		if ($result && ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $acknowledge_type == ZBX_ACKNOWLEDGE_ALL)) {
+		// If previous action was success and there is a need to acknowledge all other problem events.
+		if ($result && $acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
 			$filter = [
 				'acknowledged' => EVENT_NOT_ACKNOWLEDGED
 			];

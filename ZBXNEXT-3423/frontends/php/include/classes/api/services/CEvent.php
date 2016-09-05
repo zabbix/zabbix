@@ -744,9 +744,10 @@ class CEvent extends CApiService {
 	/**
 	 * Checks if the given events exist, are accessible and can be acknowledged.
 	 *
-	 * @throws APIException     if an event does not exist, is not accessible or is not a trigger event
-	 *
 	 * @param array $eventids
+	 *
+	 * @throws APIException			If an event does not exist, is not accessible, is not a trigger event or event is
+	 *								not in PROBLEM state.
 	 */
 	protected function checkCanBeAcknowledged(array $eventids) {
 		$allowed_events = $this->get([
@@ -761,7 +762,7 @@ class CEvent extends CApiService {
 
 				if ($allowed_events[$eventid]['value'] == TRIGGER_VALUE_FALSE) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_s('Cannot acknowledge event: %1$s.', _('event is not in PROBLEM state'))
+						_s('Cannot acknowledge problem: %1$s.', _('event is not in PROBLEM state'))
 					);
 				}
 			}
@@ -804,6 +805,8 @@ class CEvent extends CApiService {
 	 * Checks if the given events can be closed manually.
 	 *
 	 * @param array $eventids
+	 *
+	 * @throws APIException			If an event does not exist, is not accessible or trigger does not allow manual closing.
 	 */
 	protected function checkCanBeManuallyClosed(array $eventids) {
 		$events_count = count($eventids);
@@ -836,7 +839,7 @@ class CEvent extends CApiService {
 		}
 
 		foreach ($events as $event) {
-			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+			if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
 				);
