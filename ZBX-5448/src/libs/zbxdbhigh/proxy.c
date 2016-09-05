@@ -1725,7 +1725,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid, unsigned char * is_more_data_available)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid, int * records_processed)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
@@ -1794,19 +1794,10 @@ try_again:
 		id = *lastid;
 		records_lim--;
 	}
-
-	if(ZBX_MAX_HRECORDS == records)	/* we got full buffer, there might be more data */
-	{
-		*is_more_data_available = 1;
-	}
-	else
-	{
-		*is_more_data_available = 0;
-	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
-
+	*records_processed = records;
 	return records;
 }
 
@@ -1820,7 +1811,7 @@ try_again:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, unsigned char * is_more_data_available)
+static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
 {
 	const char			*__function_name = "proxy_get_history_data";
 
@@ -1976,16 +1967,7 @@ try_again:
 
 		records++;
 	}
-
-	if(ZBX_MAX_HRECORDS == records ||	/* we got full buffer, there might be more data */
-			i != records )	/* we could not fill whole buffer due to items skipped, there might be more data */
-	{
-		*is_more_data_available = 1;
-	}
-	else
-	{
-		*is_more_data_available = 0;
-	}
+	*records_processed = i;
 	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
@@ -1994,19 +1976,19 @@ try_again:
 	return records;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, unsigned char * is_more_data_available)
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
 {
-	return proxy_get_history_data(j, lastid, is_more_data_available);
+	return proxy_get_history_data(j, lastid, records_processed);
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, unsigned char * is_more_data_available)
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
 {
-	return proxy_get_history_data_simple(j, &dht, lastid, is_more_data_available);
+	return proxy_get_history_data_simple(j, &dht, lastid, records_processed);
 }
 
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, unsigned char * is_more_data_available)
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int * records_processed)
 {
-	return proxy_get_history_data_simple(j, &areg, lastid, is_more_data_available);
+	return proxy_get_history_data_simple(j, &areg, lastid, records_processed);
 }
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
