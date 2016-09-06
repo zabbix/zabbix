@@ -67,7 +67,7 @@ foreach ($this->data['items'] as $item) {
 	);
 
 	$status = (new CLink(
-		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('yes'),
+		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes'),
 		'?group_itemid[]='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
 			'&action='.(($item['status'] == ITEM_STATUS_DISABLED)
