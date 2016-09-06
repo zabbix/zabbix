@@ -254,6 +254,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickButton($value) {
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath("//button[@value='".$value."']"));
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
 	}
 
