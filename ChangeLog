@@ -1,6 +1,7 @@
 Changes for 3.2.0beta3
 
 New features:
+..F....... [ZBXNEXT-3423] removed ability to acknowledge OK events (Ivo)
 ..F....... [ZBXNEXT-3416] implemented event hidden tag display with hint box when there are more than 3 tags and better display of long tags and added event tag display in event details widget (Ivo)
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
