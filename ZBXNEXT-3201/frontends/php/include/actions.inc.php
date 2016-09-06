@@ -1440,7 +1440,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 			]);
 
 			if (++$popup_rows == ZBX_WIDGET_ROWS) {
-				break;
+				break 2;
 			}
 		}
 		$recovery = false;
