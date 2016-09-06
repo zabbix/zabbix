@@ -1599,18 +1599,25 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
 {
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		char	*msg = NULL;
-		size_t	msg_alloc = 0, msg_offset = 0;
-		int	i, num;
+		char			*msg = NULL;
+		size_t			msg_alloc = 0, msg_offset = 0;
+		int			i, num;
+		STACK_OF(SSL_CIPHER)	*cipher_list;
 
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() %s ciphersuites:", title1, title2);
 
-		num = sk_SSL_CIPHER_num(ciphers->cipher_list);
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL			/* OpenSSL 1.1.0 or newer */
+		cipher_list = SSL_CTX_get_ciphers(ciphers);
+#else
+		cipher_list = ciphers->cipher_list;
+#endif
+
+		num = sk_SSL_CIPHER_num(cipher_list);
 
 		for (i = 0; i < num; i++)
 		{
 			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s",
-					sk_SSL_CIPHER_value(ciphers->cipher_list, i)->name);
+					SSL_CIPHER_get_name(sk_SSL_CIPHER_value(cipher_list, i)));
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
@@ -3091,28 +3098,55 @@ void	zbx_tls_init_child(void)
 
 	/* set protocol version to TLS 1.2 */
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
+		method = TLS_client_method();
+	else	/* ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD */
+		method = TLS_method();
+#else
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		method = TLSv1_2_client_method();
 	else	/* ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD */
 		method = TLSv1_2_method();
-
+#endif
 	/* create context for certificate-only authentication if certificate is configured */
-	if (NULL != CONFIG_TLS_CERT_FILE && NULL == (ctx_cert = SSL_CTX_new(method)))
-		goto out_method;
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		if (NULL == (ctx_cert = SSL_CTX_new(method)))
+			goto out_method;
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+		if (1 != SSL_CTX_set_min_proto_version(ctx_cert, TLS1_2_VERSION))
+			goto out_method;
+#endif
+	}
 
 	/* Create context for PSK-only authentication. PSK can come from configuration file (in proxy, agentd) */
 	/* and later from database (in server, proxy). */
 	if ((NULL != CONFIG_TLS_PSK_FILE ||
-			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))) &&
-			NULL == (ctx_psk = SSL_CTX_new(method)))
+			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		goto out_method;
+		if (NULL == (ctx_psk = SSL_CTX_new(method)))
+			goto out_method;
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+		if (1 != SSL_CTX_set_min_proto_version(ctx_psk, TLS1_2_VERSION))
+			goto out_method;
+#endif
 	}
 
 	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a universal context */
 	/* for certificate and PSK authentication to prepare for both. */
-	if (NULL != ctx_cert && NULL != ctx_psk && NULL == (ctx_all = SSL_CTX_new(method)))
-		goto out_method;
+	if (NULL != ctx_cert && NULL != ctx_psk)
+	{
+		if (NULL == (ctx_all = SSL_CTX_new(method)))
+			goto out_method;
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+		if (1 != SSL_CTX_set_min_proto_version(ctx_all, TLS1_2_VERSION))
+			goto out_method;
+#endif
+	}
 
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != CONFIG_TLS_CA_FILE)
@@ -5618,10 +5652,6 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
  ******************************************************************************/
 int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
-#if defined(HAVE_OPENSSL)
-	SSL_SESSION	*sess;
-#endif
-
 #if defined(HAVE_POLARSSL)
 	attr->psk_identity = (char *)s->tls_ctx->ctx->psk_identity;
 	attr->psk_identity_len = s->tls_ctx->ctx->psk_identity_len;
@@ -5631,13 +5661,8 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	else
 		return FAIL;
 #elif defined(HAVE_OPENSSL)
-	if (NULL != (sess = SSL_get_session(s->tls_ctx->ctx)))
-	{
-		if (NULL != (attr->psk_identity = sess->psk_identity))
-			attr->psk_identity_len = strlen(attr->psk_identity);
-		else
-			return FAIL;
-	}
+	if (NULL != (attr->psk_identity = SSL_get_psk_identity(s->tls_ctx->ctx)))
+		attr->psk_identity_len = strlen(attr->psk_identity);
 	else
 		return FAIL;
 #endif
