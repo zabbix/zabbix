@@ -5923,8 +5923,12 @@ msgstr "Τέλος"
 msgid "Finnish (fi_FI)"
 msgstr "Φινλανδικά (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Πρώτο"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
 msgid "First"
 msgstr "Πρώτο"
 
@@ -9191,8 +9195,12 @@ msgstr "Θέση επιγραφής"
 msgid "Language"
 msgstr "Γλώσσα"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "Τελευταίο"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
 msgid "Last"
 msgstr "Τελευταίο"
 

@@ -5852,10 +5852,14 @@ msgstr "終了"
 msgid "Finnish (fi_FI)"
 msgstr "フィンランド語 (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "第1週"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr "最初"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9108,10 +9112,14 @@ msgstr "ラベルの位置"
 msgid "Language"
 msgstr "言語"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "最終週"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr "最後"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25

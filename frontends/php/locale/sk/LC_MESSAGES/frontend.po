@@ -5974,10 +5974,14 @@ msgstr "Ukončiť"
 msgid "Finnish (fi_FI)"
 msgstr "Fínsky (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Prvý"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr "Prvá"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9254,10 +9258,14 @@ msgstr "Umiestnenie popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Posledný"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Posledná"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
