@@ -123,11 +123,9 @@ foreach ($this->data['groups'] as $group) {
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
 	// info, discovered item lifetime indicator
+	$info_icons = [];
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
-		$info = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
-	}
-	else {
-		$info = '';
+		$info_icons[] = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
 	}
 
 	$hostGroupTable->addRow([
@@ -139,7 +137,7 @@ foreach ($this->data['groups'] as $group) {
 			CViewHelper::showNum($templateCount)
 		],
 		empty($hostsOutput) ? '' : $hostsOutput,
-		$info
+		makeInformationList($info_icons)
 	]);
 }
 

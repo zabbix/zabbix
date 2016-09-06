@@ -41,7 +41,8 @@ $options = [
 			'inventory' => $data['filter']['inventory'],
 			'tags' => $data['filter']['tags'],
 			'maintenance' => $data['filter']['maintenance'],
-			'unacknowledged' => $data['filter']['unacknowledged']
+			'unacknowledged' => $data['filter']['unacknowledged'],
+			'details' => $data['filter']['details']
 		]
 	]
 ];
@@ -234,6 +235,9 @@ if ($data['action'] == 'problem.view') {
 			(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
 		);
 	}
+
+	$filter_column2
+		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter('web.problem.filter.state'))
 		->addVar('action', 'problem.view')
