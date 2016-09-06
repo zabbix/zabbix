@@ -114,18 +114,7 @@ $clock-lines-color: #4f4f4f;
 .list-table {
 
 	thead th {
-		@extend %border-color;
-	}
-}
-
-%border-color {
-	border-color: lighten($table-border-color, 3%) !important;
-}
-
-tr.timeline-period {
-
-	span {
-		border-color: darken(desaturate($btn-bg-color, 4%), 18%) !important
+		border-color: lighten($table-border-color, 3%) !important;;
 	}
 }
 
