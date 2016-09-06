@@ -702,6 +702,10 @@ footer {
 		&:last-child td {
 			border-bottom: none;
 		}
+
+		&.hover-nobg {
+			background-color: $ui-bg-color;
+		}
 	}
 
 	td {
@@ -958,8 +962,6 @@ tr.timeline-period {
 		white-space: nowrap;
 		padding: 0 6px;
 		display: inline-block;
-		//color: $font-alt-color;
-		//background-color: lighten(desaturate($btn-bg-color, 27%), 44%);
 		background-color: $ui-bg-color;
 		border: 2px solid lighten(desaturate($btn-bg-color, 27%), 44%);
 		@include border-radius(2px);
