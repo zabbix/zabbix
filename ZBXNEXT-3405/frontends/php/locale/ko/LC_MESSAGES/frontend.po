@@ -5262,7 +5262,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "선택한 그룹의 디버그 모드를 활성화하시겠습니까?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "이벤트의 장애대응 코멘트를 활성화"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -5853,8 +5853,12 @@ msgstr "종료"
 msgid "Finnish (fi_FI)"
 msgstr "핀란드어 (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+msgid "First"
+msgstr "첫번째"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
 msgid "First"
 msgstr "첫번째"
 
@@ -9109,8 +9113,12 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "최근"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
 msgid "Last"
 msgstr "최근"
 
@@ -13306,7 +13314,7 @@ msgid "Search pattern is empty"
 msgstr "검색패턴이 공백입니다"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "검색/필터 항목의 상한치"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112

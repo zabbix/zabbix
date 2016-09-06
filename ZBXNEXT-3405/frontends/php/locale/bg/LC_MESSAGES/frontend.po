@@ -5335,7 +5335,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Активиране на режим отстраняване на грешки в избраните групи?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Активиране потвърждаване на събитие"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -5928,8 +5928,12 @@ msgstr "Завърши"
 msgid "Finnish (fi_FI)"
 msgstr "Финландски (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+msgid "First"
+msgstr "Първи"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
 msgid "First"
 msgstr "Първи"
 
@@ -9203,10 +9207,14 @@ msgstr "Разположение на етикет"
 msgid "Language"
 msgstr "Език"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Последно"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Последна"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
@@ -13420,7 +13428,7 @@ msgid "Search pattern is empty"
 msgstr "Шаблона за търсене е празен"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Ограничение за елементи на търсене/филтър"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112

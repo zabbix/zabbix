@@ -1526,7 +1526,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = new CLink(_('First'), $url->getUrl());
+			$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
@@ -1553,7 +1553,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = new CLink(_('Last'), $url->getUrl());
+			$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
 		}
 	}
 
@@ -1774,7 +1774,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
+			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 
