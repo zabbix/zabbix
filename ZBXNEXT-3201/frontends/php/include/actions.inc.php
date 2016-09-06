@@ -1456,12 +1456,13 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
  *
  * @param array  $problems
  * @param string $problems[]['eventid']
- * @param string $problems[]['r_eventid']  (optional) recovery event ID
- * @param bool   $display_recovery_alerts             include recovery events
+ * @param string $problems[]['r_eventid']			Recovery event ID (optional).
+ * @param bool   $display_recovery_alerts			Include recovery events.
+ * @param bool   $html								If true, display action status with hint box in HTML format.
  *
  * @return array
  */
-function makeEventsActions(array $problems, $display_recovery_alerts = false) {
+function makeEventsActions(array $problems, $display_recovery_alerts = false, $html = true) {
 	if (!$problems) {
 		return [];
 	}
@@ -1553,25 +1554,30 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false) {
 
 			switch ($status) {
 				case ALERT_STATUS_SENT:
-					$status_str = (new CSpan(_('Done')))->addClass(ZBX_STYLE_GREEN);
+					$status_str = $html ? (new CSpan(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
 					break;
 
 				case ALERT_STATUS_NOT_SENT:
-					$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+					$status_str = $html ? (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW) : _('In progress');
 					break;
 
 				default:
-					$status_str = (new CSpan(_('Failures')))->addClass(ZBX_STYLE_RED);
+					$status_str = $html ? (new CSpan(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
 			}
 
-			$problems[$index] = [
-				$status_str
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint(
-						makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
-					),
-				CViewHelper::showNum(count($event_alerts) + count($r_event_alerts))
-			];
+			if ($html) {
+				$problems[$index] = [
+					$status_str
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setHint(
+							makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
+						),
+					CViewHelper::showNum(count($event_alerts) + count($r_event_alerts))
+				];
+			}
+			else {
+				$problems[$index] = $status_str;
+			}
 		}
 		else {
 			unset($problems[$index]);
