@@ -662,14 +662,37 @@ footer {
 	}
 
 	tbody tr {
-		@include transition(background-color .2s ease-out);
 
 		&:hover {
 			background-color: $ui-hover-color;
+
+			.timeline-axis {
+				background-color:  $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color!important;
+			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
+
+			.timeline-axis {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color;
+			}
 		}
 
 		&.nothing-to-show {
@@ -687,7 +710,6 @@ footer {
 
 	td {
 		padding: 6px 5px;
-		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -915,6 +937,76 @@ footer {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+// Timeline in table view
+.timeline-date {
+	text-align: right;
+	white-space: nowrap;
+	border-bottom-color: $transparent !important;
+}
+
+.timeline-axis {
+	@extend %timeline-td;
+	padding: 6px .04em !important;
+	border-right: 2px solid lighten(desaturate($btn-bg-color, 27%), 44%);
+
+	&::before {
+		content: '';
+		position: absolute;
+		bottom: -1px;
+		right: -2px;
+		height: 100%;
+		width: 2px;
+		background-color: lighten(desaturate($btn-bg-color, 27%), 44%);
+	}
+}
+
+.timeline-dot {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 11px;
+		border: 2px solid $ui-bg-color;
+		background-color: $btn-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-dot-big {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 10px;
+		border: 2px solid $btn-bg-color;
+		background-color: $ui-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-td {
+	@extend %timeline-td;
+	padding: 6px .25em !important;
+}
+
+.timeline-th {
+	padding: 6px .25em !important;
+}
+
+%timeline-dot {
+	content: '';
+	position: absolute;
+	z-index: 100;
+	display: block;
+	width: 4px;
+	height: 4px;
+	right: -5px;
+	@include border-radius(100%);
+}
+
+%timeline-td {
+	position: relative;
+	border-bottom-color: $ui-bg-color !important;
 }
 
 // Filters
@@ -2829,7 +2921,7 @@ $form-icon-btn: (
 }
 
 .right {
-	text-align: right;
+	text-align: right !important;
 }
 
 .bottom {
