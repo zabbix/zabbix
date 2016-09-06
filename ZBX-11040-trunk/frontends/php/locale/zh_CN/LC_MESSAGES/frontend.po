@@ -5855,10 +5855,14 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬兰语 (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "第一个"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr "首"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9112,8 +9116,12 @@ msgstr "标签位置"
 msgid "Language"
 msgstr "语言"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+msgid "Last"
+msgstr "末"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 
