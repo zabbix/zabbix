@@ -156,14 +156,6 @@ class CControllerAcknowledgeCreate extends CController {
 
 		// If previous action was success and there is a need to acknowledge all other problem events.
 		if ($result && $acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
-			$filter = [
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-			];
-
-			if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
-				$filter['value'] = TRIGGER_VALUE_TRUE;
-			}
-
 			while ($result) {
 				// Filter unacknowledged events by trigger IDs. Selected events were already acknowledged (and closed).
 				$events = API::Event()->get([
@@ -171,7 +163,10 @@ class CControllerAcknowledgeCreate extends CController {
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => $triggerids,
-					'filter' => $filter,
+					'filter' => [
+						'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
+						'value' => TRIGGER_VALUE_TRUE
+					],
 					'preservekeys' => true,
 					'limit' => ZBX_DB_MAX_INSERTS
 				]);
