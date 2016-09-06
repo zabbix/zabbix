@@ -2647,6 +2647,11 @@ $form-icon-btn: (
 		}
 	}
 
+	.table-paging {
+		border: none;
+		border-top: 1px solid $table-border-color;
+	}
+
 	.table-forms-td-left {
 		text-align: left;
 	}
@@ -3791,6 +3796,7 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-width: 16px;
 	white-space: nowrap;
 
 	.icon-info {

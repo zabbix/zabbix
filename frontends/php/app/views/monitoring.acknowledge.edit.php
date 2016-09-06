@@ -58,20 +58,15 @@ $form_list
 			(new CRadioButtonList('acknowledge_type', (int) $data['acknowledge_type']))
 				->makeVertical()
 				->addValue([
-					_n('Only selected event', 'Only selected events', $selected_events),
+					_n('Only selected problem', 'Only selected problems', $selected_events),
 					$selected_events > 1 ? (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN) : null,
 					$selected_events > 1 ? new CSup(_n('%1$s event', '%1$s events', $selected_events)) : null
 				], ZBX_ACKNOWLEDGE_SELECTED)
 				->addValue([
-					_('Selected and all unacknowledged PROBLEM events'),
+					_('Selected and all other unacknowledged problems of related triggers'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					new CSup(_n('%1$s event', '%1$s events', $data['unack_problem_events_count']))
 				], ZBX_ACKNOWLEDGE_PROBLEM)
-				->addValue([
-					_('Selected and all unacknowledged events'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CSup(_n('%1$s event', '%1$s events', $data['unack_events_count']))
-				], ZBX_ACKNOWLEDGE_ALL)
 		))
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

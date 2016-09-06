@@ -5314,7 +5314,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Engedélyezi a hibakereső módot a kiválasztott csoportok számára?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr ""
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -5907,10 +5907,14 @@ msgstr "Vége"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Első"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr ""
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9176,10 +9180,14 @@ msgstr "Cimke elhelyezkedése"
 msgid "Language"
 msgstr "Nyelv"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Utolsó"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
@@ -13384,7 +13392,7 @@ msgid "Search pattern is empty"
 msgstr "A keresési feltétel üres"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Keresési/Szűrési limit"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
