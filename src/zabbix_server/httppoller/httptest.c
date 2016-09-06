@@ -359,7 +359,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
 	char		*err_str = NULL;
-	int		lastfailedstep;
+	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
 	zbx_httpstat_t	stat;
 	double		speed_download = 0;
@@ -373,8 +373,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
 			__function_name, httptest->httptest.httptestid, httptest->httptest.name);
-
-	lastfailedstep = 0;
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects,"
@@ -735,6 +733,8 @@ clean:
 
 			lastfailedstep = 1;
 
+			/* we don't have name of the step, try to fetch it */
+
 			if (NULL != (row = DBfetch(result)))
 			{
 				ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
@@ -745,11 +745,19 @@ clean:
 				process_step_data(httpstep.httpstepid, &stat, &ts);
 			}
 			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": %s",
+						httptest->httptest.name, host->name, err_str);
+				httpstep.name = NULL;
 				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
-				httpstep.name, httptest->httptest.name, host->name, err_str);
+		if (NULL != httpstep.name)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\""
+					": %s", httpstep.name, httptest->httptest.name, host->name, err_str);
+		}
 	}
 	DBfree_result(result);
 
