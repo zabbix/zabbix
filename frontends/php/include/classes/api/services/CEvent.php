@@ -744,27 +744,38 @@ class CEvent extends CApiService {
 	/**
 	 * Checks if the given events exist, are accessible and can be acknowledged.
 	 *
-	 * @throws APIException     if an event does not exist, is not accessible or is not a trigger event
+	 * @param array $eventids
 	 *
-	 * @param array $eventIds
+	 * @throws APIException			If an event does not exist, is not accessible, is not a trigger event or event is
+	 *								not in PROBLEM state.
 	 */
-	protected function checkCanBeAcknowledged(array $eventIds) {
-		$allowedEvents = $this->get([
-			'eventids' => $eventIds,
-			'output' => ['eventid'],
+	protected function checkCanBeAcknowledged(array $eventids) {
+		$allowed_events = $this->get([
+			'output' => ['eventid', 'value'],
+			'eventids' => $eventids,
 			'preservekeys' => true
 		]);
-		foreach ($eventIds as $eventId) {
-			if (!isset($allowedEvents[$eventId])) {
-				// check if an event actually exists but maybe belongs to a different source or object
+
+		foreach ($eventids as $eventid) {
+			if (array_key_exists($eventid, $allowed_events)) {
+				// Prohibit acknowledging OK events.
+				if ($allowed_events[$eventid]['value'] == TRIGGER_VALUE_FALSE) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_s('Cannot acknowledge problem: %1$s.', _('event is not in PROBLEM state'))
+					);
+				}
+			}
+			else {
+				// Check if an event actually exists but maybe belongs to a different source or object.
+
 				$event = API::getApiService()->select($this->tableName(), [
 					'output' => ['eventid', 'source', 'object'],
-					'eventids' => $eventId,
+					'eventids' => $eventid,
 					'limit' => 1
 				]);
 				$event = reset($event);
 
-				// if the event exists, check if we have permissions to access it
+				// If the event exists, check if we have permissions to access it.
 				if ($event) {
 					$event = $this->get([
 						'output' => ['eventid'],
@@ -775,13 +786,15 @@ class CEvent extends CApiService {
 					]);
 				}
 
-				// the event exists, is accessible but belongs to a different object or source
 				if ($event) {
+					// The event exists, is accessible but belongs to a different object or source.
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only trigger events can be acknowledged.'));
 				}
-				// the event either doesn't exist or is not accessible
 				else {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+					// The event either doesn't exist or is not accessible.
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 			}
 		}
@@ -791,6 +804,8 @@ class CEvent extends CApiService {
 	 * Checks if the given events can be closed manually.
 	 *
 	 * @param array $eventids
+	 *
+	 * @throws APIException			If an event does not exist, is not accessible or trigger does not allow manual closing.
 	 */
 	protected function checkCanBeManuallyClosed(array $eventids) {
 		$events_count = count($eventids);
@@ -823,7 +838,7 @@ class CEvent extends CApiService {
 		}
 
 		foreach ($events as $event) {
-			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+			if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
 				);

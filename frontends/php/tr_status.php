@@ -689,7 +689,11 @@ foreach ($triggers as $trigger) {
 					$clock,
 					zbx_date2age($event['clock']),
 					zbx_date2age($next_event_clock, $event['clock']),
-					$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
+					$config['event_ack_enable']
+						? ($event['value'] == TRIGGER_VALUE_TRUE)
+							? getEventAckState($event, $page['file'])
+							: ''
+						: null,
 					(new CCol())->setColSpan(3)
 				]))
 					->setAttribute('data-parentid', $trigger['triggerid'])

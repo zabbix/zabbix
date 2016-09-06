@@ -189,7 +189,7 @@ function make_event_details($event, $trigger, $backurl) {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
 		]);
 
-	if ($config['event_ack_enable']) {
+	if ($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
 		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
@@ -319,7 +319,11 @@ function make_small_eventlist($startEvent, $backurl) {
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null,
+			$config['event_ack_enable']
+				? ($event['value'] == TRIGGER_VALUE_TRUE)
+					? getEventAckState($event, $backurl)
+					: ''
+				: null,
 			array_key_exists($index, $actions)
 				? (new CCol($actions[$index]))->addClass(ZBX_STYLE_NOWRAP)
 				: ''
