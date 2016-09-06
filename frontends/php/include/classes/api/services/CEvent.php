@@ -759,7 +759,6 @@ class CEvent extends CApiService {
 		foreach ($eventids as $eventid) {
 			if (array_key_exists($eventid, $allowed_events)) {
 				// Prohibit acknowledging OK events.
-
 				if ($allowed_events[$eventid]['value'] == TRIGGER_VALUE_FALSE) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_s('Cannot acknowledge problem: %1$s.', _('event is not in PROBLEM state'))
