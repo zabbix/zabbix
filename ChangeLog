@@ -7,6 +7,8 @@ New features:
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
+..F....... [ZBXNEXT-3201] fixed displaying of "Actions" hintbox (Pavel, Sasha)
+..F....... [ZBXNEXT-3201] fixed "Actions" column in exported csv file from Monitoring->Problem page (Ivo)
 .......PS. [ZBX-11119] fixed use of uninitialized variable (Vladislavs)
 ..F....... [ZBX-11040] added "page navigation" context to translation strings "First" and "Last"; replicated translations for "First" and "Last" in "page navigation" context from 2.2 brancha (Cemeris)
 ..F....... [ZBX-11035] fixed incorrect headers in screens "Status of Zabbix" => "System status", "Zabbix server info" => "Status of Zabbix"; renamed screen element select option "Server info" => "Status of Zabbix" (Cemeris)
