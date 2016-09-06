@@ -92,6 +92,10 @@ class CTable extends CTag {
 		return $this;
 	}
 
+	public function getNumCols() {
+		return $this->colnum;
+	}
+
 	public function getNumRows() {
 		return $this->rownum;
 	}
