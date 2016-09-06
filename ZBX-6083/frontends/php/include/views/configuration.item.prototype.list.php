@@ -47,7 +47,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 		_('Applications'),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
 foreach ($this->data['items'] as $item) {
@@ -67,10 +67,10 @@ foreach ($this->data['items'] as $item) {
 	);
 
 	$status = (new CLink(
-		itemIndicator($item['status']),
+		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('yes'),
 		'?group_itemid[]='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&action='.($item['status'] == ITEM_STATUS_DISABLED
+			'&action='.(($item['status'] == ITEM_STATUS_DISABLED)
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
 			)
@@ -113,10 +113,10 @@ $itemForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
-			'itemprototype.massenable' => ['name' => _('Enable'),
+			'itemprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Enable selected item prototypes?')
 			],
-			'itemprototype.massdisable' => ['name' => _('Disable'),
+			'itemprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Disable selected item prototypes?')
 			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
