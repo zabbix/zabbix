@@ -560,12 +560,12 @@ class CScreenProblem extends CScreenBase {
 
 		$data = $this->makeData($data);
 
-		$actions = makeEventsActions($data['problems'], true);
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
 
 		if ($this->data['action'] === 'problem.view') {
+			$actions = makeEventsActions($data['problems'], true);
 			$url_form = clone $url;
 
 			$form = (new CForm('get', 'zabbix.php'))
@@ -730,6 +730,7 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
+			$actions = makeEventsActions($data['problems'], true, false);
 			$csv = [];
 
 			$csv[] = [
@@ -788,9 +789,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$this->config['event_ack_enable'] ? ($problem['acknowledges'] ? _('Yes') : _('No')) : null,
-					array_key_exists($problem['eventid'], $actions)
-						? strip_tags($actions[$problem['eventid']])
-						: '',
+					array_key_exists($problem['eventid'], $actions) ? $actions[$problem['eventid']] : '',
 					implode(', ', $tags[$problem['eventid']])
 				];
 			}
