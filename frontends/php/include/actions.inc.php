@@ -1375,24 +1375,13 @@ function getActionCommands(array $alerts) {
 }
 
 function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recovery_alerts) {
-	$table = (new CTableInfo())->setHeader([
-		$display_recovery_alerts ? _('Actions on') : null,
-		_('Step'),
-		_('Time'),
-		_('User'),
-		_('Details'),
-		_('Status'),
-		_('Info')
-	]);
+	$table = (new CTableInfo())->setHeader([_('Step'), _('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
 
 	$popup_rows = 0;
 	$recovery = true;
 
 	foreach ([$r_alerts, $alerts] as $alerts_data) {
-		$actions_on = $display_recovery_alerts
-			? (new CCol($recovery ? _('Recovery') : _('Problem')))->setRowSpan(count($alerts_data))
-			: null;
-		$recovery = false;
+		$show_header = $display_recovery_alerts;
 
 		foreach ($alerts_data as $alert) {
 			switch ($alert['status']) {
@@ -1430,8 +1419,18 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
+			if ($show_header) {
+				$table->addRow(
+					(new CRow(
+						(new CCol(
+							new CTag('h4', true, $recovery ? _('Recovery') : _('Problem'))
+						))->setColSpan($table->getNumCols())
+					))->addClass(ZBX_STYLE_HOVER_NOBG)
+				);
+				$show_header = false;
+			}
+
 			$table->addRow([
-				$actions_on,
 				$alert['esc_step'],
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$user,
@@ -1440,15 +1439,26 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 				makeInformationList($info_icons)
 			]);
 
-			$actions_on = null;
-
 			if (++$popup_rows == ZBX_WIDGET_ROWS) {
 				break;
 			}
 		}
+		$recovery = false;
 	}
 
-	return $table;
+	$total = count($alerts) + count($r_alerts);
+
+	return [
+		$table,
+		($total > ZBX_WIDGET_ROWS)
+			?  (new CDiv(
+				(new CDiv(
+					(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
+						->addClass(ZBX_STYLE_TABLE_STATS)
+				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			))->addClass(ZBX_STYLE_TABLE_PAGING)
+			: null
+	];
 }
 
 /**
@@ -1456,9 +1466,9 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
  *
  * @param array  $problems
  * @param string $problems[]['eventid']
- * @param string $problems[]['r_eventid']			Recovery event ID (optional).
- * @param bool   $display_recovery_alerts			Include recovery events.
- * @param bool   $html								If true, display action status with hint box in HTML format.
+ * @param string $problems[]['r_eventid']  Recovery event ID (optional).
+ * @param bool   $display_recovery_alerts  Include recovery events.
+ * @param bool   $html                     If true, display action status with hint box in HTML format.
  *
  * @return array
  */
