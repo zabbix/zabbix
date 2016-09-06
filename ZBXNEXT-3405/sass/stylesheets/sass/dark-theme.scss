@@ -118,10 +118,6 @@ $clock-lines-color: #4f4f4f;
 	}
 }
 
-//.timeline-axis {
-//	@extend %border-color;
-//}
-
 %border-color {
 	border-color: lighten($table-border-color, 3%) !important;
 }
