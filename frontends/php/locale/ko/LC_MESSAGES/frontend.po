@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 17:09+0300\n"
+"POT-Creation-Date: 2016-09-05 17:28+0300\n"
 "PO-Revision-Date: 2016-04-12 02:57+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -55,7 +55,7 @@ msgstr[0] "%2$d 중 %1$d개 이슈 출력"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (%2$s 년)"
 
-#: latest.php:637 latest.php:808
+#: latest.php:602 latest.php:773
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -279,8 +279,8 @@ msgid "Acknowledges"
 msgstr "장애대응 코멘트"
 
 #: app/views/administration.mediatype.edit.php:84
-#: app/views/monitoring.dashboard.view.php:77
-#: app/views/monitoring.dashboard.view.php:143 include/audit.inc.php:28
+#: app/views/monitoring.dashboard.view.php:67
+#: app/views/monitoring.dashboard.view.php:133 include/audit.inc.php:28
 #: include/classes/screens/CScreenActions.php:127
 #: include/views/administration.auditacts.list.php:46
 #: include/views/administration.auditlogs.list.php:35
@@ -510,7 +510,7 @@ msgstr "종료시간"
 #: include/views/js/monitoring.sysmaps.js.php:168
 #: include/views/js/monitoring.sysmaps.js.php:359
 #: include/views/monitoring.history.php:133
-#: include/views/monitoring.screen.constructor.edit.php:766
+#: include/views/monitoring.screen.constructor.edit.php:764
 #: include/views/monitoring.screen.edit.php:132
 #: include/views/monitoring.screen.edit.php:162
 #: include/views/monitoring.screen.edit.php:224
@@ -726,7 +726,7 @@ msgstr "어떤 문자열이 포함됨"
 #: include/views/configuration.httpconf.list.php:77
 #: include/views/inventory.host.view.php:168
 #: include/views/js/monitoring.sysmaps.js.php:115
-#: include/views/monitoring.screen.constructor.edit.php:514 latest.php:374
+#: include/views/monitoring.screen.constructor.edit.php:514 latest.php:339
 msgid "Application"
 msgstr "어플리케이션"
 
@@ -2554,7 +2554,7 @@ msgstr "인증서"
 msgid "Change"
 msgstr "변경"
 
-#: latest.php:441 latest.php:457
+#: latest.php:406 latest.php:422
 msgctxt "noun in latest data"
 msgid "Change"
 msgstr "변경"
@@ -3530,7 +3530,7 @@ msgid "Dark"
 msgstr "Dark"
 
 #: app/controllers/CControllerDashboardView.php:66
-#: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:46
+#: app/views/monitoring.dashboard.view.php:156 include/menu.inc.php:46
 #: include/views/monitoring.dashconf.php:22
 msgid "Dashboard"
 msgstr "대쉬보드"
@@ -4550,7 +4550,7 @@ msgstr "디스커버리 규칙"
 msgid "Discovery rules deleted"
 msgstr "디스커버리 규칙을 삭제하였습니다"
 
-#: app/views/monitoring.dashboard.view.php:128
+#: app/views/monitoring.dashboard.view.php:118
 #: app/views/monitoring.widget.discovery.view.php:60
 #: include/actions.inc.php:55
 msgid "Discovery status"
@@ -4576,15 +4576,15 @@ msgstr "디스크 쓰기 통계. 타입이 sectors, operations, bytes의 경우�
 msgid "Display OK triggers for"
 msgstr "복구트리거 표시기간"
 
-#: latest.php:823
+#: latest.php:788
 msgid "Display graph"
 msgstr "그래프 표시"
 
-#: latest.php:822
+#: latest.php:787
 msgid "Display stacked graph"
 msgstr "누계 그래프 표시"
 
-#: include/func.inc.php:1547 search.php:251 search.php:347 search.php:488
+#: include/func.inc.php:1566 search.php:251 search.php:347 search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "%2$s 중 %1$s건을 표시하고 있습니다"
@@ -5412,15 +5412,15 @@ msgstr "실패 감사"
 msgid "Fatal error, please report to the Zabbix team"
 msgstr "치명적인 에러가 발생하였습니다. Zabbix팀에 보고하여 주십시오."
 
-#: app/views/monitoring.dashboard.view.php:45 jsLoader.php:188
+#: app/views/monitoring.dashboard.view.php:35 jsLoader.php:188
 msgid "Favourite graphs"
 msgstr "즐겨찾기의 그래프"
 
-#: app/views/monitoring.dashboard.view.php:66 jsLoader.php:189
+#: app/views/monitoring.dashboard.view.php:56 jsLoader.php:189
 msgid "Favourite maps"
 msgstr "즐겨찾기의 맵"
 
-#: app/views/monitoring.dashboard.view.php:55 jsLoader.php:190
+#: app/views/monitoring.dashboard.view.php:45 jsLoader.php:190
 msgid "Favourite screens"
 msgstr "즐겨찾기의 스크린"
 
@@ -5610,8 +5610,12 @@ msgstr "종료"
 msgid "Finnish (fi_FI)"
 msgstr "핀란드어 (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
+msgid "First"
+msgstr "첫번째"
+
+#: include/func.inc.php:1526
+msgctxt "page navigation"
 msgid "First"
 msgstr "첫번째"
 
@@ -5803,8 +5807,8 @@ msgstr "그라데이션 라인"
 #: include/views/configuration.graph.edit.php:336
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.history.php:77
-#: include/views/monitoring.screen.constructor.edit.php:136 latest.php:524
-#: latest.php:704 report2.php:371
+#: include/views/monitoring.screen.constructor.edit.php:136 latest.php:489
+#: latest.php:669 report2.php:371
 msgid "Graph"
 msgstr "그래프"
 
@@ -5953,7 +5957,7 @@ msgstr "\"%1$s\"의 이름을 지닌 그래프는 그래프 혹은 그래프 프
 msgid "Graph with same name but other type exist."
 msgstr "같은 이름에 다른 타입의 그래프가 존재합니다."
 
-#: app/views/monitoring.dashboard.view.php:47 include/html.inc.php:401
+#: app/views/monitoring.dashboard.view.php:37 include/html.inc.php:401
 #: include/menu.inc.php:78 include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:41
 #: include/views/configuration.host.discovery.list.php:44
@@ -6189,7 +6193,7 @@ msgstr "중증 장애"
 #: include/views/administration.general.housekeeper.edit.php:98
 #: include/views/configuration.item.list.php:61
 #: include/views/configuration.item.prototype.list.php:46 items.php:159
-#: jsLoader.php:199 latest.php:436 latest.php:529 latest.php:709
+#: jsLoader.php:199 latest.php:401 latest.php:494 latest.php:674
 msgid "History"
 msgstr "이력"
 
@@ -6278,7 +6282,7 @@ msgstr "가로 위치"
 #: include/views/monitoring.screen.php:70
 #: include/views/monitoring.slides.php:74
 #: include/views/reports.toptriggers.php:118 items.php:555 items.php:854
-#: items.php:887 jsLoader.php:141 latest.php:432 latest.php:452 popup.php:492
+#: items.php:887 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:492
 #: popup.php:518 popup.php:1210 queue.php:248 report2.php:342 report2.php:367
 #: search.php:125 tr_status.php:207 tr_status.php:286
 msgid "Host"
@@ -6399,7 +6403,7 @@ msgstr "호스트 그룹명이 설정되어 있지 않습니다."
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/monitoring.dashconf.php:58
-#: include/views/reports.toptriggers.php:67 latest.php:347 popup.php:47
+#: include/views/reports.toptriggers.php:67 latest.php:312 popup.php:47
 #: search.php:346
 msgid "Host groups"
 msgstr "호스트 그룹"
@@ -6533,7 +6537,7 @@ msgstr "호스트 라우터"
 msgid "Host screens"
 msgstr "호스트 스크린"
 
-#: app/views/monitoring.dashboard.view.php:103
+#: app/views/monitoring.dashboard.view.php:93
 #: app/views/monitoring.widget.hosts.view.php:383
 msgid "Host status"
 msgstr "호스트 상태"
@@ -6591,7 +6595,7 @@ msgstr "같은 호스트의 표시 이름 \"%s\"를 지닌 호스트가 이미 �
 #: include/views/configuration.host.list.php:23
 #: include/views/configuration.host.massupdate.php:24
 #: include/views/conf.import.php:29 include/views/monitoring.dashconf.php:88
-#: include/views/reports.toptriggers.php:80 latest.php:360 popup.php:35
+#: include/views/reports.toptriggers.php:80 latest.php:325 popup.php:35
 #: popup.php:43 search.php:250 search.php:289 search.php:306 search.php:311
 #: search.php:327
 msgid "Hosts"
@@ -7964,7 +7968,7 @@ msgstr "인도네시아어 (id_ID)"
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.trigger.prototype.edit.php:142
 #: include/views/configuration.triggers.edit.php:147
-#: include/views/configuration.triggers.list.php:88 latest.php:443
+#: include/views/configuration.triggers.list.php:88 latest.php:408
 #: tr_status.php:281
 msgid "Info"
 msgstr "정보"
@@ -8090,7 +8094,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.massupdate.php:330
 #: include/views/configuration.item.prototype.edit.php:271
 #: include/views/configuration.item.prototype.list.php:45
-#: include/views/configuration.services.edit.php:142 latest.php:435
+#: include/views/configuration.services.edit.php:142 latest.php:400
 msgid "Interval"
 msgstr "갱신 간격"
 
@@ -8771,12 +8775,16 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "최근"
 
-#: app/views/monitoring.dashboard.view.php:108
+#: include/func.inc.php:1553
+msgctxt "page navigation"
+msgid "Last"
+msgstr "최근"
+
+#: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
 #, c-format
 msgid "Last %1$d issue"
@@ -8823,8 +8831,8 @@ msgstr "최근 갱신"
 msgid "Last change (descending)"
 msgstr "최근 변경 (내림차순)"
 
-#: include/classes/screens/CScreenHttpTest.php:121 latest.php:439
-#: latest.php:455
+#: include/classes/screens/CScreenHttpTest.php:121 latest.php:404
+#: latest.php:420
 msgid "Last check"
 msgstr "최근 검사"
 
@@ -8850,7 +8858,7 @@ msgstr "최근"
 msgid "Last seen (age)"
 msgstr "최신 데이터 수신시각 (경과시간)"
 
-#: latest.php:440 latest.php:456
+#: latest.php:405 latest.php:421
 msgid "Last value"
 msgstr "최근 값"
 
@@ -8867,7 +8875,7 @@ msgid "Last year"
 msgstr "작년"
 
 #: include/menu.inc.php:62 include/views/inventory.host.view.php:137
-#: jsLoader.php:202 latest.php:26 latest.php:336 search.php:128 search.php:232
+#: jsLoader.php:202 latest.php:26 latest.php:301 search.php:128 search.php:232
 #: search.php:284 search.php:334
 msgid "Latest data"
 msgstr "최근 데이터"
@@ -9365,7 +9373,7 @@ msgstr "매핑된 값이 없습니다: 값의 맵 \"%2$s\"의 %1$s"
 msgid "Mappings"
 msgstr "매핑"
 
-#: app/views/monitoring.dashboard.view.php:68
+#: app/views/monitoring.dashboard.view.php:58
 #: app/views/monitoring.map.view.php:26 include/menu.inc.php:96
 #: include/views/conf.import.php:39
 #: include/views/monitoring.sysmap.list.php:22 popup.php:103
@@ -9839,8 +9847,8 @@ msgstr "NTLM"
 #: include/views/monitoring.slideconf.list.php:53
 #: include/views/monitoring.sysmap.edit.php:100
 #: include/views/monitoring.sysmap.edit.php:229
-#: include/views/monitoring.sysmap.list.php:46 items.php:42 latest.php:388
-#: latest.php:433 latest.php:453 maintenance.php:43 popup_httpstep.php:36
+#: include/views/monitoring.sysmap.list.php:46 items.php:42 latest.php:353
+#: latest.php:398 latest.php:418 maintenance.php:43 popup_httpstep.php:36
 #: popup.php:562 popup.php:714 popup.php:800 popup.php:881 popup.php:963
 #: popup.php:1029 popup.php:1058 popup.php:1217 popup.php:1354 popup.php:1429
 #: popup.php:1533 popup.php:1605 popup.php:1673 popup.php:1724 popup.php:1750
@@ -12635,10 +12643,6 @@ msgstr "스크린\"%1$s\"의 셀 X - %2$s Y - %3$s 의 행의 높이가 너무 �
 msgid "Screen added"
 msgstr "스크린을 추가하였습니다"
 
-#: include/views/monitoring.screen.constructor.edit.php:752
-msgid "Screen cell configuration"
-msgstr "스크린 셀 설정"
-
 #: screenconf.php:286
 msgid "Screen deleted"
 msgstr "스크린을 삭제하였습니다"
@@ -12656,7 +12660,7 @@ msgstr "스크린의 소유자는 필수항목입니다."
 msgid "Screen updated"
 msgstr "스크린을 갱신하였습니다"
 
-#: app/views/monitoring.dashboard.view.php:57 include/html.inc.php:412
+#: app/views/monitoring.dashboard.view.php:47 include/html.inc.php:412
 #: include/menu.inc.php:83 include/views/configuration.template.edit.php:359
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:148
 #: include/views/monitoring.hostscreen.php:30
@@ -12855,7 +12859,7 @@ msgstr "보안 이름"
 #: include/views/monitoring.screen.constructor.edit.php:550
 #: include/views/monitoring.screen.constructor.edit.php:625
 #: include/views/monitoring.screen.constructor.edit.php:632 jsLoader.php:177
-#: latest.php:378 popup.php:602 popup.php:686 popup.php:772 popup.php:853
+#: latest.php:343 popup.php:602 popup.php:686 popup.php:772 popup.php:853
 #: popup.php:935 popup.php:1013 popup.php:1186 popup.php:1326 popup.php:1397
 #: popup.php:1506 popup.php:1576 popup.php:1644 popup.php:1707 popup.php:1882
 #: popup_right.php:74 popup_usrgrp.php:103 tr_logform.php:250
@@ -13090,7 +13094,7 @@ msgid "Show all (%1$s day)"
 msgid_plural "Show all (%1$s days)"
 msgstr[0] "모두 표시 (%1$s 일)"
 
-#: include/views/common.filter.trigger.php:156 latest.php:396
+#: include/views/common.filter.trigger.php:156 latest.php:361
 msgid "Show details"
 msgstr "자세히 표시"
 
@@ -13113,7 +13117,7 @@ msgstr "이벤트의 표시기간(일) \"%1$s\""
 msgid "Show hosts in maintenance"
 msgstr "메인터넌스중 호스트 보이기"
 
-#: latest.php:392
+#: latest.php:357
 msgid "Show items without data"
 msgstr "히스토리가 없는 아이템 보이기"
 
@@ -13282,7 +13286,7 @@ msgstr "슬라이드쇼의 소유자는 필수항목입니다."
 msgid "Slide show updated"
 msgstr "슬라이드 쇼를 갱신하였습니다"
 
-#: app/views/monitoring.dashboard.view.php:58
+#: app/views/monitoring.dashboard.view.php:48
 #: include/views/monitoring.screen.list.php:29
 #: include/views/monitoring.screen.php:42
 #: include/views/monitoring.slideconf.edit.php:24
@@ -13375,7 +13379,7 @@ msgstr "실행하는 액션 커맨드에서 지정된 스크립트가 존재하�
 msgid "Specify some filter condition to see the items."
 msgstr "아이템을 표시하기 위해 몇가지 필터조건을 지정해 주십시오."
 
-#: latest.php:412
+#: latest.php:377
 msgid "Specify some filter condition to see the values."
 msgstr "값을 표시하기 위해 몇가지 필터조건을 지정해 주십시오."
 
@@ -13457,7 +13461,7 @@ msgid "Status codes"
 msgstr "상태 코드"
 
 #: app/controllers/CControllerReportStatus.php:39
-#: app/views/monitoring.dashboard.view.php:121
+#: app/views/monitoring.dashboard.view.php:111
 #: app/views/monitoring.widget.status.view.php:25
 #: app/views/report.status.php:25
 #: include/classes/screens/CScreenSystemStatus.php:55 include/menu.inc.php:150
@@ -13637,7 +13641,7 @@ msgstr "시스템 호스트 명. string을 리턴"
 msgid "System statistics. Returns integer or float"
 msgstr "시스템 통계값. integer 혹은 float로 리턴"
 
-#: app/views/monitoring.dashboard.view.php:98
+#: app/views/monitoring.dashboard.view.php:88
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
 msgstr "시스템상태"
@@ -14173,7 +14177,7 @@ msgstr "트랜드 보존기간 (일)"
 #: include/views/administration.general.housekeeper.edit.php:114
 #: include/views/configuration.item.list.php:62
 #: include/views/configuration.item.prototype.list.php:47 items.php:160
-#: latest.php:437
+#: latest.php:402
 msgid "Trends"
 msgstr "트렌드"
 
@@ -14515,7 +14519,7 @@ msgstr "2개의 아이템(\"%1$s\"와 \"%2$s\")에서 하나의 호스트의 인
 #: include/views/monitoring.overview.triggers.php:80
 #: include/views/monitoring.screen.edit.php:190
 #: include/views/monitoring.slideconf.edit.php:238
-#: include/views/monitoring.sysmap.edit.php:351 latest.php:438
+#: include/views/monitoring.sysmap.edit.php:351 latest.php:403
 #: popup_media.php:133 popup.php:512 popup.php:1219 tr_logform.php:287
 #: tr_logform.php:292
 msgid "Type"
@@ -14922,7 +14926,7 @@ msgstr "Up"
 #: include/views/configuration.triggers.massupdate.php:113
 #: include/views/js/configuration.discovery.edit.js.php:351
 #: include/views/monitoring.dashconf.php:129
-#: include/views/monitoring.screen.constructor.edit.php:757
+#: include/views/monitoring.screen.constructor.edit.php:755
 #: include/views/monitoring.screen.edit.php:214
 #: include/views/monitoring.slideconf.edit.php:261
 #: include/views/monitoring.sysmap.constructor.php:57
@@ -15710,7 +15714,7 @@ msgid "Web"
 msgstr "웹"
 
 #: app/controllers/CControllerWebView.php:105
-#: app/views/monitoring.dashboard.view.php:113
+#: app/views/monitoring.dashboard.view.php:103
 #: app/views/monitoring.web.view.php:26
 #: app/views/monitoring.widget.web.view.php:91 include/items.inc.php:102
 #: include/views/configuration.httpconf.edit.php:22

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 17:09+0300\n"
+"POT-Creation-Date: 2016-09-05 17:28+0300\n"
 "PO-Revision-Date: 2016-07-05 13:10+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -59,7 +59,7 @@ msgstr[2] "отображено %1$d из %2$d событий"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (год %2$s)"
 
-#: latest.php:637 latest.php:808
+#: latest.php:602 latest.php:773
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -301,8 +301,8 @@ msgid "Acknowledges"
 msgstr "Подтверждения"
 
 #: app/views/administration.mediatype.edit.php:84
-#: app/views/monitoring.dashboard.view.php:77
-#: app/views/monitoring.dashboard.view.php:143 include/audit.inc.php:28
+#: app/views/monitoring.dashboard.view.php:67
+#: app/views/monitoring.dashboard.view.php:133 include/audit.inc.php:28
 #: include/classes/screens/CScreenActions.php:127
 #: include/views/administration.auditacts.list.php:46
 #: include/views/administration.auditlogs.list.php:35
@@ -536,7 +536,7 @@ msgstr "Активно до"
 #: include/views/js/monitoring.sysmaps.js.php:168
 #: include/views/js/monitoring.sysmaps.js.php:359
 #: include/views/monitoring.history.php:133
-#: include/views/monitoring.screen.constructor.edit.php:766
+#: include/views/monitoring.screen.constructor.edit.php:764
 #: include/views/monitoring.screen.edit.php:132
 #: include/views/monitoring.screen.edit.php:162
 #: include/views/monitoring.screen.edit.php:224
@@ -752,7 +752,7 @@ msgstr "Любая строка символов включена"
 #: include/views/configuration.httpconf.list.php:77
 #: include/views/inventory.host.view.php:168
 #: include/views/js/monitoring.sysmaps.js.php:115
-#: include/views/monitoring.screen.constructor.edit.php:514 latest.php:374
+#: include/views/monitoring.screen.constructor.edit.php:514 latest.php:339
 msgid "Application"
 msgstr "Группа элементов данных"
 
@@ -2656,7 +2656,7 @@ msgstr "Сертификат"
 msgid "Change"
 msgstr "Изменить"
 
-#: latest.php:441 latest.php:457
+#: latest.php:406 latest.php:422
 msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Изменение"
@@ -3634,7 +3634,7 @@ msgid "Dark"
 msgstr "Темная"
 
 #: app/controllers/CControllerDashboardView.php:66
-#: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:46
+#: app/views/monitoring.dashboard.view.php:156 include/menu.inc.php:46
 #: include/views/monitoring.dashconf.php:22
 msgid "Dashboard"
 msgstr "ПАНЕЛЬ"
@@ -4659,7 +4659,7 @@ msgstr "Правила обнаружения"
 msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
-#: app/views/monitoring.dashboard.view.php:128
+#: app/views/monitoring.dashboard.view.php:118
 #: app/views/monitoring.widget.discovery.view.php:60
 #: include/actions.inc.php:55
 msgid "Discovery status"
@@ -4685,15 +4685,15 @@ msgstr "Статистика записи на диск. Возвращает ц
 msgid "Display OK triggers for"
 msgstr "Отображать триггеры в состоянии ОК в течении"
 
-#: latest.php:823
+#: latest.php:788
 msgid "Display graph"
 msgstr "Показать график"
 
-#: latest.php:822
+#: latest.php:787
 msgid "Display stacked graph"
 msgstr "Показать стэкируемый график"
 
-#: include/func.inc.php:1547 search.php:251 search.php:347 search.php:488
+#: include/func.inc.php:1566 search.php:251 search.php:347 search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Отображено %1$s из %2$s найденных"
@@ -5523,15 +5523,15 @@ msgstr "Аудит отказа"
 msgid "Fatal error, please report to the Zabbix team"
 msgstr "Критическая ошибка, пожалуйста сообщите о ней команде Zabbix"
 
-#: app/views/monitoring.dashboard.view.php:45 jsLoader.php:188
+#: app/views/monitoring.dashboard.view.php:35 jsLoader.php:188
 msgid "Favourite graphs"
 msgstr "Избранные графики"
 
-#: app/views/monitoring.dashboard.view.php:66 jsLoader.php:189
+#: app/views/monitoring.dashboard.view.php:56 jsLoader.php:189
 msgid "Favourite maps"
 msgstr "Избранные карты сетей"
 
-#: app/views/monitoring.dashboard.view.php:55 jsLoader.php:190
+#: app/views/monitoring.dashboard.view.php:45 jsLoader.php:190
 msgid "Favourite screens"
 msgstr "Избранные комплексные экраны"
 
@@ -5721,10 +5721,14 @@ msgstr "Финиш"
 msgid "Finnish (fi_FI)"
 msgstr "Финский (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1515
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1831 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Первый"
+
+#: include/func.inc.php:1526
+msgctxt "page navigation"
+msgid "First"
+msgstr "Первая"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -5914,8 +5918,8 @@ msgstr "Градиентная линия"
 #: include/views/configuration.graph.edit.php:336
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.history.php:77
-#: include/views/monitoring.screen.constructor.edit.php:136 latest.php:524
-#: latest.php:704 report2.php:371
+#: include/views/monitoring.screen.constructor.edit.php:136 latest.php:489
+#: latest.php:669 report2.php:371
 msgid "Graph"
 msgstr "График"
 
@@ -6066,7 +6070,7 @@ msgstr "График с именем \"%1$s\" уже существует в г�
 msgid "Graph with same name but other type exist."
 msgstr "График с таким же именем, но другого типа, уже существует."
 
-#: app/views/monitoring.dashboard.view.php:47 include/html.inc.php:401
+#: app/views/monitoring.dashboard.view.php:37 include/html.inc.php:401
 #: include/menu.inc.php:78 include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:41
 #: include/views/configuration.host.discovery.list.php:44
@@ -6304,7 +6308,7 @@ msgstr "Высокая"
 #: include/views/administration.general.housekeeper.edit.php:98
 #: include/views/configuration.item.list.php:61
 #: include/views/configuration.item.prototype.list.php:46 items.php:159
-#: jsLoader.php:199 latest.php:436 latest.php:529 latest.php:709
+#: jsLoader.php:199 latest.php:401 latest.php:494 latest.php:674
 msgid "History"
 msgstr "История"
 
@@ -6393,7 +6397,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/monitoring.screen.php:70
 #: include/views/monitoring.slides.php:74
 #: include/views/reports.toptriggers.php:118 items.php:555 items.php:854
-#: items.php:887 jsLoader.php:141 latest.php:432 latest.php:452 popup.php:492
+#: items.php:887 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:492
 #: popup.php:518 popup.php:1210 queue.php:248 report2.php:342 report2.php:367
 #: search.php:125 tr_status.php:207 tr_status.php:286
 msgid "Host"
@@ -6520,7 +6524,7 @@ msgstr "Имя группы узлов сети не может быть пус�
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/monitoring.dashconf.php:58
-#: include/views/reports.toptriggers.php:67 latest.php:347 popup.php:47
+#: include/views/reports.toptriggers.php:67 latest.php:312 popup.php:47
 #: search.php:346
 msgid "Host groups"
 msgstr "Группы узлов сети"
@@ -6658,7 +6662,7 @@ msgstr "Роутер узла сети"
 msgid "Host screens"
 msgstr "Комплексные экраны узла сети"
 
-#: app/views/monitoring.dashboard.view.php:103
+#: app/views/monitoring.dashboard.view.php:93
 #: app/views/monitoring.widget.hosts.view.php:383
 msgid "Host status"
 msgstr "Состояние узлов сети"
@@ -6716,7 +6720,7 @@ msgstr "Узел сети с таким же видимым именем \"%s\" 
 #: include/views/configuration.host.list.php:23
 #: include/views/configuration.host.massupdate.php:24
 #: include/views/conf.import.php:29 include/views/monitoring.dashconf.php:88
-#: include/views/reports.toptriggers.php:80 latest.php:360 popup.php:35
+#: include/views/reports.toptriggers.php:80 latest.php:325 popup.php:35
 #: popup.php:43 search.php:250 search.php:289 search.php:306 search.php:311
 #: search.php:327
 msgid "Hosts"
@@ -8089,7 +8093,7 @@ msgstr "Индонезийский (id_ID)"
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.trigger.prototype.edit.php:142
 #: include/views/configuration.triggers.edit.php:147
-#: include/views/configuration.triggers.list.php:88 latest.php:443
+#: include/views/configuration.triggers.list.php:88 latest.php:408
 #: tr_status.php:281
 msgid "Info"
 msgstr "Инфо"
@@ -8215,7 +8219,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.massupdate.php:330
 #: include/views/configuration.item.prototype.edit.php:271
 #: include/views/configuration.item.prototype.list.php:45
-#: include/views/configuration.services.edit.php:142 latest.php:435
+#: include/views/configuration.services.edit.php:142 latest.php:400
 msgid "Interval"
 msgstr "Интервал"
 
@@ -8906,12 +8910,16 @@ msgstr "Расположение подписи"
 msgid "Language"
 msgstr "Язык"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1542
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1835 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Последний"
 
-#: app/views/monitoring.dashboard.view.php:108
+#: include/func.inc.php:1553
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Последняя"
+
+#: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
 #, c-format
 msgid "Last %1$d issue"
@@ -8960,8 +8968,8 @@ msgstr "Последнее изменение"
 msgid "Last change (descending)"
 msgstr "Последнее изменение (в порядке убывания)"
 
-#: include/classes/screens/CScreenHttpTest.php:121 latest.php:439
-#: latest.php:455
+#: include/classes/screens/CScreenHttpTest.php:121 latest.php:404
+#: latest.php:420
 msgid "Last check"
 msgstr "Последняя проверка"
 
@@ -8987,7 +8995,7 @@ msgstr "За последние"
 msgid "Last seen (age)"
 msgstr "Последний раз был доступен (возраст)"
 
-#: latest.php:440 latest.php:456
+#: latest.php:405 latest.php:421
 msgid "Last value"
 msgstr "Последнее значение"
 
@@ -9004,7 +9012,7 @@ msgid "Last year"
 msgstr "За последний год"
 
 #: include/menu.inc.php:62 include/views/inventory.host.view.php:137
-#: jsLoader.php:202 latest.php:26 latest.php:336 search.php:128 search.php:232
+#: jsLoader.php:202 latest.php:26 latest.php:301 search.php:128 search.php:232
 #: search.php:284 search.php:334
 msgid "Latest data"
 msgstr "Последние данные"
@@ -9502,7 +9510,7 @@ msgstr "В соответствии имеются пропущенные пар
 msgid "Mappings"
 msgstr "Соответствия"
 
-#: app/views/monitoring.dashboard.view.php:68
+#: app/views/monitoring.dashboard.view.php:58
 #: app/views/monitoring.map.view.php:26 include/menu.inc.php:96
 #: include/views/conf.import.php:39
 #: include/views/monitoring.sysmap.list.php:22 popup.php:103
@@ -9986,8 +9994,8 @@ msgstr "NTLM"
 #: include/views/monitoring.slideconf.list.php:53
 #: include/views/monitoring.sysmap.edit.php:100
 #: include/views/monitoring.sysmap.edit.php:229
-#: include/views/monitoring.sysmap.list.php:46 items.php:42 latest.php:388
-#: latest.php:433 latest.php:453 maintenance.php:43 popup_httpstep.php:36
+#: include/views/monitoring.sysmap.list.php:46 items.php:42 latest.php:353
+#: latest.php:398 latest.php:418 maintenance.php:43 popup_httpstep.php:36
 #: popup.php:562 popup.php:714 popup.php:800 popup.php:881 popup.php:963
 #: popup.php:1029 popup.php:1058 popup.php:1217 popup.php:1354 popup.php:1429
 #: popup.php:1533 popup.php:1605 popup.php:1673 popup.php:1724 popup.php:1750
@@ -12789,10 +12797,6 @@ msgstr "Объединение строк в ячейке X - %2$s Y - %3$s ко
 msgid "Screen added"
 msgstr "Комплексный экран добавлен"
 
-#: include/views/monitoring.screen.constructor.edit.php:752
-msgid "Screen cell configuration"
-msgstr "Настройка ячейки комплексного экрана"
-
 #: screenconf.php:286
 msgid "Screen deleted"
 msgstr "Комплексный экран удален"
@@ -12810,7 +12814,7 @@ msgstr "Владелец комплексного экрана не может �
 msgid "Screen updated"
 msgstr "Комплексный экран обновлен"
 
-#: app/views/monitoring.dashboard.view.php:57 include/html.inc.php:412
+#: app/views/monitoring.dashboard.view.php:47 include/html.inc.php:412
 #: include/menu.inc.php:83 include/views/configuration.template.edit.php:359
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:148
 #: include/views/monitoring.hostscreen.php:30
@@ -13011,7 +13015,7 @@ msgstr "Имя безопасности"
 #: include/views/monitoring.screen.constructor.edit.php:550
 #: include/views/monitoring.screen.constructor.edit.php:625
 #: include/views/monitoring.screen.constructor.edit.php:632 jsLoader.php:177
-#: latest.php:378 popup.php:602 popup.php:686 popup.php:772 popup.php:853
+#: latest.php:343 popup.php:602 popup.php:686 popup.php:772 popup.php:853
 #: popup.php:935 popup.php:1013 popup.php:1186 popup.php:1326 popup.php:1397
 #: popup.php:1506 popup.php:1576 popup.php:1644 popup.php:1707 popup.php:1882
 #: popup_right.php:74 popup_usrgrp.php:103 tr_logform.php:250
@@ -13248,7 +13252,7 @@ msgstr[0] "Отображать все (%1$s день)"
 msgstr[1] "Отображать все (%1$s дня)"
 msgstr[2] "Отображать все (%1$s дней)"
 
-#: include/views/common.filter.trigger.php:156 latest.php:396
+#: include/views/common.filter.trigger.php:156 latest.php:361
 msgid "Show details"
 msgstr "Показывать детали"
 
@@ -13271,7 +13275,7 @@ msgstr "Отображать события не старше чем (в дня�
 msgid "Show hosts in maintenance"
 msgstr "Показывать узлы сети в обслуживании"
 
-#: latest.php:392
+#: latest.php:357
 msgid "Show items without data"
 msgstr "Показывать элементы данных без истории"
 
@@ -13442,7 +13446,7 @@ msgstr "Владелец слайд-шоу не может быть пустым
 msgid "Slide show updated"
 msgstr "Слайд-шоу обновлено"
 
-#: app/views/monitoring.dashboard.view.php:58
+#: app/views/monitoring.dashboard.view.php:48
 #: include/views/monitoring.screen.list.php:29
 #: include/views/monitoring.screen.php:42
 #: include/views/monitoring.slideconf.edit.php:24
@@ -13535,7 +13539,7 @@ msgstr "Указанный скрипт не существует или вы н
 msgid "Specify some filter condition to see the items."
 msgstr "Укажите какое-нибудь условие в фильтре для просмотра элементов данных."
 
-#: latest.php:412
+#: latest.php:377
 msgid "Specify some filter condition to see the values."
 msgstr "Укажите какое-нибудь условие в фильтре для просмотра значений."
 
@@ -13617,7 +13621,7 @@ msgid "Status codes"
 msgstr "Коды состояний"
 
 #: app/controllers/CControllerReportStatus.php:39
-#: app/views/monitoring.dashboard.view.php:121
+#: app/views/monitoring.dashboard.view.php:111
 #: app/views/monitoring.widget.status.view.php:25
 #: app/views/report.status.php:25
 #: include/classes/screens/CScreenSystemStatus.php:55 include/menu.inc.php:150
@@ -13797,7 +13801,7 @@ msgstr "Имя узла сети системы. Возвращает строк
 msgid "System statistics. Returns integer or float"
 msgstr "Статистика системы. Возвращает целое число или дробное"
 
-#: app/views/monitoring.dashboard.view.php:98
+#: app/views/monitoring.dashboard.view.php:88
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
 msgstr "Состояние системы"
@@ -14339,7 +14343,7 @@ msgstr "Период хранения динамики изменений (в д
 #: include/views/administration.general.housekeeper.edit.php:114
 #: include/views/configuration.item.list.php:62
 #: include/views/configuration.item.prototype.list.php:47 items.php:160
-#: latest.php:437
+#: latest.php:402
 msgid "Trends"
 msgstr "Динамика изменений"
 
@@ -14691,7 +14695,7 @@ msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не мог�
 #: include/views/monitoring.overview.triggers.php:80
 #: include/views/monitoring.screen.edit.php:190
 #: include/views/monitoring.slideconf.edit.php:238
-#: include/views/monitoring.sysmap.edit.php:351 latest.php:438
+#: include/views/monitoring.sysmap.edit.php:351 latest.php:403
 #: popup_media.php:133 popup.php:512 popup.php:1219 tr_logform.php:287
 #: tr_logform.php:292
 msgid "Type"
@@ -15098,7 +15102,7 @@ msgstr "Доступен"
 #: include/views/configuration.triggers.massupdate.php:113
 #: include/views/js/configuration.discovery.edit.js.php:351
 #: include/views/monitoring.dashconf.php:129
-#: include/views/monitoring.screen.constructor.edit.php:757
+#: include/views/monitoring.screen.constructor.edit.php:755
 #: include/views/monitoring.screen.edit.php:214
 #: include/views/monitoring.slideconf.edit.php:261
 #: include/views/monitoring.sysmap.constructor.php:57
@@ -15892,7 +15896,7 @@ msgid "Web"
 msgstr "Веб"
 
 #: app/controllers/CControllerWebView.php:105
-#: app/views/monitoring.dashboard.view.php:113
+#: app/views/monitoring.dashboard.view.php:103
 #: app/views/monitoring.web.view.php:26
 #: app/views/monitoring.widget.web.view.php:91 include/items.inc.php:102
 #: include/views/configuration.httpconf.edit.php:22
