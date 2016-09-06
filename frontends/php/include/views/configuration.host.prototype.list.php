@@ -100,7 +100,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = (new CLink(
-		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('Yes') : _('No'),
+		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		'?group_hostid='.$hostPrototype['hostid'].
 			'&parent_discoveryid='.$this->data['discovery_rule']['itemid'].
 			'&action='.(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
