@@ -1451,7 +1451,7 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 	return [
 		$table,
 		($total > ZBX_WIDGET_ROWS)
-			?  (new CDiv(
+			? (new CDiv(
 				(new CDiv(
 					(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
 						->addClass(ZBX_STYLE_TABLE_STATS)
