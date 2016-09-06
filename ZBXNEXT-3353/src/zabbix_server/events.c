@@ -875,7 +875,7 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
  ******************************************************************************/
 static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event, int old_value)
 {
-	char			*expression, *value;
+	char			*expression, *value, error[256];
 	zbx_token_t		token;
 	int			pos = 0, ret = FAIL;
 	zbx_uint64_t		conditionid;
@@ -910,7 +910,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		pos = token.token.r;
 	}
 
-	if (SUCCEED == evaluate(&result, expression, NULL, 0, NULL))
+	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
 		ret = zbx_double_compare(result, 1);
 out:
 	zbx_free(expression);
@@ -1210,7 +1210,7 @@ out:
  *             objectid    - [IN] the old event source objectid (triggerid)   *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_execute_operations(zbx_correlation_t *correlation, const DB_EVENT *event,
+static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EVENT *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
 	int			i;
@@ -1239,6 +1239,9 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
 						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
+
+				event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
+
 				break;
 			case ZBX_CORR_OPERATION_CLOSE_OLD:
 				/* queue closing of old events to lock them by triggerids */

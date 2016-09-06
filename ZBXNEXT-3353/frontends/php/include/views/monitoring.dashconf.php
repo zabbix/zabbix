@@ -113,14 +113,14 @@ $form_list->addRow(_('Trigger name'),
 );
 
 if ($data['config']['event_ack_enable']) {
-	// append problem display to form list
-	$ext_ack_combobox = new CComboBox('extAck', $data['extAck'], null, [
-		EXTACK_OPTION_ALL => _('All'),
-		EXTACK_OPTION_BOTH => _('Separated'),
-		EXTACK_OPTION_UNACK => _('Unacknowledged only')
-	]);
-	$ext_ack_combobox->setEnabled($data['isFilterEnable']);
-	$form_list->addRow(_('Problem display'), $ext_ack_combobox);
+	$form_list->addRow(_('Problem display'),
+		(new CRadioButtonList('extAck', (int) $data['extAck']))
+			->addValue(_('All'), EXTACK_OPTION_ALL)
+			->addValue(_('Separated'), EXTACK_OPTION_BOTH)
+			->addValue(_('Unacknowledged only'), EXTACK_OPTION_UNACK)
+			->setEnabled($data['isFilterEnable'])
+			->setModern(true)
+	);
 }
 
 // create tab

@@ -5375,7 +5375,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr ""
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr ""
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -5968,8 +5968,12 @@ msgstr ""
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+msgid "First"
+msgstr ""
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
 msgid "First"
 msgstr ""
 
@@ -9248,8 +9252,12 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+msgid "Last"
+msgstr ""
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
 msgid "Last"
 msgstr ""
 
@@ -13465,7 +13473,7 @@ msgid "Search pattern is empty"
 msgstr ""
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr ""
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112

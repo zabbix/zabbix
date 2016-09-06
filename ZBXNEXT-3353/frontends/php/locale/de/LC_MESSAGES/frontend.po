@@ -5341,7 +5341,7 @@ msgid "Enable debug mode in selected groups?"
 msgstr "Debug-Modus für ausgewählten Gruppen aktivieren?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
-msgid "Enable event acknowledges"
+msgid "Enable event acknowledgement"
 msgstr "Aktiviere Ereignis-Bestätigungen"
 
 #: include/actions.inc.php:656 include/actions.inc.php:1060
@@ -5935,10 +5935,14 @@ msgstr "Beenden"
 msgid "Finnish (fi_FI)"
 msgstr "Finnisch (fi_FI)"
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Ersten"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr "Erste"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9211,10 +9215,14 @@ msgstr "Beschriftungsposition"
 msgid "Language"
 msgstr "Sprache"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Letzter"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr "Letzte"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
@@ -13435,7 +13443,7 @@ msgid "Search pattern is empty"
 msgstr "Suchmuster ist leer"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
-msgid "Search/Filter elements limit"
+msgid "Limit for search and filter results"
 msgstr "Suche/Filter nach Elementen"
 
 #: include/forms.inc.php:1921 include/maintenances.inc.php:112
