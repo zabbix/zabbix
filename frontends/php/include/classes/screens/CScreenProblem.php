@@ -557,7 +557,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string     $sortorder
 	 */
 	private function addTimelineBreakpoint(CTableInfo $table, $last_clock, $clock, $sortorder) {
-		if ($this->data['sortorder'] === ZBX_SORT_UP) {
+		if ($sortorder === ZBX_SORT_UP) {
 			list($clock, $last_clock) = [$last_clock, $clock];
 		}
 
