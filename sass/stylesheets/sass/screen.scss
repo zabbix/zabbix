@@ -679,6 +679,10 @@ footer {
 		&:last-child td {
 			border-bottom: none;
 		}
+
+		&.hover-nobg {
+			background-color: $ui-bg-color;
+		}
 	}
 
 	td {
@@ -2549,6 +2553,11 @@ $form-icon-btn: (
 		td {
 			@extend %dashbrd-widget-td;
 		}
+	}
+
+	.table-paging {
+		border: none;
+		border-top: 1px solid $table-border-color;
 	}
 
 	.table-forms-td-left {
