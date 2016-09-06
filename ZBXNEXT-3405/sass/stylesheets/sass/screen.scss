@@ -946,29 +946,6 @@ footer {
 	border-bottom-color: $transparent !important;
 }
 
-tr.timeline-period {
-
-	&:hover {
-		background-color: $ui-bg-color !important;
-	}
-
-	span {
-		position: absolute;
-		z-index: 100;
-		top: 3px;
-		left: 46%;
-		height: 18px;
-		line-height: 18px;
-		white-space: nowrap;
-		padding: 0 6px;
-		display: inline-block;
-		background-color: $ui-bg-color;
-		border: 2px solid lighten(desaturate($btn-bg-color, 27%), 44%);
-		@include border-radius(2px);
-		@include transform(translateX(-46%));
-	}
-}
-
 .timeline-axis {
 	@extend %timeline-td;
 	padding: 6px .04em !important;
@@ -988,34 +965,22 @@ tr.timeline-period {
 .timeline-dot {
 
 	&::after {
-		content: '';
-		position: absolute;
-		z-index: 100;
-		display: block;
+		@extend %timeline-dot;
 		top: 11px;
-		right: -5px;
-		width: 4px;
-		height: 4px;
 		border: 2px solid $ui-bg-color;
-		@include border-radius(100%);
 		background-color: $btn-bg-color;
+		@include border-radius(100%);
 	}
 }
 
 .timeline-dot-big {
 
 	&::after {
-		content: '';
-		position: absolute;
-		z-index: 100;
-		display: block;
+		@extend %timeline-dot;
 		top: 10px;
-		right: -5px;
-		width: 4px;
-		height: 4px;
 		border: 2px solid $btn-bg-color;
-		@include border-radius(100%);
 		background-color: $ui-bg-color;
+		@include border-radius(100%);
 	}
 }
 
@@ -1026,6 +991,17 @@ tr.timeline-period {
 
 .timeline-th {
 	padding: 6px .25em !important;
+}
+
+%timeline-dot {
+	content: '';
+	position: absolute;
+	z-index: 100;
+	display: block;
+	width: 4px;
+	height: 4px;
+	right: -5px;
+	@include border-radius(100%);
 }
 
 %timeline-td {
