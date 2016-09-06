@@ -5847,10 +5847,14 @@ msgstr "پایان"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1920 include/func.inc.php:1526
-#: include/maintenances.inc.php:111
+#: include/forms.inc.php:1837 include/maintenances.inc.php:111
 msgid "First"
 msgstr "ابتدا"
+
+#: include/func.inc.php:1529
+msgctxt "page navigation"
+msgid "First"
+msgstr ""
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -9104,10 +9108,14 @@ msgstr "محل برچسب"
 msgid "Language"
 msgstr "زبان"
 
-#: include/forms.inc.php:1924 include/func.inc.php:1553
-#: include/maintenances.inc.php:115
+#: include/forms.inc.php:1841 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "آخرین"
+
+#: include/func.inc.php:1556
+msgctxt "page navigation"
+msgid "Last"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.issues.view.php:25
