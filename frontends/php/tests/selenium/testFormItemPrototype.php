@@ -1314,7 +1314,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestAssertVisibleId('description');
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
-		$this->zbxTestTextPresent('Enabled');
+		$this->zbxTestTextPresent('Create enabled');
 		$this->zbxTestAssertVisibleId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
