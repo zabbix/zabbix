@@ -505,13 +505,13 @@ class CDRule extends CApiService {
 					break;
 
 				case SVC_SNMPv1:
-					// falls through
+					// break; is not missing here
 				case SVC_SNMPv2c:
 					if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
 							|| $dcheck['snmp_community'] === false || $dcheck['snmp_community'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 					}
-					// falls through
+					// break; is not missing here
 				case SVC_SNMPv3:
 					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
 							|| $dcheck['key_'] === '') {
