@@ -1447,7 +1447,11 @@ footer {
 	}
 
 	input[type="radio"] {
-		display: none;
+		position: absolute !important;
+		top: auto !important;
+		width: 1px !important;
+		height: 1px !important;
+		@include opacity(0);
 
 		+ label {
 			color: $font-color;
@@ -1684,11 +1688,12 @@ select {
 			}
 		}
 	}
-	@extend %form-custom-check-radio-style;
-}
 
-%form-custom-check-radio-style {
-	display: none;
+	position: absolute !important;
+	top: auto !important;
+	width: 1px !important;
+	height: 1px !important;
+	@include opacity(0);
 
 	+ label span {
 		display: inline-block;
