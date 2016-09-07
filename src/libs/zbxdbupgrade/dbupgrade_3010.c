@@ -547,7 +547,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 					" left join opconditions oc"
 						" on oc.operationid=o.operationid"
 					" where o.actionid=" ZBX_FS_UI64
-					" group by o.operationid",
+					" group by o.operationid,o.operationtype,o.esc_step_from,o.esc_step_to",
 					actionid);
 
 		while (NULL != (row = DBfetch(result)))
@@ -1119,7 +1119,7 @@ static int	DBpatch_3010026(void)
 			" from actions a"
 			" left join conditions c"
 				" on a.actionid=c.actionid"
-			" group by a.actionid");
+			" group by a.actionid,a.name,a.evaltype");
 
 	while (NULL != (row = DBfetch(result)))
 	{
