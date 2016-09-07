@@ -8,6 +8,7 @@ New features:
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
+....I..... [ZBX-11171] updated database versioning for v3.2 release (Sasha)
 ..F....... [ZBXNEXT-3201] fixed displaying of "Actions" hintbox (Pavel, Sasha)
 ..F....... [ZBXNEXT-3201] fixed "Actions" column in exported csv file from Monitoring->Problem page (Ivo)
 .......PS. [ZBX-11119] fixed use of uninitialized variable (Vladislavs)
