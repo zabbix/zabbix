@@ -165,13 +165,13 @@ struct	_DC_TRIGGER;
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	(GRAPH_ITEM_COLOR_LEN + 1)
 
-#define DSERVICE_KEY_LEN		255
+#define DSERVICE_KEY_LEN		512
 #define DSERVICE_VALUE_LEN		255
 
 #define HTTPTEST_HTTP_USER_LEN		64
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 
-#define PROXY_DHISTORY_KEY_LEN		255
+#define PROXY_DHISTORY_KEY_LEN		512
 #define PROXY_DHISTORY_VALUE_LEN	255
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
