@@ -337,14 +337,14 @@ int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbo
 	const char	*__function_name = "zbx_load_modules";
 
 	char		**file_name;
-	int		ret = FAIL;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&modules);
+
 	if (NULL == *file_names)
 		goto out;
-
-	zbx_vector_ptr_create(&modules);
 
 	for (file_name = file_names; NULL != *file_name; file_name++)
 	{
