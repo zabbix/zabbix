@@ -100,7 +100,7 @@ const char	*zbx_alias_get(const char *orig)
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
 		len_name = strlen(alias->name);
-		if (3 >= len_name && 0 != strcmp(alias->name + len_name - 3, "[*]"))
+		if (3 >= len_name || 0 != strcmp(alias->name + len_name - 3, "[*]"))
 			continue;
 
 		if (0 != strncmp(alias->name, orig, len_name - 2))
