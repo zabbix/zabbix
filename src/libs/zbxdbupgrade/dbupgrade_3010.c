@@ -1579,7 +1579,6 @@ static int	DBpatch_3010071(void)
 	return DBmodify_field_type("proxy_dhistory", &field);
 }
 
-
 #endif
 
 DBPATCH_START(3010)
