@@ -86,6 +86,10 @@ const char	*zbx_alias_get(const char *orig)
 	ZBX_THREAD_LOCAL static char	*buffer = NULL;
 	ZBX_THREAD_LOCAL static size_t	buffer_alloc = 0;
 	size_t				buffer_offset = 0;
+	const char			*p = orig;
+
+	if (SUCCEED != parse_key((char **)&p) || *p != '\0')
+		return orig;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
