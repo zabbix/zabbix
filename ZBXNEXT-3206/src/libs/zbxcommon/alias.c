@@ -96,14 +96,14 @@ const char	*zbx_alias_get(const char *orig)
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
 		len_name = strlen(alias->name);
-		if (0 != strcmp(alias->name + len_name - 3, "[*]"))
+		if (3 >= len_name && 0 != strcmp(alias->name + len_name - 3, "[*]"))
 			continue;
 
 		if (0 != strncmp(alias->name, orig, len_name - 2))
 			continue;
 
 		len_value = strlen(alias->value);
-		if (0 != strcmp(alias->value + len_value - 3, "[*]"))
+		if (3 >= len_value || 0 != strcmp(alias->value + len_value - 3, "[*]"))
 			return alias->value;
 
 		zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset, alias->value, len_value - 3);
