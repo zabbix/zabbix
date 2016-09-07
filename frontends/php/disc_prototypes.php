@@ -418,12 +418,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['itemprototy
 
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
-		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
-		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+	$messageSuccess = _n('Item prototype updated', 'Item prototypes updated', $updated);
+	$messageFailed = _n('Cannot update item prototype', 'Cannot update item prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
