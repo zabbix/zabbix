@@ -211,7 +211,7 @@ TABLE|dchecks|dcheckid|ZBX_DATA
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
@@ -296,7 +296,7 @@ TABLE|items|itemid|ZBX_DATA
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|snmp_oid	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
@@ -1033,7 +1033,7 @@ FIELD		|druleid	|t_id		|	|NOT NULL	|0			|-|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NULL		|0			|-|dchecks
@@ -1141,7 +1141,7 @@ TABLE|dservices|dserviceid|0
 FIELD		|dserviceid	|t_id		|	|NOT NULL	|0
 FIELD		|dhostid	|t_id		|	|NOT NULL	|0			|1|dhosts
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
