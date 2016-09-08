@@ -9,7 +9,7 @@ New features:
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
-..F....... [ZBXNEXT-3101] fixed new action operation form for IE (Cemeris)
+..F....... [ZBXNEXT-3101] fixed displaying fields of "Operations" tab in action edit form when adding new operation in IE (Cemeris)
 ....I..... [ZBX-11171] updated database versioning for v3.2 release (Sasha)
 ....I..... [ZBXNEXT-3101] fixed sql errors while upgrade IBM DB2 database (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
