@@ -215,8 +215,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 // GO
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototype.massenable', 'hostprototype.massdisable']) && hasRequest('group_hostid')) {
-	$enable = (getRequest('action') == 'hostprototype.massenable');
-	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+	$status = (getRequest('action') == 'hostprototype.massenable') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$update = [];
 
 	DBstart();
@@ -232,12 +231,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 
 	$updated = count($update);
 
-	$messageSuccess = $enable
-		? _n('Host prototype enabled', 'Host prototypes enabled', $updated)
-		: _n('Host prototype disabled', 'Host prototypes disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable host prototype', 'Cannot enable host prototypes', $updated)
-		: _n('Cannot disable host prototype', 'Cannot disable host prototypes', $updated);
+	$messageSuccess = _n('Host prototype updated', 'Host prototypes updated', $updated);
+	$messageFailed = _n('Cannot update host prototype', 'Cannot update host prototypes', $updated);
 
 	if ($result) {
 		uncheckTableRows($discoveryRule['itemid']);
