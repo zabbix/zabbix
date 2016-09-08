@@ -547,7 +547,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 					" left join opconditions oc"
 						" on oc.operationid=o.operationid"
 					" where o.actionid=" ZBX_FS_UI64
-					" group by o.operationid",
+					" group by o.operationid,o.operationtype,o.esc_step_from,o.esc_step_to",
 					actionid);
 
 		while (NULL != (row = DBfetch(result)))
@@ -1119,7 +1119,7 @@ static int	DBpatch_3010026(void)
 			" from actions a"
 			" left join conditions c"
 				" on a.actionid=c.actionid"
-			" group by a.actionid");
+			" group by a.actionid,a.name,a.evaltype");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1642,6 +1642,34 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3010080(void)
+{
+	const ZBX_FIELD field = {"snmp_oid", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
+static int	DBpatch_3010081(void)
+{
+	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dchecks", &field);
+}
+
+static int	DBpatch_3010082(void)
+{
+	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("dservices", &field);
+}
+
+static int	DBpatch_3010083(void)
+{
+	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_dhistory", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1726,5 +1754,9 @@ DBPATCH_ADD(3010076, 0, 0)
 DBPATCH_ADD(3010077, 0, 1)
 DBPATCH_ADD(3010078, 0, 1)
 DBPATCH_ADD(3010079, 0, 1)
+DBPATCH_ADD(3010080, 0, 1)
+DBPATCH_ADD(3010081, 0, 1)
+DBPATCH_ADD(3010082, 0, 1)
+DBPATCH_ADD(3010083, 0, 1)
 
 DBPATCH_END()

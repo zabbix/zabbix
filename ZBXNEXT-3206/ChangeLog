@@ -1,6 +1,7 @@
 Changes for 3.2.0beta3
 
 New features:
+A.F.I..PS. [ZBXNEXT-3344] increased maximum SNMP OID size from 255 to 512 bytes (Cemeris, viktors)
 ..F....... [ZBXNEXT-3405] implemented timeline in Monitoring->Problems view (Pavel, Sasha)
 ...G...PS. [ZBXNEXT-3353] implemented interface for history export through loadable modules and changed module loading to require only zbx_module_api_version() function (gleb, Sandis)
 ..F....... [ZBXNEXT-3423] removed ability to acknowledge OK events (Ivo)
@@ -8,6 +9,8 @@ New features:
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
+....I..... [ZBXNEXT-3101] fixed sql errors while upgrade IBM DB2 database (Sasha)
+A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 ..F....... [ZBX-6083] strings that are related to status of item, trigger and host prototypes was renamed "Enable" and "Status" => "Create enabled", "Disable" => "Create disabled", "Enabled" => "Yes", "Disabled" => "No" (Cemeris)
 ..F....... [ZBXNEXT-3201] fixed displaying of "Actions" hintbox (Pavel, Sasha)
 ..F....... [ZBXNEXT-3201] fixed "Actions" column in exported csv file from Monitoring->Problem page (Ivo)
@@ -130,6 +133,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 ..F....... [ZBX-11040] added "page navigation" context to translation strings "First" and "Last"; replicated translations for "First" and "Last" in "page navigation" context from 2.2 branch (Cemeris)
 ..F....... [ZBX-11070] disallowed zabbix admin accessing notifications of users that does not share any user group (Cemeris)
 ..F....... [ZBX-11057] fixed drawing lines of items with scheduled interval when graph data is selected from trends (Cemeris)
@@ -1592,6 +1596,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 .......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
 ........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)

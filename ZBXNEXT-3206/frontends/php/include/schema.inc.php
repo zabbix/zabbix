@@ -907,7 +907,7 @@ return [
 			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 512,
 				'default' => '',
 			],
 			'snmp_community' => [
@@ -1310,7 +1310,7 @@ return [
 			'snmp_oid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 512,
 				'default' => '',
 			],
 			'hostid' => [
@@ -4669,7 +4669,7 @@ return [
 			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 512,
 				'default' => '',
 			],
 			'value' => [
@@ -5156,7 +5156,7 @@ return [
 			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 512,
 				'default' => '',
 			],
 			'value' => [
