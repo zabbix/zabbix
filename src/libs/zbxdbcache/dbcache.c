@@ -1379,7 +1379,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (0 == items[i].history)
 			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 
-		if ((ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type) &&
+		if ((ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type) ||
 				0 == items[i].trends)
 		{
 			h->flags |= ZBX_DC_FLAG_NOTRENDS;
