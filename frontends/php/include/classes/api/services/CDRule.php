@@ -422,11 +422,6 @@ class CDRule extends CApiService {
 		}
 	}
 
-	/**
-	 * Validate discovery checks.
-	 *
-	 * @param array $dchecks
-	 */
 	protected function validateDChecks(array $dchecks) {
 		$uniq = 0;
 		$item_key_parser = new CItemKey();
@@ -470,29 +465,11 @@ class CDRule extends CApiService {
 					_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['type'], 'type')
 				);
 			}
+
 			switch ($dcheck['type']) {
 				case SVC_AGENT:
-					if (!array_key_exists('key_', $dcheck)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'key_'));
-					}
-
-					if (is_array($dcheck['key_'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-					}
-
-					if ($dcheck['key_'] === '' || $dcheck['key_'] === null || $dcheck['key_'] === false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'key_', _('cannot be empty'))
-						);
-					}
-
-					$length = mb_strlen($dcheck['key_']);
-					if ($length > 255) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'key_',
-								_s('%1$d characters exceeds maximum length of %2$d characters', $length, 255)
-							)
-						);
+					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
 					}
 
 					if ($item_key_parser->parse($dcheck['key_']) != CParser::PARSE_SUCCESS) {
@@ -503,13 +480,11 @@ class CDRule extends CApiService {
 					break;
 
 				case SVC_SNMPv1:
-					// break; is not missing here
 				case SVC_SNMPv2c:
 					if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
 							|| $dcheck['snmp_community'] === false || $dcheck['snmp_community'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 					}
-					// break; is not missing here
 				case SVC_SNMPv3:
 					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
 							|| $dcheck['key_'] === '') {
