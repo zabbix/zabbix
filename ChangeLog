@@ -10,6 +10,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased maximum SNMP OID size from 255 to 512 bytes 
 ..F....... [ZBXNEXT-3412] implemented mass update for trigger and trigger prototype tags and manual close (Ivo)
 
 Bug fixes:
+....I..... [ZBX-11171] updated database versioning for v3.2 release (Sasha)
 ....I..... [ZBXNEXT-3101] fixed sql errors while upgrade IBM DB2 database (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 ..F....... [ZBX-6083] strings that are related to status of item, trigger and host prototypes was renamed "Enable" and "Status" => "Create enabled", "Disable" => "Create disabled", "Enabled" => "Yes", "Disabled" => "No" (Cemeris)
