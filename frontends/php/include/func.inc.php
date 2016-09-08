@@ -405,10 +405,10 @@ function str2mem($val) {
 	switch ($last) {
 		case 'g':
 			$val *= 1024;
-			// break; is not missing here
+			/* falls through */
 		case 'm':
 			$val *= 1024;
-			// break; is not missing here
+			/* falls through */
 		case 'k':
 			$val *= 1024;
 	}
