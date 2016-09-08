@@ -223,7 +223,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['showGraphs']		link to host graphs page
  * @param bool   options['showScreens']		link to host screen page
- * @param bool   options['showTriggers']	link to "Status of triggers" page
+ * @param bool   options['showTriggers']	link to Monitoring->Triggers page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
@@ -455,20 +455,18 @@ function getMenuPopupMap(options) {
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
 			var events = {
-				label: t('Events')
+				label: t('Problems')
 			};
 
 			if (!options.gotos.showEvents) {
 				events.disabled = true;
 			}
 			else {
-				var url = new Curl('events.php?filter_set=1');
-
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'problem.view');
+				url.setArgument('filter_triggerids[]', options.gotos.events.triggerid);
+				url.setArgument('filter_set', '1');
 				url.unsetArgument('sid');
-
-				jQuery.each(options.gotos.events, function(name, value) {
-					url.setArgument(name, value);
-				});
 
 				events.url = url.getUrl();
 			}
@@ -596,7 +594,6 @@ function getMenuPopupRefresh(options) {
  * @param object options['acknowledge']				link to acknowledge page (optional)
  * @param string options['acknowledge']['eventid']	event id
  * @param string options['acknowledge']['backurl']	return url
- * @param int    options['eventTime']				event page url navigation time parameter (optional)
  * @param object options['configuration']			link to trigger configuration page (optional)
  * @param string options['url']						trigger url link (optional)
  *
@@ -606,19 +603,17 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid);
-
-	url.unsetArgument('sid');
-
-	if (typeof options.eventTime !== 'undefined') {
-		url.setArgument('nav_time', options.eventTime);
-	}
-
 	var events = {
-		label: t('Events')
+		label: t('Problems')
 	};
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
+		var url = new Curl('zabbix.php');
+		url.setArgument('action', 'problem.view');
+		url.setArgument('filter_triggerids[]', options.triggerid);
+		url.setArgument('filter_set', '1');
+		url.unsetArgument('sid');
+
 		events.url = url.getUrl();
 	}
 	else {

@@ -29,7 +29,9 @@ class CControllerAcknowledgeEdit extends CController {
 		$fields = [
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
-			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
+			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
+			'close_problem' =>		'db acknowledges.action|in '.
+										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
 			'backurl' =>			'string'
 		];
 
@@ -39,7 +41,6 @@ class CControllerAcknowledgeEdit extends CController {
 			$backurl = $this->getInput('backurl', 'tr_status.php');
 
 			switch (parse_url($backurl, PHP_URL_PATH)) {
-				case 'events.php':
 				case 'overview.php':
 				case 'screenedit.php':
 				case 'screens.php':
@@ -77,6 +78,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
+			'close_problem' => $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE),
 			'acknowledge_type' => $this->getInput('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED),
 			'backurl' => $this->getInput('backurl', 'tr_status.php'),
 			'unack_problem_events_count' => 0,
@@ -86,10 +88,10 @@ class CControllerAcknowledgeEdit extends CController {
 		if (count($this->getInput('eventids')) == 1) {
 			$events = API::Event()->get([
 				'output' => [],
+				'select_acknowledges' => ['clock', 'message', 'action', 'alias', 'name', 'surname'],
 				'eventids' => $this->getInput('eventids'),
 				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'select_acknowledges' => ['clock', 'message', 'alias', 'name', 'surname']
+				'object' => EVENT_OBJECT_TRIGGER
 			]);
 
 			if ($events) {
@@ -101,10 +103,11 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		$events = API::Event()->get([
-			'output' => ['objectid', 'acknowledged', 'value'],
+			'output' => ['eventid', 'objectid', 'acknowledged', 'value'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER
+			'object' => EVENT_OBJECT_TRIGGER,
+			'preservekeys' => true
 		]);
 
 		$triggerids = [];
@@ -121,6 +124,66 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		$triggerids = array_keys($triggerids);
+
+		$event_cond = false;
+		$data['close_problem_chbox'] = false;
+
+		// At least one trigger should have RW permissions and should be allowed manual close.
+		$trigger_cond = (bool) API::Trigger()->get([
+			'output' => [],
+			'triggerids' => $triggerids,
+			'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		// Get events in problem state with acknowledges.
+		$problems_events = API::Event()->get([
+			'output' => ['r_eventid'],
+			'select_acknowledges' => ['action'],
+			'eventids' => array_keys($events),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
+			'preservekeys' => true
+		]);
+
+		// At least one event should not be closed.
+		foreach ($problems_events as $problem_event) {
+			// Check if it was closed by event recovery.
+			if ($problem_event['r_eventid'] != 0) {
+				continue;
+			}
+
+			$event_closed = false;
+
+			if ($problem_event['acknowledges']) {
+				foreach ($problem_event['acknowledges'] as $acknowledge) {
+					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+						$event_closed = true;
+						break;
+					}
+				}
+
+				if (!$event_closed) {
+					$event_cond = true;
+					break;
+				}
+			}
+			else {
+				// No acknowledges yet, so event is still open.
+				$event_cond = true;
+				break;
+			}
+		}
+
+		/*
+		 * Show checkbox as enabled if trigger conditions (has permissions and allowed to close) and
+		 * event conditions (problem state and not closed) are both set to true. Otherwise checkbox is disabled.
+		 */
+		if ($trigger_cond && $event_cond) {
+			$data['close_problem_chbox'] = true;
+		}
 
 		$data['unack_problem_events_count'] += API::Event()->get([
 			'countOutput' => true,
@@ -144,7 +207,7 @@ class CControllerAcknowledgeEdit extends CController {
 		]);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Alarm acknowledgements'));
+		$response->setTitle(_('Event acknowledgements'));
 		$this->setResponse($response);
 	}
 }

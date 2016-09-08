@@ -223,7 +223,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 	}
 
@@ -254,6 +254,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickButton($value) {
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath("//button[@value='".$value."']"));
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
 	}
 
@@ -271,6 +272,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestInputTypeByXpath($xpath, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
 	}
 
@@ -375,6 +377,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
+	public function zbxTestWaitUntilElementClickable($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::elementToBeClickable($by));
+	}
+
 	public function zbxTestWaitUntilElementPresent($by) {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
 	}
@@ -397,7 +403,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitWindowAndSwitchToIt($id) {
-		$this->webDriver->wait(60)->until(function () use ($id) {
+		$this->webDriver->wait(90)->until(function () use ($id) {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
 					if ($handles > 1) {
@@ -408,8 +414,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 				return false;
 			}
 		});
+	}
 
-		$this->zbxTestCheckFatalErrors();
+	public function zbxTestSwitchToNewWindow() {
+		$this->webDriver->wait(60)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles > 1) {
+						$all = $this->webDriver->getWindowHandles();
+						return $this->webDriver->switchTo()->window(end($all));
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
 	}
 
 	public function zbxTestWaitWindowClose() {

@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageStatusOfTriggers extends CWebTest {
 	public function testPageStatusOfTriggers_CheckLayout() {
 		$this->zbxTestLogin('tr_status.php');
-		$this->zbxTestCheckTitle('Status of triggers [refreshed every 30 sec.]');
-		$this->zbxTestCheckHeader('Status of triggers');
+		$this->zbxTestCheckTitle('Triggers [refreshed every 30 sec.]');
+		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(['Group', 'Host']);
@@ -35,7 +35,7 @@ class testPageStatusOfTriggers extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageStatusOfTriggers_NoHostNames() {
 		$this->zbxTestLogin('tr_status.php');
-		$this->zbxTestCheckTitle('Status of triggers [refreshed every 30 sec.]');
+		$this->zbxTestCheckTitle('Triggers [refreshed every 30 sec.]');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 }

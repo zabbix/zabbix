@@ -61,8 +61,8 @@ class testInheritanceTrigger extends CWebTest {
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));

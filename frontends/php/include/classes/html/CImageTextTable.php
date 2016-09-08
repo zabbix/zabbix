@@ -70,8 +70,6 @@ class CImageTextTable {
 	 *
 	 * @param int   $numrow
 	 * @param array $cell
-	 *
-	 * @return void
 	 */
 	public function addCell($numrow, array $cell) {
 		if ($numrow >= $this->numrows) {
@@ -140,8 +138,6 @@ class CImageTextTable {
 
 	/**
 	 * Calculates the size of each row and column.
-	 *
-	 * @return void
 	 */
 	private function calcRows() {
 		$rowHeight = 0;

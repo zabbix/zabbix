@@ -19,7 +19,7 @@
 <body>
 	<header role="banner">
 		<div class="nav" role="navigation">
-			<div class="top-nav-container"><div class="logo"></div><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -31,7 +31,7 @@
 	<div class="header-title table">
   <div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><!--<li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li>--><li><button type="button" class="btn-conf" title="Configuration"></button><div class="active-indic" title="Enabled"></div></li><li><button type="button" class="btn-max" title="Maximize"></button></li><!--<li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li>--></ul></form>
 </div></div>
-	<div class="table widget-placeholder">
+	<div class="table">
 	<div class="row">
 	<div class="cell">
 	<div class="dashbrd-widget">
@@ -3436,10 +3436,10 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><ul class="list-hor-min-width"><li><span class="green link-action">1</span></li><li><span class="yellow link-action">5</span></li><li><span class="red link-action">35</span></li></ul><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
+				<td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><span class="green link-action">1</span><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
 			</tr>
             <tr>
-                <td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><ul class="list-hor-min-width"><li><span class="green link-action">16</span></li><li><span class="yellow link-action">5</span></li><li><span class="red link-action">407</span></li></ul><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
+                <td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><span class="red link-action">16</span><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
             </tr>
 		</tbody>
 		</table>
@@ -3517,7 +3517,7 @@
 	</ul>
 
 	<div class="overlay-dialogue" style="top: 520px; left: 700px">
-	<span class="overlay-close-btn"></span>
+	<button type="button" class="overlay-close-btn"></button>
 		<table class="list-table">
 		<thead>
 		<tr>
@@ -6854,7 +6854,7 @@
 	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
 
 	<div id="" class="overlay-dialogue notif" style="top: 128px; right: 13px">
-	<span class="overlay-close-btn"></span>
+	<button type="button" class="overlay-close-btn"></button>
 	<div class="dashbrd-widget-head cursor-move">
 	<ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
 	<ul class="notif-body">
@@ -6901,7 +6901,7 @@
 	</ul>
 	</div>
 
-<div style="top: 128px; left: 1400px" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+<div style="top: 128px; left: 1400px" class="overlay-dialogue"><button type="button" class="overlay-close-btn"></button>
 	<ul class="notif-body">
 		<li><div class="notif-indic normal-bg"></div>
 		<h4>OK</h4>

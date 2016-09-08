@@ -86,14 +86,12 @@ function getOperatorsByCorrConditionType($type) {
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			return [CONDITION_OPERATOR_EQUAL];
-			break;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			return [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 				CONDITION_OPERATOR_NOT_LIKE
 			];
-			break;
 	}
 }
 
@@ -123,6 +121,7 @@ function corrConditionValueToString(array $correlations) {
 					break;
 
 				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+					$result[$i][$j] = ['group' => _('Unknown')];
 					$groupids[$condition['groupid']] = true;
 					break;
 

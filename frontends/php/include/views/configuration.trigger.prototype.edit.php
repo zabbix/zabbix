@@ -35,11 +35,21 @@ $triggersForm = (new CForm())
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '')
-	->addVar('recovery_mode', $data['recovery_mode']);
+	->addVar('remove_recovery_expression', '');
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
+}
+
+if ($data['limited']) {
+	$triggersForm
+		->addVar('recovery_mode', $data['recovery_mode'])
+		->addVar('type', $data['type'])
+		->addVar('correlation_mode', $data['correlation_mode']);
+
+	if ($data['config']['event_ack_enable']) {
+		$triggersForm->addVar('manual_close', $data['manual_close']);
+	}
 }
 
 // create form list
@@ -157,10 +167,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$allowed_testing = true;
 	if ($data['expression_tree']) {
 		foreach ($data['expression_tree'] as $i => $e) {
-			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
@@ -173,7 +181,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// templated trigger
@@ -209,7 +217,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
@@ -250,17 +258,15 @@ if ($data['expression_constructor'] == IM_TREE) {
 			'document.forms["'.$triggersForm->getName().'"].submit();');
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
-$event_generation = (new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
-	->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
-	->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
-	->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
-	->setModern(true);
 
-if ($data['limited']) {
-	$event_generation->setEnabled(false);
-}
-
-$triggersFormList->addRow(_('OK event generation'), $event_generation);
+$triggersFormList->addRow(_('OK event generation'),
+	(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
+		->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
+		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
+		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
+		->setModern(true)
+		->setEnabled(!$data['limited'])
+);
 
 $add_recovery_expression_button = (new CButton('insert',
 		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))
@@ -358,15 +364,13 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	if ($data['recovery_expression_tree']) {
 		foreach ($data['recovery_expression_tree'] as $i => $e) {
-			if (!isset($e['recovery_expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
-				if (is_array($e['recovery_expression']['levelErrors'])) {
-					foreach ($e['recovery_expression']['levelErrors'] as $expVal => $errTxt) {
+				if (is_array($e['expression']['levelErrors'])) {
+					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
 						if ($errors) {
 							$errors[] = BR();
 						}
@@ -374,7 +378,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// templated trigger
@@ -410,7 +414,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
@@ -452,38 +456,26 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
-if ($data['limited']) {
-	$triggersFormList->addVar('type', (int) $data['type'])
-		->addVar('correlation_mode', (int) $data['correlation_mode']);
-
-	$problem_event_generation_mode = (new CRadioButtonList('type_name', (int) $data['type']))
-		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
-		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
-		->setModern(true)
-		->setEnabled(false);
-
-	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
-		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
-		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
-		->setModern(true)
-		->setEnabled(false);
-}
-else {
-	$problem_event_generation_mode = (new CRadioButtonList('type', (int) $data['type']))
-		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
-		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
-		->setModern(true);
-
-	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
-		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
-		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
-		->setModern(true);
-}
-
-$triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
-	->addRow(_('OK event closes'), $ok_event_closes)
-	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+$triggersFormList
+	->addRow(_('PROBLEM event generation mode'),
+		(new CRadioButtonList('type', (int) $data['type']))
+			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
+			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
+			->setModern(true)
+			->setEnabled(!$data['limited'])
+	)
+	->addRow(_('OK event closes'),
+		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
+			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
+			->setModern(true)
+			->setEnabled(!$data['limited']),
+		'correlation_mode_row'
+	)
+	->addRow(_('Tag for matching'),
+		(new CTextBox('correlation_tag', $data['correlation_tag'], $data['limited']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'correlation_tag_row'
 	);
 
 // tags
@@ -516,19 +508,28 @@ $triggersFormList->addRow(_('Tags'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 
+if ($data['config']['event_ack_enable']) {
+	$triggersFormList->addRow(_('Allow manual close'),
+		(new CCheckBox('manual_close'))
+			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			->setEnabled(!$data['limited'])
+	);
+}
+
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 	$status = true;
 }
 else {
-	$status = ($data['status'] == 0);
+	$status = ($data['status'] == TRIGGER_STATUS_ENABLED);
 }
+
 $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
+	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
 $triggersTab = new CTabView();

@@ -83,11 +83,11 @@ $screenResources = screen_resources();
 if ($this->data['screen']['templateid']) {
 	unset(
 		$screenResources[SCREEN_RESOURCE_DATA_OVERVIEW], $screenResources[SCREEN_RESOURCE_ACTIONS],
-		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOSTS_INFO],
+		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOST_INFO],
 		$screenResources[SCREEN_RESOURCE_MAP], $screenResources[SCREEN_RESOURCE_SCREEN],
 		$screenResources[SCREEN_RESOURCE_SERVER_INFO], $screenResources[SCREEN_RESOURCE_HOSTGROUP_TRIGGERS],
 		$screenResources[SCREEN_RESOURCE_HOST_TRIGGERS], $screenResources[SCREEN_RESOURCE_SYSTEM_STATUS],
-		$screenResources[SCREEN_RESOURCE_TRIGGERS_INFO], $screenResources[SCREEN_RESOURCE_TRIGGERS_OVERVIEW]
+		$screenResources[SCREEN_RESOURCE_TRIGGER_INFO], $screenResources[SCREEN_RESOURCE_TRIGGER_OVERVIEW]
 	);
 }
 
@@ -371,11 +371,9 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		)
 		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
-
-/*
- * Screen item: Status of triggers
- */
 elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS])) {
+	// Screen item: Triggers
+
 	$data = [];
 
 	if ($resourceType == SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
@@ -483,7 +481,7 @@ elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
 /*
  * Screen item: Overviews
  */
-elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
 	$data = [];
 
 	if ($resourceId > 0) {
@@ -554,11 +552,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 				'&screenid='.$_REQUEST['screenid'].'");')
 	]);
 }
+elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RESOURCE_TRIGGER_INFO) {
+	// Screen item: Host info
 
-/*
- * Screen item: Hosts info
- */
-elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_RESOURCE_TRIGGERS_INFO) {
 	$data = [];
 
 	if ($resourceId > 0) {
@@ -648,7 +644,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 /*
  * Append common fields
  */
-if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO])) {
+if (in_array($resourceType, [SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO])) {
 	$screenFormList->addRow(_('Style'),
 		(new CRadioButtonList('style', (int) $style))
 			->addValue(_('Horizontal'), STYLE_HORIZONTAL)
@@ -656,7 +652,7 @@ if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGER
 			->setModern(true)
 	);
 }
-elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
 	$screenFormList->addRow(_('Hosts location'),
 		(new CRadioButtonList('style', (int) $style))
 			->addValue(_('Left'), STYLE_LEFT)
@@ -746,14 +742,12 @@ if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourc
 	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
-// append tabs to form
-$screenTab = new CTabView();
-$screenTab->setAttribute('style', 'text-align: left;');
-$screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList);
+// append list to form
+$form->addItem($screenFormList);
 
 // append buttons to form
 if (isset($_REQUEST['screenitemid'])) {
-	$screenTab->setFooter(makeFormFooter(
+	$form->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CButtonDelete(null, url_params(['form', 'screenid', 'templateid', 'screenitemid'])),
@@ -762,12 +756,10 @@ if (isset($_REQUEST['screenitemid'])) {
 	));
 }
 else {
-	$screenTab->setFooter(makeFormFooter(
+	$form->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_params(['screenid', 'templateid']))]
 	));
 }
-
-$form->addItem($screenTab);
 
 return $form;

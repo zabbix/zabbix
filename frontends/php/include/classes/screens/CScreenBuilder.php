@@ -213,10 +213,10 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_PLAIN_TEXT:
 				return new CScreenPlainText($options);
 
-			case SCREEN_RESOURCE_HOSTS_INFO:
+			case SCREEN_RESOURCE_HOST_INFO:
 				return new CScreenHostsInfo($options);
 
-			case SCREEN_RESOURCE_TRIGGERS_INFO:
+			case SCREEN_RESOURCE_TRIGGER_INFO:
 				return new CScreenTriggersInfo($options);
 
 			case SCREEN_RESOURCE_SERVER_INFO:
@@ -228,7 +228,7 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_SCREEN:
 				return new CScreenScreen($options);
 
-			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+			case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 				return new CScreenTriggersOverview($options);
 
 			case SCREEN_RESOURCE_DATA_OVERVIEW:
@@ -277,6 +277,12 @@ class CScreenBuilder {
 				return new CScreenHttpTest($options);
 
 			case SCREEN_RESOURCE_PROBLEM:
+				if (array_key_exists('period', $options)) {
+					$options['data']['filter']['period'] = $options['period'];
+				}
+				if (array_key_exists('stime', $options)) {
+					$options['data']['filter']['stime'] = $options['stime'];
+				}
 				return new CScreenProblem($options);
 
 			default:
@@ -568,7 +574,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 					if (!$emptyScreenRow) {
-						$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
+						$link->addConfirmation(_('This screen row is not empty. Delete it?'));
 					}
 				}
 
@@ -614,7 +620,7 @@ class CScreenBuilder {
 						->addSID();
 
 					if (array_key_exists($i, $emptyScreenColumns)) {
-						$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
+						$link->addConfirmation(_('This screen column is not empty. Delete it?'));
 					}
 				}
 

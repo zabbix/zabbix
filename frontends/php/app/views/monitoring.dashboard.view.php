@@ -19,17 +19,7 @@
 **/
 
 
-$this->addJSfile('js/class.pmaster.js');
-
-$dashboard = (new CWidget())
-	->setTitle(_('Dashboard'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		)
-	);
+$this->addJsFile('class.pmaster.js');
 
 /*
  * Dashboard grid
@@ -143,7 +133,7 @@ foreach ($widgets as $widgetid => $widget) {
 		->setTitle(_('Action'))
 		->setMenuPopup(CMenuPopupHelper::getRefresh($widgetid, $rate));
 
-	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
+	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass(ZBX_STYLE_PRELOADER)))
 		->setExpanded($expanded)
 		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
 		->setFooter((new CList())->setId($widgetid.'_footer'));
@@ -162,19 +152,28 @@ foreach ($dashboardGrid as $key => $val) {
 	ksort($dashboardGrid[$key]);
 }
 
-$dashboardRow = (new CDiv(
-	[
-		(new CDiv($dashboardGrid[0]))->addClass('cell'),
-		(new CDiv($dashboardGrid[1]))->addClass('cell'),
-		(new CDiv($dashboardGrid[2]))->addClass('cell')
-	]))
-	->addClass('row');
-
-$dashboardTable = (new CDiv($dashboardRow))
-	->addClass('table')
-	->addClass('widget-placeholder');
-
-$dashboard->addItem($dashboardTable)->show();
+(new CWidget())
+	->setTitle(_('Dashboard'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		)
+	)
+	->addItem(
+		(new CDiv(
+			(new CDiv([
+				(new CDiv($dashboardGrid[0]))->addClass(ZBX_STYLE_CELL),
+				(new CDiv($dashboardGrid[1]))->addClass(ZBX_STYLE_CELL),
+				(new CDiv($dashboardGrid[2]))->addClass(ZBX_STYLE_CELL)
+			]))
+				->addClass(ZBX_STYLE_ROW)
+		))
+			->addClass(ZBX_STYLE_TABLE)
+			->addClass('widget-placeholder')
+	)
+	->show();
 
 /*
  * Javascript

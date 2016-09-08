@@ -156,110 +156,21 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		]);
 		order_result($data['groups'], 'name');
 
-		$group_ids = array_values($data['user_groups']);
-		if (count($group_ids) == 0) {
-			$group_ids = [-1];
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$data['groups_rights'] = [
+				'0' => [
+					'permission' => PERM_READ_WRITE,
+					'name' => '',
+					'grouped' => '1'
+				]
+			];
 		}
-		$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
-
-		// deny beat all, read-write beat read
-		$tmp_permissions = [];
-		while ($db_right = DBfetch($db_rights)) {
-			if (isset($tmp_permissions[$db_right['id']]) && $tmp_permissions[$db_right['id']] != PERM_DENY) {
-				$tmp_permissions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
-					? PERM_DENY
-					: max($tmp_permissions[$db_right['id']], $db_right['permission']);
-			}
-			else {
-				$tmp_permissions[$db_right['id']] = $db_right['permission'];
-			}
-		}
-
-		$data['user_rights'] = [];
-		foreach ($tmp_permissions as $id => $permission) {
-			array_push($data['user_rights'], ['id' => $id, 'permission' => $permission]);
+		else {
+			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($data['user_groups']));
 		}
 	}
 
 	return $data;
-}
-
-function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
-	// group
-	$lists['group']['label']		= _('Host groups');
-	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
-	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
-	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
-
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY);
-
-	foreach ($groups as $group) {
-		switch($group['permission']) {
-			case PERM_READ:
-				$list_name = 'read_only';
-				break;
-			case PERM_READ_WRITE:
-				$list_name = 'read_write';
-				break;
-			default:
-				$list_name = 'deny';
-		}
-		$lists['group'][$list_name]->addItem($group['groupid'], $group['name']);
-	}
-	unset($groups);
-
-	// host
-	$lists['host']['label']		= _('Hosts');
-	$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
-	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
-	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
-
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY);
-
-	foreach ($hosts as $host) {
-		switch($host['permission']) {
-			case PERM_READ:
-				$list_name = 'read_only';
-				break;
-			case PERM_READ_WRITE:
-				$list_name = 'read_write';
-				break;
-			default:
-				$list_name = 'deny';
-		}
-		if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
-			$host['host_name'] = $host['host'];
-		}
-		$lists['host'][$list_name]->addItem($host['hostid'], $host['host_name']);
-	}
-	unset($hosts);
-
-	// display
-	if (empty($rightsFormList)) {
-		$rightsFormList = new CFormList('rightsFormList');
-	}
-	$isHeaderDisplayed = false;
-	foreach ($lists as $list) {
-		$sLabel = '';
-		$row = new CRow();
-		foreach ($list as $class => $item) {
-			if (is_string($item)) {
-				$sLabel = $item;
-			}
-			else {
-				$row->addItem((new CCol($item))->addClass($class));
-			}
-		}
-
-		$table = new CTable();
-		if (!$isHeaderDisplayed) {
-			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
-			$isHeaderDisplayed = true;
-		}
-		$table->addRow($row);
-		$rightsFormList->addRow($sLabel, $table);
-	}
-	return $rightsFormList;
 }
 
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
@@ -1345,6 +1256,8 @@ function getTriggerMassupdateFormData() {
 		'visible' => getRequest('visible', []),
 		'priority' => getRequest('priority', ''),
 		'dependencies' => getRequest('dependencies', []),
+		'tags' => getRequest('tags', []),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
@@ -1381,6 +1294,10 @@ function getTriggerMassupdateFormData() {
 	unset($dependency);
 
 	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }
@@ -1501,6 +1418,7 @@ function getTriggerFormData(array $data) {
 			$data['recovery_mode'] = $trigger['recovery_mode'];
 			$data['correlation_mode'] = $trigger['correlation_mode'];
 			$data['correlation_tag'] = $trigger['correlation_tag'];
+			$data['manual_close'] = $trigger['manual_close'];
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];

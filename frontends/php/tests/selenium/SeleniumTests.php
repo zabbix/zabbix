@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageStatusOfTriggers.php';
-require_once dirname(__FILE__).'/testPageEvents.php';
+require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
@@ -127,7 +127,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageDiscoveryRules');
-		$suite->addTestSuite('testPageEvents');
+		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');

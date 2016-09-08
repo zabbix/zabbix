@@ -28,7 +28,7 @@ class CScreenTriggersInfo extends CScreenBase {
 	 */
 	public function get() {
 		$header = (new CDiv([
-			new CTag('h4', true, _('Triggers info'))
+			new CTag('h4', true, _('Trigger info'))
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 		if ($this->screenitem['resourceid'] != 0) {

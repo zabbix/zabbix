@@ -125,8 +125,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 												]
 											],
 											'tags' => [],
-											'correlation_mode' => 0,
-											'correlation_tag' => ''
+											'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+											'correlation_tag' => '',
+											'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 										]
 									]
 								]
@@ -151,8 +152,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 												]
 											],
 											'tags' => [],
-											'correlation_mode' => 0,
-											'correlation_tag' => ''
+											'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+											'correlation_tag' => '',
+											'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 										]
 									]
 								]
@@ -173,8 +175,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 								]
 							],
 							'tags' => [],
-							'correlation_mode' => 0,
-							'correlation_tag' => ''
+							'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+							'correlation_tag' => '',
+							'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 						]
 					],
 					'maps' => [

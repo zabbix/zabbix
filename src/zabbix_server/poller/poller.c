@@ -681,7 +681,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 #ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
-		init_snmp(progname);
+		zbx_init_snmp();
 #endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

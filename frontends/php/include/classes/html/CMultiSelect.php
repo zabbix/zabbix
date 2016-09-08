@@ -59,7 +59,7 @@ class CMultiSelect extends CTag {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew'] as $option) {
+		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'nested', 'styles'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
 			}

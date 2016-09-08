@@ -31,10 +31,11 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestInputTypeWait('name', 'Admin');
 		$this->zbxTestInputTypeWait('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
+		$this->zbxTestTextNotPresent('Login name or password is incorrect.');
 
+		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');
-		$this->zbxTestCheckHeader('Dashboard');
 
 		$this->zbxTestClickXpathWait("//ul[@class='top-nav-icons']//a[@class='top-nav-signout']");
 		$this->zbxTestTextPresent('Username');

@@ -547,7 +547,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 					" left join opconditions oc"
 						" on oc.operationid=o.operationid"
 					" where o.actionid=" ZBX_FS_UI64
-					" group by o.operationid",
+					" group by o.operationid,o.operationtype,o.esc_step_from,o.esc_step_to",
 					actionid);
 
 		while (NULL != (row = DBfetch(result)))
@@ -1119,7 +1119,7 @@ static int	DBpatch_3010026(void)
 			" from actions a"
 			" left join conditions c"
 				" on a.actionid=c.actionid"
-			" group by a.actionid");
+			" group by a.actionid,a.name,a.evaltype");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1251,62 +1251,6 @@ static int	DBpatch_3010039(void)
 	const ZBX_FIELD	field = {"eventid", NULL, "problem", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("problem_tag", 1, &field);
-}
-
-static int	DBpatch_3010040(void)
-{
-	const ZBX_FIELD	field = {"problem_count", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("triggers", &field);
-}
-
-static int	DBpatch_3010041(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		ret = FAIL, value, problem_count;
-	char		*sql = NULL;
-	size_t		sql_alloc = 4096, sql_offset = 0;
-
-	sql = zbx_malloc(NULL, sql_alloc);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	result = DBselect("select t.triggerid,count(p.objectid) from triggers t"
-				" left join problem p on p.source=0"
-					" and p.object=0"
-					" and p.objectid=t.triggerid"
-				" group by t.triggerid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		problem_count = atoi(row[1]);
-		value = (0 == problem_count ? 0 : 1);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update triggers"
-					" set value=%d,"
-					"problem_count=%d"
-				" where triggerid=%s;\n",
-				value, problem_count, row[0]);
-
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	DBfree_result(result);
-	zbx_free(sql);
-
-	return ret;
 }
 
 static int	DBpatch_3010042(void)
@@ -1553,26 +1497,173 @@ static int	DBpatch_3010067(void)
 
 static int	DBpatch_3010068(void)
 {
+	/* state: 0 - TRIGGER_STATE_NORMAL */
+	/* flags: 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK <= DBexecute("update triggers set error='',state=0 where flags=2"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3010069(void)
+{
+	const ZBX_TABLE table =
+			{"task", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010070(void)
+{
+	const ZBX_TABLE table =
+			{"task_close_problem", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010071(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_close_problem", 1, &field);
+}
+
+static int	DBpatch_3010072(void)
+{
+	const ZBX_FIELD	field = {"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3010073(void)
+{
+	const ZBX_FIELD	field = {"manual_close", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010074(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("event_recovery", &field);
+}
+
+static int	DBpatch_3010075(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010076(void)
+{
+	const char	*sql = "delete from profiles where idx in ("
+			"'web.events.discovery.period',"
+			"'web.events.filter.state',"
+			"'web.events.filter.triggerid',"
+			"'web.events.source',"
+			"'web.events.timelinefixed',"
+			"'web.events.trigger.period'"
+		")";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3010077(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("groups", &field);
+}
+
+static int	DBpatch_3010078(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_prototype", &field);
+}
+
+static int	DBpatch_3010079(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select p.eventid,e.clock,e.ns"
+			" from problem p,events e"
+			" where p.eventid=e.eventid"
+				" and p.clock=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update problem set clock=%s,ns=%s where eventid=%s;\n",
+				row[1], row[2], row[0]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3010080(void)
+{
 	const ZBX_FIELD field = {"snmp_oid", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field);
 }
 
-static int	DBpatch_3010069(void)
+static int	DBpatch_3010081(void)
 {
 	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("dchecks", &field);
 }
 
-static int	DBpatch_3010070(void)
+static int	DBpatch_3010082(void)
 {
 	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("dservices", &field);
 }
 
-static int	DBpatch_3010071(void)
+static int	DBpatch_3010083(void)
 {
 	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -1625,8 +1716,6 @@ DBPATCH_ADD(3010036, 0, 1)
 DBPATCH_ADD(3010037, 0, 1)
 DBPATCH_ADD(3010038, 0, 1)
 DBPATCH_ADD(3010039, 0, 1)
-DBPATCH_ADD(3010040, 0, 1)
-DBPATCH_ADD(3010041, 0, 1)
 DBPATCH_ADD(3010042, 0, 1)
 DBPATCH_ADD(3010043, 0, 1)
 DBPATCH_ADD(3010044, 0, 1)
@@ -1653,9 +1742,21 @@ DBPATCH_ADD(3010064, 0, 1)
 DBPATCH_ADD(3010065, 0, 1)
 DBPATCH_ADD(3010066, 0, 1)
 DBPATCH_ADD(3010067, 0, 1)
-DBPATCH_ADD(3010068, 0, 1)
+DBPATCH_ADD(3010068, 0, 0)
 DBPATCH_ADD(3010069, 0, 1)
 DBPATCH_ADD(3010070, 0, 1)
 DBPATCH_ADD(3010071, 0, 1)
+DBPATCH_ADD(3010072, 0, 1)
+DBPATCH_ADD(3010073, 0, 1)
+DBPATCH_ADD(3010074, 0, 1)
+DBPATCH_ADD(3010075, 0, 1)
+DBPATCH_ADD(3010076, 0, 0)
+DBPATCH_ADD(3010077, 0, 1)
+DBPATCH_ADD(3010078, 0, 1)
+DBPATCH_ADD(3010079, 0, 1)
+DBPATCH_ADD(3010080, 0, 1)
+DBPATCH_ADD(3010081, 0, 1)
+DBPATCH_ADD(3010082, 0, 1)
+DBPATCH_ADD(3010083, 0, 1)
 
 DBPATCH_END()

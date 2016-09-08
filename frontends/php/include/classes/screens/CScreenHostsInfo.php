@@ -90,7 +90,7 @@ class CScreenHostsInfo extends CScreenBase {
 		$total = new CCol($total.'  '._('Total'));
 
 		$header = (new CDiv([
-			new CTag('h4', true, _('Hosts info'))
+			new CTag('h4', true, _('Host info'))
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 		if ($this->screenitem['resourceid'] != 0) {

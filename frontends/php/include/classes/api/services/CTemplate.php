@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with template.
- *
- * @package API
  */
 class CTemplate extends CHostGeneral {
 

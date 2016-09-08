@@ -25,7 +25,9 @@ class CControllerAcknowledgeCreate extends CController {
 		$fields = [
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
-			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
+			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
+			'close_problem' =>		'db acknowledges.action|in '.
+										ZBX_ACKNOWLEDGE_ACTION_NONE.','.ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM,
 			'backurl' =>			'string'
 		];
 
@@ -62,34 +64,109 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function doAction() {
 		$eventids = $this->getInput('eventids');
 		$acknowledge_type = $this->getInput('acknowledge_type');
-
+		$close_problem = $this->getInput('close_problem', ZBX_ACKNOWLEDGE_ACTION_NONE);
+		$eventids_to_ack = $eventids;
 		$result = true;
 
-		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $acknowledge_type == ZBX_ACKNOWLEDGE_ALL) {
+		// Select events with trigger IDs only if there is a need to close problems or to find related all other events.
+		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			// Get trigger IDs for selected events.
 			$events = API::Event()->get([
-				'output' => ['objectid'],
+				'output' => ['eventid', 'objectid'],
+				'eventids' => $eventids,
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
-				'eventids' => $eventids
+				'preservekeys' => true
+			]);
+			$triggerids = zbx_objectValues($events, 'objectid');
+		}
+
+		if ($close_problem == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+			// User should have read-write permissions to trigger and trigger must have "manual_close" set to "1".
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'triggerids' => $triggerids,
+				'filter' => ['manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED],
+				'editable' => true,
+				'preservekeys' => true
 			]);
 
-			$triggerids = zbx_objectValues($events, 'objectid');
+			// Get problem events and check if they can be closed.
+			$problem_events = API::Event()->get([
+				'output' => ['eventid', 'objectid', 'r_eventid'],
+				'select_acknowledges' => ['action'],
+				'eventids' => array_keys($events),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value' => TRIGGER_VALUE_TRUE,
+				'preservekeys' => true
+			]);
 
-			$filter = [
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-			];
+			$eventids_to_close = [];
 
-			if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
-				$filter['value'] = TRIGGER_VALUE_TRUE;
+			// Collect event IDs that can be closed.
+			foreach ($problem_events as $problem_event) {
+				if (array_key_exists($problem_event['objectid'], $triggers)) {
+					// Check if it was closed by event recovery. If so, skip to next event.
+					if ($problem_event['r_eventid'] != 0) {
+						continue;
+					}
+
+					$event_closed = false;
+
+					// Check if it was manually closed.
+					if ($problem_event['acknowledges']) {
+						foreach ($problem_event['acknowledges'] as $acknowledge) {
+							if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+								$event_closed = true;
+								break;
+							}
+						}
+					}
+
+					if (!$event_closed) {
+						$eventids_to_close[$problem_event['eventid']] = $problem_event['eventid'];
+					}
+				}
 			}
 
+			// The remaining events can be acknowledged.
+			$eventids_to_ack = array_diff($eventids, $eventids_to_close);
+
+			// Acknowledge and close problems.
+			if ($eventids_to_close) {
+				$result = API::Event()->acknowledge([
+					'eventids' => $eventids_to_close,
+					'message' => $this->getInput('message', ''),
+					'action' => $close_problem
+				]);
+			}
+		}
+
+		/*
+		 * There might be nothing more to acknowledge since previous action closed all the events. This will also
+		 * acknowlege only selected events in case there is no need to close the events.
+		 */
+		if ($result && $eventids_to_ack) {
+			$result = API::Event()->acknowledge([
+				'eventids' => $eventids_to_ack,
+				'message' => $this->getInput('message', '')
+			]);
+		}
+
+		// If previous action was success and there is a need to acknowledge all other problem events.
+		if ($result && $acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
 			while ($result) {
+				// Filter unacknowledged events by trigger IDs. Selected events were already acknowledged (and closed).
 				$events = API::Event()->get([
 					'output' => [],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => $triggerids,
-					'filter' => $filter,
+					'filter' => [
+						'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
+						'value' => TRIGGER_VALUE_TRUE
+					],
 					'preservekeys' => true,
 					'limit' => ZBX_DB_MAX_INSERTS
 				]);
@@ -110,13 +187,6 @@ class CControllerAcknowledgeCreate extends CController {
 					break;
 				}
 			}
-		}
-
-		if ($result && $eventids) {
-			$result = API::Event()->acknowledge([
-				'eventids' => $eventids,
-				'message' => $this->getInput('message', '')
-			]);
 		}
 
 		if ($result) {

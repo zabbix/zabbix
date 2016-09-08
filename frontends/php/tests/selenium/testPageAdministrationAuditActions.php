@@ -35,7 +35,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestAssertElementPresentId('btn1');
 		$this->zbxTestAssertElementPresentXpath("//button[@name='filter_set']");
 		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
-		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient(s)', 'Message', 'Status', 'Info']);
+		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient', 'Message', 'Status', 'Info']);
 
 	}
 
@@ -64,7 +64,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 			$status = 'Sent';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] == 0) {
-			$status = 'Not sent';
+			$status = 'Failed';
 		}
 		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] <> 0) {
 			$status = 'In progress';

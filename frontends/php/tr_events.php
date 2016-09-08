@@ -81,11 +81,16 @@ $events = API::Event()->get([
 	'select_alerts' => API_OUTPUT_EXTEND,
 	'select_acknowledges' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_EXTEND,
+	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
 ]);
+
+if (!$events) {
+	access_deny();
+}
 
 $event = reset($events);
 
@@ -94,28 +99,19 @@ $event = reset($events);
  */
 $config = select_config();
 
-$correlation = [];
-if ($event['correlationid'] != 0) {
-	$correlation = API::Correlation()->get([
-		'output' => ['correlationid', 'name'],
-		'correlationids' => [$event['correlationid']]
-	]);
-	$correlation = $correlation[0];
-}
-
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
 			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
 				->setHeader(_('Event source details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
-				make_event_details($event, $correlation, $trigger,
+				make_event_details($event, $trigger,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			$config['event_ack_enable']
+			($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE)
 				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledges'), [], false, 'tr_events.php')

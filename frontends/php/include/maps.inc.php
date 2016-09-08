@@ -2152,8 +2152,6 @@ function populateFromMapAreas(array &$map) {
  * @param array $map
  * @param array $areas
  * @param array $mapInfo
- *
- * @return void
  */
 function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 	foreach ($areas as $area) {

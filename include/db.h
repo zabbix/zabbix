@@ -79,11 +79,10 @@ struct	_DC_TRIGGER;
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
-#define TRIGGER_TAG_LEN			255
-#define TRIGGER_TAG_VALUE_LEN		255
-#define TRIGGER_CORRELATION_TAG_LEN	TRIGGER_TAG_LEN
+#define TAG_NAME_LEN			255
+#define TAG_VALUE_LEN			255
 
-#define GROUP_NAME_LEN			64
+#define GROUP_NAME_LEN			255
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
@@ -492,28 +491,31 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	unsigned char	value;
 	unsigned char	state;
+	unsigned char	priority;
 	int		lastchange;
 	int		problem_count;
 	char		*error;
 
-#define ZBX_FLAGS_TRIGGER_DIFF_UNSET			0x0000
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE		0x0001
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE	0x0002
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE		0x0004
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR		0x0008
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT	0x0010
+#define ZBX_FLAGS_TRIGGER_DIFF_UNSET				0x0000
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE			0x0001
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE		0x0002
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE			0x0004
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR			0x0008
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT		0x0010
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE										\
 		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE | 		\
 		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR |			\
 		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT)
+#define ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT	0x1000
 	zbx_uint64_t			flags;
 }
 zbx_trigger_diff_t;
 
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs);
 void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
+void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
+		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
@@ -544,7 +546,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
-int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
+int	DBupdate_itservices(zbx_vector_ptr_t *trigger_diff);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
 void	zbx_create_itservices_lock();

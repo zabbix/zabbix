@@ -28,7 +28,7 @@ if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
 
 $pageHeader = new CPageHeader($page_title);
 
-$scripts = [];
+$scripts = $data['javascript']['files'];
 
 $theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
@@ -43,23 +43,17 @@ if (!empty($DB['DB'])) {
 	}
 }
 $pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
-
-$pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 // show GUI messages in pages with menus and in fullscreen mode
 $showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
+$pageHeader->addJsFile('js/browsers.js');
 $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&showGuiMessaging='.$showGuiMessaging;
 $pageHeader->addJsFile($path);
 
 if ($scripts) {
 	$pageHeader->addJsFile('jsLoader.php?'.'files[]='.implode('&amp;files[]=', $scripts));
 }
-
-foreach ($data['javascript']['files'] as $path) {
-	$pageHeader->addJsFile($path);
-}
-
 $pageHeader->display();
 
 echo '<body>';

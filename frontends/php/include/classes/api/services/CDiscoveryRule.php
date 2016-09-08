@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery rules.
- *
- * @package API
  */
 class CDiscoveryRule extends CItemGeneral {
 
@@ -396,7 +394,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
 		if (!empty($iprototypeids)) {
-			if (!API::Itemprototype()->delete($iprototypeids, true)) {
+			if (!API::ItemPrototype()->delete($iprototypeids, true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 		}
@@ -558,13 +556,14 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
-				'templateid', 'type', 'recovery_mode', 'recovery_expression'
+				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['triggerid'],
+			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
 

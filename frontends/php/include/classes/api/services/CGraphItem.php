@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with graph items.
- *
- * @package API
  */
 class CGraphItem extends CApiService {
 

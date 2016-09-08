@@ -37,11 +37,11 @@ $fields = [
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
-	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	'isset({add}) || isset({update})'],
+	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	'isset({add}) || isset({update})'],
+	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'status' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
@@ -54,6 +54,12 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+													]),
+													null
+												],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -191,33 +197,54 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
+	$description = getRequest('description', '');
+	$expression = getRequest('expression', '');
+	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
+	$recovery_expression = getRequest('recovery_expression', '');
+	$type = getRequest('type', 0);
+	$url = getRequest('url', '');
+	$priority = getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED);
+	$comments = getRequest('comments', '');
+	$correlation_mode = getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
+	$correlation_tag = getRequest('correlation_tag', '');
+	$manual_close = getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED);
+	$status = getRequest('status', TRIGGER_STATUS_ENABLED);
+
 	if (hasRequest('add')) {
-		$trigger = [
-			'description' => getRequest('description'),
-			'expression' => getRequest('expression'),
-			'recovery_mode' => getRequest('recovery_mode'),
-			'type' => getRequest('type'),
-			'url' => getRequest('url'),
-			'priority' => getRequest('priority'),
-			'comments' => getRequest('comments'),
+		$trigger_prototype = [
+			'description' => $description,
+			'expression' => $expression,
+			'recovery_mode' => $recovery_mode,
+			'type' => $type,
+			'url' => $url,
+			'priority' => $priority,
+			'comments' => $comments,
 			'tags' => $tags,
+			'manual_close' => $manual_close,
 			'dependencies' => $dependencies,
-			'status' => getRequest('status'),
-			'correlation_mode' => getRequest('correlation_mode'),
-			'correlation_tag' => getRequest('correlation_tag')
+			'status' => $status
 		];
-		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-			$trigger['recovery_expression'] = getRequest('recovery_expression');
+		switch ($recovery_mode) {
+			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+				$trigger_prototype['recovery_expression'] = $recovery_expression;
+				// break; is not missing here
+
+			case ZBX_RECOVERY_MODE_EXPRESSION:
+				$trigger_prototype['correlation_mode'] = $correlation_mode;
+				if ($correlation_mode == ZBX_TRIGGER_CORRELATION_TAG) {
+					$trigger_prototype['correlation_tag'] = $correlation_tag;
+				}
+				break;
 		}
 
-		$result = (bool) API::TriggerPrototype()->create($trigger);
+		$result = (bool) API::TriggerPrototype()->create($trigger_prototype);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -233,38 +260,45 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$trigger_prototype = [];
 
 		if ($db_trigger_prototype['templateid'] == 0) {
-			if ($db_trigger_prototype['description'] !== getRequest('description')) {
-				$trigger_prototype['description'] = getRequest('description');
+			if ($db_trigger_prototype['description'] !== $description) {
+				$trigger_prototype['description'] = $description;
 			}
-			if ($db_trigger_prototype['expression'] !== getRequest('expression')) {
-				$trigger_prototype['expression'] = getRequest('expression');
+			if ($db_trigger_prototype['expression'] !== $expression) {
+				$trigger_prototype['expression'] = $expression;
 			}
-			if ($db_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
-				$trigger_prototype['recovery_mode'] = getRequest('recovery_mode');
+			if ($db_trigger_prototype['recovery_mode'] != $recovery_mode) {
+				$trigger_prototype['recovery_mode'] = $recovery_mode;
 			}
-			if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-					&& $db_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
-				$trigger_prototype['recovery_expression'] = getRequest('recovery_expression');
-			}
-			if ($db_trigger_prototype['correlation_mode'] != getRequest('correlation_mode')) {
-				$trigger_prototype['correlation_mode'] = getRequest('correlation_mode');
-			}
-			if ($db_trigger_prototype['correlation_tag'] !== getRequest('correlation_tag')) {
-				$trigger_prototype['correlation_tag'] = getRequest('correlation_tag');
+			switch ($recovery_mode) {
+				case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+					if ($db_trigger_prototype['recovery_expression'] !== $recovery_expression) {
+						$trigger_prototype['recovery_expression'] = $recovery_expression;
+					}
+					// break; is not missing here
+
+				case ZBX_RECOVERY_MODE_EXPRESSION:
+					if ($db_trigger_prototype['correlation_mode'] != $correlation_mode) {
+						$trigger_prototype['correlation_mode'] = $correlation_mode;
+					}
+					if ($correlation_mode == ZBX_TRIGGER_CORRELATION_TAG
+							&& $db_trigger_prototype['correlation_tag'] !== $correlation_tag) {
+						$trigger_prototype['correlation_tag'] = $correlation_tag;
+					}
+					break;
 			}
 		}
 
-		if ($db_trigger_prototype['type'] != getRequest('type')) {
-			$trigger_prototype['type'] = getRequest('type');
+		if ($db_trigger_prototype['type'] != $type) {
+			$trigger_prototype['type'] = $type;
 		}
-		if ($db_trigger_prototype['url'] !== getRequest('url')) {
-			$trigger_prototype['url'] = getRequest('url');
+		if ($db_trigger_prototype['url'] !== $url) {
+			$trigger_prototype['url'] = $url;
 		}
-		if ($db_trigger_prototype['priority'] != getRequest('priority')) {
-			$trigger_prototype['priority'] = getRequest('priority');
+		if ($db_trigger_prototype['priority'] != $priority) {
+			$trigger_prototype['priority'] = $priority;
 		}
-		if ($db_trigger_prototype['comments'] !== getRequest('comments')) {
-			$trigger_prototype['comments'] = getRequest('comments');
+		if ($db_trigger_prototype['comments'] !== $comments) {
+			$trigger_prototype['comments'] = $comments;
 		}
 
 		$db_tags = $db_trigger_prototype['tags'];
@@ -274,6 +308,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$trigger_prototype['tags'] = $tags;
 		}
 
+		if ($db_trigger_prototype['manual_close'] != $manual_close) {
+			$trigger_prototype['manual_close'] = $manual_close;
+		}
+
 		$db_dependencies = $db_trigger_prototype['dependencies'];
 		CArrayHelper::sort($db_dependencies, ['triggerid']);
 		CArrayHelper::sort($dependencies, ['triggerid']);
@@ -281,8 +319,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$trigger_prototype['dependencies'] = $dependencies;
 		}
 
-		if ($db_trigger_prototype['status'] != getRequest('status')) {
-			$trigger_prototype['status'] = getRequest('status');
+		if ($db_trigger_prototype['status'] != $status) {
+			$trigger_prototype['status'] = $status;
 		}
 
 		if ($trigger_prototype) {
@@ -327,22 +365,51 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	$visible = getRequest('visible', []);
 
 	if ($visible) {
-		$triggersToUpdate = [];
+		$triggerids = getRequest('g_triggerid');
+		$triggers_to_update = [];
 
-		foreach (getRequest('g_triggerid') as $triggerId) {
-			$trigger = ['triggerid' => $triggerId];
+		$triggers = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'templateid'],
+			'triggerids' => $triggerids,
+			'preservekeys' => true
+		]);
 
-			if (isset($visible['priority'])) {
-				$trigger['priority'] = getRequest('priority');
+		if ($triggers) {
+			$tags = getRequest('tags', []);
+
+			// Remove empty new tag lines.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
 			}
-			if (isset($visible['dependencies'])) {
-				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-			}
 
-			$triggersToUpdate[] = $trigger;
+			foreach ($triggerids as $triggerid) {
+				if (array_key_exists($triggerid, $triggers)) {
+					$trigger = ['triggerid' => $triggerid];
+
+					if (array_key_exists('priority', $visible)) {
+						$trigger['priority'] = getRequest('priority');
+					}
+
+					if (array_key_exists('dependencies', $visible)) {
+						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+					}
+
+					if (array_key_exists('tags', $visible)) {
+						$trigger['tags'] = $tags;
+					}
+
+					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+						$trigger['manual_close'] = getRequest('manual_close');
+					}
+
+					$triggers_to_update[] = $trigger;
+				}
+			}
 		}
 
-		$result = (bool) API::TriggerPrototype()->update($triggersToUpdate);
+		$result = (bool) API::TriggerPrototype()->update($triggers_to_update);
 	}
 
 	if ($result) {
@@ -352,8 +419,9 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') == 'triggerprototype.massenable');
-	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$status = (getRequest('action') == 'triggerprototype.massenable')
+		? TRIGGER_STATUS_ENABLED
+		: TRIGGER_STATUS_DISABLED;
 	$update = [];
 
 	// get requested triggers with permission check
@@ -383,12 +451,8 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 
 	$updated = count($update);
 
-	$messageSuccess = $enable
-		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
-		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
-		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
+	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
+	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
@@ -400,6 +464,8 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 	}
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
 }
+
+$config = select_config();
 
 /*
  * Display
@@ -415,6 +481,7 @@ if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdat
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
+		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -425,11 +492,11 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression' => getRequest('recovery_expression', ''),
 		'expr_temp' => getRequest('expr_temp', ''),
 		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
-		'recovery_mode' => getRequest('recovery_mode', 0),
+		'recovery_mode' => getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
 		'description' => getRequest('description', ''),
 		'type' => getRequest('type', 0),
-		'priority' => getRequest('priority', 0),
-		'status' => getRequest('status', 0),
+		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
 		'comments' => getRequest('comments', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
@@ -441,7 +508,8 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
-		'correlation_tag' => getRequest('correlation_tag', '')
+		'correlation_tag' => getRequest('correlation_tag', ''),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	]);
 
 	$data['hostid'] = $discoveryRule['hostid'];
@@ -456,8 +524,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'parent_discoveryid' => getRequest('parent_discoveryid'),

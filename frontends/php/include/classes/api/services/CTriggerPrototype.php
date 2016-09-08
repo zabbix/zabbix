@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with trigger prototypes.
- *
- * @package API
  */
 class CTriggerPrototype extends CTriggerGeneral {
 

@@ -35,7 +35,7 @@ class testFormHostGroup extends CWebTest {
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 64);
+		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
 
 		$this->zbxTestAssertElementPresentId('twb_groupid');
 

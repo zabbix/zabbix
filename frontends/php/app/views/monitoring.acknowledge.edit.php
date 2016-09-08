@@ -32,13 +32,14 @@ $form_list = (new CFormList())
 if (array_key_exists('event', $data)) {
 	$acknowledgesTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Time'), _('User'), _('Message')]);
+		->setHeader([_('Time'), _('User'), _('Message'), _('User action')]);
 
 	foreach ($data['event']['acknowledges'] as $acknowledge) {
 		$acknowledgesTable->addRow([
 			(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock'])))->addClass(ZBX_STYLE_NOWRAP),
 			(new CCol(getUserFullname($acknowledge)))->addClass(ZBX_STYLE_NOWRAP),
-			zbx_nl2br($acknowledge['message'])
+			zbx_nl2br($acknowledge['message']),
+			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
 		]);
 	}
 
@@ -51,29 +52,30 @@ if (array_key_exists('event', $data)) {
 
 $selected_events = count($data['eventids']);
 
-$form_list->addRow(_('Acknowledge'),
-	(new CDiv(
-		(new CRadioButtonList('acknowledge_type', (int) $data['acknowledge_type']))
-			->makeVertical()
-			->addValue([
-				_n('Only selected event', 'Only selected events', $selected_events),
-				$selected_events > 1 ? (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN) : null,
-				$selected_events > 1 ? new CSup(_n('%1$s event', '%1$s events', $selected_events)) : null
-			], ZBX_ACKNOWLEDGE_SELECTED)
-			->addValue([
-				_('Selected and all unacknowledged PROBLEM events'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CSup(_n('%1$s event', '%1$s events', $data['unack_problem_events_count']))
-			], ZBX_ACKNOWLEDGE_PROBLEM)
-			->addValue([
-				_('Selected and all unacknowledged events'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CSup(_n('%1$s event', '%1$s events', $data['unack_events_count']))
-			], ZBX_ACKNOWLEDGE_ALL)
-	))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-);
+$form_list
+	->addRow(_('Acknowledge'),
+		(new CDiv(
+			(new CRadioButtonList('acknowledge_type', (int) $data['acknowledge_type']))
+				->makeVertical()
+				->addValue([
+					_n('Only selected problem', 'Only selected problems', $selected_events),
+					$selected_events > 1 ? (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN) : null,
+					$selected_events > 1 ? new CSup(_n('%1$s event', '%1$s events', $selected_events)) : null
+				], ZBX_ACKNOWLEDGE_SELECTED)
+				->addValue([
+					_('Selected and all other unacknowledged problems of related triggers'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CSup(_n('%1$s event', '%1$s events', $data['unack_problem_events_count']))
+				], ZBX_ACKNOWLEDGE_PROBLEM)
+		))
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	)
+	->addRow(_('Close problem'),
+		(new CCheckBox('close_problem'))
+			->setChecked($data['close_problem'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM)
+			->setEnabled($data['close_problem_chbox'])
+	);
 
 $footer_buttons = makeFormFooter(
 	new CSubmitButton(_('Acknowledge'), 'action', 'acknowledge.create'),
@@ -81,7 +83,7 @@ $footer_buttons = makeFormFooter(
 );
 
 (new CWidget())
-	->setTitle(_('Alarm acknowledgements'))
+	->setTitle(_('Event acknowledgements'))
 	->addItem(
 		(new CForm())
 			->setId('acknowledge_form')

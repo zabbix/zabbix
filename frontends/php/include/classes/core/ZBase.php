@@ -86,6 +86,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/perm.inc.php';
 		require_once $this->getRootDir().'/include/audit.inc.php';
 		require_once $this->getRootDir().'/include/js.inc.php';
+		require_once $this->getRootDir().'/include/groups.inc.php';
 		require_once $this->getRootDir().'/include/users.inc.php';
 		require_once $this->getRootDir().'/include/validate.inc.php';
 		require_once $this->getRootDir().'/include/profiles.inc.php';
@@ -367,8 +368,10 @@ class ZBase {
 
 	/**
 	 * Process request and generate response. Main entry for all processing.
+	 *
+	 * @param CRouter $rourer
 	 */
-	private function processRequest($router) {
+	private function processRequest(CRouter $router) {
 		$controller = $router->getController();
 
 		$controller = new $controller();
@@ -385,6 +388,7 @@ class ZBase {
 			else {
 				$view = new CView($router->getView(), $response->getData());
 				$data['page']['title'] = $response->getTitle();
+				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
 				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
