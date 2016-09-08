@@ -9,6 +9,7 @@ libspecsysinfo_a_SOURCES = \
 	cpu.c \
 	diskio.c \
 	diskspace.c \
+	ifdata.c \
 	inodes.c \
 	kernel.c \
 	memory.c \
