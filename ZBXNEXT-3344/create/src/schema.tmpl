@@ -99,7 +99,7 @@ INDEX		|5		|maintenanceid
 
 TABLE|groups|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|name
@@ -107,7 +107,7 @@ INDEX		|1		|name
 TABLE|group_prototype|group_prototypeid|ZBX_DATA
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NULL		|0			|2|groups	|		|RESTRICT
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|group_prototype|group_prototypeid
 INDEX		|1		|hostid
@@ -605,7 +605,7 @@ FIELD		|recovery_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|recovery_expression|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|correlation_mode|t_integer	|'0'	|NOT NULL	|0
 FIELD		|correlation_tag|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|problem_count	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|manual_close	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
@@ -1074,6 +1074,7 @@ FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|2|events
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|eventid
 INDEX		|3		|clock
@@ -1378,6 +1379,7 @@ FIELD		|r_eventid	|t_id		|	|NULL		|0			|2|events	|eventid
 FIELD		|r_clock	|t_time		|'0'	|NOT NULL	|0
 FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
+FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
 
@@ -1394,6 +1396,7 @@ FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
 FIELD		|c_eventid	|t_id		|	|NULL		|0			|3|events	|eventid
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
+FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 INDEX		|1		|r_eventid
 INDEX		|2		|c_eventid
 
@@ -1440,7 +1443,15 @@ FIELD		|correlationid	|t_id		|	|NOT NULL	|0			|1|correlation
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|correlationid
 
+TABLE|task|taskid|
+FIELD		|taskid		|t_id		|	|NOT NULL	|0
+FIELD		|type		|t_integer	|	|NOT NULL	|0
+
+TABLE|task_close_problem|taskid|
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
+FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010071	|3010071
+ROW		|3010083	|3010083

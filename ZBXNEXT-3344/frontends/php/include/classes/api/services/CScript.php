@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with scripts.
- *
- * @package API
  */
 class CScript extends CApiService {
 

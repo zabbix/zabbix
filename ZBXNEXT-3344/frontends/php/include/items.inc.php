@@ -154,19 +154,11 @@ function item_data_type2str($type = null) {
 }
 
 function item_status2str($type = null) {
-	$types = [
-		ITEM_STATUS_ACTIVE => _('Enabled'),
-		ITEM_STATUS_DISABLED => _('Disabled')
-	];
 	if (is_null($type)) {
-		return $types;
+		return [ITEM_STATUS_ACTIVE => _('Enabled'), ITEM_STATUS_DISABLED => _('Disabled')];
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return ($type == ITEM_STATUS_ACTIVE) ? _('Enabled') : _('Disabled');
 }
 
 /**
@@ -209,11 +201,8 @@ function itemIndicator($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
 		return ($state == ITEM_STATE_NOTSUPPORTED) ? _('Not supported') : _('Enabled');
 	}
-	elseif ($status == ITEM_STATUS_DISABLED) {
-		return _('Disabled');
-	}
 
-	return _('Unknown');
+	return _('Disabled');
 }
 
 /**
@@ -231,11 +220,8 @@ function itemIndicatorStyle($status, $state = null) {
 			ZBX_STYLE_GREY :
 			ZBX_STYLE_GREEN;
 	}
-	elseif ($status == ITEM_STATUS_DISABLED) {
-		return ZBX_STYLE_RED;
-	}
 
-	return ZBX_STYLE_GREY;
+	return ZBX_STYLE_RED;
 }
 
 /**
@@ -251,13 +237,11 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 
 	foreach ($items as $key => $item) {
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
-			$statusOrder = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+			$sort[$key] = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
 		}
-		elseif ($item['status'] == ITEM_STATUS_DISABLED) {
-			$statusOrder = 1;
+		else {
+			$sort[$key] = 1;
 		}
-
-		$sort[$key] = $statusOrder;
 	}
 
 	if ($sortorder == ZBX_SORT_UP) {

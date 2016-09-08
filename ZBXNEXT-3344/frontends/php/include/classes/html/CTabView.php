@@ -58,8 +58,6 @@ class CTabView extends CDiv {
 	 * Disable tabs
 	 *
 	 * @param array		$disabled	disabled tabs IDs (first tab - 0, second - 1...)
-	 *
-	 * @return void
 	 */
 	public function setDisabled($disabled) {
 		$this->disabledTabs = $disabled;

@@ -257,14 +257,14 @@ class CApiService {
 			case null:
 				return false;
 
-				// if an array of fields is passed, check if the field is present in the array
+			// if an array of fields is passed, check if the field is present in the array
 			default:
 				return in_array($field, $output);
 		}
 	}
 
 	/**
-	 * Unsets fields $field from the given objects if they are not requested in $output.
+	 * Unsets fields $fields from the given objects if they are not requested in $output.
 	 *
 	 * @param array        $objects
 	 * @param array        $fields
@@ -757,7 +757,7 @@ class CApiService {
 	}
 
 	/**
-	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
+	 * Checks if the object has any fields, that are not defined in the schema or in $extraFields.
 	 *
 	 * @param string $tableName
 	 * @param array  $object
@@ -778,7 +778,7 @@ class CApiService {
 	}
 
 	/**
-	 * Checks if an objects contains any of the given parameters.
+	 * Checks if an object contains any of the given parameters.
 	 *
 	 * Example:
 	 * checkNoParameters($item, array('templateid', 'state'), _('Cannot set "%1$s" for item "%2$s".'), $item['name']);
@@ -908,8 +908,6 @@ class CApiService {
 	 * @param array  $params
 	 * @param string $paramName
 	 * @param string $value
-	 *
-	 * @return void
 	 */
 	protected function checkDeprecatedParam(array $params, $paramName, $value = null) {
 		if (isset($params[$paramName])) {

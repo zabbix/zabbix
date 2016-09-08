@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with item prototypes.
- *
- * @package API
  */
 class CItemPrototype extends CItemGeneral {
 
@@ -41,7 +39,7 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Get Itemprototype data.
+	 * Get ItemPrototype data.
 	 */
 	public function get($options = []) {
 		$result = [];
@@ -677,7 +675,7 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Update Itemprototype.
+	 * Update ItemPrototype.
 	 *
 	 * @param array $items
 	 *

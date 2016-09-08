@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with user groups.
- *
- * @package API
  */
 class CUserGroup extends CApiService {
 

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with template screen items.
- *
- * @package API
  */
 class CTemplateScreenItem extends CApiService {
 

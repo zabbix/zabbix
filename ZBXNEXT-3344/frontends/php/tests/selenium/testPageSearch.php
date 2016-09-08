@@ -34,7 +34,7 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestTextPresent('ЗАББИКС Сервер');
 		$this->zbxTestTextNotPresent('Zabbix server');
 		$this->zbxTestTextPresent('127.0.0.1');
-		$this->zbxTestTextPresent(['Latest data', 'Triggers', 'Applications', 'Items', 'Triggers', 'Graphs', 'Events']);
+		$this->zbxTestTextPresent(['Latest data', 'Triggers', 'Applications', 'Items', 'Triggers', 'Graphs', 'Problems']);
 	}
 
 	public function testPageSearch_FindNone() {

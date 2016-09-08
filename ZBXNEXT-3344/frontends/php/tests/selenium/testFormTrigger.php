@@ -356,8 +356,8 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestAssertElementValue('delete', 'Delete');
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
-				$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_name_0'));
-				$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_name_0'][@disabled]");
+				$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
+				$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 			}
 		}
 		else {
@@ -842,10 +842,10 @@ class testFormTrigger extends CWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 				}
 			}

@@ -99,6 +99,20 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
+/******************************************************************************
+ *                                                                            *
+ * Macro: ZBX_UNUSED                                                          *
+ *                                                                            *
+ * Purpose: silences compiler warning about unused function parameter         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      var       - [IN] the unused parameter                                 *
+ *                                                                            *
+ * Comments: Use only on unused, non-volatile function parameters!            *
+ *                                                                            *
+ ******************************************************************************/
+#define ZBX_UNUSED(var) (void)(var)
+
 typedef struct
 {
 	int	sec;	/* seconds */
@@ -350,12 +364,12 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define SCREEN_RESOURCE_SIMPLE_GRAPH		1
 #define SCREEN_RESOURCE_MAP			2
 #define SCREEN_RESOURCE_PLAIN_TEXT		3
-#define SCREEN_RESOURCE_HOSTS_INFO		4
-#define SCREEN_RESOURCE_TRIGGERS_INFO		5
+#define SCREEN_RESOURCE_HOST_INFO		4
+#define SCREEN_RESOURCE_TRIGGER_INFO		5
 #define SCREEN_RESOURCE_SERVER_INFO		6
 #define SCREEN_RESOURCE_CLOCK			7
 #define SCREEN_RESOURCE_SCREEN			8
-#define SCREEN_RESOURCE_TRIGGERS_OVERVIEW	9
+#define SCREEN_RESOURCE_TRIGGER_OVERVIEW	9
 #define SCREEN_RESOURCE_DATA_OVERVIEW		10
 #define SCREEN_RESOURCE_URL			11
 #define SCREEN_RESOURCE_ACTIONS			12
@@ -656,6 +670,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* trigger correlation modes */
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
+
+/* task manager task types  */
+#define ZBX_TM_TASK_CLOSE_PROBLEM	1
+
+/* acknowledgment actions (flags) */
+#define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
+#define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
 /* user permissions */
 typedef enum
@@ -1023,6 +1044,12 @@ int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
 /* IP range support */
+#define ZBX_IPRANGE_V4	0
+#define ZBX_IPRANGE_V6	1
+
+#define ZBX_IPRANGE_GROUPS_V4	4
+#define ZBX_IPRANGE_GROUPS_V6	8
+
 typedef struct
 {
 	int	from;
@@ -1032,16 +1059,18 @@ zbx_range_t;
 
 typedef struct
 {
-	zbx_range_t	range[8];
+	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V46 */
+	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)            */
+	/*                                  0       1       2       3             */
+	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
+
 	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
 	unsigned char	type;
+
 	/* 1 if the range was defined with network mask, 0 otherwise */
 	unsigned char   mask;
 }
 zbx_iprange_t;
-
-#define ZBX_IPRANGE_V4	0
-#define ZBX_IPRANGE_V6	1
 
 int	iprange_parse(zbx_iprange_t *range, const char *address);
 void	iprange_first(const zbx_iprange_t *range, int *address);

@@ -30,17 +30,17 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_GRAPH => _('Graph'),
 		SCREEN_RESOURCE_ACTIONS => _('Action log'),
 		SCREEN_RESOURCE_EVENTS => _('History of events'),
-		SCREEN_RESOURCE_HOSTS_INFO => _('Hosts info'),
+		SCREEN_RESOURCE_HOST_INFO => _('Host info'),
 		SCREEN_RESOURCE_MAP => _('Map'),
 		SCREEN_RESOURCE_PLAIN_TEXT => _('Plain text'),
 		SCREEN_RESOURCE_SCREEN => _('Screen'),
-		SCREEN_RESOURCE_SERVER_INFO => _('Server info'),
+		SCREEN_RESOURCE_SERVER_INFO => _('Status of Zabbix'),
 		SCREEN_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
 		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS => _('Host group issues'),
 		SCREEN_RESOURCE_HOST_TRIGGERS => _('Host issues'),
 		SCREEN_RESOURCE_SYSTEM_STATUS => _('System status'),
-		SCREEN_RESOURCE_TRIGGERS_INFO => _('Triggers info'),
-		SCREEN_RESOURCE_TRIGGERS_OVERVIEW => _('Triggers overview'),
+		SCREEN_RESOURCE_TRIGGER_INFO => _('Trigger info'),
+		SCREEN_RESOURCE_TRIGGER_OVERVIEW => _('Trigger overview'),
 		SCREEN_RESOURCE_URL => _('URL'),
 		SCREEN_RESOURCE_LLD_GRAPH => _('Graph prototype'),
 		SCREEN_RESOURCE_LLD_SIMPLE_GRAPH => _('Simple graph prototype')
@@ -676,7 +676,7 @@ function check_dynamic_items($elid, $config = 0) {
 function getResourceNameByType($resourceType) {
 	switch ($resourceType) {
 		case SCREEN_RESOURCE_DATA_OVERVIEW:
-		case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 			return _('Group');
 	}
 

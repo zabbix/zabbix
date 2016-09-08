@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with applications.
- *
- * @package API
  */
 class CApplication extends CApiService {
 

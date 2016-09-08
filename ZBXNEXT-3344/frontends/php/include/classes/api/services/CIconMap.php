@@ -25,8 +25,6 @@
  * Icon maps work only with map elements that represent hosts, and used for automatic changing
  * icons based on host inventory data.
  * Icon maps has read access for everyone and write access only for superamins
- *
- * @package API
  */
 class CIconMap extends CApiService {
 
@@ -371,7 +369,6 @@ class CIconMap extends CApiService {
 	 * @throws APIException
 	 * @param $iconMaps
 	 * @param bool $mustExist if icon map should be checked against having at least one mapping
-	 * @return void
 	 */
 	protected function validateMappings($iconMaps, $mustExist = true) {
 		$inventoryFields = getHostInventories();

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with alerts.
- *
- * @package API
  */
 class CAlert extends CApiService {
 
@@ -339,8 +337,6 @@ class CAlert extends CApiService {
 	 * @throws APIException     if the input is invalid
 	 *
 	 * @param array     $options
-	 *
-	 * @return void
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([

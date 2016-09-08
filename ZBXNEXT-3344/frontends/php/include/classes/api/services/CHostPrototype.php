@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with host prototypes.
- *
- * @package API
  */
 class CHostPrototype extends CHostBase {
 
@@ -102,8 +100,6 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypes
-	 *
-	 * @return void
 	 */
 	protected function validateCreate(array $hostPrototypes) {
 		// host prototype validator
@@ -116,6 +112,7 @@ class CHostPrototype extends CHostBase {
 		// group validators
 		$groupLinkValidator = new CSchemaValidator($this->getGroupLinkSchema());
 		$groupPrototypeValidator = new CSchemaValidator($this->getGroupPrototypeSchema());
+		$host_group_name_validator = new CHostGroupNameValidator();
 
 		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -133,8 +130,15 @@ class CHostPrototype extends CHostBase {
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
+					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
+					$groupPrototypeValidator->setObjectName($name);
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+
+					if (!$host_group_name_validator->validate($name)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
+						));
+					}
 				}
 			}
 		}
@@ -372,8 +376,6 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @param array $hostPrototypes
 	 * @param array $dbHostPrototypes	array of existing host prototypes with hostids as keys
-	 *
-	 * @return void
 	 */
 	protected function validateUpdate(array $hostPrototypes, array $dbHostPrototypes) {
 		// TODO: permissions should be checked using the $dbHostPrototypes array
@@ -401,6 +403,8 @@ class CHostPrototype extends CHostBase {
 			'messageInvalid' => _('Incorrect group prototype ID.')
 		]));
 
+		$host_group_name_validator = new CHostGroupNameValidator();
+
 		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
@@ -419,8 +423,15 @@ class CHostPrototype extends CHostBase {
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
+					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
+					$groupPrototypeValidator->setObjectName($name);
 					$this->checkPartialValidator($groupPrototype, $groupPrototypeValidator);
+
+					if (!$host_group_name_validator->validate($name)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
+						));
+					}
 				}
 			}
 		}
@@ -897,8 +908,6 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @param array $hostPrototypeIds
 	 * @param bool 	$nopermissions
-	 *
-	 * @return void
 	 */
 	protected function validateDelete($hostPrototypeIds, $nopermissions) {
 		if (!$hostPrototypeIds) {

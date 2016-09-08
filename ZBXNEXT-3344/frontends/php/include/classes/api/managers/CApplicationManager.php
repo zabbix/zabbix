@@ -241,8 +241,6 @@ class CApplicationManager {
 	 *
 	 * @param array $templateIds
 	 * @param array $appIdPairs		an array of source application ID - target application ID pairs
-	 *
-	 * @return void
 	 */
 	protected function moveInheritedItems(array $templateIds, array $appIdPairs) {
 		// fetch existing item application links for all items inherited from template $templateIds
@@ -353,8 +351,6 @@ class CApplicationManager {
 	 *
 	 * @param array $templateIds
 	 * @param array $appIdPairs		an array of source application ID - target application ID pairs
-	 *
-	 * @return void
 	 */
 	protected function moveInheritedHttpTests(array $templateIds, array $appIdPairs) {
 		// find all http tests inherited from the given templates and linked to the given applications

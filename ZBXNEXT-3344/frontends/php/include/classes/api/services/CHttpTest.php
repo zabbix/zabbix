@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with http tests.
- *
- * @package API
  */
 class CHttpTest extends CApiService {
 

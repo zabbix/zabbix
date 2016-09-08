@@ -94,7 +94,7 @@ class CCorrelation extends CApiService {
 					);
 					$filter = reset($filter);
 
-					if (isset($filter['conditions'])) {
+					if (array_key_exists('conditions', $filter)) {
 						foreach ($filter['conditions'] as &$condition) {
 							unset($condition['correlationid'], $condition['corr_conditionid']);
 						}
@@ -425,11 +425,22 @@ class CCorrelation extends CApiService {
 								);
 							}
 						}
+						else {
+							/*
+							 * The evaluation method has not been changed, but it has been set and it's a custom
+							 * expression. The formula needs to be updated in this case.
+							 */
+							if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+								$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
+									$conditions_for_correlations[$correlation['correlationid']]
+								);
+							}
+						}
 					}
 					elseif ($db_correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						/*
-						 * The evaluation method has not been changed, but it's still a custom expression. The formula
-						 * needs to be updated anyway, because of the new conditions.
+						 * The evaluation method has not been changed and was not set. It's read from DB, but it's still
+						 * a custom expression and there are new conditions, so the formula needs to be updated.
 						 */
 						$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
 							$conditions_for_correlations[$correlation['correlationid']]
@@ -906,7 +917,7 @@ class CCorrelation extends CApiService {
 	 * Converts a formula with letters to a formula with IDs and updates it.
 	 *
 	 * @param string 	$correlationid
-	 * @param string 	$formula_with_letters		formula with letters
+	 * @param string 	$formula_with_letters		Formula with letters.
 	 * @param array 	$conditions
 	 */
 	protected function updateFormula($correlationid, $formula_with_letters, array $conditions) {
@@ -978,6 +989,8 @@ class CCorrelation extends CApiService {
 		}
 
 		$groupids = [];
+		$formulaIds = [];
+		$conditions = [];
 
 		foreach ($correlation['filter']['conditions'] as $condition) {
 			if (!array_key_exists('type', $condition)) {
@@ -1125,6 +1138,27 @@ class CCorrelation extends CApiService {
 					}
 					break;
 			}
+
+			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				if (array_key_exists($condition['formulaid'], $formulaIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Duplicate "%1$s" value "%2$s" for correlation "%3$s".', 'formulaid', $condition['formulaid'],
+							$correlation['name']
+					));
+				}
+				else {
+					$formulaIds[$condition['formulaid']] = true;
+				}
+			}
+
+			unset($condition['formulaid']);
+			$conditions[] = $condition;
+		}
+
+		if (count($conditions) != count(array_unique($conditions, SORT_REGULAR))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Conditions duplicates for correlation "%1$s".', $correlation['name'])
+			);
 		}
 
 		return $groupids;
@@ -1323,11 +1357,21 @@ class CCorrelation extends CApiService {
 		return $conditions;
 	}
 
+	/**
+	 * Apply query output options.
+	 *
+	 * @param type $table_name
+	 * @param type $table_alias
+	 * @param array $options
+	 * @param array $sql_parts
+	 *
+	 * @return array
+	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ($options['countOutput'] === null) {
-			// add filter fields
+			// Add filter fields.
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
 					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
@@ -1344,6 +1388,14 @@ class CCorrelation extends CApiService {
 		return $sql_parts;
 	}
 
+	/**
+	 * Extend result with requested objects.
+	 *
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @return array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1361,7 +1413,7 @@ class CCorrelation extends CApiService {
 				foreach ($result as $correlation) {
 					$filters[$correlation['correlationid']] = [
 						'evaltype' => $correlation['evaltype'],
-						'formula' => isset($correlation['formula']) ? $correlation['formula'] : '',
+						'formula' => array_key_exists('formula', $correlation) ? $correlation['formula'] : '',
 						'conditions' => []
 					];
 				}
@@ -1475,7 +1527,6 @@ class CCorrelation extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($operations, 'correlationid', 'corr_operationid');
-			$operationids = $relation_map->getRelatedIds();
 
 			foreach ($operations as &$operation) {
 				unset($operation['correlationid'], $operation['corr_operationid']);
@@ -1486,31 +1537,5 @@ class CCorrelation extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Returns true if the given correlations exist and are available for writing.
-	 *
-	 * @param array $correlationids				An array if there are correlation IDs
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $correlationids) {
-		if (!is_array($correlationids)) {
-			return false;
-		}
-		elseif (empty($correlationids)) {
-			return true;
-		}
-
-		$correlationids = array_unique($correlationids);
-
-		$count = $this->get([
-			'correlationids' => $correlationids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($correlationids) == $count);
 	}
 }

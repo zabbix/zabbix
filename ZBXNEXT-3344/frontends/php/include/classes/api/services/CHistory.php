@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with histories.
- *
- * @package API
  */
 class CHistory extends CApiService {
 

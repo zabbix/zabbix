@@ -50,23 +50,26 @@ extern int		server_num, process_num;
 static void	process_time_functions(int *triggers_count, int *events_count)
 {
 	const char		*__function_name = "process_time_functions";
-	DC_TRIGGER		*trigger_info = NULL;
+	DC_TRIGGER		trigger_info[ZBX_TRIGGERS_MAX];
 	zbx_vector_ptr_t	trigger_order, trigger_diff;
 	zbx_vector_uint64_t	triggerids;
-	int			events_num;
+	int			events_num, i;
+	zbx_uint64_t		next_triggerid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&trigger_order);
+	zbx_vector_ptr_reserve(&trigger_order, ZBX_TRIGGERS_MAX);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_create(&triggerids);
 
-	while (1)
+	while (0 != DCconfig_get_time_based_triggers(trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, next_triggerid,
+			process_num))
 	{
-		DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, process_num);
+		for (i = 0; i < trigger_order.values_num; i++)
+			zbx_vector_uint64_append(&triggerids, trigger_info[i].triggerid);
 
-		if (0 == trigger_order.values_num)
-			break;
+		next_triggerid = trigger_info[trigger_order.values_num - 1].triggerid + 1;
 
 		*triggers_count += trigger_order.values_num;
 
@@ -76,7 +79,8 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		zbx_process_triggers(&trigger_order, &trigger_diff);
 
-		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids)))
+		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids,
+				ZBX_EVENTS_PROCESS_CORRELATION)))
 		{
 			*events_count += events_num;
 
@@ -88,9 +92,10 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		DCconfig_unlock_triggers(&triggerids);
 		zbx_vector_uint64_clear(&triggerids);
+
+		DCfree_triggers(&trigger_order);
 	}
 
-	zbx_free(trigger_info);
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 	zbx_vector_ptr_destroy(&trigger_diff);
@@ -212,9 +217,9 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 				"h.maintenance_type,h.maintenance_from"
 			" from maintenances_hosts mh,hosts h"
 			" where mh.hostid=h.hostid"
-				" and h.status=%d"
+				" and h.status in (%d,%d)"
 				" and mh.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			maintenanceid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -237,9 +242,9 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 			" from maintenances_groups mg,hosts_groups hg,hosts h"
 			" where mg.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
-				" and h.status=%d"
+				" and h.status in (%d,%d)"
 				" and mg.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			maintenanceid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -259,7 +264,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
+static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 {
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -544,7 +549,7 @@ static int	process_maintenance(void)
 	}
 	DBfree_result(result);
 
-	ret = update_maintenance_hosts(hm, hm_count, (int)now);
+	ret = update_maintenance_hosts(hm, hm_count);
 
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);

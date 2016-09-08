@@ -1023,8 +1023,8 @@ class testFormGraphPrototype extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedMore',
-					'width' => 'name',
-					'height' => 'name',
+					'width' => '0',
+					'height' => '0',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'yaxismin' => 'name',
@@ -1062,8 +1062,6 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
-
 		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
@@ -1092,10 +1090,11 @@ class testFormGraphPrototype extends CWebTest {
 
 			$this->zbxTestLaunchPopup('add_item');
 
+			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
@@ -1104,16 +1103,19 @@ class testFormGraphPrototype extends CWebTest {
 				$this->zbxTestClickWait('items_0_remove');
 				$this->zbxTestTextNotPresent($this->itemSimple);
 
-				$this->zbxTestLaunchPopup('add_item');
+				$this->zbxTestClickWait('add_item');
+				$this->zbxTestSwitchToNewWindow();
 
+				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 				$this->zbxTestClickLinkTextWait($this->itemSimple);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 
-				$this->zbxTestLaunchPopup('add_protoitem');
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
 				$this->zbxTestClickLinkTextWait($this->item);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 			}
 		}
 		if (isset($data['width'])) {
@@ -1227,8 +1229,6 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
-
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**

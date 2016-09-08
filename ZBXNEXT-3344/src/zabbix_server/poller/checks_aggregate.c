@@ -174,13 +174,10 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, int
  * Purpose: calculate the last (newest) value in value vector                 *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int value_type,
-		history_value_t *result)
+static void	evaluate_history_func_last(zbx_vector_history_record_t *values, history_value_t *result)
 {
 	*result = values->values[0].value;
 }
@@ -223,7 +220,7 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 			evaluate_history_func_count(values, value_type, result);
 			break;
 		case ZBX_VALUE_FUNC_LAST:
-			evaluate_history_func_last(values, value_type, result);
+			evaluate_history_func_last(values, result);
 			break;
 	}
 }

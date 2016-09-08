@@ -19,11 +19,15 @@
 
 #include "checks_snmp.h"
 
+#ifdef HAVE_NETSNMP
+
+#define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
+
 #include "comms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-
-#ifdef HAVE_NETSNMP
 
 /*
  * SNMP Dynamic Index Cache
@@ -1729,10 +1733,12 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	free_request(&data->request);
 }
 
-static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *index, const char *value)
+static void	zbx_snmp_walk_discovery_cb(void *arg, const char *oid, const char *index, const char *value)
 {
 	zbx_snmp_ddata_t	*data = (zbx_snmp_ddata_t *)arg;
 	zbx_snmp_dobject_t	*obj;
+
+	ZBX_UNUSED(oid);
 
 	if (NULL == (obj = zbx_hashset_search(&data->objects, &index)))
 	{
@@ -2134,6 +2140,11 @@ exit:
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+void	zbx_init_snmp(void)
+{
+	init_snmp(progname);
 }
 
 #endif	/* HAVE_NETSNMP */

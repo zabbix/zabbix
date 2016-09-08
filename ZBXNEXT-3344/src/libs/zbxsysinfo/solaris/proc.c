@@ -477,7 +477,7 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
  *                                                                            *
  * Function: proc_read_cpu_util                                               *
  *                                                                            *
- * Purpose: reads process cpu utilization values from /proc/[pid]/stat file   *
+ * Purpose: reads process cpu utilization values from /proc/[pid]/usage file  *
  *                                                                            *
  * Parameters: procutil - [IN/OUT] the process cpu utilization data           *
  *                                                                            *
@@ -485,13 +485,24 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
  *                         successfully                                       *
  *               <0      - otherwise, -errno code is returned                 *
  *                                                                            *
+ * Comments: we use /proc/[pid]/usage since /proc/[pid]/status contains       *
+ *           sensitive information and by default can only be read by the     *
+ *           owner or privileged user.                                        *
+ *                                                                            *
+ *           In addition to user and system-call CPU time the                 *
+ *           /proc/[pid]/usage also contains CPU time spent in trap context   *
+ *           Currently trap CPU time is not taken into account.               *
+ *                                                                            *
+ *           prstat(1) skips processes 0 (sched), 2 (pageout) and 3 (fsflush) *
+ *           however we take them into account.                               *
+ *                                                                            *
  ******************************************************************************/
 static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 {
 	int		fd, n;
 	char		tmp[MAX_STRING_LEN];
 	psinfo_t	psinfo;
-	pstatus_t	pstatus;
+	prusage_t	prusage;
 
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/psinfo", (int)procutil->pid);
 
@@ -506,22 +517,22 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 
 	procutil->starttime = psinfo.pr_start.tv_sec;
 
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/status", (int)procutil->pid);
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/usage", (int)procutil->pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
 		return -errno;
 
-	n = read(fd, &pstatus, sizeof(pstatus));
+	n = read(fd, &prusage, sizeof(prusage));
 	close(fd);
 
 	if (-1 == n)
 		return -errno;
 
 	/* convert cpu utilization time to clock ticks */
-	procutil->utime = ((zbx_uint64_t)pstatus.pr_utime.tv_sec * 1e9 + pstatus.pr_utime.tv_nsec) *
+	procutil->utime = ((zbx_uint64_t)prusage.pr_utime.tv_sec * 1e9 + prusage.pr_utime.tv_nsec) *
 			sysconf(_SC_CLK_TCK) / 1e9;
 
-	procutil->stime = ((zbx_uint64_t)pstatus.pr_stime.tv_sec * 1e9 + pstatus.pr_stime.tv_nsec) *
+	procutil->stime = ((zbx_uint64_t)prusage.pr_stime.tv_sec * 1e9 + prusage.pr_stime.tv_nsec) *
 			sysconf(_SC_CLK_TCK) / 1e9;
 
 	return SUCCEED;

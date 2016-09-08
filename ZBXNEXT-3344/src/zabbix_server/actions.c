@@ -1408,7 +1408,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 
 	if (action->evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
 	{
-		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error)))
+		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
 
 		zbx_free(expression);
@@ -1609,13 +1609,13 @@ int	is_recovery_event(const DB_EVENT *event)
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
  *                                                                            *
- * Parameters: events     - [IN] events to apply actions for                  *
- *             events_num - [IN] number of events                             *
- *             event_recovery - [IN] a vector of (PROBLEM eventid, OK event)  *
- *                                   pairs.                                   *
+ * Parameters: events        - [IN] events to apply actions for               *
+ *             events_num    - [IN] number of events                          *
+ *             closed_events - [IN] a vector of closed event data -           *
+ *                                  (PROBLEM eventid, OK eventid) pairs.      *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *event_recovery)
+void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events)
 {
 	const char			*__function_name = "process_actions";
 
@@ -1684,24 +1684,21 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 	zbx_vector_ptr_destroy(&actions);
 
 	/* 3. Find recovered escalations and store escalationids in 'rec_escalation' by OK eventids. */
-	if (0 != event_recovery->num_data)
+	if (0 != closed_events->values_num)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_vector_uint64_t	eventids;
-		zbx_event_recovery_t	*recovery;
 		DB_ROW			row;
 		DB_RESULT		result;
-		zbx_uint64_t		actionid, eventid;
-		zbx_hashset_iter_t	iter;
+		zbx_uint64_t		actionid, r_eventid;
+		int			j, index;
 
 		zbx_vector_uint64_create(&eventids);
 
 		/* 3.1. Store PROBLEM eventids of recovered events in 'eventids'. */
-		zbx_hashset_iter_reset(event_recovery, &iter);
-
-		while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
-			zbx_vector_uint64_append(&eventids, recovery->eventid);
+		for (j = 0; j < closed_events->values_num; j++)
+			zbx_vector_uint64_append(&eventids, closed_events->values[j].first);
 
 		/* 3.2. Select escalations that must be recovered. */
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1718,21 +1715,25 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 		{
 			zbx_escalation_rec_t	*rec_escalation;
 			zbx_uint64_t		escalationid;
+			zbx_uint64_pair_t	event_pair;
 
 			ZBX_STR2UINT64(actionid, row[0]);
-			ZBX_STR2UINT64(eventid, row[1]);
+			ZBX_STR2UINT64(event_pair.first, row[1]);
 
-			if (NULL == (recovery = zbx_hashset_search(event_recovery, &eventid)))
+			if (FAIL == (index = zbx_vector_uint64_pair_bsearch(closed_events, event_pair,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations, &recovery->r_event->eventid)))
+			r_eventid = closed_events->values[index].second;
+
+			if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations, &r_eventid)))
 			{
 				zbx_escalation_rec_t	esc_rec_local;
 
-				esc_rec_local.r_eventid = recovery->r_event->eventid;
+				esc_rec_local.r_eventid = r_eventid;
 				rec_escalation = zbx_hashset_insert(&rec_escalations, &esc_rec_local,
 						sizeof(esc_rec_local));
 

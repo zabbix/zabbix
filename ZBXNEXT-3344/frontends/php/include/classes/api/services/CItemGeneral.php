@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with item general.
- *
- * @package API
  */
 abstract class CItemGeneral extends CApiService {
 
@@ -110,8 +108,6 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
-	 *
-	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		if ($update) {

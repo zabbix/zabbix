@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with items.
- *
- * @package API
  */
 class CItem extends CItemGeneral {
 
@@ -462,8 +460,6 @@ class CItem extends CItemGeneral {
 	 * Update host items.
 	 *
 	 * @param array $items
-	 *
-	 * @return void
 	 */
 	protected function updateReal(array $items) {
 		$items = zbx_toArray($items);

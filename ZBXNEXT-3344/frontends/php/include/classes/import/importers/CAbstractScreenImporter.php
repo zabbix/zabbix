@@ -51,9 +51,9 @@ abstract class CAbstractScreenImporter extends CImporter {
 					$screenItem['max_columns'] = SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT;
 				}
 				switch ($screenItem['resourcetype']) {
-					case SCREEN_RESOURCE_HOSTS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+					case SCREEN_RESOURCE_HOST_INFO:
+					case SCREEN_RESOURCE_TRIGGER_INFO:
+					case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 					case SCREEN_RESOURCE_DATA_OVERVIEW:
 					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 						$screenItem['resourceid'] = $this->referencer->resolveGroup($resource['name']);

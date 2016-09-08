@@ -89,8 +89,6 @@ class CScreenImporter extends CAbstractScreenImporter {
 	 * @see checkCircularRecursive
 	 *
 	 * @param array $screens
-	 *
-	 * @return void
 	 */
 	protected function checkCircularScreenReferences(array $screens) {
 		foreach ($screens as $screenName => $screen) {

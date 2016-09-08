@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with maps.
- *
- * @package API
  */
 class CMap extends CMapElement {
 

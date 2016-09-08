@@ -37,12 +37,12 @@ $fields = [
 	],
 	'dropdown_first_remember'	=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('remember selected')],
 	'search_limit'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})',
-		_('Search/Filter elements limit')
+		_('Limit for search and filter results')
 	],
 	'max_in_table'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
 		_('Max count of elements to show inside table cell')
 	],
-	'event_ack_enable'			=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable event acknowledges')],
+	'event_ack_enable'			=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable event acknowledgement')],
 	'event_expire'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
 		_('Show events not older than (in days)')
 	],

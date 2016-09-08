@@ -5,8 +5,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Zabbix | Hosts</title>
-		<!--<link rel="stylesheet" href="stylesheets/screen.css">-->
-		<link rel="stylesheet" href="stylesheets/dark-theme.css">
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
@@ -19,7 +19,7 @@
 <body>
 	<header role="banner">
 		<div class="nav" role="navigation">
-			<div class="top-nav-container"><div class="logo"></div><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -29,7 +29,7 @@
 	</header>
 	<div class="article">
 	<div class="header-title table">
-  <div class="cell"><h1>Map &#147;Local network&#148;</h1></div><div class="cell"><form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+  <div class="cell"><h1>Map &#147;Local network&#148;</h1></div><div class="cell"><form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div></div>
 		<ul class="object-group"><li>Icon: <span class="link-dotted">Add</span> / <span class="link-dotted">Remove</span></li><li>Link: <span class="link-dotted">Add</span> / <span class="link-dotted">Remove</span></li><li>Expand macros: <span class="link-dotted">On</span></li><li>Grid: <span class="link-dotted">Shown</span> / <span class="link-dotted">On</span></li><li><select id=""><option>50&times;50</option></select></li><li><button type="button" class="btn-alt">Align icons</button></li><li><button type="button">Update</button></li></ul>
 	<form>
@@ -54,7 +54,7 @@
 	<ul class="table-forms">
 	<li><input type="hidden" id="screenid" name="screenid" value="200032"></li>
 	<li><input type="hidden" id="screenitemid" name="screenitemid" value="200045"></li>
-	<li><div class="table-forms-td-left"><label for="resourcetype">Resource</label></div><div class="table-forms-td-right"><select id="resourcetype" name="resourcetype" onchange="submit()" autocomplete="off"><option value="12">Action log</option><option value="7">Clock</option><option value="10">Data overview</option><option value="0">Graph</option><option value="20">Graph prototype</option><option value="13">History of events</option><option value="14">Host group issues</option><option value="16">Host issues</option><option value="4">Hosts info</option><option value="2">Map</option><option value="3">Plain text</option><option value="8">Screen</option><option value="6">Server info</option><option value="1">Simple graph</option><option value="19">Simple graph prototype</option><option value="15" selected="selected">System status</option><option value="5">Triggers info</option><option value="9">Triggers overview</option><option value="11">URL</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="resourcetype">Resource</label></div><div class="table-forms-td-right"><select id="resourcetype" name="resourcetype" onchange="submit()" autocomplete="off"><option value="12">Action log</option><option value="7">Clock</option><option value="10">Data overview</option><option value="0">Graph</option><option value="20">Graph prototype</option><option value="13">History of events</option><option value="14">Host group issues</option><option value="16">Host issues</option><option value="4">Host info</option><option value="2">Map</option><option value="3">Plain text</option><option value="8">Screen</option><option value="6">Server info</option><option value="1">Simple graph</option><option value="19">Simple graph prototype</option><option value="15" selected="selected">System status</option><option value="5">Trigger info</option><option value="9">Trigger overview</option><option value="11">URL</option></select></div></li>
 	<li><input type="hidden" id="style" name="style" value="0"></li>
 	<li><input type="hidden" id="url" name="url" value=""></li>
 	<li><input type="hidden" id="width" name="width" value="500"></li>

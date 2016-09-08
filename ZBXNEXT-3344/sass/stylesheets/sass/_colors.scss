@@ -42,10 +42,10 @@ $body-bg-color: #ebeef0 !default;
 // UI
 $ui-bg-color: #fff !default;
 $ui-bg-selected-color: #768d99 !default;
-$ui-hover-color: #eef7ff !default;
+$ui-hover-color: #e8f5ff !default;
 $ui-border-color: #dfe4e7 !default;
 
-$action-hover-color: #ebebeb !default;
+$action-hover-color: #e8f5ff !default;
 $action-border-color: #ccd5d9 !default;
 $action-shadow-color: rgba(#768d99, 0.5) !default;
 
@@ -79,7 +79,7 @@ $btn-alt-border-color: $btn-bg-color !default;
 
 $btn-form-font-color: #1f2c33 !default;
 $btn-form-bg-color: $form-bg-color !default;
-$btn-form-hover-color: #eef7ff !default;
+$btn-form-hover-color: #e8f5ff !default;
 $btn-form-border-color: $form-border-color !default;
 
 $btn-disabled-font-color: #acbbc2 !default;
@@ -95,15 +95,15 @@ $link-visited-color: #0275b8 !default;
 
 $link-alt-underline-color: #768d99 !default;
 
-$link-main-nav-color: rgba(#3c5563, 0.85) !default;
-$link-main-nav-hover-color: rgba(#3c5563, 1) !default;
-$link-main-nav-active-color: rgba(#3c5563, 1) !default;
-$link-main-nav-visited-color: rgba(#3c5563, 0.85) !default;
+$link-main-nav-color: rgba(#1f2c33, 0.8) !default;
+$link-main-nav-hover-color: rgba(#1f2c33, 1) !default;
+$link-main-nav-active-color: rgba(#1f2c33, 1) !default;
+$link-main-nav-visited-color: rgba(#1f2c33, 0.8) !default;
 
-$link-main-subnav-color: rgba(#fff, 0.75) !default;
+$link-main-subnav-color: rgba(#fff, 0.8) !default;
 $link-main-subnav-hover-color: rgba(#fff, 1) !default;
 $link-main-subnav-active-color: rgba(#fff, 1) !default;
-$link-main-subnav-visited-color: rgba(#fff, 0.75) !default;
+$link-main-subnav-visited-color: rgba(#fff, 0.8) !default;
 
 // ANALOG CLOCK
 $clock-face-color: #ebebeb!default;

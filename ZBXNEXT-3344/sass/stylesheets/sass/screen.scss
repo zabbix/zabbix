@@ -25,7 +25,6 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -35,16 +34,19 @@ a {
 	}
 
 	&:hover {
+		outline: 0;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
+		position: relative;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
+		outline: 0;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
@@ -259,8 +261,8 @@ nav {
 				height: 0;
 				font-size: 0;
 				line-height: 0;
-				border-left: 9px solid transparent;
-				border-right: 9px solid transparent;
+				border-left: 9px solid $transparent;
+				border-right: 9px solid $transparent;
 				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
@@ -291,6 +293,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
+			background-color: $ui-hover-color;
 		}
 
 		&:active {
@@ -332,6 +335,7 @@ ul.top-nav-icons {
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
+		outline: 0;
 		@include opacity(0.75);
 		@include transition(opacity .2s ease-out);
 
@@ -340,6 +344,7 @@ ul.top-nav-icons {
 		}
 
 		&:focus {
+			background-color: $ui-hover-color !important;
 			@include opacity(1);
 		}
 	}
@@ -528,12 +533,16 @@ article {
 			padding: 4px 7px;
 		}
 
-		.status-container {
+		.status-container, .rel-container {
 			margin: 0 5px 0 0;
 
 			span {
 				padding: 2px 3px 1px 3px;
 			}
+		}
+
+		.rel-container {
+			margin: 0;
 		}
 	}
 
@@ -568,13 +577,6 @@ footer {
 	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
-
-	a {
-
-		&.logo {
-			border: none;
-		}
-	}
 }
 
 .footer {
@@ -586,8 +588,13 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 10px 10px 0 0;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
+}
+
+.header-logo {
+	float: left;
+	display: block;
+	margin: 10px 10px 0 0;
 }
 
 // Tables
@@ -655,14 +662,37 @@ footer {
 	}
 
 	tbody tr {
-		@include transition(background-color .2s ease-out);
 
 		&:hover {
 			background-color: $ui-hover-color;
+
+			.timeline-axis {
+				background-color:  $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color!important;
+			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
+
+			.timeline-axis {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color;
+			}
 		}
 
 		&.nothing-to-show {
@@ -672,11 +702,14 @@ footer {
 		&:last-child td {
 			border-bottom: none;
 		}
+
+		&.hover-nobg {
+			background-color: $ui-bg-color;
+		}
 	}
 
 	td {
 		padding: 6px 5px;
-		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -728,6 +761,7 @@ footer {
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $font-color;
+	outline: 0;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
@@ -827,10 +861,16 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 16px;
-	height: 18px;
-	line-height: 18px;
+	width: 14px;
+	height: 16px;
+	min-height: auto;
+	line-height: 16px;
+	padding: 0;
+	margin: 0 2px 0 0;
+	cursor: auto;
 	text-align: center;
+	border: none;
+	background-color: $transparent;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -841,20 +881,16 @@ footer {
 		border-top-color: $font-alt-color;
 	}
 
-	&:hover .arrow-right {
-		border-left-color: $link-color;
-	}
+	&:hover, &:focus {
+		background-color: $transparent;
 
-	&:focus .arrow-right {
-		border-left-color: $link-color;
-	}
+		.arrow-right {
+			border-left-color: $link-color;
+		}
 
-	&:hover .arrow-down {
-		border-top-color: $link-color;
-	}
-
-	&:focus .arrow-down {
-		border-top-color: $link-color;
+		.arrow-down {
+			border-top-color: $link-color;
+		}
 	}
 }
 
@@ -869,6 +905,13 @@ footer {
 .cell {
 	display: table-cell;
 	vertical-align: top;
+
+	&:last-child {
+
+		.dashbrd-widget {
+			margin: 0 0 10px 0;
+		}
+	}
 }
 
 .adm-img {
@@ -894,6 +937,76 @@ footer {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+// Timeline in table view
+.timeline-date {
+	text-align: right;
+	white-space: nowrap;
+	border-bottom-color: $transparent !important;
+}
+
+.timeline-axis {
+	@extend %timeline-td;
+	padding: 6px .04em !important;
+	border-right: 2px solid lighten(desaturate($btn-bg-color, 27%), 44%);
+
+	&::before {
+		content: '';
+		position: absolute;
+		bottom: -1px;
+		right: -2px;
+		height: 100%;
+		width: 2px;
+		background-color: lighten(desaturate($btn-bg-color, 27%), 44%);
+	}
+}
+
+.timeline-dot {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 11px;
+		border: 2px solid $ui-bg-color;
+		background-color: $btn-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-dot-big {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 10px;
+		border: 2px solid $btn-bg-color;
+		background-color: $ui-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-td {
+	@extend %timeline-td;
+	padding: 6px .25em !important;
+}
+
+.timeline-th {
+	padding: 6px .25em !important;
+}
+
+%timeline-dot {
+	content: '';
+	position: absolute;
+	z-index: 100;
+	display: block;
+	width: 4px;
+	height: 4px;
+	right: -5px;
+	@include border-radius(100%);
+}
+
+%timeline-td {
+	position: relative;
+	border-bottom-color: $ui-bg-color !important;
 }
 
 // Filters
@@ -1108,8 +1221,8 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $action-hover-color;
-	background-color: $action-hover-color;
+	border: 1px solid $table-border-color;
+	background-color: $table-border-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 
@@ -1696,6 +1809,7 @@ button {
 	}
 
 	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
@@ -1785,6 +1899,7 @@ button {
 	right: 4px;
 	width: 24px;
 	min-height: 22px;
+	height: 22px;
 	padding: 0;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
@@ -1836,7 +1951,7 @@ $icon-btn: (
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -329px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
 	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
 	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
@@ -1882,6 +1997,7 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
+		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -2099,6 +2215,25 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
+.icon-info {
+	position: relative;
+	width: 8px;
+	height: 11px;
+	cursor: pointer;
+	margin: -12px 0 -4px 0;
+
+	&::before {
+		content: '';
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 14px;
+		height: 14px;
+		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
+	}
+}
+
 // Sign in, Installation
 
 .setup-container  {
@@ -2276,18 +2411,15 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.widget-placeholder {
+.dashbrd-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+}
 
-	.cell {
-		min-width: 250px;
-
-		&:last-child {
-
-			.dashbrd-widget {
-				margin: 0 0 10px 0;
-			}
-		}
-	}
+.dashbrd-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 }
 
 .dashbrd-widget {
@@ -2407,6 +2539,7 @@ $form-icon-btn: (
 		color: $font-color;
 		text-decoration: none;
 		border: none;
+		outline: 0;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
@@ -2414,6 +2547,10 @@ $form-icon-btn: (
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&:focus {
 			background-color: $action-hover-color;
 		}
 
@@ -2508,6 +2645,11 @@ $form-icon-btn: (
 		td {
 			@extend %dashbrd-widget-td;
 		}
+	}
+
+	.table-paging {
+		border: none;
+		border-top: 1px solid $table-border-color;
 	}
 
 	.table-forms-td-left {
@@ -2719,7 +2861,7 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		padding: 8px 5px;
+		padding: 2px 3px;
 	}
 
 	.table-forms {
@@ -2731,6 +2873,7 @@ $form-icon-btn: (
 
 		td {
 			text-align: left;
+			padding: 6px 5px;
 			border: none;
 			border-bottom: 1px solid $table-border-color;
 		}
@@ -2739,11 +2882,15 @@ $form-icon-btn: (
 	.dashbrd-widget {
 		margin: 0;
 		border: none;
+
+		th {
+			padding: 6px 5px;
+		}
 	}
 
 	.dashbrd-widget-head {
 		text-align: left;
-		padding: 8px;
+		padding: 4px 5px;
 
 		li {
 			line-height: 2.9em;
@@ -2774,7 +2921,7 @@ $form-icon-btn: (
 }
 
 .right {
-	text-align: right;
+	text-align: right !important;
 }
 
 .bottom {
@@ -3037,10 +3184,16 @@ a.blue {
 	@extend %status;
 }
 
+.status-dark-grey {
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	@extend %status;
+}
+
 .status-yellow {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
-	background-color: darken(desaturate($alt-yellow, 10%), 16%);
+	border: 1px solid darken(desaturate($alt-yellow, 9%), 20%);
+	background-color: darken(desaturate($alt-yellow, 9%), 18%);
 	@extend %status;
 }
 
@@ -3052,6 +3205,9 @@ a.blue {
 	padding: 2px 3px;
 	text-align: center;
 	line-height: 1em;
+	max-width: 133px;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
 	@include border-radius(2px);
 
 	&:last-child {
@@ -3064,7 +3220,7 @@ a.blue {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 0.7em;
+	min-width: .7em;
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
@@ -3254,7 +3410,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $green;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3279,7 +3435,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $red;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3380,6 +3536,7 @@ td.inactive-bg {
 
 %close-icon {
 	display: block;
+	padding: 0;
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
@@ -3399,26 +3556,32 @@ td.inactive-bg {
 	&:hover {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:focus {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 }
 
 .overlay-close-btn {
 	position: absolute;
 	z-index: 1000;
-	top: 0;
-	right: 0;
+	top: 1px;
+	right: 1px;
+	min-height: auto;
+	border: none;
+	background-color: $transparent !important;
 	@extend %close-icon;
-	@include border-radius(0 0 0 2px);
+	@include border-radius(2px);
 }
 
 a.overlay-close-btn {
@@ -3633,6 +3796,16 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-width: 16px;
+	white-space: nowrap;
+
+	.icon-info {
+		margin-right: 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }
 
 .server-name {
@@ -3641,20 +3814,6 @@ tr.cursor-move {
 	white-space: nowrap;
 	overflow: hidden;
 	@extend %overflow-ellipsis;
-}
-
-.list-hor-min-width {
-
-	li {
-		display: inline-block;
-		min-width: 1.4em;
-		margin-right: .4em;
-
-		&:last-child {
-			min-width: auto;
-			margin-right: 0;
-		}
-	}
 }
 
 .uppercase {

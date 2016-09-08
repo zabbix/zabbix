@@ -188,6 +188,8 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 {
 	size_t	r_size = size * nmemb;
 
+	ZBX_UNUSED(userdata);
+
 	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, ptr, r_size);
 
 	return r_size;
@@ -195,6 +197,9 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 
 static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
+	ZBX_UNUSED(ptr);
+	ZBX_UNUSED(userdata);
+
 	return size * nmemb;
 }
 
@@ -467,6 +472,9 @@ static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 	if (NULL != hv->clusterid)
 		__vm_mem_free_func(hv->clusterid);
 
+	if (NULL != hv->datacenter_name)
+		__vm_mem_free_func(hv->datacenter_name);
+
 	__vm_mem_free_func(hv);
 }
 
@@ -723,6 +731,7 @@ static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
 	hv->id = vmware_shared_strdup(src->id);
 	hv->details = vmware_shared_strdup(src->details);
 	hv->clusterid = vmware_shared_strdup(src->clusterid);
+	hv->datacenter_name = vmware_shared_strdup(src->datacenter_name);
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_ptr_append(&hv->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
@@ -839,6 +848,7 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 	zbx_free(hv->id);
 	zbx_free(hv->details);
 	zbx_free(hv->clusterid);
+	zbx_free(hv->datacenter_name);
 	zbx_free(hv);
 }
 
@@ -1057,16 +1067,14 @@ out:
  *                                                                            *
  * Purpose: retrieves vmware service instance contents                        *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             easyhandle - [IN] the CURL handle                              *
+ * Parameters: easyhandle - [IN] the CURL handle                              *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the contents were retrieved successfully           *
  *               FAIL    - the content retrieval faield                       *
  *                                                                            *
  ******************************************************************************/
-static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easyhandle, char **contents,
-		char **error)
+static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char **error)
 {
 #	define ZBX_POST_VMWARE_CONTENTS 							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -1103,6 +1111,8 @@ static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easy
 	ret = SUCCEED;
 out:
 	return ret;
+
+#	undef ZBX_POST_VMWARE_CONTENTS
 }
 
 /******************************************************************************
@@ -1749,7 +1759,7 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		char **data, char **error)
 {
-#	define ZBX_POST_hv_DETAILS 								\
+#	define ZBX_POST_HV_DETAILS 								\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrieveProperties>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
@@ -1780,7 +1790,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_hv_DETAILS,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS,
 			vmware_service_objects[service->type].property_collector, hvid);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
@@ -1803,6 +1813,113 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		goto out;
 
 	*data = zbx_strdup(NULL, page.data);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_hv_get_datacenter_name                                    *
+ *                                                                            *
+ * Purpose: gets the vmware hypervisor datacenter name                        *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             hv           - [IN/OUT] the vmware hypervisor                  *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vmware_hv_t *hv, char **error)
+{
+#	define ZBX_POST_HV_DATACENTER_NAME									\
+		ZBX_POST_VSPHERE_HEADER										\
+			"<ns0:RetrieveProperties>"								\
+				"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
+				"<ns0:specSet>"									\
+					"<ns0:propSet>"								\
+						"<ns0:type>Datacenter</ns0:type>"				\
+						"<ns0:pathSet>name</ns0:pathSet>"				\
+					"</ns0:propSet>"							\
+					"<ns0:objectSet>"							\
+						"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
+						"<ns0:skip>false</ns0:skip>"					\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentObject</ns0:name>"			\
+							"<ns0:type>HostSystem</ns0:type>"			\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentComputeResource</ns0:name>"	\
+							"</ns0:selectSet>"					\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentComputeResource</ns0:name>"		\
+							"<ns0:type>ComputeResource</ns0:type>"			\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+						"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+							"<ns0:name>parentFolder</ns0:name>"			\
+							"<ns0:type>Folder</ns0:type>"				\
+							"<ns0:path>parent</ns0:path>"				\
+							"<ns0:skip>false</ns0:skip>"				\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentFolder</ns0:name>"		\
+							"</ns0:selectSet>"					\
+							"<ns0:selectSet>"					\
+								"<ns0:name>parentComputeResource</ns0:name>"	\
+							"</ns0:selectSet>"					\
+						"</ns0:selectSet>"						\
+					"</ns0:objectSet>"							\
+				"</ns0:specSet>"								\
+			"</ns0:RetrieveProperties>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_hv_get_datacenter_name";
+
+	char		tmp[MAX_STRING_LEN];
+	int		err, opt, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() id:'%s'", __function_name, hv->id);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
+			vmware_service_objects[service->type].property_collector, hv->id);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+		goto out;
+
+	if (NULL == (hv->datacenter_name = zbx_xml_read_value(page.data, "/*/*/*/*/*/*[local-name()='val']")))
+		hv->datacenter_name = zbx_strdup(NULL, "");
 
 	ret = SUCCEED;
 out:
@@ -1856,10 +1973,11 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 	hv->uuid = value;
 	hv->id = zbx_strdup(NULL, id);
 
+	if (SUCCEED != vmware_hv_get_datacenter_name(service, easyhandle, hv, error))
+		goto out;
+
 	if (NULL != (value = zbx_xml_read_value(hv->details, "//*[@type='ClusterComputeResource']")))
-	{
 		hv->clusterid = value;
-	}
 
 	zbx_xml_read_values(hv->details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 
@@ -2197,8 +2315,7 @@ out:
  *                                                                            *
  * Purpose: destroys event session                                            *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
- *             easyhandle     - [IN] the CURL handle                          *
+ * Parameters: easyhandle     - [IN] the CURL handle                          *
  *             event_session  - [IN] event session (EventHistoryCollector)    *
  *                                   identifier                               *
  *             error          - [OUT] the error message in the case of failure*
@@ -2207,8 +2324,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_destroy_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *event_session, char **error)
+static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *event_session, char **error)
 {
 #	define ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR					\
 		ZBX_POST_VSPHERE_HEADER							\
@@ -2248,6 +2364,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR
 }
 
 /******************************************************************************
@@ -2323,7 +2441,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	ret = SUCCEED;
 
 end_session:
-	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
+	if (SUCCEED != vmware_service_destroy_event_session(easyhandle, event_session, error))
 		ret = FAIL;
 out:
 	zbx_free(event_session);
@@ -2339,8 +2457,7 @@ out:
  *                                                                            *
  * Purpose: retrieves a list of vmware service clusters                       *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
  *             clusters     - [OUT] a pointer to the output variable          *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -2348,8 +2465,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_clusters(const zbx_vmware_service_t *service, CURL *easyhandle, char **clusters,
-		char **error)
+static int	vmware_service_get_clusters(CURL *easyhandle, char **clusters, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -2503,6 +2619,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_POST_VCENTER_CLUSTER
 }
 
 /******************************************************************************
@@ -2511,8 +2629,7 @@ out:
  *                                                                            *
  * Purpose: retrieves status of the specified vmware cluster                  *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
  *             clusterid    - [IN] the cluster id                             *
  *             status       - [OUT] a pointer to the output variable          *
  *             error        - [OUT] the error message in the case of failure  *
@@ -2521,8 +2638,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_cluster_status(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *clusterid, char **status, char **error)
+static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clusterid, char **status, char **error)
 {
 #	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -2577,6 +2693,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_CLUSTER_STATUS
 }
 
 /******************************************************************************
@@ -2585,8 +2703,7 @@ out:
  *                                                                            *
  * Purpose: creates list of vmware cluster objects                            *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
  *             clusters     - [OUT] a pointer to the resulting cluster vector *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -2594,8 +2711,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *clusters, char **error)
+static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *clusters, char **error)
 {
 	const char		*__function_name = "vmware_service_get_cluster_list";
 
@@ -2608,7 +2724,7 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 
 	zbx_vector_str_create(&ids);
 
-	if (SUCCEED != vmware_service_get_clusters(service, easyhandle, &cluster_data, error))
+	if (SUCCEED != vmware_service_get_clusters(easyhandle, &cluster_data, error))
 		goto out;
 
 	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
@@ -2623,7 +2739,7 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 		if (NULL == (name = zbx_xml_read_value(cluster_data, xpath)))
 			continue;
 
-		if (SUCCEED != vmware_service_get_cluster_status(service, easyhandle, ids.values[i], &status, error))
+		if (SUCCEED != vmware_service_get_cluster_status(easyhandle, ids.values[i], &status, error))
 		{
 			zbx_free(name);
 			goto out;
@@ -2704,7 +2820,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
 		goto out;
 
-	if (SUCCEED != vmware_service_get_contents(service, easyhandle, &contents, error))
+	if (SUCCEED != vmware_service_get_contents(easyhandle, &contents, error))
 		goto out;
 
 	zbx_vmware_lock();
@@ -2914,7 +3030,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
-			SUCCEED != vmware_service_get_cluster_list(service, easyhandle, &data->clusters, &data->error))
+			SUCCEED != vmware_service_get_cluster_list(easyhandle, &data->clusters, &data->error))
 	{
 		goto clean;
 	}

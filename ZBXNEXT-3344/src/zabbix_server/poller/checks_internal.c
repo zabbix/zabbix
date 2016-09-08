@@ -337,6 +337,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
+			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;

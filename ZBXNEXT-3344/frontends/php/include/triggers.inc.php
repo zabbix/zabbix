@@ -127,7 +127,6 @@ function getSeverityCell($severity, $config, $text = null, $forceNormal = false)
  * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
  * @param int $triggerLastChange
  * @param bool $isAcknowledged
- * @return void
  */
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
 	$config = select_config();
@@ -180,46 +179,6 @@ function trigger_value2str($value = null) {
 	else {
 		return _('Unknown');
 	}
-}
-
-function discovery_value($val = null) {
-	$array = [
-		DOBJECT_STATUS_UP => _('UP'),
-		DOBJECT_STATUS_DOWN => _('DOWN'),
-		DOBJECT_STATUS_DISCOVER => _('DISCOVERED'),
-		DOBJECT_STATUS_LOST => _('LOST')
-	];
-
-	if (is_null($val)) {
-		return $array;
-	}
-	elseif (isset($array[$val])) {
-		return $array[$val];
-	}
-	else {
-		return _('Unknown');
-	}
-}
-
-function discovery_value_style($val) {
-	switch ($val) {
-		case DOBJECT_STATUS_UP:
-			$style = ZBX_STYLE_GREEN;
-			break;
-		case DOBJECT_STATUS_DOWN:
-			$style = ZBX_STYLE_RED;
-			break;
-		case DOBJECT_STATUS_DISCOVER:
-			$style = ZBX_STYLE_GREEN;
-			break;
-		case DOBJECT_STATUS_LOST:
-			$style = ZBX_STYLE_GREY;
-			break;
-		default:
-			$style = '';
-	}
-
-	return $style;
 }
 
 function getParentHostsByTriggers($triggers) {
@@ -334,8 +293,8 @@ function utf8RawUrlDecode($source) {
  * Copies the given triggers to the given hosts or templates.
  *
  * Without the $src_hostid parameter it will only be able to copy triggers that belong to only one host. If the
- * $srcHostId parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
- * $srcHostId parameter is passed, the given host will be replaced with the destination host.
+ * $src_hostid parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
+ * $src_hostid parameter is passed, the given host will be replaced with the destination host.
  *
  * This function takes care of copied trigger dependencies.
  * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
@@ -354,9 +313,10 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 		],
 		'selectDependencies' => ['triggerid'],
+		'selectTags' => ['tag', 'value'],
 		'triggerids' => $src_triggerids
 	];
 
@@ -368,15 +328,15 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			'templated_hosts' => true
 		]);
 
-		// If provided $srcHostId doesn't match any record in DB, return false.
-		if (!($srcHost = reset($srcHost))) {
+		if (!$srcHost = reset($srcHost)) {
 			return false;
 		}
 	}
-	// If no $srcHostId provided we will need trigger host 'host'.
 	else {
+		// Select source trigger first host 'host'.
 		$options['selectHosts'] = ['host'];
 	}
+
 	$dbSrcTriggers = API::Trigger()->get($options);
 
 	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers,
@@ -392,21 +352,17 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 
 	$newTriggers = [];
 
-	// Create each trigger for each host.
 	foreach ($dbDstHosts as $dstHost) {
+		// Create each trigger for each host.
+
 		foreach ($dbSrcTriggers as $srcTrigger) {
-			// If $srcHostId provided, get host 'host' for triggerExpressionReplaceHost().
-			if ($src_hostid != 0) {
+			if ($src_hostid) {
+				// Get host 'host' for triggerExpressionReplaceHost().
+
 				$host = $srcHost['host'];
 				$srcTriggerContextHostId = $src_hostid;
 			}
-			// If $srcHostId not provided, use source trigger first host 'host'.
 			else {
-
-				/*
-				 * If we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to
-				 * replace, call error.
-				 */
 				if (count($srcTrigger['hosts']) > 1) {
 					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
 						$srcTrigger['description'], $srcTrigger['expression']
@@ -414,6 +370,8 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 
 					return false;
 				}
+
+				// Use source trigger first host 'host'.
 				$host = $srcTrigger['hosts'][0]['host'];
 				$srcTriggerContextHostId = $srcTrigger['hosts'][0]['hostid'];
 			}
@@ -428,7 +386,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 				);
 			}
 
-			// The dependddencies must be added after all triggers are created.
+			// The dependencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
 				'expression' => $srcTrigger['expression'],
@@ -438,7 +396,11 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 				'comments' => $srcTrigger['comments'],
 				'type' => $srcTrigger['type'],
 				'recovery_mode' => $srcTrigger['recovery_mode'],
-				'recovery_expression' => $srcTrigger['recovery_expression']
+				'recovery_expression' => $srcTrigger['recovery_expression'],
+				'correlation_mode' => $srcTrigger['correlation_mode'],
+				'correlation_tag' => $srcTrigger['correlation_tag'],
+				'tags' => $srcTrigger['tags'],
+				'manual_close' => $srcTrigger['manual_close']
 			]]);
 
 			if (!$result) {
@@ -473,8 +435,9 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 		['sources' => ['expression', 'recovery_expression']]
 	);
 
-	// Map dependencies to the new trigger IDs and save.
 	if ($newTriggers) {
+		// Map dependencies to the new trigger IDs and save.
+
 		$dependencies = [];
 
 		foreach ($dbSrcTriggers as $srcTrigger) {
@@ -493,7 +456,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 
 							foreach ($dst_dep_triggers as $dst_dep_trigger) {
 								/*
-								 * Dependency is within same host according to $srcHostId parameter or dep trigger has
+								 * Dependency is within same host according to $src_hostid parameter or dep trigger has
 								 * single host.
 								 */
 								if ($dst_trigger['srcTriggerContextHostId'] ==
@@ -552,8 +515,9 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 								return false;
 							}
 						}
-						// Leave original dependency.
 						else {
+							// Leave original dependency.
+
 							$depTriggerId = $depTrigger['triggerid'];
 						}
 
@@ -1146,10 +1110,21 @@ function make_trigger_details($trigger) {
 			new CCol($trigger['recovery_expression'])
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
-			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
-		->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-			? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))
+			? SPACE.'+'.SPACE._('Multiple PROBLEM events')
+			: '')
 		]);
+
+	if ($config['event_ack_enable']) {
+		$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
+		]);
+	}
+
+	$table->addRow([_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'])
+		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED)
+	]);
 
 	return $table;
 }
@@ -1989,11 +1964,8 @@ function triggerIndicator($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
 		return ($state == TRIGGER_STATE_UNKNOWN) ? _('Unknown') : _('Enabled');
 	}
-	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return _('Disabled');
-	}
 
-	return _('Unknown');
+	return _('Disabled');
 }
 
 /**
@@ -2011,11 +1983,8 @@ function triggerIndicatorStyle($status, $state = null) {
 			ZBX_STYLE_GREY :
 			ZBX_STYLE_GREEN;
 	}
-	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return ZBX_STYLE_RED;
-	}
 
-	return ZBX_STYLE_GREY;
+	return ZBX_STYLE_RED;
 }
 
 /**
@@ -2031,13 +2000,11 @@ function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
 
 	foreach ($triggers as $key => $trigger) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+			$sort[$key] = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
 		}
-		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-			$statusOrder = 1;
+		else {
+			$sort[$key] = 1;
 		}
-
-		$sort[$key] = $statusOrder;
 	}
 
 	if ($sortorder == ZBX_SORT_UP) {

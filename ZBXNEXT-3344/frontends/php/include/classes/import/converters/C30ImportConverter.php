@@ -92,6 +92,7 @@ class C30ImportConverter extends CConverter {
 			$trigger['correlation_mode'] = ZBX_TRIGGER_CORRELATION_NONE;
 			$trigger['correlation_tag'] = '';
 			$trigger['tags'] = [];
+			$trigger['manual_close'] = ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED;
 
 			if (array_key_exists('dependencies', $trigger)) {
 				$trigger['dependencies'] =

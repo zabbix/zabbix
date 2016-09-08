@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with triggers.
- *
- * @package API
  */
 class CTrigger extends CTriggerGeneral {
 
@@ -635,12 +633,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $triggerIds
 	 */
 	protected function deleteByIds(array $triggerIds) {
-		// others idx should be deleted as well if they arise at some point
-		DB::delete('profiles', [
-			'idx' => 'web.events.filter.triggerid',
-			'value_id' => $triggerIds
-		]);
-
 		DB::delete('sysmaps_elements', [
 			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
@@ -877,8 +869,6 @@ class CTrigger extends CTriggerGeneral {
 	 * find this dependency trigger child on dependent trigger host and add new dependency.
 	 *
 	 * @param array $data
-	 *
-	 * @return void
 	 */
 	public function syncTemplateDependencies(array $data) {
 		$templateIds = zbx_toArray($data['templateids']);
@@ -1377,7 +1367,7 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT t.triggerid,t.description,t.expression'.
 				' FROM triggers t'.
 				' WHERE '.dbConditionInt('t.triggerid', $triggerIds).
-				'AND t.templateid IS NOT NULL',
+				' AND t.templateid IS NOT NULL',
 			1
 		));
 		if ($trigger) {

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with maintenances.
- *
- * * @package API
  */
 class CMaintenance extends CApiService {
 

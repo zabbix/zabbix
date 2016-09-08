@@ -588,6 +588,7 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
+				'manual_close' => $trigger['manual_close'],
 				'dependencies' => $this->formatDependencies($trigger['dependencies']),
 				'tags' => $this->formatTags($trigger['tags'])
 			];

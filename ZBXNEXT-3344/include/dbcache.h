@@ -205,7 +205,6 @@ typedef struct _DC_TRIGGER
 	char			*correlation_tag;
 	zbx_timespec_t		timespec;
 	int			lastchange;
-	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -407,13 +406,10 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
-void	dc_flush_history();
+void	dc_flush_history(void);
 int	DCsync_history(int sync_type, int *sync_num);
-void	init_database_cache();
-void	free_database_cache();
-
-void	DCadd_nextcheck(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error_msg);
-void	DCflush_nextchecks();
+void	init_database_cache(void);
+void	free_database_cache(void);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -457,12 +453,12 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
-void	DCconfig_unlock_all_triggers();
+void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num,
 		unsigned char expand);
-void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
-		int process_num);
+int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
+		zbx_uint64_t start_triggerid, int process_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
@@ -550,7 +546,7 @@ void	zbx_config_clean(zbx_config_t *cfg);
 int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
-void	DCupdate_hosts_availability();
+void	DCupdate_hosts_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
 void	zbx_action_eval_free(zbx_action_eval_t *action);
@@ -566,9 +562,8 @@ void	zbx_set_availability_diff_ts(int ts);
 
 void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
-
-
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1

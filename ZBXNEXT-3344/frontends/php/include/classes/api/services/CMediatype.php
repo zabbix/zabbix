@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations media types.
- *
- * @package API
  */
 class CMediatype extends CApiService {
 

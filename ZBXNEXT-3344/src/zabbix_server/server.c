@@ -54,7 +54,8 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
-
+#include "taskmanager/taskmanager.h"
+#include "events.h"
 #include "valuecache.h"
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
@@ -145,6 +146,7 @@ int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
+int	CONFIG_TASKMANAGER_FORKS	= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -342,6 +344,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
 		*local_process_num = local_server_num - server_count + CONFIG_VMWARE_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_TASKMANAGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TASKMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
 	}
 	else
 		return FAIL;
@@ -751,6 +758,8 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
+	zbx_initialize_events();
+
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
@@ -847,7 +856,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);
@@ -903,7 +912,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -1002,6 +1011,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_VMWARE:
 				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
 				break;
+			case ZBX_PROCESS_TYPE_TASKMANAGER:
+				threads[i] = zbx_thread_start(taskmanager_thread, &thread_args);
+				break;
 		}
 	}
 
@@ -1082,7 +1094,9 @@ void	zbx_on_exit(void)
 
 	free_selfmon_collector();
 
-	unload_modules();
+	zbx_uninitialize_events();
+
+	zbx_unload_modules();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

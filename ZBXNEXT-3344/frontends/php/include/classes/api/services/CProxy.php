@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with proxies.
- *
- * @package API
  */
 class CProxy extends CApiService {
 

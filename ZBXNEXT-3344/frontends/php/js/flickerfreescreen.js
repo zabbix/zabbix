@@ -266,6 +266,7 @@ jQuery(function($) {
 							window.flickerfreeScreenShadow.fadeSpeed(id, 0);
 							window.flickerfreeScreenShadow.validate(id);
 						}
+						chkbxRange.init();
 					},
 					error: function() {
 						window.flickerfreeScreen.calculateReRefresh(id);

@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with discovery services.
- *
- * @package API
  */
 class CDService extends CApiService {
 

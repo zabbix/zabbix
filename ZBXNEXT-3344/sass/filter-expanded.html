@@ -19,7 +19,7 @@
 <body>
 <header role="banner">
 		<div class="nav" role="navigation">
-			<div class="top-nav-container"><div class="logo"></div><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -176,7 +176,7 @@
 	<table class="list-table">
 		<thead>
 			<tr>
-				<th><div class="treeview"><span class="arrow-down"></span></div><div class="treeview"><span class="arrow-right"></span></div></th>
+				<th><button type="button" class="treeview"><span class="arrow-down"></span></button><button type="button" class="treeview"><span class="arrow-right"></span></button></th>
 				<th class="cell-width"><input type="checkbox"></th>
 				<th><a href="">Hosts<span class="arrow-down"></span></a></th>
 				<th><a href="">Applications<span class="arrow-up"></span></a></th>
@@ -190,8 +190,8 @@
 				<th><a href="">Status</a></th>
 				<th>Availability</th>
 				<th>Agent encryption</th>
-				<th></th>
-				<th></th>
+				<th>Info</th>
+				<th>Info 2</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -210,8 +210,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span> <span class="status-grey">none</span><span class="status-green">psk</span><span class="status-green">cert</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><a href="">Some linksdf sdfsdsfsfssff</a></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-depend-up cursor-pointer"></span></div><div class="rel-container"><span class="icon-depend-down cursor-pointer"></span></div><a href="">Some linksdf sdfsdsfsfssff</a></td>
 			</tr>
 			<tr class="row-selected">
 			    <td>root</td>
@@ -228,11 +228,11 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-red">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">psk</span> <span class="status-grey">none</span><span class="status-green">psk</span><span class="status-grey">cert</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><!--<span class="rel-container cursor-pointer"><span class="icon-depend-up"></span></span>--><span class="icon-depend-up cursor-pointer"></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><span class="icon-depend-up cursor-pointer"></span></td>
 			</tr>
 			<tr>
-			    <td><div class="treeview"><span class="arrow-right"></span></div><a href="">Public Cloud Service</a></td>
+			    <td><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">Public Cloud Service</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Main server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
@@ -246,11 +246,11 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">psk</span> <span class="status-green">none</span><span class="status-grey">psk</span><span class="status-green">cert</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
-			    <td><div class="treeview"><span class="arrow-down"></span></div><a href="">Business System</a></td>
+			    <td><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">Business System</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Backup server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
@@ -263,12 +263,12 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-red">jmx</span><span class="status-grey">ipmi</span></div></td>
-				<td><span class="tag">Custom tag</span><span class="tag">Custom tag</span></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><span class="tag">Custom tagsfsfsdf sdfsdfsfsf</span><span class="tag">Custom tagdsfsfsfsf sdfsdfsdfsdf</span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
-			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-right"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
+			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">HQ server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
@@ -282,11 +282,11 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
-			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-down"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
+			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Riga server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>
@@ -300,8 +300,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 4em;"><a href="">ERP 2</a>-<a href="">ERP 2 is unavailable by ICMP</a></td>
@@ -318,8 +318,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -336,8 +336,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -354,8 +354,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr class="row-selected">
 			    <td></td>
@@ -372,8 +372,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-green">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -390,8 +390,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -408,8 +408,8 @@
 				<td><a href="">Enabled</a></td>
 				<td><div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
 				<td><div class="status-container"><span class="status-green">none</span></div></td>
-				<td><span class="status-yellow"><b>!</b></span></td>
-				<td><span class="status-red"><b>&times;</b></span></td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
 			</tr>
 			<tr class="nothing-to-show">
 			    <td colspan="16">We couldn't find any results</td>
