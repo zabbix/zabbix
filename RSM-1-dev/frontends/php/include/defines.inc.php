@@ -971,8 +971,8 @@ define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
 
 // SLA reports graph names
 define('DNS_SERVICE_AVAILABILITY_GRAPH_1',		'DNS Service Availability - Accumulated minutes of downtime');
-define('DNS_NS_AVAILABILITY_GRAPH_1',			'DNS NS availability 1 Service Availability');
-define('DNS_NS_AVAILABILITY_GRAPH_2',			'DNS NS availability 2');
+define('DNS_NS_AVAILABILITY_GRAPH_1',			'DNS NS Availability - [$NS$] Accumulated minutes of downtime');
+define('DNS_NS_AVAILABILITY_GRAPH_2',			'DNS NS Availability - [$NS$] UP/DOWN');
 define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_1',	'DNS TCP Resolution RTT - Average');
 define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_2',	'DNS TCP Resolution RTT - Ratio of Failed tests');
 define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_1',	'DNS UDP Resolution RTT - Average');

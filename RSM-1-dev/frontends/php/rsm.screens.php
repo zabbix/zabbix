@@ -387,7 +387,7 @@ switch ($data['item']['key_']) {
 		}
 		break;
 
-	case 0:
+	case RSM_TLD_RDDS43_ENABLED:
 		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
 			if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
 				$graph_name = RDDS_QUERY_RTT_GRAPH_1;
@@ -709,6 +709,10 @@ switch ($data['item']['key_']) {
 			else {
 				$graph_name = DNS_NS_AVAILABILITY_GRAPH_2;
 			}
+
+			$item_key = new CItemKey($data['item']['key_']);
+			$params = $item_key->getParameters();
+			$graph_name = str_replace('$NS$', implode(', ', $params), $graph_name);
 
 			$graphs = API::Graph()->get(array(
 				'output' => array('graphid'),

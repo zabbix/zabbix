@@ -317,17 +317,17 @@ if ($data['filter_search']) {
 				'slr' => _s('%1$s min of downtime', round($macros[RSM_SLV_NS_AVAIL]['value'] / 60, 2)),
 				'screen' => array(
 					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-						'&item_key='.$ns_item['itemid'].'&filter_year='.$data['filter_year'].
+						'&item_key='.$ns_item['key_'].'&filter_year='.$data['filter_year'].
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_1
 					),
 					SPACE,
 					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-						'&item_key='.$ns_item['itemid'].'&filter_year='.$data['filter_year'].
+						'&item_key='.$ns_item['key_'].'&filter_year='.$data['filter_year'].
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
 					),
 					SPACE,
 					new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-						'&item_key='.$ns_item['itemid'].'&filter_year='.$data['filter_year'].
+						'&item_key='.$ns_item['key_'].'&filter_year='.$data['filter_year'].
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 					)
 				)
