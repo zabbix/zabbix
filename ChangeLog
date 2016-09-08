@@ -1,6 +1,7 @@
 Changes for 3.2.0beta3
 
 New features:
+A.F.I..PS. [ZBXNEXT-3344] increased maximum SNMP OID size from 255 to 512 bytes (Cemeris, viktors)
 ..F....... [ZBXNEXT-3405] implemented timeline in Monitoring->Problems view (Pavel, Sasha)
 ...G...PS. [ZBXNEXT-3353] implemented interface for history export through loadable modules and changed module loading to require only zbx_module_api_version() function (gleb, Sandis)
 ..F....... [ZBXNEXT-3423] removed ability to acknowledge OK events (Ivo)
