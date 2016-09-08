@@ -1493,10 +1493,10 @@ static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.dbl);
@@ -1524,10 +1524,10 @@ static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.ui64);
@@ -1555,10 +1555,10 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (ITEM_VALUE_TYPE_STR != h->value_type)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
@@ -1586,10 +1586,10 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
@@ -1618,10 +1618,10 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (ITEM_VALUE_TYPE_LOG != h->value_type)
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+		if (ITEM_VALUE_TYPE_LOG != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
