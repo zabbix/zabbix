@@ -107,7 +107,7 @@ if (!empty($this->data['interfaces'])) {
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
-	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited'], 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
@@ -404,7 +404,7 @@ $itemFormList->addRow(_('Description'),
 // status
 $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))
 	->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);
-$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
+$itemFormList->addRow(_('Create enabled'), $enabledCheckBox);
 
 // append tabs to form
 $itemTab = (new CTabView())->addTab('itemTab', $this->data['caption'], $itemFormList);

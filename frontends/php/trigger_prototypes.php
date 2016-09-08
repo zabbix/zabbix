@@ -419,8 +419,9 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') == 'triggerprototype.massenable');
-	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$status = (getRequest('action') == 'triggerprototype.massenable')
+		? TRIGGER_STATUS_ENABLED
+		: TRIGGER_STATUS_DISABLED;
 	$update = [];
 
 	// get requested triggers with permission check
@@ -450,12 +451,8 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 
 	$updated = count($update);
 
-	$messageSuccess = $enable
-		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
-		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
-		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
+	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
+	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }

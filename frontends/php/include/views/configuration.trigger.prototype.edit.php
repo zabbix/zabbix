@@ -523,12 +523,13 @@ if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 else {
 	$status = ($data['status'] == TRIGGER_STATUS_ENABLED);
 }
+
 $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
+	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
 $triggersTab = new CTabView();

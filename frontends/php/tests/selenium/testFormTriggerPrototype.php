@@ -388,7 +388,7 @@ class testFormTriggerPrototype extends CWebTest {
 			}
 		}
 
-		$this->zbxTestTextPresent('Enabled');
+		$this->zbxTestTextPresent('Create enabled');
 		$this->zbxTestAssertVisibleId('status');
 		$this->zbxTestAssertAttribute("//input[@id='status']", 'type', 'checkbox');
 

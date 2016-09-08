@@ -406,6 +406,11 @@ define('ZBX_ICON_PREVIEW_WIDTH',	24);
 
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
+
+/**
+ * Starting from Zabbix 2.2 items could not have ITEM_STATUS_NOTSUPPORTED status
+ * this constant is left for importing data from versions 1.8 and 2.0.
+ */
 define('ITEM_STATUS_NOTSUPPORTED',	3);
 
 define('ITEM_STATE_NORMAL',			0);
