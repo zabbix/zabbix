@@ -638,6 +638,9 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 	{
 		event = &events[i];
 
+		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
+			continue;
+
 		if (ZBX_TRIGGER_CORRELATION_TAG != event->trigger.correlation_mode || TRIGGER_VALUE_OK != event->value)
 			continue;
 
