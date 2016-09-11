@@ -644,9 +644,9 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 		/* reset event flags - create flag will be set if a problem event was closed */
 		event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
 
-		for (j = 0; j < events->tags.values_num; j++)
+		for (j = 0; j < event->tags.values_num; j++)
 		{
-			zbx_tag_t	*tag = (zbx_tag_t *)events->tags.values[j];
+			zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[j];
 
 			if (0 == strcmp(tag->tag, event->trigger.correlation_tag))
 				zbx_vector_str_append(&values, tag->value);
