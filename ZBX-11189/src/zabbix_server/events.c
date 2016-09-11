@@ -626,62 +626,55 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 
 	zbx_vector_str_create(&values);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct p.eventid,p.objectid from problem p,problem_tag pt"
-			" where p.r_eventid is null"
-				" and (");
+			" where p.source=%d"
+				" and p.object=%d"
+				" and p.r_eventid is null"
+				" and (",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
 	for (i = 0; i < events_num; i++)
 	{
 		event = &events[i];
 
-		if (EVENT_SOURCE_TRIGGERS == event->source)
+		if (ZBX_TRIGGER_CORRELATION_TAG != event->trigger.correlation_mode || TRIGGER_VALUE_OK != event->value)
+			continue;
+
+		/* reset event flags - create flag will be set if a problem event was closed */
+		event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+
+		for (j = 0; j < events->tags.values_num; j++)
 		{
+			zbx_tag_t	*tag = (zbx_tag_t *)events->tags.values[j];
 
-			if (EVENT_OBJECT_TRIGGER != event->object || TRIGGER_VALUE_OK != event->value ||
-					ZBX_TRIGGER_CORRELATION_TAG != event->trigger.correlation_mode)
-			{
-				continue;
-			}
-
-			/* reset event flags - create flag will be set if a problem event was closed */
-			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
-
-			for (j = 0; j < events->tags.values_num; j++)
-			{
-				zbx_tag_t	*tag = (zbx_tag_t *)events->tags.values[j];
-
-				if (0 == strcmp(tag->tag, event->trigger.correlation_tag))
-					zbx_vector_str_append(&values, tag->value);
-			}
-
-			if (0 == values.values_num)
-				continue;
-
-			tag_esc = DBdyn_escape_string(event->trigger.correlation_tag);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s("
-					"p.source=%d"
-					" and p.object=%d"
-					" and p.objectid=%d"
-					" and p.eventid=pt.eventid"
-					" and pt.tag='%s'"
-					" and",
-					separator, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->objectid,
-					tag_esc);
-
-			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "pt.value",
-					(const char **)values.values, values.values_num);
-
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
-			separator = " or ";
-
-			zbx_free(tag_esc);
-
-			zbx_vector_str_clear(&values);
-
-			do_correlation = 1;
+			if (0 == strcmp(tag->tag, event->trigger.correlation_tag))
+				zbx_vector_str_append(&values, tag->value);
 		}
+
+		if (0 == values.values_num)
+			continue;
+
+		tag_esc = DBdyn_escape_string(event->trigger.correlation_tag);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s("
+				"p.objectid=%d"
+				" and p.eventid=pt.eventid"
+				" and pt.tag='%s'"
+				" and",
+				separator, event->objectid, tag_esc);
+
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "pt.value",
+				(const char **)values.values, values.values_num);
+
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+		separator = " or ";
+
+		zbx_free(tag_esc);
+
+		zbx_vector_str_clear(&values);
+
+		do_correlation = 1;
 	}
 
 	if (0 != do_correlation)
