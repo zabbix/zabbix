@@ -658,7 +658,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 		tag_esc = DBdyn_escape_string(event->trigger.correlation_tag);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s("
-				"p.objectid=%d"
+				"p.objectid=" ZBX_FS_UI64
 				" and p.eventid=pt.eventid"
 				" and pt.tag='%s'"
 				" and",
