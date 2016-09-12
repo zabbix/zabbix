@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-23 08:28+0300\n"
+"PO-Revision-Date: 2016-09-08 08:15+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1471933727.000000\n"
+"X-POOTLE-MTIME: 1473315355.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1283,7 +1283,7 @@ msgstr[1] "לא ניתן להכיר באירועים"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "לא ניתן להכיר בתקלה: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -1970,27 +1970,27 @@ msgstr "לא ניתן למצוא את תמונת הרקע „%1$s“ הנמצא�
 #: include/classes/import/importers/CAbstractScreenImporter.php:80
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את התרשים „%1$s“ הנמצא בשימוש במסך „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:213
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את הקבוצה „%1$s“ הנמצאת בשימוש במפה „%2$s“."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את הקבוצה „%1$s“ הנמצאת בשימוש במסך „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:221
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את המארח „%1$s“ הנמצא בשימוש במפה „%2$s“."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את המארח „%1$s“ הנמצא בשימוש במסך „%2$s“."
 
 #: include/classes/import/CConfigurationImport.php:907
 #, c-format
@@ -2008,7 +2008,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:256
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את הסמל „%1$s“ הנמצא בשימוש במפה „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:312
 #, c-format
@@ -2048,17 +2048,17 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:99
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את הפריט „%1$s“ הנמצא בשימוש במסך „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:205
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את המפה „%1$s“ הנמצאת בשימוש במפה „%2$s“."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:107
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את המפה „%1$s“ הנמצאת בשימוש במסך „%2$s“."
 
 #: include/js.inc.php:187
 msgid "Cannot find objects with name"
@@ -2067,7 +2067,7 @@ msgstr "לא ניתן למצוא אובייקטים בשם זה"
 #: include/classes/import/importers/CAbstractScreenImporter.php:115
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן למצוא את המסך „%1$s“ הנמצא בשימוש במסך „%2$s“."
 
 #: include/classes/import/CConfigurationImport.php:930
 #, c-format
@@ -2228,32 +2228,32 @@ msgstr "לא ניתן לשלוח פקודה, נא לבדוק את החיבור �
 #: include/classes/api/services/CAction.php:2381
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור הפעולה „%2$s“."
 
 #: include/classes/api/services/CApplication.php:300
 #, c-format
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור היישום „%2$s“."
 
 #: include/classes/api/services/CGraphGeneral.php:472
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור התרשים „%2$s“."
 
 #: include/classes/api/services/CGraphGeneral.php:476
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור אבטיפוס התרשים „%2$s“."
 
 #: include/classes/api/services/CHostGroup.php:700
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור קבוצת המארחים „%2$s“."
 
 #: include/classes/api/services/CItemGeneral.php:251
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור הפריט „%2$s“."
 
 #: include/classes/api/services/CTemplateScreen.php:529
 #: include/classes/api/services/CTemplateScreen.php:627
@@ -2264,7 +2264,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:493
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן להגדיר את „%1$s“ עבור ההקפצה „%2$s“."
 
 #: include/classes/api/services/CTriggerGeneral.php:498
 #, c-format
@@ -2351,32 +2351,32 @@ msgstr ""
 #: include/classes/api/services/CAction.php:2495
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור הפעולה „%2$s“."
 
 #: include/classes/api/services/CApplication.php:294
 #, c-format
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ ליישום „%2$s“."
 
 #: include/classes/api/services/CGraphGeneral.php:606
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור התרשים „%2$s“."
 
 #: include/classes/api/services/CGraphGeneral.php:610
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור אבטיפוס התרשים „%2$s“."
 
 #: include/classes/api/services/CHostGroup.php:808
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור קבוצת המארחים „%2$s“."
 
 #: include/classes/api/services/CItemGeneral.php:209
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור הפריט „%2$s“."
 
 #: include/classes/api/services/CTriggerGeneral.php:647
 #, c-format
@@ -2391,7 +2391,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:646
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%1$s“ עבור ההקפצה „%2$s“."
 
 #: include/classes/api/services/CTriggerGeneral.php:652
 #, c-format
@@ -2401,12 +2401,12 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1793
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%2$s“ עבור המארח שהתגלה „%1$s“."
 
 #: include/classes/api/services/CItemGeneral.php:171
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את „%2$s“ עבור הפריט שהתגלה „%1$s“."
 
 #: include/classes/api/services/CTriggerGeneral.php:699
 #: include/classes/api/services/CTrigger.php:710
@@ -2509,11 +2509,10 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr ""
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "לא ניתן לעדכן אבטיפוס של מארח"
-msgstr[1] "לא ניתן לעדכן אבטיפוס של מארח"
+msgstr[1] "לא ניתן לעדכן אבות טיפוס של מארח"
 
 #: hosts.php:405
 msgid "Cannot update hosts"
@@ -2537,11 +2536,10 @@ msgid "Cannot update item"
 msgstr "לא ניתן לעדכן את הפריט"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "לא ניתן לעדכן את האבטיפוס של הפריט"
-msgstr[1] "לא ניתן לעדכן את האבטיפוס של הפריט"
+msgstr[1] "לא ניתן לעדכן את אבות הטיפוס של הפריט"
 
 #: items.php:922
 msgid "Cannot update items"
@@ -2553,7 +2551,7 @@ msgstr ""
 
 #: maintenance.php:131
 msgid "Cannot update maintenance"
-msgstr ""
+msgstr "לא ניתן לעדכן את עבודת התחזוקה"
 
 #: app/controllers/CControllerMediatypeUpdate.php:65
 #: app/controllers/CControllerMediatypeUpdate.php:167
@@ -2612,7 +2610,7 @@ msgstr ""
 
 #: triggers.php:352 triggers.php:440 tr_logform.php:127
 msgid "Cannot update trigger"
-msgstr ""
+msgstr "לא ניתן לעדכן את ההקפצה"
 
 #: include/classes/api/services/CTriggerGeneral.php:1604
 #, c-format
@@ -2713,20 +2711,20 @@ msgstr "תו"
 
 #: include/regexp.inc.php:222 include/views/js/adm.regexprs.edit.js.php:128
 msgid "Character string included"
-msgstr ""
+msgstr "מחרוזת תווים כלולה"
 
 #: include/regexp.inc.php:224 include/views/js/adm.regexprs.edit.js.php:136
 msgid "Character string not included"
-msgstr ""
+msgstr "מחרוזת תווים אינה כלולה"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
-msgstr ""
+msgstr "מארז"
 
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:491
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "פרטי מארז. מחזירה מחרוזת"
 
 #: include/views/js/configuration.discovery.edit.js.php:533
 msgid "Check already exists."
@@ -2812,7 +2810,7 @@ msgstr ""
 
 #: include/classes/api/services/CDRule.php:572
 msgid "Checks should be unique."
-msgstr ""
+msgstr "הבדיקות צריכות להיות ייחודיות."
 
 #: include/locales.inc.php:55
 msgid "Chinese (zh_CN)"
@@ -2922,7 +2920,7 @@ msgstr "סגירת אירועים ישנים"
 #: app/views/monitoring.acknowledge.edit.php:74 include/acknow.inc.php:57
 #: include/events.inc.php:539
 msgid "Close problem"
-msgstr ""
+msgstr "סגירת התקלה"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:170
 msgid "Collapse"
@@ -2953,7 +2951,7 @@ msgstr "עמודה נמחקה"
 
 #: include/views/monitoring.screen.constructor.edit.php:725 screenedit.php:72
 msgid "Column span"
-msgstr ""
+msgstr "פריסת עמודות"
 
 #: include/views/monitoring.screen.edit.php:117 screenconf.php:52
 msgid "Columns"
@@ -2992,7 +2990,7 @@ msgstr "מסחרי"
 
 #: include/classes/api/services/CAction.php:2221
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "השוואת מספר הקפצות עם „וגם“ אינה מורשית."
 
 #: popup_trexpr.php:25
 msgid "Condition"
@@ -3300,7 +3298,7 @@ msgstr "התחברויות אל המתווך"
 #: include/views/monitoring.screen.list.php:84
 #: include/views/monitoring.sysmap.list.php:59
 msgid "Constructor"
-msgstr ""
+msgstr "בונה"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3378,7 +3376,7 @@ msgstr "שם היחס לא יכול להיות ריק."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "כלל יחס"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3683,7 +3681,7 @@ msgstr "סקריפט מותאם אישית"
 
 #: include/views/administration.general.triggerSeverity.edit.php:75
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr ""
+msgstr "שמות דרגות חומרה מותאמים אישית משפיעים על כל השפות ודורשות תרגום ידני!"
 
 #: include/views/js/monitoring.sysmaps.js.php:36
 msgid "Custom size"
@@ -3721,7 +3719,7 @@ msgstr "מנוטרל"
 #: include/views/inventory.host.view.php:95
 #: include/views/js/configuration.host.edit.js.php:24 search.php:127
 msgid "DNS"
-msgstr ""
+msgstr "DNS"
 
 #: app/views/administration.proxy.edit.php:44
 #: include/views/configuration.host.edit.php:128
@@ -3785,7 +3783,7 @@ msgstr "סקירת נתונים"
 #: include/views/administration.general.housekeeper.edit.php:108
 #: include/views/administration.general.housekeeper.edit.php:124
 msgid "Data storage period (in days)"
-msgstr ""
+msgstr "תקופת אחסון נתונים (בימים)"
 
 #: include/forms.inc.php:415 include/views/configuration.item.edit.php:315
 #: include/views/configuration.item.massupdate.php:226
@@ -4277,11 +4275,11 @@ msgstr[1] ""
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "למחוק את מפות הערכים הנבחרות?"
 
 #: include/views/configuration.httpconf.list.php:156
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "למחוק את תרחישי הרשת הנבחרים?"
 
 #: include/services.inc.php:120 jsLoader.php:184
 #, c-format
@@ -4483,19 +4481,19 @@ msgstr ""
 
 #: popup_trexpr.php:222
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "ההפרש בין הערך המרבי והערך המזערי בטווח הזמן T הוא < N (קטן)"
 
 #: popup_trexpr.php:232
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "ההפרש בין הערך המרבי והערך המזערי בטווח הזמן T הוא N"
 
 #: popup_trexpr.php:227
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "ההפרש בין הערך המרבי והערך המזערי בטווח הזמן T הוא > N (גדול)"
 
 #: popup_trexpr.php:237
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "ההפרש בין הערך המרבי והערך המזערי בטווח הזמן T הוא לא N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
@@ -4669,7 +4667,7 @@ msgstr "מנוטרל"
 #: adm.triggerseverities.php:40 adm.triggerseverities.php:41
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Disaster"
-msgstr ""
+msgstr "אסון"
 
 #: include/discovery.inc.php:138
 msgid "Discovered"
@@ -4684,7 +4682,7 @@ msgstr ""
 
 #: include/classes/screens/CScreenDiscovery.php:125
 msgid "Discovered device"
-msgstr ""
+msgstr "התקן שהתגלה"
 
 #: include/menu.inc.php:105 include/menu.inc.php:237
 #: include/views/configuration.action.list.php:29
@@ -4696,11 +4694,11 @@ msgstr ""
 #: include/views/inventory.host.view.php:175 search.php:138 search.php:176
 #: search.php:205 search.php:414 search.php:454 search.php:471
 msgid "Discovery"
-msgstr ""
+msgstr "גילוי"
 
 #: include/views/configuration.discovery.edit.php:50
 msgid "Discovery by proxy"
-msgstr ""
+msgstr "התגלה על ידי המתווך"
 
 #: include/actions.inc.php:49
 msgid "Discovery check"
@@ -4718,11 +4716,11 @@ msgstr ""
 
 #: include/html.inc.php:455
 msgid "Discovery list"
-msgstr ""
+msgstr "רשימת גילוי"
 
 #: include/actions.inc.php:50
 msgid "Discovery object"
-msgstr ""
+msgstr "פריט גילוי"
 
 #: app/views/monitoring.discovery.view.php:29
 #: app/views/monitoring.widget.discovery.view.php:46
@@ -5065,27 +5063,27 @@ msgstr ""
 
 #: jsLoader.php:186
 msgid "Edit trigger"
-msgstr ""
+msgstr "עריכת הקפצה"
 
 #: include/views/hostmacros.php:46
 msgid "Effective value"
-msgstr ""
+msgstr "ערך יעיל"
 
 #: include/views/monitoring.sysmap.edit.php:229
 msgid "Element"
-msgstr ""
+msgstr "רכיב"
 
 #: include/maps.inc.php:47 include/views/js/monitoring.sysmaps.js.php:307
 msgid "Element name"
-msgstr ""
+msgstr "שם הרכיב"
 
 #: app/views/administration.mediatype.edit.php:41 include/media.inc.php:24
 msgid "Email"
-msgstr ""
+msgstr "דוא״ל"
 
 #: popup.php:533
 msgid "Empty"
-msgstr ""
+msgstr "ריק"
 
 #: include/classes/api/services/CHttpTest.php:909
 #, c-format
@@ -5114,7 +5112,7 @@ msgstr ""
 #: include/classes/validators/CActionCondValidator.php:189
 #: include/classes/validators/CActionCondValidator.php:196
 msgid "Empty action condition."
-msgstr ""
+msgstr "תנאי פעולה ריק."
 
 #: include/classes/api/services/CItemPrototype.php:298
 #, c-format
@@ -5123,11 +5121,11 @@ msgstr ""
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "צבע ריק."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Empty correlation ID."
-msgstr ""
+msgstr "מזהה היחס ריק."
 
 #: include/classes/api/services/CAction.php:2267
 #, c-format
@@ -5154,7 +5152,7 @@ msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:176
 msgid "Empty host."
-msgstr ""
+msgstr "מארח ריק."
 
 #: include/classes/api/services/CAction.php:1361
 #: include/classes/api/services/CApplication.php:241
@@ -5202,7 +5200,7 @@ msgstr ""
 #: include/classes/api/services/CValueMap.php:324
 #: include/classes/api/services/CValueMap.php:390
 msgid "Empty input parameter."
-msgstr ""
+msgstr "פרמטר הקלט ריק."
 
 #: include/classes/api/services/CApplication.php:468
 #: include/classes/api/services/CHttpTest.php:259
@@ -5212,7 +5210,7 @@ msgstr ""
 
 #: include/classes/api/services/CMap.php:779
 msgid "Empty map ID."
-msgstr ""
+msgstr "מזהה המפה ריק."
 
 #: include/classes/api/services/CMediatype.php:384
 msgid "Empty media type ID."
@@ -5234,7 +5232,7 @@ msgstr ""
 
 #: include/classes/api/services/CService.php:889
 msgid "Empty name."
-msgstr ""
+msgstr "שם ריק."
 
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
@@ -5530,11 +5528,11 @@ msgstr "סוג אירוע"
 
 #: include/views/common.filter.trigger.php:63
 msgid "Events"
-msgstr ""
+msgstr "אירועים"
 
 #: include/views/administration.general.housekeeper.edit.php:32
 msgid "Events and alerts"
-msgstr ""
+msgstr "אירועים והתראות"
 
 #: include/forms.inc.php:1700
 msgid "Every day(s)"
@@ -5587,7 +5585,7 @@ msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:169
 msgid "Expand"
-msgstr ""
+msgstr "הרחבה"
 
 #: include/views/monitoring.sysmap.constructor.php:40
 msgid "Expand macros"
@@ -5712,7 +5710,7 @@ msgstr ""
 
 #: include/classes/api/services/CTemplate.php:501
 msgid "Failed to update template."
-msgstr ""
+msgstr "עדכון התבנית נכשל."
 
 #: include/items.inc.php:37
 msgid "Failure Audit"

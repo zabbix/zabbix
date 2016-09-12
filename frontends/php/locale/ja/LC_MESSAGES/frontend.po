@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-23 01:49+0300\n"
-"Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
+"PO-Revision-Date: 2016-09-08 01:16+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1471909758.000000\n"
+"X-POOTLE-MTIME: 1473290190.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1267,7 +1267,7 @@ msgstr[0] "イベントの障害対応コメントを入力できません"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "障害対応コメントを入力できません: %1$s。"
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -2463,7 +2463,6 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "ホストの暗号化設定が更新できません。両方向の接続設定を指定する必要があります。"
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "ホストのプロトタイプを更新できません"
@@ -2490,7 +2489,6 @@ msgid "Cannot update item"
 msgstr "アイテムを更新できません"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "アイテムのプロトタイプを更新できません"
@@ -2572,19 +2570,18 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "トリガー\"%1$s\"を更新できません: %2$s。"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "トリガーのプロトタイプが更新できません"
+msgstr[0] "トリガーのプロトタイプを更新できません"
 
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr "トリガーのプロトタイプ\"%1$s\"が更新できません: %2$s。"
+msgstr "トリガーのプロトタイプ\"%1$s\"を更新できません: %2$s。"
 
 #: trigger_prototypes.php:419
 msgid "Cannot update trigger prototypes"
-msgstr "トリガーのプロトタイプが更新できません"
+msgstr "トリガーのプロトタイプを更新できません"
 
 #: profile.php:179 users.php:247
 msgid "Cannot update user"
@@ -3338,7 +3335,7 @@ msgstr "相関関係名は必須項目です。"
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "相関関係ルール"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3381,7 +3378,7 @@ msgstr "相関関係の作成"
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "自動生成無効"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3398,7 +3395,7 @@ msgstr "ディスカバリルールの作成"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "自動生成有効"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4804,7 +4801,7 @@ msgstr "条件式を置き換えますか？"
 
 #: include/actions.inc.php:1567 jsLoader.php:133
 msgid "Done"
-msgstr "Done"
+msgstr "終了"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:346
 #: include/views/js/monitoring.sysmaps.js.php:426 jsLoader.php:148
@@ -4868,7 +4865,7 @@ msgstr "相関関係の\"%1$s\"の値\"%2$s\"が重複しています。"
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "ホストグループのための\"%1$s\"の値\"%2$s\"が重複しています。"
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5103,7 +5100,7 @@ msgstr "ディスカバリルール\"%1$s\"のフィルター条件マクロが�
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "グループIDが空白です。"
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5676,7 +5673,7 @@ msgstr "失敗の監査"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "失敗"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6405,7 +6402,7 @@ msgstr "ヘッダー"
 
 #: include/locales.inc.php:64
 msgid "Hebrew (he_IL)"
-msgstr ""
+msgstr "ヘブライ語 (he_IL)"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:82
 #: include/views/configuration.graph.list.php:73
@@ -6651,7 +6648,7 @@ msgstr "ホストグループ内のホスト"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "ホストグループがパラメータに設定されていません: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6757,7 +6754,6 @@ msgid "Host prototype deleted"
 msgstr "ホストのプロトタイプを削除しました"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "ホストのプロトタイプを更新しました"
@@ -7718,7 +7714,7 @@ msgstr "スクリーンの要素のグラフのプロトタイプID\"%1$s\"が�
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "グループIDが正しくありません。"
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -8845,7 +8841,6 @@ msgid "Item prototype deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "アイテムのプロトタイプを更新しました"
@@ -10396,7 +10391,7 @@ msgstr "グラフに\"%1$s\"が定義されていません。"
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "グループに\"%1$s\"が定義されていません。"
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -11436,7 +11431,7 @@ msgstr "同時には1つのユーザーグループ名しか変更できませ�
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
+msgstr[0] "選択した障害のみ"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12707,7 +12702,7 @@ msgstr "ホストグループを置換"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "タグを置換"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12786,20 +12781,20 @@ msgstr "解決済"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "相関関係ルール\"%1$s\"によって解決済。"
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "相関関係ルールによって解決済。"
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "ユーザー\"%1$s\"によって解決済。"
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "ユーザーによって解決済。"
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13468,7 +13463,7 @@ msgstr "選択したアクションを削除しました"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "選択した障害とトリガーに関連しているコメント未入力の障害"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -14849,7 +14844,7 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 #: include/classes/api/services/CTriggerGeneral.php:1531
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
-msgstr "トリガー\"%1s\"はリンクされている他のテンプレートに含まれています。"
+msgstr "トリガー\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
 #: include/classes/import/CConfigurationImport.php:1445
 #, c-format
@@ -14959,7 +14954,7 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はすでに\"%2$s\"に存在�
 #: include/classes/api/services/CTriggerGeneral.php:1535
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
-msgstr "トリガーのプロトタイプ\"%1s\"はリンクされている他のテンプレートに含まれています。"
+msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1454
 #, c-format
@@ -14989,7 +14984,6 @@ msgid "Trigger prototype deleted"
 msgstr "トリガーのプロトタイプを削除しました"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "トリガーのプロトタイプを更新しました"
@@ -17133,7 +17127,7 @@ msgstr "内部イベント"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "グループ名\"%1$s\"が正しくありません"
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17235,7 +17229,7 @@ msgstr "ms"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "文字列で設定してください"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"

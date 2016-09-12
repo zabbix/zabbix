@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-24 16:07+0300\n"
+"PO-Revision-Date: 2016-09-07 20:51+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1472047631.000000\n"
+"X-POOTLE-MTIME: 1473274304.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1283,7 +1283,7 @@ msgstr[1] "Cannot acknowledge events"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "Cannot acknowledge problem: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -2509,11 +2509,10 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "Cannot update host encryption settings. Connection settings for both directions should be specified."
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Cannot update host prototype"
-msgstr[1] "Cannot update host prototype"
+msgstr[1] "Cannot update host prototypes"
 
 #: hosts.php:405
 msgid "Cannot update hosts"
@@ -2537,11 +2536,10 @@ msgid "Cannot update item"
 msgstr "Cannot update item"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "Cannot update item prototype"
-msgstr[1] "Cannot update item prototype"
+msgstr[1] "Cannot update item prototypes"
 
 #: items.php:922
 msgid "Cannot update items"
@@ -2620,11 +2618,10 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Cannot update trigger \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Cannot update trigger prototype"
-msgstr[1] "Cannot update trigger prototype"
+msgstr[1] "Cannot update trigger prototypes"
 
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
@@ -3390,7 +3387,7 @@ msgstr "Correlation name cannot be empty."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "Correlation rule"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3433,7 +3430,7 @@ msgstr "Create correlation"
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "Create disabled"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3450,7 +3447,7 @@ msgstr "Create discovery rule"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "Create enabled"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4923,7 +4920,7 @@ msgstr "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "Duplicate \"%1$s\" value \"%2$s\" for host group."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5158,7 +5155,7 @@ msgstr "Empty filter condition macro for discovery rule \"%1$s\"."
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "Empty group ID."
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5732,7 +5729,7 @@ msgstr "Failure Audit"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "Failures"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6712,7 +6709,7 @@ msgstr "Host group elements"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "Host group is missing parameters: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6818,11 +6815,10 @@ msgid "Host prototype deleted"
 msgstr "Host prototype deleted"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Host prototype updated"
-msgstr[1] "Host prototype updated"
+msgstr[1] "Host prototypes updated"
 
 #: include/classes/api/services/CHostPrototype.php:1139
 #, c-format
@@ -7780,7 +7776,7 @@ msgstr "Incorrect graph prototype ID \"%1$s\" provided for screen element."
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "Incorrect group ID."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -8910,11 +8906,10 @@ msgid "Item prototype deleted"
 msgstr "Item prototype deleted"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "Item prototype updated"
-msgstr[1] "Item prototype updated"
+msgstr[1] "Item prototypes updated"
 
 #: include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:104
@@ -10468,7 +10463,7 @@ msgstr "No \"%1$s\" given for graph."
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "No \"%1$s\" given for group."
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -11508,8 +11503,8 @@ msgstr "Only one user group name can be changed at a time."
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Only selected problem"
+msgstr[1] "Only selected problems"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12782,7 +12777,7 @@ msgstr "Replace host groups"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "Replace tags"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12861,20 +12856,20 @@ msgstr "Resolved"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Resolved by correlation rule \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "Resolved by correlation rule."
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "Resolved by user \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "Resolved by user."
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13544,7 +13539,7 @@ msgstr "Selected actions deleted"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "Selected and all other unacknowledged problems of related triggers"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -15073,11 +15068,10 @@ msgid "Trigger prototype deleted"
 msgstr "Trigger prototype deleted"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "Trigger prototype updated"
-msgstr[1] "Trigger prototype updated"
+msgstr[1] "Trigger prototypes updated"
 
 #: include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:111
@@ -17223,7 +17217,7 @@ msgstr "internal"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "invalid group name \"%1$s\""
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17325,7 +17319,7 @@ msgstr "ms"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "must be a string"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"
