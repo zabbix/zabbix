@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-22 12:28+0300\n"
+"PO-Revision-Date: 2016-09-09 08:27+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1471861689.000000\n"
+"X-POOTLE-MTIME: 1473402426.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1301,7 +1301,7 @@ msgstr[2] "Nelze potvrdit událost"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "Nelze uznat problém: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -2557,12 +2557,11 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "Nelze aktualizovat nastavení šifrování hostitele. Měly by být upřesněny nastavení připojení pro oba směry."
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
-msgstr[0] "Nelze aktualizovat prototyp hosta"
-msgstr[1] "Nelze aktualizovat prototyp hosta"
-msgstr[2] "Nelze aktualizovat prototyp hosta"
+msgstr[0] "Nelze aktualizovat host prototyp"
+msgstr[1] "Nelze aktualizovat host prototyp"
+msgstr[2] "Nelze aktualizovat host prototyp"
 
 #: hosts.php:405
 msgid "Cannot update hosts"
@@ -2586,12 +2585,11 @@ msgid "Cannot update item"
 msgstr "Nelze upravit položku"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "Nelze aktualizovat prototyp položky"
-msgstr[1] "Nelze aktualizovat prototyp položky"
-msgstr[2] "Nelze aktualizovat prototyp položky"
+msgstr[1] "Nelze aktualizovat prototypy položek"
+msgstr[2] "Nelze aktualizovat prototypy položek"
 
 #: items.php:922
 msgid "Cannot update items"
@@ -2670,12 +2668,11 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Nelze aktualizovat spouštěč \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Není možné aktualizovat prototyp spouštěče"
-msgstr[1] "Není možné aktualizovat prototyp spouštěče"
-msgstr[2] "Není možné aktualizovat prototyp spouštěče"
+msgstr[0] "Nelze aktualizovat prototyp spouštěče"
+msgstr[1] "Nelze aktualizovat prototypy spouštěčů"
+msgstr[2] "Nelze aktualizovat prototypy spouštěčů"
 
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
@@ -3444,7 +3441,7 @@ msgstr "Název korelace nemůže být prázdný."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "Korelační pravidlo"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3487,7 +3484,7 @@ msgstr "Vytvořit korelaci"
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "Vytváření zakázáno"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3504,7 +3501,7 @@ msgstr "Vytvořit objevovací pravidlo"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "Vytváření povoleno"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4980,7 +4977,7 @@ msgstr "Duplicate \"%1$s\" hodnoty \"%2$s\" pro korelaci."
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "Duplicitní \"%1$s\" hodnota \"%2$s\" pro hostitelskou skupinu."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5215,7 +5212,7 @@ msgstr "Prázdná filtrovací podmínka makra pro objevovací pravidlo \"%1$s\".
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "Prázdné ID skupiny."
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5790,7 +5787,7 @@ msgstr "Neúspěšný audit"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "Selhání"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6523,7 +6520,7 @@ msgstr "HTTP hlavičky"
 
 #: include/locales.inc.php:64
 msgid "Hebrew (he_IL)"
-msgstr ""
+msgstr "Hebrejština (he_IL)"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:82
 #: include/views/configuration.graph.list.php:73
@@ -6775,7 +6772,7 @@ msgstr "Elementy skupiny hostů"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "Hostitelské skupině chybí parametry: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6881,12 +6878,11 @@ msgid "Host prototype deleted"
 msgstr "Prototyp hosta smazán"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] "Prototyp hosta aktualizovaný"
-msgstr[1] "Prototyp hosta aktualizovaný"
-msgstr[2] "Prototyp hosta aktualizovaný"
+msgstr[0] "Host prototyp aktualizovaný"
+msgstr[1] "Host prototypy aktualizované"
+msgstr[2] "Host prototypy aktualizované"
 
 #: include/classes/api/services/CHostPrototype.php:1139
 #, c-format
@@ -7844,7 +7840,7 @@ msgstr "Neplatné ID prototypu grafu \"%1$s\" v prvku obrazovky."
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "Nesprávné ID skupiny."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -8977,12 +8973,11 @@ msgid "Item prototype deleted"
 msgstr "Není možné smazat prototyp položky"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] "Prototyp položky aktualizovaný"
-msgstr[1] "Prototyp položky aktualizovaný"
-msgstr[2] "Prototyp položky aktualizovaný"
+msgstr[0] "Prototyp položky aktualizován"
+msgstr[1] "Prototypy položek aktualizovány"
+msgstr[2] "Prototypy položek aktualizovány"
 
 #: include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:104
@@ -10542,7 +10537,7 @@ msgstr "Žádné \"%1$s\" dané pro graf."
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "Žádné \"%1$s\" uvedeny pro skupinu."
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -11582,9 +11577,9 @@ msgstr "Jen jedna uživatelská skupina může byt změněná naráz."
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Pouze vybraný problém"
+msgstr[1] "Pouze vybrané problémy"
+msgstr[2] "Pouze vybrané problémy"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12859,7 +12854,7 @@ msgstr "Nahradit skupiny"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "Nahradit tagy"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12938,20 +12933,20 @@ msgstr "Vyřešené"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Vyřešená korelační pravidla \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "Vyřešená korelační pravidla."
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "Vyřešeno uživatelem \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "Vyřešeno uživatelem."
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13622,7 +13617,7 @@ msgstr "Označené akce smazané"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "Vybrané a všechny ostatní nepřiznané problémy souvisejících spouštěčů."
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -15159,12 +15154,11 @@ msgid "Trigger prototype deleted"
 msgstr "Není možné smazat prototyp spouštěč"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "Prototyp spouštěče aktualizovaný"
-msgstr[1] "Prototyp spouštěče aktualizovaný"
-msgstr[2] "Prototyp spouštěče aktualizovaný"
+msgstr[1] "Prototypy spouštěčů aktualizované"
+msgstr[2] "Prototypy spouštěčů aktualizované"
 
 #: include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:111
@@ -17315,7 +17309,7 @@ msgstr "interní"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "neplatný název skupiny \"%1$s\""
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17417,7 +17411,7 @@ msgstr "ms"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "musí být řetězec"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"

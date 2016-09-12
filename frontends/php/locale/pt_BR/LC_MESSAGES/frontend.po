@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-22 11:46+0300\n"
+"PO-Revision-Date: 2016-08-27 17:26+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1471859166.000000\n"
+"X-POOTLE-MTIME: 1472311595.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -9376,7 +9376,7 @@ msgstr "Associar à template"
 
 #: include/actions.inc.php:698
 msgid "Link to templates"
-msgstr "Vínculo para templates"
+msgstr "Vínculo com templates"
 
 #: include/views/configuration.host.edit.php:588
 #: include/views/configuration.host.edit.php:629
