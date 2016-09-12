@@ -156,15 +156,9 @@ foreach ($this->data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$triggerDescription[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$triggerDescription[] = new CLink(
-				CHtml::encode($trigger['description']),
-				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
-			);
-		}
+		$triggerDescription[] = new CLink(CHtml::encode($trigger['description']),
+			'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
