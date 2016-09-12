@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-23 08:13+0300\n"
+"PO-Revision-Date: 2016-09-08 13:54+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1471932821.000000\n"
+"X-POOTLE-MTIME: 1473335672.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1267,7 +1267,7 @@ msgstr[0] "이벤트의 장애대응 코멘트를 입력할 수 없습니다"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "장애대응 코멘트를 입력할 수 없습니다 : %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -2463,7 +2463,6 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "호스트의 암호화 설정을 갱신할 수 없습니다. 양 측의 접속설정을 확인할 필요가 있습니다."
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "호스트 프로토타입을 갱신할 수 없습니다"
@@ -2490,7 +2489,6 @@ msgid "Cannot update item"
 msgstr "아이템을 갱신할 수 없습니다"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "아이템의 프로토타입을 갱신할 수 없습니다"
@@ -2572,7 +2570,6 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "트리거 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "트리거 프로토타입을 갱신할 수 없습니다"
@@ -3338,7 +3335,7 @@ msgstr "상관관계의 이름은 필수입니다."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "상관관계 규칙"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3381,7 +3378,7 @@ msgstr "상관관계의 작성"
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "자동생성 비활성화"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3398,7 +3395,7 @@ msgstr "디스커버리 규칙 작성"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "자동생성 활성화"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4869,7 +4866,7 @@ msgstr "상관관계의 \"%1$s\"의 값 \"%2$s\"가 중복되었습니다."
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "호스트 그룹을 위한 \"%1$s\"의 값 \"%2$s\"가 중복되었습니다."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5104,7 +5101,7 @@ msgstr "디스커버리 규칙\"%1$s\"의 필터조건 매크로가 공백입니
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "그룹 ID가 공백입니다."
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5677,7 +5674,7 @@ msgstr "실패 감사"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "실패"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6406,7 +6403,7 @@ msgstr "헤더"
 
 #: include/locales.inc.php:64
 msgid "Hebrew (he_IL)"
-msgstr ""
+msgstr "히브리어 (he_IL)"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:82
 #: include/views/configuration.graph.list.php:73
@@ -6652,7 +6649,7 @@ msgstr "호스트 그룹내의 호스트"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "호스트 그룹이 파라미터에 설정되어 있지 않습니다: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6758,10 +6755,9 @@ msgid "Host prototype deleted"
 msgstr "호스트 프로토타입을 삭제하였습니다."
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] "호스트 프로토타입을 갱신하였습니다."
+msgstr[0] " 호스트 프로토타입을 갱신하였습니다"
 
 #: include/classes/api/services/CHostPrototype.php:1139
 #, c-format
@@ -7719,7 +7715,7 @@ msgstr "스크린 요소의 그래프 프로토타입 ID\"%1$s\"가 올바르지
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "그룹ID가 올바르지 않습니다."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -8846,7 +8842,6 @@ msgid "Item prototype deleted"
 msgstr "아이템 프로토타입을 삭제하였습니다"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "아이템 프로토타입을 갱신하였습니다"
@@ -10397,7 +10392,7 @@ msgstr "그래프에 \"%1$s\"가 정의되어 있지 않습니다."
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "그룹에 \"%1$s\"가 정의되지 않았습니다."
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -11437,7 +11432,7 @@ msgstr "동시에 하나의 유저 그룹 이름만 변경할 수 있습니다."
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
+msgstr[0] "선택한 장애만"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12708,7 +12703,7 @@ msgstr "호스트 그룹을 치환"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "태그를 치환하기"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12787,20 +12782,20 @@ msgstr "해결됨"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "상관관계 규칙 \"%1$s\"에 의해 해결됨."
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "상관관계 규칙에 의해 해결됨."
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "유저 \"%1$s\"에 의해 해결됨"
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "유저에 의해 해결됨."
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13469,7 +13464,7 @@ msgstr "선택한 액션을 삭제하였습니다"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "선택한 장애와 트리거에 관련되어 있는 코멘트 미입력의 장애"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -14990,7 +14985,6 @@ msgid "Trigger prototype deleted"
 msgstr "트리거 프로토타입을 삭제하였습니다"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "트리거 프로토타입을 갱신하였습니다"
@@ -17135,7 +17129,7 @@ msgstr "내부 이벤트"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "그룹명 \"%1$s\"가 올바르지 않습니다"
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17237,7 +17231,7 @@ msgstr "ms"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "문자열로 지정하여 주세요"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"
