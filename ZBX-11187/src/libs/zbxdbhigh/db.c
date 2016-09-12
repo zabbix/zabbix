@@ -2031,7 +2031,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	{
 		field = (ZBX_FIELD *)self->fields.values[i];
 
-		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[(int)(0 == i)]);
+		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
 
@@ -2064,7 +2064,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 #ifdef HAVE_ORACLE
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[(int)(0 == i)]);
+		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ":%d", i + 1);
 	}
 	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
@@ -2135,7 +2135,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 			field = self->fields.values[j];
 
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, delim[(int)(0 == j)]);
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, delim[0 == j]);
 
 			switch (field->type)
 			{
