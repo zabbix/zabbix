@@ -3,6 +3,7 @@ Changes for 3.2.0rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-11187] improved performance of event tag processing by caching eventtagid and problemtagid (Sasha)
 ........S. [ZBX-11177] fixed sql errors while processing event correlation on trigger level (Sasha)
 
 --------------------------------------------------------------------------------
