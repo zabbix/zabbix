@@ -687,6 +687,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 	if (0 != do_correlation)
 	{
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
