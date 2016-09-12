@@ -1652,7 +1652,7 @@ select {
 				left: 7px;
 				border-left: 2px solid $btn-bg-color;
 				border-bottom: 2px solid $btn-bg-color;
-				@include transform(translate3d(-50%, -50%, 0) rotate(-45deg));
+				@include transform(translate(-50%, -50%) rotate(-45deg));
 			}
 		}
 
