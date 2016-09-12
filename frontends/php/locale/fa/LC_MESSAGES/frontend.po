@@ -3,16 +3,16 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:50+0300\n"
-"PO-Revision-Date: 2014-04-13 14:12+0300\n"
-"Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
+"PO-Revision-Date: 2016-09-10 14:57+0300\n"
+"Last-Translator: m.shahrokhi <mohammad.shahrokhi72@gmail.com>\n"
 "Language-Team: none\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1397391161.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1473512249.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -20,7 +20,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:896
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" انتظار می رود."
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -35,7 +35,7 @@ msgstr "\"%s\" می بايست بين 1970.01.01 و 2038.01.18 باشد."
 #: include/classes/import/validators/C10XmlValidator.php:415
 #: include/classes/import/validators/C10XmlValidator.php:436
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" جفت انتظار می رود."
 
 #: include/func.inc.php:452
 #, c-format
@@ -70,7 +70,7 @@ msgstr ""
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
+msgstr[0] "%1$s روز"
 
 #: app/views/monitoring.acknowledge.edit.php:61
 #: app/views/monitoring.acknowledge.edit.php:66
@@ -78,38 +78,40 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
+msgstr[0] "%1$s رویداد"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
+msgstr[0] "%1$s آیتم"
 
 #: jsLoader.php:219 jsLoader.php:220 jsLoader.php:221 jsLoader.php:222
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s دقیقه"
 
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:66
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
+msgstr[0] "%1$s تلاش مجدد از چپ"
 
 #: jsLoader.php:217 jsLoader.php:218
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s ثانیه"
 
 #: app/views/layout.htmlpage.php:80 include/page_header.php:246
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] ""
+"%4$s تلاش برای ورود ناموفق بود. آخرین تلاش ناموفق از %1$s روی %2$s در %3$s "
+"بود."
 
 #: include/classes/screens/CScreenDiscovery.php:220
 #, c-format
@@ -121,17 +123,17 @@ msgstr[0] "%dدستگاه"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:532
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - بی نهایت)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
 #: include/views/configuration.template.edit.php:123
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(تنها ادمین اصلی می تواند گروه ایجاد کند.)"
 
 #: include/views/configuration.action.edit.php:539
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -146,7 +148,7 @@ msgstr "(بدون پروکسی)"
 
 #: include/classes/setup/CSetupWizard.php:237
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - از پورت پیش فرض استفاده کنید"
 
 #: include/triggers.inc.php:1819 include/triggers.inc.php:1821
 #: include/triggers.inc.php:1822 include/triggers.inc.php:1824
@@ -166,7 +168,7 @@ msgstr "10 ثانیه"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100تا مشغول ترین رویدادها"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -190,7 +192,7 @@ msgstr "500 مقدار اخیر"
 
 #: app/views/administration.script.edit.php:39
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "اسکریپت"
 
 #: include/views/monitoring.sysmap.edit.php:124
 msgid "<manual>"
@@ -210,11 +212,11 @@ msgstr "و"
 
 #: popup_trexpr.php:186
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "تفاوت مطلق بین آخرین مقدار و مقدار قبلی < N"
 
 #: popup_trexpr.php:194
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "تفاوت مطلق بین آخرین مقدار و مقدار قبلی = N"
 
 #: popup_trexpr.php:190
 msgid "Absolute difference between last and previous value is > N"
@@ -369,18 +371,18 @@ msgstr ""
 
 #: include/classes/api/services/CUser.php:1434
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "به علت حذف کاربر اقدام غیرفعال شد."
 
 #: actionconf.php:415
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
+msgstr[0] "اقدام فعال شد."
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:176
 #: include/menu.inc.php:168 include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
-msgstr ""
+msgstr "گزارش اقدامات"
 
 #: include/views/configuration.action.edit.php:498
 msgid "Action operations"
@@ -408,7 +410,7 @@ msgstr "فعال"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "فعال"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:498
@@ -529,7 +531,7 @@ msgstr "افزودن"
 
 #: include/services.inc.php:75 include/services.inc.php:114
 msgid "Add child"
-msgstr ""
+msgstr "اضافه کردن فرزند"
 
 #: include/actions.inc.php:594 include/actions.inc.php:881
 msgid "Add host"
@@ -537,11 +539,11 @@ msgstr "افزودن هاست"
 
 #: include/views/configuration.item.massupdate.php:555
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "اضافه کردن برنامه جدید یا موجود"
 
 #: include/views/configuration.host.massupdate.php:110
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "اضافه کردن گروه میزبان جدید یا موجود"
 
 #: include/views/configuration.graph.edit.php:297
 #: include/views/configuration.trigger.prototype.edit.php:314
@@ -601,10 +603,12 @@ msgstr "عامل"
 #: include/classes/items/CHelpItems.php:339
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr ""
+"چک کردن در دسترسی پذیری Agent. چیزی برنگردان - در دسترس نیست; 1 - در دسترس "
+"هست"
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
-msgstr ""
+msgstr "پنهانی کردن عامل"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -690,7 +694,7 @@ msgstr "هاست ها مجاز"
 
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "متناوبا، شما می توانید آن را به صورت دستی نصب کنید."
 
 #: include/triggers.inc.php:1271
 #: include/views/configuration.action.edit.php:133
@@ -699,13 +703,13 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.triggers.edit.php:104
 msgid "And"
-msgstr ""
+msgstr "و"
 
 #: include/views/configuration.action.edit.php:132
 #: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
-msgstr ""
+msgstr "و/یا"
 
 #: include/views/common.filter.trigger.php:35
 #: include/views/common.filter.trigger.php:45
@@ -739,7 +743,6 @@ msgid "Application added"
 msgstr "برنامه اضافه شد"
 
 #: applications.php:167 applications.php:207
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "برنامه حذف شد"
@@ -750,7 +753,7 @@ msgstr "خطای برنامه."
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "Application prototypes"
-msgstr ""
+msgstr "نمونه های اولیه نرم افزار"
 
 #: applications.php:110
 msgid "Application updated"
@@ -787,7 +790,7 @@ msgstr "اعمال"
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "نزدیک شونده"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -950,7 +953,7 @@ msgstr "روش تصدیق هویت به Fanoos internal تغییر یافت"
 #: include/views/configuration.item.prototype.edit.php:141
 #: include/views/js/configuration.discovery.edit.js.php:91
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "تصدیق عبارت عبور"
 
 #: include/views/configuration.host.discovery.edit.php:126
 #: include/views/configuration.item.edit.php:135
@@ -958,7 +961,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:134
 #: include/views/js/configuration.discovery.edit.js.php:81
 msgid "Authentication protocol"
-msgstr ""
+msgstr "تصدیق قرارداد"
 
 #: include/views/configuration.action.list.php:30
 msgid "Auto registration"
@@ -974,16 +977,16 @@ msgstr "خروج خودکار (حداقل 30 ثانیه)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "دوره ثبت خودکار انبار داده ها ( روز )"
 
 #: adm.housekeeper.php:41
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "دوره ثبت خودکار رویداد و آژیر انبار داده ها"
 
 #: include/profiles.inc.php:136
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "دوره ثبت خودکار رویداد و آژیر انبار داده ( روز ) \"%1$s\""
 
 #: include/hosts.inc.php:1075
 #: include/views/administration.general.other.edit.php:52
@@ -1022,15 +1025,15 @@ msgstr "متوسط"
 
 #: popup_trexpr.php:202
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "مقدار میانگین دوره N > T"
 
 #: popup_trexpr.php:212
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "مقدار میانگین دوره N = T"
 
 #: popup_trexpr.php:207
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "مقدار میانگین دوره N < T"
 
 #: popup_trexpr.php:217
 msgid "Average value of a period T is NOT N"
