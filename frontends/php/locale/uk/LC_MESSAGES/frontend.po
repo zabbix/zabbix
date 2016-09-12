@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
-"PO-Revision-Date: 2016-08-24 16:09+0300\n"
+"PO-Revision-Date: 2016-09-07 20:44+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1472047761.000000\n"
+"X-POOTLE-MTIME: 1473273899.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1301,7 +1301,7 @@ msgstr[2] "Не вдалося підтвердити події"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "Не вдалося підтвердити проблему: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -2557,12 +2557,11 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "Не вдалося оновити налаштування шифрування вузла мережі. Потрібно вказати налаштування з'єднання для обох сторін."
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Не вдалося оновити прототип вузла мережі"
-msgstr[1] "Не вдалося оновити прототип вузла мережі"
-msgstr[2] "Не вдалося оновити прототип вузла мережі"
+msgstr[1] "Не вдалося оновити прототипи вузлів мережі"
+msgstr[2] "Не вдалося оновити прототипи вузлів мережі"
 
 #: hosts.php:405
 msgid "Cannot update hosts"
@@ -2586,12 +2585,11 @@ msgid "Cannot update item"
 msgstr "Не вдалося оновити елемент даних"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "Не вдалося оновити прототип елемента даних"
-msgstr[1] "Не вдалося оновити прототип елемента даних"
-msgstr[2] "Не вдалося оновити прототип елемента даних"
+msgstr[1] "Не вдалося оновити прототипи елементів даних"
+msgstr[2] "Не вдалося оновити прототипи елементів даних"
 
 #: items.php:922
 msgid "Cannot update items"
@@ -2670,12 +2668,11 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Не вдалося оновити тригер \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Не вдалося оновити прототип тригера"
-msgstr[1] "Не вдалося оновити прототип тригера"
-msgstr[2] "Не вдалося оновити прототип тригера"
+msgstr[1] "Не вдалося оновити прототипи тригерів"
+msgstr[2] "Не вдалося оновити прототипи тригерів"
 
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
@@ -3444,7 +3441,7 @@ msgstr "Ім'я кореляції не може бути пустим."
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "Правило кореляції"
 
 #: correlation.php:139
 msgid "Correlation updated"
@@ -3487,7 +3484,7 @@ msgstr "Створити кореляцію"
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "Створювати дезактивованим"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3504,7 +3501,7 @@ msgstr "Створити правило виявлення"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "Створювати активованим"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4980,7 +4977,7 @@ msgstr "Дублікат \"%1$s\" значення \"%2$s\" в кореляці�
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "Дублікат \"%1$s\" значення \"%2$s\" для групи вузлів мережі."
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5215,7 +5212,7 @@ msgstr "Пустий макрос умови фільтру для правил�
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "Пустий ID групи."
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5790,7 +5787,7 @@ msgstr "Аудит відмов"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "Збої"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6775,7 +6772,7 @@ msgstr "Елементи групи вузлів мережі"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "Група вузлів мережі не містить параметрів: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6881,12 +6878,11 @@ msgid "Host prototype deleted"
 msgstr "Прототип вузлів мережі видалено"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Прототип вузлів мережі оновлено"
-msgstr[1] "Прототип вузлів мережі оновлено"
-msgstr[2] "Прототип вузлів мережі оновлено"
+msgstr[1] "Прототипи вузлів мережі оновлено"
+msgstr[2] "Прототипи вузлів мережі оновлено"
 
 #: include/classes/api/services/CHostPrototype.php:1139
 #, c-format
@@ -7844,7 +7840,7 @@ msgstr "Некоректний ID прототипу графіку \"%1$s\" в�
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "Некоректний ID групи."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -8977,12 +8973,11 @@ msgid "Item prototype deleted"
 msgstr "Прототип елемента даних видалено"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "Прототип елемента даних оновлено"
-msgstr[1] "Прототип елемента даних оновлено"
-msgstr[2] "Прототип елемента даних оновлено"
+msgstr[1] "Прототипи елементів даних оновлено"
+msgstr[2] "Прототипи елементів даних оновлено"
 
 #: include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:104
@@ -10542,7 +10537,7 @@ msgstr "Не вказано \"%1$s\" для графіку."
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "Не вказано \"%1$s\" для групи."
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -11582,9 +11577,9 @@ msgstr "Тільки одне ім'я групи користувачів мож
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Тільки вибрана проблема"
+msgstr[1] "Тільки вибрані проблеми"
+msgstr[2] "Тільки вибрані проблеми"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12859,7 +12854,7 @@ msgstr "Замінити групи вузла мережі"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "Замінити теги"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12938,20 +12933,20 @@ msgstr "Вирішено"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Вирішено правилом кореляції \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "Вирішено правилом кореляції."
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "Вирішено користувачем \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "Вирішено користувачем."
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13622,7 +13617,7 @@ msgstr "Вибрані дії видалено"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "Вибрані та всі інші непідтвердженні проблеми пов'язаних тригерів"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
@@ -15159,12 +15154,11 @@ msgid "Trigger prototype deleted"
 msgstr "Прототип тригера видалено"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] "Прототипи тригера оновлено"
-msgstr[1] "Прототипи тригера оновлено"
-msgstr[2] "Прототипи тригера оновлено"
+msgstr[0] "Прототип тригера оновлено"
+msgstr[1] "Прототипи тригерів оновлено"
+msgstr[2] "Прототипи тригерів оновлено"
 
 #: include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:111
@@ -17315,7 +17309,7 @@ msgstr "внутрішній"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "недійсна назва групи \"%1$s\""
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17417,7 +17411,7 @@ msgstr "мс"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "має бути рядком"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"
