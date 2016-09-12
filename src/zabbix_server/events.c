@@ -725,8 +725,8 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
 			recovery_local.userid = 0;
-			zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 
+			zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 		}
 		DBfree_result(result);
 	}
