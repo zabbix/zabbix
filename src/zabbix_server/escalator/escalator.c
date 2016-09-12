@@ -1752,8 +1752,8 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* Action recovery operations have a single escalation step so alerts created
-	* by escalation operations must have esc_step field set to 1. */
+	/* Action recovery operations have a single escalation step, so alerts */
+	/* created by escalation operations must have esc_step field set to 1. */
 	escalation->esc_step = 1;
 
 	escalation_execute_recovery_operations(escalation, event, r_event, action);
