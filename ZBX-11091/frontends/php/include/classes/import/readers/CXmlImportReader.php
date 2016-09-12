@@ -51,7 +51,7 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = self::xmlToArray($xml);
+		$data = $this->xmlToArray($xml);
 		$xml->close();
 
 		return $data;
@@ -64,23 +64,18 @@ class CXmlImportReader extends CImportReader {
 	 * @param XMLReader $xml
 	 * @param string    $path
 	 *
-	 * @throws Exception
-	 *
 	 * @return array|string
 	 */
-	protected static function xmlToArray(XMLReader $xml, $path = '') {
+	protected function xmlToArray(XMLReader $xml, $path = '') {
 		$data = null;
 
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
+					$this->validateElement($data, $path);
+
 					if ($data === null) {
 						$data = [];
-					}
-					elseif (!is_array($data)) {
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
-							_s('unexpected text "%1$s"', trim($data))
-						));
 					}
 
 					$node_name = $xml->name;
@@ -105,7 +100,9 @@ class CXmlImportReader extends CImportReader {
 						 * We assume that an element with attributes never contains text node
 						 * works for 1.8 XML.
 						 */
-						$child_data = $xml->isEmptyElement ? '' : self::xmlToArray($xml, $sub_path);
+						$child_data = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
+
+						$this->validateChildElement($child_data, $sub_path);
 
 						if (is_array($child_data)) {
 							foreach ($child_data as $child_node_name => $child_node_value) {
@@ -115,27 +112,18 @@ class CXmlImportReader extends CImportReader {
 								$data[$node_name][$child_node_name] = $child_node_value;
 							}
 						}
-						elseif ($child_data !== '') {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
-								_s('unexpected text "%1$s"', trim($child_data))
-							));
-						}
 					}
 					else {
-						$data[$node_name] = $xml->isEmptyElement ? '' : self::xmlToArray($xml, $sub_path);
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
 					}
 					break;
 
 				case XMLReader::TEXT:
+					$this->validateText($data, $path, $xml->value);
+
 					if ($data === null) {
 						$data = $xml->value;
 					}
-					elseif (is_array($data)) {
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
-							_s('unexpected text "%1$s"', trim($xml->value))
-						));
-					}
-
 					break;
 
 				case XMLReader::END_ELEMENT:
@@ -151,5 +139,48 @@ class CXmlImportReader extends CImportReader {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Validate node of type TEXT.
+	 *
+	 * @param mixed  $data     Data for validation.
+	 * @param string $path     XML path (for error reporting).
+	 * @param string $value    XML node value.
+	 *
+	 * @throws Exception if $data is an array.
+	 */
+	private function validateText($data, $path, $value) {
+		if (is_array($data)) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($value))));
+		}
+	}
+
+	/**
+	 * Validate node of type ELEMENT.
+	 *
+	 * @param mixed  $data    Data for validation.
+	 * @param string $path    XML path (for error reporting).
+	 *
+	 * @throws Exception if $data is not an array.
+	 */
+	private function validateElement($data, $path) {
+		if ($data !== null && !is_array($data)) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($data))));
+		}
+	}
+
+	/**
+	 * Validate child element.
+	 *
+	 * @param mixed  $data    Data for validation.
+	 * @param string $path    XML path (for error reporting).
+	 *
+	 * @throws Exception if $data is not an empty string.
+	 */
+	private function validateChildElement($data, $path) {
+		if ($data !== '' && !is_array($data)) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($data))));
+		}
 	}
 }

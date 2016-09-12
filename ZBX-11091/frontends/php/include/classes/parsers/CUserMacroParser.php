@@ -30,7 +30,9 @@ class CUserMacroParser extends CParser {
 	private $macro = '';
 	private $context = null;
 	private $context_quoted = false;
-	private $error = '';
+	private $error_source = null;
+	private $error_start_pos = 0;
+	private $error_current_pos = 0;
 
 	/**
 	 * Returns an error message depending on input parameters.
@@ -65,19 +67,21 @@ class CUserMacroParser extends CParser {
 		$this->macro = '';
 		$this->context = null;
 		$this->context_quoted = false;
-		$this->error = '';
+		$this->error_source = null;
+		$this->error_start_pos = 0;
+		$this->error_current_pos = 0;
 
 		$p = $pos;
 
 		if (!isset($source[$p]) || $source[$p] != '{') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if (!isset($source[$p]) || $source[$p] != '$') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_FAIL;
 		}
@@ -87,7 +91,7 @@ class CUserMacroParser extends CParser {
 			;
 
 		if ($p == $pos + 2 || !isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_FAIL;
 		}
@@ -100,7 +104,7 @@ class CUserMacroParser extends CParser {
 			$this->match = substr($source, $pos, $this->length);
 
 			if (isset($source[$p])) {
-				$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+				$this->setErrorSourceAndPosition($source, $pos, $p);
 
 				return self::PARSE_SUCCESS_CONT;
 			}
@@ -110,7 +114,7 @@ class CUserMacroParser extends CParser {
 
 		if ($source[$p] != ':') {
 			$this->macro = '';
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_FAIL;
 		}
@@ -187,7 +191,7 @@ class CUserMacroParser extends CParser {
 			$this->macro = '';
 			$this->context = null;
 			$this->context_quoted = false;
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_FAIL;
 		}
@@ -196,7 +200,7 @@ class CUserMacroParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		if (isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->setErrorSourceAndPosition($source, $pos, $p);
 
 			return self::PARSE_SUCCESS_CONT;
 		}
@@ -260,6 +264,25 @@ class CUserMacroParser extends CParser {
 	 * @return string
 	 */
 	public function getError() {
-		return $this->error;
+		if ($this->error_source !== null) {
+			return $this->errorMessage(substr($this->error_source, $this->error_start_pos),
+				$this->error_current_pos - $this->error_start_pos
+			);
+		}
+
+		return '';
+	}
+
+	/**
+	 * Set error source, start position and current position.
+	 *
+	 * @param string $source         User macro string.
+	 * @param int    $start_pos      Start positon of error message.
+	 * @param int    $current_pos    Current position of parser pointer.
+	 */
+	private function setErrorSourceAndPosition($source, $start_pos, $current_pos) {
+		$this->error_source = $source;
+		$this->error_start_pos = $start_pos;
+		$this->error_current_pos = $current_pos;
 	}
 }
