@@ -181,8 +181,15 @@ abstract class CGraphGeneral extends CApiService {
 		$graphids = DB::insert('graphs', [$graph]);
 		$graphid = reset($graphids);
 
+		$sort_order = 1;
 		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
+
+			if (!array_key_exists('sortorder', $gitem)) {
+				$gitem['sortorder'] = $sort_order;
+			}
+
+			$sort_order++;
 		}
 		unset($gitem);
 
