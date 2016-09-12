@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:50+0300\n"
-"PO-Revision-Date: 2016-05-17 12:13+0300\n"
+"PO-Revision-Date: 2016-09-08 03:33+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1463480002.000000\n"
+"X-POOTLE-MTIME: 1473298434.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -585,16 +585,16 @@ msgstr "高级标签"
 #: include/events.inc.php:197 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:274
 msgid "Age"
-msgstr "历时"
+msgstr "时长"
 
 #: include/views/common.filter.trigger.php:83
 msgid "Age less than"
-msgstr "历时少于"
+msgstr "时长少于"
 
 #: include/views/monitoring.overview.triggers.php:63
 #, c-format
 msgid "Age less than %s"
-msgstr "历时少于%s"
+msgstr "时长少于%s"
 
 #: app/views/administration.script.list.php:64 include/items.inc.php:286
 #: include/views/configuration.httpconf.edit.php:93 popup.php:1861
@@ -1037,7 +1037,7 @@ msgstr "期间T的平均值 > N"
 
 #: popup_trexpr.php:217
 msgid "Average value of a period T is NOT N"
-msgstr "期间T的平均值不是 N"
+msgstr "在一段时间（T）内平均值不是 N"
 
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:342
@@ -3261,7 +3261,7 @@ msgstr "创建监控项原型"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr "创建维护期间"
+msgstr "创建维护周期"
 
 #: include/views/monitoring.sysmap.list.php:26
 msgid "Create map"
@@ -3644,7 +3644,7 @@ msgstr "硬件安装日期"
 
 #: include/hosts.inc.php:324
 msgid "Date HW maintenance expires"
-msgstr "硬件维修过期日期"
+msgstr "硬件维护失效日期"
 
 #: include/hosts.inc.php:314
 msgid "Date HW purchased"
@@ -3887,7 +3887,7 @@ msgstr "删除所选组件间的连接?"
 
 #: include/views/configuration.maintenance.edit.php:204
 msgid "Delete maintenance period?"
-msgstr "删除维修期间?"
+msgstr "删除维护周期?"
 
 #: app/views/administration.mediatype.edit.php:166
 msgid "Delete media type?"
@@ -3988,7 +3988,7 @@ msgstr "删除所选的监控项?"
 
 #: include/views/configuration.maintenance.list.php:78
 msgid "Delete selected maintenance periods?"
-msgstr "删除所选的维修期间?"
+msgstr "删除所选的维护周期?"
 
 #: include/views/monitoring.sysmap.edit.php:377
 msgid "Delete selected map?"
@@ -4256,19 +4256,19 @@ msgstr "设备唯一性准则"
 
 #: popup_trexpr.php:222
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr "期间T的最大与最小值的差 < N"
+msgstr "在一段时间（T）的最大与最小值的差 < N"
 
 #: popup_trexpr.php:232
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr "期间T的最大与最小值的差 = N"
+msgstr "在一段时间（T）的最大与最小值的差 = N"
 
 #: popup_trexpr.php:227
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr "期间T的最大与最小值的差 > N"
+msgstr "在一段时间（T）里，最大与最小值的差 > N"
 
 #: popup_trexpr.php:237
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr "期间T的最大与最小值的差不是 N"
+msgstr "在一段时间（T）里，最大与最小值的差不是 N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
@@ -6622,7 +6622,7 @@ msgstr "主机在于"
 
 #: include/views/configuration.maintenance.edit.php:178
 msgid "Hosts in maintenance"
-msgstr "维修中主机"
+msgstr "设备维护中"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
 msgid "Hosts info"
@@ -6806,7 +6806,7 @@ msgstr "图标(停用的)"
 
 #: include/views/js/monitoring.sysmaps.js.php:265
 msgid "Icon (maintenance)"
-msgstr "图标(维修)"
+msgstr "图标(维护)"
 
 #: include/views/js/monitoring.sysmaps.js.php:258
 msgid "Icon (problem)"
@@ -7013,7 +7013,7 @@ msgstr "在...群组之中"
 #: include/views/configuration.maintenance.edit.php:177
 #: include/views/configuration.maintenance.edit.php:185
 msgid "In maintenance"
-msgstr "维修中"
+msgstr "维护中"
 
 #: include/actions.inc.php:1107 include/actions.inc.php:1162
 #: include/actions.inc.php:1190 include/classes/screens/CScreenActions.php:147
@@ -8828,7 +8828,7 @@ msgstr "最近7天"
 
 #: include/blocks.inc.php:628 include/blocks.inc.php:629 tr_status.php:273
 msgid "Last change"
-msgstr "上次修改于"
+msgstr "问题发生时间"
 
 #: include/views/monitoring.screen.constructor.edit.php:444
 msgid "Last change (descending)"
@@ -8859,7 +8859,7 @@ msgstr "最后一个"
 
 #: app/views/administration.proxy.list.php:46
 msgid "Last seen (age)"
-msgstr "最近出现(历时)"
+msgstr "最近出现(时长)"
 
 #: latest.php:405 latest.php:421
 msgid "Last value"
@@ -13118,7 +13118,7 @@ msgstr "查看事件不能久于(日计)\"%1$s\"."
 #: include/views/common.filter.trigger.php:150
 #: include/views/monitoring.dashconf.php:89
 msgid "Show hosts in maintenance"
-msgstr "查看维修中主机"
+msgstr "查看维护中的设备"
 
 #: latest.php:357
 msgid "Show items without data"
