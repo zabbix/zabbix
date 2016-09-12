@@ -968,6 +968,7 @@ define('RSM_SLV_EPP_RTT_UPDATE_PFAILED',	'rsm.slv.epp.rtt.update.pfailed');
 define('RSM_SLV_RDDS_AVAIL',				'rsm.slv.rdds.avail');
 define('RSM_SLV_EPP_AVAIL',					'rsm.slv.epp.avail');
 define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
+define('RSM_SLV_RDDS_RTT',					'rsm.slv.rdds.rtt.pfailed');
 
 // SLA reports graph names
 define('DNS_SERVICE_AVAILABILITY_GRAPH_1',		'DNS Service Availability - Accumulated minutes of downtime');
@@ -977,8 +978,7 @@ define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_1',	'DNS TCP Resolution RTT - Average')
 define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_2',	'DNS TCP Resolution RTT - Ratio of Failed tests');
 define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_1',	'DNS UDP Resolution RTT - Average');
 define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_2',	'DNS UDP Resolution RTT - Ratio of Failed tests');
-define('DNS_UPDATE_TIME_GRAPH_1',				'DNS Update Time – Average');
-define('DNS_UPDATE_TIME_GRAPH_2',				'DNS Update Time – Ratio of Failed tests');
+define('DNS_UPDATE_TIME_GRAPH_1',				'DNS UDP Update Time – Average');
 define('RDDS_AVAILABILITY_GRAPH_1',				'RDDS Availability – Accumulated minutes of downtime');
 define('RDDS_QUERY_RTT_GRAPH_1',				'RDDS Query RTT – Average');
 define('RDDS_QUERY_RTT_GRAPH_2',				'RDDS Query RTT – Ratio of Failed tests');

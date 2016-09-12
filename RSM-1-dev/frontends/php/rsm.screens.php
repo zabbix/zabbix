@@ -343,7 +343,7 @@ switch ($data['item']['key_']) {
 		break;
 
 	case RSM_SLV_RDDS_DOWNTIME:
-		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1 || get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_2) {
+		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
 			$graphs = API::Graph()->get(array(
 				'output' => array('graphid'),
 				'hostids' => $data['tld']['hostid'],
@@ -387,8 +387,8 @@ switch ($data['item']['key_']) {
 		}
 		break;
 
-	case RSM_TLD_RDDS43_ENABLED:
-		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
+	case RSM_SLV_RDDS_RTT:
+		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1 || get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_2) {
 			if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
 				$graph_name = RDDS_QUERY_RTT_GRAPH_1;
 			}
@@ -402,6 +402,7 @@ switch ($data['item']['key_']) {
 				'filter' => array('name' => $graph_name),
 				'limit' => 1
 			));
+
 			$graph = reset($graphs);
 
 			$src ='chart2.php?graphid='.$graph['graphid'].'&period='.$period.'&stime='.$stime.'&curtime='.$curtime;
