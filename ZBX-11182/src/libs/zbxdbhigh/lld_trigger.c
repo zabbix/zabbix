@@ -877,17 +877,13 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_has
 	return NULL;
 }
 
-static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functions)
+static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functions, zbx_uint64_t *function_index)
 {
-	const char		*__function_name = "lld_expression_simplify";
-
 	size_t			l, r;
 	int			index;
-	zbx_uint64_t		functionid, function_index = 0;
+	zbx_uint64_t		functionid;
 	zbx_lld_function_t	*function;
 	char			buffer[ZBX_MAX_UINT64_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
 	for (l = 0; '\0' != (*expression)[l]; l++)
 	{
@@ -924,7 +920,7 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 			function = (zbx_lld_function_t *)functions->values[index];
 
 			if (0 == function->index)
-				function->index = ++function_index;
+				function->index = ++(*function_index);
 
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, function->index);
 
@@ -935,8 +931,22 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 
 		l = r;
 	}
+}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __function_name, *expression);
+static void	lld_expressions_simplify(char **expression, char **recovery_expression, zbx_vector_ptr_t *functions)
+{
+	const char	*__function_name = "lld_expression_simplify";
+
+	zbx_uint64_t	function_index = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' recovery_expression:'%s'", __function_name,
+			*expression, *recovery_expression);
+
+	lld_expression_simplify(expression, functions, &function_index);
+	lld_expression_simplify(recovery_expression, functions, &function_index);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s' recovery_expression:'%s'", __function_name,
+			*expression, *recovery_expression);
 }
 
 static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *functions)
@@ -1964,8 +1974,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		{
 			db_trigger = (zbx_lld_trigger_t *)db_triggers.values[i];
 
-			lld_expression_simplify(&db_trigger->expression, &db_trigger->functions);
-			lld_expression_simplify(&db_trigger->recovery_expression, &db_trigger->functions);
+			lld_expressions_simplify(&db_trigger->expression, &db_trigger->recovery_expression,
+					&db_trigger->functions);
 
 			for (j = 0; j < triggers->values_num; j++)
 			{
@@ -3371,16 +3381,15 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 	{
 		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes.values[i];
 
-		lld_expression_simplify(&trigger_prototype->expression, &trigger_prototype->functions);
-		lld_expression_simplify(&trigger_prototype->recovery_expression, &trigger_prototype->functions);
+		lld_expressions_simplify(&trigger_prototype->expression, &trigger_prototype->recovery_expression,
+				&trigger_prototype->functions);
 	}
 
 	for (i = 0; i < triggers.values_num; i++)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers.values[i];
 
-		lld_expression_simplify(&trigger->expression, &trigger->functions);
-		lld_expression_simplify(&trigger->recovery_expression, &trigger->functions);
+		lld_expressions_simplify(&trigger->expression, &trigger->recovery_expression, &trigger->functions);
 	}
 
 	/* making triggers */
