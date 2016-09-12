@@ -3,6 +3,8 @@ Changes for 3.2.0rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-11182] fixed creating of recovery expressions for triggers created from trigger prototypes (Sasha)
+..F....... [ZBX-11182] added possibility to open lld-created trigger from list of items (Sasha)
 ........S. [ZBX-11189] fixed resolving of problems by event correlation on trigger level (Sasha)
 ........S. [ZBX-11187] improved performance of event tag processing by caching eventtagid and problemtagid (Sasha)
 ........S. [ZBX-11177] fixed sql errors while processing event correlation on trigger level (Sasha)
