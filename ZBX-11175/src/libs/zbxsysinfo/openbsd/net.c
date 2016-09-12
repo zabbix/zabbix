@@ -25,6 +25,10 @@
 #include <sys/sockio.h>
 
 #if OpenBSD >= 201405
+#	if OpenBSD >= 201609
+#	define _KERNEL	/* whole header file is under this define now */
+#	define _SYS_MALLOC_H_	/* malloc header in if_var conflicts wtih stdlib */
+#	endif
 #	include <net/if_var.h>	/* structs ifnet and ifnet_head are defined in this header since OpenBSD 5.5 */
 #endif
 
