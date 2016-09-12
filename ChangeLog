@@ -1,7 +1,5 @@
 Changes for 3.2.0rc2
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-11182] fixed creating of recovery expressions for triggers created from trigger prototypes (Sasha)
 ..F....... [ZBX-11182] added possibility to open lld-created trigger from list of items (Sasha)
