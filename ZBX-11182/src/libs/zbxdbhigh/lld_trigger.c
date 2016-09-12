@@ -935,7 +935,7 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 
 static void	lld_expressions_simplify(char **expression, char **recovery_expression, zbx_vector_ptr_t *functions)
 {
-	const char	*__function_name = "lld_expression_simplify";
+	const char	*__function_name = "lld_expressions_simplify";
 
 	zbx_uint64_t	function_index = 0;
 
