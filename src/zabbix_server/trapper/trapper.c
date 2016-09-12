@@ -120,9 +120,9 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 	const char	*__function_name = "send_proxyhistory";
 
 	struct zbx_json	j;
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid, lastid_latency;
 	zbx_timespec_t	timespec;
-	int		records;
+	int		records, records_latency;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -131,6 +131,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	records = proxy_get_hist_data(&j, &lastid);
+	records_latency = proxy_get_hist_data_latency(&j, &lastid_latency);
 
 	zbx_json_close(&j);
 
@@ -141,8 +142,13 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",
 				zbx_tcp_strerror());
-	else if (SUCCEED == zbx_recv_response(sock, NULL, 0, CONFIG_TIMEOUT) && 0 != records)
-		proxy_set_hist_lastid(lastid);
+	else if (SUCCEED == zbx_recv_response(sock, NULL, 0, CONFIG_TIMEOUT) && 0 != records + records_latency)
+	{
+		if (0 != records)
+			proxy_set_hist_lastid(lastid);
+		if (0 != records_latency)
+			proxy_set_hist_lastid_latency(lastid_latency);
+	}
 
 	zbx_json_free(&j);
 
@@ -425,6 +431,6 @@ void	main_trapper_loop(zbx_sock_t *s)
 			zbx_tcp_unaccept(s);
 		}
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
+			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection: %s", zbx_tcp_strerror());
 	}
 }

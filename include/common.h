@@ -22,6 +22,7 @@
 
 #include "sysinc.h"
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 #include "version.h"
 
 #ifdef DEBUG
@@ -414,6 +415,26 @@ typedef enum
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_LATENCY_ENABLE	"latency_enable"
+#define ZBX_LATENCY_DISABLE	"latency_disable"
+
+/* RSM: latency mode for proxy */
+#define ZBX_TLD_SERVICE_DNS	0x01
+#define ZBX_TLD_SERVICE_RDDS	0x02
+#define ZBX_TLD_SERVICE_EPP	0x04
+typedef struct
+{
+	char	*tld;
+	char	services;	/* see ZBX_TLD_SERVICE_* flags above */
+}
+zbx_tld_config_t;
+
+typedef struct
+{
+	int			delay;
+	zbx_vector_ptr_t	tlds;
+}
+zbx_latency_config_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -468,6 +489,9 @@ typedef enum
 /*ITEM_STATUS_DELETED		4*/
 /*ITEM_STATUS_NOTAVAILABLE	5*/
 } zbx_item_status_t;
+
+/* NB! This value is used in zbxdbhigh/proxy.h! */
+#define PROXY_LATENCY_SEVERITY	12345678
 
 /* trigger types */
 typedef enum
@@ -764,7 +788,9 @@ typedef enum
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
 	ZBX_TASK_CHANGE_NODEID,
-	ZBX_TASK_CONFIG_CACHE_RELOAD
+	ZBX_TASK_CONFIG_CACHE_RELOAD,
+	ZBX_TASK_LATENCY_ENABLE,
+	ZBX_TASK_LATENCY_DISABLE
 }
 zbx_task_t;
 

@@ -26,6 +26,7 @@
 #include "base64.h"
 #include "md5.h"
 #include "rsm.h"
+#include "log.h"
 
 #define ZBX_HOST_BUF_SIZE	128
 #define ZBX_IP_BUF_SIZE		64
@@ -52,6 +53,8 @@
 
 extern const char	*CONFIG_LOG_FILE;
 extern const char	epp_passphrase[128];
+
+extern zbx_latency_config_t	latency_config;
 
 typedef struct
 {
@@ -848,48 +851,48 @@ static void	zbx_set_value_ts(zbx_timespec_t *ts, int sec)
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_add_value(const DC_ITEM *item, AGENT_RESULT *result, int ts)
+static void	zbx_add_value(const DC_ITEM *item, AGENT_RESULT *result, int ts, int severity)
 {
 	zbx_timespec_t	timespec;
 
 	zbx_set_value_ts(&timespec, ts);
 
 	dc_add_history(item->itemid, item->value_type, item->flags, result, &timespec, ITEM_STATUS_ACTIVE,
-			NULL, 0, NULL, 0, 0, 0, 0);
+			NULL, 0, NULL, severity, 0, 0, 0);
 }
 
-static void	zbx_add_value_uint(const DC_ITEM *item, int ts, int value)
+static void	zbx_add_value_uint(const DC_ITEM *item, int ts, int value, int severity)
 {
 	AGENT_RESULT	result;
 
 	result.type = 0;
 
 	SET_UI64_RESULT(&result, value);
-	zbx_add_value(item, &result, ts);
+	zbx_add_value(item, &result, ts, severity);
 }
 
-static void	zbx_add_value_dbl(const DC_ITEM *item, int ts, int value)
+static void	zbx_add_value_dbl(const DC_ITEM *item, int ts, int value, int severity)
 {
 	AGENT_RESULT	result;
 
 	result.type = 0;
 
 	SET_DBL_RESULT(&result, value);
-	zbx_add_value(item, &result, ts);
+	zbx_add_value(item, &result, ts, severity);
 }
 
-static void	zbx_add_value_str(const DC_ITEM *item, int ts, const char *value)
+static void	zbx_add_value_str(const DC_ITEM *item, int ts, const char *value, int severity)
 {
 	AGENT_RESULT	result;
 
 	result.type = 0;
 
 	SET_STR_RESULT(&result, value);
-	zbx_add_value(item, &result, ts);
+	zbx_add_value(item, &result, ts, severity);
 }
 
 static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt, int upd, int value_ts,
-		size_t keypart_size, const DC_ITEM *items, size_t items_num)
+		size_t keypart_size, const DC_ITEM *items, size_t items_num, int severity)
 {
 	size_t		i;
 	const char	*p;
@@ -911,7 +914,7 @@ static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt
 
 			if (0 == strcmp(ns, item_ns) && 0 == strcmp(ip, item_ip))
 			{
-				zbx_add_value_dbl(item, value_ts, rtt);
+				zbx_add_value_dbl(item, value_ts, rtt, severity);
 
 				rtt_set = 1;
 			}
@@ -923,7 +926,7 @@ static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt
 
 			if (0 == strcmp(ns, item_ns) && 0 == strcmp(ip, item_ip))
 			{
-				zbx_add_value_dbl(item, value_ts, upd);
+				zbx_add_value_dbl(item, value_ts, upd, severity);
 
 				upd_set = 1;
 			}
@@ -1430,6 +1433,42 @@ out:
 	return tld;
 }
 
+static int	tld_compare_func(const void *d1, const void *d2)
+{
+	return strcmp((*(const zbx_tld_config_t **)d1)->tld, (*(const zbx_tld_config_t **)d2)->tld);
+}
+
+static int	get_latency_severity(const char *tld, char service_flag)
+{
+	zbx_tld_config_t	*tldc, tldc_local;
+	char			service[32];
+	int			i;
+
+	if (0 == latency_config.delay)
+		return 0;
+
+	tldc_local.tld = (char *)tld;
+
+	if (FAIL == (i = zbx_vector_ptr_bsearch(&latency_config.tlds, &tldc_local, tld_compare_func)))
+		return 0;
+
+	tldc = (zbx_tld_config_t *)latency_config.tlds.values[i];
+
+	if (0 == (tldc->services & service_flag))
+		return 0;
+
+	if (0 != (service_flag & ZBX_TLD_SERVICE_DNS))
+		zbx_strlcpy(service, "dns", sizeof(service));
+	else if (0 != (service_flag & ZBX_TLD_SERVICE_RDDS))
+		zbx_strlcpy(service, "rdds", sizeof(service));
+	else if (0 != (service_flag & ZBX_TLD_SERVICE_EPP))
+		zbx_strlcpy(service, "epp", sizeof(service));
+
+	zabbix_log(LOG_LEVEL_WARNING, "LATENCY: %s-%s...", tld, service);
+
+	return PROXY_LATENCY_SEVERITY;
+}
+
 int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result, char proto)
 {
 	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], ok_nss_num = 0, *res_ip = NULL,
@@ -1441,13 +1480,15 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	zbx_ns_t	*nss = NULL;
 	size_t		i, j, items_num = 0, nss_num = 0;
 	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, rdds_enabled, res_ec = ZBX_EC_NOERROR,
-			rtt, upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
+			rtt, upd = ZBX_NO_VALUE, rtt_limit, severity, ret = SYSINFO_RET_FAIL;
 
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
 		return SYSINFO_RET_FAIL;
 	}
+
+	severity = get_latency_severity(domain, ZBX_TLD_SERVICE_DNS);
 
 	/* open log file */
 	if (NULL == (log_fd = open_item_log(domain, ZBX_DNS_LOG_PREFIX, err, sizeof(err))))
@@ -1560,7 +1601,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 				rtt = res_ec;
 
 			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck, strlen(keyname) + 1,
-					items, items_num);
+					items, items_num, severity);
 
 			/* if a single IP of the Name Server fails, consider the whole Name Server down */
 			if (SUCCEED != rtt_result(rtt, rtt_limit))
@@ -1577,7 +1618,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	}
 
 	/* set the value of our simple check item itself */
-	zbx_add_value_uint(item, item->nextcheck, ok_nss_num);
+	zbx_add_value_uint(item, item->nextcheck, ok_nss_num, severity);
 out:
 	if (0 != nss_num)
 	{
@@ -1944,7 +1985,7 @@ static void	zbx_get_strings_from_list(zbx_vector_str_t *strings, char *list, cha
 }
 
 static void	zbx_set_rdds_values(const char *ip43, int rtt43, int upd43, const char *ip80, int rtt80,
-		int value_ts, size_t keypart_size, const DC_ITEM *items, size_t items_num)
+		int value_ts, size_t keypart_size, const DC_ITEM *items, size_t items_num, int severity)
 {
 	size_t		i;
 	const DC_ITEM	*item;
@@ -1956,15 +1997,15 @@ static void	zbx_set_rdds_values(const char *ip43, int rtt43, int upd43, const ch
 		p = item->key + keypart_size + 1;	/* skip "rsm.rdds." part */
 
 		if (NULL != ip43 && 0 == strncmp(p, "43.ip[", 6))
-			zbx_add_value_str(item, value_ts, ip43);
+			zbx_add_value_str(item, value_ts, ip43, severity);
 		else if (0 == strncmp(p, "43.rtt[", 7))
-			zbx_add_value_dbl(item, value_ts, rtt43);
+			zbx_add_value_dbl(item, value_ts, rtt43, severity);
 		else if (ZBX_NO_VALUE != upd43 && 0 == strncmp(p, "43.upd[", 7))
-			zbx_add_value_dbl(item, value_ts, upd43);
+			zbx_add_value_dbl(item, value_ts, upd43, severity);
 		else if (NULL != ip80 && 0 == strncmp(p, "80.ip[", 6))
-			zbx_add_value_str(item, value_ts, ip80);
+			zbx_add_value_str(item, value_ts, ip80, severity);
 		else if (ZBX_NO_VALUE != rtt80 && 0 == strncmp(p, "80.rtt[", 7))
-			zbx_add_value_dbl(item, value_ts, rtt80);
+			zbx_add_value_dbl(item, value_ts, rtt80, severity);
 	}
 }
 
@@ -2097,7 +2138,7 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	DC_ITEM			*items = NULL;
 	size_t			i, items_num = 0;
 	time_t			ts, now;
-	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
+	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit, severity,
 				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, maxredirs;
 
 	/* first read the TLD */
@@ -2106,6 +2147,8 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
 		return SYSINFO_RET_FAIL;
 	}
+
+	severity = get_latency_severity(domain, ZBX_TLD_SERVICE_RDDS);
 
 	/* open log file */
 	if (NULL == (log_fd = open_item_log(domain, ZBX_RDDS_LOG_PREFIX, err, sizeof(err))))
@@ -2419,7 +2462,7 @@ out:
 		int	rdds_result, rdds43, rdds80;
 
 		zbx_set_rdds_values(ip43, rtt43, upd43, ip80, rtt80, item->nextcheck, strlen(keyname), items,
-				items_num);
+				items_num, severity);
 
 		rdds43 = rtt_result(rtt43, rtt_limit);
 		rdds80 = rtt_result(rtt80, rtt_limit);
@@ -2440,7 +2483,7 @@ out:
 		}
 
 		/* set the value of our item itself */
-		zbx_add_value_uint(item, item->nextcheck, rdds_result);
+		zbx_add_value_uint(item, item->nextcheck, rdds_result, severity);
 	}
 
 	free_items(items, items_num);
@@ -3019,7 +3062,7 @@ static size_t	zbx_get_epp_items(const char *keyname, DC_ITEM *item, const char *
 }
 
 static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int value_ts, size_t keypart_size,
-		const DC_ITEM *items, size_t items_num)
+		const DC_ITEM *items, size_t items_num, int severity)
 {
 	size_t		i;
 	const DC_ITEM	*item;
@@ -3032,7 +3075,7 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 		p = item->key + keypart_size + 1;	/* skip "rsm.epp." part */
 
 		if (NULL != ip && 0 == strncmp(p, "ip[", 3))
-			zbx_add_value_str(item, value_ts, ip);
+			zbx_add_value_str(item, value_ts, ip, severity);
 		else if ((ZBX_NO_VALUE != rtt1 || ZBX_NO_VALUE != rtt2 || ZBX_NO_VALUE != rtt3) &&
 				0 == strncmp(p, "rtt[", 4))
 		{
@@ -3041,11 +3084,11 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 			if (0 == get_param(item->params, 2, cmd, sizeof(cmd)) && '\0' != *cmd)
 			{
 				if (ZBX_NO_VALUE != rtt1 && 0 == strcmp("login", cmd))
-					zbx_add_value_dbl(item, value_ts, rtt1);
+					zbx_add_value_dbl(item, value_ts, rtt1, severity);
 				else if (ZBX_NO_VALUE != rtt2 && 0 == strcmp("update", cmd))
-					zbx_add_value_dbl(item, value_ts, rtt2);
+					zbx_add_value_dbl(item, value_ts, rtt2, severity);
 				else if (ZBX_NO_VALUE != rtt3 && 0 == strcmp("info", cmd))
-					zbx_add_value_dbl(item, value_ts, rtt3);
+					zbx_add_value_dbl(item, value_ts, rtt3, severity);
 			}
 		}
 	}
@@ -3352,7 +3395,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	zbx_vector_str_t	epp_hosts, epp_ips;
 	int			rv, i, epp_enabled, epp_cert_size, rtt, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE,
 				rtt3 = ZBX_NO_VALUE, rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled,
-				ret = SYSINFO_RET_FAIL;
+				severity, ret = SYSINFO_RET_FAIL;
 
 	memset(&sock, 0, sizeof(zbx_sock_t));
 	sock.socket = ZBX_SOCK_ERROR;
@@ -3366,6 +3409,8 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "first key parameter missing"));
 		goto out;
 	}
+
+	severity = get_latency_severity(domain, ZBX_TLD_SERVICE_EPP);
 
 	/* open log file */
 	if (NULL == (log_fd = open_item_log(domain, ZBX_EPP_LOG_PREFIX, err, sizeof(err))))
@@ -3759,19 +3804,19 @@ out:
 	{
 		/* set other EPP item values */
 		if (0 != items_num)
-			zbx_set_epp_values(ip, rtt1, rtt2, rtt3, item->nextcheck, strlen(keyname), items, items_num);
+			zbx_set_epp_values(ip, rtt1, rtt2, rtt3, item->nextcheck, strlen(keyname), items, items_num, severity);
 
 		/* set availability of EPP (up/down) */
 		if (SUCCEED != rtt_result(rtt1, rtt1_limit) || SUCCEED != rtt_result(rtt2, rtt2_limit) ||
 				SUCCEED != rtt_result(rtt3, rtt3_limit))
 		{
 			/* down */
-			zbx_add_value_uint(item, item->nextcheck, 0);
+			zbx_add_value_uint(item, item->nextcheck, 0, severity);
 		}
 		else
 		{
 			/* up */
-			zbx_add_value_uint(item, item->nextcheck, 1);
+			zbx_add_value_uint(item, item->nextcheck, 1, severity);
 		}
 	}
 
@@ -4104,7 +4149,7 @@ out:
 			}
 		}
 
-		zbx_add_value_uint(item, item->nextcheck, status);
+		zbx_add_value_uint(item, item->nextcheck, status, 0);	/* no latency */
 	}
 	else
 	{

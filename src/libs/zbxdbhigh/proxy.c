@@ -28,6 +28,8 @@
 #include "discovery.h"
 #include "zbxalgo.h"
 
+extern zbx_latency_config_t	latency_config;
+
 typedef struct
 {
 	const char		*field;
@@ -54,8 +56,27 @@ ZBX_ID_OFFSET;
 
 extern zbx_timespec_t	recv_timespec;	/* for tracking time difference between sender and receiver */
 
+/* NB! Latency mode: p.severity must NOT be the value of PROXY_LATENCY_SEVERITY defined in common.h! */
 static ZBX_HISTORY_TABLE ht = {
-	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and ",
+	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and p.severity<>12345678 and ",
+		{
+		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"p.ns",	ZBX_PROTO_TAG_NS,		ZBX_JSON_TYPE_INT,	NULL},
+		{"p.timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
+		{"p.source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
+		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
+		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"p.logeventid",ZBX_PROTO_TAG_LOGEVENTID,	ZBX_JSON_TYPE_INT,	"0"},
+		{"p.status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
+		{NULL}
+		}
+};
+
+/* NB! Latency mode: p.severity must be the value of PROXY_LATENCY_SEVERITY defined in common.h! */
+static ZBX_HISTORY_TABLE htl = {
+	"proxy_history", "history_lastid_latency", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and p.severity=12345678 and ",
 		{
 		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
@@ -1644,6 +1665,28 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__function_name, *lastid);
 }
 
+static void	proxy_get_lastid_latency(const ZBX_HISTORY_TABLE *htl, zbx_uint64_t *lastid_latency)
+{
+	const char	*__function_name = "proxy_get_lastid_latency";
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s]", __function_name, htl->table, htl->lastfieldname);
+
+	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+			htl->table,
+			htl->lastfieldname);
+
+	if (NULL == (row = DBfetch(result)))
+		*lastid_latency = 0;
+	else
+		ZBX_STR2UINT64(*lastid_latency, row[0]);
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__function_name, *lastid_latency);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: proxy_set_lastid                                                 *
@@ -1686,9 +1729,49 @@ static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t las
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	proxy_set_lastid_latency(const ZBX_HISTORY_TABLE *htl, const zbx_uint64_t lastid_latency)
+{
+	const char	*__function_name = "proxy_set_lastid_latency";
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]",
+			__function_name, htl->table, htl->lastfieldname, lastid_latency);
+
+	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
+			htl->table,
+			htl->lastfieldname);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
+				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
+				htl->table,
+				htl->lastfieldname,
+				lastid_latency);
+	}
+	else
+	{
+		DBexecute("update ids set nextid=" ZBX_FS_UI64
+				" where table_name='%s' and field_name='%s'",
+				lastid_latency,
+				htl->table,
+				htl->lastfieldname);
+	}
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 void	proxy_set_hist_lastid(const zbx_uint64_t lastid)
 {
 	proxy_set_lastid(&ht, lastid);
+}
+
+void	proxy_set_hist_lastid_latency(const zbx_uint64_t lastid_latency)
+{
+	proxy_set_lastid_latency(&htl, lastid_latency);
 }
 
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid)
@@ -1787,9 +1870,96 @@ try_again:
 	return records;
 }
 
+static int	proxy_get_history_data_latency(struct zbx_json *j, const ZBX_HISTORY_TABLE *htl,
+		zbx_uint64_t *lastid_latency)
+{
+	const char	*__function_name = "proxy_get_history_data_latency";
+	size_t		offset = 0;
+	int		f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1, time;
+	char		sql[MAX_STRING_LEN];
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, htl->table);
+
+	*lastid_latency = 0;
+
+	proxy_get_lastid_latency(htl, &id);
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select p.id");
+
+	for (f = 0; NULL != htl->fields[f].field; f++)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", htl->fields[f].field);
+try_again:
+	time = zbx_time();
+
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s%s p"
+			" where %sp.id>" ZBX_FS_UI64 " and p.clock+%d<%d order by p.id",
+			htl->from, htl->table,
+			htl->where,
+			id, latency_config.delay, time);
+
+	result = DBselectN(sql, records_lim);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(*lastid_latency, row[0]);
+
+		if (1 < *lastid_latency - id)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				DBfree_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid_latency - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__function_name, *lastid_latency - id - 1);
+			}
+		}
+
+		zbx_json_addobject(j, NULL);
+
+		for (f = 0; NULL != htl->fields[f].field; f++)
+		{
+			if (NULL != htl->fields[f].default_value && 0 == strcmp(row[f + 1], htl->fields[f].default_value))
+				continue;
+
+			zbx_json_addstring(j, htl->fields[f].tag, row[f + 1], htl->fields[f].jt);
+		}
+
+		records++;
+
+		zbx_json_close(j);
+
+		id = *lastid_latency;
+		records_lim--;
+	}
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid_latency);
+
+	return records;
+}
+
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
 	return proxy_get_history_data(j, &ht, lastid);
+}
+
+int	proxy_get_hist_data_latency(struct zbx_json *j, zbx_uint64_t *lastid_latency)
+{
+	return proxy_get_history_data_latency(j, &htl, lastid_latency);
 }
 
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)

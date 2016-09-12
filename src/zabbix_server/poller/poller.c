@@ -48,6 +48,8 @@
 extern unsigned char	process_type;
 extern int		process_num;
 
+extern int		enable_latency;
+
 static int	is_bunch_poller(int poller_type)
 {
 	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
@@ -731,6 +733,7 @@ static int	get_values(unsigned char poller_type)
 		if (SUCCEED == errcodes[i])
 		{
 			items[i].status = ITEM_STATUS_ACTIVE;
+
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
 		}

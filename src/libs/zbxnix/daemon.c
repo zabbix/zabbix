@@ -106,6 +106,25 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					}
 				}
 			}
+			else if (ZBX_TASK_LATENCY_ENABLE == CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT) ||
+					ZBX_TASK_LATENCY_DISABLE == CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT))
+			{
+				union sigval	s;
+				extern pid_t	*threads;
+				extern int	threads_num;
+				int		i;
+
+				s.ZBX_SIVAL_INT = CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
+
+				for (i = 0; i < threads_num; i++)
+				{
+					if (threads[i] && -1 == sigqueue(threads[i], SIGUSR1, s))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
+								zbx_strerror(errno));
+					}
+				}
+			}
 #endif
 			break;
 		case SIGQUIT:

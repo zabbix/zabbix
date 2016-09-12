@@ -191,6 +191,10 @@ ZBX_MUTEX	node_sync_access;
 /* a passphrase for EPP data encryption used in proxy poller */
 char	epp_passphrase[128]		= "";
 
+/* latency mode: delay sending collected data from proxy to server */
+int			enable_latency	= 0;
+zbx_latency_config_t	latency_config;
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_defaults                                                 *

@@ -194,6 +194,10 @@ ZBX_MUTEX	node_sync_access;
 /* a passphrase for EPP data encryption used in proxy poller */
 char	epp_passphrase[128]		= "";
 
+/* latency mode: delay sending collected data from proxy to server */
+int			enable_latency	= 0;
+zbx_latency_config_t	latency_config;
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_defaults                                                 *
@@ -441,6 +445,250 @@ static void	zbx_load_config()
 }
 
 #ifdef HAVE_SIGQUEUE
+static int	set_enable_latency(int value)
+{
+	if (0 == value)
+	{
+		if (value == enable_latency)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "latency mode already disabled");
+			return FAIL;
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "disabled latency mode");
+	}
+	else if (1 == value)
+	{
+		if (value == enable_latency)	/* enabling once again re-reads latency config */
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "enabled latency mode");
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	enable_latency = value;
+
+	return SUCCEED;
+}
+
+static char	*read_latency_config(char *err, size_t err_len)
+{
+	char		*filename = "/opt/zabbix/etc/latency.conf", *encoding = "UTF-8", read_buf[MAX_BUFFER_LEN],
+			*contents = NULL;
+	size_t          contents_alloc = 512, contents_offset = 0;
+	struct stat     stat_buf;
+	double          ts;
+	int             nbytes, flen = 0, f = -1, ret = FAIL;
+
+	ts = zbx_time();
+
+	if (0 != zbx_stat(filename, &stat_buf))
+	{
+		zbx_snprintf(err, err_len, "%s: %s", filename, zbx_strerror(errno));
+		goto out;
+	}
+
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	{
+		zbx_snprintf(err, err_len, "%s: timeout while trying to access", filename);
+		goto out;
+	}
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		zbx_snprintf(err, err_len, "%s: %s", filename, zbx_strerror(errno));
+		goto out;
+	}
+
+	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	{
+		zbx_snprintf(err, err_len, "%s: timeout while trying to read", filename);
+		goto out;
+	}
+
+	contents = zbx_malloc(contents, contents_alloc);
+
+	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+	{
+		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		{
+			zbx_snprintf(err, err_len, "%s: timeout while trying to read", filename);
+			zbx_free(contents);
+			goto out;
+		}
+
+		zbx_strncpy_alloc(&contents, &contents_alloc, &contents_offset, read_buf, nbytes);
+	}
+
+	if (-1 == nbytes)	/* error occurred */
+	{
+		zbx_snprintf(err, err_len, "%s: %s", filename, zbx_strerror(errno));
+		zbx_free(contents);
+		goto out;
+	}
+
+	if (0 == contents_offset)	/* empty file */
+	{
+		zbx_snprintf(err, err_len, "%s: the file is empty", filename);
+		zbx_free(contents);
+		goto out;
+	}
+out:
+	if (-1 != f)
+		close(f);
+
+	return contents;
+}
+
+static void	destroy_latency_config()
+{
+	zbx_tld_config_t	*tldc;
+	int			i;
+
+	for (i = 0; i < latency_config.tlds.values_num; i++)
+	{
+		tldc = (zbx_tld_config_t *)latency_config.tlds.values[i];
+
+		zbx_free(tldc->tld);
+
+		zbx_free(tldc);
+	}
+
+	zbx_vector_ptr_destroy(&latency_config.tlds);
+
+	latency_config.delay = 0;
+}
+
+static int	tld_compare_func(const void *d1, const void *d2)
+{
+	return strcmp((*(const zbx_tld_config_t **)d1)->tld, (*(const zbx_tld_config_t **)d2)->tld);
+}
+
+static int	get_latency_config()
+{
+	char			err[256], tmp[32], *contents = NULL;
+	struct zbx_json_parse	jp, jp_tlds, jp_row;
+	const char		*p = NULL;
+	int			delay, ret = FAIL;
+
+	if (NULL == (contents = read_latency_config(err, sizeof(err))))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: %s", err);
+		goto out;
+	}
+
+	if (0 != latency_config.delay)
+		destroy_latency_config();
+
+	if (SUCCEED != (ret = zbx_json_open(contents, &jp)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: invalid json");
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp, "tlds", &jp_tlds)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: \"tlds\" tag is missing");
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_object_is_empty(&jp_tlds))
+	{
+		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: \"tlds\" tag is missing");
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, "delay", tmp, sizeof(tmp))))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: \"delay\" tag is missing");
+		goto out;
+	}
+
+	latency_config.delay = atoi(tmp);
+
+	if (1 > latency_config.delay)
+	{
+		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: invalid \"delay\": %s", tmp);
+		goto out;
+	}
+
+	zbx_vector_ptr_create(&latency_config.tlds);
+
+	zabbix_log(LOG_LEVEL_WARNING, "delay: %d", latency_config.delay);
+
+	while (NULL != (p = zbx_json_next(&jp_tlds, p)))
+	{
+		zbx_tld_config_t	*tldc;
+		struct zbx_json_parse	jp_services;
+		const char		*p2 = NULL;
+		char			tld[128], service[32];
+
+		if (SUCCEED != (ret = zbx_json_brackets_open(p, &jp_row)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: %s", zbx_json_strerror());
+			goto out;
+		}
+
+		if (SUCCEED != (ret = zbx_json_value_by_name(&jp_row, "tld", tld, sizeof(tld))))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration: \"tld\" tag is missing");
+			goto out;
+		}
+
+		if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp_row, "services", &jp_services)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration:"
+					" \"services\" tag of TLD \"%s\" is missing", tld);
+			goto out;
+		}
+
+		tldc = zbx_malloc(NULL, sizeof(*tldc));
+		tldc->tld = zbx_strdup(NULL, tld);
+		tldc->services = 0;
+
+		while (NULL != (p2 = zbx_json_next_value(&jp_services, p2, service, sizeof(service), NULL)))
+		{
+			if (0 == strcmp(service, "dns"))
+				tldc->services |= ZBX_TLD_SERVICE_DNS;
+			else if (0 == strcmp(service, "rdds"))
+				tldc->services |= ZBX_TLD_SERVICE_RDDS;
+			else if (0 == strcmp(service, "epp"))
+				tldc->services |= ZBX_TLD_SERVICE_EPP;
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "error in latency configuration:"
+						" TLD \"%s\" has unknown service: \"%s\"", tld,
+						service);
+		}
+
+		if (0 == tldc->services)
+		{
+			ret = FAIL;
+			zabbix_log(LOG_LEVEL_ERR, "cannot read latency configuration:"
+					" TLD \"%s\" doesn't have any known services listed", tld);
+			goto out;
+		}
+
+		zbx_vector_ptr_append(&latency_config.tlds, tldc);
+
+		zabbix_log(LOG_LEVEL_WARNING, "tld: %s (dns:%s rdds:%s epp:%s)", tldc->tld,
+				(ZBX_TLD_SERVICE_DNS & tldc->services) ? "on" : "off",
+				(ZBX_TLD_SERVICE_RDDS & tldc->services) ? "on" : "off",
+				(ZBX_TLD_SERVICE_EPP & tldc->services) ? "on" : "off");
+	}
+out:
+	zbx_free(contents);
+
+	if (SUCCEED != ret)
+		destroy_latency_config();
+	else
+		zbx_vector_ptr_sort(&latency_config.tlds,  tld_compare_func);
+
+	return ret;
+}
+
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 	switch (task)
@@ -451,6 +699,30 @@ void	zbx_sigusr_handler(zbx_task_t task)
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 				zbx_wakeup();
 			}
+			break;
+		case ZBX_TASK_LATENCY_ENABLE:
+			if (ZBX_PROCESS_TYPE_HISTSYNCER == process_type || ZBX_PROCESS_TYPE_POLLER == process_type ||
+					ZBX_PROCESS_TYPE_TRAPPER == process_type)
+			{
+				int	i;
+
+				if (SUCCEED != get_latency_config())
+					break;
+
+				set_enable_latency(1);
+			}
+
+			break;
+		case ZBX_TASK_LATENCY_DISABLE:
+			if (ZBX_PROCESS_TYPE_HISTSYNCER == process_type || ZBX_PROCESS_TYPE_POLLER == process_type ||
+					ZBX_PROCESS_TYPE_TRAPPER == process_type)
+			{
+				if (0 != latency_config.delay)
+					destroy_latency_config();
+
+				set_enable_latency(0);
+			}
+
 			break;
 		default:
 			break;
@@ -472,6 +744,8 @@ int	main(int argc, char **argv)
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch;
 
+	latency_config.delay = 0;
+
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -485,6 +759,10 @@ int	main(int argc, char **argv)
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
+				else if (0 == strcmp(zbx_optarg, ZBX_LATENCY_ENABLE))
+					task = ZBX_TASK_LATENCY_ENABLE;
+				else if (0 == strcmp(zbx_optarg, ZBX_LATENCY_DISABLE))
+					task = ZBX_TASK_LATENCY_DISABLE;
 				else
 				{
 					printf("invalid runtime control option: %s\n", zbx_optarg);
@@ -524,6 +802,10 @@ int	main(int argc, char **argv)
 
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
+	else if (ZBX_TASK_LATENCY_ENABLE == task)
+		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_LATENCY_ENABLE) ? EXIT_SUCCESS : EXIT_FAILURE);
+	else if (ZBX_TASK_LATENCY_DISABLE == task)
+		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_LATENCY_DISABLE) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

@@ -1802,7 +1802,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 static void	dc_add_proxy_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
 {
 	int		i;
-	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value) values ";
+	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value,severity) values ";
 	char		*value_esc;
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -1827,21 +1827,22 @@ static void	dc_add_proxy_history_sql(ZBX_DC_HISTORY *history, int history_num, s
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "')" ZBX_ROW_DL,
+						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "',%d)" ZBX_ROW_DL,
 						history[i].itemid, history[i].clock, history[i].ns,
-						history[i].value_orig.dbl);
+						history[i].value_orig.dbl, history[i].severity);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "')" ZBX_ROW_DL,
+						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "',%d)" ZBX_ROW_DL,
 						history[i].itemid, history[i].clock, history[i].ns,
-						history[i].value_orig.ui64);
+						history[i].value_orig.ui64, history[i].severity);
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				value_esc = DBdyn_escape_string(history[i].value_orig.str);
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-						history[i].itemid, history[i].clock, history[i].ns, value_esc);
+						"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)" ZBX_ROW_DL,
+						history[i].itemid, history[i].clock, history[i].ns, value_esc,
+						history[i].severity);
 				zbx_free(value_esc);
 				break;
 		}
@@ -2598,7 +2599,7 @@ static void	DCadd_text(char **dst, const char *src, size_t len)
 	(*dst)[len] = '\0';
 }
 
-static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t *ts)
+static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t *ts, int severity)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -2616,6 +2617,7 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t
 	history->value_orig.dbl = value_orig;
 	history->value.dbl = 0;
 	history->value_null = 0;
+	history->severity = severity;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
@@ -2623,7 +2625,7 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t
 	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx_timespec_t *ts, int severity)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -2641,6 +2643,7 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx
 	history->value_orig.ui64 = value_orig;
 	history->value.ui64 = 0;
 	history->value_null = 0;
+	history->severity = severity;
 
 	cache->stats.history_counter++;
 	cache->stats.history_uint_counter++;
@@ -2648,7 +2651,7 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx
 	UNLOCK_CACHE;
 }
 
-static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts, int severity)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
@@ -2668,6 +2671,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_t
 	history->value_type = ITEM_VALUE_TYPE_STR;
 	DCadd_text(&history->value_orig.str, value_orig, len);
 	history->value_null = 0;
+	history->severity = severity;
 
 	cache->stats.history_counter++;
 	cache->stats.history_str_counter++;
@@ -2836,15 +2840,15 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (GET_DBL_RESULT(value))
-				DCadd_history(itemid, value->dbl, ts);
+				DCadd_history(itemid, value->dbl, ts, severity);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (GET_UI64_RESULT(value))
-				DCadd_history_uint(itemid, value->ui64, ts);
+				DCadd_history_uint(itemid, value->ui64, ts, severity);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			if (GET_STR_RESULT(value))
-				DCadd_history_str(itemid, value->str, ts);
+				DCadd_history_str(itemid, value->str, ts, severity);
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			if (GET_TEXT_RESULT(value))
