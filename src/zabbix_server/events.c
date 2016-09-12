@@ -611,7 +611,7 @@ out:
 static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 {
 	const char		*__function_name = "correlate_events_by_trigger_rules";
-	int			j, index, do_correlation = 0;
+	int			j, r_event_index, index, do_correlation = 0;
 	zbx_uint64_t		objectid;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -687,13 +687,14 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 	if (0 != do_correlation)
 	{
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(objectid, row[1]);
 
-			if (FAIL == (index = get_event_index_by_source_object_id(EVENT_SOURCE_TRIGGERS,
+			if (FAIL == (r_event_index = get_event_index_by_source_object_id(EVENT_SOURCE_TRIGGERS,
 					EVENT_OBJECT_TRIGGER, objectid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -718,10 +719,10 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 				continue;
 			}
 
-			events[index].flags = ZBX_FLAGS_DB_EVENT_CREATE;
+			events[r_event_index].flags = ZBX_FLAGS_DB_EVENT_CREATE;
 
 			recovery_local.objectid = objectid;
-			recovery_local.r_event_index = index;
+			recovery_local.r_event_index = r_event_index;
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
 			recovery_local.userid = 0;
