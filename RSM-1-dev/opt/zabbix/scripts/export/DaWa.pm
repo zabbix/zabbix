@@ -67,6 +67,12 @@ my %_MAX_IDS = (
 	ID_STATUS_MAP() => 127,
 	ID_IP_VERSION() => 127);
 
+use constant _DIGITS_CLOCK			=> 10;
+use constant _DIGITS_SERVICE_CATEGORY_ID	=> 3;
+use constant _DIGITS_TLD_ID			=> 5;
+use constant _DIGITS_NS_ID			=> 5;
+use constant _DIGITS_IP_ID			=> 5;
+
 my (%_csv_files, %_csv_catalogs, $_csv);
 
 my ($_year, $_month, $_day);
@@ -252,20 +258,35 @@ sub dw_get_cycle_id
 	$ns_id = 0 unless (defined($ns_id));
 	$ip_id = 0 unless (defined($ip_id));
 
-	return "$clock-$service_category_id-$tld_id-$ns_id-$ip_id";
+	return sprintf(
+		"%0"._DIGITS_CLOCK."d%0"._DIGITS_SERVICE_CATEGORY_ID."d%0"._DIGITS_TLD_ID."d%0"._DIGITS_NS_ID."d%0".
+		_DIGITS_IP_ID."d", $clock, $service_category_id, $tld_id, $ns_id, $ip_id);
 }
 
 sub dw_translate_cycle_id
 {
 	my $cycle_id = shift;
 
-	my @parts = split('-', $cycle_id);
+	my $from = 0;
+	my $len = _DIGITS_CLOCK;
 
-	my $clock = $parts[0];
-	my $service_category = dw_get_name(ID_SERVICE_CATEGORY, $parts[1]);
-	my $tld = dw_get_name(ID_TLD, $parts[2]);
-	my $ns = dw_get_name(ID_NS_NAME, $parts[3]) || '';
-	my $ip = dw_get_name(ID_NS_IP, $parts[4]) || '';
+	my $clock = int(substr($cycle_id, $from, $len));
+
+	$from += $len;
+	$len = _DIGITS_SERVICE_CATEGORY_ID;
+	my $service_category = dw_get_name(ID_SERVICE_CATEGORY, int(substr($cycle_id, $from, $len)));
+
+	$from += $len;
+	$len = _DIGITS_TLD_ID;
+	my $tld = dw_get_name(ID_TLD, int(substr($cycle_id, $from, $len)));
+
+	$from += $len;
+	$len = _DIGITS_NS_ID;
+	my $ns = dw_get_name(ID_NS_NAME, int(substr($cycle_id, $from, $len))) || '';
+
+	$from += $len;
+	$len = _DIGITS_IP_ID;
+	my $ip = dw_get_name(ID_NS_IP, int(substr($cycle_id, $from, $len))) || '';
 
 	return "$clock-$service_category-$tld-$ns-$ip";
 }
