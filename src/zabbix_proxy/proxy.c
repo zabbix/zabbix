@@ -479,7 +479,7 @@ static char	*read_latency_config(char *err, size_t err_len)
 	size_t          contents_alloc = 512, contents_offset = 0;
 	struct stat     stat_buf;
 	double          ts;
-	int             nbytes, flen = 0, f = -1, ret = FAIL;
+	int             nbytes, f = -1;
 
 	ts = zbx_time();
 
@@ -570,7 +570,7 @@ static int	get_latency_config()
 	char			err[256], tmp[32], *contents = NULL;
 	struct zbx_json_parse	jp, jp_tlds, jp_row;
 	const char		*p = NULL;
-	int			delay, ret = FAIL;
+	int			ret = FAIL;
 
 	if (NULL == (contents = read_latency_config(err, sizeof(err))))
 	{
@@ -704,8 +704,6 @@ void	zbx_sigusr_handler(zbx_task_t task)
 			if (ZBX_PROCESS_TYPE_HISTSYNCER == process_type || ZBX_PROCESS_TYPE_POLLER == process_type ||
 					ZBX_PROCESS_TYPE_TRAPPER == process_type)
 			{
-				int	i;
-
 				if (SUCCEED != get_latency_config())
 					break;
 
