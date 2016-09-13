@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -302,15 +302,16 @@ out:
 	return ret;
 }
 
-#define OP_EQ	0
-#define OP_NE	1
-#define OP_GT	2
-#define OP_GE	3
-#define OP_LT	4
-#define OP_LE	5
-#define OP_LIKE	6
-#define OP_BAND	7
-#define OP_MAX	8
+#define OP_UNKNOWN	-1
+#define OP_EQ		0
+#define OP_NE		1
+#define OP_GT		2
+#define OP_GE		3
+#define OP_LT		4
+#define OP_LE		5
+#define OP_LIKE		6
+#define OP_BAND		7
+#define OP_MAX		8
 
 static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t *value, const char *arg2,
 		const char *arg2_2)
@@ -454,9 +455,9 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
  *             parameters - up to four comma-separated fields:                *
  *                            (1) number of seconds/values                    *
  *                            (2) value to compare with (optional)            *
- *                                Exception is for comparison operator "band".*
- *                                With "band" this parameter is mandatory and *
- *                                can take one of 2 forms:                    *
+ *                                Becomes mandatory for numeric items if 3rd  *
+ *                                parameter is specified. With "band" can     *
+ *                                take one of 2 forms:                        *
  *                                  - value_to_compare_with/mask              *
  *                                  - mask                                    *
  *                            (3) comparison operator (optional)              *
@@ -469,7 +470,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
 static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_COUNT";
-	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
+	int				arg1, flag, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
 	zbx_vector_history_record_t	values;
@@ -489,58 +490,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	if (2 <= nparams && SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 2, &arg2))
 		goto out;
 
-	if (3 <= nparams)
-	{
-		int	fail = 2;
-
-		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 3, &arg3))
-			goto out;
-
-		if ('\0' == *arg3)
-			op = (0 != numeric_search ? OP_EQ : OP_LIKE);
-		else if (0 == strcmp(arg3, "eq"))
-			op = OP_EQ;
-		else if (0 == strcmp(arg3, "ne"))
-			op = OP_NE;
-		else if (0 == strcmp(arg3, "gt"))
-			op = OP_GT;
-		else if (0 == strcmp(arg3, "ge"))
-			op = OP_GE;
-		else if (0 == strcmp(arg3, "lt"))
-			op = OP_LT;
-		else if (0 == strcmp(arg3, "le"))
-			op = OP_LE;
-		else if (0 == strcmp(arg3, "like"))
-			op = OP_LIKE;
-		else if (0 == strcmp(arg3, "band"))
-		{
-			op = OP_BAND;
-
-			if (NULL != (arg2_2 = strchr(arg2, '/')))
-			{
-				*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
-				arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
-			}
-		}
-		else
-			fail = 1;
-
-		if (1 == fail)
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
-		else if (0 != numeric_search && OP_LIKE == op)
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"like\" is not supported for counting numeric values");
-		else if (0 == numeric_search && OP_LIKE != op && OP_EQ != op && OP_NE != op)
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
-		else
-			fail = 0;
-
-		zbx_free(arg3);
-
-		if (0 != fail)
-			goto out;
-	}
-	else
-		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
+	if (3 <= nparams && SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 3, &arg3))
+		goto out;
 
 	if (4 <= nparams)
 	{
@@ -555,8 +506,62 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		now -= time_shift;
 	}
 
-	if (NULL != arg2 && '\0' == *arg2 && (0 != numeric_search || OP_LIKE == op))
-		zbx_free(arg2);
+	if (NULL == arg3 || '\0' == *arg3)
+		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
+	else if (0 == strcmp(arg3, "eq"))
+		op = OP_EQ;
+	else if (0 == strcmp(arg3, "ne"))
+		op = OP_NE;
+	else if (0 == strcmp(arg3, "gt"))
+		op = OP_GT;
+	else if (0 == strcmp(arg3, "ge"))
+		op = OP_GE;
+	else if (0 == strcmp(arg3, "lt"))
+		op = OP_LT;
+	else if (0 == strcmp(arg3, "le"))
+		op = OP_LE;
+	else if (0 == strcmp(arg3, "like"))
+		op = OP_LIKE;
+	else if (0 == strcmp(arg3, "band"))
+		op = OP_BAND;
+
+	if (OP_UNKNOWN == op)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
+		goto out;
+	}
+
+	if (0 != numeric_search)
+	{
+		if (NULL != arg3 && '\0' != *arg3 && '\0' == *arg2)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "pattern must be provided along with operator for numeric values");
+			goto out;
+		}
+
+		if (OP_LIKE == op)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"like\" is not supported for counting numeric values");
+			goto out;
+		}
+
+		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"band\" is not supported for counting float values");
+			goto out;
+		}
+
+		if (OP_BAND == op && NULL != (arg2_2 = strchr(arg2, '/')))
+		{
+			*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
+			arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+		}
+	}
+	else if (OP_LIKE != op && OP_EQ != op && OP_NE != op)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
+		goto out;
+	}
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg1;
@@ -566,20 +571,24 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	for (i = 0; i < values.values_num; i++)
+	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
+	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3 && OP_LIKE != op))
 	{
-		if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2,
-				arg2_2))
+		for (i = 0; i < values.values_num; i++)
 		{
-			count++;
+			if (SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2, arg2_2))
+				count++;
 		}
 	}
+	else
+		count = values.values_num;
 
 	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", count);
 
 	ret = SUCCEED;
 out:
 	zbx_free(arg2);
+	zbx_free(arg3);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -588,6 +597,7 @@ out:
 	return ret;
 }
 
+#undef OP_UNKNOWN
 #undef OP_EQ
 #undef OP_NE
 #undef OP_GT
@@ -616,6 +626,7 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const 
 	const char			*__function_name = "evaluate_SUM";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_vector_history_record_t	values;
+	history_value_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -651,26 +662,23 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	if (0 < values.values_num)
+	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 	{
-		history_value_t	result = {0};
+		result.dbl = 0;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		{
-			for (i = 0; i < values.values_num; i++)
-				result.dbl += values.values[i].value.dbl;
-		}
-		else
-		{
-			for (i = 0; i < values.values_num; i++)
-				result.ui64 += values.values[i].value.ui64;
-		}
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
-
-		ret = SUCCEED;
+		for (i = 0; i < values.values_num; i++)
+			result.dbl += values.values[i].value.dbl;
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
+	{
+		result.ui64 = 0;
+
+		for (i = 0; i < values.values_num; i++)
+			result.ui64 += values.values[i].value.ui64;
+	}
+
+	zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1461,32 +1469,29 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	if (0 == values.values_num)
+	if (0 != values.values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
-		goto out;
-	}
-
-	/* at this point the value type can be only str, tex or log */
-	if (ITEM_VALUE_TYPE_LOG == item->value_type)
-	{
-		for (i = 0; i < values.values_num; i++)
+		/* at this point the value type can be only str, text or log */
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 		{
-			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+			for (i = 0; i < values.values_num; i++)
 			{
-				found = 1;
-				break;
+				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+				{
+					found = 1;
+					break;
+				}
 			}
 		}
-	}
-	else
-	{
-		for (i = 0; i < values.values_num; i++)
+		else
 		{
-			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+			for (i = 0; i < values.values_num; i++)
 			{
-				found = 1;
-				break;
+				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+				{
+					found = 1;
+					break;
+				}
 			}
 		}
 	}
@@ -2089,7 +2094,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		orig_value[MAX_BUFFER_LEN], *value_esc;
+	char		*value_esc, *value_tmp;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value, valuemapid);
@@ -2110,9 +2115,9 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	{
 		del_zeroes(row[0]);
 
-		strscpy(orig_value, value);
-
-		zbx_snprintf(value, max_len, "%s (%s)", row[0], orig_value);
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
 
 		ret = SUCCEED;
 	}

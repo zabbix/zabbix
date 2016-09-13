@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,8 +62,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	int		errcode;
 	AGENT_RESULT	value;
 
-	assert(value_ui64 || value_dbl);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
@@ -96,9 +94,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		free_result(&value);
 	}
-
-	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);
 clean:
+	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);
+
 	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -131,46 +129,68 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 
 	for (h = 0; h < hosts_count; h++)
 	{
+		const ZBX_FPING_HOST	*host = &hosts[h];
+
 		if (NOTSUPPORTED == ping_result)
-			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] %s",
-					hosts[h].addr, error);
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] %s", host->addr, error);
+		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] cnt=%d rcv=%d min/max/avg=" ZBX_FS_DBL "/" ZBX_FS_DBL "/" ZBX_FS_DBL,
-					hosts[h].addr, hosts[h].cnt, hosts[h].rcv, hosts[h].min, hosts[h].max, hosts[h].avg);
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] cnt=%d rcv=%d"
+					" min=" ZBX_FS_DBL " max=" ZBX_FS_DBL " sum=" ZBX_FS_DBL,
+					host->addr, host->cnt, host->rcv, host->min, host->max, host->sum);
+		}
 
 		for (i = first_index; i < last_index; i++)
 		{
-			if (0 == strcmp(items[i].addr, hosts[h].addr))
+			const icmpitem_t	*item = &items[i];
+
+			if (0 != strcmp(item->addr, host->addr))
+				continue;
+
+			if (NOTSUPPORTED == ping_result)
 			{
-				switch (items[i].icmpping)
-				{
-					case ICMPPING:
-						value_uint64 = hosts[h].rcv ? 1 : 0;
-						process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
-						break;
-					case ICMPPINGSEC:
-						switch (items[i].type)
-						{
-							case ICMPPINGSEC_MIN:
-								value_dbl = hosts[h].min;
-								break;
-							case ICMPPINGSEC_MAX:
-								value_dbl = hosts[h].max;
-								break;
-							case ICMPPINGSEC_AVG:
-								value_dbl = hosts[h].avg;
-								break;
-						}
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
-						break;
-					case ICMPPINGLOSS:
-						if (0 == hosts[h].cnt)
-							value_dbl = 0;
-						else
-							value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
-						break;
-				}
+				process_value(item->itemid, NULL, NULL, ts, NOTSUPPORTED, error);
+				continue;
+			}
+
+			if (0 == host->cnt)
+			{
+				process_value(item->itemid, NULL, NULL, ts, NOTSUPPORTED,
+						"Cannot send ICMP ping packets to this host.");
+				continue;
+			}
+
+			switch (item->icmpping)
+			{
+				case ICMPPING:
+					value_uint64 = (0 != host->rcv ? 1 : 0);
+					process_value(item->itemid, &value_uint64, NULL, ts, SUCCEED, NULL);
+					break;
+				case ICMPPINGSEC:
+					switch (item->type)
+					{
+						case ICMPPINGSEC_MIN:
+							value_dbl = host->min;
+							break;
+						case ICMPPINGSEC_MAX:
+							value_dbl = host->max;
+							break;
+						case ICMPPINGSEC_AVG:
+							value_dbl = (0 != host->rcv ? host->sum / host->rcv : 0);
+							break;
+					}
+
+					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
+						value_dbl = ZBX_FLOAT_PRECISION;
+
+					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
+					break;
+				case ICMPPINGLOSS:
+					value_dbl = (100 * (host->cnt - host->rcv)) / (double)host->cnt;
+					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
+					break;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1053,7 +1053,7 @@ class CItem extends CItemGeneral {
 			$interfaces = API::HostInterface()->get(array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectInterfaces'],
-				'intefaceids' => $relationMap->getRelatedIds(),
+				'interfaceids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

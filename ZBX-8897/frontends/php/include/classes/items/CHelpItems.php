@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,12 +81,12 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS.')
 				),
 				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
-					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
-				),
-				array(
 					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
+				),
+				array(
+					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
 					'key' => 'net.if.collisions[if]',
@@ -161,8 +161,8 @@ class CHelpItems {
 					'description' => _('CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.')
 				),
 				array(
-					'key' => 'system.cpu.num',
-					'description' => _('Number of available proccessors.')
+					'key' => 'system.cpu.num[<type>]',
+					'description' => _('Number of available processors.')
 				),
 				array(
 					'key' => 'system.cpu.switches',
@@ -193,7 +193,7 @@ class CHelpItems {
 					'description' => _('MAC address - lists all MAC addresses with interface names by default')
 				),
 				array(
-					'key' => 'system.localtime',
+					'key' => 'system.localtime[<type>]',
 					'description' => _('System local time. Time in seconds.')
 				),
 				array(
@@ -217,15 +217,15 @@ class CHelpItems {
 					'description' => _('Software package list - lists all packages for all supported package managers by default')
 				),
 				array(
-					'key' => 'system.swap.in[<swap>,<type>]',
+					'key' => 'system.swap.in[<device>,<type>]',
 					'description' => _('Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.out[<swap>,<type>]',
+					'key' => 'system.swap.out[<device>,<type>]',
 					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.size[<swap>,<mode>]',
+					'key' => 'system.swap.size[<device>,<type>]',
 					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
 				),
 				array(
@@ -241,11 +241,11 @@ class CHelpItems {
 					'description' => _('Number of users connected. Command who is used on agent side.')
 				),
 				array(
-					'key' => 'vfs.dev.read[device,<type>,<mode>]',
+					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
 					'description' => _('Device read statistics.')
 				),
 				array(
-					'key' => 'vfs.dev.write[device,<type>,<mode>]',
+					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
 					'description' => _('Device write statistics.')
 				),
 				array(
@@ -265,11 +265,11 @@ class CHelpItems {
 					'description' => _('Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]')
 				),
 				array(
-					'key' => 'vfs.file.regexp[file,regexp,<encoding>]',
+					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
 					'description' => _('Find string in a file. Matched string')
 				),
 				array(
-					'key' => 'vfs.file.regmatch[file,regexp,<encoding>]',
+					'key' => 'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
 					'description' => _('Find string in a file. 0 - expression not found, 1 - found')
 				),
 				array(
@@ -301,7 +301,7 @@ class CHelpItems {
 					'description' => _('Get timing of loading full WEB page. Default path is /')
 				),
 				array(
-					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
+					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
 					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
 				),
 				array(
@@ -323,7 +323,7 @@ class CHelpItems {
 					'description' => _('Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1')
 				),
 				array(
-					'key' => 'eventlog[logtype,<pattern>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+					'key' => 'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
 					'description' => _('Monitoring of Windows event logs. pattern, severity, eventid - regular expressions')
 				),
 				array(
@@ -335,20 +335,20 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS.')
 				),
 				array(
-					'key' => 'log[file,<pattern>,<encoding>,<maxlines>,<mode>,<output>]',
+					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
 					'description' => _('Monitoring of log file. pattern - regular expression')
 				),
 				array(
-					'key' => 'logrt[file_format,<pattern>,<encoding>,<maxlines>,<mode>,<output>]',
+					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
 					'description' => _('Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression')
-				),
-				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
-					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
 					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
+				),
+				array(
+					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
 					'key' => 'net.if.collisions[if]',
@@ -379,12 +379,12 @@ class CHelpItems {
 					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 				),
 				array(
-					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
-				),
-				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
 					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+				),
+				array(
+					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
+					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
@@ -423,8 +423,8 @@ class CHelpItems {
 					'description' => _('CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.')
 				),
 				array(
-					'key' => 'system.cpu.num',
-					'description' => _('Number of available proccessors.')
+					'key' => 'system.cpu.num[<type>]',
+					'description' => _('Number of available processors.')
 				),
 				array(
 					'key' => 'system.cpu.switches',
@@ -455,7 +455,7 @@ class CHelpItems {
 					'description' => _('MAC address - lists all MAC addresses with interface names by default')
 				),
 				array(
-					'key' => 'system.localtime',
+					'key' => 'system.localtime[<type>]',
 					'description' => _('System local time. Time in seconds.')
 				),
 				array(
@@ -479,15 +479,15 @@ class CHelpItems {
 					'description' => _('Software package list - lists all packages for all supported package managers by default')
 				),
 				array(
-					'key' => 'system.swap.in[<swap>,<type>]',
+					'key' => 'system.swap.in[<device>,<type>]',
 					'description' => _('Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.out[<swap>,<type>]',
+					'key' => 'system.swap.out[<device>,<type>]',
 					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.size[<swap>,<mode>]',
+					'key' => 'system.swap.size[<device>,<type>]',
 					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
 				),
 				array(
@@ -503,11 +503,11 @@ class CHelpItems {
 					'description' => _('Number of users connected. Command who is used on agent side.')
 				),
 				array(
-					'key' => 'vfs.dev.read[device,<type>,<mode>]',
+					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
 					'description' => _('Device read statistics.')
 				),
 				array(
-					'key' => 'vfs.dev.write[device,<type>,<mode>]',
+					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
 					'description' => _('Device write statistics.')
 				),
 				array(
@@ -591,12 +591,12 @@ class CHelpItems {
 					'description' => _('Returns ICMP ping response time in seconds. Example: 0.02')
 				),
 				array(
-					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used.')
-				),
-				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
 					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used.')
+				),
+				array(
+					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
+					'description' => _('Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used.')
 				),
 				array(
 					'key' => 'vmware.cluster.status[<url>,<name>]',
@@ -609,10 +609,6 @@ class CHelpItems {
 				array(
 					'key' => 'vmware.fullname[<url>]',
 					'description' => _('VMware service full name, <url> - VMware service URL')
-				),
-				array(
-					'key' => 'vmware.eventlog[<url>]',
-					'description' => _('VMware service version, <url> - VMware service URL')
 				),
 				array(
 					'key' => 'vmware.hv.cluster.name[<url>,<uuid>]',
@@ -683,6 +679,10 @@ class CHelpItems {
 					'description' => _('VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps')
 				),
 				array(
+					'key' => 'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
+					'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance')
+				),
+				array(
 					'key' => 'vmware.hv.status[<url>,<uuid>]',
 					'description' => _('VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				),
@@ -697,6 +697,10 @@ class CHelpItems {
 				array(
 					'key' => 'vmware.hv.vm.num[<url>,<uuid>]',
 					'description' => _('Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				),
+				array(
+					'key' => 'vmware.version[<url>]',
+					'description' => _('VMware service version, <url> - VMware service URL')
 				),
 				array(
 					'key' => 'vmware.vm.cluster.name[<url>,<uuid>]',
@@ -753,6 +757,10 @@ class CHelpItems {
 				array(
 					'key' => 'vmware.vm.net.if.out[<url>,<uuid>,<instance>,<mode>]',
 					'description' => _('VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second')
+				),
+				array(
+					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
+					'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance')
 				),
 				array(
 					'key' => 'vmware.vm.powerstate[<url>,<uuid>]',

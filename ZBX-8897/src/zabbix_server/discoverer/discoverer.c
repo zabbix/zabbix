@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						ret = FAIL;
 				}
 				else
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 				{
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
@@ -284,7 +284,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				}
 #else
 					ret = FAIL;
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
 
 				if (FAIL == ret && ISSET_MSG(&result))
 				{
@@ -365,6 +365,15 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 			DBbegin();
 
+			if (SUCCEED != DBlock_dcheckid(dcheck->dcheckid, drule->druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_service(drule, dcheck, dhost, ip, dns, port, status, value, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
@@ -381,7 +390,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		else
 			break;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -603,13 +612,22 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBbegin();
 
+			if (SUCCEED != DBlock_druleid(drule->druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
+						" stopping", drule->name);
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_host(&dhost, ip, host_status, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
-
 		}
 next:
 		if (NULL != dash)
@@ -637,7 +655,7 @@ next:
 		else
 			break;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

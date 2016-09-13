@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,14 +123,11 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		global $DB, $URL;
 
-		if (strstr(PHPUNIT_URL, 'http://')) {
-			$URL=PHPUNIT_URL.'api_jsonrpc.php';
-		}
-		else {
-			$URL='http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/api_jsonrpc.php';
-		}
+		$URL = PHPUNIT_URL.'api_jsonrpc.php';
 
-		if (!isset($DB['DB'])) DBConnect($error);
+		if (!isset($DB['DB'])) {
+			DBConnect($error);
+		}
 	}
 
 	protected function tearDown() {

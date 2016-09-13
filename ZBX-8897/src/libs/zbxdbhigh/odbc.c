@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -296,17 +296,25 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		goto end;
 	}
 
-	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
-	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
-
-	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * (size_t)pdbh->col_num);
-	memset(pdbh->data_len, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
+	pdbh->data_len = (SQLLEN *)zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
-		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
+		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_DESC_OCTET_LENGTH, NULL, 0,
+				NULL, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
+				"Cannot execute ODBC query"))
+		{
+			goto end;
+		}
+	}
+
+	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
+
+	for (i = 0; i < pdbh->col_num; i++)
+	{
+		pdbh->row_data[i] = zbx_malloc(NULL, pdbh->data_len[i]);
 		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				MAX_STRING_LEN, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
+				pdbh->data_len[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot bind column in ODBC result"))
 		{
 			goto end;

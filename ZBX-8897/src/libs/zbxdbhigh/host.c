@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,142 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+
+static char	*get_template_names(const zbx_vector_uint64_t *templateids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL, *template_names = NULL;
+	size_t		sql_alloc = 256, sql_offset=0, tmp_alloc = 64, tmp_offset = 0;
+
+	sql = zbx_malloc(sql, sql_alloc);
+	template_names = zbx_malloc(template_names, tmp_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select host"
+			" from hosts"
+			" where");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+		zbx_snprintf_alloc(&template_names, &tmp_alloc, &tmp_offset, "\"%s\", ", row[0]);
+
+	template_names[tmp_offset - 2] = '\0';
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return template_names;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_screenitems_by_resource_types_ids                          *
+ *                                                                            *
+ * Description: gets a vector of screen item identifiers used with the        *
+ *              specified resource types and identifiers                      *
+ *                                                                            *
+ * Parameters: screen_itemids - [OUT] the screen item identifiers             *
+ *             types          - [IN] an array of resource types               *
+ *             types_num      - [IN] the number of values in types array      *
+ *             resourceids    - [IN] the resource identifiers                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_screenitems_by_resource_types_ids(zbx_vector_uint64_t *screen_itemids, const zbx_uint64_t *types,
+		int types_num, const zbx_vector_uint64_t *resourceids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct screenitemid from screens_items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourcetype", types, types_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", resourceids->values,
+			resourceids->values_num);
+
+	DBselect_uint64(sql, screen_itemids);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(screen_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_profiles_by_source_idxs_values                             *
+ *                                                                            *
+ * Description: gets a vector of profile identifiers used with the specified  *
+ *              source, indexes and value identifiers                         *
+ *                                                                            *
+ * Parameters: profileids - [OUT] the screen item identifiers                 *
+ *             source     - [IN] the source                                   *
+ *             idxs       - [IN] an array of index values                     *
+ *             idxs_num   - [IN] the number of values in idxs array           *
+ *             value_ids  - [IN] the resource identifiers                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_profiles_by_source_idxs_values(zbx_vector_uint64_t *profileids, const char *source,
+		const char **idxs, int idxs_num, zbx_vector_uint64_t *value_ids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct profileid from profiles where");
+
+	if (NULL != source)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " source='%s' and", source);
+
+	if (0 != idxs_num)
+	{
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "idx", idxs, idxs_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+	}
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", value_ids->values, value_ids->values_num);
+
+	DBselect_uint64(sql, profileids);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(profileids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_sysmapelements_by_element_type_ids                         *
+ *                                                                            *
+ * Description: gets a vector of sysmap element identifiers used with the     *
+ *              specified element type and identifiers                        *
+ *                                                                            *
+ * Parameters: selementids - [OUT] the sysmap element identifiers             *
+ *             elementtype - [IN] the element type                            *
+ *             elementids  - [IN] the element identifiers                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *selementids, int elementtype,
+		zbx_vector_uint64_t *elementids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct selementid"
+			" from sysmaps_elements"
+			" where elementtype=%d"
+				" and",
+			elementtype);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "elementid", elementids->values, elementids->values_num);
+	DBselect_uint64(sql, selementids);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -75,8 +211,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 		if (NULL != (row = DBfetch(result)))
 		{
 			ret = FAIL;
-			zbx_snprintf(error, max_error_len,
-					"template with item key \"%s\" already linked to the host", row[0]);
+			zbx_snprintf(error, max_error_len, "conflicting item key \"%s\" found", row[0]);
 		}
 		DBfree_result(result);
 	}
@@ -740,10 +875,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
 					" and",
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_AGGREGATE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED);
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -789,39 +924,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_sysmaps_elements                                        *
- *                                                                            *
- * Purpose: delete elements from map by elementtype and elementid             *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids, int elementids_num)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 256, sql_offset = 0;
-
-	if (0 == elementids_num)
-		return;
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from sysmaps_elements"
-			" where elementtype=%d"
-				" and",
-			elementtype);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "elementid", elementids, elementids_num);
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBdelete_action_conditions                                       *
  *                                                                            *
  * Purpose: delete action conditions by condition type and id                 *
@@ -831,21 +933,65 @@ static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids,
  ******************************************************************************/
 static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		id;
+	zbx_vector_uint64_t	actionids, conditionids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_uint64_create(&actionids);
+	zbx_vector_uint64_create(&conditionids);
 
 	/* disable actions */
-	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
-			conditiontype, elementid);
+	result = DBselect("select actionid,conditionid from conditions where conditiontype=%d and"
+			" value='" ZBX_FS_UI64 "'", conditiontype, elementid);
 
 	while (NULL != (row = DBfetch(result)))
-		DBexecute("update actions set status=%d where actionid=%s", ACTION_STATUS_DISABLED, row[0]);
+	{
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(&actionids, id);
+
+		ZBX_STR2UINT64(id, row[1]);
+		zbx_vector_uint64_append(&conditionids, id);
+	}
 
 	DBfree_result(result);
 
-	/* delete action conditions */
-	DBexecute("delete from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
-			conditiontype, elementid);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (0 != actionids.values_num)
+	{
+		zbx_vector_uint64_sort(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=%d where",
+				ACTION_STATUS_DISABLED);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
+				actionids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	if (0 != conditionids.values_num)
+	{
+		zbx_vector_uint64_sort(&conditionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from conditions where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "conditionid", conditionids.values,
+				conditionids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* in ORACLE always present begin..end; */
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&conditionids);
+	zbx_vector_uint64_destroy(&actionids);
 }
 
 /******************************************************************************
@@ -859,14 +1005,19 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  ******************************************************************************/
 static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
-	int		num, i;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	int			num, i;
+	zbx_vector_uint64_t	profileids, selementids;
+	const char		*profile_idx = "web.events.filter.triggerid";
 
 	if (0 == triggerids->values_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&profileids);
+	zbx_vector_uint64_create(&selementids);
 
 	/* add child triggers (auto-created) */
 	do
@@ -886,21 +1037,30 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	while (num != triggerids->values_num);
 
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids->values, triggerids->values_num);
-
-	for (i = 0; i < triggerids->values_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	/* delete from profiles */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from profiles"
-			" where idx='web.events.filter.triggerid'"
-				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", triggerids->values, triggerids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
+	if (0 != selementids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
+				selementids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	for (i = 0; i < triggerids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
+
+	DBget_profiles_by_source_idxs_values(&profileids, NULL, &profile_idx, 1, triggerids);
+	if (0 != profileids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
+				profileids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
@@ -911,6 +1071,9 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&selementids);
+	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
 }
@@ -1012,11 +1175,14 @@ out:
  ******************************************************************************/
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
-	const char	*__function_name = "DBdelete_graphs";
+	const char		*__function_name = "DBdelete_graphs";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
-	int		num;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	int			num;
+	zbx_vector_uint64_t	profileids, screen_itemids;
+	zbx_uint64_t		resource_type = SCREEN_RESOURCE_GRAPH;
+	const char		*profile_idx =  "web.favorite.graphids";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, graphids->values_num);
 
@@ -1024,6 +1190,9 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&profileids);
+	zbx_vector_uint64_create(&screen_itemids);
 
 	do	/* add child graphs (auto-created) */
 	{
@@ -1045,22 +1214,24 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from screens_items */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from screens_items"
-			" where resourcetype=%d"
-				" and",
-			SCREEN_RESOURCE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", graphids->values, graphids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_screenitems_by_resource_types_ids(&screen_itemids, &resource_type, 1, graphids);
+	if (0 != screen_itemids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
+				screen_itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete from profiles */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from profiles"
-			" where idx='web.favorite.graphids'"
-				" and source='graphid'"
-				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", graphids->values, graphids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
+	if (0 != profileids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
+				profileids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete from graphs */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs where");
@@ -1070,6 +1241,9 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&screen_itemids);
+	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
 out:
@@ -1152,11 +1326,14 @@ out:
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
-	const char	*__function_name = "DBdelete_items";
+	const char		*__function_name = "DBdelete_items";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
-	int		num;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	zbx_vector_uint64_t	screen_itemids, profileids;
+	int			num;
+	zbx_uint64_t		resource_types[] = {SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH};
+	const char		*profile_idx = "web.favorite.graphids";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
@@ -1164,6 +1341,8 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&screen_itemids);
+	zbx_vector_uint64_create(&profileids);
 
 	do	/* add child items (auto-created and prototypes) */
 	{
@@ -1186,23 +1365,24 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from screens_items */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from screens_items"
-				" where resourcetype in (%d,%d)"
-					" and",
-			SCREEN_RESOURCE_PLAIN_TEXT,
-			SCREEN_RESOURCE_SIMPLE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", itemids->values, itemids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types, ARRSIZE(resource_types), itemids);
+	if (0 != screen_itemids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
+				screen_itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete from profiles */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from profiles"
-			" where idx='web.favorite.graphids'"
-				" and source='itemid'"
-				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", itemids->values, itemids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
+	if (0 != profileids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
+				profileids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete from items */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
@@ -1212,6 +1392,9 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&profileids);
+	zbx_vector_uint64_destroy(&screen_itemids);
 
 	zbx_free(sql);
 out:
@@ -2086,7 +2269,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
- *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
@@ -4596,7 +4779,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
-	char			error[MAX_STRING_LEN];
+	char			error[MAX_STRING_LEN], *template_names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4606,7 +4789,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&templateids, lnk_templateids->values[i],
+		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
 			/* template already linked */
@@ -4624,13 +4807,23 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template: %s", error);
+		template_names = get_template_names(lnk_templateids);
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
+				template_names, zbx_host_string(hostid), error);
+
+		zbx_free(template_names);
 		goto clean;
 	}
 
 	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template: %s", error);
+		template_names = get_template_names(lnk_templateids);
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
+				template_names, zbx_host_string(hostid), error);
+
+		zbx_free(template_names);
 		goto clean;
 	}
 
@@ -4672,14 +4865,18 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 {
 	const char		*__function_name = "DBdelete_hosts";
 
-	zbx_vector_uint64_t	itemids, httptestids;
+	zbx_vector_uint64_t	itemids, httptestids, selementids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != DBlock_hostids(hostids))
+		goto out;
+
 	zbx_vector_uint64_create(&httptestids);
+	zbx_vector_uint64_create(&selementids);
 
 	/* delete web tests */
 
@@ -4713,21 +4910,76 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	zbx_vector_uint64_destroy(&itemids);
 
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	/* delete host from maps */
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, hostids->values, hostids->values_num);
+	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
+	if (0 != selementids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
+				selementids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete action conditions */
 	for (i = 0; i < hostids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
 
 	/* delete host */
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
 	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&selementids);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_hosts_with_prototypes                                   *
+ *                                                                            *
+ * Purpose: delete hosts from database, check if there are any host           *
+ *          prototypes and delete them first                                  *
+ *                                                                            *
+ * Parameters: hostids - [IN] host identificators from database               *
+ *                                                                            *
+ ******************************************************************************/
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
+{
+	const char		*__function_name = "DBdelete_hosts_with_prototypes";
+
+	zbx_vector_uint64_t	host_prototypeids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&host_prototypeids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hd.hostid"
+			" from items i,host_discovery hd"
+			" where i.itemid=hd.parent_itemid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &host_prototypeids);
+
+	DBdelete_host_prototypes(&host_prototypeids);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&host_prototypeids);
+
+	DBdelete_hosts(hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4967,11 +5219,17 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
  ******************************************************************************/
 void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "DBdelete_groups";
+	const char		*__function_name = "DBdelete_groups";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	int		i;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	int			i;
+	zbx_vector_uint64_t	profileids, screen_itemids, selementids;
+	zbx_uint64_t		resource_types_delete[] = {SCREEN_RESOURCE_DATA_OVERVIEW,
+						SCREEN_RESOURCE_TRIGGERS_OVERVIEW};
+	zbx_uint64_t		resource_types_update[] = {SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO,
+						SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS};
+	const char		*profile_idxs[] = {"web.dashconf.groups.groupids", "web.dashconf.groups.hide.groupids"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
 
@@ -4985,44 +5243,54 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
+	zbx_vector_uint64_create(&profileids);
+	zbx_vector_uint64_create(&screen_itemids);
+	zbx_vector_uint64_create(&selementids);
+
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete sysmaps_elements */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from sysmaps_elements"
-			" where elementtype=%d"
-				" and",
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "elementid", groupids->values, groupids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST_GROUP, groupids);
+	if (0 != selementids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
+				selementids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* delete screens_items (host group is mandatory for this elements) */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from screens_items"
-			" where resourcetype in (%d,%d)"
-				" and",
-			SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_TRIGGERS_OVERVIEW);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", groupids->values, groupids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types_delete, ARRSIZE(resource_types_delete),
+			groupids);
+	if (0 != screen_itemids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
+				screen_itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* update screens_items (host group isn't mandatory for this elements) */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"update screens_items"
-			" set resourceid=0"
-			" where resourcetype in (%d,%d,%d,%d)"
-				" and",
-			SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO,
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", groupids->values, groupids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	zbx_vector_uint64_clear(&screen_itemids);
+	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types_update, ARRSIZE(resource_types_update),
+			groupids);
 
-	/* profiles */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from profiles"
-			" where idx in ('web.dashconf.groups.groupids','web.dashconf.groups.hide.groupids')"
-				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", groupids->values, groupids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	if (0 != screen_itemids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update screens_items set resourceid=0 where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
+				screen_itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	DBget_profiles_by_source_idxs_values(&profileids, NULL, profile_idxs, ARRSIZE(profile_idxs), groupids);
+	if (0 != profileids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from profiles where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "profileid", profileids.values,
+				profileids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	/* groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from groups where");
@@ -5032,6 +5300,10 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&selementids);
+	zbx_vector_uint64_destroy(&screen_itemids);
+	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
 out:

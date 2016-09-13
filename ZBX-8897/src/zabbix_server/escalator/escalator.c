@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -222,19 +222,33 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		const char *subject, const char *message)
 {
 	const char	*__function_name = "add_user_msg";
-	ZBX_USER_MSG	*p;
+	ZBX_USER_MSG	*p, **pnext;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	p = *user_msg;
-
-	while (NULL != p)
+	if (0 == mediatypeid)
 	{
-		if (p->userid == userid && p->mediatypeid == mediatypeid &&
-				0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message))
-			break;
+		for (pnext = user_msg, p = *user_msg; NULL != p; p = *pnext)
+		{
+			if (p->userid == userid && 0 == strcmp(p->subject, subject) &&
+					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
+			{
+				*pnext = p->next;
 
-		p = p->next;
+				zbx_free(p->subject);
+				zbx_free(p->message);
+				zbx_free(p);
+			}
+			else
+				pnext = (ZBX_USER_MSG **)&p->next;
+		}
+	}
+
+	for (p = *user_msg; NULL != p; p = p->next)
+	{
+		if (p->userid == userid && 0 == strcmp(p->subject, subject) && 0 == strcmp(p->message, message) &&
+				(0 == p->mediatypeid || mediatypeid == p->mediatypeid))
+			break;
 	}
 
 	if (NULL == p)
@@ -468,15 +482,21 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	DB_ROW		row;
 	zbx_db_insert_t	db_insert;
 	int		alerts_num = 0;
+	char		*buffer = NULL;
+	size_t		buffer_alloc = ZBX_KIBIBYTE, buffer_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
+	buffer = zbx_malloc(buffer, buffer_alloc);
+
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command");
 #ifdef HAVE_OPENIPMI
-				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
 			" where o.operationid=og.operationid"
 				" and og.groupid=hg.groupid"
@@ -485,10 +505,13 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and h.status=%d"
 			" union "
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
+			operationid, HOST_STATUS_MONITORED);
 #ifdef HAVE_OPENIPMI
-				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh,hosts h"
 			" where o.operationid=oh.operationid"
 				" and oh.hostid=h.hostid"
@@ -496,17 +519,21 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and h.status=%d"
 			" union "
 			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
+			operationid, HOST_STATUS_MONITORED);
 #ifdef HAVE_OPENIPMI
-				",0,2,null,null"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, ",0,2,null,null");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh"
 			" where o.operationid=oh.operationid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
-			operationid, HOST_STATUS_MONITORED,
-			operationid, HOST_STATUS_MONITORED,
 			operationid);
+
+	result = DBselect("%s", buffer);
+
+	zbx_free(buffer);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -520,21 +547,6 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
 
-		ZBX_STR2UINT64(host.hostid, row[0]);
-
-		if (0 != host.hostid)
-		{
-			strscpy(host.host, row[1]);
-#ifdef HAVE_OPENIPMI
-			host.ipmi_authtype = (signed char)atoi(row[12]);
-			host.ipmi_privilege = (unsigned char)atoi(row[13]);
-			strscpy(host.ipmi_username, row[14]);
-			strscpy(host.ipmi_password, row[15]);
-#endif
-		}
-		else
-			rc = get_dynamic_hostid(event, &host, error, sizeof(error));
-
 		script.type = (unsigned char)atoi(row[2]);
 
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
@@ -544,13 +556,31 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
+			script.execute_on = (unsigned char)atoi(row[4]);
+
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT != script.type || ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		{
+			ZBX_STR2UINT64(host.hostid, row[0]);
+
+			if (0 != host.hostid)
+			{
+				strscpy(host.host, row[1]);
+#ifdef HAVE_OPENIPMI
+				host.ipmi_authtype = (signed char)atoi(row[12]);
+				host.ipmi_privilege = (unsigned char)atoi(row[13]);
+				strscpy(host.ipmi_username, row[14]);
+				strscpy(host.ipmi_password, row[15]);
+#endif
+			}
+			else
+				rc = get_dynamic_hostid(event, &host, error, sizeof(error));
+		}
+
 		if (SUCCEED == rc)
 		{
 			switch (script.type)
 			{
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					script.execute_on = (unsigned char)atoi(row[4]);
-					break;
 				case ZBX_SCRIPT_TYPE_SSH:
 					script.authtype = (unsigned char)atoi(row[6]);
 					script.publickey = zbx_strdup(script.publickey, row[9]);

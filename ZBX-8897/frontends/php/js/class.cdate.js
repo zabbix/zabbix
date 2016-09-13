@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,25 +133,14 @@ CDate.prototype = {
 	},
 
 	setZBXDate: function(strdate) {
-		this.server = 1;
-
-		var theDate = {
-			Y: strdate.toString().substr(0, 4),
-			m: strdate.toString().substr(4, 2),
-			d: strdate.toString().substr(6, 2),
-			H: strdate.toString().substr(8, 2),
-			i: strdate.toString().substr(10, 2),
-			s: strdate.toString().substr(12, 2)
-		};
-
-		this.serverDate.setFullYear(theDate.Y);
-		this.serverDate.setMonth(theDate.m - 1);
-		this.serverDate.setDate(theDate.d);
-		this.serverDate.setHours(theDate.H);
-		this.serverDate.setMinutes(theDate.i);
-		this.serverDate.setSeconds(theDate.s);
-		this.serverDate.setMilliseconds(0);
-		this.calcTZdiff();
+		this.setTimeObject(
+			strdate.toString().substr(0, 4),
+			strdate.toString().substr(4, 2) - 1,
+			strdate.toString().substr(6, 2),
+			strdate.toString().substr(8, 2),
+			strdate.toString().substr(10, 2),
+			strdate.toString().substr(12, 2)
+		);
 
 		return this.getTime();
 	},
@@ -255,15 +244,38 @@ CDate.prototype = {
 		this.calcTZdiff();
 	},
 
-	setMonth: function(arg) {
+	setTimeObject: function(y, m, d, h, i, s) {
 		this.server = 1;
-		this.serverDate.setMonth(arg);
-		this.calcTZdiff();
-	},
+		function hasAttr(arg) {
+			return (typeof(arg) != 'undefined' && arg !== null);
+		}
 
-	setFullYear: function(arg) {
-		this.server = 1;
-		this.serverDate.setFullYear(arg);
+		if (hasAttr(y)) {
+			this.serverDate.setFullYear(y);
+		}
+
+		if (hasAttr(m) && hasAttr(d)) {
+			this.serverDate.setMonth(m, d);
+		}
+		else if (hasAttr(m)) {
+			this.serverDate.setMonth(m);
+		}
+		else if (hasAttr(d)) {
+			this.serverDate.setDate(d);
+		}
+
+		if (hasAttr(h)) {
+			this.serverDate.setHours(h);
+		}
+
+		if (hasAttr(i)) {
+			this.serverDate.setMinutes(i);
+		}
+
+		if (hasAttr(s)) {
+			this.serverDate.setSeconds(s);
+		}
+
 		this.calcTZdiff();
 	},
 

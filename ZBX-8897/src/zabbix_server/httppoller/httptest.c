@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -450,6 +450,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
+
+			zbx_free(page.data);
 		}
 		while (0 != --httptest->httptest.retries);
 
@@ -517,11 +519,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 
 			zbx_free(var_err_str);
+			zbx_free(page.data);
 		}
 		else
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 
-		zbx_free(page.data);
 httpstep_error:
 		zbx_free(httpstep.status_codes);
 		zbx_free(httpstep.required);
@@ -664,9 +666,14 @@ int	process_httptests(int httppoller_num, int now)
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
-		httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
-				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+		if ('\0' != *row[10])
+		{
+			httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+					&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+		}
+		else
+			httptest.httptest.http_proxy = NULL;
 
 		httptest.httptest.retries = atoi(row[11]);
 
@@ -676,6 +683,7 @@ int	process_httptests(int httppoller_num, int now)
 		process_httptest(&host, &httptest);
 
 		zbx_free(httptest.httptest.http_proxy);
+
 		if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
 		{
 			zbx_free(httptest.httptest.http_password);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ $fields = array(
 	'user_groups' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'user_groups_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null,	DB_ID,		null),
+	'user_medias_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_groups' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'new_media' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -431,8 +431,11 @@ class CPageFilter {
 		}
 
 		// select remembered selection
-		if (is_null($groupid) && $this->_profileIds['groupid']) {
+		if ($groupid === null && $this->config['DDRemember'] && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
+			$host = null;
+			$template = null;
+
 			if ($hostid) {
 				$host = API::Host()->get(array(
 					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
@@ -440,8 +443,18 @@ class CPageFilter {
 					'hostids' => $hostid,
 					'groupids' => $this->_profileIds['groupid']
 				));
+
+				if (!$host) {
+					$template = API::Template()->get(array(
+						'output' => array('hostid'),
+						'templateids' => $hostid,
+						'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+						'groupids' => $this->_profileIds['groupid']
+					));
+				}
 			}
-			if (!$hostid || !empty($host)) {
+
+			if (!$hostid || $host || $template) {
 				$groupid = $this->_profileIds['groupid'];
 			}
 		}
@@ -453,9 +466,46 @@ class CPageFilter {
 				reset($this->data['groups']);
 				$groupid = key($this->data['groups']);
 			}
-			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
+			// Otherwise for 'Dropdown first entry' option ALL or NONE.
 			else {
+				// If no group will be found for host use the default the option ALL (or NONE depending on config).
 				$groupid = 0;
+
+				// For 'Dropdown first entry' option NONE, select the first possible group when the host is given.
+				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE && $hostid) {
+					$groupids = array();
+
+					$hosts = API::Host()->get(array(
+						'output' => array('hostid'),
+						'selectGroups' => array('groupid'),
+						'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+						'hostids' => array($hostid)
+					));
+
+					if ($hosts) {
+						$host = reset($hosts);
+						$groupids = zbx_objectValues($host['groups'], 'groupid');
+					}
+					else {
+						$templates = API::Template()->get(array(
+							'output' => array('hostid'),
+							'selectGroups' => array('groupid'),
+							'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+							'templateids' => array($hostid)
+						));
+
+						$template = reset($templates);
+						$groupids = zbx_objectValues($template['groups'], 'groupid');
+					}
+
+					// Set first possible group (ordered by ID, not names), if found in list. Leave 0 (NONE) otherwise.
+					foreach ($groupids as $id) {
+						if (array_key_exists($id, $this->data['groups'])) {
+							$groupid = $id;
+							break;
+						}
+					}
+				}
 			}
 		}
 
@@ -504,7 +554,7 @@ class CPageFilter {
 			}
 
 			// select remembered selection
-			if (is_null($hostId) && $this->_profileIds['hostid']) {
+			if (is_null($hostId) && $this->config['DDRemember'] && $this->_profileIds['hostid']) {
 				$hostId = $this->_profileIds['hostid'];
 			}
 

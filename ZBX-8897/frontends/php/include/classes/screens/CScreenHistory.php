@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,15 +236,7 @@ class CScreenHistory extends CScreenBase {
 						$row[] = new CCol($data['value'], 'pre');
 
 						$newRow = new CRow($row);
-						if (is_null($color)) {
-							$min_color = 0x98;
-							$max_color = 0xF8;
-							$int_color = ($max_color - $min_color) / count($this->itemids);
-							$int_color *= array_search($data['itemid'], $this->itemids);
-							$int_color += $min_color;
-							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
-						}
-						elseif (!is_null($color)) {
+						if (!is_null($color)) {
 							$newRow->setAttribute('class', $color);
 						}
 

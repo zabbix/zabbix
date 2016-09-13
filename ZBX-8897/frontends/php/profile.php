@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ $fields = array(
 	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({save})', _('Rows per page')),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
-	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
+	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'new_media' =>			array(T_ZBX_STR, O_OPT, null, null, null),
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
 	'disable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -507,16 +507,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 					_s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$triggerExpression = new CTriggerExpression();
-			if (!$triggerExpression->parse($trigger['expression'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
-			}
-
+			$this->checkExpression($trigger);
 			$this->checkIfExistsOnHost($trigger);
-
-			// check item prototypes
-			$items = getExpressionItems($triggerExpression);
-			$this->checkDiscoveryRuleCount($trigger, $items);
 		}
 
 		$this->createReal($triggers);
@@ -567,19 +559,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (isset($trigger['expression'])) {
 				$expressionFull = explode_exp($dbTrigger['expression']);
-				if (strcmp($trigger['expression'], $expressionFull) == 0) {
+
+				if ($trigger['expression'] === $expressionFull) {
 					unset($triggers[$key]['expression']);
 				}
-
-				// check item prototypes
-				$triggerExpression = new CTriggerExpression();
-				if (!$triggerExpression->parse($trigger['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
+				else {
+					$this->checkExpression($trigger);
 				}
-
-				// check item prototypes
-				$items = getExpressionItems($triggerExpression);
-				$this->checkDiscoveryRuleCount($trigger, $items);
 			}
 
 			if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0) {
@@ -770,11 +756,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
-
-				if (!isset($expressionData->expressions[0])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Trigger expression must contain at least one host:key reference.'));
-				}
 			}
 
 			if ($expressionChanged) {
@@ -904,36 +885,109 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check if trigger prototype has at least one item prototype and belongs to one discovery rule.
+	 * Check if trigger prototype has a correct trigger expression and has at least one item prototype and belongs to
+	 * one discovery rule, does not belong to a host and a template simultaneously and has permissions to all hosts and
+	 * templates in the expression.
 	 *
-	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
+	 * @param array  $trigger
+	 * @param string $trigger['description']
+	 * @param string $trigger['expression']
 	 *
-	 * @param array  $trigger						array of trigger data
-	 * @param string $trigger['description']		trigger description
-	 * @param array  $items							array of trigger items
+	 * @throws APIException
 	 */
-	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
-		if ($items) {
-			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+	protected function checkExpression(array $trigger) {
+		$triggerExpression = new CTriggerExpression();
+		if (!$triggerExpression->parse($trigger['expression'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
+		}
+
+		$lld_rules = array();
+
+		if ($triggerExpression->expressions) {
+			$expressions = array();
+			$hosts = array();
+			$has_host = false;
+			$has_template = false;
+
+			foreach ($triggerExpression->expressions as $expression) {
+				if (!array_key_exists($expression['host'], $expressions)) {
+					$expressions[$expression['host']] = array('hostid' => null, 'items' => array());
+				}
+
+				$expressions[$expression['host']]['items'][$expression['item']] = true;
+				$hosts[$expression['host']] = true;
+			}
+
+			$db_hosts = API::Host()->get(array(
+				'output' => array('hostid', 'host'),
 				'nodeids' => get_current_nodeid(true),
-				'output' => array('parent_itemid'),
-				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
+				'filter' => array(
+					'host' => array_keys($hosts)
+				)
 			));
 
-			$itemDiscoveryIds = array_flip(zbx_objectValues($itemDiscoveries, 'parent_itemid'));
+			foreach ($db_hosts as $db_host) {
+				$expressions[$db_host['host']]['hostid'] = $db_host['hostid'];
+				$has_host = true;
+				unset($hosts[$db_host['host']]);
+			}
 
-			if (count($itemDiscoveryIds) > 1) {
+			if ($hosts) {
+				$db_templates = API::Template()->get(array(
+					'output' => array('templateid', 'host'),
+					'nodeids' => get_current_nodeid(true),
+					'filter' => array(
+						'host' => array_keys($hosts)
+					)
+				));
+
+				foreach ($db_templates as $db_template) {
+					$expressions[$db_template['host']]['hostid'] = $db_template['templateid'];
+					$has_template = true;
+				}
+			}
+
+			if ($has_host && $has_template) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _(
+					'Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'
+				));
+			}
+
+			foreach ($expressions as $host => $expression) {
+				if ($expression['hostid'] === null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.',
+						$host
+					));
+				}
+
+				$db_item_prototypes = API::ItemPrototype()->get(array(
+					'output' => array(),
+					'selectDiscoveryRule' => array('itemid'),
+					'hostids' => array($expression['hostid']),
+					'filter' => array(
+						'key_' => array_keys($expression['items'])
+					),
+					'nopermissions' => true
+				));
+
+				foreach ($db_item_prototypes as $db_item_prototype) {
+					$lld_rules[$db_item_prototype['discoveryRule']['itemid']] = true;
+				}
+			}
+
+			if (count($lld_rules) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
 					$trigger['description']
 				));
 			}
-			elseif (!$itemDiscoveryIds) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" must contain at least one item prototype.',
-					$trigger['description']
-				));
-			}
+		}
+
+		if (!$lld_rules) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Trigger prototype "%1$s" must contain at least one item prototype.', $trigger['description']
+			));
 		}
 	}
 }

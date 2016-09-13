@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,10 +44,6 @@ function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
 
-function REGEXP($regexp, $var = null) {
-	return "(preg_match(\"".$regexp."\", {".$var."}))&&";
-}
-
 function GT($value, $var = '') {
 	return '({'.$var.'}>='.$value.')&&';
 }
@@ -62,10 +58,6 @@ function IN($array, $var = '') {
 
 function HEX($var = null) {
 	return 'preg_match("/^([a-zA-Z0-9]+)$/",{'.$var.'})&&';
-}
-
-function KEY_PARAM($var = null) {
-	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 }
 
 function validate_ipv4($str, &$arr) {

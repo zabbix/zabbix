@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@
 #ifndef _WINDOWS
 #	error "This module is only available for Windows OS"
 #endif
+
+#define EVT_VARIANT_TYPE_ARRAY	128
+#define EVT_VARIANT_TYPE_MASK	0x7f
 
 /* Structures from winevt.h file */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;

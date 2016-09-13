@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static char	*empty_str = '\0';
+static char	*empty_str = "";
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -64,9 +64,9 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
  *                                                                            *
  ******************************************************************************/
 #if defined(PS_OVERWRITE_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+char	**setproctitle_save_env(int argc, char **argv)
 {
-	int	i = 0;
+	int	i;
 	char	*arg_next = NULL;
 
 	if (NULL == argv || 0 == argc)
@@ -88,13 +88,14 @@ char **	setproctitle_save_env(int argc, char **argv)
 	{
 		arg_next = argv[i] + strlen(argv[i]) + 1;
 		argv_int[i] = zbx_strdup(NULL, argv[i]);
-		argc_ext_copied_last = i;
 
 		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
 		/* overwritten and their argv[] pointers will point to wrong strings. */
 		if (argc_ext_copied_first < i)
 			argv[i] = empty_str;
 	}
+
+	argc_ext_copied_last = i - 1;
 
 	for (; i < argc; i++)
 		argv_int[i] = argv[i];
@@ -116,12 +117,13 @@ char **	setproctitle_save_env(int argc, char **argv)
 		{
 			arg_next = environ[i] + strlen(environ[i]) + 1;
 			environ_int[i] = zbx_strdup(NULL, environ[i]);
-			environ_ext_copied++;
 
 			/* environment variables can be overwritten by status messages in argv[0] */
 			/* and environ[] pointers will point to wrong strings */
 			environ[i] = empty_str;
 		}
+
+		environ_ext_copied = i;
 
 		for (;  i < envc; i++)
 			environ_int[i] = environ[i];
@@ -159,7 +161,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 	return argv_int;
 }
 #elif defined(PS_PSTAT_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+char	**setproctitle_save_env(int argc, char **argv)
 {
 	size_t	len0;
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1776,7 +1776,13 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 
 	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
-		array_pop($items);
+		if (getPageSortOrder() == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+
 		$searchLimit = '+';
 	}
 
@@ -1789,7 +1795,7 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 		$currentPage = 1;
 	}
 
-	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+	if ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 

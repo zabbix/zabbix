@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 /*      SSS - source nodeid (in which node was the ID created) */
 /*      DDDDDDDDDDD - the ID itself                            */
 /***************************************************************/
-
-extern int	txn_level;
-extern int	txn_error;
 
 /******************************************************************************
  *                                                                            *
@@ -126,7 +123,6 @@ int	DBconnect(int flag)
 	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
-
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -1108,7 +1104,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
 	int		*seq_len = NULL;
-
+#if defined(HAVE_SQLITE3)
+	int		expr_num, expr_cnt = 0;
+#endif
 	if (0 == num)
 		return;
 
@@ -1145,24 +1143,51 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
+#if defined(HAVE_SQLITE3)
+	expr_num = between_num + (in_num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
+
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+#endif
 	/* compose "between"s */
 	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
 		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
 			if (1 != first)
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			{
+#if defined(HAVE_SQLITE3)
+				if (MAX_EXPRESSIONS == ++expr_cnt)
+				{
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+					expr_cnt = 0;
+				}
+				else
+#endif
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			}
+			else
+				first = 0;
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 					fieldname, values[start], values[start + seq_len[i] - 1]);
-			first = 0;
 		}
 
 		start += seq_len[i];
 	}
 
 	if (0 < in_num && 0 < between_num)
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	{
+#if defined(HAVE_SQLITE3)
+		if (MAX_EXPRESSIONS == ++expr_cnt)
+		{
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+			expr_cnt = 0;
+		}
+		else
+#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
 
 	if (1 < in_num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -1186,7 +1211,21 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 					{
 						in_cnt = 0;
 						(*sql_offset)--;
-						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+#if defined(HAVE_SQLITE3)
+						if (MAX_EXPRESSIONS == ++expr_cnt)
+						{
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ")) or (%s in (",
+									fieldname);
+							expr_cnt = 0;
+						}
+						else
+						{
+#endif
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (",
+									fieldname);
+#if defined(HAVE_SQLITE3)
+						}
+#endif
 					}
 
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
@@ -1207,6 +1246,10 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_free(seq_len);
 
+#if defined(HAVE_SQLITE3)
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+#endif
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
@@ -2272,7 +2315,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 #ifdef HAVE_ORACLE
 				row[i].str = NULL;
 				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_n(value->str, field->length));
+						zbx_strlen_utf8_nchars(value->str, field->length));
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
@@ -2625,3 +2668,106 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	exit(FAIL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_record                                                    *
+ *                                                                            *
+ * Purpose: locks a record in a table by its primary key and an optional      *
+ *          constraint field                                                  *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             id        - [IN] primary key value                             *
+ *             add_field - [IN] additional constraint field name (optional)   *
+ *             add_id    - [IN] constraint field value                        *
+ *                                                                            *
+ * Return value: SUCCEED - the record was successfully locked                 *
+ *               FAIL    - the table does not contain the specified record    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
+{
+	const char	*__function_name = "DBlock_record";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	if (NULL == add_field)
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE, table, t->recid, id);
+	}
+	else
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 " and %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE,
+				table, t->recid, id, add_field, add_id);
+	}
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_records                                                   *
+ *                                                                            *
+ * Purpose: locks a records in a table by its primary key                     *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             ids       - [IN] primary key values                            *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - the table does not contain any of the specified    *
+ *                         records                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
+{
+	const char	*__function_name = "DBlock_records";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
+
+	result = DBselect("%s" ZBX_FOR_UPDATE, sql);
+
+	zbx_free(sql);
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}

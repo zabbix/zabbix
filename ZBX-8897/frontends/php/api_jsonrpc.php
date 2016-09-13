@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,11 +57,11 @@ catch (Exception $e) {
 		'jsonrpc' => '2.0',
 		'error' => array(
 			'code' => 1,
-			'message' => $e->getMessage()
+			'message' => $e->getMessage(),
+			'data' => ''
 		),
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	);
 
 	echo CJs::encodeJson($response);
 }
-

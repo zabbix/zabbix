@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,12 +107,12 @@ if ($availableNodeIds && $nodeId === null) {
 order_result($hostGroups, 'name');
 
 foreach ($hostGroups as $hostGroup) {
-	$hostGroupCheckBox = new CCheckBox();
-	$hostGroupCheckBox->setAttribute('data-id', $hostGroup['groupid']);
-	$hostGroupCheckBox->setAttribute('data-name', $hostGroup['name']);
-	$hostGroupCheckBox->setAttribute('data-permission', $permission);
+	$host_group_checkbox = new CCheckBox();
+	$host_group_checkbox->setAttribute('data-host-group',
+		'{"id":"'.$hostGroup['groupid'].'","name":"'.$hostGroup['name'].'","permission":'.$permission.'}'
+	);
 
-	$hostGroupTable->addRow(new CCol(array($hostGroupCheckBox, $hostGroup['name'])));
+	$hostGroupTable->addRow(new CCol(array($host_group_checkbox, $hostGroup['name'])));
 }
 
 $hostGroupTable->setFooter(new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")'), 'right'));
@@ -133,11 +133,12 @@ $hostGroupForm->show();
 			var obj = jQuery(this);
 
 			if (obj.attr('name') !== 'all_groups' && obj.prop('checked')) {
-				var id = obj.data('id');
+				var group = obj.data('hostGroup');
 
-				add_variable('input', 'new_right[' + id + '][permission]', obj.data('permission'), formName,
-					parentDocument);
-				add_variable('input', 'new_right[' + id + '][name]', obj.data('name'), formName, parentDocument);
+				add_variable('input', 'new_right[' + group.id + '][permission]', group.permission, formName,
+					parentDocument
+				);
+				add_variable('input', 'new_right[' + group.id + '][name]', group.name, formName, parentDocument);
 			}
 		});
 

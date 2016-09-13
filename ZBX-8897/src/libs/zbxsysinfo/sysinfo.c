@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -709,19 +709,6 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
 	return log;
 }
 
-zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)
-{
-	size_t	i;
-
-	if (!ISSET_LOG(result) || NULL == result->logs[0])
-		return 0;
-
-	for (i = 1; NULL != result->logs[i]; i++)
-		;
-
-	return result->logs[i - 1]->lastlogsize;
-}
-
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
 	int		ret = FAIL;
@@ -1111,19 +1098,28 @@ void	unquote_key_param(char *param)
  *                            0 - do nothing if the paramter does not contain *
  *                                any special characters                      *
  *                                                                            *
+ * Return value: SUCEED - if parameter doesn't contain special characters and *
+ *                        is not forced to be quoted or when parameter is     *
+ *                        enclosed in quotes                                  *
+ *               FAIL   - if parameter ends with backslash                    *
+ *                                                                            *
  ******************************************************************************/
-void	quote_key_param(char **param, int forced)
+int	quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
 
 	if (0 == forced)
 	{
-		if ('"' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
-			return;
+		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+			return SUCCEED;
 	}
 
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 	sz_src = strlen(*param);
+
+	if ('\\' == (*param)[sz_src - 1])
+		return FAIL;
+
+	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
 	*param = zbx_realloc(*param, sz_dst);
 
@@ -1137,6 +1133,8 @@ void	quote_key_param(char **param, int forced)
 			(*param)[--sz_dst] = '\\';
 	}
 	(*param)[--sz_dst] = '"';
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_KSTAT_H

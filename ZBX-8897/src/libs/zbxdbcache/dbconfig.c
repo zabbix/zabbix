@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,10 @@ static int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 
+/* trigger is functional unless its expression contains disabled or not monitored items */
+#define TRIGGER_FUNCTIONAL_TRUE		0
+#define TRIGGER_FUNCTIONAL_FALSE	1
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -58,6 +62,7 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
+	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
 }
 ZBX_DC_TRIGGER;
 
@@ -107,6 +112,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	unreachable;
 }
 ZBX_DC_ITEM;
 
@@ -273,6 +279,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		timediff;
 	unsigned char	location;
 }
 ZBX_DC_PROXY;
@@ -435,7 +442,7 @@ typedef struct
 ZBX_DC_CONFIG;
 
 static ZBX_DC_CONFIG	*config = NULL;
-static ZBX_MUTEX	config_lock;
+static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	daemon_type;
@@ -554,10 +561,14 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	return itemid;
 }
 
-static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
+static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
 {
-	int		nextcheck;
+	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
+	int		nextcheck;
+
+	if (0 != host->proxy_hostid && NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
+		now -= proxy->timediff;
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -575,6 +586,9 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 
 		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now);
 	}
+
+	if (NULL != proxy)
+		nextcheck += proxy->timediff + 1;
 
 	return nextcheck;
 }
@@ -605,7 +619,7 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 			/* nothing to do */;
 	}
 
-	return DCget_reachable_nextcheck(item, time(NULL));
+	return DCget_reachable_nextcheck(item, host, time(NULL));
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -980,8 +994,6 @@ static void	DCsync_hosts(DB_RESULT result)
 				host->data_expected_from = now;
 		}
 
-		host->status = status;
-
 		/* update hosts_h index using new data, if not done already */
 
 		if (1 == update_index)
@@ -1015,21 +1027,31 @@ static void	DCsync_hosts(DB_RESULT result)
 			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
 
-		/* passive proxies */
+		/* proxies */
 
-		if (HOST_STATUS_PROXY_PASSIVE == host->status)
+		if (HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status)
 		{
 			proxy = DCfind_id(&config->proxies, hostid, sizeof(ZBX_DC_PROXY), &found);
 
 			if (0 == found)
 			{
+				proxy->timediff = 0;
+				proxy->location = ZBX_LOC_NOWHERE;
+			}
+
+			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
+			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-				proxy->location = ZBX_LOC_NOWHERE;
 
 				DCupdate_proxy_queue(proxy);
+			}
+			else if (HOST_STATUS_PROXY_ACTIVE == status && ZBX_LOC_QUEUE == proxy->location)
+			{
+				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
+				proxy->location = ZBX_LOC_NOWHERE;
 			}
 		}
 		else if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
@@ -1042,6 +1064,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			zbx_hashset_remove(&config->proxies, &hostid);
 		}
+
+		host->status = status;
 	}
 
 	/* remove deleted hosts from buffer */
@@ -1067,7 +1091,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
 
-		/* passive proxies */
+		/* proxies */
 
 		if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
 		{
@@ -1231,6 +1255,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
+			item->unreachable = 0;
 		}
 		else
 		{
@@ -1309,17 +1334,28 @@ static void	DCsync_items(DB_RESULT result)
 					(ITEM_STATE_NORMAL == item->state &&
 					(item->delay != delay || 0 != delay_flex_changed))))
 			{
+				ZBX_DC_PROXY	*proxy = NULL;
 				zbx_uint64_t	seed;
+				int		proxy_timediff;
+
+				if (0 != host->proxy_hostid)
+					proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid);
+
+				proxy_timediff = (NULL == proxy ? 0 : proxy->timediff);
 
 				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, type, item->key);
 
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
-							config->config->refresh_unsupported, NULL, now);
+							config->config->refresh_unsupported, NULL,
+							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
 				}
 				else
-					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16], now);
+				{
+					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
+							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+				}
 			}
 		}
 		else
@@ -1811,6 +1847,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		}
 
 		trigger->topoindex = 1;
+
+		/* reset trigger functionality, it will be updated in DCsync_functions() */
+		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -2034,6 +2073,30 @@ static void	DCsync_functions(DB_RESULT result)
 	{
 		zbx_vector_ptr_sort(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	/* disable functionality for triggers with expression containing */
+	/* disabled or not monitored items                               */
+	for (i = 0; i < itemtrigs.values_num; i++)
+	{
+		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
+
+		if (TRIGGER_FUNCTIONAL_FALSE != trigger->functional)
+		{
+			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
+
+			if (ITEM_STATUS_DISABLED != item->status)
+			{
+				ZBX_DC_HOST	*host;
+
+				host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+				if (HOST_STATUS_NOT_MONITORED != host->status)
+					continue;
+			}
+
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
+		}
 	}
 
 	/* update links from items to triggers */
@@ -2941,7 +3004,7 @@ void	DCsync_configuration(void)
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result);	/* relies on host status, must be after DCsync_hosts() */
+	DCsync_items(item_result);	/* relies on host status and proxies, must be after DCsync_hosts() */
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -3293,6 +3356,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3319,6 +3383,7 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
@@ -3349,6 +3414,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3427,11 +3493,8 @@ void	init_configuration_cache()
 
 #define CREATE_HASHSET_EXT(hashset, hash_func, compare_func)								\
 															\
-	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE,								\
-				hash_func, compare_func,								\
-				__config_mem_malloc_func,								\
-				__config_mem_realloc_func,								\
-				__config_mem_free_func)
+	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE, hash_func, compare_func, NULL,				\
+				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items);
 	CREATE_HASHSET(config->numitems);
@@ -3727,6 +3790,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
@@ -4238,6 +4302,29 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCconfig_unlock_all_triggers                                     *
+ *                                                                            *
+ * Purpose: Unlocks all locked triggers before doing full history sync at     *
+ *          program exit                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_unlock_all_triggers()
+{
+	ZBX_DC_TRIGGER		*dc_trigger;
+	zbx_hashset_iter_t	iter;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+
+	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
+		dc_trigger->locked = 0;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
@@ -4505,7 +4592,13 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 	if (num < min_snmp_fail)
 		return num;
 
-	return min_snmp_fail - 1;
+	/* If we have already found the optimal number of variables to query, we wish to base our suggestion on that */
+	/* number. If we occasionally get a timeout in this area, it can mean two things: either the device's actual */
+	/* limit is a bit lower than that (it can process requests above it, but only sometimes) or a UDP packet in  */
+	/* one of the directions was lost. In order to account for the former, we allow ourselves to lower the count */
+	/* of variables, but only up to two times. Otherwise, performance will gradually degrade due to the latter.  */
+
+	return MAX(max_snmp_succeed - 2, min_snmp_fail - 1);
 }
 
 /******************************************************************************
@@ -4683,7 +4776,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 		{
 			old_nextcheck = dc_item->nextcheck;
-			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
 
 			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 			continue;
@@ -4691,14 +4784,15 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (0 == (disable_until = DCget_disable_until(dc_item, dc_host)))
 		{
-			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+			/* move reachable items on reachable hosts to normal pollers */
+			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
 						dc_item->key);
 
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
@@ -4973,13 +5067,12 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
+
+	dc_item->unreachable = 0;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
-
-	if (ZBX_LOC_POLLER == dc_item->location)
-		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
 
@@ -4997,11 +5090,10 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
+	dc_item->unreachable = 1;
+
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
-
-	if (ZBX_LOC_POLLER == dc_item->location)
-		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
 
@@ -5032,6 +5124,9 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
+		if (ZBX_LOC_POLLER == dc_item->location)
+			dc_item->location = ZBX_LOC_NOWHERE;
+
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
@@ -5061,6 +5156,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
@@ -5351,7 +5447,9 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state)
+					TRIGGER_STATE_NORMAL == next_trigger->state &&
+					TRIGGER_STATUS_ENABLED == next_trigger->status &&
+					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
 				return FAIL;
 			}
@@ -5534,26 +5632,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 			/* Store time at which no-data maintenance ended for the host (either */
 			/* because no-data maintenance ended or because maintenance type was */
 			/* changed to normal), this is needed for nodata() trigger function. */
-			/* Also, recalculate "nextcheck" time for items for which we usually */
-			/* update it upon receiving a value (i.e., items without a poller). */
-
-			ZBX_DC_ITEM		*dc_item;
-			zbx_hashset_iter_t	iter;
-
 			dc_host->data_expected_from = now;
-
-			zbx_hashset_iter_reset(&config->items, &iter);
-
-			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
-			{
-				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
-					continue;
-
-				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
-					continue;
-
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
-			}
 		}
 
 		dc_host->maintenance_status = maintenance_status;
@@ -5740,7 +5819,9 @@ int	DCconfig_get_proxypoller_nextcheck()
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 {
 	const char	*__function_name = "DCrequeue_proxy";
+
 	time_t		now;
+	ZBX_DC_HOST	*dc_host;
 	ZBX_DC_PROXY	*dc_proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d", __function_name, (int)update_nextcheck);
@@ -5749,28 +5830,104 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)) &&
+			NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
 	{
-		if (0 != (0x01 & update_nextcheck))
-		{
-			dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
-		}
-		if (0 != (0x02 & update_nextcheck))
-		{
-			dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-		}
-
 		if (ZBX_LOC_POLLER == dc_proxy->location)
 			dc_proxy->location = ZBX_LOC_NOWHERE;
 
-		DCupdate_proxy_queue(dc_proxy);
+		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
+		{
+			if (0 != (0x01 & update_nextcheck))
+			{
+				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
+			}
+			if (0 != (0x02 & update_nextcheck))
+			{
+				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+			}
+
+			DCupdate_proxy_queue(dc_proxy);
+		}
 	}
 
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_set_proxy_timediff                                      *
+ *                                                                            *
+ * Purpose: set rounded time difference between server clock and proxy clock  *
+ *                                                                            *
+ * Comments: When we calculate "nextcheck" for items on proxied hosts, we     *
+ *           take the time difference between server and proxy into account.  *
+ *                                                                            *
+ *           For instance, suppose an item was processed on the proxy at 10   *
+ *           seconds and there is a time difference between server and proxy  *
+ *           of -2 seconds (that is, proxy's time is 2 seconds in front). In  *
+ *           the server's database, we will store the timestamp of 8 seconds. *
+ *           However, when we calculate "nextcheck" on the server side, we    *
+ *           should calculate it from 10 seconds. Otherwise, if we calculate  *
+ *           it from 8 seconds, we will probably get those 10 seconds as the  *
+ *           "nextcheck". Finally, after calculating "nextcheck", we should   *
+ *           utilize the time difference again to get Zabbix server's time.   *
+ *                                                                            *
+ *           Now, suppose we have a non-integer time difference, say, of -1.5 *
+ *           seconds. Suppose also that one item on the proxy was checked at  *
+ *           4.7 seconds, whereas a second item was checked at 5.2 seconds,   *
+ *           which corresponds to server times of 3.2 and 3.7 seconds. Since  *
+ *           "nextcheck" calculation only uses the integer part, server will  *
+ *           use 3 seconds as the basis, before using the time difference.    *
+ *           However, it is very likely that the first item was scheduled for *
+ *           4 seconds on the proxy and the second item for 5 seconds, so in  *
+ *           order to be precise we would need to store time differences for  *
+ *           each individual item. That would lead to a significant increase  *
+ *           in memory consumption, which we rather avoid. For this reason    *
+ *           we only store a single time difference between server and proxy, *
+ *           and use it for all items. However, the way time difference is    *
+ *           used is different before and after "nextcheck" calculation.      *
+ *                                                                            *
+ *           Consider the example above. Server uses 3 seconds as the basis,  *
+ *           and subtracts a unified difference of -2 (rounded down) to both  *
+ *           items, yielding 5. It then calculates "nextcheck" for these two  *
+ *           items, yielding 4 and 5 (assuming a one-minute delay). It then   *
+ *           adds a unified difference of -1 (rounded up), to get Zabbix      *
+ *           server's time of 3 and 4.                                        *
+ *                                                                            *
+ *           This has the effect that items will get into the delayed item    *
+ *           queue at most one second later, but this is feasible: in proxy   *
+ *           to server communication there is a communication latency, which  *
+ *           also has the effect of putting items into the delayed item queue *
+ *           a bit later, and we do not account for that anyway.              *
+ *                                                                            *
+ *           As described above, we subtract a rounded down difference before *
+ *           "nextcheck" calculation and a rounded up difference after. Since *
+ *           we have a 1/10^9 chance of hitting an integer "timediff" value,  *
+ *           which would yield the same value rounded down and rounded up, in *
+ *           the proxy structure we only store the difference rounded down to *
+ *           save space. This is achieved by discarding the "ns" part of the  *
+ *           "timediff" structure. We then assume that the rounded down value *
+ *           and the rounded up values are different.                         *
+ *                                                                            *
+ *           Calculations of "nextchecks" themselves are done in functions    *
+ *           DCget_reachable_nextcheck() and DCsync_items() functions.        *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
+		dc_proxy->timediff = timediff->sec;
+
+	UNLOCK_CACHE;
 }
 
 static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
@@ -5972,7 +6129,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*item;
-	int			now, nitems = 0;
+	int			now, nitems = 0, data_expected_from;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -6004,6 +6161,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		{
 			case ITEM_TYPE_ZABBIX:
 				if (HOST_AVAILABLE_TRUE != host->available)
+					continue;
+				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (host->data_expected_from > (data_expected_from = item->data_expected_from))
+					data_expected_from = host->data_expected_from;
+				if (data_expected_from + item->delay > now)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,19 +166,13 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (!empty(e)) {
-		if (IE) {
-			e.cancelBubble = true;
-			e.returnValue = false;
-
-			if (IE9 && e.preventDefault) {
-				e.preventDefault();
-			}
-		}
-		else {
-			e.stopPropagation();
-			e.preventDefault();
-		}
+	if (!IE8) {
+		e.stopPropagation();
+		e.preventDefault();
+	}
+	if (IE) {
+		e.cancelBubble = true;
+		e.returnValue = false;
 	}
 
 	return false;

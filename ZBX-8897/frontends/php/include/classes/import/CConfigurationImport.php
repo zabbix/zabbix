@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,8 +226,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($host['macros'] as $macro) {
-				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			if (!empty($host['macros'])) {
+				foreach ($host['macros'] as $macro) {
+					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($host['templates'])) {

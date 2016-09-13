@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1192,7 +1192,7 @@ class CXmlImport18 {
 						// we must know interface ids to assign them to items
 						$agent_interface_id = null;
 						$ipmi_interface_id = null;
-						$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+						$snmp_interfaces = array(); // hash 'port' => 'interfaceid'
 
 						foreach ($interfaces as $interface) {
 							switch ($interface['type']) {

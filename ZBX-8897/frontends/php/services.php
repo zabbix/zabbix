@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ $fields = array(
 	'new_service_time_to_year' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_service_time_to_hour' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_service_time_to_minute' =>		array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
-	'children' =>						array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'children' =>						array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'parentid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'parentname' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions

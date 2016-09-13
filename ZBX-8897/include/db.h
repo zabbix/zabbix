@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -510,6 +510,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
@@ -552,6 +553,13 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
+
+#define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
+#define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
+#define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_hostids(ids)			DBlock_records("hosts", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 

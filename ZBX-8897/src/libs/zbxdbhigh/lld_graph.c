@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -456,23 +456,14 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_ptr_t *graphs, zbx_uint64_t
  * Return value: upon successful completion return pointer to the graph       *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs,
-		zbx_vector_ptr_t *item_links)
+static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *item_links)
 {
-	int			i, index;
-	zbx_lld_graph_t		*graph;
-	zbx_lld_item_link_t	*item_link;
+	int		i;
+	zbx_lld_graph_t	*graph;
 
-	for (i = 0; i < gitems_proto->values_num; i++)
+	for (i = 0; i < item_links->values_num; i++)
 	{
-		zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)gitems_proto->values[i];
-
-		index = zbx_vector_ptr_bsearch(item_links, &gitem->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL == index)
-			continue;
-
-		item_link = (zbx_lld_item_link_t *)item_links->values[index];
+		zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
 
 		if (NULL != (graph = lld_graph_by_item(graphs, item_link->itemid)))
 			return graph;
@@ -649,7 +640,7 @@ static void 	lld_graph_make(zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gr
 	else if (SUCCEED != lld_item_get(ymax_itemid_proto, items, &lld_row->item_links, &ymax_itemid))
 		goto out;
 
-	if (NULL != (graph = lld_graph_get(gitems_proto, graphs, &lld_row->item_links)))
+	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
 	{
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
@@ -913,10 +904,10 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width, int height,
-		double yaxismin, double yaxismax, unsigned char show_work_period, unsigned char show_triggers,
-		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
-		double percent_right, unsigned char ymin_type, unsigned char ymax_type)
+static void	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width,
+		int height, double yaxismin, double yaxismax, unsigned char show_work_period,
+		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
+		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
 	const char		*__function_name = "lld_graphs_save";
 
@@ -975,6 +966,13 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	}
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_graphs)
 	{
@@ -1336,7 +1334,7 @@ void	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
 				lld_rows);
 		lld_graphs_validate(hostid, &graphs, error);
-		lld_graphs_save(parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
+		lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
 				show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right,
 				ymin_type, ymax_type);
 

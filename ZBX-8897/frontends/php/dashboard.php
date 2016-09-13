@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,8 +298,8 @@ $columns = array_fill(0, 3, array());
 
 // refresh tab
 $refresh_tab = array(
-	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.widget.syssum.rf_rate', 120)),
-	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.widget.stszbx.rf_rate', 120)),
+	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.widget.syssum.rf_rate', 60)),
+	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.widget.stszbx.rf_rate', 60)),
 	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.widget.lastiss.rf_rate', 60)),
 	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.widget.webovr.rf_rate', 60)),
 	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.widget.hoststat.rf_rate', 60))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,8 +119,8 @@ foreach ($types as $mediaTypeId => $type) {
 	);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
-$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
-$frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
+$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48, 'no', 100));
+$frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48, 'no', 100));
 
 $frm_row = array();
 foreach (getSeverityCaption() as $i => $caption) {

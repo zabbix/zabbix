@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -731,6 +731,7 @@ elseif (isset($_REQUEST['form'])) {
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
+		order_result($dbHost['groups'], 'name');
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $hostId,
@@ -830,10 +831,10 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
+			'output' => array('hostid', $sortfield),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
 				'name' => empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host'],

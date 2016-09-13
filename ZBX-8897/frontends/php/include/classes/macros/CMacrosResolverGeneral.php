@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,7 +294,7 @@ class CMacrosResolverGeneral {
 				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 			));
 
-			$history = Manager::History()->getLast($functions);
+			$history = Manager::History()->getLast($functions, 1, ZBX_HISTORY_PERIOD);
 
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			foreach ($functions as $func) {

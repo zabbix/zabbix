@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ static time_t (*vc_time)(time_t *) = time;
 
 static zbx_mem_info_t	*vc_mem = NULL;
 
-static ZBX_MUTEX	vc_lock;
+static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
 
 /* flag indicating that the cache was explicitly locked by this process */
 static int	vc_locked = 0;
@@ -748,7 +748,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	int		now;
+	int	now;
 
 	now = ZBX_VC_TIME();
 
@@ -1656,6 +1656,59 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vch_item_remove_values                                           *
+ *                                                                            *
+ * Purpose: removes item history data that are older than the specified       *
+ *          timestamp                                                         *
+ *                                                                            *
+ * Parameters:  item      - [IN] the target item                              *
+ *              timestamp - [IN] the timestamp (number of seconds since the   *
+ *                               Epoch)                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
+{
+	zbx_vc_chunk_t	*chunk = item->tail;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		item->status = 0;
+
+	/* try to remove chunks with all history values older than the timestamp */
+	while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+	{
+		zbx_vc_chunk_t	*next;
+
+		/* If chunk contains values with timestamp greater or equal - remove */
+		/* only the values with less timestamp. Otherwise remove the while   */
+		/* chunk and check next one.                                         */
+		if (chunk->slots[chunk->last_value].timestamp.sec >= timestamp)
+		{
+			while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+			{
+				vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->first_value);
+				chunk->first_value++;
+			}
+
+			break;
+		}
+
+		next = chunk->next;
+		vch_item_remove_chunk(item, chunk);
+
+		/* empty items must be removed to avoid situation when a new value is added to cache */
+		/* while other values with matching timestamp seconds are not cached                 */
+		if (NULL == next)
+		{
+			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			break;
+		}
+
+		chunk = next;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vch_item_add_value_at_head                                       *
  *                                                                            *
  * Purpose: adds one item history value at the end of current item's history  *
@@ -1682,10 +1735,9 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 		if (0 < vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
 			/* If the added value has the same or older timestamp as the first value in cache */
-			/* we can't add it to keep cache consistency. In this case reset the cached all   */
-			/* flag and return success.                                                       */
-			if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-				item->status = 0;
+			/* we can't add it to keep cache consistency. Additionally we must make sure no   */
+			/* values with matching timestamp seconds are kept in cache.                      */
+			vch_item_remove_values(item, value->timestamp.sec + 1);
 
 			ret = SUCCEED;
 			goto out;
@@ -1726,7 +1778,8 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 
 				sindex = schunk->last_value;
 			}
-		} while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
+		}
+		while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
 	}
 	else
 	{
@@ -2289,8 +2342,8 @@ out:
 static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_history_record_t *value,
 		int *found)
 {
-	int			index, ret = FAIL, hits = 0, misses = 0, now;
-	zbx_vc_chunk_t		*chunk;
+	int		index, ret = FAIL, hits = 0, misses = 0, now;
+	zbx_vc_chunk_t	*chunk;
 
 	now = ZBX_VC_TIME();
 	*found = 0;
@@ -2427,9 +2480,9 @@ void	zbx_vc_init(void)
 	}
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
-	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func,
-			__vc_mem_free_func);
+	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -2437,7 +2490,8 @@ void	zbx_vc_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE, vc_strpool_hash_func, vc_strpool_compare_func,
+	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE,
+			vc_strpool_hash_func, vc_strpool_compare_func, NULL,
 			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->strpool.slots)
@@ -2637,7 +2691,8 @@ out:
 
 		vc_try_lock();
 
-		vc_cache->db_queries += queries;
+		if (NULL != vc_cache)
+			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
 			vc_update_statistics(NULL, 0, values->values_num);
@@ -2726,7 +2781,8 @@ out:
 
 		vc_try_lock();
 
-		vc_cache->db_queries += queries;
+		if (NULL != vc_cache)
+			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
 		{
@@ -2848,10 +2904,10 @@ void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value,
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_strlcpy(buffer, value->str, size);
+			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_strlcpy(buffer, value->log->value, size);
+			zbx_strlcpy_utf8(buffer, value->log->value, size);
 	}
 }
 

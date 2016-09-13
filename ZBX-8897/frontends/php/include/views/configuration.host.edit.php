@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@ if (!isset($_REQUEST['form_refresh'])) {
 }
 
 $host_groups = get_request('groups', array());
-if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_groups)) {
-	array_push($host_groups, $_REQUEST['groupid']);
+$groupid = getRequest('groupid');
+if (!hasRequest('form_refresh') && $groupid != 0) {
+	$host_groups[] = $groupid;
 }
 
 $newgroup = get_request('newgroup', '');
@@ -89,9 +90,12 @@ else {
 	$original_templates = array();
 }
 
-// load data from the DB when opening the full clone form for the first time
-$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
+if (getRequest('hostid') != 0
+		&& (($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& (!hasRequest('form_refresh') || getRequest('form_refresh') == 1))
+			|| (!hasRequest('form_refresh') && getRequest('form') === 'update'))) {
+	// Load data from DB for host update and for discovered host clone.
+
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -101,7 +105,9 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 		$visiblename = '';
 	}
 
-	$status = $dbHost['status'];
+	if (!hasRequest('form_refresh')) {
+		$status = $dbHost['status'];
+	}
 
 	$ipmi_authtype = $dbHost['ipmi_authtype'];
 	$ipmi_privilege = $dbHost['ipmi_privilege'];
@@ -181,14 +187,52 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
-	$all_groups = API::HostGroup()->get(array(
+	// get user allowed host groups and sort them by name
+	$groupsAllowed = API::HostGroup()->get(array(
+		'output' => array('groupid', 'name'),
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'preservekeys' => true
 	));
-	order_result($all_groups, 'name');
-	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+	order_result($groupsAllowed, 'name');
+
+	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups);
+
+	if (getRequest('form') === 'update') {
+		// get other host groups that user has also read permissions and sort by name
+		$all_groups = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true
+		));
+		order_result($all_groups, 'name');
+
+		// add existing host groups to list and, depending on permissions show name as enabled or disabled
+		$groupsInList = array();
+		if ($host_groups) {
+			$host_groups = array_combine($host_groups, $host_groups);
+		}
+
+		foreach ($all_groups as $group) {
+			if (isset($host_groups[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name'], true,
+					isset($groupsAllowed[$group['groupid']])
+				);
+				$groupsInList[$group['groupid']] = $group['groupid'];
+			}
+		}
+
+		// then add other host groups that user has permissions to, if not yet added to list
+		foreach ($groupsAllowed as $group) {
+			if (!isset($groupsInList[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name']);
+			}
+		}
+	}
+	else {
+		// when cloning a host or creating a new one, don't show read-only host groups in left box
+		// show empty or posted groups in case of an error
+		foreach ($groupsAllowed as $group) {
+			$grp_tb->addItem($group['groupid'], $group['name']);
+		}
 	}
 
 	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
@@ -246,7 +290,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceAgent);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'agentIterfacesFooter');
+	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -263,7 +307,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceSNMP);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
+	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -279,7 +323,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceJMX);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'JMXIterfacesFooter');
+	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -294,7 +338,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceIPMI);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
+	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -327,7 +371,7 @@ else {
 		new CCol(SPACE, 'interface-control')
 	));
 
-	$row = new CRow(null, null, 'agentIterfacesFooter');
+	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
@@ -341,7 +385,7 @@ else {
 	$ifTab->setAttribute('id', 'SNMPInterfaces');
 	$ifTab->setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
@@ -354,7 +398,7 @@ else {
 	$ifTab->setAttribute('id', 'JMXInterfaces');
 	$ifTab->setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
@@ -367,7 +411,7 @@ else {
 	$ifTab->setAttribute('id', 'IPMIInterfaces');
 	$ifTab->setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));

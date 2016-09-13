@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,11 @@
 #define DO_MAX	2
 #define DO_MIN	3
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
+static char	*locations[] = {"", "/device", NULL};
 #endif
 
 #define ATTR_MAX	128
@@ -50,7 +51,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 	zbx_fclose(f);
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 	if (1 == sscanf(line, "%*f\t%*f\t%lf\n", &value))
 	{
 #else
@@ -80,50 +81,61 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 	}
 }
 
+#ifndef KERNEL_2_4
 /*********************************************************************************
  *                                                                               *
  * Function: sysfs_read_attr                                                     *
  *                                                                               *
- * Purpose: read the name attribute of a sensor from sysf                        *
+ * Purpose: locate and read the name attribute of a sensor from sysfs            *
  *                                                                               *
- * Parameters:  device   - [IN] the path to sensor data in sysf                  *
+ * Parameters:  device        - [IN] the path to sensor data in sysfs            *
+ *              attribute     - [OUT] the sensor name                            *
  *                                                                               *
- * Return value: The seonsor name or NULL pointer                                *
+ * Return value: Subfolder where the sensor name file was found or NULL          *
  *                                                                               *
- * Comments: The returned string must be freed by caller after it's been used.   *
+ * Comments: attribute string must be freed by caller after it's been used.      *
  *                                                                               *
  *********************************************************************************/
-static char	*sysfs_read_attr(const char *device)
+static const char	*sysfs_read_attr(const char *device, char **attribute)
 {
-	char	path[MAX_STRING_LEN], buf[ATTR_MAX], *p;
+	char	path[MAX_STRING_LEN], buf[ATTR_MAX], *p, **location;
 	FILE	*f;
 
-	zbx_snprintf(path, MAX_STRING_LEN, "%s/%s", device, "name");
+	for (location = locations; NULL != *location; location++)
+	{
+		zbx_snprintf(path, MAX_STRING_LEN, "%s%s/name", device, *location);
 
-	if (NULL == (f = fopen(path, "r")))
-		return NULL;
+		if (NULL != (f = fopen(path, "r")))
+		{
+			p = fgets(buf, ATTR_MAX, f);
+			zbx_fclose(f);
 
-	p = fgets(buf, ATTR_MAX, f);
-	zbx_fclose(f);
+			if (NULL == p)
+				break;
 
-	if (NULL == p)
-		return NULL;
+			/* Last byte is a '\n'; chop that off */
+			buf[strlen(buf) - 1] = '\0';
 
-	/* Last byte is a '\n'; chop that off */
-	buf[strlen(buf) - 1] = '\0';
+			if (NULL != attribute)
+				*attribute = zbx_strdup(*attribute, buf);
 
-	return zbx_strdup(NULL, buf);
+			return *location;
+		}
+	}
+
+	return NULL;
 }
 
-int	get_device_info(const char *dev_path, const char *dev_name, char *device_info)
+int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
 	char		bus_path[MAX_STRING_LEN], linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char		*subsys, *prefix, *bus_attr = NULL;
+	char		*subsys, *prefix = NULL, *bus_attr = NULL;
+	const char	*bus_subfolder;
 	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
 	short int	bus_spi, bus_i2c;
 
 	/* ignore any device without name attribute */
-	if (NULL == (prefix = sysfs_read_attr(dev_path)))
+	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
 		goto out;
 
 	if (NULL == dev_name)
@@ -138,14 +150,14 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 	}
 
 	/* Find bus type */
-	zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/subsystem", dev_path);
+	zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/device/subsystem", dev_path);
 
 	sub_len = readlink(linkpath, subsys_path, MAX_STRING_LEN - 1);
 
 	if (0 > sub_len && ENOENT == errno)
 	{
 		/* Fallback to "bus" link for kernels <= 2.6.17 */
-		zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/bus", dev_path);
+		zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/device/bus", dev_path);
 		sub_len = readlink(linkpath, subsys_path, MAX_STRING_LEN - 1);
 	}
 
@@ -175,9 +187,10 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 		}
 		else
 		{
-			zbx_snprintf(bus_path, sizeof(bus_path), "/sys/class/i2c-adapter/i2c-%d/device", bus_i2c);
+			zbx_snprintf(bus_path, sizeof(bus_path), "/sys/class/i2c-adapter/i2c-%d", bus_i2c);
+			bus_subfolder = sysfs_read_attr(bus_path, &bus_attr);
 
-			if (NULL != (bus_attr = sysfs_read_attr(bus_path)))
+			if (NULL != bus_subfolder && '\0' != *bus_subfolder)
 			{
 				if (0 != strncmp(bus_attr, "ISA ", 4))
 					goto out;
@@ -245,11 +258,12 @@ out:
 
 	return ret;
 }
+#endif
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
 	char	sensorname[MAX_STRING_LEN];
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 
 	if (DO_ONE == do_task)
 	{
@@ -298,6 +312,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	struct dirent	*sensorent, *deviceent;
 	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN],
 			device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
+	const char	*subfolder;
 	int		err, dev_len;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
@@ -312,12 +327,12 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 
 		zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s/device", DEVICE_DIR, deviceent->d_name);
 		dev_len = readlink(devicepath, deviced, MAX_STRING_LEN - 1);
+		zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s", DEVICE_DIR, deviceent->d_name);
 
 		if (0 > dev_len)
 		{
 			/* No device link? Treat device as virtual */
-			zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s", DEVICE_DIR, deviceent->d_name);
-			err = get_device_info(devicepath, NULL, device_info);
+			err = get_device_info(devicepath, NULL, device_info, &subfolder);
 		}
 		else
 		{
@@ -327,16 +342,19 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			if (0 == strcmp(device, device_p))
 			{
 				zbx_snprintf(device_info, sizeof(device_info), "%s", device);
-				err = SUCCEED;
+				err = (NULL != (subfolder = sysfs_read_attr(devicepath, NULL)) ? SUCCEED : FAIL);
 			}
 			else
 			{
-				err = get_device_info(devicepath, device_p, device_info);
+				err = get_device_info(devicepath, device_p, device_info, &subfolder);
 			}
 		}
 
 		if (SUCCEED == err && 0 == strcmp(device_info, device))
 		{
+			zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s%s", DEVICE_DIR, deviceent->d_name,
+					subfolder);
+
 			if (DO_ONE == do_task)
 			{
 				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s_input", devicepath, name);
@@ -347,7 +365,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 				zbx_snprintf(regex, sizeof(regex), "%s[0-9]*_input", name);
 
 				if (NULL == (sensordir = opendir(devicepath)))
-					return;
+					goto out;
 
 				while (NULL != (sensorent = readdir(sensordir)))
 				{
@@ -366,6 +384,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			}
 		}
 	}
+out:
 	closedir(devicedir);
 #endif
 }

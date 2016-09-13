@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,17 +624,9 @@ class CHost extends CHostGeneral {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 
-		// permissions
-		$groupids = array();
-		foreach ($hosts as $host) {
-			if (!isset($host['groups'])) {
-				continue;
-			}
-			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
-		}
+		$hostDBfields = $update ? array('hostid' => null) : array('host' => null);
 
 		if ($update) {
-			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
 				'output' => array('hostid', 'host', 'flags'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
@@ -643,16 +635,62 @@ class CHost extends CHostGeneral {
 			));
 		}
 		else {
-			$hostDBfields = array('host' => null);
+			$groupids = array();
+
+			foreach ($hosts as $host) {
+				if (!isset($host['groups'])) {
+					continue;
+				}
+				$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
+			}
+
+			if ($groupids) {
+				$dbGroups = API::HostGroup()->get(array(
+					'output' => array('groupid'),
+					'groupids' => $groupids,
+					'editable' => true,
+					'preservekeys' => true
+				));
+			}
 		}
 
-		if (!empty($groupids)) {
-			$dbGroups = API::HostGroup()->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $groupids,
-				'editable' => true,
-				'preservekeys' => true
-			));
+		foreach ($hosts as $host) {
+			// validate mandatory fields
+			if (!check_db_fields($hostDBfields, $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : '')
+				);
+			}
+
+			if ($update) {
+				$hostId = $host['hostid'];
+
+				// validate host permissions
+				if (!isset($dbHosts[$hostId])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+
+				if (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".',
+						$dbHosts[$hostId]['host'])
+					);
+				}
+			}
+			else {
+				if (!isset($host['groups']) || !is_array($host['groups']) || !$host['groups']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
+				}
+
+				foreach ($host['groups'] as $group) {
+					if (!isset($dbGroups[$group['groupid']])) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
+			}
 		}
 
 		$inventoryFields = getHostInventories();
@@ -660,13 +698,7 @@ class CHost extends CHostGeneral {
 
 		$hostNames = array();
 		foreach ($hosts as &$host) {
-			if (!check_db_fields($hostDBfields, $host)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
-			}
-
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
-
 				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 				}
@@ -683,11 +715,8 @@ class CHost extends CHostGeneral {
 				'allowed' => array('hostid', 'status', 'inventory'),
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
-			if ($update) {
-				if (!isset($dbHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
 
+			if ($update) {
 				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
@@ -697,24 +726,8 @@ class CHost extends CHostGeneral {
 					$host['name'] = $host['host'];
 				}
 
-				if (!isset($host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
-				}
-
 				if (!isset($host['interfaces'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
-				}
-			}
-
-			if (isset($host['groups'])) {
-				if (!is_array($host['groups']) || empty($host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
-				}
-
-				foreach ($host['groups'] as $group) {
-					if (!isset($dbGroups[$group['groupid']])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-					}
 				}
 			}
 
@@ -901,15 +914,21 @@ class CHost extends CHostGeneral {
 			}
 
 			if (!empty($host['inventory'])) {
-				$fields = array_keys($host['inventory']);
-				$fields[] = 'inventory_mode';
-				$fields = implode(', ', $fields);
+				$hostInventory = $host['inventory'];
+				$hostInventory['hostid'] = $hostid;
+				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			}
+			else {
+				$hostInventory = array();
+			}
 
-				$values = array_map('zbx_dbstr', $host['inventory']);
-				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
-				$values = implode(', ', $values);
+			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$hostInventory['hostid'] = $hostid;
+				$hostInventory['inventory_mode'] = $host['inventory_mode'];
+			}
 
-				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+			if ($hostInventory) {
+				DB::insert('host_inventory', array($hostInventory), false);
 			}
 		}
 
@@ -944,15 +963,30 @@ class CHost extends CHostGeneral {
 		// fetch fields required to update host inventory
 		$inventories = array();
 		foreach ($hosts as $host) {
-			$inventory = $host['inventory'];
-			$inventory['hostid'] = $host['hostid'];
+			if (isset($host['inventory'])) {
+				$inventory = $host['inventory'];
+				$inventory['hostid'] = $host['hostid'];
 
-			$inventories[] = $inventory;
+				$inventories[] = $inventory;
+			}
 		}
 		$inventories = $this->extendObjects('host_inventory', $inventories, array('inventory_mode'));
 		$inventories = zbx_toHash($inventories, 'hostid');
 
 		$macros = array();
+		foreach ($hosts as &$host) {
+			if (isset($host['macros'])) {
+				$macros[$host['hostid']] = $host['macros'];
+
+				unset($host['macros']);
+			}
+		}
+		unset($host);
+
+		if ($macros) {
+			API::UserMacro()->replaceMacros($macros);
+		}
+
 		foreach ($hosts as $host) {
 			// extend host inventory with the required data
 			if (isset($host['inventory']) && $host['inventory']) {
@@ -969,11 +1003,6 @@ class CHost extends CHostGeneral {
 			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
 
-			if (isset($host['macros'])) {
-				$macros[$host['hostid']] = $host['macros'];
-				unset($host['macros']);
-			}
-
 			$data = $host;
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
@@ -981,10 +1010,6 @@ class CHost extends CHostGeneral {
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 			}
-		}
-
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
 		}
 
 		return array('hostids' => $hostids);
@@ -1169,37 +1194,6 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Update hostgroups linkage
-		 */
-		if (isset($updateGroups)) {
-			$updateGroups = zbx_toArray($updateGroups);
-
-			$hostGroups = API::HostGroup()->get(array('hostids' => $hostids));
-			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
-			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
-
-			$result = $this->massAdd(array(
-				'hosts' => $hosts,
-				'groups' => $updateGroups
-			));
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
-			}
-
-			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
-
-			if ($groupidsToDel) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
-				}
-			}
-		}
-
-		/*
 		 * Update interfaces
 		 */
 		if (isset($updateInterfaces)) {
@@ -1359,6 +1353,38 @@ class CHost extends CHostGeneral {
 						DB::insert('host_inventory', array($inventory), false);
 					}
 				}
+			}
+		}
+
+		/*
+		 * Update host and host group linkage. This procedure should be done the last because user can unlink
+		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * host-template linkage, inventory update, macros update, must be done before this.
+		 */
+		if (isset($updateGroups)) {
+			$updateGroups = zbx_toArray($updateGroups);
+
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $hostids
+			));
+			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
+
+			$groupsToAdd = array_diff($newGroupids, $hostGroupids);
+			if ($groupsToAdd) {
+				$this->massAdd(array(
+					'hosts' => $hosts,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+			}
+
+			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
+			if ($groupidsToDel) {
+				$this->massRemove(array(
+					'hostids' => $hostids,
+					'groupids' => $groupidsToDel
+				));
 			}
 		}
 
@@ -1585,7 +1611,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// remove Monitoring > Latest data toggle profile values related to given hosts
-		CProfile::delete('web.latest.toggle_other', $hostIds);
+		DB::delete('profiles', array('idx' => 'web.latest.toggle_other', 'idx2' => $hostIds));
 
 		return array('hostids' => $hostIds);
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,10 +219,16 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 	timeout *= 1000;
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_RCVTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_SNDTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 #else
 	alarm(timeout);
 #endif
@@ -252,9 +258,9 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_connect                                                  *
+ * Function: zbx_sock_connect                                                 *
  *                                                                            *
- * Purpose: connect to external host                                          *
+ * Purpose: connect the socket of the specified type to external host         *
  *                                                                            *
  * Parameters: s - [OUT] socket descriptor                                    *
  *                                                                            *
@@ -265,7 +271,8 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -279,7 +286,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	zbx_snprintf(service, sizeof(service), "%d", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_socktype = type;
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
@@ -289,7 +296,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
-		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
 
@@ -302,18 +310,20 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		memset(&hints, 0x00, sizeof(struct addrinfo));
 
 		hints.ai_family = PF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_socktype = type;
 		hints.ai_flags = AI_NUMERICHOST;
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
 			zbx_set_tcp_strerror("invalid source IP address [%s]", source_ip);
+			zbx_tcp_close(s);
 			goto out;
 		}
 
 		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
+			zbx_tcp_close(s);
 			goto out;
 		}
 	}
@@ -323,7 +333,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
 	}
@@ -339,7 +350,8 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -364,7 +376,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port = htons(port);
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
+	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
 	{
 		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -387,6 +399,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
+			zbx_tcp_close(s);
 			return FAIL;
 		}
 	}
@@ -396,7 +409,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in)))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return FAIL;
 	}
@@ -404,6 +418,11 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	return SUCCEED;
 }
 #endif	/* HAVE_IPV6 */
+
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+{
+	return zbx_sock_connect(s, SOCK_STREAM, source_ip, ip, port, timeout);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -618,16 +637,27 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
+			on = 1;
+#ifdef _WINDOWS
+			/* prevent other processes from binding to the same port */
+			/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
+			/* on Windows SO_REUSEADDR has different semantics than on Unix */
+			/* https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx */
+			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on)))
+			{
+				zbx_set_tcp_strerror("setsockopt() with SO_EXCLUSIVEADDRUSE for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
+			}
+#else
 			/* enable address reuse */
 			/* this is to immediately use the address even if it is in TIME_WAIT state */
 			/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
-			on = 1;
 			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
 			{
 				zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 			}
+#endif
 
 #if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
@@ -741,17 +771,27 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
-		/* Enable address reuse */
-		/* This is to immediately use the address even if it is in TIME_WAIT state */
-		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 		on = 1;
-		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+#ifdef _WINDOWS
+		/* prevent other processes from binding to the same port */
+		/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
+		/* on Windows SO_REUSEADDR has different semantics than on Unix */
+		/* https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx */
+		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on)))
 		{
-			zbx_set_tcp_strerror("setsockopt() for [[%s]:%hu] failed: %s",
+			zbx_set_tcp_strerror("setsockopt() with SO_EXCLUSIVEADDRUSE for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 		}
-
+#else
+		/* enable address reuse */
+		/* this is to immediately use the address even if it is in TIME_WAIT state */
+		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
+		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+		{
+			zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
+		}
+#endif
 		memset(&serv_addr, 0, sizeof(serv_addr));
 
 		serv_addr.sin_family		= AF_INET;
@@ -1279,4 +1319,76 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return FAIL;
+}
+
+int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+{
+	return zbx_sock_connect(s, SOCK_DGRAM, source_ip, ip, port, timeout);
+}
+
+int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
+{
+	int	ret = SUCCEED;
+
+	ZBX_TCP_START();
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+	if (ZBX_TCP_ERROR == sendto(s->socket, data, data_len, 0, NULL, 0))
+	{
+		zbx_set_tcp_strerror("sendto() failed: %s", strerror_from_system(zbx_sock_last_error()));
+		ret = FAIL;
+	}
+
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
+
+	return ret;
+}
+
+int	zbx_udp_recv(zbx_sock_t *s, char **data, size_t *data_len, int timeout)
+{
+	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
+	ssize_t	read_bytes;
+
+	ZBX_TCP_START();
+
+	zbx_free(s->buf_dyn);
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+	if (ZBX_TCP_ERROR == (read_bytes = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
+		zbx_set_tcp_strerror("recvfrom() failed: %s", strerror_from_system(zbx_sock_last_error()));
+
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
+
+	if (ZBX_TCP_ERROR == read_bytes)
+		return FAIL;
+
+	if (sizeof(s->buf_stat) > read_bytes)
+	{
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		*data = s->buf_stat;
+	}
+	else
+	{
+		s->buf_type = ZBX_BUF_TYPE_DYN;
+		s->buf_dyn = zbx_malloc(s->buf_dyn, read_bytes + 1);
+		*data = s->buf_dyn;
+	}
+
+	buffer[read_bytes] = '\0';
+	memcpy(*data, buffer, read_bytes + 1);
+
+	*data_len = read_bytes;
+
+	return SUCCEED;
+}
+
+void	zbx_udp_close(zbx_sock_t *s)
+{
+	zbx_tcp_close(s);
 }

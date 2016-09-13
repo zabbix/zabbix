@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,9 +45,11 @@ foreach ($this->data['db_cservices'] as $service) {
 	$description = new CLink($service['name'], '#', 'service-name');
 	$description->setAttributes(array(
 		'id' => 'service-name-'.$service['serviceid'],
-		'data-name' => $service['name'],
-		'data-serviceid' => $service['serviceid'],
-		'data-trigger' => $service['trigger']
+		'data-service' => '{'.
+			'"id":"'.$service['serviceid'].'",'.
+			'"name":"'.$service['name'].'",'.
+			'"trigger":"'.$service['trigger'].'"'.
+		'}'
 	));
 
 	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);

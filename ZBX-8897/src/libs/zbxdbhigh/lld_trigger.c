@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -363,23 +363,14 @@ static zbx_lld_trigger_t	*lld_trigger_by_item(zbx_vector_ptr_t *triggers, zbx_ui
  * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_trigger_t	*lld_trigger_get(const zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers,
-		zbx_vector_ptr_t *item_links)
+static zbx_lld_trigger_t	*lld_trigger_get(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *item_links)
 {
-	int			i, index;
+	int			i;
 	zbx_lld_trigger_t	*trigger;
-	zbx_lld_item_link_t	*item_link;
 
-	for (i = 0; i < functions_proto->values_num; i++)
+	for (i = 0; i < item_links->values_num; i++)
 	{
-		zbx_lld_function_t	*function = (zbx_lld_function_t *)functions_proto->values[i];
-
-		index = zbx_vector_ptr_bsearch(item_links, &function->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL == index)
-			continue;
-
-		item_link = (zbx_lld_item_link_t *)item_links->values[index];
+		zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
 
 		if (NULL != (trigger = lld_trigger_by_item(triggers, item_link->itemid)))
 			return trigger;
@@ -639,7 +630,7 @@ static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	trigger = lld_trigger_get(functions_proto, triggers, &lld_row->item_links);
+	trigger = lld_trigger_get(triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, expression_proto);
 	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
@@ -1102,8 +1093,8 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
  * Purpose: add or update triggers in database based on discovery rule        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers, unsigned char status,
-		unsigned char type, unsigned char priority, const char *url)
+static void	lld_triggers_save(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers,
+		unsigned char status, unsigned char type, unsigned char priority, const char *url)
 {
 	const char		*__function_name = "lld_triggers_save";
 
@@ -1167,6 +1158,13 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 	}
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_triggers)
 	{
@@ -1447,7 +1445,8 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 		lld_triggers_make(&functions_proto, &triggers, &items, description_proto, expression_proto,
 				comments_proto, lld_rows, error);
 		lld_triggers_validate(hostid, &triggers, error);
-		lld_triggers_save(parent_triggerid, &triggers, status, type, priority, url);
+
+		lld_triggers_save(hostid, parent_triggerid, &triggers, status, type, priority, url);
 
 		/* cleaning */
 

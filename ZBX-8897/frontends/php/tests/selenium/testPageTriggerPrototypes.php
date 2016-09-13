@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND i.name LIKE '.zbx_dbstr('%-layout-test%')
+					" AND i.name LIKE '%-layout-test%'"
 		);
 	}
 
@@ -131,7 +131,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+					" AND h.host LIKE '%-layout-test-%'"
 		);
 	}
 

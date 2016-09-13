@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,13 +146,28 @@ class CAlert extends CZBXAPI {
 		}
 
 		// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-		$sqlParts['where'][] = 'EXISTS ('.
-			'SELECT NULL'.
-			' FROM events e'.
-			' WHERE a.eventid=e.eventid'.
-				' AND e.source='.zbx_dbstr($options['eventsource']).
-				' AND e.object='.zbx_dbstr($options['eventobject']).
-		')';
+		if ($options['eventsource'] == EVENT_SOURCE_TRIGGERS
+				|| $options['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
+			/*
+			 * Performance optimization: events with such sources does not have multiple objects therefore we can ignore
+			 * event object in SQL requests.
+			 */
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM actions aa'.
+				' WHERE a.actionid=aa.actionid'.
+					' AND aa.eventsource='.zbx_dbstr($options['eventsource']).
+			')';
+		}
+		else {
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM events e'.
+				' WHERE a.eventid=e.eventid'.
+					' AND e.source='.zbx_dbstr($options['eventsource']).
+					' AND e.object='.zbx_dbstr($options['eventobject']).
+			')';
+		}
 
 		// groupids
 		if (!is_null($options['groupids'])) {

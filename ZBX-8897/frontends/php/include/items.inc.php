@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -673,29 +673,53 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	$items = array();
+	$item_counter = array();
+	$host_items = array();
 	foreach ($dbItems as $dbItem) {
-		$name = $dbItem['name_expanded'];
+		$item_name = $dbItem['name_expanded'];
+		$host_name = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
+		$hostNames[$dbItem['hostid']] = $host_name;
 
-		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
-		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
+		if (!array_key_exists($host_name, $item_counter)) {
+			$item_counter[$host_name] = array();
+		}
+
+		if (!array_key_exists($item_name, $item_counter[$host_name])) {
+			$item_counter[$host_name][$item_name] = 0;
+		}
+
+		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
+			$host_items[$item_name][$host_name] = array();
+		}
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($items[$name][$dbItem['hostname']])
-				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
-			$items[$name][$dbItem['hostname']] = array(
+		if (!array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])
+			|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+				|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					&& $dbItem['priority'] > $host_items[$item_name][$host_name][$dbItem['itemid']]['severity']))) {
+
+			if (array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])) {
+				$item_place = $host_items[$item_name][$host_name][$dbItem['itemid']]['item_place'];
+			}
+			else {
+				$item_place = $item_counter[$host_name][$item_name];
+				$item_counter[$host_name][$item_name]++;
+			}
+
+			$items[$item_name][$item_place][$host_name] = array(
 				'itemid' => $dbItem['itemid'],
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
 				'units' => $dbItem['units'],
-				'name' => $name,
 				'valuemapid' => $dbItem['valuemapid'],
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],
-				'triggerid' => $dbItem['triggerid']
+				'triggerid' => $dbItem['triggerid'],
+				'item_place' => $item_place
 			);
+
+			$host_items[$item_name][$host_name][$dbItem['itemid']] = $items[$item_name][$item_place][$host_name];
 		}
 	}
 
@@ -714,20 +738,24 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($items as $descr => $ithosts) {
-			$tableRow = array(nbsp($descr));
-			foreach ($hostNames as $hostName) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$tableRow = array(nbsp($item_name));
+				foreach ($hostNames as $hostName) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
+				$table->addRow($tableRow);
 			}
-			$table->addRow($tableRow);
 		}
 	}
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		$header = array(new CCol(_('Hosts'), 'center'));
-		foreach ($items as $descr => $ithosts) {
-			$header[] = new CCol($descr, 'vertical_rotation');
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$header[] = new CCol($item_name, 'vertical_rotation');
+			}
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -738,8 +766,10 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
 
 			$tableRow = array(new CCol($name));
-			foreach ($items as $ithosts) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+			foreach ($items as $item_data) {
+				foreach ($item_data as $ithosts) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
 			}
 			$table->addRow($tableRow);
 		}
@@ -1219,7 +1249,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
- * @return array
+ * @return int
  */
 function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
 	// special processing of active items to see better view in queue

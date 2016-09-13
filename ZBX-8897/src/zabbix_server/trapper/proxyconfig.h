@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;
+extern int	CONFIG_TRAPPER_TIMEOUT;
 
 void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp);
 void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,31 +21,37 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageHistory extends CWebTest {
-	// Returns all enabled items that belong to enabled hosts
-	public static function allEnabledItems() {
+
+	public static function checkLayoutItems() {
 		return DBdata(
-				'SELECT i.itemid'.
-				' FROM items i,hosts h'.
-				' WHERE i.hostid=h.hostid'.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+			'SELECT i.itemid,i.value_type,i.key_'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				" AND h.host='testPageHistory_CheckLayout'"
 		);
 	}
 
 	/**
-	* @dataProvider allEnabledItems
+	* @dataProvider checkLayoutItems
 	*/
-
-	public function testPageItems_CheckLayout($item) {
-
-		// should switch to graph for numeric items, should check filter for history & text items
-		// also different header for log items (different for eventlog items ?)
-		$itemid = $item['itemid'];
-		$this->zbxTestLogin("history.php?action=showvalues&itemid=$itemid");
+	public function testPageHistory_CheckLayout($item) {
+		$this->zbxTestLogin('history.php?action=showvalues&itemid='.$item['itemid']);
 		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
-		// Header
-		$this->zbxTestTextPresent(array('Timestamp', 'Value'));
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_LOG:
+				if (substr($item['key_'], 0, 9) === 'eventlog[') {
+					$table_titles = array('Timestamp', 'Local time', 'Source', 'Severity', 'Event ID', 'Value');
+				}
+				else {
+					$table_titles = array('Timestamp', 'Local time', 'Value');
+				}
+				break;
+
+			default:
+				$table_titles = array('Timestamp', 'Value');
+		}
+		$this->zbxTestTextPresent($table_titles);
+
 		$this->zbxTestDropdownSelectWait('action', '500 latest values');
 		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
 		$this->zbxTestClickWait('plaintext');

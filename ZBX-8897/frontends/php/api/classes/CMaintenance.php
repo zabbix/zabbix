@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -398,13 +398,17 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$insert[$mnum] = $maintenance;
 
 			foreach ($maintenance['timeperiods'] as $timeperiod) {
+				if (!is_array($timeperiod)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+				}
+
 				$dbFields = array(
 					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
 					'period' => SEC_PER_HOUR,
@@ -444,6 +448,10 @@ class CMaintenance extends CZBXAPI {
 					'maintenanceid' => $maintenanceids[$mnum]
 				);
 			}
+
+			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenanceids[$mnum],
+				$maintenance['name'], null
+			);
 		}
 		DB::insert('maintenances_hosts', $insertHosts);
 		DB::insert('maintenances_groups', $insertGroups);
@@ -511,8 +519,14 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+			}
+
+			foreach ($maintenance['timeperiods'] as $timeperiod) {
+				if (!is_array($timeperiod)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+				}
 			}
 
 			$hostids = array_merge($hostids, $maintenance['hostids']);
@@ -623,6 +637,18 @@ class CMaintenance extends CZBXAPI {
 				);
 				DB::delete('maintenances_groups', $deleteGroups);
 			}
+
+			add_audit_ext(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_MAINTENANCE,
+				$maintenance['maintenanceid'],
+				array_key_exists('name', $maintenance)
+					? $maintenance['name']
+					: $updMaintenances[$maintenance['maintenanceid']]['name'],
+				'maintenances',
+				$updMaintenances[$maintenance['maintenanceid']],
+				$maintenance
+			);
 		}
 
 		DB::insert('maintenances_hosts', $insertHosts);
@@ -647,7 +673,7 @@ class CMaintenance extends CZBXAPI {
 			$options = array(
 				'maintenanceids' => $maintenanceids,
 				'editable' => true,
-				'output' => array('maintenanceid'),
+				'output' => array('maintenanceid', 'name'),
 				'preservekeys' => true
 			);
 			$maintenances = $this->get($options);
@@ -689,6 +715,13 @@ class CMaintenance extends CZBXAPI {
 			DB::delete('maintenances_hosts', $midCond);
 			DB::delete('maintenances_groups', $midCond);
 			DB::delete('maintenances', $midCond);
+
+			foreach ($maintenances as $maintenanceid => $maintenance) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
+					null
+				);
+			}
+
 			return array('maintenanceids' => $maintenanceids);
 	}
 

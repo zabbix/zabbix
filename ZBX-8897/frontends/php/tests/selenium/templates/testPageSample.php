@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,26 +177,6 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
-	}
-
-	public function testPageHosts_MassExportAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassExport() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassUpdateAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassUpdate() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	public function testPageHosts_MassActivateAll() {

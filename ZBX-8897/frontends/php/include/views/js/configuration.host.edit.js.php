@@ -121,7 +121,7 @@
 				handle: 'span.ui-icon-arrowthick-2-n-s',
 				revert: 'invalid',
 				stop: function(event, ui) {
-					var hostInterfaceId = jQuery(this).data('interfaceid');
+					var hostInterfaceId = jQuery(this).attr('data-interfaceid');
 					resetMainInterfaces();
 					resetUseipInterface(hostInterfaceId)
 				}
@@ -174,16 +174,16 @@
 
 			switch (hostInterfaceType) {
 				case getHostInterfaceNumericType('agent'):
-					footerRowId = '#agentIterfacesFooter';
+					footerRowId = '#agentInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('snmp'):
-					footerRowId = '#SNMPIterfacesFooter';
+					footerRowId = '#SNMPInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('jmx'):
-					footerRowId = '#JMXIterfacesFooter';
+					footerRowId = '#JMXInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('ipmi'):
-					footerRowId = '#IPMIIterfacesFooter';
+					footerRowId = '#IPMIInterfacesFooter';
 					break;
 				default:
 					throw new Error('Unknown host interface type.');
@@ -318,7 +318,7 @@
 		'use strict';
 
 		jQuery('#hostlist').on('click', 'button.remove', function() {
-			var interfaceId = jQuery(this).data('interfaceid');
+			var interfaceId = jQuery(this).attr('data-interfaceid');
 			jQuery('#hostInterfaceRow_' + interfaceId).remove();
 			hostInterfacesManager.remove(interfaceId);
 			hostInterfacesManager.resetMainInterfaces();
@@ -340,7 +340,7 @@
 			tolerance: 'pointer',
 			drop: function(event, ui) {
 				var hostInterfaceTypeName = jQuery('.formElementTable', this).data('type'),
-					hostInterfaceId = ui.draggable.data('interfaceid');
+					hostInterfaceId = ui.draggable.attr('data-interfaceid');
 
 				ui.helper.remove();
 

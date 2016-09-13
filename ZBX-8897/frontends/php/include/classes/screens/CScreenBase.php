@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -355,7 +355,7 @@ class CScreenBase {
 			$stimeUnix = zbxDateToTime($options['stime']);
 
 			if ($stimeUnix > $time || zbxAddSecondsToUnixtime($options['period'], $stimeUnix) > $time) {
-				$stimeNow = $options['stime'];
+				$stimeNow = zbxAddSecondsToUnixtime(SEC_PER_YEAR, $options['stime']);
 				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
 				$usertime = date(TIMESTAMP_FORMAT, $time);
 				$isNow = 1;
@@ -403,8 +403,10 @@ class CScreenBase {
 
 		return array(
 			'period' => $options['period'],
-			'stime' => $options['stime'],
-			'stimeNow' => !empty($stimeNow) ? $stimeNow : $options['stime'],
+			'stime' => date(TIMESTAMP_FORMAT, zbxDateToTime($options['stime'])),
+			'stimeNow' => ($stimeNow === null)
+				? date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(SEC_PER_YEAR, $options['stime']))
+				: $stimeNow,
 			'starttime' => date(TIMESTAMP_FORMAT, $time - ZBX_MAX_PERIOD),
 			'usertime' => $usertime,
 			'isNow' => $isNow

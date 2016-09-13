@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ $fields = array(
 	'conditions' =>			array(null,		O_OPT,	null,	null,		null),
 	'new_condition' =>		array(null,		O_OPT,	null,	null,		'isset({add_condition})'),
 	'operations' =>			array(null,		O_OPT,	null,	null,		'isset({save})'),
-	'edit_operationid' =>	array(null,		O_OPT,	P_ACT,	DB_ID,		null),
+	'edit_operationid' =>	array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
 	'new_operation' =>		array(null,		O_OPT,	null,	null,		'isset({add_operation})'),
 	'opconditions' =>		array(null,		O_OPT,	null,	null,		null),
 	'new_opcondition' =>	array(null,		O_OPT,	null,	null,		'isset({add_opcondition})'),
@@ -270,12 +270,15 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			OPERATION_TYPE_HOST_DISABLE => 0
 		);
 		if (isset($uniqOperations[$new_operation['operationtype']])) {
-			foreach ($_REQUEST['operations'] as $operation) {
-				if (isset($uniqOperations[$operation['operationtype']])) {
+			$uniqOperations[$new_operation['operationtype']]++;
+			foreach ($_REQUEST['operations'] as $operationId => $operation) {
+				if (array_key_exists($operation['operationtype'], $uniqOperations)
+					&& (!array_key_exists('id', $new_operation)
+						|| bccomp($new_operation['id'], $operationId) != 0)) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
-			if ($uniqOperations[$new_operation['operationtype']]) {
+			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
 				info(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
@@ -283,16 +286,18 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 		}
 
 		if ($result) {
+			$eventsource = getRequest('eventsource',
+				CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+			);
+
 			if (isset($new_operation['id'])) {
 				$_REQUEST['operations'][$new_operation['id']] = $new_operation;
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
-				$eventsource = getRequest('eventsource',
-					CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
-				);
-				sortOperations($eventsource, $_REQUEST['operations']);
 			}
+
+			sortOperations($eventsource, $_REQUEST['operations']);
 		}
 
 		unset($_REQUEST['new_operation']);
@@ -401,8 +406,6 @@ if (hasRequest('form')) {
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
-
-		sortOperations($data['eventsource'], $data['action']['operations']);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');

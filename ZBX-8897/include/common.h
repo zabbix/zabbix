@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -778,26 +778,29 @@ int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+
+#define ZBX_SIZE_T_MAX	(~(size_t)0)
+
 #define is_ushort(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
 
 #define is_uint32(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint64_n(str, n, value) \
 	is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint31(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
@@ -830,14 +833,18 @@ char	*get_param_dyn(const char *param, int num);
  *                       will be 0; for their parameters - 1 or higher        *
  *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
+ *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: NULL if parameter doesn't change; a new string - otherwise   *
+ * Return value: SUCEED - if parameter doesn't change or has been changed     *
+ *                        successfully                                        *
+ *               FAIL   - otherwise                                           *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *
  *                                                                            *
  ******************************************************************************/
-typedef char	*(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data);
+typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param);
 #define ZBX_KEY_TYPE_ITEM	0
 #define ZBX_KEY_TYPE_OID	1
 int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
@@ -887,7 +894,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
@@ -918,6 +927,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
@@ -1004,7 +1014,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
@@ -1066,5 +1077,19 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
+
+char	*zbx_dyn_escape_shell_single_quote(const char *text);
+
+typedef struct
+{
+	char	*name;
+	char	**params;
+	int	nparam;
+}
+zbx_function_t;
+
+void	zbx_function_clean(zbx_function_t *func);
+int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
 
 #endif

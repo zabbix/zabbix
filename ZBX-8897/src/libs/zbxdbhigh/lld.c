@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,13 +56,16 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 	const char		*p;
 	zbx_vector_ptr_t	regexps;
 	zbx_lld_row_t		*lld_row;
-	int			ret = FAIL;
+	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&regexps);
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
 		*error = zbx_strdup(*error, "Value should be a JSON object.");
+		ret = FAIL;
 		goto out;
 	}
 
@@ -72,10 +75,9 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 	{
 		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);
+		ret = FAIL;
 		goto out;
 	}
-
-	zbx_vector_ptr_create(&regexps);
 
 	if (NULL != (f_regexp = strchr(filter, ':')))
 	{
@@ -83,7 +85,17 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 		*f_regexp++ = '\0';
 
 		if ('@' == *f_regexp)
+		{
 			DCget_expressions_by_name(&regexps, f_regexp + 1);
+
+			if (0 == regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
+						f_regexp + 1);
+				ret = FAIL;
+				goto out;
+			}
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'", __function_name, f_macro, f_regexp);
 	}
@@ -107,12 +119,10 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 
 		zbx_vector_ptr_append(lld_rows, lld_row);
 	}
-
+out:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
 
-	ret = SUCCEED;
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

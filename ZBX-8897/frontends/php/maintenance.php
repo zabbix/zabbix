@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@ $fields = array(
 	'new_timeperiod_start_date_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_timeperiod' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
 	'timeperiods' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'del_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
-	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
+	'del_timeperiodid' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'edit_timeperiodid' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'go' =>									array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -197,7 +197,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
 	}
 
@@ -212,22 +211,10 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 
 	zbx_value2array($maintenanceids);
 
-	DBstart();
-
-	$maintenances = array();
-	foreach ($maintenanceids as $id => $maintenanceid) {
-		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
-	}
-
 	$goResult = API::Maintenance()->delete($maintenanceids);
 	if ($goResult) {
-		foreach ($maintenances as $maintenanceid => $maintenance) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
-		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
-
-	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 	clearCookies($goResult);
@@ -516,10 +503,9 @@ else {
 
 	// get only maintenance IDs for paging
 	$options = array(
-		'output' => array('maintenanceid'),
+		'output' => array('maintenanceid', $sortfield),
 		'editable' => true,
 		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1
 	);
 
@@ -531,6 +517,9 @@ else {
 	}
 
 	$data['maintenances'] = API::Maintenance()->get($options);
+
+	order_result($data['maintenances'], $sortfield, $sortorder);
+
 	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 
 	// get list of maintenances

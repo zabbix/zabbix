@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "checks_simple.h"
 #include "simple.h"
 #include "log.h"
+
+#include "zbxself.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
@@ -71,6 +73,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.datastore.discovery", VMCHECK_FUNC(check_vcenter_hv_datastore_discovery)},
 	{"hv.datastore.read", VMCHECK_FUNC(check_vcenter_hv_datastore_read)},
 	{"hv.datastore.write", VMCHECK_FUNC(check_vcenter_hv_datastore_write)},
+	{"hv.perfcounter", VMCHECK_FUNC(check_vcenter_hv_perfcounter)},
 
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
@@ -98,6 +101,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.vfs.dev.write", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_write)},
 	{"vm.vfs.fs.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_discovery)},
 	{"vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
+	{"vm.perfcounter", VMCHECK_FUNC(check_vcenter_vm_perfcounter)},
 
 	{NULL, NULL}
 };
@@ -165,11 +169,17 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (NULL != vmfunc)
 		{
+			if (0 == get_process_type_forks(ZBX_PROCESS_TYPE_VMWARE))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "No \"vmware collector\" processes started."));
+				goto out;
+			}
+
 			if (SYSINFO_RET_OK == vmfunc(&request, item->username, item->password, result))
 				ret = SUCCEED;
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
 	}
 	else
 	{
@@ -179,8 +189,9 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
+out:
 	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

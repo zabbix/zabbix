@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 #else	/* not _WINDOWS */
 
 #	define ZBX_MUTEX		int
-#	define ZBX_MUTEX_NULL		0
+#	define ZBX_MUTEX_NULL		-1
 
 #	define ZBX_MUTEX_ERROR		-1
 #	define ZBX_MUTEX_OK		1

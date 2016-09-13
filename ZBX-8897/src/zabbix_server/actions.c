@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 					triggerid = 0;
 
-					if (NULL != (row = DBfetch(result)))
+					while (NULL != (row = DBfetch(result)))
 					{
 						ZBX_STR2UINT64(hostid, row[0]);
 						ZBX_STR2UINT64(triggerid, row[1]);
@@ -287,11 +287,11 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_IN:
-				if (SUCCEED == check_time_period(condition->value, (time_t)NULL))
+				if (SUCCEED == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NOT_IN:
-				if (FAIL == check_time_period(condition->value, (time_t)NULL))
+				if (FAIL == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			default:

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1039,14 +1039,6 @@ class testUrlParameters extends CWebTest {
 						'text_present' => array(
 							'ERROR: Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "groupid" field.'
-						)
-					),
-					array(
-						'url' => 'hostinventoriesoverview.php?groupid=4&groupby=-1',
-						'text_not_present' => 'HOST INVENTORY OVERVIEW',
-						'text_present' => array(
-							'ERROR: Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupby" field.'
 						)
 					),
 					array(

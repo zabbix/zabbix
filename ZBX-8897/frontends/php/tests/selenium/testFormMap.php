@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,6 @@ class testFormMap extends CWebTest {
 
 		// selecting new grid size
 		$this->zbxTestDropdownSelect('gridsize', $gridSize);
-		sleep(1);
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
@@ -105,6 +104,7 @@ class testFormMap extends CWebTest {
 		if (($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)) {
 			$this->zbxTestClick('gridautoalign');
 		}
+		sleep(1);
 
 		// clicking "Save"
 		$this->chooseOkOnNextConfirmation();

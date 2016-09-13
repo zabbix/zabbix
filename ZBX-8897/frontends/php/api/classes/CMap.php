@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,6 +94,16 @@ class CMap extends CMapElement {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		if ($options['countOutput'] !== null) {
+			$count_output = true;
+			$options['output'] = array('sysmapid');
+			$options['countOutput'] = null;
+			$options['limit'] = null;
+		}
+		else {
+			$count_output = false;
+		}
+
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
@@ -122,24 +132,19 @@ class CMap extends CMapElement {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
-			if ($options['countOutput']) {
-				$result = $sysmap['rowscount'];
+			$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
+
+			if (!isset($result[$sysmap['sysmapid']])) {
+				$result[$sysmap['sysmapid']] = array();
 			}
-			else {
-				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if (!isset($result[$sysmap['sysmapid']])) {
-					$result[$sysmap['sysmapid']] = array();
-				}
+			// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
+			// leaving this block commented
+			// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
+			// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
+			// }
 
-				// originally we intended not to pass those parameters if advanced labels are off, but they might be useful
-				// leaving this block commented
-				// if (isset($sysmap['label_format']) && ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)) {
-				// 	unset($sysmap['label_string_hostgroup'], $sysmap['label_string_host'], $sysmap['label_string_trigger'], $sysmap['label_string_map'], $sysmap['label_string_image']);
-				// }
-
-				$result[$sysmap['sysmapid']] += $sysmap;
-			}
+			$result[$sysmap['sysmapid']] += $sysmap;
 		}
 
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -285,8 +290,8 @@ class CMap extends CMapElement {
 			}
 		}
 
-		if (!is_null($options['countOutput'])) {
-			return $result;
+		if ($count_output) {
+			return count($result);
 		}
 
 		if ($result) {

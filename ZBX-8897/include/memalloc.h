@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,8 @@ do							\
 {							\
 	__zbx_mem_free(__FILE__, __LINE__, info, ptr);	\
 	ptr = NULL;					\
-} while (0)
+}							\
+while (0)
 
 void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
 void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);

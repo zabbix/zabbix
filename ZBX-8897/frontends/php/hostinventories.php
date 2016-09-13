@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -182,8 +182,7 @@ else{
 				'output' => array('hostid', 'name', 'status'),
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
-				'selectGroups' => API_OUTPUT_EXTEND,
-				'limit' => ($data['config']['search_limit'] + 1)
+				'selectGroups' => API_OUTPUT_EXTEND
 			);
 			if ($data['pageFilter']->groupid > 0) {
 				$options['groupids'] = $data['pageFilter']->groupid;
@@ -215,7 +214,20 @@ else{
 				}
 			}
 
-			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$limit = $data['config']['search_limit'] + 1;
+
+			order_result($data['hosts'], $sortfield, $sortorder);
+
+			if ($sortorder == ZBX_SORT_UP) {
+				$data['hosts'] = array_slice($data['hosts'], 0, $limit);
+			}
+			else {
+				$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
+			}
+
+			order_result($data['hosts'], $sortfield, $sortorder);
 		}
 
 	}

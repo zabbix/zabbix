@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,8 +66,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t value_num, int *processed);
-int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
-		const zbx_uint64_t proxy_hostid, char *info, int max_info_size);
+int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid, char **info);
 void	process_dhis_data(struct zbx_json_parse *jp);
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
 

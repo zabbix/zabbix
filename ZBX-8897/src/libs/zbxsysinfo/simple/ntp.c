@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,186 +23,150 @@
 #include "log.h"
 #include "ntp.h"
 
-#define NTP_SCALE  4294967296.0        /* 2^32, of course! */
+#define NTP_SCALE		4294967296.0	/* 2^32, of course! */
 
-#define NTP_PACKET_MIN       48        /* Without authentication */
-#define NTP_PACKET_MAX       68        /* With authentication (ignored) */
-#define NTP_DISP_FIELD        8        /* Offset of dispersion field */
-#define NTP_REFERENCE        16        /* Offset of reference timestamp */
-#define NTP_ORIGINATE        24        /* Offset of originate timestamp */
-#define NTP_RECEIVE          32        /* Offset of receive timestamp */
-#define NTP_TRANSMIT         40        /* Offset of transmit timestamp */
+#define NTP_PACKET_SIZE		48		/* without authentication */
+#define NTP_OFFSET_ORIGINATE	24		/* offset of originate timestamp */
+#define NTP_OFFSET_TRANSMIT	40		/* offset of transmit timestamp */
 
-#define NTP_LI_FUDGE          0        /* The current 'status' */
-#define NTP_VERSION           3        /* The current version */
-#define NTP_VERSION_MAX       4        /* The maximum valid version */
-#define NTP_STRATUM          15        /* The current stratum as a server */
-#define NTP_STRATUM_MAX      15        /* The maximum valid stratum */
-#define NTP_POLLING           8        /* The current 'polling interval' */
-#define NTP_PRECISION         0        /* The current 'precision' - 1 sec. */
+#define NTP_VERSION		3		/* the current version */
 
-#define NTP_ACTIVE            1        /* NTP symmetric active request */
-#define NTP_PASSIVE           2        /* NTP symmetric passive response */
-#define NTP_CLIENT            3        /* NTP client request */
-#define NTP_SERVER            4        /* NTP server response */
-#define NTP_BROADCAST         5        /* NTP server broadcast */
-
-#define NTP_INSANITY     3600.0        /* Errors beyond this are hopeless */
-#define RESET_MIN            15        /* Minimum period between resets */
-#define ABSCISSA            3.0        /* Scale factor for standard errors */
+#define NTP_MODE_CLIENT		3		/* NTP client request */
+#define NTP_MODE_SERVER		4		/* NTP server response */
 
 typedef struct
 {
-	unsigned char
-		status,
-		version,
-		mode,
-		stratum,
-		polling,
-		precision;
-	double
-		dispersion,
-		reference,
-		originate,
-		receive,
-		transmit,
-		current;
+	unsigned char	version;
+	unsigned char	mode;
+	double		transmit;
 }
 ntp_data;
 
 static void	make_packet(ntp_data *data)
 {
-	data->status	= NTP_LI_FUDGE << 6;
-	data->stratum	= NTP_STRATUM;
-	data->reference = data->dispersion = 0.0;
-
-	data->version	= NTP_VERSION;
-	data->mode	= 1;
-	data->polling	= NTP_POLLING;
-	data->precision	= NTP_PRECISION;
-	data->receive	= data->originate = 0.0;
-	data->current	= data->transmit = zbx_current_time();
+	data->version = NTP_VERSION;
+	data->mode = NTP_MODE_CLIENT;
+	data->transmit = zbx_current_time();
 }
 
-static void	pack_ntp(unsigned char *packet, int length, ntp_data *data)
+static void	pack_ntp(const ntp_data *data, unsigned char *request, int length)
 {
-	/* Pack the essential data into an NTP packet, bypassing struct layout and
-	endian problems.  Note that it ignores fields irrelevant to SNTP. */
+	/* Pack the essential data into an NTP packet, bypassing struct layout  */
+	/* and endian problems. Note that it ignores fields irrelevant to SNTP. */
 
 	int	i, k;
 	double	d;
 
-	assert(length >= (NTP_TRANSMIT + 8));
+	memset(request, 0, length);
 
-	memset(packet, 0, (size_t)length);
-
-	packet[0] = (data->status << 6) | (data->version << 3) | data->mode;
-	packet[1] = data->stratum;
-	packet[2] = data->polling;
-	packet[3] = data->precision;
-
-	d = data->originate / NTP_SCALE;
-	for (i = 0; i < 8; i++)
-	{
-		if ((k = (int)(d *= 256.0)) >= 256)
-			k = 255;
-		packet[NTP_ORIGINATE + i] = k;
-		d -= k;
-	}
-
-	d = data->receive / NTP_SCALE;
-	for (i = 0; i < 8; i++)
-	{
-		if ((k = (int)(d *= 256.0)) >= 256)
-			k = 255;
-		packet[NTP_RECEIVE + i] = k;
-		d -= k;
-	}
+	request[0] = (data->version << 3) | data->mode;
 
 	d = data->transmit / NTP_SCALE;
+
 	for (i = 0; i < 8; i++)
 	{
 		if ((k = (int)(d *= 256.0)) >= 256)
 			k = 255;
-		packet[NTP_TRANSMIT + i] = k;
+
+		request[NTP_OFFSET_TRANSMIT + i] = k;
+
 		d -= k;
 	}
 }
 
-static void	unpack_ntp(ntp_data *data, unsigned char *packet, int length)
+static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsigned char *response, int length)
 {
-	/* Unpack the essential data from an NTP packet, bypassing struct layout and
-	endian problems.  Note that it ignores fields irrelevant to SNTP. */
+	/* Unpack the essential data from an NTP packet, bypassing struct layout */
+	/* and endian problems. Note that it ignores fields irrelevant to SNTP.  */
 
-	int	i;
-	double	d;
+	const char	*__function_name = "unpack_ntp";
 
-	memset(data, 0, sizeof(ntp_data));
+	int		i, ret = FAIL;
+	double		d;
 
-	if (0 == length)
-		return;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	assert(length >= (NTP_TRANSMIT + 8));
+	if (NTP_PACKET_SIZE != length)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid response size: %d", length);
+		goto out;
+	}
 
-	data->current	= zbx_current_time();    /* best to come first */
-	data->status	= (packet[0] >> 6);
-	data->version	= (packet[0] >> 3) & 0x07;
-	data->mode	= packet[0] & 0x07;
-	data->stratum	= packet[1];
-	data->polling	= packet[2];
-	data->precision	= packet[3];
+	if (0 != memcmp(response + NTP_OFFSET_ORIGINATE, request + NTP_OFFSET_TRANSMIT, 8))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "originate timestamp in the response does not match"
+				" transmit timestamp in the request: 0x%04x%04x 0x%04x%04x",
+				*(int *)&response[NTP_OFFSET_ORIGINATE], *(int *)&response[NTP_OFFSET_ORIGINATE + 4],
+				*(int *)&request[NTP_OFFSET_TRANSMIT], *(int *)&request[NTP_OFFSET_TRANSMIT + 4]);
+		goto out;
+	}
 
-	d = 0.0;
-	for (i = 0; i < 4; i++)
-		d = 256.0 * d + packet[NTP_DISP_FIELD + i];
-	data->dispersion = d / 65536.0;
+	data->version = (response[0] >> 3) & 7;
+
+	if (NTP_VERSION != data->version)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid NTP version in the response: %d", (int)data->version);
+		goto out;
+	}
+
+	data->mode = response[0] & 7;
+
+	if (NTP_MODE_SERVER != data->mode)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid mode in the response: %d", (int)data->mode);
+		goto out;
+	}
+
+	if (15 < response[1])
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid stratum in the response: %d", (int)response[1]);
+		goto out;
+	}
 
 	d = 0.0;
 	for (i = 0; i < 8; i++)
-		d = 256.0 * d + packet[NTP_REFERENCE + i];
-	data->reference = d / NTP_SCALE;
-
-	d = 0.0;
-	for (i = 0; i < 8; i++)
-		d = 256.0 * d + packet[NTP_ORIGINATE + i];
-	data->originate = d / NTP_SCALE;
-
-	d = 0.0;
-	for (i = 0; i < 8; i++)
-		d = 256.0 * d + packet[NTP_RECEIVE + i];
-	data->receive = d / NTP_SCALE;
-
-	d = 0.0;
-	for (i = 0; i < 8; i++)
-		d = 256.0 * d + packet[NTP_TRANSMIT + i];
+		d = 256.0 * d + response[NTP_OFFSET_TRANSMIT + i];
 	data->transmit = d / NTP_SCALE;
+
+	if (0 == data->transmit)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid transmit timestamp in the response: " ZBX_FS_DBL, data->transmit);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_sock_t	s;
 	int		ret;
-	char		*buf = NULL, packet[NTP_PACKET_MIN];
+	char		request[NTP_PACKET_SIZE], *response = NULL;
+	size_t		response_len;
 	ntp_data	data;
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED == (ret = zbx_udp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		make_packet(&data);
 
-		pack_ntp((unsigned char *)packet, sizeof(packet), &data);
+		pack_ntp(&data, (unsigned char *)request, sizeof(request));
 
-		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, packet)))
+		if (SUCCEED == (ret = zbx_udp_send(&s, request, sizeof(request), timeout)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv(&s, &buf)))
+			if (SUCCEED == (ret = zbx_udp_recv(&s, &response, &response_len, timeout)))
 			{
-				unpack_ntp(&data, (unsigned char *)buf, (int)strlen(buf));
-				*value_int = (0 < data.receive ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0);
+				*value_int = (SUCCEED == unpack_ntp(&data, (unsigned char *)request,
+						(unsigned char *)response, response_len));
 			}
 		}
 
-		zbx_tcp_close(&s);
+		zbx_udp_close(&s);
 	}
 
 	if (FAIL == ret)

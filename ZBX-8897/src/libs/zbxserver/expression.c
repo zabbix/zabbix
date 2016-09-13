@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1345,7 +1345,7 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 	{
 		case EVENT_OBJECT_DHOST:
 			result = DBselect("select r.%s from drules r,dhosts h"
-					" where r.druleid=r.druleid and h.dhostid=" ZBX_FS_UI64,
+					" where r.druleid=h.druleid and h.dhostid=" ZBX_FS_UI64,
 					fieldname, event->objectid);
 			break;
 		case EVENT_OBJECT_DSERVICE:
@@ -1522,7 +1522,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
-			char	tmp[MAX_STRING_LEN];
+			char	tmp[MAX_BUFFER_LEN];
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
@@ -1605,7 +1605,7 @@ out:
  * Purpose: retrieve escalation history                                       *
  *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(const DB_EVENT *event, const DB_EVENT *r_event, char **replace_to)
+static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1628,8 +1628,9 @@ static void	get_escalation_history(const DB_EVENT *event, const DB_EVENT *r_even
 			" left join media_type mt"
 				" on mt.mediatypeid=a.mediatypeid"
 			" where a.eventid=" ZBX_FS_UI64
+				" and a.actionid=" ZBX_FS_UI64
 			" order by a.clock",
-			event->eventid);
+			event->eventid, actionid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2507,7 +2508,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-		expand_trigger_description_constants(data, event->trigger.expression);
+	{
+		char	*expression;
+
+		expression = zbx_strdup(NULL, event->trigger.expression);
+
+		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, &expression,
+				MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+
+		expand_trigger_description_constants(data, expression);
+
+		zbx_free(expression);
+	}
 
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
@@ -2563,7 +2575,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -2802,7 +2814,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -3128,7 +3140,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -3228,7 +3240,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(event, r_event, &replace_to);
+					get_escalation_history(*actionid, event, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
@@ -4253,35 +4265,38 @@ replace_key_param_data_t;
  * Comments: auxiliary function for substitute_key_macros()                   *
  *                                                                            *
  ******************************************************************************/
-static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+static int	replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param)
 {
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
-	int				macro_type = replace_key_param_data->macro_type;
-	char				*param;
+	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return NULL;
+		return ret;
 
 	if (NULL == strchr(data, '{'))
-		return NULL;
+		return ret;
 
-	param = zbx_strdup(NULL, data);
+	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(param);
+		unquote_key_param(*param);
 
 	if (NULL == jp_row)
-		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, &param, macro_type, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, param, macro_type, NULL, 0);
 	else
-		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
-		quote_key_param(&param, quoted);
+	{
+		if (FAIL == (ret = quote_key_param(param, quoted)))
+			zbx_free(*param);
+	}
 
-	return param;
+	return ret;
 }
 
 /******************************************************************************
@@ -4293,7 +4308,9 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
  * Example:  key                     | macro       | result                   *
  *          -------------------------+-------------+-----------------         *
  *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
+ *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
+ *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}]        *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
  *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
@@ -4324,10 +4341,11 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 			key_type = ZBX_KEY_TYPE_OID;
 			break;
 		default:
-			assert(0);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
-	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
+	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
 

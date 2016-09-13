@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,11 +181,11 @@ err:
 
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
-	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
-	double	ts;
+	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
+	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
+	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	uint32_t	start_line, end_line, current_line = 0;
+	double		ts;
 
 	ts = zbx_time();
 
@@ -272,11 +272,11 @@ err:
 
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, *tmp, encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int	nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
-	double	ts;
+	char		*filename, *regexp, *tmp, encoding[32];
+	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
+	int		nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
+	uint32_t	start_line, end_line, current_line = 0;
+	double		ts;
 
 	ts = zbx_time();
 

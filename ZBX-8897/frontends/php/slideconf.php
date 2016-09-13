@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,12 +190,19 @@ if (isset($_REQUEST['form'])) {
 	$slideshowView->show();
 }
 else {
+	$config = select_config();
+	$limit = $config['search_limit'] + 1;
+
+	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
+
 	$data['slides'] = DBfetchArray(DBselect(
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
 				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
 			whereDbNode('s.slideshowid').
-			' GROUP BY s.slideshowid,s.name,s.delay'
+			' GROUP BY s.slideshowid,s.name,s.delay'.
+			' ORDER BY '.(($sortfield === 'cnt') ? 'cnt' : 's.'.$sortfield)
 	));
 
 	foreach ($data['slides'] as $key => $slide) {
@@ -204,7 +211,16 @@ else {
 		}
 	}
 
-	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
+	order_result($data['slides'], $sortfield, $sortorder);
+
+	if ($sortorder == ZBX_SORT_UP) {
+		$data['slides'] = array_slice($data['slides'], 0, $limit);
+	}
+	else {
+		$data['slides'] = array_slice($data['slides'], -$limit, $limit);
+	}
+
+	order_result($data['slides'], $sortfield, $sortorder);
 
 	$data['paging'] = getPagingLine($data['slides'], array('slideshowid'));
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
-	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
+	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null,
+			$drawtype = null) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
@@ -123,7 +124,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
-		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
+		$this->items[$this->num]['calc_type'] = GRAPH_ITEM_SIMPLE;
 
 		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 			$this->yaxisleft = 1;
@@ -215,7 +216,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
-			$type = $this->items[$i]['calc_type'];
+			$calc_type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
@@ -284,11 +285,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->data[$this->items[$i]['itemid']] = array();
 			}
 
-			if (!isset($this->data[$this->items[$i]['itemid']][$type])) {
-				$this->data[$this->items[$i]['itemid']][$type] = array();
-			}
-
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
+			$curr_data = &$this->data[$this->items[$i]['itemid']][$calc_type];
 
 			$curr_data['count'] = null;
 			$curr_data['min'] = null;
@@ -541,8 +538,10 @@ class CLineGraphDraw extends CGraphDraw {
 		foreach ($this->percentile as $side => $percentile) {
 			if ($percentile['percent'] > 0 && !empty($values[$side])) {
 				sort($values[$side]);
-				$percent = (int) ((count($values[$side]) * $percentile['percent'] / 100) + 0.5);
-				$this->percentile[$side]['value'] = $values[$side][$percent];
+				// Using "Nearest Rank" method: http://en.wikipedia.org/wiki/Percentile#Definition_of_the_Nearest_Rank_method
+				$percent = (int) ceil($percentile['percent'] / 100 * count($values[$side]));
+				// - 1 is necessary because array starts with the 0 index
+				$this->percentile[$side]['value'] = $values[$side][$percent - 1];
 				unset($values[$side]);
 			}
 		}

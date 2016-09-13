@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,15 +30,24 @@ PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENT
 	LPTSTR		wcounterPath = NULL;
 	PDH_STATUS	pdh_status;
 
-	wcounterPath = zbx_realloc(wcounterPath, dwSize * sizeof(TCHAR));
+	wcounterPath = zbx_malloc(wcounterPath, dwSize * sizeof(TCHAR));
 
 	if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, wcounterPath, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath '%s': %s",
-				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
-	}
+		char	*object, *counter;
 
-	zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
+		object = zbx_unicode_to_utf8(cpe->szObjectName);
+		counter = zbx_unicode_to_utf8(cpe->szCounterName);
+
+		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath for \"\\%s\\%s\": %s",
+				function, object, counter, strerror_from_module(pdh_status, L"PDH.DLL"));
+
+		zbx_free(counter);
+		zbx_free(object);
+	}
+	else
+		zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
+
 	zbx_free(wcounterPath);
 
 	return pdh_status;

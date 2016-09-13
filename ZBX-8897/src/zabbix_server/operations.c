@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,7 +472,7 @@ void	op_host_del(const DB_EVENT *event)
 
 	zbx_vector_uint64_append(&hostids, hostid);
 
-	DBdelete_hosts(&hostids);
+	DBdelete_hosts_with_prototypes(&hostids);
 
 	zbx_vector_uint64_destroy(&hostids);
 

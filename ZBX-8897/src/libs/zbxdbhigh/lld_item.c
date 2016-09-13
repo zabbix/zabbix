@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -521,9 +521,103 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_formula_macros                                        *
+ *                                                                            *
+ * Purpose: substitutes lld macros in calculated item formula expression      *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] the expression                               *
+ *             jp_row - [IN] the lld data row                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
+{
+	char		*exp, *tmp, *e, *func, *key, *host = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
+	zbx_function_t	funcdata;
+	int		i;
+
+	exp = zbx_malloc(NULL, exp_alloc);
+	tmp = zbx_malloc(NULL, tmp_alloc);
+
+	for (e = *data; '\0' != *e; e += len)
+	{
+		/* get function data or jump over part of the string that is not a function */
+		if (FAIL == zbx_function_parse(&funcdata, e, &len))
+		{
+			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
+			continue;
+		}
+
+		/* substitute LLD macros in the part of the string that was jumped over */
+		if (0 != tmp_offset)
+		{
+			size_t	tmp_len;
+
+			substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			tmp_len = strlen(tmp);
+
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
+
+			if (++tmp_len > tmp_alloc)
+				tmp_alloc = tmp_len;
+
+			tmp_offset = 0;
+		}
+
+		/* substitute LLD macros in function parameters (if any) */
+		if (0 < funcdata.nparam)
+		{
+			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
+			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
+			{
+				zbx_free(funcdata.params[0]);
+				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+				if (NULL != host)
+				{
+					funcdata.params[0] = zbx_dsprintf(NULL, "%s:%s", host, key);
+					zbx_free(host);
+					zbx_free(key);
+				}
+				else
+				{
+					funcdata.params[0] = key;
+					key = NULL;
+				}
+			}
+
+			/* substitute LLD macros in the rest of the parameters (simple replacement) */
+			for (i = 1; i < funcdata.nparam; i++)
+				substitute_discovery_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, 0);
+		}
+
+		/* substitute the original function in the string with the new one (with substituted LLD macros) */
+		zbx_function_tostr(&funcdata, e, len, &func);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
+
+		/* cleanup */
+		zbx_free(func);
+		zbx_function_clean(&funcdata);
+	}
+
+	/* substitute the LLD macros in the remainder of the string that was jumped over */
+	if (0 != tmp_offset)
+	{
+		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+	}
+
+	zbx_free(tmp);
+
+	zbx_free(*data);
+	*data = exp;
+}
+
 static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		struct zbx_json_parse *jp_row)
+		unsigned char type, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_make_item";
 
@@ -567,7 +661,12 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
-		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+		if (ITEM_TYPE_CALCULATED == type)
+			substitute_formula_macros(&item->params, jp_row);
+		else
+			substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
 		zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 		item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
@@ -607,7 +706,12 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 		}
 
 		buffer = zbx_strdup(buffer, params_proto);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+		if (ITEM_TYPE_CALCULATED == type)
+			substitute_formula_macros(&buffer, jp_row);
+		else
+			substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(item->params, buffer))
 		{
@@ -651,7 +755,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		zbx_vector_ptr_t *lld_rows)
+		unsigned char type, zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -660,7 +764,7 @@ static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, cons
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
-				&lld_row->jp_row);
+				type, &lld_row->jp_row);
 	}
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -828,6 +932,13 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		goto out;
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_items)
 	{
@@ -1456,7 +1567,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 				snmpv3_authpassphrase, snmpv3_privprotocol, snmpv3_privpassphrase, authtype, username,
 				password, publickey, privatekey, description_proto, interfaceid, snmpv3_contextname);
 
-		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
+		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto, type,
 				lld_rows);
 
 		lld_items_validate(hostid, &items, error);

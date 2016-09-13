@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,12 +53,18 @@ class CTriggersInfo extends CTable {
 	public function bodyToString() {
 		$this->cleanItems();
 
-		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
+		$okCount = 0;
+		$notClassifiedCount = 0;
+		$informationCount = 0;
+		$warningCount = 0;
+		$averageCount = 0;
+		$highCount = 0;
+		$disasterCount = 0;
 
 		$options = array(
+			'output' => array('triggerid', 'priority', 'value'),
 			'monitored' => true,
-			'skipDependent' => true,
-			'output' => array('triggerid')
+			'skipDependent' => true
 		);
 
 		if ($this->hostid > 0) {
@@ -68,88 +74,90 @@ class CTriggersInfo extends CTable {
 			$options['groupids'] = $this->groupid;
 		}
 		$triggers = API::Trigger()->get($options);
-		$triggers = zbx_objectValues($triggers, 'triggerid');
 
-		$db_priority = DBselect(
-			'SELECT t.priority,t.value,count(DISTINCT t.triggerid) AS cnt'.
-			' FROM triggers t'.
-			' WHERE '.dbConditionInt('t.triggerid', $triggers).
-			' GROUP BY t.priority,t.value'
-		);
-		while ($row = DBfetch($db_priority)) {
-			switch ($row['value']) {
-				case TRIGGER_VALUE_TRUE:
-					switch ($row['priority']) {
-						case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-							$uncl += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_INFORMATION:
-							$info += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_WARNING:
-							$warn += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_AVERAGE:
-							$avg += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_HIGH:
-							$high += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_DISASTER:
-							$dis += $row['cnt'];
-							break;
-					}
-					break;
-				case TRIGGER_VALUE_FALSE:
-					$ok += $row['cnt'];
-					break;
+		foreach ($triggers as $trigger) {
+			if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+				switch ($trigger['priority']) {
+					case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+						$notClassifiedCount++;
+						break;
+					case TRIGGER_SEVERITY_INFORMATION:
+						$informationCount++;
+						break;
+					case TRIGGER_SEVERITY_WARNING:
+						$warningCount++;
+						break;
+					case TRIGGER_SEVERITY_AVERAGE:
+						$averageCount++;
+						break;
+					case TRIGGER_SEVERITY_HIGH:
+						$highCount++;
+						break;
+					case TRIGGER_SEVERITY_DISASTER:
+						$disasterCount++;
+						break;
+				}
+			}
+			elseif ($trigger['value'] == TRIGGER_VALUE_FALSE) {
+				$okCount++;
 			}
 		}
 
 		if ($this->show_header) {
-			$header_str = _('Triggers info').SPACE;
+			$headerString = _('Triggers info').SPACE;
 
 			if (!is_null($this->nodeid)) {
 				$node = get_node_by_nodeid($this->nodeid);
 				if ($node > 0) {
-					$header_str .= '('.$node['name'].')'.SPACE;
+					$headerString .= '('.$node['name'].')'.SPACE;
 				}
 			}
 
 			if ($this->groupid != 0) {
 				$group = get_hostgroup_by_groupid($this->groupid);
-				$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
+				$headerString .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 			}
 			else {
-				$header_str .= _('All groups');
+				$headerString .= _('All groups');
 			}
 
-			$header = new CCol($header_str, 'header');
+			$header = new CCol($headerString, 'header');
 			if ($this->style == STYLE_HORIZONTAL) {
 				$header->setColspan(8);
 			}
 			$this->addRow($header);
 		}
 
-		$trok = getSeverityCell(null, $ok.SPACE._('Ok'), true);
-		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$uncl);
-		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
-		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
-		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$avg);
-		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
-		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
+		$okCount = getSeverityCell(null, $okCount.SPACE._('Ok'), true);
+		$notClassifiedCount = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+			$notClassifiedCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$notClassifiedCount
+		);
+		$informationCount = getSeverityCell(TRIGGER_SEVERITY_INFORMATION,
+			$informationCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$informationCount
+		);
+		$warningCount = getSeverityCell(TRIGGER_SEVERITY_WARNING,
+			$warningCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warningCount);
+		$averageCount = getSeverityCell(TRIGGER_SEVERITY_AVERAGE,
+			$averageCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$averageCount
+		);
+		$highCount = getSeverityCell(TRIGGER_SEVERITY_HIGH,
+			$highCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$highCount
+		);
+		$disasterCount = getSeverityCell(TRIGGER_SEVERITY_DISASTER,
+			$disasterCount.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$disasterCount
+		);
 
 		if (STYLE_HORIZONTAL == $this->style) {
-			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
+			$this->addRow(array($okCount, $notClassifiedCount, $informationCount, $warningCount, $averageCount, $highCount, $disasterCount));
 		}
 		else {
-			$this->addRow($trok);
-			$this->addRow($uncl);
-			$this->addRow($info);
-			$this->addRow($warn);
-			$this->addRow($avg);
-			$this->addRow($high);
-			$this->addRow($dis);
+			$this->addRow($okCount);
+			$this->addRow($notClassifiedCount);
+			$this->addRow($informationCount);
+			$this->addRow($warningCount);
+			$this->addRow($averageCount);
+			$this->addRow($highCount);
+			$this->addRow($disasterCount);
 		}
 
 		return parent::bodyToString();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ class CPageHeader {
 		<title>$this->title</title>
 		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />
+		<meta name="msapplication-config" content="none"/>
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 
 HTML;

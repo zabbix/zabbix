@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -370,7 +370,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_TCP_ERROR != (rc == telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_TCP_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
 			break;

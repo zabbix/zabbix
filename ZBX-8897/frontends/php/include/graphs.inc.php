@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -884,13 +884,13 @@ function find_period_end($periods, $time, $max_time) {
  * Example:
  * 	204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
  *
- * @param string $value
- * @param string $step
+ * @param string   $value
+ * @param bool|int $step
  *
  * @return array
  */
-function convertToBase1024 ($value, $step = false) {
-	if (empty($step)) {
+function convertToBase1024($value, $step = false) {
+	if (!$step) {
 		$step = 1000;
 	}
 
@@ -928,7 +928,7 @@ function convertToBase1024 ($value, $step = false) {
 	}
 	else {
 		$valData['pow'] = 0;
-		if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if (round($valData['value'], 6) > 0) {
 			$valData['value'] = $value;
 		}
 		else {

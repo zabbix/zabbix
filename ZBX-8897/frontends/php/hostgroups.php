@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,20 +73,26 @@ elseif (isset($_REQUEST['save'])) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
 		'output' => array('hostid'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'preservekeys' => true
 	));
 
 	$templates = API::Template()->get(array(
 		'templateids' => $hostIds,
-		'output' => array('templateid')
+		'output' => array('templateid'),
+		'preservekeys' => true
 	));
 
-	if (!empty($_REQUEST['groupid'])) {
+	$groupId = getRequest('groupid', 0);
+
+	if ($groupId != 0) {
 		DBstart();
 
 		$oldGroup = API::HostGroup()->get(array(
 			'groupids' => $_REQUEST['groupid'],
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid'),
+			'selectTemplates' => array('templateid')
 		));
 		$oldGroup = reset($oldGroup);
 
@@ -94,7 +100,7 @@ elseif (isset($_REQUEST['save'])) {
 		// don't try to update the name for a discovered host group
 		if ($oldGroup['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			$result = API::HostGroup()->update(array(
-				'groupid' => $_REQUEST['groupid'],
+				'groupid' => $groupId,
 				'name' => $_REQUEST['name']
 			));
 		}
@@ -105,21 +111,73 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_EXTEND
 			));
 
-			$result = API::HostGroup()->massUpdate(array(
-				'hosts' => $hosts,
-				'templates' => $templates,
-				'groups' => $groups
-			));
+			$hostIdsToAdd = array();
+			$hostIdsToRemove = array();
+			$templateIdsToAdd = array();
+			$templateIdsToRemove = array();
+
+			$oldHostIds = zbx_objectValues($oldGroup['hosts'], 'hostid');
+			$newHostIds = array_keys($hosts);
+			$oldTemplateIds = zbx_objectValues($oldGroup['templates'], 'templateid');
+			$newTemplateIds = array_keys($templates);
+
+			foreach (array_diff($newHostIds, $oldHostIds) as $hostId) {
+				$hostIdsToAdd[$hostId] = $hostId;
+			}
+
+			foreach (array_diff($oldHostIds, $newHostIds) as $hostId) {
+				$hostIdsToRemove[$hostId] = $hostId;
+			}
+
+			foreach (array_diff($newTemplateIds, $oldTemplateIds) as $templateId) {
+				$templateIdsToAdd[$templateId] = $templateId;
+			}
+
+			foreach (array_diff($oldTemplateIds, $newTemplateIds) as $templateId) {
+				$templateIdsToRemove[$templateId] = $templateId;
+			}
+
+			if ($hostIdsToAdd || $templateIdsToAdd) {
+				$massAdd = array(
+					'groups' => array('groupid' => $groupId)
+				);
+
+				if ($hostIdsToAdd) {
+					$massAdd['hosts'] = zbx_toObject($hostIdsToAdd, 'hostid');
+				}
+
+				if ($templateIdsToAdd) {
+					$massAdd['templates'] = zbx_toObject($templateIdsToAdd, 'templateid');
+				}
+
+				$result &= (bool) API::HostGroup()->massAdd($massAdd);
+			}
+
+			if ($hostIdsToRemove || $templateIdsToRemove) {
+				$massRemove = array(
+					'groupids' => array($groupId)
+				);
+
+				if ($hostIdsToRemove) {
+					$massRemove['hostids'] = $hostIdsToRemove;
+				}
+
+				if ($templateIdsToRemove) {
+					$massRemove['templateids'] = $templateIdsToRemove;
+				}
+
+				$result &= (bool) API::HostGroup()->massRemove($massRemove);
+			}
+
+			if ($result) {
+				$group = reset($groups);
+
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
+					'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
+			}
 		}
 
 		$result = DBend($result);
-
-		if ($result) {
-			$group = reset($groups);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
-				'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
-		}
 
 		$msgOk = _('Group updated');
 		$msgFail = _('Cannot update group');
@@ -337,10 +395,11 @@ else {
 
 	$groups = API::HostGroup()->get(array(
 		'editable' => true,
-		'output' => array('groupid'),
+		'output' => array('groupid', $sortfield),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
+	order_result($groups, $sortfield, $sortorder);
 
 	$data['paging'] = getPagingLine($groups, array('groupid'));
 

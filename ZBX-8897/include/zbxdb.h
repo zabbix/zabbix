@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@
 	int	IBM_DB2server_status();
 	int	zbx_ibm_db2_success(SQLRETURN ret);
 	int	zbx_ibm_db2_success_ext(SQLRETURN ret);
-	void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl);
 
 #elif defined(HAVE_MYSQL)
 
@@ -150,6 +149,12 @@
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
+#ifdef HAVE_SQLITE3
+#	define ZBX_FOR_UPDATE	""	/* SQLite3 does not support "select ... for update" */
+#else
+#	define ZBX_FOR_UPDATE	" for update"
+#endif
+
 #ifdef HAVE_MULTIROW_INSERT
 #	define ZBX_ROW_DL	","
 #else
@@ -186,5 +191,7 @@ char		*zbx_db_dyn_escape_string(const char *src);
 char		*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len);
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
+
+int		zbx_db_strlen_n(const char *text, size_t maxlen);
 
 #endif

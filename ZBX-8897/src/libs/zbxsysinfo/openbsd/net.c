@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
 #include "zbxjson.h"
 
 #include <sys/sockio.h>
+
+#if OpenBSD >= 201405
+#	include <net/if_var.h>	/* structs ifnet and ifnet_head are defined in this header since OpenBSD 5.5 */
+#endif
 
 static struct nlist kernel_symbols[] =
 {

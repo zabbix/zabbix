@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -461,7 +461,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('itemid', 'value_type', 'units', 'valuemapid')
+			'output' => array('itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock')
 		));
 
 		$item = reset($item);
@@ -470,17 +470,6 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		if (!$item) {
 			$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 			continue;
-		}
-
-		$lastValue = Manager::History()->getLast(array($item));
-		if ($lastValue) {
-			$lastValue = reset($lastValue[$item['itemid']]);
-			$item['lastvalue'] = $lastValue['value'];
-			$item['lastclock'] = $lastValue['clock'];
-		}
-		else {
-			$item['lastvalue'] = '0';
-			$item['lastclock'] = '0';
 		}
 
 		// do function type (last, min, max, avg) related actions
@@ -987,7 +976,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 
 	$config = select_config();
-	$show_unack = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
+	$showUnacknowledged = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
 
 	$triggers_map = array();
 	$triggers_map_submaps = array();
@@ -1127,13 +1116,17 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	$all_triggers = array();
 
 	if (!empty($triggers_map)) {
-		$triggers = API::Trigger()->get(array(
+		$triggerOptions = array(
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectLastEvent' => array('acknowledged'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('state' => null),
-			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
-		));
+		);
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1145,14 +1138,19 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from submaps, skip dependent
 	if (!empty($triggers_map_submaps)) {
-		$triggers = API::Trigger()->get(array(
+		$triggerOptions = array(
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectLastEvent' => array('acknowledged'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
-		));
+			'nopermissions' => true,
+			'only_true' => true
+		);
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1164,16 +1162,21 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if (!empty($monitored_hostids)) {
-		$triggers = API::Trigger()->get(array(
-			'hostids' => $monitored_hostids,
-			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+		$triggerOptions = array(
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
+			'selectLastEvent' => array('acknowledged'),
+			'hostids' => $monitored_hostids,
 			'nopermissions' => true,
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
-			'skipDependent' => true
-		));
+			'skipDependent' => true,
+			'only_true' => true
+		);
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1187,17 +1190,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		}
 	}
 	$all_triggers = zbx_toHash($all_triggers, 'triggerid');
-
-	$unackTriggerIds = API::Trigger()->get(array(
-		'triggerids' => array_keys($all_triggers),
-		'withLastEventUnacknowledged' => true,
-		'output' => array('triggerid'),
-		'nodeids' => get_current_nodeid(true),
-		'nopermissions' => true,
-		'monitored' => true,
-		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'state' => null)
-	));
-	$unackTriggerIds = zbx_toHash($unackTriggerIds, 'triggerid');
 
 	$info = array();
 	foreach ($selements as $selementId => $selement) {
@@ -1224,6 +1216,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
+		$last_event = false;
+
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $all_triggers[$triggerId];
 
@@ -1239,20 +1233,23 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						if ($i['priority'] < $trigger['priority']) {
 							$i['priority'] = $trigger['priority'];
 						}
-					}
 
-					if (isset($unackTriggerIds[$triggerId])) {
-						$i['problem_unack']++;
-					}
+						if ($trigger['lastEvent']) {
+							if (!$trigger['lastEvent']['acknowledged']) {
+								$i['problem_unack']++;
+							}
 
-					$config = select_config();
+							$last_event = $last_event || true;
+						}
+					}
 
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 				}
 			}
 		}
 
-		$i['ack'] = (bool) !($i['problem_unack']);
+		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
+		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
 		if ($sysmap['expandproblem'] && $i['problem'] == 1) {
 			if (!isset($lastProblemId)) {
@@ -1280,22 +1277,22 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$info[$selementId] = getMapsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getMapsInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$info[$selementId] = getHostGroupsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getHostGroupsInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
-				$info[$selementId] = getHostsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap, $hostInventories[$selement['elementid']]);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$info[$selementId] = getTriggersInfo($selement, $i, $show_unack);
+				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_IMAGE:

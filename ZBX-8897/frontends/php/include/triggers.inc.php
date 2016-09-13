@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1069,47 +1069,6 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 	return $expression;
 }
 
-/**
- * Get items from expression.
- *
- * @param CTriggerExpression $triggerExpression
- *
- * @return array
- */
-function getExpressionItems(CTriggerExpression $triggerExpression) {
-	$items = array();
-	$processedFunctions = array();
-	$processedItems = array();
-
-	foreach ($triggerExpression->expressions as $expression) {
-		if (isset($processedFunctions[$expression['expression']])) {
-			continue;
-		}
-
-		if (!isset($processedItems[$expression['host']][$expression['item']])) {
-			$dbItems = DBselect(
-				'SELECT i.itemid,i.flags'.
-				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($expression['item']).
-					' AND '.dbConditionInt('i.flags', array(
-						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
-					)).
-					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'.
-					andDbNode('i.itemid')
-			);
-			if ($dbItem = DBfetch($dbItems)) {
-				$items[] = $dbItem;
-				$processedItems[$expression['host']][$expression['item']] = true;
-			}
-		}
-
-		$processedFunctions[$expression['expression']] = true;
-	}
-
-	return $items;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
@@ -1188,43 +1147,47 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
+		'selectHosts' => array('hostid'),
 		'sortfield' => 'description'
 	));
 
 	// get hosts
 	$hostIds = array();
 	foreach ($dbTriggers as $trigger) {
-		$host = reset($trigger['hosts']);
-
-		$hostIds[$host['hostid']] = $host['hostid'];
+		foreach ($trigger['hosts'] as $host) {
+			$hostIds[$host['hostid']] = true;
+		}
 	}
 
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
-		'hostids' => $hostIds,
+		'hostids' => array_keys($hostIds),
 		'preservekeys' => true,
 		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
 	));
 
 	$triggers = array();
 	$hostNames = array();
+	$trcounter = array();
 
 	foreach ($dbTriggers as $trigger) {
-		$host = reset($trigger['hosts']);
+		$trigger_name = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
-		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
-		$hostNames[$host['hostid']] = $host['name'];
+		foreach ($trigger['hosts'] as $host) {
+			$hostid = $host['hostid'];
+			$host_name = get_node_name_by_elid($hostid, null, NAME_DELIMITER).$hosts[$hostid]['name'];
+			$hostNames[$hostid] = $host_name;
 
-		// a little tricky check for attempt to overwrite active trigger (value=1) with
-		// inactive or active trigger with lower priority.
-		if (!isset($triggers[$trigger['description']][$host['name']])
-				|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-					|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-						&& $trigger['priority'] > $triggers[$trigger['description']][$host['name']]['priority']))) {
-			$triggers[$trigger['description']][$host['name']] = array(
-				'hostid' => $host['hostid'],
+			if (!array_key_exists($host_name, $trcounter)) {
+				$trcounter[$host_name] = array();
+			}
+
+			if (!array_key_exists($trigger_name, $trcounter[$host_name])) {
+				$trcounter[$host_name][$trigger_name] = 0;
+			}
+
+			$triggers[$trigger_name][$trcounter[$host_name][$trigger_name]][$host_name] = array(
+				'hostid' => $hostid,
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
@@ -1233,6 +1196,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 				'url' => $trigger['url'],
 				'hosts' => array($host)
 			);
+			$trcounter[$host_name][$trigger_name]++;
 		}
 	}
 
@@ -1257,26 +1221,29 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
-		foreach ($triggers as $description => $triggerHosts) {
-			$columns = array(nbsp($description));
+		foreach ($triggers as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$columns = array(nbsp($trigger_name));
 
-			foreach ($hostNames as $hostName) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+				foreach ($hostNames as $hostName) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
+				$triggerTable->addRow($columns);
 			}
-
-			$triggerTable->addRow($columns);
 		}
 	}
 	else {
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 
-		foreach ($triggers as $description => $triggerHosts) {
-			$header[] = new CCol($description, 'vertical_rotation');
+		foreach ($triggers as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$header[] = new CCol($trigger_name, 'vertical_rotation');
+			}
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
@@ -1289,12 +1256,14 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
-			foreach ($triggers as $triggerHosts) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+			foreach ($triggers as $trigger_data) {
+				foreach ($trigger_data as $trigger_hosts) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
 			}
 
 			$triggerTable->addRow($columns);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ $page['file'] = 'scripts_exec.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -35,8 +37,7 @@ $fields = array(
 );
 check_fields($fields);
 
-ob_flush();
-flush();
+ob_end_flush();
 
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');

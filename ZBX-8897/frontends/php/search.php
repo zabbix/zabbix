@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,6 @@ $params = array(
 		'ip' => $search
 	),
 	'limit' => $rows_per_page,
-	'selectGroups' => API_OUTPUT_EXTEND,
 	'selectInterfaces' => API_OUTPUT_EXTEND,
 	'selectItems' => API_OUTPUT_COUNT,
 	'selectTriggers' => API_OUTPUT_COUNT,
@@ -155,8 +154,7 @@ foreach ($hosts as $hnum => $host) {
 
 	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? 'on' : null;
 
-	$group = reset($host['groups']);
-	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
+	$link = 'hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
 	$caption = make_decoration($host['name'], $search);
 

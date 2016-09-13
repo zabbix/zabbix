@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ ZBX_COLLECTOR_DATA	*collector = NULL;
 static int		shm_id;
 int 			my_diskstat_shmid = NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-ZBX_MUTEX		diskstats_lock;
+ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
 
 /******************************************************************************

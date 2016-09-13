@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -420,7 +420,7 @@ jQuery(function($) {
 		}
 
 		var opener = $(this),
-			id = opener.data('menu-popup-id'),
+			id = opener.attr('data-menu-popup-id'),
 			menuPopup = $('#' + id),
 			mapContainer = null;
 
@@ -529,7 +529,7 @@ jQuery(function($) {
 			}
 			// set menu popup for common html elements
 			else {
-				opener.data('menu-popup-id', id);
+				opener.attr('data-menu-popup-id', id);
 
 				$('body').append(menuPopup);
 			}

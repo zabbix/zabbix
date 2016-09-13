@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,8 +204,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
 						privatekey, item->password);
-				zbx_free(publickey);
-				zbx_free(privatekey);
 
 				if (0 != rc)
 				{
@@ -298,25 +296,18 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 channel_close:
 	/* close an active data channel */
 	exitcode = 127;
-	while (0 != (rc = libssh2_channel_close(channel)))
-	{
-		switch (rc)
-		{
-			case LIBSSH2_ERROR_EAGAIN:
-				waitsocket(s.socket, session);
-				continue;
-			default:
-				libssh2_session_last_error(session, &ssherr, NULL, 0);
-				zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s",
-						__function_name, ssherr);
-				break;
-		}
-	}
+	while (LIBSSH2_ERROR_EAGAIN == (rc = libssh2_channel_close(channel)))
+		waitsocket(s.socket, session);
 
-	if (0 == rc)
+	if (0 != rc)
+	{
+		libssh2_session_last_error(session, &ssherr, NULL, 0);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s", __function_name, ssherr);
+	}
+	else
 		exitcode = libssh2_channel_get_exit_status(channel);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode: %d bytecount: %d",
-			__function_name, exitcode, bytecount);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, bytecount);
 
 	libssh2_channel_free(channel);
 	channel = NULL;
@@ -331,6 +322,8 @@ tcp_close:
 	zbx_tcp_close(&s);
 
 close:
+	zbx_free(publickey);
+	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,9 +43,9 @@ static zbx_mem_info_t	*trend_mem = NULL;
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-static ZBX_MUTEX	cache_lock;
-static ZBX_MUTEX	trends_lock;
-static ZBX_MUTEX	cache_ids_lock;
+static ZBX_MUTEX	cache_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	trends_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
@@ -1310,56 +1310,37 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char		*__function_name = "DCmass_proxy_update_items";
+	const char	*__function_name = "DCmass_proxy_update_items";
 
-	size_t			sql_offset = 0;
-	zbx_vector_uint64_t	itemids;
-	int			i, j;
+	size_t		sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&itemids);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
-			zbx_vector_uint64_append(&itemids, history[i].itemid);
-	}
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
+			continue;
 
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
+			continue;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items"
+				" set lastlogsize=" ZBX_FS_UI64
+					",mtime=%d"
+				" where itemid=" ZBX_FS_UI64 ";\n",
+				history[i].lastlogsize, history[i].mtime, history[i].itemid);
 
-	for (i = 0; i < itemids.values_num; i++)
-	{
-		for (j = history_num - 1; j >= 0; j--)
-		{
-			if (history[j].itemid != itemids.values[i])
-				continue;
-
-			if (ITEM_VALUE_TYPE_LOG != history[j].value_type)
-				continue;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update items"
-					" set lastlogsize=" ZBX_FS_UI64
-						",mtime=%d"
-					" where itemid=" ZBX_FS_UI64 ";\n",
-					history[j].lastlogsize, history[j].mtime, history[j].itemid);
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			break;
-		}
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
-
-	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1900,7 +1881,7 @@ int	DCsync_history(int sync_type)
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			i, history_num, n, f;
-	int			syncs;
+	int			syncs, iterations;
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
@@ -1914,6 +1895,10 @@ int	DCsync_history(int sync_type)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
+		/* unlock all triggers before full sync so no items are locked by triggers */
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			DCconfig_unlock_all_triggers();
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 		now = time(NULL);
 		cache->itemids_num = 0;
@@ -1937,6 +1922,7 @@ int	DCsync_history(int sync_type)
 
 		candidate_num = 0;
 		skipped_clock = 0;
+		iterations = 0;
 
 		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > candidate_num;)
 		{
@@ -1960,6 +1946,16 @@ int	DCsync_history(int sync_type)
 				f += num;
 				continue;
 			}
+
+			/* Limit iteration count to improve handling of situation when few items */
+			/* have flooded history cache with several hundred thousands of values.  */
+			/* This is achieved by breaking out of the loop if the number of values  */
+			/* that we take is less than 10% of the values that we see. This way, at */
+			/* least ZBX_SYNC_MAX and at most ZBX_SYNC_MAX * 10 iterations are done. */
+			if (ZBX_SYNC_MAX <= iterations && candidate_num * 10 < iterations)
+				break;
+
+			iterations++;
 
 			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 					cache->history[f].itemid))
@@ -2101,7 +2097,7 @@ int	DCsync_history(int sync_type)
 
 		LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
 		UNLOCK_CACHE;
@@ -2631,7 +2627,7 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->value_type = ITEM_VALUE_TYPE_STR;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -2650,7 +2646,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, c
 	item_value->value_type = ITEM_VALUE_TYPE_TEXT;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -2670,10 +2666,10 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->value_type = ITEM_VALUE_TYPE_LOG;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 	item_value->timestamp = timestamp;
 	if (NULL != source && '\0' != *source)
-		item_value->source.len = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
+		item_value->source.len = zbx_db_strlen_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
 		item_value->source.len = 0;
 	item_value->severity = severity;
@@ -2702,7 +2698,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->state = ITEM_STATE_NOTSUPPORTED;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(error, ITEM_ERROR_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -2894,7 +2890,7 @@ static void	init_trend_cache()
 #define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef INIT_HASHSET_SIZE

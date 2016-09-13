@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,9 +94,15 @@ $paging = null;
 
 
 if ($pageFilter->hostsSelected) {
+	$sortfield = getPageSortField('hostname');
+	$sortorder = getPageSortOrder();
+
 	$options = array(
-		'output' => array('httptestid'),
+		'output' => array('httptestid', 'name', 'hostid'),
+		'selectHosts' => array('name', 'status'),
+		'selectSteps' => API_OUTPUT_COUNT,
 		'templated' => false,
+		'preservekeys' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -108,16 +114,6 @@ if ($pageFilter->hostsSelected) {
 	}
 	$httpTests = API::HttpTest()->get($options);
 
-	$paging = getPagingLine($httpTests);
-
-	$httpTests = API::HttpTest()->get(array(
-		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
-		'preservekeys' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name', 'status'),
-		'selectSteps' => API_OUTPUT_COUNT,
-	));
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['host'] = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $httpTest['host']['name'];
@@ -125,9 +121,13 @@ if ($pageFilter->hostsSelected) {
 	}
 	unset($httpTest);
 
+	order_result($httpTests, $sortfield, $sortorder);
+
+	$paging = getPagingLine($httpTests);
+
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 
-	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
+	order_result($httpTests, $sortfield, $sortorder);
 
 	// fetch the latest results of the web scenario
 	$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httpTests));

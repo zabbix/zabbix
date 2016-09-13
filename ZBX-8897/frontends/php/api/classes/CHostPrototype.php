@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -870,7 +870,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid'),
-			'selectDiscoveryRule' => array('itemid')
+			'selectDiscoveryRule' => array('itemid'),
+			'selectInventory' => array('inventory_mode')
 		));
 
 		foreach ($hostPrototypes as &$hostPrototype) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ void	zbx_strpool_create(size_t size)
 
 	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
 	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
-				__strpool_hash_func, __strpool_compare_func,
+				__strpool_hash_func, __strpool_compare_func, NULL,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -138,7 +138,7 @@ void	zbx_strpool_clear()
 
 	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
 	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
-				__strpool_hash_func, __strpool_compare_func,
+				__strpool_hash_func, __strpool_compare_func, NULL,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

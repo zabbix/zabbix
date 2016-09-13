@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,15 +254,16 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
-		'expandDescription' => true,
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange',
+			'expression'
+		),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	));
@@ -302,6 +303,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
+				'ns' => '999999999',
 				'value' => $trigger['value']
 			);
 		}
@@ -449,6 +451,8 @@ function make_hoststat_summary($filter) {
 	));
 
 	if ($filter['extAck']) {
+		$hosts_with_unack_triggers = array();
+
 		$triggers_unack = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(),
 			'monitored' => true,
@@ -484,7 +488,7 @@ function make_hoststat_summary($filter) {
 				$host = $hosts[$trigger_host['hostid']];
 			}
 
-			if ($filter['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])) {
+			if ($filter['extAck'] && array_key_exists($host['hostid'], $hosts_with_unack_triggers)) {
 				if (!isset($lastUnack_host_list[$host['hostid']])) {
 					$lastUnack_host_list[$host['hostid']] = array();
 					$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];
@@ -562,7 +566,20 @@ function make_hoststat_summary($filter) {
 
 				if (!isset($hosts_data[$group['groupid']]['hostids_all'][$host['hostid']])) {
 					$hosts_data[$group['groupid']]['hostids_all'][$host['hostid']] = $host['hostid'];
-					$hosts_data[$group['groupid']]['problematic']++;
+
+					/*
+					 * Display acknowledged problem triggers in "Without problems" column when filter dashboard is
+					 * enabled and is set to display "Unacknowledged only". Host and trigger must not be in
+					 * unacknowledged lists. Count as problematic host otherwise.
+					 */
+					if ($filter['extAck'] == EXTACK_OPTION_UNACK
+							&& !array_key_exists($host['hostid'], $hosts_with_unack_triggers)
+							&& !array_key_exists($trigger['triggerid'], $triggers_unack)) {
+						$hosts_data[$group['groupid']]['ok']++;
+					}
+					else {
+						$hosts_data[$group['groupid']]['problematic']++;
+					}
 				}
 			}
 		}
@@ -1516,6 +1533,11 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
 
 	foreach ($triggers as $trigger) {
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+			'clock' => $trigger['event']['clock'],
+			'ns' => $trigger['event']['ns']
+		)));
+
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
@@ -1540,7 +1562,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $trigger['description']),
+			getSeverityCell($trigger['priority'], $description),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,

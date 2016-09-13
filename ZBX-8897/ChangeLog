@@ -1,3 +1,340 @@
+Changes for 2.2.15rc1
+
+New features:
+...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
+
+Bug fixes:
+A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
+A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
+.......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
+........S. [ZBX-10830] fixed SNMP trap to convert non-printable values from SNMPv3 to hexadecimal (viktors, zalex_ua)
+........S. [ZBX-11124] fixed memory leak in process of deleting hosts, which occurs during lld processing (Sergejs)
+........S. [ZBX-11099] reduced configuration cache lock time after host maintenance ends (wiper)
+........S. [ZBX-9413] fixed disabled hosts linking to a maintenance (Sergejs)
+........S. [ZBX-11059] fixed duplicate notifications sending from one media type (Sergejs)
+........S. [ZBX-10713] fixed incorrect macro {ESC.HISTORY} that gathers history about one event to different actions (Sergejs)
+........S. [ZBX-10759] fixed trigger prototypes status when host become unavailable (Sergejs)
+...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
+........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
+..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14
+
+Bug fixes:
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page; thanks to 1N3 at Early Warning Services, LLC (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14rc1
+
+Bug fixes:
+A......... [ZBX-10933] fixed unexpected overwriting of trigger expressions for unchanged triggers when updating multiple triggers simultaneously via the API trigger.update method (Gunars)
+..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
+..F....... [ZBX-10866] fixed starting value of time selector for events, graphs and screens (Cemeris)
+.......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13
+
+2.2.13rc1 was released as 2.2.13 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13rc1
+
+New features:
+A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
+....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
+........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
+.......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
+A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
+........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
+..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
+........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
+........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12
+
+2.2.12rc1 was released as 2.2.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12rc1
+
+New features:
+A.F....... [ZBX-1357] enabled Chinese (China), Greek, Korean, Romanian, Ukrainian, Vietnamese translations to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United States), French, Japanese, Korean, Polish, Russian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
+
+Bug fixes:
+A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
+.......PS. [ZBX-10493] fixed memory leak when trying to reconnect to URL (viktors)
+..F....... [ZBX-6491] fixed resolving of {ITEM.VALUE} macro in "System status" widget and Monitoring -> Triggers (Gunars)
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
+A......... [ZBX-10155] prohibited creation of a trigger prototype which belongs to a host and a template simultaneously (Sasha)
+A......... [ZBX-10155] prohibited creation of a trigger prototype without item prototypes in the expression (Cemeris, Sasha)
+A......... [ZBX-10155] prohibited creation of a trigger prototype without permissions to a host or template in the expression (Sasha)
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
+.......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
+A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
+...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
+..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
+........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
+.......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
+.......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
+..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
+.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
+.......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new host groups list (Cemeris)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+.......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
+...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
+.......PS. [ZBX-9661] fixed bug when VMware collectors could sometimes use 100% of CPU without processing any data (wiper)
+..F....... [ZBX-8635] fixed undefined index in trigger expression constructor popup (Cemeris)
+..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
+A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
+...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
+..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
+...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
+....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
+..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11
+
+2.2.11rc1 was released as 2.2.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11rc1
+
+New features:
+..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
+A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (Cemeris)
+...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
+.D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
+..F....... [ZBX-9919] fixed y scale calculation for linear graphs (Cemeris)
+...G...PS. [ZBX-9864] fixed compilation warnings regarding SIZE_T_MAX under NetBSD (Sasha)
+..F....... [ZBX-9862] added meta tag "msapplication-config" to prevent MSIE11 requesting browserconfig.xml (Gunars)
+A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
+...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
+........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
+........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
+...G...... [ZBX-9796] fixed item key vfs.fs.size operation for NetBSD and HP-UX (viktors)
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
+........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
+...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
+.......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
+..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10
+
+2.2.10rc2 was released as 2.2.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10rc2
+
+New features:
+A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+..F....... [ZBX-9381] fixed empty host list in popup drowpdowns (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10rc1
+
+New features:
+A.F....... [ZBX-1357] enabled Czech locale to be displayed by default (Richlv)
+...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, French, Japanese, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+
+Bug fixes:
+...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (Gleb)
+..F....... [ZBX-9332] fixed correct display of green circle in maps and showing more unacknowledged problems than total number of problems (Ivo)
+..F....... [ZBX-8895] improved trigger count calculation and removed unnecessary query, thanks to Alexey Pustovalov (Krists)
+..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
+........S. [ZBX-8949] fixed possible deadlocks when deleting items on systems with MySQL backend (wiper)
+...G...... [ZBX-8969] fixed "system.uname" and "system.sw.arch" returning bad values on HP-UX (asaveljevs, wiper)
+...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
+...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
+.......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
+...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
+.......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
+.......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
+........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
+........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarious (igors)
+........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
+.......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
+A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
+..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.9
+
+2.2.9rc1 was released as 2.2.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.9rc1
+
+New features:
+.......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
+A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
+...G...PS. [ZBX-9284] added Zabbix log file locking to avoid incomplete logging on log file rotation (igors)
+...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
+...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
+........S. [ZBX-9285] fixed memory leak when processing host prototypes (Sasha)
+.......PS. [ZBX-9279] optimized VMware requests to reduce amount of transferred data (wiper)
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
+.......PS. [ZBX-7719] added configurable timeout for VMware data gathering requests (wiper)
+...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
+.......PS. [ZBX-9104] fixed repeated error messaging if SSH channel failed to close (igors)
+...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
+...G...... [ZBX-9233] fixed processing of bogus negative value of performance counter (igors)
+.......PST [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
+A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] added read-only groups in host and template edit forms as grayed out when object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed template edit form losing host and template linkages by adding grayed out objects when they belong to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed trigger and trigger prototype "enable/disable" action when trigger belongs to read-only group (Ivo)
+..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in LLD rules (igors)
+.......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
+.......PS. [ZBX-8584] fixed vmware eventlog items sometimes returning duplicate values (wiper)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
+..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
+...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+.......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
+...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+.......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
+..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
+..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
+..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.8
+
+2.2.8rc1 was released as 2.2.8 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.8rc1
+
+New features:
+.......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
+........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
+.......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
+.......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
+...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
+.......PS. [ZBX-9016] fixed items not being processed again in case these items or their hosts are disabled and then reenabled (asaveljevs, Sasha)
+..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
+A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
+..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
+A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
+..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
+.......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
+.......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
+..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
+.......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
+A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
+........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
+....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
+...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
+.D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
+.......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
+A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
+.......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
+.......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
+..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
+........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.7
+
+New features:
+A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.7rc2
 
 Bug fixes:
@@ -66,10 +403,10 @@ Bug fixes:
 ........S. [ZBX-8444] changed the interval for checking sleeping escalations to improve performance (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not updating properly when linking template to host (Ivo)
-........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
+........S. [ZBX-8415] fixed possible server crash on LLD hosts or host groups update (dimir, Sasha)
 ...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
-.......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
+.......PST [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
 .......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
 ..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
 ..F....... [ZBX-8216] fixed screen import error (Andrejs)
@@ -188,7 +525,7 @@ A.F....... [ZBX-8101] fixed exporting maps from Oracle database (Eduard, Ivo)
 ...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
 .......PS. [ZBX-8202] fixed queue calculation for unavailable hosts which are monitored through a proxy (Nikolaj)
 .......PS. [ZBX-8152] added informative log message about optional database patches (Juris)
-...G...PS. [ZBX-8138] fixed ssh infostring searching and validation for ssh related items to allow information messages as per RFC4253 Section 4.2 (Juris)
+...G...PS. [ZBX-8138] fixed SSH infostring searching and validation for SSH related items to allow information messages as per RFC4253 Section 4.2 (Juris)
 ...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
 A.F....... [ZBX-7766] fixed webscenario status code field validation to accept user macros (Krists)
 ...GI..... [ZBX-8127] fixed truncation of hostname on HP-UX machines (igors)
@@ -244,7 +581,7 @@ Changes for 2.2.3
 Changes for 2.2.3rc2
 
 Bug fixes:
-.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling SSH, telnet and database monitor items (Juris)
 .......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
@@ -380,7 +717,7 @@ A......... [ZBX-7660] fixed host.get returning the "templates" property even if 
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
-.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+.......PS. [ZBX-7576] fixed network discovery processing broadcast responses as valid hosts (wiper)
 ..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
 .......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
@@ -602,7 +939,7 @@ Changes for 2.1.8
 New features:
 .....J.... [ZBX-6404] added support for values of type java.lang.Double when toString() returns them in scientific format (asaveljevs)
 .......PS. [ZBXNEXT-78] added support for scientific notation for received values and item multipliers for items of type "Numeric (float)" (asaveljevs)
-...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (Igors, Andris, wiper)
+...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (igors, Andris, wiper)
 ..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
@@ -1115,13 +1452,143 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.19rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18
+
+2.0.18rc1 was released as 2.0.18 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18rc1
+
+New features:
+A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
+........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
+........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17
+
+2.0.17rc1 was released as 2.0.17 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17rc1
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
+.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16
+
+2.0.16rc1 was released as 2.0.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (Cemeris)
+........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.15
+
+2.0.15rc1 was released as 2.0.15 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.15rc1
+
+New features:
+...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+A.F....... [ZBX-1357] updated Czech, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+........S. [ZBX-9657] fixed timeout error being recognized as success when executing scripts on nodes (wiper)
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
+...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
+...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
+.......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
+...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
+.......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
+........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
+........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+...G...PS. [ZBX-9284] added Zabbix log file locking to avoid incomplete logging on log file rotation (igors)
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
+...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
+.......PS. [ZBX-9104] fixed repeated error messaging if SSH channel failed to close (igors)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in LLD rules (igors)
+.......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
+A......... [ZBX-9197] fixed PHP fatal error "Call to undefined function array_fill_keys()" in trigger.get method with PHP<5.2.0 (Sasha)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.14
+
+2.0.14rc1 was released as 2.0.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.14rc1
 
 New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
-A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
+..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
+.D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
+.......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces (asaveljevs)
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
@@ -1156,7 +1623,7 @@ A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxm
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
-.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+.......PS. [ZBX-7576] fixed network discovery processing broadcast responses as valid hosts (wiper)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
@@ -2711,8 +3178,18 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.23rc1
+
+A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
+....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
+
+Changes for 1.8.22
+
+1.8.22rc1 was released as 1.8.22 without any changes
+
 Changes for 1.8.22rc1
 
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)

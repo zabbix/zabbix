@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ ZABBIX.apps.map = (function($) {
 						ln;
 
 					for (i = 0, ln = selected.length; i < ln; i++) {
-						ids.push($(selected[i]).data('id'));
+						ids.push($(selected[i]).attr('data-id'));
 
 						// remove ui-selected class, to not confuse next selection
 						selected.removeClass('ui-selected');

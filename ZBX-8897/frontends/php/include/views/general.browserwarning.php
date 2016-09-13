@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 	<title>WARNING! You are using an outdated browser.</title>
 	<meta name="Author" content="Zabbix SIA" />
 	<meta charset="utf-8" />
+	<meta name="msapplication-config" content="none"/>
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="styles/default.css" />
 	<link rel="stylesheet" type="text/css" href="styles/pages.css" />

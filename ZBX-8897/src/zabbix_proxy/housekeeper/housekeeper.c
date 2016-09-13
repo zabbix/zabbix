@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ rollback:
  *                                                                            *
  * Function: housekeeping_history                                             *
  *                                                                            *
- * Purpose: remove outdated information from history and trends               *
+ * Purpose: remove outdated information from history                          *
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
-	<property name="basedir" value="${WORKSPACE}"/>
-	<property name="builddir" value="${BUILDDIR}"/>
-	<property name="svn" value="${SVN}"/>
 	<property name="dbenable" value="${DBENABLE}"/>
 	<property name="dbtype" value="${DBTYPE}"/>
 	<property name="dbhost" value="${DBHOST}"/>
@@ -12,23 +9,34 @@
 	<property name="agentport" value="${AGENTPORT}"/>
 	<property name="serverport" value="${SERVERPORT}"/>
 	<property name="url" value="${URL}"/>
+	<property name="host" value="${HOST}"/>
+	<property name="screenshot_dir" value="${SCREENSHOT_DIR}"/>
+	<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
 
 	<target name="buildagent">
+		<antcall target="killagent"/>
+
 		<!-- Build agent binaries -->
-		<exec executable="./configure" dir="${builddir}" failonerror="on">
+		<exec executable="./configure" failonerror="on">
 			<arg value="--enable-agent"/>
 			<arg value="--with-libcurl"/>
-			<arg value="--prefix=${builddir}"/>
+			<arg value="--prefix=${basedir}"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on">
-			<arg value="-j4"/>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
+			<arg value="clean"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
 			<arg value="install"/>
 		</exec>
 	</target>
 
 	<target name="buildserver">
+		<antcall target="killserver"/>
+
 		<!-- Build server binaries -->
-		<exec executable="./configure" dir="${builddir}" failonerror="on">
+		<exec executable="./configure" failonerror="on">
 			<arg value="--enable-server"/>
 			<arg value="--with-${dbenable}"/>
 			<arg value="--with-net-snmp"/>
@@ -37,17 +45,21 @@
 			<arg value="--with-ssh2"/>
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
-			<arg value="--prefix=${builddir}"/>
+			<arg value="--prefix=${basedir}"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on">
-			<arg value="-j4"/>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
+			<arg value="clean"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
 			<arg value="install"/>
 		</exec>
 	</target>
 
 	<target name="buildproxy">
 		<!-- Build proxy binaries -->
-		<exec executable="./configure" dir="${builddir}" failonerror="on">
+		<exec executable="./configure" failonerror="on">
 			<arg value="--enable-proxy"/>
 			<arg value="--with-${dbenable}"/>
 			<arg value="--with-net-snmp"/>
@@ -56,134 +68,106 @@
 			<arg value="--with-ssh2"/>
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
-			<arg value="--prefix=${builddir}"/>
+			<arg value="--prefix=${basedir}"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on">
-			<arg value="-j4"/>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
+			<arg value="clean"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
 			<arg value="install"/>
 		</exec>
 	</target>
 
 	<target name="init-common">
 		<!-- Create the different build directories -->
-		<mkdir dir="${basedir}/build/logs" />
-		<mkdir dir="${builddir}" />
-		<exec executable="svn" dir="${basedir}/frontends/php/tests" failonerror="on">
-			<arg line="checkout ${svn} ${builddir}"/>
-		</exec>
-		<exec executable="./bootstrap.sh" dir="${builddir}" failonerror="on"></exec>
-		<exec executable="./configure" dir="${builddir}" failonerror="on"></exec>
-		<exec executable="make" dir="${builddir}" failonerror="on">
+		<mkdir dir="build/logs" />
+		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
 			<arg line="dbschema"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on">
-			<arg value="-j4"/>
+		<exec executable="make" failonerror="on">
+			<arg value="-s"/>
 			<arg line="dist"/>
 		</exec>
-		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/tests/bootstrap.php">
-			<arg line="'s/{URL}/${url}/' ${builddir}/frontends/php/tests/bootstrap.php.template"/>
-		</exec>
-	</target>
-
-	<target name="init-sqlite3" depends="init-common">
-		<!-- Remove old SQLite3 database if exists -->
-		<delete failonerror="off">
-			<fileset dir="/tmp" includes="${dbname}.db" />
-		</delete>
-		<!-- Create SQLite3 database -->
-		<exec executable="sqlite3" input="${builddir}/database/sqlite3/schema.sql" failonerror="on">
-			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-		<exec executable="chmod" dir="/tmp" failonerror="on">
-			<arg line="go+rw"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-		<exec executable="sqlite3" input="${builddir}/database/sqlite3/images.sql" failonerror="on">
-			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-		<exec executable="sqlite3" input="${builddir}/database/sqlite3/data.sql" failonerror="on">
-			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-		<exec executable="sqlite3" input="${builddir}/tests/data/data_test.sql" failonerror="on">
-			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-
-		<!-- Create PHP config file -->
-		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/\/tmp\/${dbname}.db/' ${builddir}/tests/templates/zabbix.conf.php.sqlite3"/>
-		</exec>
-		<exec executable="sed" failonerror="on" output="${basedir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/\/tmp\/${dbname}.db/' ${builddir}/tests/templates/zabbix.conf.php.sqlite3"/>
-		</exec>
+		<copy overwrite="true" file="frontends/php/tests/bootstrap.php.template" tofile="frontends/php/tests/bootstrap.php"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{URL}" value="${url}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{HOST}" value="${host}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${screenshot_dir}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${screenshot_url}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
 	</target>
 
 	<target name="create-configs" depends="init-common">
 		<!-- Create PHP config file -->
-		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<copy overwrite="true" file="tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<!-- Create deamon config files -->
-		<mkdir dir="${builddir}/etc"/>
-		<mkdir dir="${builddir}/tmp"/>
-		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_agentd.conf" tofile="${builddir}/etc/zabbix_agentd.conf"/>
-		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{AGENTPORT}" value="${agentport}"/>
-		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{ROOTDIR}" value="${builddir}"/>
+		<mkdir dir="etc"/>
+		<mkdir dir="tmp"/>
+		<copy overwrite="true" file="tests/templates/zabbix_agentd.conf" tofile="etc/zabbix_agentd.conf"/>
+		<replace file="etc/zabbix_agentd.conf" token="{AGENTPORT}" value="${agentport}"/>
+		<replace file="etc/zabbix_agentd.conf" token="{ROOTDIR}" value="${basedir}"/>
 
-		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_server.conf" tofile="${builddir}/etc/zabbix_server.conf"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{SERVERPORT}" value="${serverport}"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{ROOTDIR}" value="${builddir}"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBNAME}" value="${dbname}"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<copy overwrite="true" file="tests/templates/zabbix_server.conf" tofile="etc/zabbix_server.conf"/>
+		<replace file="etc/zabbix_server.conf" token="{SERVERPORT}" value="${serverport}"/>
+		<replace file="etc/zabbix_server.conf" token="{ROOTDIR}" value="${basedir}"/>
+		<replace file="etc/zabbix_server.conf" token="{DBNAME}" value="${dbname}"/>
+		<replace file="etc/zabbix_server.conf" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="etc/zabbix_server.conf" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="etc/zabbix_server.conf" token="{DBPASSWORD}" value="${dbpassword}"/>
 	</target>
 
 	<target name="init-postgresql" depends="create-configs">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'drop database if exists ${dbname};'"/>
-			<arg line="template1 ${dbuser}"/>
+			<arg line="-c 'drop database if exists ${dbname}'"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'create database ${dbname};'"/>
-			<arg line="template1 ${dbuser}"/>
+			<arg line="-c 'create database ${dbname}'"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/database/postgresql/schema.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname} ${dbuser}"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/database/postgresql/images.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+		<exec executable="psql" input="database/postgresql/images.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname} ${dbuser}"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/database/postgresql/data.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+		<exec executable="psql" input="database/postgresql/data.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname} ${dbuser}"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
+		<exec executable="psql" input="tests/data/data_test.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname} ${dbuser}"/>
+			<arg line="${dbname}"/>
 		</exec>
 	</target>
 
@@ -191,13 +175,27 @@
 		<!-- Kill previously running agent -->
 		<exec executable="bash">
 			<arg value="-c"/>
-			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_agentd.conf|head -1|awk '{print $2}'`"/>
+			<arg value="kill `ps -fu $USER|grep -v grep|grep ${basedir}/etc/zabbix_agentd.conf|head -1|awk '{print $2}'`"/>
 		</exec>
 		<!-- Sleep for 2 seconds -->
 		<exec executable="sleep" failonerror="off">
 			<arg line="2"/>
 		</exec>
 	</target>
+
+	<target name="killserver">
+		<!-- Kill previously running server -->
+		<exec executable="bash">
+			<arg value="-c"/>
+			<arg value="kill `ps -fu $USER|grep -v grep|grep ${basedir}/etc/zabbix_server.conf|head -1|awk '{print $2}'`"/>
+		</exec>
+		<!-- Sleep for 2 seconds -->
+		<exec executable="sleep" failonerror="off">
+			<arg line="2"/>
+		</exec>
+	</target>
+
+	<target name="killdaemons" depends="killserver,killagent"/>
 
 	<target name="sleep5m">
 		<!-- Sleep for 5 minutes -->
@@ -206,104 +204,63 @@
 		</exec>
 	</target>
 
-	<target name="killdaemons">
-		<!-- Kill previously running server -->
-		<exec executable="bash">
-			<arg value="-c"/>
-			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_server.conf|head -1|awk '{print $2}'`"/>
-		</exec>
-		<exec executable="bash">
-			<arg value="-c"/>
-			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_agentd.conf|head -1|awk '{print $2}'`"/>
-		</exec>
-	</target>
-
-	<target name="killserver">
-		<!-- Kill previously running server -->
-		<exec executable="bash">
-			<arg value="-c"/>
-			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_server.conf|head -1|awk '{print $2}'`"/>
-		</exec>
-		<!-- Sleep for 2 seconds -->
-		<exec executable="sleep" failonerror="off">
-			<arg line="2"/>
-		</exec>
-	</target>
-
 	<target name="runserver" depends="buildserver">
 		<!-- Execute Server -->
-		<exec executable="${builddir}/sbin/zabbix_server" dir="${builddir}/sbin" failonerror="on">
-			<arg line="--config=${builddir}/etc/zabbix_server.conf"/>
+		<exec executable="./zabbix_server" dir="sbin/" failonerror="on">
+			<arg line="--config=${basedir}/etc/zabbix_server.conf"/>
 		</exec>
 	</target>
 
 	<target name="runagent" depends="buildagent">
 		<!-- Execute Agent -->
-		<exec executable="${builddir}/sbin/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
-			<arg line="--config=${builddir}/etc/zabbix_agentd.conf"/>
+		<exec executable="./zabbix_agentd" dir="sbin/" failonerror="on">
+			<arg line="--config=${basedir}/etc/zabbix_agentd.conf"/>
 		</exec>
 	</target>
 
 	<target name="init-mysql" depends="create-configs">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} -e 'drop database if exists ${dbname};'"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="-e 'drop database if exists ${dbname}'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} -e 'create database ${dbname} character set utf8;'"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="-e 'create database ${dbname} character set utf8 collate utf8_bin'"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/database/mysql/schema.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} ${dbname}"/>
+		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/database/mysql/images.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} ${dbname}"/>
+		<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/database/mysql/data.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} ${dbname}"/>
+		<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
-			<arg line="-h ${dbhost}"/>
-			<arg line="-u${dbuser} ${dbname}"/>
+		<exec executable="mysql" input="tests/data/data_test.sql" failonerror="on">
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-u '${dbuser}'"/>
+			<arg line="${dbname}"/>
 		</exec>
-	</target>
-
-	<target name="clean">
-		<!-- Delete build directories from the previous run -->
-		<delete failonerror="off">
-			<fileset dir="${basedir}/build/logs" includes="**.*" />
-		</delete>
-		<delete dir="${builddir}" failonerror="off"/>
 	</target>
 
 	<target name="test-frontend">
-		<exec executable="phpunit" dir="${builddir}/frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php frontend.php"/>
+		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
 		</exec>
 	</target>
 
-	<target name="test-agent" depends="clean,init-common,buildagent,runagent">
-		<!-- Create PHP config file. It is needed because PHP test classes depend on it. -->
-		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.postgresql"/>
-		</exec>
-		<exec executable="sed" failonerror="on" output="${basedir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.postgresql"/>
-		</exec>
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php agent.php"/>
-		</exec>
-	</target>
-
-	<target name="build-mysql" depends="clean,killserver,init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
-	<target name="build-postgresql" depends="clean,killserver,init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
-	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,test-frontend" />
+	<target name="build-mysql" depends="init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
+	<target name="build-postgresql" depends="init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
-
 </project>

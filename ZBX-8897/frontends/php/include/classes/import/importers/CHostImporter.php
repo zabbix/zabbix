@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,12 +149,15 @@ class CHostImporter extends CImporter {
 
 		if ($hostId = $this->referencer->resolveHost($host['host'])) {
 			$host['hostid'] = $hostId;
-			foreach ($host['macros'] as &$macro) {
-				if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
-					$macro['hostmacroid'] = $hostMacroId;
+
+			if (!empty($host['macros'])) {
+				foreach ($host['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
 				}
+				unset($macro);
 			}
-			unset($macro);
 		}
 
 

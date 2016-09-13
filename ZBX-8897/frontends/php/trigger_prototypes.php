@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,14 +101,30 @@ if (get_request('parent_discoveryid')) {
 		access_deny();
 	}
 
-	if (isset($_REQUEST['triggerid'])) {
-		$triggerPrototype = API::TriggerPrototype()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
+	$triggerPrototypeIds = getRequest('g_triggerid', array());
+	if (!is_array($triggerPrototypeIds)) {
+		$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
+	}
+	if (!zbx_empty(getRequest('triggerid'))) {
+		$triggerPrototypeIds[] = getRequest('triggerid');
+	}
+
+	if ($triggerPrototypeIds) {
+		$triggerPrototypes = API::TriggerPrototype()->get(array(
 			'output' => array('triggerid'),
+			'triggerids' => $triggerPrototypeIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
-		if (empty($triggerPrototype)) {
+
+		if ($triggerPrototypes) {
+			foreach ($triggerPrototypeIds as $triggerPrototypeId) {
+				if (!isset($triggerPrototypes[$triggerPrototypeId])) {
+					access_deny();
+				}
+			}
+		}
+		else {
 			access_deny();
 		}
 	}
@@ -284,9 +300,11 @@ else {
 
 	// get triggers
 	$sortfield = getPageSortField('description');
+	$sortorder = getPageSortOrder();
+
 	$options = array(
 		'editable' => true,
-		'output' => array('triggerid'),
+		'output' => array('triggerid', $sortfield),
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
@@ -295,6 +313,8 @@ else {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
+
+	order_result($data['triggers'], $sortfield, $sortorder);
 
 	// paging
 	$data['paging'] = getPagingLine(
@@ -313,7 +333,7 @@ else {
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND
 	));
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+	order_result($data['triggers'], $sortfield, $sortorder);
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);

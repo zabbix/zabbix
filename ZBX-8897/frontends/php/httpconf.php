@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -463,7 +463,7 @@ else {
 
 		$options = array(
 			'editable' => true,
-			'output' => array('httptestid'),
+			'output' => array('httptestid', $sortfield),
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showDisabled'])) {
@@ -477,10 +477,6 @@ else {
 		}
 		$httpTests = API::HttpTest()->get($options);
 
-		order_result($httpTests, $sortfield, getPageSortOrder());
-
-		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
-
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
 				' FROM httptest ht'.
@@ -491,6 +487,10 @@ else {
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
+
+		order_result($httpTests, $sortfield, getPageSortOrder());
+
+		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
 
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.

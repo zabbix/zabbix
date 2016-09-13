@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ $fields = array(
 	'httptestid' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
 	'http_item_type' =>	array(T_ZBX_INT, O_OPT, null,		null,				null),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
 	'ymin_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
 	'ymax_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
@@ -52,7 +52,9 @@ $fields = array(
 	'percent_right' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
 	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,				null)
 );
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 if ($httptestid = getRequest('httptestid', false)) {
 	if (!API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
@@ -125,49 +127,46 @@ else {
 /*
  * Display
  */
-if ($isDataValid) {
-	$profileIdx = getRequest('profileIdx', 'web.httptest');
-	$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
+$profileIdx = getRequest('profileIdx', 'web.httptest');
+$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
 
-	$timeline = CScreenBase::calculateTime(array(
-		'profileIdx' => $profileIdx,
-		'profileIdx2' => $profileIdx2,
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime')
-	));
+$timeline = CScreenBase::calculateTime(array(
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2,
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
+));
 
-	CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
+CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
 
-	$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader($name);
-	$graph->setPeriod($timeline['period']);
-	$graph->setSTime($timeline['stime']);
-	$graph->setWidth(getRequest('width', 900));
-	$graph->setHeight(getRequest('height', 200));
-	$graph->showLegend(getRequest('legend', 1));
-	$graph->showWorkPeriod(getRequest('showworkperiod', 1));
-	$graph->showTriggers(getRequest('showtriggers', 1));
-	$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYAxisMin(getRequest('yaxismin', 0.00));
-	$graph->setYAxisMax(getRequest('yaxismax', 100.00));
-	$graph->setYMinItemId(getRequest('ymin_itemid', 0));
-	$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
-	$graph->setLeftPercentage(getRequest('percent_left', 0));
-	$graph->setRightPercentage(getRequest('percent_right', 0));
+$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader($name);
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
+$graph->setWidth(getRequest('width', 900));
+$graph->setHeight(getRequest('height', 200));
+$graph->showLegend(getRequest('legend', 1));
+$graph->showWorkPeriod(getRequest('showworkperiod', 1));
+$graph->showTriggers(getRequest('showtriggers', 1));
+$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYAxisMin(getRequest('yaxismin', 0.00));
+$graph->setYAxisMax(getRequest('yaxismax', 100.00));
+$graph->setYMinItemId(getRequest('ymin_itemid', 0));
+$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
+$graph->setLeftPercentage(getRequest('percent_left', 0));
+$graph->setRightPercentage(getRequest('percent_right', 0));
 
-	foreach ($items as $item) {
-		$graph->addItem(
-			$item['itemid'],
-			isset($item['yaxisside']) ? $item['yaxisside'] : null,
-			isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
-			isset($item['color']) ? $item['color'] : null,
-			isset($item['drawtype']) ? $item['drawtype'] : null,
-			isset($item['type']) ? $item['type'] : null
-		);
-	}
-
-	$graph->draw();
+foreach ($items as $item) {
+	$graph->addItem(
+		$item['itemid'],
+		isset($item['yaxisside']) ? $item['yaxisside'] : null,
+		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
+		isset($item['color']) ? $item['color'] : null,
+		isset($item['drawtype']) ? $item['drawtype'] : null
+	);
 }
+
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

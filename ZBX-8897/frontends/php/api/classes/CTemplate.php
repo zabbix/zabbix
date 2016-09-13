@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -582,31 +582,34 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$macros = array();
+		foreach ($templates as &$template) {
+			if (isset($template['macros'])) {
+				$macros[$template['templateid']] = $template['macros'];
+
+				unset($template['macros']);
+			}
+		}
+		unset($template);
+
+		if ($macros) {
+			API::UserMacro()->replaceMacros($macros);
+		}
+
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
 				$template['name'] = $template['host'];
 			}
+
 			$tplTmp = $template;
-
 			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
-
-			if (isset($template['macros'])) {
-				$macros[$template['templateid']] = $template['macros'];
-				unset($template['macros']);
-			}
-
-			unset($template['templates']);
-			unset($template['templateid']);
-			unset($tplTmp['templates']);
-
+			unset($template['templateid'], $tplTmp['templates']);
 			$template['templates'] = array($tplTmp);
-			$result = $this->massUpdate($template);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
-		}
 
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
+			$result = $this->massUpdate($template);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
+			}
 		}
 
 		return array('templateids' => $templateids);
@@ -792,6 +795,12 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
 			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
+			if (!API::Host()->isWritable($hostIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
 			// check if any of the hosts are discovered
 			$this->checkValidator($hostIds, new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
@@ -934,39 +943,6 @@ class CTemplate extends CHostGeneral {
 		}
 		// }}} UPDATE TEMPLATES PROPERTIES
 
-
-		// UPDATE HOSTGROUPS LINKAGE {{{
-		if (isset($data['groups']) && !is_null($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
-			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
-
-			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
-
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'templates' => $templates,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
-				}
-			}
-
-			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
-			if (!empty($groupidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
-				}
-			}
-		}
-		// }}} UPDATE HOSTGROUPS LINKAGE
-
 		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
 		$templateidsClear = zbx_objectValues($data['templates_clear'], 'templateid');
 
@@ -981,7 +957,12 @@ class CTemplate extends CHostGeneral {
 		// firstly need to unlink all things, to correctly check circulars
 
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
+			/*
+			 * Get all currently linked hosts and templates (skip discovered hosts) to these templates
+			 * that user has read permissions.
+			 */
 			$templateHosts = API::Host()->get(array(
+				'output' => array('hostid'),
 				'templateids' => $templateids,
 				'templated_hosts' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
@@ -991,8 +972,34 @@ class CTemplate extends CHostGeneral {
 
 			$hostsToDel = array_diff($templateHostids, $newHostids);
 			$hostidsToDel = array_diff($hostsToDel, $templateidsClear);
+			$hostIdsToAdd = array_diff($newHostids, $templateHostids);
 
-			if (!empty($hostidsToDel)) {
+			// gather both host and template IDs and validate write permissions
+			$hostIds = array_merge($hostIdsToAdd, $hostidsToDel);
+
+			if ($hostIds) {
+				/*
+				 * Get all currently linked hosts and templates (skip discovered hosts) to these templates
+				 * that user has write permissions.
+				 */
+				$templatesHostsAllowed = API::Host()->get(array(
+					'output' => array('hostid'),
+					'templated_hosts' => true,
+					'editable' => true,
+					'preservekeys' => true,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
+
+				foreach ($hostIds as $hostId) {
+					if (!isset($templatesHostsAllowed[$hostId])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
+			}
+
+			if ($hostidsToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostidsToDel,
 					'templateids' => $templateids
@@ -1053,6 +1060,38 @@ class CTemplate extends CHostGeneral {
 			));
 		}
 
+		/*
+		 * Update template and host group linkage. This procedure should be done the last because user can unlink
+		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * host-template linking, macros update, must be done before this.
+		 */
+		if (isset($data['groups']) && is_array($data['groups'])) {
+			$updateGroups = zbx_toArray($data['groups']);
+
+			$templateGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'templateids' => $templateids
+			));
+			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
+
+			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
+			if ($groupsToAdd) {
+				$this->massAdd(array(
+					'templates' => $templates,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+			}
+
+			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
+			if ($groupidsToDel) {
+				$this->massRemove(array(
+					'templateids' => $templateids,
+					'groupids' => $groupidsToDel
+				));
+			}
+		}
+
 		return array('templateids' => $templateids);
 	}
 
@@ -1077,6 +1116,12 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hostids'])) {
+			if (!API::Host()->isWritable($data['hostids'])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
 			// check if any of the hosts are discovered
 			$this->checkValidator($data['hostids'], new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ class CProfile {
 		}
 
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
+		DB::delete('profiles', array('idx' => $idx, 'idx2' => $idx2, 'userid' => self::$userDetails['userid']));
 
 		// remove from cache
 		if (!is_null(self::$profiles)) {
@@ -180,7 +180,7 @@ class CProfile {
 			'idx' => zbx_dbstr($idx),
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
-			'idx2' => $idx2
+			'idx2' => zbx_dbstr($idx2)
 		);
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}

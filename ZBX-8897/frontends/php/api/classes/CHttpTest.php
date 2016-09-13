@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -593,11 +593,6 @@ class CHttpTest extends CZBXAPI {
 		if (array_key_exists('steps', $httpTest)
 				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-		}
-
-		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
-		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
 		if ($dbHttpTest) {

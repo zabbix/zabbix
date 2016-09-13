@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,13 @@
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
-static int	txn_init = 0;	/* connecting to db */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
+
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
 #elif defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
@@ -53,7 +54,7 @@ static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
-static ZBX_MUTEX		sqlite_access;
+static ZBX_MUTEX		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -209,7 +210,7 @@ static int	is_recoverable_mysql_error(void)
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int		ret = ZBX_DB_OK;
+	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
@@ -223,7 +224,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*p, *path = NULL;
 #endif
 
-	txn_init = 1;
+	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
+	if (0 != txn_level)
+		txn_error = 1;
+
+	last_txn_error = txn_error;
+	last_txn_level = txn_level;
+
+	txn_error = 0;
+	txn_level = 0;
 
 #if defined(HAVE_IBM_DB2)
 	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
@@ -248,27 +257,37 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* recommended for pure IBM DB2 CLI, but not required */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION,
 			(void *)SQL_OV_ODBC3, 0)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* allocate a database connection handle */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv,
 			&ibm_db2.hdbc)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* connect to the database */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect,
 			SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* set autocommit on */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* we do not generate vendor escape clause sequences */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
 			(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* set current schema */
 	if (NULL != dbschema && '\0' != *dbschema && ZBX_DB_OK == ret)
@@ -286,12 +305,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* output error information */
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-
+		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv, ERR_Z3001, dbname);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3001, dbname);
 	}
 #elif defined(HAVE_MYSQL)
-	conn = mysql_init(NULL);
+	if (NULL == (conn = mysql_init(NULL)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
+		exit(EXIT_FAILURE);
+	}
 
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
@@ -495,7 +517,8 @@ out:
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
 
-	txn_init = 0;
+	txn_error = last_txn_error;
+	txn_level = last_txn_level;
 
 	return ret;
 }
@@ -629,12 +652,15 @@ int	zbx_db_begin(void)
 	txn_level++;
 
 #if defined(HAVE_IBM_DB2)
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<begin>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -679,12 +705,15 @@ int	zbx_db_commit(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -730,12 +759,15 @@ int	zbx_db_rollback(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<rollback>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -789,7 +821,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
 			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
 	{
-		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
+		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT,
+				oracle.errhp);
 	}
 
 	oci_ids_num = 0;
@@ -804,7 +837,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	sword	err;
 	int	ret = ZBX_DB_OK;
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
 	if (1 == txn_error)
@@ -853,7 +886,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 			if (oci_ids_num >= oci_ids_alloc)
 			{
 				old_alloc = oci_ids_alloc;
-				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
+				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 3 / 2);
 				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber *));
 
 				for (i = old_alloc; i < oci_ids_alloc; i++)
@@ -964,7 +997,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
 	if (1 == txn_error)
@@ -1003,8 +1036,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt, ERR_Z3005, sql);
 
 		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
@@ -1038,12 +1071,15 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
-				else
-					ret += (int)mysql_affected_rows(conn);
 
-				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
+				ret += (int)mysql_affected_rows(conn);
+
+				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
+				{
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+				}
 			}
 			while (0 == status);
 		}
@@ -1226,8 +1262,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 error:
 	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt, ERR_Z3005, sql);
 
 		IBM_DB2free_result(result);
 
@@ -1859,8 +1895,8 @@ int	IBM_DB2server_status()
 {
 	int	server_status = SQL_CD_TRUE;
 
-	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
-								&server_status, SQL_IS_POINTER, NULL)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD, &server_status,
+			SQL_IS_POINTER, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
@@ -1878,16 +1914,30 @@ int	zbx_ibm_db2_success_ext(SQLRETURN ret)
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
 }
 
-void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context)
 {
-	SQLCHAR		message[SQL_MAX_MESSAGE_LENGTH + 1];
-	SQLCHAR		sqlstate[SQL_SQLSTATE_SIZE + 1];
+	SQLCHAR		tmp_message[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
+	char		message[SQL_MAX_MESSAGE_LENGTH + SQL_SQLSTATE_SIZE + 2];
 	SQLINTEGER	sqlcode;
 	SQLSMALLINT	length, i = 1;
 
-	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
+	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, tmp_message, sizeof(tmp_message),
+			&length))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
+		zbx_snprintf(message, sizeof(message), "%s %s", sqlstate, tmp_message);
+		zbx_rtrim(message, ZBX_WHITESPACE);
+
+		switch(err)
+		{
+			case ERR_Z3001:
+				zabbix_errlog(err, context, (int)sqlcode, message);
+				break;
+			case ERR_Z3005:
+				zabbix_errlog(err, (int)sqlcode, message, context);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 }
 #elif defined(HAVE_ORACLE)
@@ -2014,6 +2064,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return dst;
 }
 
+#ifndef HAVE_IBM_DB2
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_dyn_escape_string_len                                     *
@@ -2027,9 +2078,12 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 	char		*dst = NULL;
 	size_t		len = 1;	/* '\0' */
 
+	if (NULL == src)
+		goto out;
+
 	max_src_len++;
 
-	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
+	for (s = src; '\0' != *s && 0 < max_src_len; s++)
 	{
 		if ('\r' == *s)
 			continue;
@@ -2049,13 +2103,65 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 		len++;
 	}
-
+out:
 	dst = zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len);
 
 	return dst;
 }
+#else
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string_len                                     *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Comments: This function is used to escape strings for IBM DB2 where fields *
+ *           are limited by bytes rather than characters.                     *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
+{
+	const char	*s;
+	char		*dst = NULL;
+	size_t		csize, len = 1;	/* '\0' */
+
+	if (NULL == src)
+		goto out;
+
+	for (s = src; '\0' != *s;)
+	{
+		if ('\r' == *s)
+		{
+			s++;
+			continue;
+		}
+
+		csize = zbx_utf8_char_len(s);
+
+		/* process non-UTF-8 characters as single byte characters */
+		if (0 == csize)
+			csize = 1;
+
+		if (max_src_len < csize)
+			break;
+
+		if ('\'' == *s)
+			len++;
+
+		s += csize;
+		len += csize;
+		max_src_len -= csize;
+	}
+out:
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -2162,3 +2268,21 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return dst;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_strlen_n                                                  *
+ *                                                                            *
+ * Purpose: return the string length to fit into a database field of the      *
+ *          specified size                                                    *
+ *                                                                            *
+ * Return value: the string length in bytes                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_strlen_n(const char *text, size_t maxlen)
+{
+#ifdef HAVE_IBM_DB2
+	return zbx_strlen_utf8_nbytes(text, maxlen);
+#else
+	return zbx_strlen_utf8_nchars(text, maxlen);
+#endif
+}

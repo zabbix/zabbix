@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,13 +118,17 @@ if ($data['alias']) {
 if ($queryData) {
 	foreach (eventSourceObjects() as $eventSource) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectMediatypes' => API_OUTPUT_EXTEND,
+			'output' => array('alertid', 'clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error',
+				'alerttype'
+			),
+			'selectMediatypes' => array('mediatypeid', 'description'),
 			'userids' => $data['alias'] ? $user['userid'] : null,
 			'time_from' => $from,
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
 			'eventobject' => $eventSource['object'],
+			'sortfield' => 'alertid',
+			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
 		)));
 	}

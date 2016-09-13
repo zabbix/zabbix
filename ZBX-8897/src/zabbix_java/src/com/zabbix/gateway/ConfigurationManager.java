@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ class ConfigurationManager
 	public static final String LISTEN_IP = "listenIP";
 	public static final String LISTEN_PORT = "listenPort";
 	public static final String START_POLLERS = "startPollers";
+	public static final String TIMEOUT = "timeout";
 
 	private static ConfigurationParameter[] parameters =
 	{
@@ -68,6 +69,9 @@ class ConfigurationManager
 				null),
 		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5,
 				new IntegerValidator(1, 1000),
+				null),
+		new ConfigurationParameter(TIMEOUT, ConfigurationParameter.TYPE_INTEGER, 3,
+				new IntegerValidator(1, 30),
 				null)
 	};
 

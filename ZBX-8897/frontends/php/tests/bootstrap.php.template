@@ -10,4 +10,7 @@
 	define('PHPUNIT_URL', '{URL}');
 	define('PHPUNIT_LOGIN_NAME', 'Admin');
 	define('PHPUNIT_LOGIN_PWD', 'zabbix');
-	define('PHPUNIT_FRONTEND_HOST', 'hudson');
+	define('PHPUNIT_HOST', '{HOST}');
+	define('PHPUNIT_SCREENSHOT_DIR', '{SCREENSHOT_DIR}');
+	define('PHPUNIT_SCREENSHOT_URL', '{SCREENSHOT_URL}');
+	define('PHPUNIT_BASEDIR', '{BASEDIR}');

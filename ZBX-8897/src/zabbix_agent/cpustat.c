@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,10 +26,15 @@
 #include "mutexs.h"
 #include "log.h"
 
+/* <sys/dkstat.h> removed in OpenBSD 5.7, only <sys/sched.h> with the same CP_* definitions remained */
+#if defined(OpenBSD) && defined(HAVE_SYS_SCHED_H) && !defined(HAVE_SYS_DKSTAT_H)
+#	include <sys/sched.h>
+#endif
+
 #if !defined(_WINDOWS)
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
-static ZBX_MUTEX	cpustats_lock;
+static ZBX_MUTEX	cpustats_lock = ZBX_MUTEX_NULL;
 #endif
 
 #ifdef HAVE_KSTAT_H

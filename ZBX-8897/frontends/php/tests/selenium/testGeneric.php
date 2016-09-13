@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class testGeneric extends CWebTest {
 			array('hostgroups.php',					'Configuration of host groups'),
 			array('templates.php',					'Configuration of templates'),
 			array('hosts.php',						'Configuration of hosts'),
-			array('maintenance.php',				'Configuration of maintenance'),
+			array('maintenance.php',				'Configuration of maintenance periods'),
 			array('httpconf.php',					'Configuration of web monitoring'),
 
 			array('actionconf.php',					'Configuration of actions'),
@@ -79,7 +79,7 @@ class testGeneric extends CWebTest {
 			array('screenconf.php',					'Configuration of screens'),
 			array('slideconf.php',					'Configuration of slide shows'),
 			array('sysmaps.php',					'Configuration of network maps'),
-			array('discoveryconf.php',				'Configuration of discovery'),
+			array('discoveryconf.php',				'Configuration of discovery rules'),
 			array('services.php',					'Configuration of IT services'),
 
 			// Administration
@@ -125,11 +125,10 @@ class testGeneric extends CWebTest {
 	/**
 	* @dataProvider provider
 	*/
-	public function testGeneric_Pages($a, $b) {
-		$this->zbxTestLogin($a);
-		$this->zbxTestCheckTitle($b);
+	public function testGeneric_Pages($url, $title) {
+		$this->zbxTestLogin($url);
+		$this->zbxTestCheckTitle($title);
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}
-
 }
