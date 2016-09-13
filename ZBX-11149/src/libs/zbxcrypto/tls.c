@@ -5081,7 +5081,11 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	cipher_name = SSL_get_cipher(s->tls_ctx->ctx);
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+	if (0 == strncmp("ECDHE-PSK-", cipher_name, 10) || 0 == strncmp("PSK-", cipher_name, 4))
+#else
 	if (0 == strncmp("PSK-", cipher_name, 4))
+#endif
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
