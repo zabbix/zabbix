@@ -370,13 +370,13 @@ class CItemKey extends CParser {
 	}
 
 	/*
-	 * Quotes special symbols in item key parameter
+	 * Quotes special symbols in item key parameter.
 	 *
-	 * @param string $param   item key parameter
-	 * @param bool   $forced  true - enclose parameter in " even if it does not contain any special characters
-	 *                        false - do nothing if the paramter does not contain any special characters
+	 * @param string $param   Item key parameter.
+	 * @param bool   $forced  true - enclose parameter in " even if it does not contain any special characters.
+	 *                        false - do nothing if the paramter does not contain any special characters.
 	 *
-	 * @return string|bool  false - if parameter ends with backslash (cannot be quoted), string - otherwice
+	 * @return string|bool  false - if parameter ends with backslash (cannot be quoted), string - otherwice.
 	 */
 	public static function quoteParam($param, $forced = false) {
 		if (!$forced)
