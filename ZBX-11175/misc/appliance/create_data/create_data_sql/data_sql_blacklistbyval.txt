@@ -1,0 +1,3 @@
+items flag 4
+triggers flag 4
+graphs flag 4
