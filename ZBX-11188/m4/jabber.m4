@@ -37,14 +37,20 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
 
   if test "x$_libiksemel_with" != x"no"; then
        if test "$_libiksemel_with" = "yes"; then
-		PKG_CHECK_MODULES(IKSEMEL,iksemel,
+       	m4_ifdef([PKG_CHECK_MODULES], [
+       		PKG_CHECK_MODULES(IKSEMEL,iksemel,
+       			[
+       				JABBER_INCDIR="$IKSEMEL_CPPFLAGS"
+       				JABBER_LIBDIR="$IKSEMEL_LDFLAGS"
+       				JABBER_LIBS="-liksemel"
+                ],[
+                	found_iksemel="no"
+                	found_jabber="no"
+                ])
+			],
 			[
-			 JABBER_INCDIR="$IKSEMEL_CPPFLAGS"
-			 JABBER_LIBDIR="$IKSEMEL_LDFLAGS"
-			 JABBER_LIBS="-liksemel"
-			],[
-			 found_iksemel="no"
-			 found_jabber="no"
+				found_iksemel="no"
+				found_jabber="no"
 			])
        else
 	       AC_MSG_CHECKING(for iksemel support)
