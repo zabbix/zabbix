@@ -276,10 +276,6 @@ class C20ImportConverter extends CConverter {
 				$discovery_rule['status'] = ITEM_STATUS_ACTIVE;
 			}
 
-			if (!array_key_exists('type', $discovery_rule)) {
-				var_dump($discovery_rule);
-			}
-
 			if (in_array($discovery_rule['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
 				$param = CItemKey::quoteParam($discovery_rule['snmp_oid']);
 				if ($param !== false) {
