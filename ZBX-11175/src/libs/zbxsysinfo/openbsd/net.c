@@ -23,7 +23,11 @@
 #include <sys/sockio.h>
 
 #if OpenBSD >= 201405
-#	include <net/if_var.h>	/* structs ifnet and ifnet_head are defined in this header since OpenBSD 5.5 */
+#	if OpenBSD >= 201510	/* since Openbsd 5.8 */
+#		include <sys/malloc.h>	/* no kernel define to avoid malloc and free redefinition */
+#		define _KERNEL	/* whole header file is under this define now */
+#	endif
+#	include <net/if_var.h>  /* structs ifnet and ifnet_head are defined in this header since OpenBSD 5.5 */
 #endif
 
 static struct nlist kernel_symbols[] =
