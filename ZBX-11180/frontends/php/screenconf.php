@@ -45,7 +45,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
+	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form}) && ({form} == "update" || {form} == "clone")'),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
@@ -110,17 +110,20 @@ if ($isExportData) {
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])) {
-	unset($_REQUEST['screenid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
 	if (isset($_REQUEST['screenid'])) {
 		$screen = array(
-			'screenid' => $_REQUEST['screenid'],
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
 			'vsize' => $_REQUEST['vsize']
 		);
+
+		if (getRequest('form') !== 'clone') {
+			$screen['screenid'] = $_REQUEST['screenid'];
+		}
+
 		if (isset($_REQUEST['templateid'])) {
 			$screenOld = API::TemplateScreen()->get(array(
 				'screenids' => $_REQUEST['screenid'],
@@ -129,23 +132,53 @@ elseif (isset($_REQUEST['save'])) {
 			));
 			$screenOld = reset($screenOld);
 
-			$screenids = API::TemplateScreen()->update($screen);
+			if (getRequest('form') === 'clone') {
+				$screenids = API::TemplateScreen()->create($screen);
+			}
+			else {
+				$screenids = API::TemplateScreen()->update($screen);
+			}
 		}
 		else {
-			$screenOld = API::Screen()->get(array(
+			$options = array(
 				'screenids' => $_REQUEST['screenid'],
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true
-			));
-			$screenOld = reset($screenOld);
+			);
 
-			$screenids = API::Screen()->update($screen);
+			if (getRequest('form') === 'clone') {
+				$options['selectScreenItems'] = API_OUTPUT_EXTEND;
+
+				$screenOld = API::Screen()->get($options);
+				$screenOld = reset($screenOld);
+
+				unset($screen['screenid']);
+
+				$screen['screenitems'] = $screenOld['screenitems'];
+				$screenids = API::Screen()->create($screen);
+			}
+			else {
+				$screenOld = API::Screen()->get($options);
+				$screenOld = reset($screenOld);
+
+				$screenids = API::Screen()->update($screen);
+			}
 		}
 
-		if (!empty($screenids)) {
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens', $screenOld, $screen);
+		if (getRequest('form') === 'clone') {
+			if (!empty($screenids)) {
+				$screenid = reset($screenids);
+				$screenid = reset($screenid);
+				add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCREEN, $screenid, $screen['name']);
+			}
+			show_messages(!empty($screenids), _('Screen added'), _('Cannot add screen'));
 		}
-		show_messages(!empty($screenids), _('Screen updated'), _('Cannot update screen'));
+		else {
+			if (!empty($screenids)) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens', $screenOld, $screen);
+			}
+			show_messages(!empty($screenids), _('Screen updated'), _('Cannot update screen'));
+		}
 	}
 	else {
 		$screen = array(

@@ -48,14 +48,17 @@ $screenTab->addTab('screenTab', _('Screen'), $screenFormList);
 $screenForm->addItem($screenTab);
 
 // append buttons to form
-$screenForm->addItem(makeFormFooter(
-	new CSubmit('save', _('Save')),
-	array(
-		!empty($this->data['screenid']) ? new CSubmit('clone', _('Clone')) : null,
-		!empty($this->data['screenid']) ? new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid')) : null,
-		new CButtonCancel(url_param('templateid'))
-	)
-));
+if (is_array($data) && array_key_exists('screenid', $data) && $data['screenid'] !== null
+		&& array_key_exists('form', $data) && $data['form'] !== 'clone'){
+	$buttons = array(
+		new CSubmit('clone', _('Clone')),
+		new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid'))
+	);
+}
+
+$buttons[] = new CButtonCancel(url_param('templateid'));
+
+$screenForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 
 $screenWidget->addItem($screenForm);
 return $screenWidget;
