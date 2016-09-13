@@ -385,7 +385,7 @@ class CItemKey extends CParser {
 				return $param;
 			}
 
-			if (strstr('" ', $param[0]) === false && strstr($param, ',') === false && strchr($param, ']') === false) {
+			if (strpos('" ', $param[0]) === false && strpos($param, ',') === false && strpos($param, ']') === false) {
 				return $param;
 			}
 		}
