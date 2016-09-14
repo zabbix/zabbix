@@ -485,10 +485,10 @@ $tags_table = (new CTable())->setId('tbl_tags');
 foreach ($data['tags'] as $tag_key => $tag) {
 	$tags = [
 		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag')),
 		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value'))
 	];
 
