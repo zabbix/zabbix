@@ -957,6 +957,8 @@ define('RSM_SLV_DNS_AVAIL',					'rsm.slv.dns.avail');
 define('RSM_SLV_DNS_DOWNTIME',				'rsm.slv.dns.downtime');
 define('RSM_SLV_DNS_NS_DOWNTIME',			'rsm.slv.dns.ns.downtime');
 define('RSM_SLV_DNS_TCP_RTT_PFAILED',		'rsm.slv.dns.tcp.rtt.pfailed');
+define('RSM_SLV_DNS_TCP_RTT_FAILED',		'rsm.slv.dns.tcp.rtt.failed');
+define('RSM_SLV_DNS_TCP_RTT_MAX',			'rsm.slv.dns.tcp.rtt.max');
 define('RSM_SLV_DNS_UDP_RTT_PFAILED',		'rsm.slv.dns.udp.rtt.pfailed');
 define('RSM_SLV_DNS_UDP_UPD_PFAILED',		'rsm.slv.dns.udp.upd.pfailed');
 define('RSM_SLV_RDDS_DOWNTIME',				'rsm.slv.rdds.downtime');

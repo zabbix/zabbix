@@ -324,12 +324,17 @@ if ($data['filter_search']) {
 					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 						'&item_key='.$ns_item['key_'].'&filter_year='.$data['filter_year'].
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
+					),
+					SPACE,
+					new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.$ns_item['key_'].'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 					)
 				)
 			);
 		}
 
-		// TCP DNS resolution RTT.
+		// DNS TCP resolution RTT.
 		$item_hystory = DBfetch(DBselect(
 			'SELECT h.value'.
 			' FROM history_uint h'.
@@ -347,7 +352,7 @@ if ($data['filter_search']) {
 
 		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_DNS_TCP_RTT_LOW]['value']._('ms');
 		$data['services'][] = array(
-			'name' => 'TCP DNS resolution RTT',
+			'name' => 'DNS TCP resolution RTT',
 			'main' => false,
 			'details' => '-',
 			'from' => '-',
@@ -365,6 +370,11 @@ if ($data['filter_search']) {
 				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&item_key='.RSM_SLV_DNS_TCP_RTT_PFAILED.'&filter_year='.$data['filter_year'].
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
+				),
+				SPACE,
+				new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+					'&item_key='.RSM_SLV_DNS_TCP_RTT_PFAILED.'&filter_year='.$data['filter_year'].
+					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 				)
 			)
 		);
@@ -387,7 +397,7 @@ if ($data['filter_search']) {
 
 		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_DNS_UDP_RTT_LOW]['value']._('ms');
 		$data['services'][] = array(
-			'name' => 'UDP DNS resolution RTT',
+			'name' => 'DNS UDP resolution RTT',
 			'main' => false,
 			'details' => '-',
 			'from' => '-',

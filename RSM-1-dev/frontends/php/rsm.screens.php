@@ -164,7 +164,7 @@ switch ($data['item']['key_']) {
 			$table = new CTableInfo(_('No date found.'));
 			$table->setHeader(array(
 				_('Date'),
-				_('TLD')
+				_('SLV')
 			));
 
 			$item_values = API::History()->get(array(
@@ -215,10 +215,12 @@ switch ($data['item']['key_']) {
 			$table->setHeader(array(
 				_('Date'),
 				_('SLV'),
+				_('Failed tests'),
 				_('Maximum number of expected tests'),
 			));
 
-			$item_values = API::History()->get(array(
+			// Ratio of Failed tests against Maximum expected number of tests (%).
+			$pfail = API::History()->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => $data['item']['itemid'],
 				'time_from' => $start_time,
@@ -226,11 +228,67 @@ switch ($data['item']['key_']) {
 				'history' => $data['item']['value_type']
 			));
 
-			foreach ($item_values as $item_value) {
+			// Failed tests and maximum expected number of tests per month.
+			$item_keys = array(RSM_SLV_DNS_TCP_RTT_FAILED, RSM_SLV_DNS_TCP_RTT_MAX);
+			$items = API::Item()->get(array(
+				'output' => array('itemid', 'key_', 'value_type'),
+				'hostids' => $data['tld']['hostid'],
+				'filter' => array(
+					'key_' => $item_keys
+				)
+			));
+
+			if (count($item_keys) != count($items)) {
+				$missed_items = array();
+				foreach ($item_keys as $item_key) {
+					if (!array_key_exists($item_key, $items)) {
+						$missed_items[] = $item_key;
+					}
+				}
+
+				show_error_message(_s('Configuration error, cannot find items: "%1$s".', implode(', ', $missed_items)));
+				require_once dirname(__FILE__).'/include/page_footer.php';
+				exit;
+			}
+
+			foreach ($items as $item) {
+				if ($item['key_'] == RSM_SLV_DNS_TCP_RTT_FAILED) {
+					$fail = API::History()->get(array(
+						'output' => API_OUTPUT_EXTEND,
+						'itemids' => $item['itemid'],
+						'time_from' => $start_time,
+						'time_till' => $end_time,
+						'history' => $item['value_type']
+					));
+				}
+				else {
+					$max = API::History()->get(array(
+						'output' => API_OUTPUT_EXTEND,
+						'itemids' => $item['itemid'],
+						'time_from' => $start_time,
+						'time_till' => $end_time,
+						'history' => $item['value_type']
+					));
+				}
+			}
+
+			$test_results = array();
+			foreach ($pfail as $histoty) {
+				$test_results[date('d.m.Y H:i', $histoty['clock'])]['pfail'] = $histoty['value'];
+			}
+			foreach ($fail as $histoty) {
+				$test_results[date('d.m.Y H:i', $histoty['clock'])]['fail'] = $histoty['value'];
+			}
+			foreach ($max as $histoty) {
+				$test_results[date('d.m.Y H:i', $histoty['clock'])]['max'] = $histoty['value'];
+			}
+
+			foreach ($test_results as $key => $test_result) {
 				$table->addRow(array(
-					date('d.m.Y H:i', $item_value['clock']),
-					$item_value['value'],
-					'-'
+					$key,
+					(array_key_exists('pfail', $test_results)) ? $test_results['pfail'] : '-',
+					(array_key_exists('fail', $test_results)) ? $test_results['fail'] : '-',
+					(array_key_exists('max', $test_results)) ? $test_results['max'] : '-'
 				));
 			}
 
@@ -734,8 +792,7 @@ switch ($data['item']['key_']) {
 			$table = new CTableInfo(_('No date found.'));
 			$table->setHeader(array(
 				_('Date'),
-				_('SLV'),
-				_('Maximum number of expected tests'),
+				_('SLV')
 			));
 
 			$item_values = API::History()->get(array(
@@ -749,8 +806,7 @@ switch ($data['item']['key_']) {
 			foreach ($item_values as $item_value) {
 				$table->addRow(array(
 					date('d.m.Y H:i', $item_value['clock']),
-					$item_value['value'],
-					'-'
+					$item_value['value']
 				));
 			}
 
