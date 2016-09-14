@@ -963,6 +963,8 @@ define('RSM_SLV_DNS_UDP_RTT_PFAILED',		'rsm.slv.dns.udp.rtt.pfailed');
 define('RSM_SLV_DNS_UDP_RTT_FAILED',		'rsm.slv.dns.udp.rtt.failed');
 define('RSM_SLV_DNS_UDP_RTT_MAX',			'rsm.slv.dns.udp.rtt.max');
 define('RSM_SLV_DNS_UDP_UPD_PFAILED',		'rsm.slv.dns.udp.upd.pfailed');
+define('RSM_SLV_DNS_UDP_UPD_FAILED',		'rsm.slv.dns.udp.upd.failed');
+define('RSM_SLV_DNS_UDP_UPD_MAX',			'rsm.slv.dns.udp.upd.max');
 define('RSM_SLV_RDDS_DOWNTIME',				'rsm.slv.rdds.downtime');
 define('RSM_SLV_RDDS43_UPD_PFAILED',		'rsm.slv.rdds43.upd.pfailed');
 define('RSM_SLV_EPP_DOWNTIME',				'rsm.slv.epp.downtime');

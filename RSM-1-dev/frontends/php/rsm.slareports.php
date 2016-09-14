@@ -455,6 +455,11 @@ if ($data['filter_search']) {
 				new CLink(_('Graph'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&item_key='.RSM_SLV_DNS_UDP_UPD_PFAILED.'&filter_year='.$data['filter_year'].
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_1
+				),
+				SPACE,
+				new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+					'&item_key='.RSM_SLV_DNS_UDP_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 				)
 			)
 		);
