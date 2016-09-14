@@ -136,7 +136,7 @@ if ($data['action'] == 'problem.view') {
 					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
 						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Problem'),
 			(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

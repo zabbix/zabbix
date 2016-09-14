@@ -156,7 +156,7 @@ switch ($data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TEMPLATE:
@@ -171,7 +171,7 @@ switch ($data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST:
@@ -186,7 +186,7 @@ switch ($data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=hostid&writeonly=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER:
@@ -201,16 +201,16 @@ switch ($data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TIME_PERIOD:
 		$condition = (new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -228,7 +228,7 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$action_tab->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('drule', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('drule', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -241,7 +241,7 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$action_tab->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -254,7 +254,7 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$action_tab->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -268,7 +268,7 @@ switch ($data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_DHOST_IP:
 		$condition = (new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSERVICE_TYPE:
@@ -279,7 +279,7 @@ switch ($data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DSERVICE_PORT:
-		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSTATUS:
@@ -301,15 +301,15 @@ switch ($data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DVALUE:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_APPLICATION:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_EVENT_TYPE:
@@ -317,22 +317,22 @@ switch ($data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_HOST_METADATA:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_EVENT_TAG:
 		$condition = (new CTextBox('new_condition[value]', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag'));
 		break;
 
 	case CONDITION_TYPE_EVENT_TAG_VALUE:
 		$condition = (new CTextBox('new_condition[value]', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value'));
 
 		$condition2 = (new CTextBox('new_condition[value2]', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag'));
 		break;
 
