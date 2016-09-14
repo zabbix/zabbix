@@ -379,7 +379,7 @@ if ($data['filter_search']) {
 			)
 		);
 
-		// UDP DNS resolution RTT.
+		// DNS UDP resolution RTT.
 		$item_hystory = DBfetch(DBselect(
 			'SELECT h.value'.
 			' FROM history_uint h'.
@@ -415,6 +415,11 @@ if ($data['filter_search']) {
 				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&item_key='.RSM_SLV_DNS_UDP_RTT_PFAILED.'&filter_year='.$data['filter_year'].
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
+				),
+				SPACE,
+				new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+					'&item_key='.RSM_SLV_DNS_UDP_RTT_PFAILED.'&filter_year='.$data['filter_year'].
+					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 				)
 			)
 		);
