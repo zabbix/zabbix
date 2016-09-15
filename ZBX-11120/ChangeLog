@@ -1,8 +1,24 @@
-Changes for 3.2.0rc2
+Changes for 3.2.1rc1
 
 New features:
+..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
+..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.0
+
+New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), Hebrew, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.0rc2
+
+Bug fixes:
+........S. [ZBX-11182] fixed creating of recovery expressions for triggers created from trigger prototypes (Sasha)
+..F....... [ZBX-11182] added possibility to open lld-created trigger from list of items (Sasha)
 ........S. [ZBX-11189] fixed resolving of problems by event correlation on trigger level (Sasha)
 ........S. [ZBX-11187] improved performance of event tag processing by caching eventtagid and problemtagid (Sasha)
 ........S. [ZBX-11177] fixed sql errors while processing event correlation on trigger level (Sasha)
@@ -142,9 +158,14 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.5rc1
 
 New features:
+..F....... [ZBX-11136] increased width of input fields (Sasha)
+A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian translations; thanks to Zabbix translators (zalex_ua)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
+A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
+..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 ..F....... [ZBX-11040] added "page navigation" context to translation strings "First" and "Last"; replicated translations for "First" and "Last" in "page navigation" context from 2.2 branch (Cemeris)
 ..F....... [ZBX-11070] disallowed zabbix admin accessing notifications of users that does not share any user group (Cemeris)
@@ -1608,6 +1629,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
 .......PS. [ZBX-8489] removed ODBC request answer size limitation (viktors, wiper)
