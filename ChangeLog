@@ -162,6 +162,7 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
 ..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 ..F....... [ZBX-11040] added "page navigation" context to translation strings "First" and "Last"; replicated translations for "First" and "Last" in "page navigation" context from 2.2 branch (Cemeris)
