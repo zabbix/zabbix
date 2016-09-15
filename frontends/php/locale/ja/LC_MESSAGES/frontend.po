@@ -278,7 +278,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "対応済み障害イベント"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "障害対応コメント"
 
 #: app/views/administration.mediatype.edit.php:83

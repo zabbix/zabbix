@@ -289,7 +289,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Événements PROBLÈME acquittés"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Acquittements"
 
 #: app/views/administration.mediatype.edit.php:83
