@@ -109,16 +109,16 @@ $encryption_form_list = (new CFormList('encryption'))
 		new CLabel([new CCheckBox('tls_in_cert'), _('Certificate')])
 	])
 	->addRow(_('PSK identity'),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('PSK'),
-		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Issuer'),
-		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
-		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 $tabs->addTab('proxyTab', _('Proxy'), $proxy_form_list);
