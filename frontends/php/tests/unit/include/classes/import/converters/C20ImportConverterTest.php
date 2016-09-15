@@ -47,6 +47,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
+									'type' => ITEM_TYPE_SNMPV1,
+									'snmp_oid' => 'ifDescr',
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [
@@ -88,6 +90,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'type' => ITEM_TYPE_SNMPV2C,
+									'snmp_oid' => 'a,b,c',
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => '',
 									'item_prototypes' => [],
@@ -95,6 +99,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_SNMPV3,
+									'snmp_oid' => ',c:\\',
 									'status' => ITEM_STATUS_NOTSUPPORTED,
 									'filter' => ':',
 									'item_prototypes' => [],
@@ -102,6 +108,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => '{#MACRO}:regex',
 									'item_prototypes' => [],
@@ -131,6 +138,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
+									'type' => ITEM_TYPE_SNMPV1,
+									'snmp_oid' => 'discovery[{#SNMPVALUE},ifDescr]',
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [
@@ -173,6 +182,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_SNMPV2C,
+									'snmp_oid' => 'discovery[{#SNMPVALUE},"a,b,c"]',
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -185,6 +196,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_SNMPV3,
+									'snmp_oid' => ',c:\\',
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -197,6 +210,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -336,6 +350,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
+									'type' => ITEM_TYPE_SNMPV3,
+									'snmp_oid' => 'ifDescr\\',
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [
@@ -377,6 +393,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => '',
 									'item_prototypes' => [],
@@ -384,6 +401,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_NOTSUPPORTED,
 									'filter' => ':',
 									'item_prototypes' => [],
@@ -391,6 +409,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => '{#MACRO}:regex',
 									'item_prototypes' => [],
@@ -447,6 +466,8 @@ class C20ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
+									'type' => ITEM_TYPE_SNMPV3,
+									'snmp_oid' => 'discovery[{#SNMPVALUE},ifDescr\\]',
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [
@@ -489,6 +510,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -501,6 +523,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -513,6 +536,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'host_prototypes' => []
 								],
 								[
+									'type' => ITEM_TYPE_ZABBIX,
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [
 										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
