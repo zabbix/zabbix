@@ -617,8 +617,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	public function resolveTriggerUrls(array $triggers) {
 		$macros = [
 			'host' => [],
-			'interface' => [],
-			'item' => []
+			'interface' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -629,11 +628,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			],
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
-			],
-			'macro_funcs_n' => [
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
 			],
 			'usermacros' => true
 		];
@@ -664,26 +659,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
-			}
-
-			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-						'token' => $token,
-						'function' => $data['function'],
-						'parameters' => $data['parameters']
-					];
-				}
-			}
-
 			if ($matched_macros['usermacros']) {
 				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 			}
@@ -692,7 +667,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
 
 		if ($usermacros) {
 			// Get hosts for triggers.

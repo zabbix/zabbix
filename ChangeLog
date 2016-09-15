@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0
