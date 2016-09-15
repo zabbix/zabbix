@@ -49,7 +49,7 @@ if (!check_fields($fields)) {
  */
 $dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
-	'selectGraphItems' => ['itemid', 'calc_fnc', 'color', 'type'],
+	'selectGraphItems' => ['itemid', 'sortorder', 'color', 'calc_fnc', 'type'],
 	'selectHosts' => ['name'],
 	'graphids' => $_REQUEST['graphid']
 ]);
@@ -91,8 +91,7 @@ $graph->setHeight($height);
 
 // array sorting
 CArrayHelper::sort($dbGraph['gitems'], [
-	['field' => 'sortorder', 'order' => ZBX_SORT_UP],
-	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
+	['field' => 'sortorder', 'order' => ZBX_SORT_UP]
 ]);
 
 // get graph items
