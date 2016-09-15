@@ -290,7 +290,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Bestätigte PROBLEM-Ereignisse"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Bestätigungen"
 
 #: app/views/administration.mediatype.edit.php:83

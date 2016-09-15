@@ -303,7 +303,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Pripažinti PROBLEM įvykiai"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Pripažinimai"
 
 #: app/views/administration.mediatype.edit.php:83

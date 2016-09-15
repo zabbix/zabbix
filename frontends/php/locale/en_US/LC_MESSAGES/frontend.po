@@ -288,8 +288,8 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Acknowledged PROBLEM events"
 
 #: tr_events.php:117
-msgid "Acknowledges"
-msgstr "Acknowledges"
+msgid "Acknowledgements"
+msgstr "Acknowledgements"
 
 #: app/views/administration.mediatype.edit.php:83
 #: app/views/monitoring.dashboard.view.php:67
