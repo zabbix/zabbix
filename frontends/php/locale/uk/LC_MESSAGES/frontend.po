@@ -300,7 +300,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Підтверджені події ПРОБЛЕМА"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Підтвердження"
 
 #: app/views/administration.mediatype.edit.php:83
