@@ -108,10 +108,10 @@ $tags_table = (new CTable())->setId('tbl_tags');
 foreach ($data['tags'] as $tag_key => $tag) {
 	$tags_table->addRow([
 		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag')),
 		(new CTextBox('tags['.$tag_key.'][value]', $tag['value']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value')),
 		(new CCol(
 			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
