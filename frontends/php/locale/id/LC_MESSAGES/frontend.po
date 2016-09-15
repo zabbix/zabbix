@@ -277,7 +277,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Pemberitahuan event MASALAH"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Pemberitahuan"
 
 #: app/views/administration.mediatype.edit.php:83

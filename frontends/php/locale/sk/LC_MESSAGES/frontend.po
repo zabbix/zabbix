@@ -301,7 +301,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Potvrdené PROBLÉMOVÉ udalosti"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Potvrdenia"
 
 #: app/views/administration.mediatype.edit.php:83

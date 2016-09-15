@@ -278,7 +278,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "대응 완료 장애 이벤트"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "장애대응 코멘트"
 
 #: app/views/administration.mediatype.edit.php:83
