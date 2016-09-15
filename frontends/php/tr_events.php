@@ -114,7 +114,7 @@ $eventTab = (new CTable())
 			($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE)
 				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-					->setHeader(_('Acknowledges'), [], false, 'tr_events.php')
+					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
 				: null,
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($event['alerts'])))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
