@@ -136,7 +136,7 @@ if ($data['filter_search']) {
 					|| $template_macro['macro'] == RSM_TLD_RDDS80_ENABLED
 					|| $template_macro['macro'] == RSM_TLD_RDAP_ENABLED)) {
 				$rdds = true;
-				$item_keys = array_merge($item_keys, array(RSM_SLV_RDDS_DOWNTIME, RSM_SLV_RDDS43_UPD_PFAILED));
+				$item_keys = array_merge($item_keys, array(RSM_SLV_RDDS_DOWNTIME, RSM_SLV_RDDS_UPD_PFAILED));
 				$macro_keys = array_merge($macro_keys, array(RSM_SLV_MACRO_RDDS_AVAIL, RSM_SLV_RDDS_UPD,
 					RSM_RDDS_UPDATE_TIME
 				));
@@ -519,7 +519,7 @@ if ($data['filter_search']) {
 				$item_hystory = DBfetch(DBselect(
 					'SELECT h.value'.
 					' FROM history_uint h'.
-					' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS43_UPD_PFAILED]['itemid']).
+					' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS_UPD_PFAILED]['itemid']).
 						' AND h.value=0'.
 						' AND h.clock>='.zbx_dbstr($start_time).
 						' AND h.clock<'.zbx_dbstr($end_time).
@@ -544,13 +544,18 @@ if ($data['filter_search']) {
 					),
 					'screen' => array(
 						new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-							'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+							'&item_key='.RSM_SLV_RDDS_UPD_PFAILED.'&filter_year='.$data['filter_year'].
 							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_1
 						),
 						SPACE,
 						new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-							'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+							'&item_key='.RSM_SLV_RDDS_UPD_PFAILED.'&filter_year='.$data['filter_year'].
 							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
+						),
+						SPACE,
+						new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+							'&item_key='.RSM_SLV_RDDS_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 						)
 					)
 				);
@@ -585,6 +590,11 @@ if ($data['filter_search']) {
 					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 						'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
 						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH_2
+					),
+					SPACE,
+					new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_SCREEN
 					)
 				)
 			);
