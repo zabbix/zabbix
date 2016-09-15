@@ -28,8 +28,8 @@ class testFormLogin extends CWebTest {
 
 	public function testFormLogin_LoginLogout() {
 		$this->zbxTestOpen('index.php');
-		$this->zbxTestInputTypeWait('name', 'Admin');
-		$this->zbxTestInputTypeWait('password', 'zabbix');
+		$this->zbxTestInputTypeOverwrite('name', 'Admin');
+		$this->zbxTestInputTypeOverwrite('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextNotPresent('Login name or password is incorrect.');
 
