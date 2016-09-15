@@ -1843,14 +1843,17 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['name'])){
 			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 
 		if (isset($data['def_shortdata'])){
-			$this->zbxTestInputTypeWait('def_shortdata', $data['def_shortdata']);
+			$this->zbxTestInputTypeOverwrite('def_shortdata', $data['def_shortdata']);
+			$this->zbxTestAssertElementValue('def_shortdata', $data['def_shortdata']);
 		}
 
 		if (isset($data['def_longdata'])){
-			$this->zbxTestInputTypeWait('def_longdata', $data['def_longdata']);
+			$this->zbxTestInputTypeOverwrite('def_longdata', $data['def_longdata']);
+			$this->zbxTestAssertElementValue('def_longdata', $data['def_longdata']);
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
