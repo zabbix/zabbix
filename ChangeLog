@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+..F....... [ZBX-11120] fixed checkbox functionality and display of undefined indexes in trigger expression and recovery expression constructor (Ivo)
 A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
 ..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
 
