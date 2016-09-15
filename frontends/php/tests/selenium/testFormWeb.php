@@ -546,7 +546,10 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}
 
-		$this->zbxTestTabSwitch('Steps');
+		$this->zbxTestClickWait('tab_stepTab');
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != 'Steps' ) {
+			$this->zbxTestTabSwitch('Steps');
+		}
 		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes', 'Action']);
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
