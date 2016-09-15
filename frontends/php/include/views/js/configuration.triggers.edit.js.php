@@ -2,10 +2,10 @@
 <?=
 	(new CRow([
 		(new CTextBox('tags[#{rowNum}][tag]', '', false, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag')),
 		(new CTextBox('tags[#{rowNum}][value]', '', false, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value')),
 		(new CCol(
 			(new CButton('tags[#{rowNum}][remove]', _('Remove')))
