@@ -288,7 +288,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "אירועי תקלה מוכרים"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "הכרות"
 
 #: app/views/administration.mediatype.edit.php:83

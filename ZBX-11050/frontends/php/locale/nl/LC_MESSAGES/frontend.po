@@ -291,7 +291,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Bevestigde gebeurtenissen met status Probleem"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Bevestigingen"
 
 #: app/views/administration.mediatype.edit.php:83

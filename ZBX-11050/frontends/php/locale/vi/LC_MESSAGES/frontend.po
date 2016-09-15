@@ -278,7 +278,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Sự cố được ghi nhận"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Những ghi nhận"
 
 #: app/views/administration.mediatype.edit.php:83
