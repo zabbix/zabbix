@@ -1693,7 +1693,10 @@ button::-moz-focus-inner {
 }
 
 button {
-	font-family: $font-stack;
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	border: 1px solid $btn-bg-color;
