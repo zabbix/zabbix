@@ -485,13 +485,35 @@ class CUserGroup extends CZBXAPI {
 					if (!isset($linkedUsers[$usrgrpid][$userid])) {
 						$userUsergroupLinksToInsert[] = array(
 							'usrgrpid' => $usrgrpid,
-							'userid' => $userid,
+							'userid' => $userid
 						);
 					}
 					unset($linkedUsers[$usrgrpid][$userid]);
 				}
+
 				if (isset($linkedUsers[$usrgrpid]) && !empty($linkedUsers[$usrgrpid])) {
-					$userIdsToUnlink = array_merge($userIdsToUnlink, array_keys($linkedUsers[$usrgrpid]));
+					foreach (array_keys($linkedUsers[$usrgrpid]) as $unlinkid) {
+						$users = API::User()->get(array(
+							'userids' => $unlinkid,
+							'output' => array('userid', 'alias'),
+							'selectUsrgrps' => array('usrgrpid'),
+							'preservekeys' => true
+						));
+
+						foreach ($users[$unlinkid]['usrgrps'] as $key => $user_group) {
+							if ($user_group['usrgrpid'] == $usrgrpid) {
+								unset($users[$unlinkid]['usrgrps'][$key]);
+							}
+						}
+
+						if (!$users[$unlinkid]['usrgrps']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('User "%s" cannot be without user group.', $users[$unlinkid]['alias'])
+							);
+						}
+
+						$userIdsToUnlink[] = $unlinkid;
+					}
 				}
 			}
 
