@@ -396,6 +396,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestCheckFatalErrors();
 	}
 
+	public function zbxTestTabSwitchById($id, $tab) {
+		$this->zbxTestClickWait($id);
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != $tab ) {
+			$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
+		}
+		$this->zbxTestCheckFatalErrors();
+	}
+
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		$this->zbxTestClickWait($buttonId);
