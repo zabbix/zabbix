@@ -11,6 +11,7 @@ New features:
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 ..F....... [ZBX-11050] changed translation string "Acknowledges" => "Acknowledgements" (Cemeris)
 A......... [ZBX-11196] implemented dynamic default sortorder for icon map mappings, now default sortorder increases by one with each entry of mapping (Cemeris)
 ..F....... [ZBX-11202] fixed timeline in Problem view which shows "Yesterday" instead of "Today" (Sasha)
