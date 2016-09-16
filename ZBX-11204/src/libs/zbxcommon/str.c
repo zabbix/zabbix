@@ -1873,8 +1873,8 @@ clean:
 void	remove_param(char *p, int num)
 {
 	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
-	int	idx = 1;
-	char	*buf;
+	int	idx = 1, skip_char = 0;
+	char	*buf, *prev = NULL;
 
 	for (buf = p; '\0' != *p; p++)
 	{
@@ -1884,21 +1884,22 @@ void	remove_param(char *p, int num)
 				if (',' == *p)
 				{
 					if (1 == idx && 1 == num)
-						p++;
+						skip_char = 1;
 					idx++;
 				}
 				else if ('"' == *p)
 					state = 1;
 				break;
-			case 1:			/* in quoted param */
-				if ('"' == *p)
+			case 1:			/* in quoted parameter */
+				if ('"' == *p && (NULL == prev || '\\' != *prev))
 					state = 0;
-				else if ('\\' == *p && '"' == p[1])
-					p++;
 				break;
 		}
-		if (idx != num)
+		if (idx != num && 0 == skip_char)
 			*buf++ = *p;
+
+		skip_char = 0;
+		prev = p;
 	}
 
 	*buf = '\0';
