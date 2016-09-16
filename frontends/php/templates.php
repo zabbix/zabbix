@@ -157,21 +157,32 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 	$_REQUEST['hosts'] = [];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$templateId = getRequest('templateid');
-
 	try {
 		DBstart();
+
+		$templateId = getRequest('templateid', 0);
+
+		if ($templateId == 0) {
+			$messageSuccess = _('Template added');
+			$messageFailed = _('Cannot add template');
+			$auditAction = AUDIT_ACTION_ADD;
+		}
+		else {
+			$messageSuccess = _('Template updated');
+			$messageFailed = _('Cannot update template');
+			$auditAction = AUDIT_ACTION_UPDATE;
+		}
 
 		$templates = getRequest('templates', []);
 		$templateName = getRequest('template_name', '');
 
 		// clone template id
-		$cloneTemplateId = null;
+		$cloneTemplateId = 0;
 		$templatesClear = getRequest('clear_templates', []);
 
 		if (getRequest('form') === 'full_clone') {
 			$cloneTemplateId = $templateId;
-			$templateId = null;
+			$templateId = 0;
 		}
 
 		// macros
@@ -188,6 +199,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = API::HostGroup()->create([
 				'name' => $newGroup
 			]);
+
+			if (!$result) {
+				throw new Exception();
+			}
 
 			$newGroup = API::HostGroup()->get([
 				'groupids' => $result['groupids'],
@@ -230,24 +245,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'description' => getRequest('description', '')
 		];
 
-		if ($templateId) {
-			$template['templateid'] = $templateId;
-			$template['templates_clear'] = $templatesClear;
-
-			$messageSuccess = _('Template updated');
-			$messageFailed = _('Cannot update template');
-			$auditAction = AUDIT_ACTION_UPDATE;
-
-			$result = API::Template()->update($template);
-			if (!$result) {
-				throw new Exception();
-			}
-		}
-		else {
-			$messageSuccess = _('Template added');
-			$messageFailed = _('Cannot add template');
-			$auditAction = AUDIT_ACTION_ADD;
-
+		if ($templateId == 0) {
 			$result = API::Template()->create($template);
 
 			if ($result) {
@@ -257,9 +255,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 		}
+		else {
+			$template['templateid'] = $templateId;
+			$template['templates_clear'] = $templatesClear;
+
+			$result = API::Template()->update($template);
+
+			if (!$result) {
+				throw new Exception();
+			}
+		}
 
 		// full clone
-		if ($templateId && $cloneTemplateId && getRequest('form') === 'full_clone') {
+		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
 			if (!copyApplications($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
