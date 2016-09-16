@@ -31,7 +31,7 @@ SELECT (SELECT MAX(graphthemeid) FROM graph_theme) + 1 AS graphthemeid,
 INSERT INTO graph_theme (graphthemeid, description, theme, backgroundcolor, graphcolor, graphbordercolor, gridcolor,
 	maingridcolor, gridbordercolor, textcolor, highlightcolor, leftpercentilecolor, rightpercentilecolor, nonworktimecolor,
 	gridview, legendview)
-SELECT (SELECT MAX(graphthemeid) FROM graph_theme) + 2 AS graphthemeid,
+SELECT (SELECT MAX(graphthemeid) FROM graph_theme) + 1 AS graphthemeid,
 	'Classic' AS description,
 	'classic' AS theme,
 	'F0F0F0' AS backgroundcolor,
