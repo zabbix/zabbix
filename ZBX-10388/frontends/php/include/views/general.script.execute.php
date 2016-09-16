@@ -20,9 +20,14 @@
 
 
 return (new CWidget())
+	->setTitle($data['name'])
 	->addItem(
 		(new CForm())
 			->addItem(
-				(new CTabView())->addTab('scriptTab', null, new CPre($data['message']))
+				(new CTabView())->addTab('scriptTab', null,
+					(new CPre(
+						(new CList([bold($data['command']), SPACE, $data['message']]))
+					))
+				)
 			)
 	);

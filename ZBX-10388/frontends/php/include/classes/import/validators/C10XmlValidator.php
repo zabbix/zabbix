@@ -25,6 +25,18 @@
 class C10XmlValidator {
 
 	/**
+	 * @var string
+	 */
+	private $format;
+
+	/**
+	 * @param string $format format of import source
+	 */
+	public function __construct($format) {
+		$this->format = $format;
+	}
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array  $data	import data
@@ -329,7 +341,7 @@ class C10XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 
 	/**
@@ -343,7 +355,7 @@ class C10XmlValidator {
 	 */
 	public function validateDate($data, array $parent_data = null, $path) {
 		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $data)) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
 		}
 
 		return $data;
@@ -360,7 +372,7 @@ class C10XmlValidator {
 	 */
 	public function validateTime($data, array $parent_data = null, $path) {
 		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $data)) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
 		}
 
 		return $data;
@@ -378,11 +390,11 @@ class C10XmlValidator {
 	public function validateYMinItem($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['ymin_type']) && $parent_data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
-				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 			}
 		}
 		elseif ($data !== '') {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('an empty string is expected')));
 		}
 
 		return $data;
@@ -400,11 +412,11 @@ class C10XmlValidator {
 	public function validateYMaxItem($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['ymax_type']) && $parent_data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
-				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 			}
 		}
 		elseif ($data !== '') {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('an empty string is expected')));
 		}
 
 		return $data;
@@ -421,7 +433,7 @@ class C10XmlValidator {
 	 */
 	public function validateGraphItem($data, array $parent_data = null, $path) {
 		if (strpos($data, ':') === false) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 		}
 
 		return $data;
@@ -490,7 +502,7 @@ class C10XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 		}
 
 		return $data;

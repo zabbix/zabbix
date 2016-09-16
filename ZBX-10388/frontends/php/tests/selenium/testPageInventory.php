@@ -39,7 +39,7 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckTitle('Host inventory');
-		$this->zbxTestTextPresent('HOST INVENTORY');
+		$this->zbxTestCheckHeader('Host inventory');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(
 			['Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A']
@@ -71,7 +71,7 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestClickWait('cancel');
 
 		$this->zbxTestCheckTitle('Host inventory');
-		$this->zbxTestTextPresent('HOST INVENTORY');
+		$this->zbxTestCheckHeader('Host inventory');
 	}
 
 }

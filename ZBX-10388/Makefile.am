@@ -61,11 +61,11 @@ gettext:
 	frontends/php/locale/make_mo.sh
 
 css_theme_blue:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
+	sass --no-cache --sourcemap=none --style=compressed sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
 	cp frontends/php/styles/blue-theme.css sass/stylesheets/screen.css
 
 css_theme_dark:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
+	sass --no-cache --sourcemap=none --style=compressed sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
 css_icons:

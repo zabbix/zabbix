@@ -64,11 +64,11 @@ class CControllerDiscoveryView extends CController {
 	}
 
 	protected function doAction() {
-		$sort = $this->getInput('sort', CProfile::get('web.discovery.php.sort', 'ip'));
-		$sortorder = $this->getInput('sortorder', CProfile::get('web.discovery.php.sortorder', ZBX_SORT_UP));
+		$sortField = $this->getInput('sort', CProfile::get('web.discovery.php.sort', 'ip'));
+		$sortOrder = $this->getInput('sortorder', CProfile::get('web.discovery.php.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.discovery.php.sort', $sort, PROFILE_TYPE_STR);
-		CProfile::update('web.discovery.php.sortorder', $sortorder, PROFILE_TYPE_STR);
+		CProfile::update('web.discovery.php.sort', $sortField, PROFILE_TYPE_STR);
+		CProfile::update('web.discovery.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		/*
 		 * Display
@@ -76,8 +76,8 @@ class CControllerDiscoveryView extends CController {
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'druleid' => $this->getInput('druleid', 0),
-			'sort' => $sort,
-			'sortorder' => $sortorder
+			'sort' => $sortField,
+			'sortorder' => $sortOrder
 		];
 
 		$data['pageFilter'] = new CPageFilter([

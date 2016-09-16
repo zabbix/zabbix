@@ -52,8 +52,6 @@ class API_JSON_Map extends CZabbixTest {
 	 * @dataProvider map_data
 	 */
 	public function testCMap_Create($maps) {
-		$debug = null;
-
 		DBsave_tables('sysmaps');
 
 		// creating map

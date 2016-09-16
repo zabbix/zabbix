@@ -132,7 +132,7 @@ var timeControl = {
 						obj.objDims.width = 0;
 					}
 
-					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
+					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 23);
 				}
 
 				// url
@@ -640,13 +640,13 @@ var CScrollBar = Class.create({
 
 	setBarPosition: function(rightSide, periodWidth, setTimeLine) {
 		if (empty(periodWidth)) {
-			var periodWidth =  null;
+			periodWidth = null;
 		}
 		if (empty(rightSide)) {
-			var rightSide = null;
+			rightSide = null;
 		}
 		if (empty(setTimeLine)) {
-			var setTimeLine = false;
+			setTimeLine = false;
 		}
 
 		var width = 0;

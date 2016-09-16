@@ -87,6 +87,13 @@ class CJson {
 	protected $_level;
 
 	/**
+	 * Last error of $this->decode() method.
+	 *
+	 * @var int
+	 */
+	protected $last_error;
+
+	/**
 	 *
 	 * Constructor.
 	 *
@@ -103,6 +110,8 @@ class CJson {
 	public function __construct($config = null) {
 		$this->_mapAscii();
 		$this->_setStateTransitionTable();
+
+		$this->last_error = JSON_ERROR_NONE;
 	}
 
 	/**
@@ -226,11 +235,16 @@ class CJson {
 	 */
 	public function decode($encodedValue, $asArray = false) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_decode')) {
-			return json_decode($encodedValue, (bool) $asArray);
+			$result = json_decode($encodedValue, $asArray);
+			$this->last_error = json_last_error();
+			return $result;
 		}
+
+		$this->last_error = JSON_ERROR_NONE;
 
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if ($first_char != '{' && $first_char != '[') {
+			$this->last_error = JSON_ERROR_SYNTAX;
 			return null;
 		}
 
@@ -241,10 +255,20 @@ class CJson {
 		$result = null;
 
 		if ($this->isValid($encodedValue)) {
-			$result = $this->_json_decode($encodedValue, (bool) $asArray);
+			$result = $this->_json_decode($encodedValue, $asArray);
 		}
 
+		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : $result;
 		return $result;
+	}
+
+	/**
+	 * Returns true if last $this->decode call was with error.
+	 *
+	 * @return bool
+	 */
+	public function hasError() {
+		return ($this->last_error != JSON_ERROR_NONE);
 	}
 
 	/**

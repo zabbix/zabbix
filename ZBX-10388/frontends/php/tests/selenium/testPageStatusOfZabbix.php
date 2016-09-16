@@ -22,18 +22,15 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageStatusOfZabbix extends CWebTest {
 	public function testPageStatusOfZabbix_CheckLayout() {
-		$this->zbxTestLogin('report1.php');
+		$this->zbxTestLogin('zabbix.php?action=report.status');
 		$this->zbxTestCheckTitle('Status of Zabbix');
-		$this->zbxTestTextPresent('STATUS OF ZABBIX');
-
-		// header
+		$this->zbxTestCheckHeader('Status of Zabbix');
 		$this->zbxTestTextPresent(['Parameter', 'Value', 'Details']);
 
-		// data
 		$this->zbxTestTextPresent('Zabbix server is running');
 		$this->zbxTestTextPresent('Number of hosts (enabled/disabled/templates)');
 		$this->zbxTestTextPresent('Number of items (enabled/disabled/not supported)');
-		$this->zbxTestTextPresent('Number of triggers (enabled/disabled) [problem/ok]');
+		$this->zbxTestTextPresent('Number of triggers (enabled/disabled [problem/ok])');
 		$this->zbxTestTextPresent('Number of users (online)');
 		$this->zbxTestTextPresent('Required server performance, new values per second');
 	}

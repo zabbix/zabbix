@@ -141,10 +141,10 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
-	int		ret;
+	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
-	int             (*function)();
+	int             (*function)(DC_ITEM *, AGENT_RESULT *);
 
 #ifdef HAVE_SSH2
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -158,9 +158,18 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	memset(&item, 0, sizeof(item));
 	memcpy(&item.host, host, sizeof(item.host));
 
-	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_AGENT)))
+	for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
-		zbx_snprintf(error, max_error_len, "Zabbix agent interface is not defined for host [%s]", host->host);
+		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid,
+				INTERFACE_TYPE_PRIORITY[i])))
+		{
+			break;
+		}
+	}
+
+	if (FAIL == ret)
+	{
+		zbx_snprintf(error, max_error_len, "No interface defined for host [%s]", host->host);
 		goto fail;
 	}
 

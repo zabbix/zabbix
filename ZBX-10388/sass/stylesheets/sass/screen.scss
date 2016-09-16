@@ -16,35 +16,37 @@ body {
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
-	margin-bottom: 60px; 
+	margin-bottom: 60px;
 	min-width: 950px;
 }
 
 a {
-  
+
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
 	&:visited {
 		color: $link-visited-color;
-		text-decoration: none; 
+		text-decoration: none;
 	}
 
 	&:hover {
-		color: $link-hover-color; 
+		outline: 0;
+		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
+		position: relative;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
+		outline: 0;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
@@ -112,8 +114,6 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid $ui-border-color;
-	padding: 0 0 5px 0;
 }
 
 h2 {
@@ -158,7 +158,7 @@ ol {
 
 	li {
 		padding: 0 0 0.7em 0;
-	} 
+	}
 }
 
 p {
@@ -231,8 +231,9 @@ nav {
 }
 
 .top-nav-container {
-	height: 49px;
-	line-height: 49px;
+	height: 45px;
+	line-height: 45px;
+	padding: 0 10px 0 10px;
 	position: relative;
 	background-color: $main-nav-bg-color;
 }
@@ -256,23 +257,23 @@ nav {
 				left: 0;
 				right: 0;
 				margin: 0 auto;
-				width: 0; 
+				width: 0;
 				height: 0;
 				font-size: 0;
 				line-height: 0;
-				border-left: 9px solid transparent;
-				border-right: 9px solid transparent;
-			    border-bottom: 9px solid $main-subnav-bg-color;
+				border-left: 9px solid $transparent;
+				border-right: 9px solid $transparent;
+				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
 				color: $link-main-nav-active-color;
 			}
-	    }
+		}
 	}
 
 	a {
-		padding: 17px 13px;
+		padding: 15px 10px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 		cursor: pointer;
@@ -292,6 +293,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
+			background-color: $ui-hover-color;
 		}
 
 		&:active {
@@ -303,17 +305,19 @@ nav {
 ul.top-nav-icons {
 	position: absolute;
 	top: 0;
-	right: 0;
+	right: 10px;
 
 	li {
 		display: block;
 		float: left;
+		padding: 0 0 0 10px;
 
 		.search-suggest {
 			min-width: 186px;
 
 			li {
 				float: none;
+				padding: 0.4em 5px;
 
 				a {
 					opacity: inherit;
@@ -325,12 +329,13 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 38px;
-		height: 49px;
-		line-height: 49px;
+		width: 24px;
+		height: 45px;
+		line-height: 45px;
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
+		outline: 0;
 		@include opacity(0.75);
 		@include transition(opacity .2s ease-out);
 
@@ -339,27 +344,27 @@ ul.top-nav-icons {
 		}
 
 		&:focus {
+			background-color: $ui-hover-color !important;
 			@include opacity(1);
 		}
-    }
+	}
 
 	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -30px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
 	}
 
 	.top-nav-profile {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -102px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
 	}
 
 	.top-nav-signout {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -138px;
-		width: 44px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -140px;
 	}
 
 	.top-nav-zbbshare {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -66px;
-	    width: auto;
-		padding: 0 12px 0 27px;
+		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
+		width: auto;
+		padding: 0 6px 0 17px;
 		-webkit-transform-style: preserve-3d;
 	}
 
@@ -371,7 +376,7 @@ ul.top-nav-icons {
 		background-color: darken($main-nav-bg-color, 7%);
 		border: 1px solid darken($main-nav-bg-color, 10%);
 		width: 198px;
-		margin: 6px 7px 0 0;
+		margin: 6px 3px 0 0;
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
@@ -389,11 +394,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
-	height: 32px;
-	line-height: 32px;
+	height: 30px;
+	line-height: 30px;
 	background-color: $main-subnav-bg-color;
 	position: relative;
-	padding: 0 13px;
+	padding: 0 10px;
 }
 
 .top-subnav {
@@ -404,16 +409,16 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		padding: 0 12px;
+		padding: 0 10px;
 
 		&:last-child {
-			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
 
 .top-subnav a {
-	padding: 9px 1px;
+	padding: 8px 0;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -437,7 +442,7 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
-		padding: 9px 1px 6px 1px;
+		padding: 8px 0 5px 0;
 		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
 	}
 }
@@ -471,8 +476,8 @@ ul.top-nav-icons {
 }
 
 %arrow {
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	font-size: 0;
 	line-height: 0;
 	display: inline-block;
@@ -481,35 +486,44 @@ ul.top-nav-icons {
 
 .header-title {
 	position: relative;
+	width: 100%;
+	padding: 0 0 6px 0;
 	margin: 0 0 10px 0;
+	text-align: right;
+	border-bottom: 1px solid $ui-border-color;
+
+	h1 {
+		text-align: left;
+	}
+
+	form {
+		display: inline-block;
+	}
 
 	ul {
-		position: absolute;
-		right: 0;
-		bottom: 6px;
 
 		li {
-			display: block;
-			float: left;
+			display: inline-block;
+			vertical-align: top;
 			position: relative;
-			padding: 0 0 0 14px;
+			padding: 0 0 0 10px;
 		}
 	}
 }
 
 // Article
 article {
-	padding: 13px 13px 0 13px;
+	padding: 10px 10px 0 10px;
 }
 
 .article {
 	@extend article;
 }
 
-// Obgect Group Navigation
+// Object Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
-	
+
 	li {
 		display: inline-block;
 		padding: 0 5px 0 0;
@@ -540,7 +554,7 @@ article {
 }
 
 .hor-list {
-	
+
 	li {
 		display: inline-block;
 		margin: 0 6px 0 0;
@@ -554,18 +568,11 @@ article {
 // Footer
 footer {
 	position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 30px;
+	bottom: 0;
+	width: 100%;
+	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
-
-	a {
-
-		&.logo {
-			border: none;
-		}
-	}
 }
 
 .footer {
@@ -577,75 +584,77 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 12px 9px 0 13px;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
+}
+
+.header-logo {
+	float: left;
+	display: block;
+	margin: 10px 10px 0 0;
 }
 
 // Tables
 .list-table {
 	width: 100%;
-    background-color: $ui-bg-color;
-    border: 1px solid $ui-border-color;
-	
+	background-color: $ui-bg-color;
+	border-collapse: separate;
+	border: 1px solid $ui-border-color;
+
 	thead th {
-		font-size: $font-h3-size;
 		color: $font-alt-color;
-		text-transform: $font-transform;
-		letter-spacing: 0.0688em;
-		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 8px 5px 6px 5px;
-	    vertical-align: bottom;
-	    border-bottom: 2px solid $table-border-color;
-	    text-align: left;
+		padding: 6px 5px;
+		vertical-align: bottom;
+		border-bottom: 2px solid darken($table-border-color, 5%);
+		text-align: left;
 
-	    .arrow-up {
-	    	margin: 0 0 0 4px;
-	    	border-bottom-color: $font-alt-color;
-	    }
+		.arrow-up {
+			margin: 0 0 0 3px;
+			border-bottom-color: $font-alt-color;
+		}
 
-	    .arrow-right {
-	    	margin: 0 0 0 4px;
-	    	border-left-color: $font-alt-color;
-	    }
+		.arrow-right {
+			margin: 0 0 0 3px;
+			border-left-color: $font-alt-color;
+		}
 
-	    .arrow-down {
-	    	margin: 0 0 0 4px;
-	    	border-top-color: $font-alt-color;
-	    }
+		.arrow-down {
+			margin: 0 0 0 3px;
+			border-top-color: $font-alt-color;
+		}
 
-	    .treeview {
+		.treeview {
 
-	    	span {
-	    		margin: 0;
-	    	}
-	    }
+			span {
+				margin: 0;
+			}
+		}
 
-	    a {
-	    	display: block;
-	    	position: relative;
-	    	margin: -1em;
-	    	padding: 1em;
-	    	border: none;
-	    	@include transition(background-color .2s ease-out);
+		a {
+			display: block;
+			position: relative;
+			margin: -1em;
+			padding: 1em;
+			border: none;
+			@include transition(background-color .2s ease-out);
 
-	    	&:hover {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:hover {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
 
-	    	&:focus {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:focus {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
 
-	    	&:active {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}	    
-	    }
+			&:active {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
+		}
 	}
 
 	tbody tr {
@@ -660,8 +669,8 @@ footer {
 		}
 
 		&.nothing-to-show {
-				@extend %nothing-to-show;
-			}
+			@extend %nothing-to-show;
+		}
 
 		&:last-child td {
 			border-bottom: none;
@@ -669,7 +678,7 @@ footer {
 	}
 
 	td {
-		padding: 8px 5px;
+		padding: 6px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -684,7 +693,7 @@ footer {
 	text-align: center;
 	background-color: $ui-bg-color;
 	margin-top: -1px;
-	padding: 7px 5px;
+	padding: 4px 5px;
 	overflow: hidden;
 	position: relative;
 	border: 1px solid $ui-border-color;
@@ -703,9 +712,9 @@ footer {
 .table-stats {
 	color: $font-alt-color;
 	display: inline-block;
-    padding: 4px 0;
-    position: absolute;
-    right: 5px;
+	padding: 4px 0;
+	position: absolute;
+	right: 5px;
 }
 
 .radio-switch {
@@ -722,6 +731,7 @@ footer {
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $font-color;
+	outline: 0;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
@@ -755,7 +765,7 @@ footer {
 	&.paging-selected {
 		color: $font-selected-color;
 		border-color: $ui-bg-selected-color;
-		background-color: $ui-bg-selected-color;	
+		background-color: $ui-bg-selected-color;
 		position: relative;
 		z-index: 1;
 
@@ -821,10 +831,16 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 16px;
-	height: 18px;
-	line-height: 18px;
+	width: 14px;
+	height: 16px;
+	min-height: auto;
+	line-height: 16px;
+	padding: 0;
+	margin: 0 2px 0 0;
+	cursor: auto;
 	text-align: center;
+	border: none;
+	background-color: $transparent;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -835,20 +851,16 @@ footer {
 		border-top-color: $font-alt-color;
 	}
 
-	&:hover .arrow-right {
-		border-left-color: $link-color;
-	}
+	&:hover, &:focus {
+		background-color: $transparent;
 
-	&:focus .arrow-right {
-		border-left-color: $link-color;
-	}
+		.arrow-right {
+			border-left-color: $link-color;
+		}
 
-	&:hover .arrow-down {
-		border-top-color: $link-color;
-	}
-
-	&:focus .arrow-down {
-		border-top-color: $link-color;
+		.arrow-down {
+			border-top-color: $link-color;
+		}
 	}
 }
 
@@ -863,6 +875,13 @@ footer {
 .cell {
 	display: table-cell;
 	vertical-align: top;
+
+	&:last-child {
+
+		.dashbrd-widget {
+			margin: 0 0 10px 0;
+		}
+	}
 }
 
 .adm-img {
@@ -896,7 +915,7 @@ footer {
 }
 
 .filter-container {
-	padding: 15px 0 10px 0;
+	padding: 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -909,17 +928,13 @@ footer {
 		padding: 0 10px;
 	}
 
-	.list-table {                                       
+	.list-table {
 		margin-bottom: -10px;
 		border: none;
 
 		thead {
 
 			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
 				color: initial;
 				padding: 8px 5px 5px 5px;
 				border-bottom-width: 1px;
@@ -1070,7 +1085,7 @@ footer {
 .multiselect-matches {
 	padding: 0.4em 5px;
 	color: $font-color;
-	font-weight: bold; 
+	font-weight: bold;
 	@extend .multiselect-suggest;
 }
 
@@ -1106,11 +1121,11 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $action-hover-color;
-	background-color: $action-hover-color;
+	border: 1px solid $table-border-color;
+	background-color: $table-border-color;
 	margin: 5px 0;
 	@include border-radius(2px);
-	
+
 	button {
 
 		&:first-child {
@@ -1229,7 +1244,7 @@ footer {
 
 		a {
 			margin: 0 4px;
-		} 
+		}
 	}
 
 	.period {
@@ -1280,11 +1295,7 @@ footer {
 	}
 
 	th {
-		font-size: $font-h3-size;
 		color: $font-alt-color;
-		text-transform: $font-transform;
-		letter-spacing: 0.0688em;
-		text-rendering: optimizeLegibility;
 		padding: 0 5px 0 0;
 
 		&:last-child {
@@ -1343,14 +1354,14 @@ footer {
 				margin-right: 5px;
 			}
 
-			 &.center {
-			 	text-align: center;
-			 	vertical-align: middle;
+			&.center {
+				text-align: center;
+				vertical-align: middle;
 
-			 	.btn-grey {
-			 		margin: 3px 0;
-			 	}
-			 }
+				.btn-grey {
+					margin: 3px 0;
+				}
+			}
 		}
 	}
 
@@ -1486,13 +1497,13 @@ footer {
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;;	
+			background-color: $ui-bg-selected-color;
 			position: relative;
 			z-index: 1;
 		}
 
 		&:checked:focus + label {
-			border-color: $form-border-focus-color;	
+			border-color: $form-border-focus-color;
 			position: relative;
 			z-index: 2;
 		}
@@ -1524,7 +1535,7 @@ input {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	
+
 	&[type="text"] {
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
@@ -1575,7 +1586,7 @@ input {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}  
+	}
 }
 
 textarea {
@@ -1596,7 +1607,7 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}   
+	}
 }
 
 select {
@@ -1604,6 +1615,7 @@ select {
 		family: $font-stack;
 		size: $font-form-size;
 	}
+
 	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
@@ -1635,7 +1647,7 @@ select {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}   
+	}
 }
 
 .form-input-margin {
@@ -1697,6 +1709,7 @@ button {
 	}
 
 	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
@@ -1774,10 +1787,11 @@ button {
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
-	top: 13px;
-	right: 8px;
+	top: 11px;
+	right: 4px;
 	width: 24px;
 	min-height: 22px;
+	height: 22px;
 	padding: 0;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
@@ -1837,10 +1851,10 @@ $icon-btn: (
 );
 
 @each $icon-btn, $bgimage in $icon-btn {
-    .btn-#{$icon-btn} {
-        background: $bgimage;
-        @extend %button-icon-size;
-    }
+	.btn-#{$icon-btn} {
+		background: $bgimage;
+		@extend %button-icon-size;
+	}
 }
 
 $icon-widget-btn: (
@@ -1854,10 +1868,10 @@ $icon-widget-btn: (
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
-    .btn-#{$icon-widget-btn} {
-        background: $bgimage;
-        @extend %btn-widget;
-    }
+	.btn-#{$icon-widget-btn} {
+		background: $bgimage;
+		@extend %btn-widget;
+	}
 }
 
 %btn-widget {
@@ -1875,6 +1889,7 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
+		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -1967,8 +1982,8 @@ button[disabled] {
 }
 
 .ui-tabs-nav {
-	height: 36px;
-	line-height: 36px;
+	height: 30px;
+	line-height: 30px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1976,7 +1991,7 @@ button[disabled] {
 
 		a {
 			@extend %no-border;
-			padding: 11px 13px;
+			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
 			&:hover {
@@ -1990,7 +2005,7 @@ button[disabled] {
 			&:active {
 				background-color: $ui-hover-color;
 			}
-		} 
+		}
 
 		&.ui-tabs-active:first-child {
 			border-left: 0;
@@ -1999,7 +2014,7 @@ button[disabled] {
 		&.ui-tabs-active {
 
 			a {
-				padding: 11px 13px 9px 13px;
+				padding: 8px 10px 6px 10px;
 				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
@@ -2014,6 +2029,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
+				@extend %no-border;
 			}
 		}
 	}
@@ -2027,13 +2043,13 @@ $var-icons: (
 );
 
 @each $var-icons, $bgimage in $var-icons {
-    .icon-#{$var-icons} {
-    	margin: 0 18px 0 0;
-    	&::before {
-    		background: $bgimage;
-    		@extend %var-icons;
-    	}
-    }
+	.icon-#{$var-icons} {
+		margin: 0 18px 0 0;
+		&::before {
+			background: $bgimage;
+			@extend %var-icons;
+		}
+	}
 }
 
 $form-icon-btn: (
@@ -2043,14 +2059,14 @@ $form-icon-btn: (
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
-    .icon-#{$form-icon-btn} {
-        background: $transparent $bgimage;
-        @extend %form-icon-btn;
+	.icon-#{$form-icon-btn} {
+		background: $transparent $bgimage;
+		@extend %form-icon-btn;
 
-        @if $form-icon-btn == 'wzrd-action' {
-        	margin-top: -16px;
-        }
-    }
+		@if $form-icon-btn == 'wzrd-action' {
+			margin-top: -16px;
+		}
+	}
 }
 
 %form-icon-btn {
@@ -2214,7 +2230,7 @@ $form-icon-btn: (
 	}
 
 	ul li {
-		padding: 16px 0 0 0; 
+		padding: 16px 0 0 0;
 		font-size: $font-top-nav-size;
 
 		&.sign-in-txt {
@@ -2222,7 +2238,7 @@ $form-icon-btn: (
 		}
 	}
 
-	label {                                                                                                                                                                                                                                                                                                              
+	label {
 		display: inline-block;
 		margin: 0 0 2px 0;
 	}
@@ -2268,18 +2284,15 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.widget-placeholder {
+.dashbrd-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+}
 
-	.cell {
-		min-width: 250px;
-
-		&:last-child {
-
-			.dashbrd-widget {
-				margin: 0 0 10px 0;
-			}
-		}
-	}
+.dashbrd-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 }
 
 .dashbrd-widget {
@@ -2294,7 +2307,7 @@ $form-icon-btn: (
 		th {
 			@extend %dashbrd-widget-td;
 		}
-		
+
 		td {
 			@extend %dashbrd-widget-td;
 		}
@@ -2368,7 +2381,7 @@ $form-icon-btn: (
 		display: inline-block;
 		padding: 8px 0 8px 13px
 	}
-} 
+}
 
 // Action Menus, Pop-up Menus
 .action-menu {
@@ -2399,13 +2412,18 @@ $form-icon-btn: (
 		color: $font-color;
 		text-decoration: none;
 		border: none;
+		outline: 0;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
-		@extend %overflow-ellipsis; 
+		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&:focus {
 			background-color: $action-hover-color;
 		}
 
@@ -2484,7 +2502,7 @@ $form-icon-btn: (
 .overlay-dialogue {
 	position: absolute;
 	z-index: 1000;
-	padding: 15px;
+	padding: 15px 10px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -2496,7 +2514,7 @@ $form-icon-btn: (
 		th {
 			@extend %dashbrd-widget-td;
 		}
-		
+
 		td {
 			@extend %dashbrd-widget-td;
 		}
@@ -2552,33 +2570,6 @@ $form-icon-btn: (
 	@include opacity(0.35);
 }
 
-.pop-up {
-	min-width: initial;
-	margin-bottom: 0;
-
-	article {
-		padding: 13px;
-	}
-
-	h1 {
-		border-bottom: none;
-		padding: 0;
-	}
-
-	.header-title {
-
-		ul {
-			position: absolute;
-			right: 0;
-			bottom: 0;
-		}
-	}
-
-	.dashbrd-widget-head {
-		padding: 8px 10px;
-	}
-}
-
 .calendar {
 	width: 200px;
 
@@ -2588,8 +2579,8 @@ $form-icon-btn: (
 
 		&:hover {
 			@extend .selected
-			}
 		}
+	}
 
 	table {
 		width: 100%;
@@ -2738,7 +2729,7 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		padding: 8px 5px;
+		padding: 2px 3px;
 	}
 
 	.table-forms {
@@ -2750,6 +2741,7 @@ $form-icon-btn: (
 
 		td {
 			text-align: left;
+			padding: 6px 5px;
 			border: none;
 			border-bottom: 1px solid $table-border-color;
 		}
@@ -2758,11 +2750,15 @@ $form-icon-btn: (
 	.dashbrd-widget {
 		margin: 0;
 		border: none;
+
+		th {
+			padding: 6px 5px;
+		}
 	}
 
 	.dashbrd-widget-head {
 		text-align: left;
-		padding: 8px;
+		padding: 4px 5px;
 
 		li {
 			line-height: 2.9em;
@@ -2978,9 +2974,9 @@ a.blue {
 
 .progress-bar-bg {
 	padding: 3px 0 2px 0;
-    font-size: $font-h3-size;
-    line-height: 1em;
-    display: inline-block;
+	font-size: $font-h3-size;
+	line-height: 1em;
+	display: inline-block;
 
 	&.green-bg {
 		background-color: darken(desaturate($alt-green, 10%), 16%);
@@ -3036,7 +3032,7 @@ a.blue {
 }
 
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
@@ -3068,7 +3064,7 @@ a.blue {
 	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
-	@include border-radius(2px); 
+	@include border-radius(2px);
 }
 
 .green-bg {
@@ -3255,7 +3251,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $green;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3280,7 +3276,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $red;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3297,20 +3293,20 @@ td.inactive-bg {
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
-	max-height: 300px;
-    padding: 0 5px 0 0;
-    overflow-y: auto;
-    @extend %webkit-scrollbar;
 
 	.link-action {
 		position: absolute;
 		top: 7px;
-		left: 15px;
+		left: 10px;
 		margin-bottom: 20px;
 	}
 
 	ul {
 		font-size: $font-msg-reset-size;
+		max-height: 300px;
+		padding: 0 5px 0 0;
+		overflow-y: auto;
+		@extend %webkit-scrollbar;
 
 		li {
 			margin: .5em 0 .5em 1em;
@@ -3323,7 +3319,7 @@ td.inactive-bg {
 
 			&:only-child {
 				margin-left: 0;
-			} 
+			}
 		}
 
 		&.msg-details-border {
@@ -3345,7 +3341,7 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	padding: 7px 15px;
+	padding: 7px 20px 7px 15px;
 	margin: 0 0 12px 0;
 	text-align: center;
 	position: relative;
@@ -3381,6 +3377,7 @@ td.inactive-bg {
 
 %close-icon {
 	display: block;
+	padding: 0;
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
@@ -3400,30 +3397,36 @@ td.inactive-bg {
 	&:hover {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:focus {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 }
 
 .overlay-close-btn {
 	position: absolute;
 	z-index: 1000;
-	top: 0;
-	right: 0;
+	top: 1px;
+	right: 1px;
+	min-height: auto;
+	border: none;
+	background-color: $transparent !important;
 	@extend %close-icon;
-	@include border-radius(0 0 0 2px);
+	@include border-radius(2px);
 }
 
 a.overlay-close-btn {
-	@extend .overlay-close-btn; 
+	@extend .overlay-close-btn;
 }
 
 .subfilter-disable-btn {
@@ -3456,6 +3459,7 @@ a.overlay-close-btn {
 // Color picker
 .color-picker {
 	height: 20px;
+	white-space: nowrap;
 
 	div {
 		display: inline-block;
@@ -3525,17 +3529,17 @@ $browser-logos: (
 );
 
 @each $browser, $bgimage in $browser-logos {
-    .browser-logo-#{$browser} {
-        background: $bgimage;
-        @extend %browser-logo-style;
-    }
+	.browser-logo-#{$browser} {
+		background: $bgimage;
+		@extend %browser-logo-style;
+	}
 }
 
 %browser-logo-style {
 	width: 66px;
-    height: 66px;
-    margin: 0 auto;
-    margin-bottom: 5px;
+	height: 66px;
+	margin: 0 auto;
+	margin-bottom: 5px;
 }
 
 .browser-warning-container {
@@ -3754,7 +3758,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
 
 ```html_example
 <div class="overflow-table">
@@ -3989,7 +3993,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
             <td>
                <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a> 
+               <a href="#">Collapsed</a>
                <div class="treeview"><span class="arrow-down"></span></div>
                <a href="#">Expanded</a>
             </td>
@@ -3998,7 +4002,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Severity</td>
             <td>asdasd</td>
             <td class="normal-bg">
-               <span class="link-action">25</span> 
+               <span class="link-action">25</span>
             </td>
          </tr>
       </tbody>
@@ -4053,7 +4057,7 @@ Forms contain UI elements that are used to submit information.
 
 ##Inputs
 
-Text on html5 input types 
+Text on html5 input types
 
 ```html_example
 <ul class="table-forms">
@@ -4228,7 +4232,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 
 ##Contextual Dialogs
 
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
 <ul class="action-menu">
@@ -4526,7 +4530,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information. Different colors 
+Labels add information. Different colors
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>

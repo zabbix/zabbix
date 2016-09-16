@@ -25,11 +25,10 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
-		$this->zbxTestTextPresent('Discovery rules');
+		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(['Name', 'IP range', 'Delay', 'Checks', 'Status']);
-		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);
 	}
 
 	// returns all discovery rules
@@ -48,7 +47,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestClickWait('link='.$drule['name']);
+		$this->zbxTestClickLinkText($drule['name']);
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -65,15 +64,12 @@ class testPageDiscovery extends CWebTest {
 	public function testPageDiscovery_MassDelete($drule) {
 		DBsave_tables('drules');
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
+		$this->zbxTestClickButton('drule.massdelete');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
 
@@ -83,62 +79,15 @@ class testPageDiscovery extends CWebTest {
 		DBrestore_tables('drules');
 	}
 
-	public function testPageDiscovery_MassEnableAll() {
-		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('all_drules');
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->zbxTestClickWait('goButton');
-
-		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rules enabled');
-
-		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE status='.DRULE_STATUS_DISABLED));
-	}
-
-	/**
-	* @dataProvider allRules
-	*/
-	public function testPageDiscovery_MassEnable($drule) {
-		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
-
-		$this->chooseOkOnNextConfirmation();
-
-		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->zbxTestClickWait('goButton');
-
-		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule enabled');
-
-		$this->assertEquals(1, DBcount(
-			'SELECT *'.
-			' FROM drules'.
-			' WHERE druleid='.$drule['druleid'].
-				' AND status='.DRULE_STATUS_ACTIVE
-		));
-	}
-
 	public function testPageDiscovery_MassDisableAll() {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('drule.massdisable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules disabled');
 
@@ -151,15 +100,12 @@ class testPageDiscovery extends CWebTest {
 	public function testPageDiscovery_MassDisable($drule) {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE.' WHERE druleid='.$drule['druleid']);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
+		$this->zbxTestClickButton('drule.massdisable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule disabled');
 
@@ -168,6 +114,44 @@ class testPageDiscovery extends CWebTest {
 			' FROM drules'.
 			' WHERE druleid='.$drule['druleid'].
 				' AND status='.DRULE_STATUS_DISABLED
+		));
+	}
+
+	public function testPageDiscovery_MassEnableAll() {
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
+
+		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('all_drules');
+		$this->zbxTestClickButton('drule.massenable');
+		$this->webDriver->switchTo()->alert()->accept();
+
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rules enabled');
+
+		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE status='.DRULE_STATUS_DISABLED));
+	}
+
+	/**
+	* @dataProvider allRules
+	*/
+	public function testPageDiscovery_MassEnable($drule) {
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
+
+		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
+		$this->zbxTestClickButton('drule.massenable');
+		$this->webDriver->switchTo()->alert()->accept();
+
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rule enabled');
+
+		$this->assertEquals(1, DBcount(
+			'SELECT *'.
+			' FROM drules'.
+			' WHERE druleid='.$drule['druleid'].
+				' AND status='.DRULE_STATUS_ACTIVE
 		));
 	}
 

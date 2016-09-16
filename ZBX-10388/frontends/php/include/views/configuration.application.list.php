@@ -85,25 +85,10 @@ foreach ($this->data['applications'] as $application) {
 		];
 		$name[] = NAME_DELIMITER.$application['name'];
 
-		if ($application['applicationDiscovery']['ts_delete']) {
-			$icon_warning = new CDiv(SPACE, 'status_icon iconwarning');
-
-			// Check if application should've been deleted in the past.
-			if ($current_time > $application['applicationDiscovery']['ts_delete']) {
-				$icon_warning->setHint(_s(
-					'The application is not discovered anymore and will be deleted the next time discovery rule is processed.'
-				));
-			}
-			else {
-				$icon_warning->setHint(_s(
-					'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($application['applicationDiscovery']['ts_delete']),
-					zbx_date2str(DATE_FORMAT, $application['applicationDiscovery']['ts_delete']),
-					zbx_date2str(TIME_FORMAT, $application['applicationDiscovery']['ts_delete'])
-				));
-			}
-
-			$info_icons[] = $icon_warning;
+		if ($application['applicationDiscovery']['ts_delete'] != 0) {
+			$info_icons[] = getApplicationLifetimeIndicator(
+				$current_time, $application['applicationDiscovery']['ts_delete']
+			);
 		}
 		else {
 			$info_icons[] = '';

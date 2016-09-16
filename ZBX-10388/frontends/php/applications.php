@@ -405,7 +405,11 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['applications'], $sortOrder);
+	$url = (new CUrl('applications.php'))
+		->setArgument('groupid', $data['groupid'])
+		->setArgument('hostid', $data['hostid']);
+
+	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);

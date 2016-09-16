@@ -94,9 +94,9 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'stime' => getRequest('stime')
 	]);
 
-	$curl = new CUrl();
-	$curl->removeArgument('period');
-	$curl->removeArgument('stime');
+	$curl = (new CUrl())
+		->removeArgument('period')
+		->removeArgument('stime');
 
 	ob_end_clean();
 

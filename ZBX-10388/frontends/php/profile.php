@@ -30,11 +30,11 @@ $page['scripts'] = ['class.cviewswitcher.js'];
 
 ob_start();
 
-require_once dirname(__FILE__).'/include/page_header.php';
-
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
-	access_deny();
+if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
+	access_deny(ACCESS_DENY_PAGE);
 }
+
+require_once dirname(__FILE__).'/include/page_header.php';
 
 $themes = array_keys(Z::getThemes());
 $themes[] = THEME_DEFAULT;

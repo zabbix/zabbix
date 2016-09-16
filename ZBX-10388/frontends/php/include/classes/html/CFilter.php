@@ -101,7 +101,7 @@ class CFilter extends CTag {
 			jQuery("#filter-space").toggle();
 			jQuery("#filter-mode").toggleClass("filter-active");
 			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
-			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0);
+			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0, []);
 			if (jQuery(".multiselect").length > 0 && jQuery("#filter-arrow").hasClass("arrow-up")) {
 				jQuery(".multiselect").multiSelect("resize");
 			}'
@@ -135,10 +135,10 @@ class CFilter extends CTag {
 			return null;
 		}
 
-		$url = new CUrl();
-		$url->removeArgument('filter_set');
-		$url->removeArgument('ddreset');
-		$url->setArgument('filter_rst', 1);
+		$url = (new CUrl())
+			->removeArgument('filter_set')
+			->removeArgument('ddreset')
+			->setArgument('filter_rst', 1);
 
 		return (new CDiv())
 			->addClass(ZBX_STYLE_FILTER_FORMS)

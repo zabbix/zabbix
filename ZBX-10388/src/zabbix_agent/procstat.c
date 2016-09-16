@@ -477,7 +477,6 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
 		{
 			return query;
 		}
-
 	}
 
 	return NULL;
@@ -856,7 +855,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			util_local.pid = qdata->pids.values[i];
 
 			/* find the process utilization data in current snapshot */
-			putil = (zbx_procstat_util_t *)bsearch(&util_local, stats, pids->values_num,
+			putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, stats, pids->values_num,
 					sizeof(zbx_procstat_util_t), procstat_util_compare);
 
 			if (NULL == putil || SUCCEED != putil->error)
@@ -868,7 +867,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			starttime = putil->starttime;
 
 			/* find the process utilization data in last snapshot */
-			putil = (zbx_procstat_util_t *)bsearch(&util_local, procstat_snapshot, procstat_snapshot_num,
+			putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, procstat_snapshot, procstat_snapshot_num,
 					sizeof(zbx_procstat_util_t), procstat_util_compare);
 
 			if (NULL == putil || SUCCEED != putil->error || putil->starttime != starttime)
@@ -1092,16 +1091,16 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 		start += MAX_COLLECTOR_HISTORY;
 
 	if (0 != (type & ZBX_PROCSTAT_CPU_USER))
-			ticks_diff += query->h_data[current].utime - query->h_data[start].utime;
+		ticks_diff += query->h_data[current].utime - query->h_data[start].utime;
 
 	if (0 != (type & ZBX_PROCSTAT_CPU_SYSTEM))
-			ticks_diff += query->h_data[current].stime - query->h_data[start].stime;
+		ticks_diff += query->h_data[current].stime - query->h_data[start].stime;
 
 	time_diff = (zbx_uint64_t)(query->h_data[current].timestamp.sec - query->h_data[start].timestamp.sec) *
 			1000000000 + query->h_data[current].timestamp.ns - query->h_data[start].timestamp.ns;
 
 	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
-	ticks_diff *= 1000000000000;
+	ticks_diff *= __UINT64_C(1000000000000);
 	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
 	*value = (double)ticks_diff / 10;
 

@@ -134,7 +134,7 @@ if (!$data['alias'] || $data['users']) {
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 	// paging
-	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN);
+	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN, new CUrl('auditacts.php'));
 
 	// get users
 	if (!$data['alias']) {

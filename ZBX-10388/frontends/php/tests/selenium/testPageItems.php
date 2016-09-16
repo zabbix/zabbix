@@ -21,12 +21,11 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageItems extends CWebTest {
-	// returns hosts and templates
 	public static function data() {
 		return DBdata(
 			'SELECT hostid,status'.
 			' FROM hosts'.
-			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%')
+			' WHERE host LIKE \'%-layout-test%\''
 		);
 	}
 
@@ -34,17 +33,13 @@ class testPageItems extends CWebTest {
 	* @dataProvider data
 	*/
 	public function testPageItems_CheckLayout($data) {
-		// Go to the list of items
 		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
-		// We are in the list of items
 		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-		$this->zbxTestTextPresent('Items');
+		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$this->zbxTestTextPresent('Host list');
-			// Header
+			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
 				[
 					'Wizard',
@@ -57,13 +52,12 @@ class testPageItems extends CWebTest {
 					'Type',
 					'Applications',
 					'Status',
-					'Error'
+					'Info'
 				]
 			);
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->zbxTestTextPresent('Template list');
-			// Header
+			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
 				[
 					'Wizard',
@@ -78,16 +72,9 @@ class testPageItems extends CWebTest {
 					'Status'
 				]
 			);
-			$this->zbxTestTextNotPresent('Error');
+			$this->zbxTestTextNotPresent('Info');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('action', [
-				'Enable selected',
-				'Disable selected',
-				'Mass update',
-				'Copy selected to ...',
-				'Clear history for selected',
-				'Delete selected'
-			]);
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
 	}
 }

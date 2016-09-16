@@ -214,20 +214,25 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	ssize_t		bytes_received = -1;
 	char		*tls_arg1, *tls_arg2, *request;
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	switch (configured_tls_connect_mode)
 	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
-	{
-		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
@@ -431,10 +436,14 @@ int	main(int argc, char **argv)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
+
+		if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+		{
 #if defined(_WINDOWS)
-		zbx_tls_init_parent();
+			zbx_tls_init_parent();
 #endif
-		zbx_tls_init_child();
+			zbx_tls_init_child();
+		}
 #endif
 	}
 #if !defined(_WINDOWS)

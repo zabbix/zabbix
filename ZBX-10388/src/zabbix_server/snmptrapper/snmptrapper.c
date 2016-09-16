@@ -413,7 +413,7 @@ static int	read_traps()
 
 	if (0 < nbytes)
 	{
-		if (INT_MAX < (zbx_uint64_t)trap_lastsize + nbytes)
+		if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)trap_lastsize + nbytes)
 		{
 			nbytes = 0;
 			goto exit;
@@ -472,7 +472,7 @@ static int	open_trap_file()
 		goto out;
 	}
 
-	if (INT_MAX < file_buf.st_size)
+	if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
 	{
 		if (0 == overflow_warning)
 		{
@@ -538,7 +538,7 @@ static int	get_latest_data()
 
 			close_trap_file();
 		}
-		else if (INT_MAX < file_buf.st_size)
+		else if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
 		{
 			close_trap_file();
 		}

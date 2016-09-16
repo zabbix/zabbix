@@ -144,44 +144,54 @@ $map_tab->addRow(_('Advanced labels'),
 );
 
 // Append hostgroup to form list.
-$map_tab->addRow(_('Host group label type'), [
-	new CComboBox('label_type_hostgroup', $data['sysmap']['label_type_hostgroup'], null, $data['labelTypesLimited']),
-	BR(),
-	(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
+$map_tab
+	->addRow(_('Host group label type'),
+		new CComboBox('label_type_hostgroup', $data['sysmap']['label_type_hostgroup'], null, $data['labelTypesLimited'])
+	)
+	->addRow(null,
+		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append host to form list.
-$map_tab->addRow(_('Host label type'), [
-	new CComboBox('label_type_host', $data['sysmap']['label_type_host'], null, $data['labelTypes']),
-	BR(),
-	(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
+$map_tab
+	->addRow(_('Host label type'),
+		new CComboBox('label_type_host', $data['sysmap']['label_type_host'], null, $data['labelTypes'])
+	)
+	->addRow(null,
+		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append trigger to form list.
-$map_tab->addRow(_('Trigger label type'), [
-	new CComboBox('label_type_trigger', $data['sysmap']['label_type_trigger'], null, $data['labelTypesLimited']),
-	BR(),
-	(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
+$map_tab
+	->addRow(_('Trigger label type'),
+		new CComboBox('label_type_trigger', $data['sysmap']['label_type_trigger'], null, $data['labelTypesLimited'])
+	)
+	->addRow(null,
+		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append map to form list.
-$map_tab->addRow(_('Map label type'), [
-	new CComboBox('label_type_map', $data['sysmap']['label_type_map'], null, $data['labelTypesLimited']),
-	BR(),
-	(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
+$map_tab
+	->addRow(_('Map label type'),
+		new CComboBox('label_type_map', $data['sysmap']['label_type_map'], null, $data['labelTypesLimited'])
+	)
+	->addRow(null,
+		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append image to form list.
-$map_tab->addRow(_('Image label type'), [
-	new CComboBox('label_type_image', $data['sysmap']['label_type_image'], null, $data['labelTypesImage']),
-	BR(),
-	(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
+$map_tab
+	->addRow(_('Image label type'),
+		new CComboBox('label_type_image', $data['sysmap']['label_type_image'], null, $data['labelTypesImage'])
+	)
+	->addRow(null,
+		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append icon label to form list.
 unset($data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);

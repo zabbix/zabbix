@@ -111,6 +111,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$parser = new CItemDelayFlexParser($item['delay_flex']);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
+		$this->items[$this->num]['intervals'] = $parser->getIntervals();
 
 		if (strpos($item['units'], ',') === false) {
 			$this->items[$this->num]['unitsLong'] = '';
@@ -281,7 +282,9 @@ class CLineGraphDraw extends CGraphDraw {
 					' GROUP BY itemid,'.$calc_field
 				);
 
-				$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+				if (!$this->hasSchedulingIntervals($this->items[$i]['intervals']) || $this->items[$i]['delay'] != 0) {
+					$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+				}
 			}
 
 			if (!isset($this->data[$this->items[$i]['itemid']])) {
@@ -1313,8 +1316,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$intervals = [
 			['main' => SEC_PER_MIN / 2, 'sub' => SEC_PER_MIN / 60],		// 30 seconds and 1 second
 			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// 60 seconds and 5 seconds
-			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minuts and 10 seconds
-			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minuts and 30 seconds
+			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minutes and 10 seconds
+			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minutes and 30 seconds
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],				// 1 hour and 1 minute
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],			// 1 hour and 2 minutes
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],			// 1 hour and 5 minutes
@@ -2646,26 +2649,28 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			// for each X
-			$draw = true;
 			$prevDraw = true;
 			for ($i = 1, $j = 0; $i < $maxX; $i++) { // new point
 				if ($data['count'][$i] == 0 && $i != ($maxX - 1)) {
 					continue;
 				}
 
-				$diff = abs($data['clock'][$i] - $data['clock'][$j]);
-				$cell = ($this->to_time - $this->from_time) / $this->sizeX;
 				$delay = $this->items[$item]['delay'];
 
-				if ($cell > $delay) {
-					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
+					$draw = true;
 				}
 				else {
-					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
-				}
+					$diff = abs($data['clock'][$i] - $data['clock'][$j]);
+					$cell = ($this->to_time - $this->from_time) / $this->sizeX;
 
-				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) {
-					$draw = true;
+					if ($cell > $delay) {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
+					}
+					else {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+					}
 				}
 
 				if (!$draw && !$prevDraw) {
@@ -2718,5 +2723,22 @@ class CLineGraphDraw extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
+	}
+
+	/**
+	 * Checks if item intervals has at least one scheduling interval.
+	 *
+	 * @param array $intervals
+	 *
+	 * @return bool
+	 */
+	private function hasSchedulingIntervals($intervals) {
+		foreach ($intervals as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

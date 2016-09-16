@@ -43,6 +43,7 @@ class CControllerAcknowledgeEdit extends CController {
 				case 'overview.php':
 				case 'screenedit.php':
 				case 'screens.php':
+				case 'slides.php':
 				case 'tr_events.php':
 				case 'tr_status.php':
 				case 'zabbix.php':

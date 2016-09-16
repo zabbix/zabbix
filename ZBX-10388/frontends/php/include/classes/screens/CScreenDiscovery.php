@@ -29,7 +29,7 @@ class CScreenDiscovery extends CScreenBase {
 	 *
 	 * @var array
 	 */
-	public $data;
+	protected $data = [];
 
 	/**
 	 * Init screen data.
@@ -40,7 +40,7 @@ class CScreenDiscovery extends CScreenBase {
 	public function __construct(array $options = []) {
 		parent::__construct($options);
 
-		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
+		$this->data = $options['data'];
 	}
 
 	/**
@@ -51,8 +51,8 @@ class CScreenDiscovery extends CScreenBase {
 	public function get() {
 		$this->dataId = 'discovery';
 
-		$sort = $this->data['sort'];
-		$sortorder = $this->data['sortorder'];
+		$sort_field = $this->data['sort'];
+		$sort_order = $this->data['sortorder'];
 		$druleid = $this->data['druleid'];
 
 		// discovery rules
@@ -75,8 +75,8 @@ class CScreenDiscovery extends CScreenBase {
 		$options = [
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'output' => ['dserviceid', 'type', 'key_', 'port', 'status', 'lastup', 'lastdown', 'ip', 'dns'],
-			'sortfield' => $sort,
-			'sortorder' => $sortorder,
+			'sortfield' => $sort_field,
+			'sortorder' => $sort_order,
 			'limitSelects' => 1
 		];
 		if ($druleid > 0) {
@@ -122,7 +122,9 @@ class CScreenDiscovery extends CScreenBase {
 		$dhosts = zbx_toHash($dhosts, 'dhostid');
 
 		$header = [
-			make_sorting_header(_('Discovered device'), 'ip', $sort, $sortorder, 'zabbix.php?action=discovery.view'),
+			make_sorting_header(_('Discovered device'), 'ip', $sort_field, $sort_order,
+				'zabbix.php?action=discovery.view'
+			),
 			_('Monitored host'),
 			_('Uptime').'/'._('Downtime')
 		];
@@ -221,7 +223,7 @@ class CScreenDiscovery extends CScreenBase {
 
 				$table->addRow($col);
 			}
-			order_result($discovery_info, $sort, $sortorder);
+			order_result($discovery_info, $sort_field, $sort_order);
 
 			foreach ($discovery_info as $ip => $h_data) {
 				$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';

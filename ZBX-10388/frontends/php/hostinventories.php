@@ -255,7 +255,10 @@ else {
 		}
 	}
 
-	$data['paging'] = getPagingLine($data['hosts'], $sortOrder);
+	$url = (new CUrl('hostinventories.php'))
+		->setArgument('groupid', $data['pageFilter']->groupid);
+
+	$data['paging'] = getPagingLine($data['hosts'], $sortOrder, $url);
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();

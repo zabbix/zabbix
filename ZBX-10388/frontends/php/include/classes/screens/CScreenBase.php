@@ -122,6 +122,13 @@ class CScreenBase {
 	public $dataId;
 
 	/**
+	 * Page number.
+	 *
+	 * @var array
+	 */
+	public $page;
+
+	/**
 	 * Screen parameters with default values.
 	 *
 	 * @var array
@@ -174,7 +181,8 @@ class CScreenBase {
 			'profileIdx2'		=> null,
 			'updateProfile'		=> true,
 			'timeline'			=> null,
-			'dataId'			=> null
+			'dataId'			=> null,
+			'page'				=> 1
 		];
 
 		$this->resourcetype = array_key_exists('resourcetype', $options) ? $options['resourcetype'] : null;
@@ -199,7 +207,8 @@ class CScreenBase {
 					'profileIdx'		=> false,
 					'profileIdx2'		=> true,
 					'updateProfile'		=> false,
-					'timeline'			=> false
+					'timeline'			=> false,
+					'page'				=> false
 				];
 				break;
 
@@ -214,7 +223,24 @@ class CScreenBase {
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
 					'updateProfile'		=> false,
-					'timeline'			=> false
+					'timeline'			=> false,
+					'page'				=> false
+				];
+				break;
+
+			case SCREEN_RESOURCE_HTTPTEST:
+				$this->required_parameters += [
+					'isTemplatedScreen'	=> false,
+					'screenid'			=> false,
+					'action'			=> false,
+					'groupid'			=> true,
+					'hostid'			=> true,
+					'pageFile'			=> false,
+					'profileIdx'		=> false,
+					'profileIdx2'		=> false,
+					'updateProfile'		=> false,
+					'timeline'			=> false,
+					'page'				=> true
 				];
 				break;
 
@@ -229,7 +255,8 @@ class CScreenBase {
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
 					'updateProfile'		=> true,
-					'timeline'			=> true
+					'timeline'			=> true,
+					'page'				=> false
 				];
 		}
 
@@ -238,7 +265,7 @@ class CScreenBase {
 		if (array_key_exists('screenitem', $options) && is_array($options['screenitem'])) {
 			$this->screenitem = $options['screenitem'];
 		}
-		elseif (array_key_exists('screenitemid', $options)) {
+		elseif (array_key_exists('screenitemid', $options) && $options['screenitemid'] > 0) {
 			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
 				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'application',
 				'max_columns'

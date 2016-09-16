@@ -62,6 +62,10 @@ AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
 		if test "x$unixodbc_error" = "x"; then
 			AC_DEFINE(HAVE_UNIXODBC,1,[Define to 1 if unixUNIXODBC Driver Manager should be used.])
 		fi
+
+		CFLAGS="${_save_unixodbc_cflags}"
+		LDFLAGS="${_save_unixodbc_ldflags}"
+		LIBS="${_save_unixodbc_libs}"
 	fi
   fi
 

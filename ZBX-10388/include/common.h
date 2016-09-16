@@ -96,8 +96,6 @@ const char	*zbx_result_string(int result);
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
-#define ZBX_DM_DELIMITER	'\255'
-
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
@@ -107,6 +105,15 @@ typedef struct
 	int	ns;	/* nanoseconds */
 }
 zbx_timespec_t;
+
+/* time zone offset */
+typedef struct
+{
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
+}
+zbx_timezone_t;
 
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
@@ -851,14 +858,18 @@ char	*get_param_dyn(const char *param, int num);
  *                       will be 0; for their parameters - 1 or higher        *
  *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
+ *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: NULL if parameter doesn't change; a new string - otherwise   *
+ * Return value: SUCEED - if parameter doesn't change or has been changed     *
+ *                        successfully                                        *
+ *               FAIL   - otherwise                                           *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *
  *                                                                            *
  ******************************************************************************/
-typedef char	*(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data);
+typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param);
 #define ZBX_KEY_TYPE_ITEM	0
 #define ZBX_KEY_TYPE_OID	1
 int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
@@ -905,11 +916,16 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int	zbx_day_in_month(int year, int mon);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -972,6 +988,12 @@ int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
 /* IP range support */
+#define ZBX_IPRANGE_V4	0
+#define ZBX_IPRANGE_V6	1
+
+#define ZBX_IPRANGE_GROUPS_V4	4
+#define ZBX_IPRANGE_GROUPS_V6	8
+
 typedef struct
 {
 	int	from;
@@ -981,16 +1003,18 @@ zbx_range_t;
 
 typedef struct
 {
-	zbx_range_t	range[8];
+	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V46 */
+	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)            */
+	/*                                  0       1       2       3             */
+	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
+
 	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
 	unsigned char	type;
+
 	/* 1 if the range was defined with network mask, 0 otherwise */
 	unsigned char   mask;
 }
 zbx_iprange_t;
-
-#define ZBX_IPRANGE_V4	0
-#define ZBX_IPRANGE_V6	1
 
 int	iprange_parse(zbx_iprange_t *range, const char *address);
 void	iprange_first(const zbx_iprange_t *range, int *address);
@@ -1146,5 +1170,7 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
 #endif
+
+#define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
 #endif

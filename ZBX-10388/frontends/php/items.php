@@ -812,11 +812,16 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$result = DBend($result);
 
+		$items_count = count(getRequest('group_itemid'));
+
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 			unset($_REQUEST['group_itemid']);
 		}
-		show_messages($result, _('Items copied'), _('Cannot copy items'));
+		show_messages($result,
+			_n('Item copied', 'Items copied', $items_count),
+			_n('Cannot copy item', 'Cannot copy items', $items_count)
+		);
 	}
 	else {
 		show_error_message(_('No target selected.'));
@@ -1359,7 +1364,7 @@ else {
 		order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$data['paging'] = getPagingLine($data['items'], $sortOrder);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {

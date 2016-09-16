@@ -111,49 +111,51 @@ class testFormConfigTriggerSeverity extends CWebTest {
 	public function testFormTriggerSeverity_Layout() {
 		$this->zbxTestLogin('adm.triggerseverities.php');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
+		$this->zbxTestCheckHeader('Trigger severities');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 
-		$this->zbxTestTextPresent('Trigger severities');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER SEVERITIES');
-
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
-		$this->assertElementPresent('severity_name_0');
-		$this->assertElementPresent('severity_color_0');
-		$this->assertElementPresent('lbl_severity_color_0');
-		$this->assertElementPresent('severity_name_1');
-		$this->assertElementPresent('severity_color_1');
-		$this->assertElementPresent('lbl_severity_color_1');
-		$this->assertElementPresent('severity_name_2');
-		$this->assertElementPresent('severity_color_2');
-		$this->assertElementPresent('lbl_severity_color_2');
-		$this->assertElementPresent('severity_name_3');
-		$this->assertElementPresent('severity_color_3');
-		$this->assertElementPresent('lbl_severity_color_3');
-		$this->assertElementPresent('severity_name_4');
-		$this->assertElementPresent('severity_color_4');
-		$this->assertElementPresent('lbl_severity_color_4');
-		$this->assertElementPresent('severity_name_5');
-		$this->assertElementPresent('severity_color_5');
-		$this->assertElementPresent('lbl_severity_color_5');
-		$this->assertElementPresent('update');
+		$this->zbxTestAssertElementPresentId('severity_name_0');
+		$this->zbxTestAssertElementPresentId('severity_color_0');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_0');
+		$this->zbxTestAssertElementPresentId('severity_name_1');
+		$this->zbxTestAssertElementPresentId('severity_color_1');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_1');
+		$this->zbxTestAssertElementPresentId('severity_name_2');
+		$this->zbxTestAssertElementPresentId('severity_color_2');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_2');
+		$this->zbxTestAssertElementPresentId('severity_name_3');
+		$this->zbxTestAssertElementPresentId('severity_color_3');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_3');
+		$this->zbxTestAssertElementPresentId('severity_name_4');
+		$this->zbxTestAssertElementPresentId('severity_color_4');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_4');
+		$this->zbxTestAssertElementPresentId('severity_name_5');
+		$this->zbxTestAssertElementPresentId('severity_color_5');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_5');
+		$this->zbxTestAssertElementPresentId('update');
 
-		$this->assertElementPresent('color_picker');
-		$this->assertNotVisible('color_picker');
-		$this->fireEvent('lbl_severity_color_0', 'click');
-		$this->assertVisible('color_picker');
+		$this->zbxTestAssertElementPresentXpath('//div[@class="overlay-dialogue"]/div[@class="color-picker"]');
+		$this->zbxTestAssertNotVisibleXpath('//div[@class="color-picker"]');
+		$this->zbxTestClick('lbl_severity_color_0');
+		$this->zbxTestAssertVisibleXpath('//div[@class="color-picker"]');
+	}
+
+	public function testFormTriggerSeverity_backup() {
+		DBsave_tables('config');
 	}
 
 	/**
 	 * @dataProvider providerTriggerSeverity
 	 */
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
-		DBsave_tables('config');
-
 		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestCheckTitle('Configuration of trigger severities');
+		$this->zbxTestCheckHeader('Trigger severities');
 
 		foreach ($data as $field => $value) {
-			$this->input_type($field, $value);
+			$this->zbxTestInputType($field, $value);
 		}
 
 		$sql = 'SELECT '.implode(', ', array_keys($data)).' FROM config';
@@ -172,10 +174,13 @@ class testFormConfigTriggerSeverity extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('ERROR:');
+			$this->zbxTestTextPresent('Page received incorrect data');
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
+	}
+
+	public function testFormTriggerSeverity_restore() {
 		DBrestore_tables('config');
 	}
 

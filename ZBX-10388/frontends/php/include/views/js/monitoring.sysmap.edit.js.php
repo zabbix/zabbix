@@ -65,33 +65,24 @@
 </script>
 
 <script type="text/javascript">
-	inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
-
-	function toggleAdvancedLabels(toggle) {
-		jQuery.each(inputs, function() {
-			jQuery('#' + this).parentsUntil('ul').toggle(toggle);
-		});
-
-		jQuery('#label_type').parentsUntil('ul').toggle(!toggle);
-	}
-
-	function toggleCustomLabel(e) {
-		jQuery(e.target)
-			.parent()
-			.find('textarea')
-			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
-	}
-
 	jQuery(function($) {
+		var inputs = '#label_type_hostgroup, #label_type_host, #label_type_trigger, #label_type_map, #label_type_image';
+
 		$('#label_format').click(function() {
-			toggleAdvancedLabels($('#label_format:checked').length != 0);
+			var toggle = $('#label_format').is(':checked');
+
+			$(inputs).each(function() {
+				$(this).parentsUntil('ul')
+					.toggle(toggle)
+					.next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?> && toggle);
+			});
+
+			$('#label_type').parentsUntil('ul').toggle(!toggle);
 		});
 
-		$.each(inputs, function() {
-			$('#' + this).change(toggleCustomLabel);
+		$(inputs).change(function() {
+			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
-
-		toggleAdvancedLabels($('#label_format:checked').length != 0);
 
 		// clone button
 		$('#clone').click(function() {
@@ -116,6 +107,8 @@
 				'name': $('#current_user_fullname').val()
 			});
 		});
+
+		$('#label_format').triggerHandler('click');
 	});
 
 	/**

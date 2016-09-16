@@ -40,16 +40,14 @@ $fields = [
 	'gname' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
 	'users' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
 	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
 	'new_right' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'right_to_del' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_users_to_del' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_users' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'set_users_status' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
-	'set_debug_mode' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
@@ -82,7 +80,7 @@ $fields = [
 ];
 check_fields($fields);
 
-$_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
+$_REQUEST['users_status'] = hasRequest('users_status') ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
 $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
 
 /*
@@ -331,7 +329,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.m
 		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
 	}
 }
-elseif (str_in_array(getRequest('action'), ['usergroup.massenable', 'usergroup.massdisable'])) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.massenable', 'usergroup.massdisable'])) {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
@@ -495,7 +493,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder);
+	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder, new CUrl('usergrps.php'));
 
 	// render view
 	$view = new CView('administration.usergroups.list', $data);

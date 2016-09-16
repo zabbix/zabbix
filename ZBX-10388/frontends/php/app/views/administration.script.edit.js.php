@@ -1,36 +1,40 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		// type change
-		jQuery('#type').change(function() {
-			var ipmi = (jQuery(this).val() == 1);
+		jQuery('#type')
+			.change(function() {
+				var type = jQuery(this).val(),
+					command_ipmi = jQuery('#commandipmi'),
+					command = jQuery('#command');
 
-			if (ipmi) {
-				jQuery('#execute_on, #command').closest('li').hide();
+				if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
+					if (command.val() !== '') {
+						command_ipmi.val(command.val());
+						command.val('');
+					}
 
-				jQuery('#commandipmi')
-					.val(jQuery('#command').val())
-					.closest('li')
-					.show();
-			}
-			else {
-				jQuery('#execute_on')
-					.closest('li')
-					.show();
+					jQuery('#execute_on').add(command).closest('li').hide();
+					command_ipmi.closest('li').show();
+				}
+				else {
+					if (command_ipmi.val() !== '') {
+						command.val(command_ipmi.val());
+						command_ipmi.val('');
+					}
 
-				jQuery('#command')
-					.val(jQuery('#commandipmi').val())
-					.closest('li')
-					.show();
-
-				jQuery('#commandipmi').closest('li').hide();
-			}
-		});
+					command_ipmi.closest('li').hide();
+					jQuery('#execute_on').add(command).closest('li').show();
+				}
+			})
+			.change();
 
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
 			jQuery('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
-			jQuery('#update').val('script.create').attr({id: 'add'});
+			jQuery('#update')
+				.val('script.create')
+				.attr({id: 'add'});
 			jQuery('#name').focus();
 		});
 
@@ -40,14 +44,18 @@
 		}).keyup();
 
 		// enable confirmation checkbox
-		jQuery('#enable_confirmation').change(function() {
-			if (this.checked) {
-				jQuery('#confirmation').removeAttr('disabled').keyup();
-			}
-			else {
-				jQuery('#confirmation, #testConfirmation').prop('disabled', true);
-			}
-		}).change();
+		jQuery('#enable_confirmation')
+			.change(function() {
+				if (this.checked) {
+					jQuery('#confirmation')
+						.removeAttr('disabled')
+						.keyup();
+				}
+				else {
+					jQuery('#confirmation, #testConfirmation').prop('disabled', true);
+				}
+			})
+			.change();
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
@@ -64,7 +72,7 @@
 					jQuery('#hostGroupSelection').hide();
 				}
 			})
-			.trigger('change');
+			.change();
 
 		// trim spaces on sumbit
 		jQuery('#scriptForm').submit(function() {

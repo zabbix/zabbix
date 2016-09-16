@@ -79,15 +79,15 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: rgba(#fff, 0.85);
+$link-main-nav-color: rgba(#fff, 0.8);
 $link-main-nav-hover-color: rgba(#fff, 1);
 $link-main-nav-active-color: rgba(#fff, 1);
-$link-main-nav-visited-color: rgba(#fff, 0.85);
+$link-main-nav-visited-color: rgba(#fff, 0.8);
 
-$link-main-subnav-color: rgba(#fff, 0.75);
+$link-main-subnav-color: rgba(#fff, 0.8);
 $link-main-subnav-hover-color: rgba(#fff, 1);
 $link-main-subnav-active-color: rgba(#fff, 1);
-$link-main-subnav-visited-color: rgba(#fff, 0.75);
+$link-main-subnav-visited-color: rgba(#fff, 0.8);
 
 // ANALOG CLOCK
 $clock-face-color: #383838;
@@ -96,19 +96,26 @@ $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
 
 .top-nav-help {
-	background: url(../img/icon-sprite.svg) no-repeat -77px -30px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
 }
 .top-nav-profile {
-	background: url(../img/icon-sprite.svg) no-repeat -77px -102px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
 }
 .top-nav-signout {
-	background: url(../img/icon-sprite.svg) no-repeat -77px -138px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
 }
 .top-nav-zbbshare {
-	background: url(../img/icon-sprite.svg) no-repeat -77px -66px !important;
+	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
 }
 .btn-search{
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
+}
+
+.list-table {
+
+	thead th {
+		border-bottom: 2px solid lighten($table-border-color, 3%) !important;
+	}
 }
 
 // Important! @import string should come after variables

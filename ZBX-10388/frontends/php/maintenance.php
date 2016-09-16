@@ -520,7 +520,10 @@ else {
 
 	order_result($data['maintenances'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['maintenances'], $sortOrder);
+	$url = (new CUrl('maintenance.php'))
+		->setArgument('groupid', $pageFilter->groupid);
+
+	$data['paging'] = getPagingLine($data['maintenances'], $sortOrder, $url);
 
 	// get list of maintenances
 	$data['maintenances'] = API::Maintenance()->get([

@@ -63,9 +63,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent('Graph prototype updated');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -84,6 +84,19 @@ class testInheritanceGraphPrototype extends CWebTest {
 						['itemName' => 'testInheritanceItemPrototype4']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'testInheritanceGraphPrototype4',
+					'addItemPrototypes' => [
+						['itemName' => 'testInheritanceItemPrototype1']
+					],
+					'errors'=> [
+						'Cannot add graph prototype',
+						'Graph with name "testInheritanceGraphPrototype4" already exists in graphs or graph prototypes.'
+					]
+				]
 			]
 		];
 	}
@@ -94,14 +107,15 @@ class testInheritanceGraphPrototype extends CWebTest {
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {
-				$this->zbxTestLaunchPopup('add_protoitem');
-				$this->zbxTestClick("//span[text()='".$item['itemName']."']");
-				sleep(1);
-				$this->selectWindow();
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
+				$this->zbxTestClickLinkTextWait($item['itemName']);
+				$this->zbxTestWaitWindowClose();
+				$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 			}
 		}
 
@@ -110,16 +124,19 @@ class testInheritanceGraphPrototype extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+				$this->zbxTestCheckHeader('Graph prototypes');
 				$this->zbxTestTextPresent('Graph prototype added');
+				$this->zbxTestTextPresent($data['name']);
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+				$this->zbxTestCheckHeader('Graph prototypes');
 				$this->zbxTestTextPresent($data['errors']);
+				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;
 		}
+
 	}
 
 	public function testInheritanceGraphPrototype_restore() {

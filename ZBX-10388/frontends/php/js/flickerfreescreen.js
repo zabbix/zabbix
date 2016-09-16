@@ -63,9 +63,14 @@ jQuery(function($) {
 					ajaxParams = ['mode', 'resourcetype', 'data'];
 					break;
 
+				case 23:
+					// SCREEN_RESOURCE_HTTPTEST
+					ajaxParams = ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'];
+					break;
+
 				default:
 					ajaxParams = ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
-						'updateProfile', 'screenitemid', 'timeline'
+						'updateProfile', 'screenitemid'
 					];
 			}
 
@@ -90,7 +95,7 @@ jQuery(function($) {
 			}
 
 			// timeline params
-			if ($.inArray('timeline', ajaxParams) > -1) {
+			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}

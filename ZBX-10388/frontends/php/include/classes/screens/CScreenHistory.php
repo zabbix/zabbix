@@ -61,13 +61,6 @@ class CScreenHistory extends CScreenBase {
 	public $plaintext;
 
 	/**
-	 * Items data
-	 *
-	 * @var array
-	 */
-	public $items;
-
-	/**
 	 * Items ids.
 	 *
 	 * @var array
@@ -82,7 +75,7 @@ class CScreenHistory extends CScreenBase {
 	 * @param int		$options['filterTask']
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
-	 * @param array		$options['items']
+	 * @param array		$options['itemids']
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct($options);
@@ -90,14 +83,13 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->filter = isset($options['filter']) ? $options['filter'] : null;
+		$this->filter = isset($options['filter']) ? $options['filter'] : '';
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
-		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : null;
+		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
 		$this->graphType = isset($options['graphtype']) ? $options['graphtype'] : GRAPH_TYPE_NORMAL;
 
 		// optional
-		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : null;
-		$this->items = array_key_exists('items', $options) ?  $options['items'] : [];
+		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
 	}
 
@@ -109,23 +101,18 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
-		if ($this->itemids !== null && !$this->items) {
-			$this->items = API::Item()->get([
-				'itemids' => $this->itemids,
-				'webitems' => true,
-				'selectHosts' => ['name'],
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
-				'preservekeys' => true
-			]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+			'selectHosts' => ['name'],
+			'itemids' => $this->itemids,
+			'webitems' => true,
+			'preservekeys' => true
+		]);
 
-			$this->items = CMacrosResolverHelper::resolveItemNames($this->items);
-		}
-		else {
-			$this->itemids = zbx_objectValues($this->items, 'itemid');
-		}
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$stime = zbxDateToTime($this->timeline['stime']);
-		$firstItem = reset($this->items);
+		$firstItem = reset($items);
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -157,7 +144,7 @@ class CScreenHistory extends CScreenBase {
 
 			// text log
 			if (isset($iv_string[$firstItem['value_type']])) {
-				$isManyItems = (count($this->items) > 1);
+				$isManyItems = (count($items) > 1);
 				$useLogItem = ($firstItem['value_type'] == ITEM_VALUE_TYPE_LOG);
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
@@ -194,7 +181,7 @@ class CScreenHistory extends CScreenBase {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
 
 					if (empty($this->plaintext)) {
-						$item = $this->items[$data['itemid']];
+						$item = $items[$data['itemid']];
 						$host = reset($item['hosts']);
 						$color = null;
 
@@ -287,7 +274,7 @@ class CScreenHistory extends CScreenBase {
 				$historyData = API::History()->get($options);
 
 				foreach ($historyData as $data) {
-					$item = $this->items[$data['itemid']];
+					$item = $items[$data['itemid']];
 					$value = rtrim($data['value'], " \t\r\n");
 
 					// format the value as float

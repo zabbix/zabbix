@@ -73,88 +73,88 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, 
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (9,'Autoregistration action 1',2,0,0,0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'','');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (15,'Autoregistration action 2',2,0,1,0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'','');
 
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 2, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (502, 9, 20, 0, '20000');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (503, 9, 20, 1, '20001');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (502, 9, 20, 1, '20001');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (503, 9, 20, 0, '20000');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (504, 10, 5, 0, '1');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (505, 11, 5, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (506, 12, 5, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (507, 12, 15, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (508, 12, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (509, 12, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (511, 12, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (506, 12, 16, 7, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (507, 12, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (508, 12, 15, 3, 'PostgreSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (509, 12, 15, 2, 'MYSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (511, 12, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (512, 12, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (513, 12, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (514, 12, 1, 0, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (515, 12, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (516, 12, 2, 0, '13496');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (517, 12, 2, 1, '13491');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (518, 12, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (519, 12, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (520, 12, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (521, 12, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (522, 12, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (523, 12, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (524, 12, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (525, 12, 5, 0, '0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (526, 12, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 16, 4, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (530, 13, 5, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (531, 13, 15, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (532, 13, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (534, 13, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (535, 13, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (513, 12, 6, 7, '6-7,08:00-18:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (514, 12, 6, 4, '1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (515, 12, 5, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (516, 12, 5, 0, '0');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (517, 12, 4, 6, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (518, 12, 4, 5, '3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (519, 12, 4, 1, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (520, 12, 4, 0, '5');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (521, 12, 4, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (522, 12, 3, 3, 'DB2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (523, 12, 3, 2, 'Oracle');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (524, 12, 2, 1, '13491');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (525, 12, 2, 0, '13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (526, 12, 1, 1, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 0, 0, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (530, 13, 16, 7, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (531, 13, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (532, 13, 15, 3, 'PostgreSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 15, 2, 'MYSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (534, 13, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (535, 13, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (536, 13, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (537, 13, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (538, 13, 1, 0, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (539, 13, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (540, 13, 2, 0, '13496');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (541, 13, 2, 1, '13491');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (542, 13, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (543, 13, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (544, 13, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (545, 13, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (546, 13, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (547, 13, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (548, 13, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (549, 13, 5, 0, '0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (550, 13, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 16, 4, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (554, 14, 5, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (555, 14, 15, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (556, 14, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (558, 14, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (559, 14, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (537, 13, 6, 7, '6-7,08:00-18:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (538, 13, 6, 4, '1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (539, 13, 5, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (540, 13, 5, 0, '0');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (541, 13, 4, 6, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (542, 13, 4, 5, '3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (543, 13, 4, 1, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (544, 13, 4, 0, '5');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (545, 13, 4, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (546, 13, 3, 3, 'DB2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (547, 13, 3, 2, 'Oracle');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (548, 13, 2, 1, '13491');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (549, 13, 2, 0, '13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (550, 13, 1, 1, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 0, 0, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (554, 14, 16, 7, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (555, 14, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (556, 14, 15, 3, 'PostgreSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 15, 2, 'MYSQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (558, 14, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (559, 14, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (560, 14, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (561, 14, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (562, 14, 1, 0, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (563, 14, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (564, 14, 2, 0, '13496');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (565, 14, 2, 1, '13491');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (566, 14, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (567, 14, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (568, 14, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (569, 14, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (570, 14, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (571, 14, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (572, 14, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (573, 14, 5, 0, '0');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (574, 14, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (575, 14, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (576, 14, 16, 4, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (577, 14, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (578, 15, 22, 2, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (579, 15, 22, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (580, 15, 20, 0, '20000');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (581, 15, 20, 1, '20001');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (561, 14, 6, 7, '6-7,08:00-18:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (562, 14, 6, 4, '1-7,00:00-24:00');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (563, 14, 5, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (564, 14, 5, 0, '0');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (565, 14, 4, 6, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (566, 14, 4, 5, '3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (567, 14, 4, 1, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (568, 14, 4, 0, '5');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (569, 14, 4, 0, '1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (570, 14, 3, 3, 'DB2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (571, 14, 3, 2, 'Oracle');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (572, 14, 2, 1, '13491');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (573, 14, 2, 0, '13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (574, 14, 1, 1, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (575, 14, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (576, 14, 0, 1, '4');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (577, 14, 0, 0, '2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (578, 15, 22, 3, 'DB2');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (579, 15, 22, 2, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (580, 15, 20, 1, '20001');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (581, 15, 20, 0, '20000');
 
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (7, 10, 0, 0, 1, 1, 0);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (8, 11, 0, 0, 1, 1, 0);
@@ -267,7 +267,7 @@ INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, wid
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200004,200004,13,0,500,100,0,0,0,0,25,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200005,200005,4,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200006,200006,4,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200007,200007,2,2,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200007,200007,2,3,500,100,0,0,1,1,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200008,200008,3,10057,500,100,0,0,0,0,25,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200009,200009,8,200000,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200010,200010,6,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
@@ -687,8 +687,10 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 -- inheritance testing
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15000, 'Inheritance test template', 'Inheritance test template', 3, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15002, 'Inheritance test template 2', 'Inheritance test template 2', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (15015, 'Inheritance test template for unlink', 'Inheritance test template for unlink', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15000, 15000, 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15002, 15002, 1);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15015, 15015, 1);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Template inheritance test host', 'Template inheritance test host', 0, '');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
@@ -699,13 +701,14 @@ INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES 
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15001, 15001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15000, 15001, 15000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15001, 15001, 15002);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15003, 15001, 15015);
 
 -- testFormItem.LayoutCheck testInheritanceItem.SimpleUpdate
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15000, 15000, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15001, 15000, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , 30, 3, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15000, 15000, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15001, 15000, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, 1, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15005, 15001, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, '', '', 15000, 15000);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15006, 15001, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , 30, 3, '', '', 15000, 15001);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15007, 15001, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, '', '', 15000, 15002);
@@ -754,26 +757,26 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color) 
 
 -- testInheritanceDiscoveryRule.LayoutCheck and testInheritanceDiscoveryRule.SimpleUpdate
 -- testFormItemPrototype, testInheritanceItemPrototype etc. for all prototype testing
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15011, 15000, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 4, '', '', 1);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15012, 15000, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 4, '', '', 1);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15013, 15000, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 4, '', '', 1);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15014, 15000, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 4, '', '', 1);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15015, 15000, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 4, '', '', 1);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15016, 15001, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 4, '', '', 1, 15000, 15011);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15017, 15001, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 4, '', '', 1, 15000, 15012);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15018, 15001, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 4, '', '', 1, 15000, 15013);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15019, 15001, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 4, '', '', 1, 15000, 15014);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15020, 15001, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 4, '', '', 1, 15000, 15015);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags)                          VALUES (15011, 15000, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags)                          VALUES (15012, 15000, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags)                          VALUES (15013, 15000, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags)                          VALUES (15014, 15000, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags)                          VALUES (15015, 15000, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid) VALUES (15016, 15001, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '', 1, 15000, 15011);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid) VALUES (15017, 15001, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '', 1, 15000, 15012);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid) VALUES (15018, 15001, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '', 1, 15000, 15013);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid) VALUES (15019, 15001, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '', 1, 15000, 15014);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid) VALUES (15020, 15001, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '', 1, 15000, 15015);
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15081, 15002, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '', 1);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15082, 15001, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '', 1, 15000, 15081);
 
 -- testInheritanceItemPrototype.SimpleUpdate and testInheritanceItemPrototype.SimpleCreate
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15021, 15000, 0, 'itemDiscovery'                , 'item-discovery-prototype', 30, 3, '', '', 2);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15022, 15000, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1'    , 30, 3, '', '', 2);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15023, 15000, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2'    , 30, 3, '', '', 2);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15024, 15000, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3'    , 30, 3, '', '', 2);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15025, 15000, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4'    , 30, 3, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15021, 15000, 0, 'itemDiscovery'                , 'item-discovery-prototype', 30, 3, 1, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15022, 15000, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1'    , 30, 3, 1, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15023, 15000, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2'    , 30, 3, 1, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15024, 15000, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3'    , 30, 3, 1, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15025, 15000, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4'    , 30, 3, 1, '', '', 2);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15026, 15001, 0, 'itemDiscovery'                , 'item-discovery-prototype', 30, 3, '', '', 2, 15000, 15021);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15027, 15001, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1'    , 30, 3, '', '', 2, 15000, 15022);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15028, 15001, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2'    , 30, 3, '', '', 2, 15000, 15023);
@@ -973,10 +976,10 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
 -- testFormItem.LayoutCheck testFormItem.SimpleUpdate
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '', 1);
 
 -- testFormTrigger.SimpleCreate
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, multiplier, delta, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, 0, 0, '', '', 0, 0, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, 0, 40011);
@@ -1310,15 +1313,22 @@ INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_o
 
 -- testPageHistory_CheckLayout
 
-INSERT INTO hosts (hostid, host, name, status) VALUES (15003, 'testPageHistory_CheckLayout', 'testPageHistory_CheckLayout', 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (15003, 'testPageHistory_CheckLayout', 'testPageHistory_CheckLayout', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15003, 15003, 4);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15005, 15003, 1, '127.0.0.1', 1, '10050', 1);
 
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15085, 15003, 15005, 0, 3, 0, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', 30, 90, 365, 0, '', NULL, 0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15086, 15003, 15005, 0, 0,    'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , 30, 90, 365, 0, '', NULL, 0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15087, 15003, 15005, 0, 1,    'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , 30, 90,      0,           0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15088, 15003, 15005, 0, 4,    'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , 30, 90,      0,           0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15089, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , 30, 90,      0,           0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15090, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , 30, 90,      0,           0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15091, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , 30, 90,      0,           0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15092, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (15085, 15003, 15005, 0, 3, 0, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', 30, 90, 365, 0, '', NULL, '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (15086, 15003, 15005, 0, 0,    'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , 30, 90, 365, 0, '', NULL, '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15087, 15003, 15005, 0, 1,    'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , 30, 90,      0,           '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15088, 15003, 15005, 0, 4,    'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , 30, 90,      0,           '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15089, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , 30, 90,      0,           '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15090, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , 30, 90,      0,           '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15091, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , 30, 90,      0,           '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    params, description, flags) VALUES (15092, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , 30, 90,      0,           '', '', 0);
+
+-- testPageUsers
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
+
+-- Disable warning if Zabbix server is down
+UPDATE config SET server_check_interval = 0 WHERE configid = 1;

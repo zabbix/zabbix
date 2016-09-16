@@ -89,14 +89,14 @@ class testInheritanceDiscoveryRule extends CWebTest {
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&hostid='.$this->templateid);
 
-		$this->input_type('name', $data['name']);
-		$this->input_type('key', $data['key']);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
-				$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+				$this->zbxTestCheckHeader('Discovery rules');
 				$this->zbxTestTextPresent('Discovery rule created');
 
 				$itemId = 0;
@@ -133,8 +133,8 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
-				$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
-				$this->zbxTestTextPresent('ERROR: Cannot add discovery rule');
+				$this->zbxTestCheckHeader('Discovery rules');
+				$this->zbxTestTextPresent('Cannot add discovery rule');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

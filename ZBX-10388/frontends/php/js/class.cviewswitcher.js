@@ -339,65 +339,29 @@ ActionProcessor.prototype = {
 
 	process: function() {
 		var action;
+		this.hidden = jQuery();
 
 		for (var i = 0; i < this.actions.length; i++) {
 			action = this.actions[i];
 			switch (action.action) {
 				case 'show':
-					if (this.checkConditions(action.cond)) {
-						this.actionShow(action.value);
-					}
-					else {
-						this.actionHide(action.value);
-					}
+					this.actionToggle(action.value, this.checkConditions(action.cond));
 					break;
 				case 'hide':
-					if (this.checkConditions(action.cond)) {
-						this.actionHide(action.value);
-					}
-					else {
-						this.actionShow(action.value);
-					}
+					this.actionToggle(action.value, !this.checkConditions(action.cond));
 					break;
 				case 'enable':
-					if (this.checkConditions(action.cond)) {
-						this.actionEnable(action.value);
-					}
-					else {
-						this.actionDisable(action.value);
-					}
+					jQuery(action.value).prop('disabled', !this.checkConditions(action.cond));
 					break;
 				case 'disable':
-					if (this.checkConditions(action.cond)) {
-						this.actionDisable(action.value);
-					}
-					else {
-						this.actionEnable(action.value);
-					}
+					jQuery(action.value).prop('disabled', this.checkConditions(action.cond));
 					break;
 			}
 		}
 	},
 
-	actionShow: function(value) {
-		jQuery(value)
-			.css('display', '')
-			.find(':input')
-			.prop('disabled', false);
-	},
-
-	actionHide: function(value) {
-		jQuery(value)
-			.css('display', 'none')
-			.find(':input')
-			.prop('disabled', true);
-	},
-
-	actionEnable: function(value) {
-		jQuery(value).prop('disabled', false);
-	},
-
-	actionDisable: function(value) {
-		jQuery(value).prop('disabled', true);
+	actionToggle: function(value, toggle) {
+		jQuery(value).toggle(toggle);
+		this.hidden = toggle ? this.hidden.not(jQuery(':input', value)) : this.hidden.add(jQuery(':input', value));
 	}
 };

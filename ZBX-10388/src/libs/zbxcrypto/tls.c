@@ -3575,7 +3575,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			goto out;
 		}
 	}
-	else	/* pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
@@ -3585,6 +3585,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
 			goto out;
 		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
 	}
 
 	/* set up TLS context */
@@ -3793,10 +3799,16 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
 	}
-	else	/* pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out2;
 	}
 
 	/* set up TLS context */
@@ -4071,7 +4083,7 @@ out:	/* an error occurred */
 out1:
 	if (NULL != peer_cert)
 		gnutls_x509_crt_deinit(peer_cert);
-
+out2:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
@@ -4108,7 +4120,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			goto out;
 		}
 	}
-	else	/* connect with pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
@@ -4161,6 +4173,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			psk_for_cb = psk_buf;				/* buffer is on stack */
 			psk_len_for_cb = (size_t)psk_len;
 		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out1;
 	}
 
 	/* set our connected TCP socket to TLS context */
@@ -4494,7 +4512,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 				zbx_tls_cert_error_msg((unsigned int)s->tls_ctx->ctx->session_negotiate->verify_result,
 						error);
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
@@ -5286,6 +5304,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
 		*error = zbx_dsprintf(*error, "gnutls_record_recv() failed: " ZBX_FS_SSIZE_T " %s",
 				(zbx_fs_ssize_t)res, gnutls_strerror(res));
+
 		return ZBX_PROTO_ERROR;
 	}
 

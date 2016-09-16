@@ -253,7 +253,7 @@ class CPageFilter {
 
 		// groups
 		if (isset($options['groups'])) {
-			$this->_initGroups($options['groupid'], $options['groups'], isset($options['hostid']) ? $options['hostid'] : null);
+			$this->_initGroups($options['groupid'], $options['groups'], $this->_requestIds['hostid']);
 		}
 
 		// hosts
@@ -280,7 +280,7 @@ class CPageFilter {
 	/**
 	 * Retrieve objects stored in the user profile.
 	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
-	 * otherwise - from the web.*.objectid field, depending on the use of the 'individial' option.
+	 * otherwise - from the web.*.objectid field, depending on the use of the 'individual' option.
 	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
 	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
 	 *
@@ -302,25 +302,25 @@ class CPageFilter {
 			$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
 			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
-			$this->_profileIds['severityMin'] = null;
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
 			$this->_profileIds['hostid'] = 0;
 			$this->_profileIds['graphid'] = 0;
 			$this->_profileIds['druleid'] = 0;
-			$this->_profileIds['severityMin'] = null;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
 			$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
 			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
 			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
-
-			// minimum severity
-			$mapId = isset($options['severitiesMin']['mapId']) ? $options['severitiesMin']['mapId'] : null;
-			$this->_profileIds['severityMin'] = CProfile::get($this->_profileIdx['severityMin'], null, $mapId);
 		}
+
+		// minimum severity
+		$mapid = (array_key_exists('severitiesMin', $options) && array_key_exists('mapId', $options['severitiesMin']))
+			? $options['severitiesMin']['mapId']
+			: null;
+		$this->_profileIds['severityMin'] = CProfile::get($this->_profileIdx['severityMin'], null, $mapid);
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
@@ -390,7 +390,7 @@ class CPageFilter {
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if ($groupId === null && $this->config['DDRemember'] && $this->_profileIds['groupid']) {
+		if ($groupId === null && $this->_profileIds['groupid'] > 0) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
 			$template = null;
@@ -512,7 +512,7 @@ class CPageFilter {
 			}
 
 			// select remembered selection
-			if (is_null($hostId) && $this->config['DDRemember'] && $this->_profileIds['hostid']) {
+			if ($hostId === null) {
 				$hostId = $this->_profileIds['hostid'];
 			}
 

@@ -64,7 +64,8 @@ $this->addJsFile('js/flickerfreescreen.js');
 						'screenid' => null,
 						'resourceid' => $data['map']['sysmapid'],
 						'width' => null,
-						'height' => null
+						'height' => null,
+						'severity_min' => $data['severity_min']
 					]
 				])->get()
 			)

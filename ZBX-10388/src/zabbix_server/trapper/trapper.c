@@ -37,7 +37,6 @@
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;

@@ -64,8 +64,8 @@
 
 		/**
 		 * Enabling or disabling connections to/from proxy based on proxy mode:
-		 *  if proxy is active, then disabled "Connections to proxy" field and enabled "Connections from proxy";
-		 *  if proxy is passive, then enabled "Connections to proxy" field and disabled "Connections from proxy".
+		 *  if proxy is active, disable "Connections to proxy" field and enable "Connections from proxy";
+		 *  if proxy is active, "Connections to proxy" field is disabled and "Connections from proxy" is enabled.
 		 */
 		function toggleEncryptionFields() {
 			if ($('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {

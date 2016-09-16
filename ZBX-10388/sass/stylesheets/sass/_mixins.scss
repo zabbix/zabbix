@@ -1,7 +1,7 @@
 @mixin box-shadow($shadow...) {
 	-webkit-box-shadow: $shadow;
-    -moz-box-shadow: $shadow;
-    box-shadow: $shadow;
+	-moz-box-shadow: $shadow;
+	box-shadow: $shadow;
 }
 
 @mixin border-radius($radius) {
@@ -49,9 +49,9 @@
 }
 
 @function h4-widget-color($font-color) {
-  @if (lightness($font-color) < 50) {
-    @return lighten($font-color, 15%);
-  } @else {
-    @return darken($font-color, 8%);
-  }
+	@if (lightness($font-color) < 50) {
+		@return lighten($font-color, 15%);
+	} @else {
+		@return darken($font-color, 8%);
+	}
 }

@@ -470,20 +470,25 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	switch (configured_tls_connect_mode)
 	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
-	{
-		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
@@ -514,7 +519,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (FAIL == tcp_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
-
+out:
 	zbx_thread_exit(ret);
 }
 
@@ -946,6 +951,49 @@ static void	parse_commandline(int argc, char **argv)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_fgets_alloc                                                  *
+ *                                                                            *
+ * Purpose: reads a line from file                                            *
+ *                                                                            *
+ * Parameters: buffer       - [IN/OUT] the output buffer                      *
+ *             buffer_alloc - [IN/OUT] the buffer size                        *
+ *             fp           - [IN] the file to read                           *
+ *                                                                            *
+ * Return value: Pointer to the line or NULL.                                 *
+ *                                                                            *
+ * Comments: This is a fgets() function wrapper with dynamically reallocated  *
+ *           buffer.                                                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
+{
+	char	tmp[MAX_BUFFER_LEN];
+	size_t	buffer_offset = 0, len;
+
+	do
+	{
+		if (NULL == fgets(tmp, sizeof(tmp), fp))
+			return (0 != buffer_offset ? *buffer : NULL);
+
+		len = strlen(tmp);
+
+		if (*buffer_alloc - buffer_offset < len + 1)
+		{
+			*buffer_alloc = (buffer_offset + len + 1) * 3 / 2;
+			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+		}
+
+		memcpy(*buffer + buffer_offset, tmp, len);
+		buffer_offset += len;
+		(*buffer)[buffer_offset] = '\0';
+	}
+	while (MAX_BUFFER_LEN - 1 == len && '\n' != tmp[len - 1]);
+
+	return *buffer;
+}
+
 /* sending a huge amount of values in a single connection is likely to */
 /* take long and hit timeout, so we limit values to 250 per connection */
 #define VALUES_MAX	250
@@ -953,10 +1001,11 @@ static void	parse_commandline(int argc, char **argv)
 int	main(int argc, char **argv)
 {
 	FILE			*in;
-	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
-				key_value[MAX_BUFFER_LEN], clock[32];
+	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], *key_value = NULL,
+				clock[32];
 	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL,
 				timestamp;
+	size_t			in_line_alloc = MAX_BUFFER_LEN, key_value_alloc = 0;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -1006,10 +1055,14 @@ int	main(int argc, char **argv)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
+
+		if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+		{
 #if defined(_WINDOWS)
-		zbx_tls_init_parent();
+			zbx_tls_init_parent();
 #endif
-		zbx_tls_init_child();
+			zbx_tls_init_child();
+		}
 #else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 				" support");
@@ -1046,9 +1099,12 @@ int	main(int argc, char **argv)
 		}
 
 		sendval_args.sync_timestamp = WITH_TIMESTAMPS;
+		in_line = zbx_malloc(NULL, in_line_alloc);
+
 		ret = SUCCEED;
 
-		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
+		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
+				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
 			/* line format: <hostname> <key> [<timestamp>] <value> */
 
@@ -1103,11 +1159,17 @@ int	main(int argc, char **argv)
 				}
 			}
 
+			if (key_value_alloc != in_line_alloc)
+			{
+				key_value_alloc = in_line_alloc;
+				key_value = zbx_realloc(key_value, key_value_alloc);
+			}
+
 			if ('\0' != *p && '"' != *p)
 			{
-				zbx_strlcpy(key_value, p, sizeof(key_value));
+				zbx_strlcpy(key_value, p, key_value_alloc);
 			}
-			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
+			else if ('\0' == *p || NULL == (p = get_string(p, key_value, key_value_alloc)))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key value' required", total_count);
 				ret = FAIL;
@@ -1182,6 +1244,9 @@ int	main(int argc, char **argv)
 
 		if (in != stdin)
 			fclose(in);
+
+		zbx_free(key_value);
+		zbx_free(in_line);
 	}
 	else
 	{

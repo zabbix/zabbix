@@ -197,7 +197,7 @@ else {
 	]);
 
 	order_result($data['valuemaps'], $sortfield, $sortorder);
-	$data['paging'] = getPagingLine($data['valuemaps'], $sortorder);
+	$data['paging'] = getPagingLine($data['valuemaps'], $sortorder, new CUrl('adm.valuemapping.php'));
 
 	foreach ($data['valuemaps'] as &$valuemap) {
 		order_result($valuemap['mappings'], 'value');

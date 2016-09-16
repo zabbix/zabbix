@@ -38,8 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = new CUrl($url);
-	$curl->removeArgument('sid');
+	$curl = (new CUrl($url))->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1262,7 +1261,6 @@ function zbx_toArray($value) {
 		return $value;
 	}
 
-	$result = [];
 	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
@@ -1272,6 +1270,9 @@ function zbx_toArray($value) {
 		}
 		elseif (!empty($value)) {
 			$result = [$value];
+		}
+		else {
+			$result = [];
 		}
 	}
 	else {
@@ -1286,7 +1287,6 @@ function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = [];
 
 	if (!is_array($value)) {
 		$result = [$value];
@@ -1295,6 +1295,8 @@ function zbx_objectValues($value, $field) {
 		$result = [$value[$field]];
 	}
 	else {
+		$result = [];
+
 		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = $val;
@@ -1461,18 +1463,31 @@ function getPageNumber() {
 }
 
 /**
- * Returns paging line.
+ * Returns paging line and recursively slice $items of current page.
  *
- * @param array  $items				list of items
+ * @param array  $items				list of elements
  * @param string $sortorder			the order in which items are sorted ASC or DESC
+ * @param CUrl $url					URL object containing arguments and query
  *
  * @return CDiv
  */
-function getPagingLine(&$items, $sortorder) {
+function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
-	$rowsPerPage = CWebUser::$data['rows_per_page'];
+	$rowsPerPage = (int) CWebUser::$data['rows_per_page'];
+	$config = select_config();
+
 	$itemsCount = count($items);
+	$limit_exceeded = ($config['search_limit'] < $itemsCount);
+	$offset = 0;
+
+	if ($limit_exceeded) {
+		if ($sortorder == ZBX_SORT_DOWN) {
+			$offset = $itemsCount - $config['search_limit'];
+		}
+		$itemsCount = $config['search_limit'];
+	}
+
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 	$currentPage = getPageNumber();
 
@@ -1483,7 +1498,6 @@ function getPagingLine(&$items, $sortorder) {
 		$currentPage = $pagesCount;
 	}
 
-	$start = ($currentPage - 1) * $rowsPerPage;
 	$tags = [];
 
 	if ($pagesCount > 1) {
@@ -1497,7 +1511,7 @@ function getPagingLine(&$items, $sortorder) {
 			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 		}
 
-		// viewed pages (better to use not odd)
+		// viewed pages (better to use odd)
 		$pagingNavRange = 11;
 
 		$endPage = $currentPage + floor($pagingNavRange / 2);
@@ -1510,10 +1524,9 @@ function getPagingLine(&$items, $sortorder) {
 
 		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = new CLink(_('First'), $url->getUrl());
+			$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
@@ -1540,38 +1553,27 @@ function getPagingLine(&$items, $sortorder) {
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = new CLink(_('Last'), $url->getUrl());
+			$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
 		}
+	}
+
+	$total = $limit_exceeded ? $itemsCount.'+' : $itemsCount;
+	$start = ($currentPage - 1) * $rowsPerPage;
+	$end = $start + $rowsPerPage;
+
+	if ($end > $itemsCount) {
+		$end = $itemsCount;
 	}
 
 	if ($pagesCount == 1) {
-		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
+		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $total);
 	}
 	else {
-		$config = select_config();
-
-		$end = $start + $rowsPerPage;
-		if ($end > $itemsCount) {
-			$end = $itemsCount;
-		}
-		$total = $itemsCount;
-
-		if ($config['search_limit'] < $itemsCount) {
-			if ($sortorder == ZBX_SORT_UP) {
-				array_pop($items);
-			}
-			else {
-				array_shift($items);
-			}
-
-			$total .= '+';
-		}
-
 		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
-	// trim array with items to contain items for current page
-	$items = array_slice($items, $start, $rowsPerPage, true);
+	// Trim array with elements to contain elements for current page.
+	$items = array_slice($items, $start + $offset, $end - $start, true);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
@@ -1652,24 +1654,25 @@ function num2letter($number) {
 /**
  * Renders an "access denied" message and stops the execution of the script.
  *
- * The $mode parameters controls the layout of the message:
+ * The $mode parameters controls the layout of the message for logged in users:
  * - ACCESS_DENY_OBJECT     - render the message when denying access to a specific object
  * - ACCESS_DENY_PAGE       - render a complete access denied page
+ *
+ * If visitor is without any access permission then layout of the message is same as in ACCESS_DENY_PAGE mode.
  *
  * @param int $mode
  */
 function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to an object
-	if ($mode == ACCESS_DENY_OBJECT) {
+	if ($mode == ACCESS_DENY_OBJECT && CWebUser::isLoggedIn()) {
 		require_once dirname(__FILE__).'/page_header.php';
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 		require_once dirname(__FILE__).'/page_footer.php';
 	}
 	// deny access to a page
 	else {
-		// url to redirect the user to after he loggs in
-		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->removeArgument('sid');
+		// url to redirect the user to after he logs in
+		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
@@ -1769,9 +1772,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	if ($show_close_box) {
-		$msg_box->addItem((new CSpan())
+		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
+			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 
@@ -2302,4 +2305,22 @@ function get_color($image, $color, $alpha = 0) {
 	}
 
 	return imagecolorallocate($image, $red, $green, $blue);
+}
+
+/**
+ * Custom error handler for PHP errors.
+ *
+ * @param int     $errno Level of the error raised.
+ * @param string  $errstr Error message.
+ * @param string  $errfile Filename that the error was raised in.
+ * @param int     $errline Line number the error was raised in.
+ */
+function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+	// Necessary to suppress errors when calling with error control operator like @function_name().
+	if (error_reporting() === 0) {
+		return true;
+	}
+
+	// Don't show the call to this handler function.
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
 }

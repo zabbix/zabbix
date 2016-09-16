@@ -123,12 +123,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		global $DB, $URL;
 
-		if (strpos(PHPUNIT_URL, 'http://') !== false) {
-			$URL = PHPUNIT_URL.'api_jsonrpc.php';
-		}
-		else {
-			$URL = 'http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/api_jsonrpc.php';
-		}
+		$URL = PHPUNIT_URL.'api_jsonrpc.php';
 
 		if (!isset($DB['DB'])) DBConnect($error);
 	}

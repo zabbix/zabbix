@@ -59,7 +59,10 @@ $icons->addItem(
 
 // 1st level menu
 $top_menu = (new CDiv())
-	->addItem(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+	->addItem(
+		(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+			->addClass(ZBX_STYLE_HEADER_LOGO)
+	)
 	->addItem(
 		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
 	)
@@ -83,10 +86,10 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		if ($sub_page['menu_action'] !== null) {
 			$url->setArgument('action', $sub_page['menu_action']);
 		}
-		else {
-			$url->setArgument('ddreset', 1);
-		}
-		$url->removeArgument('sid');
+
+		$url
+			->setArgument('ddreset', 1)
+			->removeArgument('sid');
 
 		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
 		if ($sub_page['selected']) {

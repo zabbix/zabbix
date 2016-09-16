@@ -225,6 +225,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 				if (SVC_AGENT == dcheck->type)
 				{
+					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+
 					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else
@@ -774,7 +776,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 #ifdef HAVE_NETSNMP
-	init_snmp(progname);
+	zbx_init_snmp();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);

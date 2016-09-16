@@ -562,13 +562,21 @@ class CHost extends CHostGeneral {
 				self::exception();
 			}
 
-			if (!empty($host['inventory'])) {
+			if (array_key_exists('inventory', $host) && $host['inventory']) {
 				$hostInventory = $host['inventory'];
 				$hostInventory['hostid'] = $hostid;
-				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])
-					? $host['inventory_mode']
-					: HOST_INVENTORY_MANUAL;
+				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			}
+			else {
+				$hostInventory = [];
+			}
 
+			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$hostInventory['hostid'] = $hostid;
+				$hostInventory['inventory_mode'] = $host['inventory_mode'];
+			}
+
+			if ($hostInventory) {
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
 		}
@@ -1535,11 +1543,15 @@ class CHost extends CHostGeneral {
 			];
 
 			if (array_key_exists('tls_connect', $host) && !in_array($host['tls_connect'], $available_connect_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to host field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_connect',
+					_s('unexpected value "%1$s"', $host['tls_connect'])
+				));
 			}
 
 			if (array_key_exists('tls_accept', $host) && !in_array($host['tls_accept'], $available_accept_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
+					_s('unexpected value "%1$s"', $host['tls_accept'])
+				));
 			}
 
 			// PSK validation.
@@ -1547,11 +1559,15 @@ class CHost extends CHostGeneral {
 					|| (array_key_exists('tls_accept', $host)
 						&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
 				if (!array_key_exists('tls_psk_identity', $host) || zbx_empty($host['tls_psk_identity'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('cannot be empty'))
+					);
 				}
 
 				if (!array_key_exists('tls_psk', $host) || zbx_empty($host['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('cannot be empty'))
+					);
 				}
 
 				if (!preg_match('/^([0-9a-f]{2})+$/i', $host['tls_psk'])) {

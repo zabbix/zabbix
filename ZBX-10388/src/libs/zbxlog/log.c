@@ -134,62 +134,6 @@ void	zbx_redirect_stdio(const char *filename)
 	close(fd);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_time                                                         *
- *                                                                            *
- * Purpose:                                                                   *
- *     get current time and store it in memory locations provided by caller   *
- *                                                                            *
- * Parameters:                                                                *
- *     tm           - [OUT] broken-down representation of the current time    *
- *     milliseconds - [OUT] milliseconds since the previous second            *
- *                                                                            *
- * Comments:                                                                  *
- *     On Windows localtime() returns pointer to static, thread-local storage *
- *     location. On Unix localtime() is not thread-safe and re-entrant as it  *
- *     returns pointer to static storage location which can be overwritten    *
- *     by localtime() itself or other time functions in other threads or      *
- *     signal handlers. To avoid this we use localtime_r().                   *
- *                                                                            *
- ******************************************************************************/
-static void	get_time(struct tm *tm, long *milliseconds)
-{
-#ifdef _WINDOWS
-	struct _timeb	current_time;
-	struct tm	*tm_thread_static;
-
-	_ftime(&current_time);
-	if (NULL != (tm_thread_static = localtime(&current_time.time)))
-	{
-		*tm = *tm_thread_static;
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		memset(tm, 0, sizeof(struct tm));
-	}
-
-	*milliseconds = current_time.millitm;
-#else
-	struct timeval	current_time;
-	struct tm	tm_local;
-
-	gettimeofday(&current_time, NULL);
-	if (NULL != localtime_r(&current_time.tv_sec, &tm_local))
-	{
-		*tm = tm_local;
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		memset(tm, 0, sizeof(struct tm));
-	}
-
-	*milliseconds = current_time.tv_usec / 1000;
-#endif
-}
-
 static void	rotate_log(const char *filename)
 {
 	zbx_stat_t		buf;
@@ -230,7 +174,7 @@ static void	rotate_log(const char *filename)
 				long		milliseconds;
 				struct tm	tm;
 
-				get_time(&tm, &milliseconds);
+				zbx_get_time(&tm, &milliseconds, NULL);
 
 				fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
 						" cannot rename log file \"%s\" to \"%s\": %s\n",
@@ -485,7 +429,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			long		milliseconds;
 			struct tm	tm;
 
-			get_time(&tm, &milliseconds);
+			zbx_get_time(&tm, &milliseconds, NULL);
 
 			fprintf(log_file,
 					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
@@ -520,7 +464,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		lock_log();
 
-		get_time(&tm, &milliseconds);
+		zbx_get_time(&tm, &milliseconds, NULL);
 
 		fprintf(stdout,
 				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",

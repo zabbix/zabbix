@@ -1236,16 +1236,6 @@ ZABBIX.apps.map = (function($) {
 				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 			$('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
-			if (this.sysmap.data.iconmapid === '0') {
-				$('#use_iconmapLabel')
-					.mouseenter(function(e) {
-						hintBox.showHint(e, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
-					})
-					.mouseleave(function(e) {
-						hintBox.hideHint(e, this);
-					});
-			}
-
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
@@ -1350,16 +1340,14 @@ ZABBIX.apps.map = (function($) {
 				$('#urlContainer tbody tr').remove();
 				this.addUrls(selement.urls);
 
-				// should be unchecked before action processor
 				if (this.sysmap.data.iconmapid === '0') {
-					$('#use_iconmap').prop('checked', false);
+					$('#use_iconmap').prop({
+						checked: false,
+						disabled: true
+					});
 				}
 
 				this.actionProcessor.process();
-
-				if (this.sysmap.data.iconmapid === '0') {
-					$('#use_iconmap').prop('disabled', true);
-				}
 
 				// set multiselect values
 				if (selement.elementtype == 0 || selement.elementtype == 3) {
@@ -1389,7 +1377,7 @@ ZABBIX.apps.map = (function($) {
 			 * @retrurns {Object|Boolean}
 			 */
 			getValues: function() {
-				var values = $('#selementForm').serializeArray(),
+				var values = $(':input', '#selementForm').not(this.actionProcessor.hidden).serializeArray(),
 					data = {
 						urls: {}
 					},

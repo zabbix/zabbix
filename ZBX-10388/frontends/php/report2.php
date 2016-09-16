@@ -375,7 +375,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	CArrayHelper::sort($triggers, ['host', 'description']);
 
-	$paging = getPagingLine($triggers, ZBX_SORT_UP);
+	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], getRequest('filter_timesince'),

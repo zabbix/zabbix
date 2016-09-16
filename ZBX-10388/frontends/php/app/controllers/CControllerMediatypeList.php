@@ -103,7 +103,10 @@ class CControllerMediatypeList extends CController {
 			order_result($data['mediatypes'], $sortField, $sortOrder);
 		}
 
-		$data['paging'] = getPagingLine($data['mediatypes'], $sortOrder);
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.list');
+
+		$data['paging'] = getPagingLine($data['mediatypes'], $sortOrder, $url);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

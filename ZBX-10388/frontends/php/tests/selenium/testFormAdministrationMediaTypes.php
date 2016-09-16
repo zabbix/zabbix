@@ -34,12 +34,17 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			],
 			[
 				'Email', ['Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
-					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com']],
-			['Script', ['Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']],
+					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com']
+			],
 			[
-				'Script', ['Description' => 'Skype message2',
-						'Script' => '/usr/local/bin/skyp2.sh']],
-			['SMS', ['Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']],
+				'Script', ['Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']
+			],
+			[
+				'Script', ['Description' => 'Skype message2', 'Script' => '/usr/local/bin/skyp2.sh']
+			],
+			[
+				'SMS', ['Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']
+			],
 			[
 				'Jabber',
 				[
@@ -52,53 +57,53 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		return $data;
 	}
 
+	public function testFormAdministrationMediaTypes_backup() {
+		DBsave_tables('media_type');
+	}
+
 	/**
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_CheckLayout($allMediaTypes) {
-		$this->zbxTestLogin('media_types.php');
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
+		$this->zbxTestCheckHeader('Media types');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create media type');
 
 		$this->zbxTestTextPresent('Media types');
-		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
-		$this->zbxTestTextPresent('Media');
+		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestTextNotPresent('Displaying');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email', 'Connection security', 'Authentication']);
 
-		$this->assertElementPresent('description');
-		$this->assertAttribute("//input[@id='description']/@maxlength", '100');
-		$this->assertAttribute("//input[@id='description']/@size", '50');
+		$this->zbxTestAssertElementPresentId('description');
+		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
+		$this->zbxTestAssertAttribute("//input[@id='description']", "size", 20);
 
-		$this->assertElementPresent('type');
-		$this->assertElementPresent("//select[@id='type']/option[text()='Email']");
-		$this->assertElementPresent("//select[@id='type']/option[text()='Script']");
-		$this->assertElementPresent("//select[@id='type']/option[text()='SMS']");
-		$this->assertElementPresent("//select[@id='type']/option[text()='Jabber']");
+		$this->zbxTestAssertElementPresentId('type');
+		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Jabber']);
+		$this->zbxTestAssertElementPresentXpath("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
 
-		$this->assertElementPresent("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
+		$this->zbxTestAssertElementPresentId('smtp_server');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "size", 20);
 
-		$this->assertElementPresent('smtp_server');
-		$this->assertAttribute("//input[@id='smtp_server']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='smtp_server']/@size", '50');
+		$this->zbxTestAssertElementPresentId('smtp_helo');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_helo']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_helo']", "size", 20);
 
-		$this->assertElementPresent('smtp_helo');
-		$this->assertAttribute("//input[@id='smtp_helo']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='smtp_helo']/@size", '50');
+		$this->zbxTestAssertElementPresentId('smtp_email');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_email']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_email']", "size", 20);
 
-		$this->assertElementPresent('smtp_email');
-		$this->assertAttribute("//input[@id='smtp_email']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='smtp_email']/@size", '50');
-
-		$this->assertElementPresent('status');
+		$this->zbxTestAssertElementPresentId('status');
 		if ($allMediaTypes['status']) {
-			$this->assertElementPresent("//input[@id='status' and not @checked]");
+			$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		}
 
 		// media type enabled
 		if ($allMediaTypes['status']==0) {
-			$this->assertElementPresent("//input[@id='status' and (@checked)]");
+			$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		}
 
 		$this->zbxTestClickWait('cancel');
@@ -110,48 +115,50 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	* @dataProvider newMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_Create($type, $data) {
-		$this->zbxTestLogin('media_types.php');
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestClickButtonText('Create media type');
 
 		switch ($type) {
 			case 'Email':
 				$this->zbxTestDropdownSelect('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('smtp_server', $data['SMTP server']);
-				$this->input_type('smtp_helo', $data['SMTP helo']);
-				$this->input_type('smtp_email', $data['SMTP email']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
+				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
+				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
 				break;
 			case 'Script':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('exec_path', $data['Script']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('exec_path', $data['Script']);
 				break;
 			case 'SMS':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('gsm_modem', $data['GSM modem']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('gsm_modem', $data['GSM modem']);
 				break;
 			case 'Jabber':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('username', $data['Jabber identifier']);
-				$this->input_type('password', $data['Password']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('jabber_username', $data['Jabber identifier']);
+				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 			case 'Ez Texting':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('username', $data['Username']);
-				$this->input_type('password', $data['Password']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('eztext_username', $data['Username']);
+				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 		}
 
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickWait('add');
 
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestTextNotPresent('ERROR');
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestTextNotPresent('Cannot add media type');
+		$this->zbxTestTextPresent('Media type added');
 		$this->zbxTestTextPresent($data['Description']);
-		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 	}
 
 	/**
@@ -163,13 +170,14 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 		$oldHashMediaType = DBhash($sql);
 
-		$this->zbxTestLogin('media_types.php');
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
+		$this->zbxTestCheckHeader('Media types');
 
 		$this->assertEquals($oldHashMediaType, DBhash($sql), 'Chuck Norris: Media type values in the DB should not be changed in this case');
 	}
@@ -183,10 +191,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
 		$oldHashMediaType=DBhash($sqlMediaType);
 
-		$this->zbxTestLogin('media_types.php');
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Media type updated');
 
@@ -206,30 +214,29 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid='.zbx_dbstr($id).''));
 		$used_by_operations = ($row['cnt'] > 0);
 
-		DBsave_tables('media_type');
-
-		$this->zbxTestLogin('media_types.php');
+		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClick('link='.$name);
-		$this->chooseOkOnNextConfirmation();
-		$this->wait();
+		$this->zbxTestCheckHeader('Media types');
+		$this->zbxTestClickLinkText($name);
 
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 
-		$this->getConfirmation();
-		$this->wait();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of media types');
 		if ($used_by_operations) {
 				$this->zbxTestTextNotPresent('Media type deleted');
-				$this->zbxTestTextPresent('Cannot delete media type');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete media type');
 				$this->zbxTestTextPresent('Media types used by action');
 		}
 		else {
 				$this->zbxTestTextPresent('Media type deleted');
-				$sql = 'SELECT count(*) AS cnt FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
-				//$this->assertEquals(0, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
+				$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
+				$this->assertEquals(0, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
 		}
 
+	}
+
+	public function testFormAdministrationMediaTypes_restore() {
 		DBrestore_tables('media_type');
 	}
 }

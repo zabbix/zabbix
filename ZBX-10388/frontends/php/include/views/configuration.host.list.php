@@ -41,7 +41,7 @@ $filter = (new CFilter('web.hosts.filter.state'))
 	->addColumn((new CFormList())->addRow(_('IP like'),
 		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	))
-	->addColumn((new CFormList())->addRow(_('Port like'),
+	->addColumn((new CFormList())->addRow(_('Port'),
 		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	));
 

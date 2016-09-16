@@ -66,18 +66,15 @@ class testPageAdministrationAudit extends CWebTest {
 
 	public function testPageAdministrationAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php');
-		$this->zbxTestCheckTitle('Audit logs');
-		$this->assertElementPresent('config');
+		$this->zbxTestCheckTitle('Audit log');
+		$this->zbxTestAssertElementPresentId('config');
 
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('Logs');
+		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
 
-		// input field "User"
-		$this->assertElementPresent('alias');
-		$this->assertAttribute("//input[@id='alias']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='alias']/@size", '20');
-		$this->assertElementPresent('btn1');
+		$this->zbxTestAssertElementPresentId('alias');
+		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
+		$this->zbxTestAssertElementPresentId('btn1');
 
 		$this->zbxTestDropdownHasOptions('action', $this->actions);
 		$this->zbxTestDropdownHasOptions('resourcetype', $this->resourcetypes);
@@ -171,16 +168,15 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_Filter($action, $resourcetype) {
 		$this->zbxTestLogin('auditlogs.php');
-		$this->zbxTestCheckTitle('Audit logs');
-		$this->assertElementPresent('config');
+		$this->zbxTestCheckTitle('Audit log');
+		$this->zbxTestAssertElementPresentId('config');
 
-		$this->zbxTestClick('flicker_icon_l');
-
-		$this->input_type('alias', '');
+		$this->zbxTestInputType('alias', '');
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 
-		$this->zbxTestClickWait('filter');
+		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestCheckHeader('Audit log');
 	}
 
 }

@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageHosts extends CWebTest {
-	// Returns all hosts
+
 	public static function allHosts() {
 		return DBdata(
 			'SELECT h.name,h.hostid,g.name AS group_name'.
@@ -42,9 +42,9 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', $host['group_name']);
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestCheckHeader('Hosts');
 		$this->zbxTestTextPresent('Displaying');
-		// Header
+
 		$this->zbxTestTextPresent(
 			[
 				'Name',
@@ -56,13 +56,14 @@ class testPageHosts extends CWebTest {
 				'Interface',
 				'Templates',
 				'Status',
-				'Availability'
+				'Availability',
+				'Agent encryption',
+				'Info'
 			]
 		);
-		// Data
+
 		$this->zbxTestTextPresent([$host['name']]);
-		$this->zbxTestDropdownHasOptions('action',
-				['Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected']);
+		$this->zbxTestTextPresent(['Export', 'Mass update', 'Enable', 'Disable', 'Delete']);
 	}
 
 	/**
@@ -72,7 +73,14 @@ class testPageHosts extends CWebTest {
 		$hostid = $host['hostid'];
 		$name = $host['name'];
 
-		$sqlHosts = "select * from hosts where hostid=$hostid";
+		$sqlHosts =
+			'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+			'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+			'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+			'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,'.
+			'name,flags,templateid,description,tls_connect,tls_accept'.
+			' FROM hosts'.
+			' WHERE hostid='.$hostid;
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items where hostid=$hostid order by itemid";
 		$oldHashItems = DBhash($sqlItems);
@@ -94,10 +102,10 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestCheckHeader('Hosts');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		// Header
+
 		$this->zbxTestTextPresent(
 			[
 				'Name',
@@ -109,11 +117,13 @@ class testPageHosts extends CWebTest {
 				'Interface',
 				'Templates',
 				'Status',
-				'Availability'
+				'Availability',
+				'Agent encryption',
+				'Info'
 			]
 		);
 
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
@@ -135,35 +145,32 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_FilterHost($host) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		//$this->zbxTestClick('flicker_icon_l');
-		$this->zbxTestClickWait('filter_rst');
-		$this->input_type('filter_host', $host['name']);
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestInputTypeWait('filter_host', $host['name']);
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent($host['name']);
 	}
 
-	// filter returns nothing
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		// Reset filter
-		$this->zbxTestClickWait('filter_rst');
+		$this->zbxTestClickButtonText('Reset');
 
-		$this->input_type('filter_host', '1928379128ksdhksdjfh');
+		$this->zbxTestInputTypeWait('filter_host', '1928379128ksdhksdjfh');
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
+		$this->zbxTestClickButtonText('Reset');
 
-		$this->input_type('filter_host', '%');
+		$this->zbxTestInputTypeWait('filter_host', '%');
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
-	// filter reset
 	public function testPageHosts_FilterReset() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('filter_rst');
+		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -178,15 +185,15 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestCheckHeader('Hosts');
 		$this->zbxTestTextPresent('Displaying');
-		// Go to the list of items
-		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
-		$this->wait();
-		// We are in the list of items
+
+		$this->zbxTestHrefClickWait("items.php?filter_set=1&hostid=$hostid");
+
 		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
-		// Header
+
 		$this->zbxTestTextPresent(
 			[
 				'Wizard',
@@ -199,7 +206,7 @@ class testPageHosts extends CWebTest {
 				'Type',
 				'Status',
 				'Applications',
-				'Error'
+				'Info'
 			]
 		);
 	}
@@ -207,18 +214,14 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_MassActivateAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->assertVisible('goButton');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('host.massenable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Hosts enabled');
 
@@ -233,8 +236,6 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_MassActivate($host) {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$hostid = $host['hostid'];
 
 		$this->zbxTestLogin('hosts.php');
@@ -242,11 +243,9 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->assertVisible('goButton');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('host.massenable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host enabled');
 
@@ -257,20 +256,16 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_MassDisableAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->assertVisible('goButton');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('host.massdisable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Hosts disabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
 			" and name NOT LIKE '%{#%'";
@@ -283,8 +278,6 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_MassDisable($host) {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$hostid = $host['hostid'];
 
 		$this->zbxTestLogin('hosts.php');
@@ -292,11 +285,9 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->assertVisible('goButton');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('host.massdisable');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host disabled');
 

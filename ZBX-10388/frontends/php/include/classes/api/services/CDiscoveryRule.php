@@ -396,7 +396,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
 		if (!empty($iprototypeids)) {
-			if (!API::Itemprototype()->delete($iprototypeids, true)) {
+			if (!API::ItemPrototype()->delete($iprototypeids, true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 		}
@@ -562,6 +562,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectItems' => ['itemid', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
+			'selectDependencies' => ['triggerid'],
 			'preservekeys' => true
 		]);
 
@@ -570,32 +571,163 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		foreach ($srcTriggers as $id => $trigger) {
-			// skip triggers with web items
+			// Skip trigger prototypes with web items and remove them from source.
 			if (httpItemExists($trigger['items'])) {
 				unset($srcTriggers[$id]);
-				continue;
 			}
 		}
 
-		// save new triggers
+		/*
+		 * Copy the remaining trigger prototypes to a new source. These will contain IDs and original dependencies.
+		 * The dependencies from $srcTriggers will be removed.
+		 */
+		$trigger_prototypes = $srcTriggers;
+
+		// Contains original trigger prototype dependency IDs.
+		$dep_triggerids = [];
+
+		/*
+		 * Collect dependency trigger IDs and remove them from source. Otherwise these IDs do not pass
+		 * validation, since they don't belong to destination discovery rule.
+		 */
+		$add_dependencies = false;
+
+		foreach ($srcTriggers as $id => &$trigger) {
+			if ($trigger['dependencies']) {
+				foreach ($trigger['dependencies'] as $dep_trigger) {
+					$dep_triggerids[] = $dep_trigger['triggerid'];
+				}
+				$add_dependencies = true;
+			}
+			unset($trigger['dependencies']);
+		}
+		unset($trigger);
+
+		// Save new trigger prototypes and without dependencies for now.
 		$dstTriggers = $srcTriggers;
 		$dstTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dstTriggers);
 		foreach ($dstTriggers as $id => &$trigger) {
 			unset($dstTriggers[$id]['triggerid'], $dstTriggers[$id]['templateid']);
 
-			// update expression
+			// Update the destination expression.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
 				$dstHost['host']
 			);
 		}
 		unset($trigger);
 
-		$rs = API::TriggerPrototype()->create($dstTriggers);
-		if (!$rs) {
+		$result = API::TriggerPrototype()->create($dstTriggers);
+		if (!$result) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
 		}
 
-		return $rs;
+		// Process dependencies, if at least one trigger prototype has a dependency.
+		if ($add_dependencies) {
+			$trigger_prototypeids = array_keys($trigger_prototypes);
+
+			foreach ($result['triggerids'] as $i => $triggerid) {
+				$new_trigger_prototypes[$trigger_prototypeids[$i]] = [
+					'new_triggerid' => $triggerid,
+					'new_hostid' => $dstHost['hostid'],
+					'new_host' => $dstHost['host'],
+					'src_hostid' => $srcHost['hostid'],
+					'src_host' => $srcHost['host']
+				];
+			}
+
+			/*
+			 * Search for original dependant triggers and expressions to find corresponding triggers on destination host
+			 * with same expression.
+			 */
+			$dep_triggers = API::Trigger()->get([
+				'output' => ['description', 'expression'],
+				'selectHosts' => ['hostid'],
+				'triggerids' => $dep_triggerids,
+				'preservekeys' => true
+			]);
+			$dep_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dep_triggers);
+
+			// Map dependencies to the new trigger IDs and save.
+			foreach ($trigger_prototypes as &$trigger_prototype) {
+				// Get corresponding created trigger prototype ID.
+				$new_trigger_prototype = $new_trigger_prototypes[$trigger_prototype['triggerid']];
+
+				if ($trigger_prototype['dependencies']) {
+					foreach ($trigger_prototype['dependencies'] as &$dependency) {
+						$dep_triggerid = $dependency['triggerid'];
+
+						/*
+						 * We have added a dependant trigger prototype and we know corresponding trigger prototype ID
+						 * for newly created trigger prototype.
+						 */
+						if (array_key_exists($dependency['triggerid'], $new_trigger_prototypes)) {
+							/*
+							 * Dependency is within same host according to $srcHostId parameter or dep trigger has
+							 * single host.
+							 */
+							if ($new_trigger_prototype['src_hostid'] ==
+									$new_trigger_prototypes[$dep_triggerid]['src_hostid']) {
+								$dependency['triggerid'] = $new_trigger_prototypes[$dep_triggerid]['new_triggerid'];
+							}
+						}
+						elseif (in_array(['hostid' => $new_trigger_prototype['src_hostid']],
+								$dep_triggers[$dep_triggerid]['hosts'])) {
+							// Get all possible $depTrigger matching triggers by description.
+							$target_triggers = API::Trigger()->get([
+								'output' => ['hosts', 'triggerid', 'expression'],
+								'hostids' => $new_trigger_prototype['new_hostid'],
+								'filter' => ['description' => $dep_triggers[$dep_triggerid]['description']],
+								'preservekeys' => true
+							]);
+							$target_triggers = CMacrosResolverHelper::resolveTriggerExpressions($target_triggers);
+
+							// Compare exploded expressions for exact match.
+							$expr1 = $dep_triggers[$dep_triggerid]['expression'];
+							$dependency['triggerid'] = null;
+
+							foreach ($target_triggers as $target_trigger) {
+								$expr2 = triggerExpressionReplaceHost($target_trigger['expression'],
+									$new_trigger_prototype['new_host'],
+									$new_trigger_prototype['src_host']
+								);
+
+								if ($expr2 === $expr1) {
+									// Matching trigger has been found.
+									$dependency['triggerid'] = $target_trigger['triggerid'];
+									break;
+								}
+							}
+
+							// If matching trigger was not found, raise exception.
+							if ($dependency['triggerid'] === null) {
+								$expr2 = triggerExpressionReplaceHost($dep_triggers[$dep_triggerid]['expression'],
+									$new_trigger_prototype['src_host'],
+									$new_trigger_prototype['new_host']
+								);
+								error(_s(
+									'Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
+									$trigger_prototype['description'],
+									$trigger_prototype['expression'],
+									$dep_triggers[$dep_triggerid]['description'],
+									$expr2
+								));
+
+								return false;
+							}
+						}
+					}
+					unset($dependency);
+
+					$trigger_prototype['triggerid'] = $new_trigger_prototype['new_triggerid'];
+				}
+			}
+			unset($trigger_prototype);
+
+			// If adding a dependency fails, the exception will be raised in TriggerPrototype API.
+			API::TriggerPrototype()->addDependencies($trigger_prototypes);
+		}
+
+		return $result;
 	}
 
 	protected function createReal(&$items) {

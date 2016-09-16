@@ -31,7 +31,7 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestCheckTitle('User profile');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Copyright');
+		$this->zbxTestCheckHeader('Dashboard');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -40,25 +40,25 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('cancel');
-		$this->zbxTestTextPresent('Copyright');
+		$this->zbxTestCheckHeader('Dashboard');
 	}
 
 	public function testFormProfile_PasswordChange() {
 		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
 
-		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
+		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', $pwd);
-		$this->input_type('password2', $pwd);
+		$this->zbxTestInputTypeWait('password1', $pwd);
+		$this->zbxTestInputType('password2', $pwd);
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Copyright');
+		$this->zbxTestCheckHeader('Dashboard');
 
-		$row = DBfetch(DBselect('select passwd from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
+		$row = DBfetch(DBselect("select passwd from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals(md5($pwd), $row['passwd']);
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -67,11 +67,11 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestOpen('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', PHPUNIT_LOGIN_PWD);
-		$this->input_type('password2', PHPUNIT_LOGIN_PWD);
+		$this->zbxTestInputTypeWait('password1', PHPUNIT_LOGIN_PWD);
+		$this->zbxTestInputType('password2', PHPUNIT_LOGIN_PWD);
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Copyright');
+		$this->zbxTestCheckHeader('Dashboard');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -83,11 +83,11 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', '');
-		$this->input_type('password2', '');
+		$this->zbxTestInputTypeWait('password1', '');
+		$this->zbxTestInputType('password2', '');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('ERROR: Password should not be empty');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Password should not be empty');
 		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -100,28 +100,28 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', 'abc');
-		$this->input_type('password2', 'def');
+		$this->zbxTestInputTypeWait('password1', 'abc');
+		$this->zbxTestInputType('password2', 'def');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot update user. Both passwords must be equal.');
 		$this->zbxTestCheckTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_ThemeChange() {
-		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
+		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->zbxTestDropdownSelect('theme', 'Original blue');
+		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Copyright');
+		$this->zbxTestCheckHeader('Dashboard');
 
-		$row = DBfetch(DBselect('select theme from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
-		$this->assertEquals('originalblue', $row['theme']);
+		$row = DBfetch(DBselect("select theme from users where alias='".PHPUNIT_LOGIN_NAME."'"));
+		$this->assertEquals('blue-theme', $row['theme']);
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}

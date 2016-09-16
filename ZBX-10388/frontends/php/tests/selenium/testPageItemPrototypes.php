@@ -30,7 +30,7 @@ class testPageItemPrototypes extends CWebTest {
 			' WHERE i.itemid=d.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND d.parent_itemid=di.itemid'.
-				' AND i.key_ LIKE '.zbx_dbstr('%-layout-test%')
+				' AND i.key_ LIKE \'%-layout-test%\''
 		);
 	}
 
@@ -41,31 +41,26 @@ class testPageItemPrototypes extends CWebTest {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
-		// We are in the list of protos
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-		$this->zbxTestTextPresent('Item prototypes of '.$drule);
+		$this->zbxTestCheckHeader('Item prototypes');
+		$this->zbxTestTextPresent($drule);
+		$this->zbxTestTextPresent($data['name']);
 		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$this->zbxTestTextPresent('Host list');
+			$this->zbxTestTextPresent('All hosts');
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->zbxTestTextPresent('Template list');
+			$this->zbxTestTextPresent('All templates');
 		}
 
-		// Header
 		$this->zbxTestTextPresent(
 			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Status']
 		);
-		$this->zbxTestTextNotPresent('Error');
+		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->zbxTestDropdownHasOptions('action', [
-			'Enable selected',
-			'Disable selected',
-			'Delete selected'
-		]);
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);
 	}
 
 	/**
@@ -82,20 +77,16 @@ class testPageItemPrototypes extends CWebTest {
 		$itemid = $data['itemid'];
 		$drule = $data['d_name'];
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-		$this->zbxTestTextPresent('Item prototypes of '.$drule);
+		$this->zbxTestCheckHeader('Item prototypes');
+		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
 		$this->assertEquals(0, DBcount($sql));
@@ -123,7 +114,7 @@ class testPageItemPrototypes extends CWebTest {
 			' WHERE i.itemid=d.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND d.parent_itemid=di.itemid'.
-				' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+				' AND h.host LIKE \'%-layout-test%\''
 		);
 	}
 
@@ -139,20 +130,17 @@ class testPageItemPrototypes extends CWebTest {
 		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
-		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('itemprototype.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-		$this->zbxTestTextPresent('Item prototypes of '.$drule);
+		$this->zbxTestCheckHeader('Item prototypes');
+		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
 		$this->assertEquals(0, DBcount($sql));

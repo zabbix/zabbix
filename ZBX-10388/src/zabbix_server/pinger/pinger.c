@@ -181,6 +181,10 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							value_dbl = (0 != host->rcv ? host->sum / host->rcv : 0);
 							break;
 					}
+
+					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
+						value_dbl = ZBX_FLOAT_PRECISION;
+
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
 				case ICMPPINGLOSS:

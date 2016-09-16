@@ -277,9 +277,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'users.php',
 					'label' => _('Users'),
 					'sub_pages' => [
-						'popup_usrgrp.php',
-						'popup_media.php'
-					],
+						'popup_usrgrp.php'
+					]
 				],
 				[
 					'url' => 'zabbix.php',
