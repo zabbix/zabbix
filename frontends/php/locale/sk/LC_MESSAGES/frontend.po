@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-12 23:51+0300\n"
+"POT-Creation-Date: 2016-09-18 20:24+0300\n"
 "PO-Revision-Date: 2016-07-23 10:02+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -512,7 +512,7 @@ msgstr "Aktívny do"
 #: include/views/configuration.host.edit.php:167
 #: include/views/configuration.host.edit.php:183
 #: include/views/configuration.host.edit.php:607
-#: include/views/configuration.host.edit.php:818
+#: include/views/configuration.host.edit.php:808
 #: include/views/configuration.hostgroups.edit.php:71
 #: include/views/configuration.host.prototype.edit.php:210
 #: include/views/configuration.host.prototype.edit.php:285
@@ -882,7 +882,7 @@ msgstr "Budúca"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:1796 include/func.inc.php:119
+#: include/forms.inc.php:1802 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:116
 msgid "April"
 msgstr "Apríl"
@@ -948,7 +948,7 @@ msgstr[0] "O %1$s:%2$s každý deň"
 msgstr[1] "O %1$s:%2$s každé %3$s dni"
 msgstr[2] "O %1$s:%2$s každých %3$s dní"
 
-#: include/forms.inc.php:1927
+#: include/forms.inc.php:1933
 msgid "At (hour:minute)"
 msgstr "O (hodina:minúta)"
 
@@ -1000,7 +1000,7 @@ msgstr "Audit log"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:1780 include/func.inc.php:123
+#: include/forms.inc.php:1786 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:120
 msgid "August"
 msgstr "August"
@@ -1457,7 +1457,7 @@ msgstr "Nie je možné pridať službu"
 msgid "Cannot add slide show"
 msgstr "Nie je možné pridať prezentáciu"
 
-#: templates.php:248
+#: templates.php:167
 msgid "Cannot add template"
 msgstr "Nie je možné pridať šablónu"
 
@@ -1597,7 +1597,7 @@ msgid "Cannot create icon map"
 msgstr "Nie je možné vytvoriť mapu ikon"
 
 #: include/classes/api/services/CIconMap.php:164
-#: include/classes/api/services/CIconMap.php:224
+#: include/classes/api/services/CIconMap.php:233
 #, c-format
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Nie je možné vytvoriť mapu ikon s rovnakým menom \"%s\"."
@@ -1794,7 +1794,7 @@ msgstr "Nie je možné zmazať službu"
 msgid "Cannot delete slide show"
 msgstr "Nie je možné zmazať prezentáciu"
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Cannot delete template"
 msgstr "Nie je možné zmazať šablónu"
 
@@ -2285,12 +2285,12 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre aplikáciu \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:472
+#: include/classes/api/services/CGraphGeneral.php:487
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:476
+#: include/classes/api/services/CGraphGeneral.php:491
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr ""
@@ -2408,12 +2408,12 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre aplikáciu \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:606
+#: include/classes/api/services/CGraphGeneral.php:621
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:610
+#: include/classes/api/services/CGraphGeneral.php:625
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr ""
@@ -2648,7 +2648,7 @@ msgstr "Nie je možné aktualizovať službu"
 msgid "Cannot update slide show"
 msgstr "Nie je možné aktualizovať prezentáciu"
 
-#: templates.php:238
+#: templates.php:172
 msgid "Cannot update template"
 msgstr "Nie je možné aktualizovať šablónu"
 
@@ -2730,8 +2730,8 @@ msgstr "Stred"
 
 #: app/views/administration.proxy.edit.php:103
 #: app/views/administration.proxy.edit.php:111
-#: include/views/configuration.host.edit.php:767
-#: include/views/configuration.host.edit.php:779
+#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.edit.php:769
 #: include/views/configuration.host.massupdate.php:348
 #: include/views/configuration.host.massupdate.php:356
 #: include/views/configuration.host.prototype.edit.php:354
@@ -2935,7 +2935,7 @@ msgstr "Hodiny"
 #: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:394
 #: include/views/configuration.host.discovery.edit.php:354
-#: include/views/configuration.host.edit.php:809
+#: include/views/configuration.host.edit.php:799
 #: include/views/configuration.hostgroups.edit.php:76
 #: include/views/configuration.host.prototype.edit.php:401
 #: include/views/configuration.httpconf.edit.php:259
@@ -3342,7 +3342,7 @@ msgstr ""
 msgid "Connections"
 msgstr "Spojenia"
 
-#: include/views/configuration.host.edit.php:771
+#: include/views/configuration.host.edit.php:761
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
@@ -3352,7 +3352,7 @@ msgstr "Spojenia z hosta"
 msgid "Connections from proxy"
 msgstr "Spojenia z proxy"
 
-#: include/views/configuration.host.edit.php:763
+#: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
@@ -3799,7 +3799,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS meno"
 
-#: app/views/report.services.php:26 include/forms.inc.php:1688
+#: app/views/report.services.php:26 include/forms.inc.php:1694
 #: include/maintenances.inc.php:33 report4.php:102
 msgid "Daily"
 msgstr "Denne"
@@ -3906,7 +3906,7 @@ msgstr "Typ databázy"
 msgid "Database user"
 msgstr "Databázový používateľ"
 
-#: include/forms.inc.php:1826 include/forms.inc.php:1923
+#: include/forms.inc.php:1832 include/forms.inc.php:1929
 msgid "Date"
 msgstr "Dátum"
 
@@ -3926,11 +3926,11 @@ msgstr "Dátum vypršania kontraktu podpory HW"
 msgid "Date HW purchased"
 msgstr "Dátum kúpy HW"
 
-#: app/views/report.services.php:57 include/forms.inc.php:1828 report4.php:163
+#: app/views/report.services.php:57 include/forms.inc.php:1834 report4.php:163
 msgid "Day"
 msgstr "Deň"
 
-#: include/forms.inc.php:1893
+#: include/forms.inc.php:1899
 msgid "Day of month"
 msgstr "Deň v mesiaci"
 
@@ -3950,8 +3950,8 @@ msgstr "Deň v mesiaci je > N"
 msgid "Day of month is NOT N"
 msgstr "Deň v mesiaci NIE JE N"
 
-#: include/forms.inc.php:1758 include/forms.inc.php:1829
-#: include/forms.inc.php:1889
+#: include/forms.inc.php:1764 include/forms.inc.php:1835
+#: include/forms.inc.php:1895
 msgid "Day of week"
 msgstr "Deň v týždni"
 
@@ -3971,7 +3971,7 @@ msgstr "Deň v týždni je > N"
 msgid "Day of week is NOT N"
 msgstr "Deň v týždni NIE JE N"
 
-#: include/forms.inc.php:1945
+#: include/forms.inc.php:1951
 msgid "Days"
 msgstr "dní"
 
@@ -3993,7 +3993,7 @@ msgstr "Ladiaci režim aktualizovaný"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:1820 include/func.inc.php:127
+#: include/forms.inc.php:1826 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:124
 msgid "December"
 msgstr "December"
@@ -4256,7 +4256,7 @@ msgstr "Zmazať označený prototyp hosta?"
 msgid "Delete selected host prototypes?"
 msgstr "Zmazať označené prototypy hosta?"
 
-#: include/views/configuration.host.edit.php:811
+#: include/views/configuration.host.edit.php:801
 msgid "Delete selected host?"
 msgstr "Zmazať označeného hosta?"
 
@@ -5244,7 +5244,7 @@ msgstr "Prázdny host."
 #: include/classes/api/services/CHostInterface.php:389
 #: include/classes/api/services/CHost.php:1175
 #: include/classes/api/services/CHostPrototype.php:914
-#: include/classes/api/services/CIconMap.php:299
+#: include/classes/api/services/CIconMap.php:318
 #: include/classes/api/services/CItem.php:550
 #: include/classes/api/services/CItemPrototype.php:703
 #: include/classes/api/services/CMap.php:348
@@ -5496,7 +5496,7 @@ msgstr "Povolené"
 
 #: app/views/administration.proxy.edit.php:127
 #: app/views/administration.proxy.list.php:60
-#: include/views/configuration.host.edit.php:799
+#: include/views/configuration.host.edit.php:789
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:386
 msgid "Encryption"
@@ -5608,11 +5608,11 @@ msgstr "Udalosti"
 msgid "Events and alerts"
 msgstr "Udalosti a poplachy"
 
-#: include/forms.inc.php:1700
+#: include/forms.inc.php:1706
 msgid "Every day(s)"
 msgstr "Každý deň(dni)"
 
-#: include/forms.inc.php:1710
+#: include/forms.inc.php:1716
 msgid "Every week(s)"
 msgstr "Každý týždeň(e)"
 
@@ -5826,7 +5826,7 @@ msgstr "Obľúbené"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:1776 include/func.inc.php:117
+#: include/forms.inc.php:1782 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:114
 msgid "February"
 msgstr "Február"
@@ -5971,7 +5971,7 @@ msgstr "Ukončiť"
 msgid "Finnish (fi_FI)"
 msgstr "Fínsky (fi_FI)"
 
-#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+#: include/forms.inc.php:1843 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Prvý"
 
@@ -6032,7 +6032,7 @@ msgstr "Predpoveď na ďalších t sekúnd založených na perióde T NIE JE N"
 msgid "Formula"
 msgstr "Vzorec"
 
-#: include/forms.inc.php:1840 include/maintenances.inc.php:114
+#: include/forms.inc.php:1846 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Štvrtý"
 
@@ -6044,7 +6044,7 @@ msgstr "Francúzsky (fr_FR)"
 msgid "Fri"
 msgstr "Pi"
 
-#: include/forms.inc.php:1742 include/forms.inc.php:1873
+#: include/forms.inc.php:1748 include/forms.inc.php:1879
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Friday"
 msgstr "Piatok"
@@ -6073,7 +6073,7 @@ msgstr "Frontend prístup aktualizovaný"
 msgid "Frontend messaging"
 msgstr "Povoliť frontend správy"
 
-#: include/views/configuration.host.edit.php:810
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.template.edit.php:485
 msgid "Full clone"
 msgstr "Vytvoriť úplnú kópiu"
@@ -6316,7 +6316,7 @@ msgstr "Typ grafu"
 msgid "Graph updated"
 msgstr "Graf aktualizovaný"
 
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:743
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Graf s menom \"%1$s\" už existuje v grafoch alebo prototypoch grafov."
@@ -6814,7 +6814,7 @@ msgstr "Rozhranie hosta"
 
 #: app/views/monitoring.problem.view.php:227 hostinventories.php:26
 #: include/views/common.filter.trigger.php:145
-#: include/views/configuration.host.edit.php:759
+#: include/views/configuration.host.edit.php:749
 #: include/views/configuration.host.prototype.edit.php:346
 #: include/views/inventory.host.list.php:21
 #: include/views/inventory.host.view.php:22 jsLoader.php:199
@@ -7024,7 +7024,7 @@ msgstr "Umiestnenie hostov"
 msgid "Hosts updated"
 msgstr "Hosty aktualizované"
 
-#: include/forms.inc.php:1947
+#: include/forms.inc.php:1953
 msgid "Hours"
 msgstr "hodín"
 
@@ -7209,44 +7209,44 @@ msgstr "Typ popisku ikony"
 msgid "Icon map"
 msgstr "Mapová ikona"
 
-#: include/classes/api/services/CIconMap.php:311
+#: include/classes/api/services/CIconMap.php:330
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
 msgstr "Mapová ikona \"%1$s\" nemôže byť zmazaná. Je použitá v mape \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:413
+#: include/classes/api/services/CIconMap.php:432
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
 msgstr "Mapová ikona \"%1$s\" je mapovaná s nesprávnym iconid \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:409
+#: include/classes/api/services/CIconMap.php:428
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
 msgstr "Mapová ikona \"%1$s\" je mapovaná s nesprávnou inventárnou spojnicou \"%2$s\"."
 
 #: include/classes/api/services/CIconMap.php:181
-#: include/classes/api/services/CIconMap.php:259
+#: include/classes/api/services/CIconMap.php:268
 #, c-format
 msgid "Icon map \"%s\" already exists."
 msgstr "Mapová ikona \"%s\" už existuje."
 
-#: include/classes/api/services/CIconMap.php:423
+#: include/classes/api/services/CIconMap.php:442
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
 msgstr "Mapová ikona \"%s\" nemôže byť mapovaná s prázdnym výrazom."
 
-#: include/classes/api/services/CIconMap.php:427
+#: include/classes/api/services/CIconMap.php:446
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
 msgstr "Mapová ikona \"%s\" nemôže byť mapovaná s globálnym výrazom, ktorý neexistuje."
 
-#: include/classes/api/services/CIconMap.php:431
+#: include/classes/api/services/CIconMap.php:450
 #, c-format
 msgid "Icon map \"%s\" has incorrect expression."
 msgstr "Mapová ikona \"%s\" má neplatný výraz."
 
-#: include/classes/api/services/CIconMap.php:384
-#: include/classes/api/services/CIconMap.php:389
+#: include/classes/api/services/CIconMap.php:403
+#: include/classes/api/services/CIconMap.php:408
 #, c-format
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "Mapová ikona \"%s\" musí mať najmenej jedno mapovanie."
@@ -7260,7 +7260,7 @@ msgid "Icon map deleted"
 msgstr "Mapová ikona zmazaná"
 
 #: include/classes/api/services/CIconMap.php:161
-#: include/classes/api/services/CIconMap.php:221
+#: include/classes/api/services/CIconMap.php:230
 msgid "Icon map name cannot be empty."
 msgstr "Meno mapovej ikony nemôže byť prázdne."
 
@@ -7268,7 +7268,7 @@ msgstr "Meno mapovej ikony nemôže byť prázdne."
 msgid "Icon map updated"
 msgstr "Mapová ikona aktualizovaná"
 
-#: include/classes/api/services/CIconMap.php:246
+#: include/classes/api/services/CIconMap.php:255
 #, c-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Mapová ikona s iconmapid \"%s\" neexistuje."
@@ -7279,7 +7279,7 @@ msgstr "Mapová ikona s iconmapid \"%s\" neexistuje."
 msgid "Icon mapping"
 msgstr "Mapovanie ikon"
 
-#: include/classes/api/services/CIconMap.php:437
+#: include/classes/api/services/CIconMap.php:456
 #, c-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "Mapovanie ikony \"%1$s\" na \"%2$s\" už existuje."
@@ -7920,7 +7920,7 @@ msgstr "Neplatný mód inventára v prevádzke."
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
 msgstr "Neplatné ID položky \"%1$s\" v prvku obrazovky."
 
-#: include/classes/api/services/CGraphGeneral.php:275
+#: include/classes/api/services/CGraphGeneral.php:290
 msgid "Incorrect item for axis value."
 msgstr "Neplatná položka pre hodnotu osi."
 
@@ -8034,7 +8034,7 @@ msgstr "Neplatné parametre pre aktulizačnú metódu \"%1$s\"."
 msgid "Incorrect parameters for condition."
 msgstr "Neplatné parametre pre podmienku."
 
-#: include/classes/api/services/CIconMap.php:216
+#: include/classes/api/services/CIconMap.php:225
 #, c-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "Neplatné parametre pre metódu aktualizácie mapove ikony \"%s\"."
@@ -8536,8 +8536,8 @@ msgstr "Interná JSON-RPC chyba."
 msgid "Internal data storage period (in days)"
 msgstr "Perióda uloženia interných údajov (v dňoch)"
 
-#: include/classes/api/services/CGraphGeneral.php:480
-#: include/classes/api/services/CGraphGeneral.php:614
+#: include/classes/api/services/CGraphGeneral.php:495
+#: include/classes/api/services/CGraphGeneral.php:629
 #: include/classes/api/services/CTriggerGeneral.php:301
 #: include/classes/api/services/CTriggerGeneral.php:439
 #: include/classes/api/services/CTriggerGeneral.php:502
@@ -8848,7 +8848,7 @@ msgid "Issue"
 msgstr "Problém"
 
 #: app/views/administration.proxy.edit.php:119
-#: include/views/configuration.host.edit.php:790
+#: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
@@ -9138,7 +9138,7 @@ msgstr "Jabber účet"
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1766 include/func.inc.php:116
+#: include/forms.inc.php:1772 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:113
 msgid "January"
 msgstr "Január"
@@ -9151,7 +9151,7 @@ msgstr "Japonsky (ja_JP)"
 msgid "Jul"
 msgstr "Júl"
 
-#: include/forms.inc.php:1770 include/func.inc.php:122
+#: include/forms.inc.php:1776 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:119
 msgid "July"
 msgstr "Júl"
@@ -9160,7 +9160,7 @@ msgstr "Júl"
 msgid "Jun"
 msgstr "Jún"
 
-#: include/forms.inc.php:1816 include/func.inc.php:121
+#: include/forms.inc.php:1822 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:118
 msgid "June"
 msgstr "Jún"
@@ -9246,7 +9246,7 @@ msgstr "Umiestnenie popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+#: include/forms.inc.php:1847 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Posledný"
 
@@ -9735,7 +9735,7 @@ msgstr "Údržba zmazaná"
 msgid "Maintenance period"
 msgstr "Perióda údržby"
 
-#: include/forms.inc.php:1941
+#: include/forms.inc.php:1947
 msgid "Maintenance period length"
 msgstr "Dĺžka periódy údržby"
 
@@ -9855,7 +9855,7 @@ msgstr "Mapy"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1786 include/func.inc.php:118
+#: include/forms.inc.php:1792 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:115
 msgid "March"
 msgstr "Marec"
@@ -9942,7 +9942,7 @@ msgstr "Maximálna hodnota v perióde T je > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Maximálna hodnota v perióde T NIE JE N"
 
-#: include/forms.inc.php:1806 include/func.inc.php:120
+#: include/forms.inc.php:1812 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:117
 msgid "May"
 msgstr "Máj"
@@ -10141,7 +10141,7 @@ msgstr "Minimálna hodnota pre periódu T je > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Minimálna hodnota pre periódu T NIE JE N"
 
-#: include/forms.inc.php:1949
+#: include/forms.inc.php:1955
 msgid "Minutes"
 msgstr "minút"
 
@@ -10149,8 +10149,8 @@ msgstr "minút"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Chýbajúce \"gitemid\" pole pre položku."
 
-#: include/classes/api/services/CGraphGeneral.php:427
-#: include/classes/api/services/CGraphGeneral.php:557
+#: include/classes/api/services/CGraphGeneral.php:442
+#: include/classes/api/services/CGraphGeneral.php:572
 msgid "Missing \"itemid\" field for item."
 msgstr "Chýbajúce \"itemid\" pole pre položku."
 
@@ -10200,7 +10200,7 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Po"
 
-#: include/forms.inc.php:1718 include/forms.inc.php:1849
+#: include/forms.inc.php:1724 include/forms.inc.php:1855
 #: include/func.inc.php:135 include/func.inc.php:225
 msgid "Monday"
 msgstr "Pondelok"
@@ -10219,11 +10219,11 @@ msgstr "Monitorovaný host"
 msgid "Monitoring"
 msgstr "Monitorovanie"
 
-#: app/views/report.services.php:55 include/forms.inc.php:1824 report4.php:150
+#: app/views/report.services.php:55 include/forms.inc.php:1830 report4.php:150
 msgid "Month"
 msgstr "Mesiac"
 
-#: app/views/report.services.php:28 include/forms.inc.php:1690
+#: app/views/report.services.php:28 include/forms.inc.php:1696
 #: include/maintenances.inc.php:37 report4.php:104
 msgid "Monthly"
 msgstr "Mesačne"
@@ -10236,7 +10236,7 @@ msgstr "Viacero výberov bolo nájdených..."
 msgid "More than 10 minutes"
 msgstr "Viac ako 10 minút"
 
-#: include/classes/api/services/CGraphGeneral.php:741
+#: include/classes/api/services/CGraphGeneral.php:756
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Viac ako jeden graf s menom \"%1$s\" pre host."
@@ -10727,8 +10727,8 @@ msgstr "Žiadne stanovené ID zisťovacích pravidiel."
 
 #: app/views/administration.proxy.edit.php:101
 #: app/views/administration.proxy.edit.php:107
-#: include/views/configuration.host.edit.php:765
-#: include/views/configuration.host.edit.php:773
+#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:346
 #: include/views/configuration.host.massupdate.php:352
 #: include/views/configuration.host.prototype.edit.php:352
@@ -10956,7 +10956,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CHttpTest.php:485
 #: include/classes/api/services/CHttpTest.php:614
 #: include/classes/api/services/CHttpTest.php:705
-#: include/classes/api/services/CIconMap.php:302
+#: include/classes/api/services/CIconMap.php:321
 #: include/classes/api/services/CImage.php:371
 #: include/classes/api/services/CImage.php:443
 #: include/classes/api/services/CImage.php:490
@@ -11183,7 +11183,7 @@ msgstr ""
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1810 include/func.inc.php:126
+#: include/forms.inc.php:1816 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:123
 msgid "November"
 msgstr "November"
@@ -11438,7 +11438,7 @@ msgstr "Okt"
 msgid "Octal"
 msgstr "Osmičkový"
 
-#: include/forms.inc.php:1800 include/func.inc.php:125
+#: include/forms.inc.php:1806 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:122
 msgid "October"
 msgstr "Október"
@@ -11486,7 +11486,7 @@ msgstr "Raz"
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z objekov je bez skupiny hostov."
 
-#: include/forms.inc.php:1687 include/maintenances.inc.php:31
+#: include/forms.inc.php:1693 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Jednorázovo"
 
@@ -11535,7 +11535,7 @@ msgstr "Len super administrátori môžu upravovať typy médií."
 msgid "Only Super Admins can update global macros."
 msgstr "Len super administrátori môžu upravovať globálne makrá."
 
-#: include/classes/api/services/CIconMap.php:205
+#: include/classes/api/services/CIconMap.php:214
 msgid "Only Super Admins can update icon maps."
 msgstr "Len super administrátori môžu aktualizovať mapové ikony."
 
@@ -11994,9 +11994,9 @@ msgstr ""
 #: app/views/administration.proxy.edit.php:116
 #: app/views/administration.proxy.list.php:109
 #: app/views/administration.proxy.list.php:122
+#: include/views/configuration.host.edit.php:756
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.edit.php:776
-#: include/views/configuration.host.edit.php:786
 #: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.list.php:210
 #: include/views/configuration.host.list.php:213
@@ -12010,7 +12010,7 @@ msgid "PSK"
 msgstr "PSK"
 
 #: app/views/administration.proxy.edit.php:113
-#: include/views/configuration.host.edit.php:782
+#: include/views/configuration.host.edit.php:772
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
@@ -12174,7 +12174,7 @@ msgstr "Vykonať DNS dotaz. Vráti reťazec s požadovaným typom informácie"
 msgid "Period"
 msgstr "Perióda"
 
-#: include/forms.inc.php:1692
+#: include/forms.inc.php:1698
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.services.edit.php:192
 msgid "Period type"
@@ -12634,8 +12634,8 @@ msgstr "Zotavenie"
 msgid "Recovery expression"
 msgstr ""
 
-#: include/forms.inc.php:1511 include/forms.inc.php:1516
-#: include/forms.inc.php:1524
+#: include/forms.inc.php:1514 include/forms.inc.php:1519
+#: include/forms.inc.php:1527
 msgid "Recovery expression syntax error."
 msgstr ""
 
@@ -12872,15 +12872,15 @@ msgstr "Reporty"
 msgid "Required"
 msgstr "Požadované"
 
-#: include/classes/api/services/CIconMap.php:399
+#: include/classes/api/services/CIconMap.php:418
 msgid "Required field \"expression\" is missing in icon mapping."
 msgstr "Požadované pole \"expression\" chýba v mapovaní ikon."
 
-#: include/classes/api/services/CIconMap.php:405
+#: include/classes/api/services/CIconMap.php:424
 msgid "Required field \"iconid\" is missing in icon mapping."
 msgstr "Požadované pole \"iconid\" chýba v mapovaní ikon."
 
-#: include/classes/api/services/CIconMap.php:402
+#: include/classes/api/services/CIconMap.php:421
 msgid "Required field \"inventory_link\" is missing in icon mapping."
 msgstr "Požadované pole \"inventory_link\" chýba v mapovaní ikôn."
 
@@ -13294,7 +13294,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "So"
 
-#: include/forms.inc.php:1748 include/forms.inc.php:1879
+#: include/forms.inc.php:1754 include/forms.inc.php:1885
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Saturday"
 msgstr "Sobota"
@@ -13511,7 +13511,7 @@ msgstr "Hľadaný atribút"
 msgid "Search pattern is empty"
 msgstr "Vyhľadávací vzor je prázdny"
 
-#: include/forms.inc.php:1838 include/maintenances.inc.php:112
+#: include/forms.inc.php:1844 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Druhý"
 
@@ -13684,7 +13684,7 @@ msgstr "Sep"
 msgid "Separated"
 msgstr "Oddelene"
 
-#: include/forms.inc.php:1790 include/func.inc.php:124
+#: include/forms.inc.php:1796 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:121
 msgid "September"
 msgstr "September"
@@ -14304,7 +14304,7 @@ msgid "Subject"
 msgstr "Predmet"
 
 #: app/views/administration.proxy.edit.php:122
-#: include/views/configuration.host.edit.php:794
+#: include/views/configuration.host.edit.php:784
 #: include/views/configuration.host.massupdate.php:367
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
@@ -14344,7 +14344,7 @@ msgstr "Súčet hodnôt v periode T NIE JE N"
 msgid "Sun"
 msgstr "Ne"
 
-#: include/forms.inc.php:1754 include/forms.inc.php:1885
+#: include/forms.inc.php:1760 include/forms.inc.php:1891
 #: include/func.inc.php:142 include/func.inc.php:224
 msgid "Sunday"
 msgstr "Nedeľa"
@@ -14495,6 +14495,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:174
 #: include/views/configuration.triggers.edit.php:355
 #: include/views/js/configuration.action.edit.js.php:63
+#: trigger_prototypes.php:50 trigger_prototypes.php:52 triggers.php:53
+#: triggers.php:55
 msgid "Target"
 msgstr "Cieľ"
 
@@ -14534,7 +14536,7 @@ msgstr "Šablóna \"%1$s\" už existuje."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Šablóna \"%1$s\" pre host \"%2$s\" neexistuje."
 
-#: templates.php:247
+#: templates.php:166
 msgid "Template added"
 msgstr "Šablóna pridaná"
 
@@ -14542,7 +14544,7 @@ msgstr "Šablóna pridaná"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Šablóna nemôže byť pripojená k inej šablóne viac ako raz, vrátanie prepojenia cez iné šablóny."
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Template deleted"
 msgstr "Šablóna zmazaná"
 
@@ -14576,7 +14578,7 @@ msgstr "Šablóna obrazoviek"
 msgid "Template trigger"
 msgstr "Šablóna spúšťača"
 
-#: templates.php:237
+#: templates.php:171
 msgid "Template updated"
 msgstr "Šablóna aktualizovaná"
 
@@ -14779,11 +14781,11 @@ msgstr[0] "Tam je \"%1$d\" skupina s interným GUI prístupom."
 msgstr[1] "Tam sú \"%1$d\" skupiny s interným GUI prístupom."
 msgstr[2] "Tam je \"%1$d\" skupín s interným GUI prístupom."
 
-#: include/forms.inc.php:1839 include/maintenances.inc.php:113
+#: include/forms.inc.php:1845 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Tretí"
 
-#: include/views/configuration.host.edit.php:738
+#: include/views/configuration.host.edit.php:728
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Toto pole je automaticky vyplnené položkou \"%s\"."
@@ -14816,7 +14818,7 @@ msgstr "Prahová hodnota"
 msgid "Thu"
 msgstr "Št"
 
-#: include/forms.inc.php:1736 include/forms.inc.php:1867
+#: include/forms.inc.php:1742 include/forms.inc.php:1873
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Thursday"
 msgstr "Štvrtok"
@@ -15272,7 +15274,7 @@ msgstr "Pokus o čítanie nedostupnej vlastnosti \"%s\"."
 msgid "Tue"
 msgstr "Ut"
 
-#: include/forms.inc.php:1724 include/forms.inc.php:1855
+#: include/forms.inc.php:1730 include/forms.inc.php:1861
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Tuesday"
 msgstr "Utorok"
@@ -15709,7 +15711,7 @@ msgstr "Dostupný"
 #: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:378
 #: include/views/configuration.host.discovery.edit.php:365
-#: include/views/configuration.host.edit.php:807
+#: include/views/configuration.host.edit.php:797
 #: include/views/configuration.hostgroups.edit.php:87
 #: include/views/configuration.host.massupdate.php:397
 #: include/views/configuration.host.prototype.edit.php:399
@@ -16623,12 +16625,12 @@ msgstr "Web scenáre"
 msgid "Wed"
 msgstr "St"
 
-#: include/forms.inc.php:1730 include/forms.inc.php:1861
+#: include/forms.inc.php:1736 include/forms.inc.php:1867
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Wednesday"
 msgstr "Streda"
 
-#: app/views/report.services.php:27 include/forms.inc.php:1689
+#: app/views/report.services.php:27 include/forms.inc.php:1695
 #: include/maintenances.inc.php:35 report4.php:103
 msgid "Weekly"
 msgstr "Týždenne"
@@ -16802,7 +16804,7 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "Maximálna hodnota osy Y"
 
-#: include/classes/api/services/CGraphGeneral.php:299
+#: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:689
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Maximálna hodnota pre os Y musí byť väčšia ako minimálna hodnota pre túto os."

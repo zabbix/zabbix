@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-12 23:51+0300\n"
+"POT-Creation-Date: 2016-09-18 20:24+0300\n"
 "PO-Revision-Date: 2016-09-07 20:44+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -511,7 +511,7 @@ msgstr "Активно до"
 #: include/views/configuration.host.edit.php:167
 #: include/views/configuration.host.edit.php:183
 #: include/views/configuration.host.edit.php:607
-#: include/views/configuration.host.edit.php:818
+#: include/views/configuration.host.edit.php:808
 #: include/views/configuration.hostgroups.edit.php:71
 #: include/views/configuration.host.prototype.edit.php:210
 #: include/views/configuration.host.prototype.edit.php:285
@@ -881,7 +881,7 @@ msgstr "Наближається"
 msgid "Apr"
 msgstr "Кві"
 
-#: include/forms.inc.php:1796 include/func.inc.php:119
+#: include/forms.inc.php:1802 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:116
 msgid "April"
 msgstr "Квітень"
@@ -947,7 +947,7 @@ msgstr[0] "О %1$s:%2$s кожний %3$s день"
 msgstr[1] "О %1$s:%2$s кожні %3$s дні"
 msgstr[2] "О %1$s:%2$s кожні %3$s днів"
 
-#: include/forms.inc.php:1927
+#: include/forms.inc.php:1933
 msgid "At (hour:minute)"
 msgstr "В (час:хвилина)"
 
@@ -999,7 +999,7 @@ msgstr "Журнал аудиту"
 msgid "Aug"
 msgstr "Сер"
 
-#: include/forms.inc.php:1780 include/func.inc.php:123
+#: include/forms.inc.php:1786 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:120
 msgid "August"
 msgstr "Серпень"
@@ -1456,7 +1456,7 @@ msgstr "Не вдалося додати послугу"
 msgid "Cannot add slide show"
 msgstr "Не вдалося додати слайд-шоу"
 
-#: templates.php:248
+#: templates.php:167
 msgid "Cannot add template"
 msgstr "Не вдалося додати шаблон"
 
@@ -1596,7 +1596,7 @@ msgid "Cannot create icon map"
 msgstr "Не вдалося створити призначення іконок"
 
 #: include/classes/api/services/CIconMap.php:164
-#: include/classes/api/services/CIconMap.php:224
+#: include/classes/api/services/CIconMap.php:233
 #, c-format
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не вдалося створити призначення іконок з ідентичним ім'ям \"%s\"."
@@ -1793,7 +1793,7 @@ msgstr "Не вдалося видалити послугу"
 msgid "Cannot delete slide show"
 msgstr "Не вдалося видалити слайд-шоу"
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Cannot delete template"
 msgstr "Не вдалося видалити шаблон"
 
@@ -2283,12 +2283,12 @@ msgstr "Не вдалося встановити \"%1$s\" для дії \"%2$s\"
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
 msgstr "Не вдалося задати \"%1$s\" для групи елементів даних \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:472
+#: include/classes/api/services/CGraphGeneral.php:487
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Не вдалося встановити \"%1$s\" для графіка \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:476
+#: include/classes/api/services/CGraphGeneral.php:491
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Не вдалося встановити \"%1$s\" для прототипу графіка \"%2$s\"."
@@ -2406,12 +2406,12 @@ msgstr "Не вдалося оновити \"%1$s\" для дії \"%2$s\"."
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для групи елементів даних \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:606
+#: include/classes/api/services/CGraphGeneral.php:621
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для графіка \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:610
+#: include/classes/api/services/CGraphGeneral.php:625
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Не вдалося оновити \"%1$s\" для прототипу графіка \"%2$s\"."
@@ -2644,7 +2644,7 @@ msgstr "Не вдалося оновити послугу"
 msgid "Cannot update slide show"
 msgstr "Не вдалося оновити слайд-шоу"
 
-#: templates.php:238
+#: templates.php:172
 msgid "Cannot update template"
 msgstr "Не вдалося оновити шаблон"
 
@@ -2725,8 +2725,8 @@ msgstr "По центру"
 
 #: app/views/administration.proxy.edit.php:103
 #: app/views/administration.proxy.edit.php:111
-#: include/views/configuration.host.edit.php:767
-#: include/views/configuration.host.edit.php:779
+#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.edit.php:769
 #: include/views/configuration.host.massupdate.php:348
 #: include/views/configuration.host.massupdate.php:356
 #: include/views/configuration.host.prototype.edit.php:354
@@ -2930,7 +2930,7 @@ msgstr "Годинник"
 #: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:394
 #: include/views/configuration.host.discovery.edit.php:354
-#: include/views/configuration.host.edit.php:809
+#: include/views/configuration.host.edit.php:799
 #: include/views/configuration.hostgroups.edit.php:76
 #: include/views/configuration.host.prototype.edit.php:401
 #: include/views/configuration.httpconf.edit.php:259
@@ -3337,7 +3337,7 @@ msgstr ""
 msgid "Connections"
 msgstr "З'єднання"
 
-#: include/views/configuration.host.edit.php:771
+#: include/views/configuration.host.edit.php:761
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
@@ -3347,7 +3347,7 @@ msgstr "З'єднання від вузла мережі"
 msgid "Connections from proxy"
 msgstr "З'єднання з проксі"
 
-#: include/views/configuration.host.edit.php:763
+#: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
@@ -3794,7 +3794,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS ім'я"
 
-#: app/views/report.services.php:26 include/forms.inc.php:1688
+#: app/views/report.services.php:26 include/forms.inc.php:1694
 #: include/maintenances.inc.php:33 report4.php:102
 msgid "Daily"
 msgstr "Щодня"
@@ -3901,7 +3901,7 @@ msgstr "Тип бази даних"
 msgid "Database user"
 msgstr "Користувач бази даних"
 
-#: include/forms.inc.php:1826 include/forms.inc.php:1923
+#: include/forms.inc.php:1832 include/forms.inc.php:1929
 msgid "Date"
 msgstr "Дата"
 
@@ -3921,11 +3921,11 @@ msgstr "Дата закінчення гарантії HW"
 msgid "Date HW purchased"
 msgstr "Дата придбання HW"
 
-#: app/views/report.services.php:57 include/forms.inc.php:1828 report4.php:163
+#: app/views/report.services.php:57 include/forms.inc.php:1834 report4.php:163
 msgid "Day"
 msgstr "День"
 
-#: include/forms.inc.php:1893
+#: include/forms.inc.php:1899
 msgid "Day of month"
 msgstr "День в місяць"
 
@@ -3945,8 +3945,8 @@ msgstr "День місяця > N"
 msgid "Day of month is NOT N"
 msgstr "День місяця НЕ є N"
 
-#: include/forms.inc.php:1758 include/forms.inc.php:1829
-#: include/forms.inc.php:1889
+#: include/forms.inc.php:1764 include/forms.inc.php:1835
+#: include/forms.inc.php:1895
 msgid "Day of week"
 msgstr "День в тиждень"
 
@@ -3966,7 +3966,7 @@ msgstr "День тижня > N"
 msgid "Day of week is NOT N"
 msgstr "День тижня НЕ є N"
 
-#: include/forms.inc.php:1945
+#: include/forms.inc.php:1951
 msgid "Days"
 msgstr "Днів"
 
@@ -3988,7 +3988,7 @@ msgstr "Режим діагностики оновлено"
 msgid "Dec"
 msgstr "Гру"
 
-#: include/forms.inc.php:1820 include/func.inc.php:127
+#: include/forms.inc.php:1826 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:124
 msgid "December"
 msgstr "Грудень"
@@ -4251,7 +4251,7 @@ msgstr "Видалити вибраний прототип вузлів мере
 msgid "Delete selected host prototypes?"
 msgstr "Видалити вибрані прототипи вузлів мережі?"
 
-#: include/views/configuration.host.edit.php:811
+#: include/views/configuration.host.edit.php:801
 msgid "Delete selected host?"
 msgstr "Видалити вибраний вузел мережі?"
 
@@ -5239,7 +5239,7 @@ msgstr "Пусте ім'я вузла мережі."
 #: include/classes/api/services/CHostInterface.php:389
 #: include/classes/api/services/CHost.php:1175
 #: include/classes/api/services/CHostPrototype.php:914
-#: include/classes/api/services/CIconMap.php:299
+#: include/classes/api/services/CIconMap.php:318
 #: include/classes/api/services/CItem.php:550
 #: include/classes/api/services/CItemPrototype.php:703
 #: include/classes/api/services/CMap.php:348
@@ -5491,7 +5491,7 @@ msgstr "Активовано"
 
 #: app/views/administration.proxy.edit.php:127
 #: app/views/administration.proxy.list.php:60
-#: include/views/configuration.host.edit.php:799
+#: include/views/configuration.host.edit.php:789
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:386
 msgid "Encryption"
@@ -5603,11 +5603,11 @@ msgstr "Події"
 msgid "Events and alerts"
 msgstr "Події і повідомлення"
 
-#: include/forms.inc.php:1700
+#: include/forms.inc.php:1706
 msgid "Every day(s)"
 msgstr "Щодня"
 
-#: include/forms.inc.php:1710
+#: include/forms.inc.php:1716
 msgid "Every week(s)"
 msgstr "Щотижня"
 
@@ -5821,7 +5821,7 @@ msgstr "Обрані"
 msgid "Feb"
 msgstr "Лют"
 
-#: include/forms.inc.php:1776 include/func.inc.php:117
+#: include/forms.inc.php:1782 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:114
 msgid "February"
 msgstr "Лютий"
@@ -5966,7 +5966,7 @@ msgstr "Завершити"
 msgid "Finnish (fi_FI)"
 msgstr "Фінська (fi_FI)"
 
-#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+#: include/forms.inc.php:1843 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Перший"
 
@@ -6027,7 +6027,7 @@ msgstr "Прогноз на наступні t секунд, на основі �
 msgid "Formula"
 msgstr "Формула"
 
-#: include/forms.inc.php:1840 include/maintenances.inc.php:114
+#: include/forms.inc.php:1846 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Четвертий"
 
@@ -6039,7 +6039,7 @@ msgstr "Французька (fr_FR)"
 msgid "Fri"
 msgstr "П'ят"
 
-#: include/forms.inc.php:1742 include/forms.inc.php:1873
+#: include/forms.inc.php:1748 include/forms.inc.php:1879
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Friday"
 msgstr "П'ятниця"
@@ -6068,7 +6068,7 @@ msgstr "Доступ до веб-інтерфейсу оновлено"
 msgid "Frontend messaging"
 msgstr "Повідомлення у веб-інтерфейсі"
 
-#: include/views/configuration.host.edit.php:810
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.template.edit.php:485
 msgid "Full clone"
 msgstr "Клонувати повністю"
@@ -6311,7 +6311,7 @@ msgstr "Тип графіка"
 msgid "Graph updated"
 msgstr "Графік оновлено"
 
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:743
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Графік з іменем \"%1$s\" вже існує в графіках або в прототипах графіків."
@@ -6809,7 +6809,7 @@ msgstr "Інтерфейс вузла мережі"
 
 #: app/views/monitoring.problem.view.php:227 hostinventories.php:26
 #: include/views/common.filter.trigger.php:145
-#: include/views/configuration.host.edit.php:759
+#: include/views/configuration.host.edit.php:749
 #: include/views/configuration.host.prototype.edit.php:346
 #: include/views/inventory.host.list.php:21
 #: include/views/inventory.host.view.php:22 jsLoader.php:199
@@ -7018,7 +7018,7 @@ msgstr "Розміщення вузлів"
 msgid "Hosts updated"
 msgstr "Вузли мережі оновлено"
 
-#: include/forms.inc.php:1947
+#: include/forms.inc.php:1953
 msgid "Hours"
 msgstr "Годин"
 
@@ -7203,44 +7203,44 @@ msgstr "Тип ярлика у іконці"
 msgid "Icon map"
 msgstr "Призначення іконок"
 
-#: include/classes/api/services/CIconMap.php:311
+#: include/classes/api/services/CIconMap.php:330
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
 msgstr "Призначення іконок \"%1$s\" не може бути видалено. Використовується в карті мережі \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:413
+#: include/classes/api/services/CIconMap.php:432
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
 msgstr "Призначення іконок \"%1$s\" посилається на некоректний iconid \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:409
+#: include/classes/api/services/CIconMap.php:428
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
 msgstr "Призначення іконок \"%1$s\" посилається на некоректний зв'язок \"%2$s\" з інвентарними даними."
 
 #: include/classes/api/services/CIconMap.php:181
-#: include/classes/api/services/CIconMap.php:259
+#: include/classes/api/services/CIconMap.php:268
 #, c-format
 msgid "Icon map \"%s\" already exists."
 msgstr "Призначення іконок \"%s\" вже існує."
 
-#: include/classes/api/services/CIconMap.php:423
+#: include/classes/api/services/CIconMap.php:442
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
 msgstr "Призначення іконок \"%s\" не може посилатись на пустий вираз."
 
-#: include/classes/api/services/CIconMap.php:427
+#: include/classes/api/services/CIconMap.php:446
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
 msgstr "Призначення іконок \"%s\" не може посилатись на глобальний вираз якого не існує."
 
-#: include/classes/api/services/CIconMap.php:431
+#: include/classes/api/services/CIconMap.php:450
 #, c-format
 msgid "Icon map \"%s\" has incorrect expression."
 msgstr "Призначення іконок \"%s\" має некоректний вираз."
 
-#: include/classes/api/services/CIconMap.php:384
-#: include/classes/api/services/CIconMap.php:389
+#: include/classes/api/services/CIconMap.php:403
+#: include/classes/api/services/CIconMap.php:408
 #, c-format
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "Призначення іконок \"%s\" повинно мати як мінімум одне призначення."
@@ -7254,7 +7254,7 @@ msgid "Icon map deleted"
 msgstr "Призначення іконок видалено"
 
 #: include/classes/api/services/CIconMap.php:161
-#: include/classes/api/services/CIconMap.php:221
+#: include/classes/api/services/CIconMap.php:230
 msgid "Icon map name cannot be empty."
 msgstr "Ім'я призначення іконок не може бути пустим."
 
@@ -7262,7 +7262,7 @@ msgstr "Ім'я призначення іконок не може бути пу�
 msgid "Icon map updated"
 msgstr "Призначення іконок оновлено"
 
-#: include/classes/api/services/CIconMap.php:246
+#: include/classes/api/services/CIconMap.php:255
 #, c-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Призначення іконок з iconmapid \"%s\" не існує."
@@ -7273,7 +7273,7 @@ msgstr "Призначення іконок з iconmapid \"%s\" не існує.
 msgid "Icon mapping"
 msgstr "Призначення іконок"
 
-#: include/classes/api/services/CIconMap.php:437
+#: include/classes/api/services/CIconMap.php:456
 #, c-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "В призначенні іконок запис \"%1$s\" для \"%2$s\" вже існує."
@@ -7914,7 +7914,7 @@ msgstr "Некоректний режим інвентарних даних в �
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID елемента даних \"%1$s\" вказано для елемента комплексного екрану."
 
-#: include/classes/api/services/CGraphGeneral.php:275
+#: include/classes/api/services/CGraphGeneral.php:290
 msgid "Incorrect item for axis value."
 msgstr "Некоректний елемент даних для значення вісі."
 
@@ -8028,7 +8028,7 @@ msgstr "Некоректні параметри для методу оновле
 msgid "Incorrect parameters for condition."
 msgstr "Некоректні параметри для умови."
 
-#: include/classes/api/services/CIconMap.php:216
+#: include/classes/api/services/CIconMap.php:225
 #, c-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "Некоректні параметри для методу оновлення призначення іконок \"%s\"."
@@ -8530,8 +8530,8 @@ msgstr "Внутрішня помилка JSON-RPC."
 msgid "Internal data storage period (in days)"
 msgstr "Період зберігання внутрішніх даних (в днях)"
 
-#: include/classes/api/services/CGraphGeneral.php:480
-#: include/classes/api/services/CGraphGeneral.php:614
+#: include/classes/api/services/CGraphGeneral.php:495
+#: include/classes/api/services/CGraphGeneral.php:629
 #: include/classes/api/services/CTriggerGeneral.php:301
 #: include/classes/api/services/CTriggerGeneral.php:439
 #: include/classes/api/services/CTriggerGeneral.php:502
@@ -8842,7 +8842,7 @@ msgid "Issue"
 msgstr "Проблема"
 
 #: app/views/administration.proxy.edit.php:119
-#: include/views/configuration.host.edit.php:790
+#: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
@@ -9131,7 +9131,7 @@ msgstr "Ідентифікатор Jabber"
 msgid "Jan"
 msgstr "Січ"
 
-#: include/forms.inc.php:1766 include/func.inc.php:116
+#: include/forms.inc.php:1772 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:113
 msgid "January"
 msgstr "Січень"
@@ -9144,7 +9144,7 @@ msgstr "Японська (ja_JP)"
 msgid "Jul"
 msgstr "Лип"
 
-#: include/forms.inc.php:1770 include/func.inc.php:122
+#: include/forms.inc.php:1776 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:119
 msgid "July"
 msgstr "Липень"
@@ -9153,7 +9153,7 @@ msgstr "Липень"
 msgid "Jun"
 msgstr "Чер"
 
-#: include/forms.inc.php:1816 include/func.inc.php:121
+#: include/forms.inc.php:1822 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:118
 msgid "June"
 msgstr "Червень"
@@ -9239,7 +9239,7 @@ msgstr "Розміщення ярлика"
 msgid "Language"
 msgstr "Мова"
 
-#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+#: include/forms.inc.php:1847 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Останній"
 
@@ -9728,7 +9728,7 @@ msgstr "Сервіс видалено"
 msgid "Maintenance period"
 msgstr "Період сервісу"
 
-#: include/forms.inc.php:1941
+#: include/forms.inc.php:1947
 msgid "Maintenance period length"
 msgstr "Тривалість періоду сервісу"
 
@@ -9848,7 +9848,7 @@ msgstr "Карти мереж"
 msgid "Mar"
 msgstr "Бер"
 
-#: include/forms.inc.php:1786 include/func.inc.php:118
+#: include/forms.inc.php:1792 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:115
 msgid "March"
 msgstr "Березень"
@@ -9935,7 +9935,7 @@ msgstr "Максимальне значення за період T є > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Максимальне значення за період T НЕ є N"
 
-#: include/forms.inc.php:1806 include/func.inc.php:120
+#: include/forms.inc.php:1812 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:117
 msgid "May"
 msgstr "Тра"
@@ -10134,7 +10134,7 @@ msgstr "Мінімальне значення за період T є > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Мінімальне значення за період T НЕ є N"
 
-#: include/forms.inc.php:1949
+#: include/forms.inc.php:1955
 msgid "Minutes"
 msgstr "Хвилин"
 
@@ -10142,8 +10142,8 @@ msgstr "Хвилин"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Відсутнє поле \"gitemid\" для елемента даних."
 
-#: include/classes/api/services/CGraphGeneral.php:427
-#: include/classes/api/services/CGraphGeneral.php:557
+#: include/classes/api/services/CGraphGeneral.php:442
+#: include/classes/api/services/CGraphGeneral.php:572
 msgid "Missing \"itemid\" field for item."
 msgstr "Відсутнє поле \"itemid\" для елемента даних."
 
@@ -10193,7 +10193,7 @@ msgstr "Модель"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:1718 include/forms.inc.php:1849
+#: include/forms.inc.php:1724 include/forms.inc.php:1855
 #: include/func.inc.php:135 include/func.inc.php:225
 msgid "Monday"
 msgstr "Понеділок"
@@ -10212,11 +10212,11 @@ msgstr "Вузел мережі під спостереженням"
 msgid "Monitoring"
 msgstr "Моніторинг"
 
-#: app/views/report.services.php:55 include/forms.inc.php:1824 report4.php:150
+#: app/views/report.services.php:55 include/forms.inc.php:1830 report4.php:150
 msgid "Month"
 msgstr "Місяць"
 
-#: app/views/report.services.php:28 include/forms.inc.php:1690
+#: app/views/report.services.php:28 include/forms.inc.php:1696
 #: include/maintenances.inc.php:37 report4.php:104
 msgid "Monthly"
 msgstr "Щомісяця"
@@ -10229,7 +10229,7 @@ msgstr "Знайдено більше співпадінь..."
 msgid "More than 10 minutes"
 msgstr "Більше 10 хвилин"
 
-#: include/classes/api/services/CGraphGeneral.php:741
+#: include/classes/api/services/CGraphGeneral.php:756
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Більше ніж один графік з ім'ям \"%1$s\" у вузла мережі."
@@ -10720,8 +10720,8 @@ msgstr "ID правил виявлення не вказано."
 
 #: app/views/administration.proxy.edit.php:101
 #: app/views/administration.proxy.edit.php:107
-#: include/views/configuration.host.edit.php:765
-#: include/views/configuration.host.edit.php:773
+#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:346
 #: include/views/configuration.host.massupdate.php:352
 #: include/views/configuration.host.prototype.edit.php:352
@@ -10949,7 +10949,7 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CHttpTest.php:485
 #: include/classes/api/services/CHttpTest.php:614
 #: include/classes/api/services/CHttpTest.php:705
-#: include/classes/api/services/CIconMap.php:302
+#: include/classes/api/services/CIconMap.php:321
 #: include/classes/api/services/CImage.php:371
 #: include/classes/api/services/CImage.php:443
 #: include/classes/api/services/CImage.php:490
@@ -11176,7 +11176,7 @@ msgstr "Сповістити всіх, хто раніше отримав буд
 msgid "Nov"
 msgstr "Лис"
 
-#: include/forms.inc.php:1810 include/func.inc.php:126
+#: include/forms.inc.php:1816 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:123
 msgid "November"
 msgstr "Листопад"
@@ -11431,7 +11431,7 @@ msgstr "Жов"
 msgid "Octal"
 msgstr "Вісімковий"
 
-#: include/forms.inc.php:1800 include/func.inc.php:125
+#: include/forms.inc.php:1806 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:122
 msgid "October"
 msgstr "Жовтень"
@@ -11479,7 +11479,7 @@ msgstr "Один раз"
 msgid "One of the objects is left without a host group."
 msgstr "Один із об'єктів залишився без групи вузлів мережі."
 
-#: include/forms.inc.php:1687 include/maintenances.inc.php:31
+#: include/forms.inc.php:1693 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Одноразово"
 
@@ -11528,7 +11528,7 @@ msgstr "Тільки Супер-Адміністратори можуть ред
 msgid "Only Super Admins can update global macros."
 msgstr "Тільки Супер-Адміністратори можуть редагувати глобальні макроси."
 
-#: include/classes/api/services/CIconMap.php:205
+#: include/classes/api/services/CIconMap.php:214
 msgid "Only Super Admins can update icon maps."
 msgstr "Тільки Супер-Адміністратори можуть редагувати призначення іконок."
 
@@ -11987,9 +11987,9 @@ msgstr "Режим генерації подій ПРОБЛЕМА"
 #: app/views/administration.proxy.edit.php:116
 #: app/views/administration.proxy.list.php:109
 #: app/views/administration.proxy.list.php:122
+#: include/views/configuration.host.edit.php:756
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.edit.php:776
-#: include/views/configuration.host.edit.php:786
 #: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.list.php:210
 #: include/views/configuration.host.list.php:213
@@ -12003,7 +12003,7 @@ msgid "PSK"
 msgstr "PSK"
 
 #: app/views/administration.proxy.edit.php:113
-#: include/views/configuration.host.edit.php:782
+#: include/views/configuration.host.edit.php:772
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
@@ -12167,7 +12167,7 @@ msgstr "Виконує DNS запит. Повертає рядок символ�
 msgid "Period"
 msgstr "Період"
 
-#: include/forms.inc.php:1692
+#: include/forms.inc.php:1698
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.services.edit.php:192
 msgid "Period type"
@@ -12627,8 +12627,8 @@ msgstr "Відновлення"
 msgid "Recovery expression"
 msgstr "Вираз для відновлення"
 
-#: include/forms.inc.php:1511 include/forms.inc.php:1516
-#: include/forms.inc.php:1524
+#: include/forms.inc.php:1514 include/forms.inc.php:1519
+#: include/forms.inc.php:1527
 msgid "Recovery expression syntax error."
 msgstr "Синтаксична помилка у виразі для відновлення."
 
@@ -12865,15 +12865,15 @@ msgstr "Звіти"
 msgid "Required"
 msgstr "Вимагається текст-відповідь"
 
-#: include/classes/api/services/CIconMap.php:399
+#: include/classes/api/services/CIconMap.php:418
 msgid "Required field \"expression\" is missing in icon mapping."
 msgstr "В призначенні іконок пропущено необхідне поле \"expression\"."
 
-#: include/classes/api/services/CIconMap.php:405
+#: include/classes/api/services/CIconMap.php:424
 msgid "Required field \"iconid\" is missing in icon mapping."
 msgstr "В призначенні іконок пропущено необхідне поле \"iconid\"."
 
-#: include/classes/api/services/CIconMap.php:402
+#: include/classes/api/services/CIconMap.php:421
 msgid "Required field \"inventory_link\" is missing in icon mapping."
 msgstr "В призначенні іконок пропущено необхідне поле \"inventory_link\"."
 
@@ -13287,7 +13287,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Суб"
 
-#: include/forms.inc.php:1748 include/forms.inc.php:1879
+#: include/forms.inc.php:1754 include/forms.inc.php:1885
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Saturday"
 msgstr "Субота"
@@ -13504,7 +13504,7 @@ msgstr "Атрибут пошуку"
 msgid "Search pattern is empty"
 msgstr "Шаблон пошуку пустий"
 
-#: include/forms.inc.php:1838 include/maintenances.inc.php:112
+#: include/forms.inc.php:1844 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Другий"
 
@@ -13677,7 +13677,7 @@ msgstr "Вер"
 msgid "Separated"
 msgstr "Непідтверджені окремо"
 
-#: include/forms.inc.php:1790 include/func.inc.php:124
+#: include/forms.inc.php:1796 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:121
 msgid "September"
 msgstr "Вересень"
@@ -14297,7 +14297,7 @@ msgid "Subject"
 msgstr "Тема"
 
 #: app/views/administration.proxy.edit.php:122
-#: include/views/configuration.host.edit.php:794
+#: include/views/configuration.host.edit.php:784
 #: include/views/configuration.host.massupdate.php:367
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
@@ -14337,7 +14337,7 @@ msgstr "Сума значень за період T НЕ є N"
 msgid "Sun"
 msgstr "Нед"
 
-#: include/forms.inc.php:1754 include/forms.inc.php:1885
+#: include/forms.inc.php:1760 include/forms.inc.php:1891
 #: include/func.inc.php:142 include/func.inc.php:224
 msgid "Sunday"
 msgstr "Неділя"
@@ -14488,6 +14488,8 @@ msgstr "Теги"
 #: include/views/configuration.triggers.edit.php:174
 #: include/views/configuration.triggers.edit.php:355
 #: include/views/js/configuration.action.edit.js.php:63
+#: trigger_prototypes.php:50 trigger_prototypes.php:52 triggers.php:53
+#: triggers.php:55
 msgid "Target"
 msgstr "Ціль"
 
@@ -14527,7 +14529,7 @@ msgstr "Шаблон \"%1$s\" вже існує."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Шаблон \"%1$s\" для вузла мережі \"%2$s\" не існує."
 
-#: templates.php:247
+#: templates.php:166
 msgid "Template added"
 msgstr "Шаблон додано"
 
@@ -14535,7 +14537,7 @@ msgstr "Шаблон додано"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Шаблон не може бути приєднано до іншого шаблону більше ніж один раз, навіть через інші шаблони."
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Template deleted"
 msgstr "Шаблон видалено"
 
@@ -14569,7 +14571,7 @@ msgstr "Комплексні екрани з шаблону"
 msgid "Template trigger"
 msgstr "Тригер з шаблону"
 
-#: templates.php:237
+#: templates.php:171
 msgid "Template updated"
 msgstr "Шаблон оновлено"
 
@@ -14772,11 +14774,11 @@ msgstr[0] "Існує \"%1$d\" група з Внутрішнім доступо
 msgstr[1] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
 msgstr[2] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
 
-#: include/forms.inc.php:1839 include/maintenances.inc.php:113
+#: include/forms.inc.php:1845 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Третій"
 
-#: include/views/configuration.host.edit.php:738
+#: include/views/configuration.host.edit.php:728
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Це поле автоматично заповнюється елементом даних \"%s\"."
@@ -14809,7 +14811,7 @@ msgstr "Межа"
 msgid "Thu"
 msgstr "Чет"
 
-#: include/forms.inc.php:1736 include/forms.inc.php:1867
+#: include/forms.inc.php:1742 include/forms.inc.php:1873
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Thursday"
 msgstr "Четвер"
@@ -15264,7 +15266,7 @@ msgstr "Спроба читання недоступної властивост�
 msgid "Tue"
 msgstr "Вів"
 
-#: include/forms.inc.php:1724 include/forms.inc.php:1855
+#: include/forms.inc.php:1730 include/forms.inc.php:1861
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Tuesday"
 msgstr "Вівторок"
@@ -15701,7 +15703,7 @@ msgstr "Доступний"
 #: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:378
 #: include/views/configuration.host.discovery.edit.php:365
-#: include/views/configuration.host.edit.php:807
+#: include/views/configuration.host.edit.php:797
 #: include/views/configuration.hostgroups.edit.php:87
 #: include/views/configuration.host.massupdate.php:397
 #: include/views/configuration.host.prototype.edit.php:399
@@ -16615,12 +16617,12 @@ msgstr "Веб сценарії"
 msgid "Wed"
 msgstr "Сер"
 
-#: include/forms.inc.php:1730 include/forms.inc.php:1861
+#: include/forms.inc.php:1736 include/forms.inc.php:1867
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Wednesday"
 msgstr "Середа"
 
-#: app/views/report.services.php:27 include/forms.inc.php:1689
+#: app/views/report.services.php:27 include/forms.inc.php:1695
 #: include/maintenances.inc.php:35 report4.php:103
 msgid "Weekly"
 msgstr "Щотижня"
@@ -16794,7 +16796,7 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "Максимальне значення вісі Y"
 
-#: include/classes/api/services/CGraphGeneral.php:299
+#: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:689
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "МАКС значення вісі Y має бути більшим ніж МІН значення вісі Y."

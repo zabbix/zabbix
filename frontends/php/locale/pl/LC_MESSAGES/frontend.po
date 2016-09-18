@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-12 23:51+0300\n"
+"POT-Creation-Date: 2016-09-18 20:24+0300\n"
 "PO-Revision-Date: 2016-08-24 07:17+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -511,7 +511,7 @@ msgstr "Aktywne do"
 #: include/views/configuration.host.edit.php:167
 #: include/views/configuration.host.edit.php:183
 #: include/views/configuration.host.edit.php:607
-#: include/views/configuration.host.edit.php:818
+#: include/views/configuration.host.edit.php:808
 #: include/views/configuration.hostgroups.edit.php:71
 #: include/views/configuration.host.prototype.edit.php:210
 #: include/views/configuration.host.prototype.edit.php:285
@@ -881,7 +881,7 @@ msgstr "Nadchodzące"
 msgid "Apr"
 msgstr "Kwi"
 
-#: include/forms.inc.php:1796 include/func.inc.php:119
+#: include/forms.inc.php:1802 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:116
 msgid "April"
 msgstr "Kwiecień"
@@ -947,7 +947,7 @@ msgstr[0] "O %1$s:%2$s każdego dnia"
 msgstr[1] "O %1$s:%2$s każdego %3$s dnia"
 msgstr[2] "O %1$s:%2$s każdego %3$s dnia"
 
-#: include/forms.inc.php:1927
+#: include/forms.inc.php:1933
 msgid "At (hour:minute)"
 msgstr "O (godzina:minuta)"
 
@@ -999,7 +999,7 @@ msgstr "Log audytu"
 msgid "Aug"
 msgstr "Sie"
 
-#: include/forms.inc.php:1780 include/func.inc.php:123
+#: include/forms.inc.php:1786 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:120
 msgid "August"
 msgstr "Sierpień"
@@ -1456,7 +1456,7 @@ msgstr "Nie można dodać usługi"
 msgid "Cannot add slide show"
 msgstr "Nie można dodać pokazu slajdów"
 
-#: templates.php:248
+#: templates.php:167
 msgid "Cannot add template"
 msgstr "Nie można dodać szablonu"
 
@@ -1596,7 +1596,7 @@ msgid "Cannot create icon map"
 msgstr "Nie można utworzyć mapy ikon"
 
 #: include/classes/api/services/CIconMap.php:164
-#: include/classes/api/services/CIconMap.php:224
+#: include/classes/api/services/CIconMap.php:233
 #, c-format
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Nie można utworzyć map ikon o identycznej nazwie \"%s\"."
@@ -1793,7 +1793,7 @@ msgstr "Nie można usunąć usługi"
 msgid "Cannot delete slide show"
 msgstr "Nie można usunąć pokazu slajdów"
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Cannot delete template"
 msgstr "Nie można usunąć szablonu"
 
@@ -2283,12 +2283,12 @@ msgstr "Nie można ustawić \"%1$s\" dla akcji \"%2$s\"."
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
 msgstr "Nie można ustawić \"%1$s\" dla aplikacji \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:472
+#: include/classes/api/services/CGraphGeneral.php:487
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Nie można ustawić \"%1$s\" dla wykresu \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:476
+#: include/classes/api/services/CGraphGeneral.php:491
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Nie można ustawić \"%1$s\" dla prototypu wykresu \"%2$s\"."
@@ -2406,12 +2406,12 @@ msgstr "Nie można zaktualizować \"%1$s\" dla akcji \"%2$s\"."
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" dla aplikacji \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:606
+#: include/classes/api/services/CGraphGeneral.php:621
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" dla wykresu \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:610
+#: include/classes/api/services/CGraphGeneral.php:625
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" dla prototypu wykresu \"%2$s\"."
@@ -2646,7 +2646,7 @@ msgstr "Nie można zaktualizować usługi"
 msgid "Cannot update slide show"
 msgstr "Nie można zaktualizować pokazu slajdów"
 
-#: templates.php:238
+#: templates.php:172
 msgid "Cannot update template"
 msgstr "Nie można zaktualizować szablonu"
 
@@ -2728,8 +2728,8 @@ msgstr "W środku"
 
 #: app/views/administration.proxy.edit.php:103
 #: app/views/administration.proxy.edit.php:111
-#: include/views/configuration.host.edit.php:767
-#: include/views/configuration.host.edit.php:779
+#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.edit.php:769
 #: include/views/configuration.host.massupdate.php:348
 #: include/views/configuration.host.massupdate.php:356
 #: include/views/configuration.host.prototype.edit.php:354
@@ -2933,7 +2933,7 @@ msgstr "Zegar"
 #: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:394
 #: include/views/configuration.host.discovery.edit.php:354
-#: include/views/configuration.host.edit.php:809
+#: include/views/configuration.host.edit.php:799
 #: include/views/configuration.hostgroups.edit.php:76
 #: include/views/configuration.host.prototype.edit.php:401
 #: include/views/configuration.httpconf.edit.php:259
@@ -3340,7 +3340,7 @@ msgstr ""
 msgid "Connections"
 msgstr "Połączenia"
 
-#: include/views/configuration.host.edit.php:771
+#: include/views/configuration.host.edit.php:761
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
@@ -3350,7 +3350,7 @@ msgstr "Połączenia z hosta"
 msgid "Connections from proxy"
 msgstr "Połączenia z proxy"
 
-#: include/views/configuration.host.edit.php:763
+#: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
@@ -3797,7 +3797,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "Nazwa DNS"
 
-#: app/views/report.services.php:26 include/forms.inc.php:1688
+#: app/views/report.services.php:26 include/forms.inc.php:1694
 #: include/maintenances.inc.php:33 report4.php:102
 msgid "Daily"
 msgstr "Dziennie"
@@ -3904,7 +3904,7 @@ msgstr "Typ bazy danych"
 msgid "Database user"
 msgstr "Użytkownik bazy danych"
 
-#: include/forms.inc.php:1826 include/forms.inc.php:1923
+#: include/forms.inc.php:1832 include/forms.inc.php:1929
 msgid "Date"
 msgstr "Data"
 
@@ -3924,11 +3924,11 @@ msgstr "Data zakończenia umowy serwisowej"
 msgid "Date HW purchased"
 msgstr "Data zakupu sprzętu"
 
-#: app/views/report.services.php:57 include/forms.inc.php:1828 report4.php:163
+#: app/views/report.services.php:57 include/forms.inc.php:1834 report4.php:163
 msgid "Day"
 msgstr "Dzień"
 
-#: include/forms.inc.php:1893
+#: include/forms.inc.php:1899
 msgid "Day of month"
 msgstr "Dzień miesiąca"
 
@@ -3948,8 +3948,8 @@ msgstr "Dzień miesiąca jest > N"
 msgid "Day of month is NOT N"
 msgstr "Dzień miesiąca NIE jest = N"
 
-#: include/forms.inc.php:1758 include/forms.inc.php:1829
-#: include/forms.inc.php:1889
+#: include/forms.inc.php:1764 include/forms.inc.php:1835
+#: include/forms.inc.php:1895
 msgid "Day of week"
 msgstr "Dzień tygodnia"
 
@@ -3969,7 +3969,7 @@ msgstr "Dzień tygodnia jest > N"
 msgid "Day of week is NOT N"
 msgstr "Dzień tygodnia NIE jest = N"
 
-#: include/forms.inc.php:1945
+#: include/forms.inc.php:1951
 msgid "Days"
 msgstr "Dni"
 
@@ -3991,7 +3991,7 @@ msgstr "Zaktualizowano tryb debugowania"
 msgid "Dec"
 msgstr "Gru"
 
-#: include/forms.inc.php:1820 include/func.inc.php:127
+#: include/forms.inc.php:1826 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:124
 msgid "December"
 msgstr "Grudzień"
@@ -4254,7 +4254,7 @@ msgstr "Usunąć wybrany prototyp hosta?"
 msgid "Delete selected host prototypes?"
 msgstr "Usunąć wybrane prototypy hostów?"
 
-#: include/views/configuration.host.edit.php:811
+#: include/views/configuration.host.edit.php:801
 msgid "Delete selected host?"
 msgstr "Usunąć wybranego hosta?"
 
@@ -5242,7 +5242,7 @@ msgstr "Pusty host."
 #: include/classes/api/services/CHostInterface.php:389
 #: include/classes/api/services/CHost.php:1175
 #: include/classes/api/services/CHostPrototype.php:914
-#: include/classes/api/services/CIconMap.php:299
+#: include/classes/api/services/CIconMap.php:318
 #: include/classes/api/services/CItem.php:550
 #: include/classes/api/services/CItemPrototype.php:703
 #: include/classes/api/services/CMap.php:348
@@ -5494,7 +5494,7 @@ msgstr "Włączony"
 
 #: app/views/administration.proxy.edit.php:127
 #: app/views/administration.proxy.list.php:60
-#: include/views/configuration.host.edit.php:799
+#: include/views/configuration.host.edit.php:789
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:386
 msgid "Encryption"
@@ -5606,11 +5606,11 @@ msgstr "Zdarzenia"
 msgid "Events and alerts"
 msgstr "Zdarzenia i alarmy"
 
-#: include/forms.inc.php:1700
+#: include/forms.inc.php:1706
 msgid "Every day(s)"
 msgstr "Co ile dni"
 
-#: include/forms.inc.php:1710
+#: include/forms.inc.php:1716
 msgid "Every week(s)"
 msgstr "Co ile tygodni"
 
@@ -5824,7 +5824,7 @@ msgstr "Ulubione"
 msgid "Feb"
 msgstr "Lut"
 
-#: include/forms.inc.php:1776 include/func.inc.php:117
+#: include/forms.inc.php:1782 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:114
 msgid "February"
 msgstr "Luty"
@@ -5969,7 +5969,7 @@ msgstr "Zakończ"
 msgid "Finnish (fi_FI)"
 msgstr "Fiński (fi_FI)"
 
-#: include/forms.inc.php:1837 include/maintenances.inc.php:111
+#: include/forms.inc.php:1843 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Pierwszy"
 
@@ -6030,7 +6030,7 @@ msgstr "Prognoza na najbliższe t sekund w oparciu o okres T NIE jest N"
 msgid "Formula"
 msgstr "Formuła"
 
-#: include/forms.inc.php:1840 include/maintenances.inc.php:114
+#: include/forms.inc.php:1846 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Czwarty"
 
@@ -6042,7 +6042,7 @@ msgstr "Francuski (fr_FR)"
 msgid "Fri"
 msgstr "Pt"
 
-#: include/forms.inc.php:1742 include/forms.inc.php:1873
+#: include/forms.inc.php:1748 include/forms.inc.php:1879
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Friday"
 msgstr "Piątek"
@@ -6071,7 +6071,7 @@ msgstr "Zaktualizowano dostęp do interfejsu użytkownika"
 msgid "Frontend messaging"
 msgstr "Komunikaty interfejsu użytkownika"
 
-#: include/views/configuration.host.edit.php:810
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.template.edit.php:485
 msgid "Full clone"
 msgstr "Pełne powielenie"
@@ -6314,7 +6314,7 @@ msgstr "Typ wykresu"
 msgid "Graph updated"
 msgstr "Zaktualizowano wykres"
 
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:743
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Istnieje już wykres lub prototyp wykresu o nazwie \"%1$s\"."
@@ -6812,7 +6812,7 @@ msgstr "Interfejs hosta"
 
 #: app/views/monitoring.problem.view.php:227 hostinventories.php:26
 #: include/views/common.filter.trigger.php:145
-#: include/views/configuration.host.edit.php:759
+#: include/views/configuration.host.edit.php:749
 #: include/views/configuration.host.prototype.edit.php:346
 #: include/views/inventory.host.list.php:21
 #: include/views/inventory.host.view.php:22 jsLoader.php:199
@@ -7022,7 +7022,7 @@ msgstr "Lokalizacja hosta"
 msgid "Hosts updated"
 msgstr "Zaktualizowano hosty"
 
-#: include/forms.inc.php:1947
+#: include/forms.inc.php:1953
 msgid "Hours"
 msgstr "Godziny"
 
@@ -7207,44 +7207,44 @@ msgstr "Typ etykiety ikony"
 msgid "Icon map"
 msgstr "Mapa ikon"
 
-#: include/classes/api/services/CIconMap.php:311
+#: include/classes/api/services/CIconMap.php:330
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
 msgstr "Mapa ikon \"%1$s\" nie może być usunięta. Jest użyta w mapie \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:413
+#: include/classes/api/services/CIconMap.php:432
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
 msgstr "Mapa ikon \"%1$s\" posiada mapowanie z błędnym iconid \"%2$s\"."
 
-#: include/classes/api/services/CIconMap.php:409
+#: include/classes/api/services/CIconMap.php:428
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
 msgstr "Mapa ikon \"%1$s\" posiada mapowanie z błędnym połączeniem do inwentarza \"%2$s\"."
 
 #: include/classes/api/services/CIconMap.php:181
-#: include/classes/api/services/CIconMap.php:259
+#: include/classes/api/services/CIconMap.php:268
 #, c-format
 msgid "Icon map \"%s\" already exists."
 msgstr "Mapa ikon \"%s\" już istnieje."
 
-#: include/classes/api/services/CIconMap.php:423
+#: include/classes/api/services/CIconMap.php:442
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
 msgstr "Mapa ikon \"%s\" nie może posiadać mapowania z pustym wyrażeniem."
 
-#: include/classes/api/services/CIconMap.php:427
+#: include/classes/api/services/CIconMap.php:446
 #, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
 msgstr "Mapa ikon \"%s\" nie może posiadać mapowania zawierającego wyrażenie globalne, które nie istnieje."
 
-#: include/classes/api/services/CIconMap.php:431
+#: include/classes/api/services/CIconMap.php:450
 #, c-format
 msgid "Icon map \"%s\" has incorrect expression."
 msgstr "Mapa ikon \"%s\" posiada błędne wyrażenie."
 
-#: include/classes/api/services/CIconMap.php:384
-#: include/classes/api/services/CIconMap.php:389
+#: include/classes/api/services/CIconMap.php:403
+#: include/classes/api/services/CIconMap.php:408
 #, c-format
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "Mapa ikon \"%s\" musi posiadać przynajmniej jedno mapowanie."
@@ -7258,7 +7258,7 @@ msgid "Icon map deleted"
 msgstr "Usunięto mapę ikon"
 
 #: include/classes/api/services/CIconMap.php:161
-#: include/classes/api/services/CIconMap.php:221
+#: include/classes/api/services/CIconMap.php:230
 msgid "Icon map name cannot be empty."
 msgstr "Nazwa mapy ikon nie może być pusta."
 
@@ -7266,7 +7266,7 @@ msgstr "Nazwa mapy ikon nie może być pusta."
 msgid "Icon map updated"
 msgstr "Zaktualizowano mapę ikon"
 
-#: include/classes/api/services/CIconMap.php:246
+#: include/classes/api/services/CIconMap.php:255
 #, c-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "Mapa ikon o iconmapid \"%s\" nie istnieje."
@@ -7277,7 +7277,7 @@ msgstr "Mapa ikon o iconmapid \"%s\" nie istnieje."
 msgid "Icon mapping"
 msgstr "Mapowanie ikon"
 
-#: include/classes/api/services/CIconMap.php:437
+#: include/classes/api/services/CIconMap.php:456
 #, c-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr "Wpis mapowania ikon \"%1$s\" do \"%2$s\" istnieje."
@@ -7918,7 +7918,7 @@ msgstr "Błędny tryb inwentarza w operacji akcji."
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
 msgstr "Błędne ID pozycji \"%1$s\" dla elementu ekranu."
 
-#: include/classes/api/services/CGraphGeneral.php:275
+#: include/classes/api/services/CGraphGeneral.php:290
 msgid "Incorrect item for axis value."
 msgstr "Błędna pozycja dla wartości osi."
 
@@ -8032,7 +8032,7 @@ msgstr "Błędne parametry dla metody aktualizacji akcji \"%1$s\"."
 msgid "Incorrect parameters for condition."
 msgstr "Błędne parametry dla warunku."
 
-#: include/classes/api/services/CIconMap.php:216
+#: include/classes/api/services/CIconMap.php:225
 #, c-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "Błędne parametry dla metody aktualizacji mapy ikon \"%s\"."
@@ -8534,8 +8534,8 @@ msgstr "Błąd wewnętrzny JSON-RPC."
 msgid "Internal data storage period (in days)"
 msgstr "Okres przechowywania danych wewnętrznych (w dniach)"
 
-#: include/classes/api/services/CGraphGeneral.php:480
-#: include/classes/api/services/CGraphGeneral.php:614
+#: include/classes/api/services/CGraphGeneral.php:495
+#: include/classes/api/services/CGraphGeneral.php:629
 #: include/classes/api/services/CTriggerGeneral.php:301
 #: include/classes/api/services/CTriggerGeneral.php:439
 #: include/classes/api/services/CTriggerGeneral.php:502
@@ -8846,7 +8846,7 @@ msgid "Issue"
 msgstr "Problem"
 
 #: app/views/administration.proxy.edit.php:119
-#: include/views/configuration.host.edit.php:790
+#: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
@@ -9136,7 +9136,7 @@ msgstr "Identyfikator Jabbera"
 msgid "Jan"
 msgstr "Sty"
 
-#: include/forms.inc.php:1766 include/func.inc.php:116
+#: include/forms.inc.php:1772 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:113
 msgid "January"
 msgstr "Styczeń"
@@ -9149,7 +9149,7 @@ msgstr "Japoński (ja_JP)"
 msgid "Jul"
 msgstr "Lip"
 
-#: include/forms.inc.php:1770 include/func.inc.php:122
+#: include/forms.inc.php:1776 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:119
 msgid "July"
 msgstr "Lipiec"
@@ -9158,7 +9158,7 @@ msgstr "Lipiec"
 msgid "Jun"
 msgstr "Cze"
 
-#: include/forms.inc.php:1816 include/func.inc.php:121
+#: include/forms.inc.php:1822 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:118
 msgid "June"
 msgstr "Czerwiec"
@@ -9244,7 +9244,7 @@ msgstr "Położenie etykiety"
 msgid "Language"
 msgstr "Język"
 
-#: include/forms.inc.php:1841 include/maintenances.inc.php:115
+#: include/forms.inc.php:1847 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Ostatnia"
 
@@ -9733,7 +9733,7 @@ msgstr "Usunięto utrzymanie"
 msgid "Maintenance period"
 msgstr "Okres utrzymania"
 
-#: include/forms.inc.php:1941
+#: include/forms.inc.php:1947
 msgid "Maintenance period length"
 msgstr "Długość okresu utrzymania"
 
@@ -9853,7 +9853,7 @@ msgstr "Mapy"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1786 include/func.inc.php:118
+#: include/forms.inc.php:1792 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:115
 msgid "March"
 msgstr "Marzec"
@@ -9940,7 +9940,7 @@ msgstr "Maksymalna wartość w okresie T jest > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Maksymalna wartość w okresie T NIE jest = N"
 
-#: include/forms.inc.php:1806 include/func.inc.php:120
+#: include/forms.inc.php:1812 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:117
 msgid "May"
 msgstr "Maj"
@@ -10139,7 +10139,7 @@ msgstr "Minimalna wartość w okresie T jest > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Minimalna wartość w okresie T NIE jest = N"
 
-#: include/forms.inc.php:1949
+#: include/forms.inc.php:1955
 msgid "Minutes"
 msgstr "Minuty"
 
@@ -10147,8 +10147,8 @@ msgstr "Minuty"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Brakujące pole \"gitemid\" dla pozycji."
 
-#: include/classes/api/services/CGraphGeneral.php:427
-#: include/classes/api/services/CGraphGeneral.php:557
+#: include/classes/api/services/CGraphGeneral.php:442
+#: include/classes/api/services/CGraphGeneral.php:572
 msgid "Missing \"itemid\" field for item."
 msgstr "Brakujące pole \"itemid\" dla pozycji."
 
@@ -10198,7 +10198,7 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Pn"
 
-#: include/forms.inc.php:1718 include/forms.inc.php:1849
+#: include/forms.inc.php:1724 include/forms.inc.php:1855
 #: include/func.inc.php:135 include/func.inc.php:225
 msgid "Monday"
 msgstr "Poniedziałek"
@@ -10217,11 +10217,11 @@ msgstr "Monitorowany host"
 msgid "Monitoring"
 msgstr "Monitorowanie"
 
-#: app/views/report.services.php:55 include/forms.inc.php:1824 report4.php:150
+#: app/views/report.services.php:55 include/forms.inc.php:1830 report4.php:150
 msgid "Month"
 msgstr "Miesiąc"
 
-#: app/views/report.services.php:28 include/forms.inc.php:1690
+#: app/views/report.services.php:28 include/forms.inc.php:1696
 #: include/maintenances.inc.php:37 report4.php:104
 msgid "Monthly"
 msgstr "Miesięcznie"
@@ -10234,7 +10234,7 @@ msgstr "Znaleziono więcej dopasowań..."
 msgid "More than 10 minutes"
 msgstr "Ponad 10 minut"
 
-#: include/classes/api/services/CGraphGeneral.php:741
+#: include/classes/api/services/CGraphGeneral.php:756
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Więcej niż jeden wykres o nazwie \"%1$s\" w hoście."
@@ -10725,8 +10725,8 @@ msgstr "Nie podano żadnego identifykatora reguł wykrywania."
 
 #: app/views/administration.proxy.edit.php:101
 #: app/views/administration.proxy.edit.php:107
-#: include/views/configuration.host.edit.php:765
-#: include/views/configuration.host.edit.php:773
+#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.edit.php:763
 #: include/views/configuration.host.massupdate.php:346
 #: include/views/configuration.host.massupdate.php:352
 #: include/views/configuration.host.prototype.edit.php:352
@@ -10954,7 +10954,7 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: include/classes/api/services/CHttpTest.php:485
 #: include/classes/api/services/CHttpTest.php:614
 #: include/classes/api/services/CHttpTest.php:705
-#: include/classes/api/services/CIconMap.php:302
+#: include/classes/api/services/CIconMap.php:321
 #: include/classes/api/services/CImage.php:371
 #: include/classes/api/services/CImage.php:443
 #: include/classes/api/services/CImage.php:490
@@ -11181,7 +11181,7 @@ msgstr "Powiadom wszystkich, którzy otrzymali w przeszłości jakiekolwiek wiad
 msgid "Nov"
 msgstr "Lis"
 
-#: include/forms.inc.php:1810 include/func.inc.php:126
+#: include/forms.inc.php:1816 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:123
 msgid "November"
 msgstr "Listopad"
@@ -11436,7 +11436,7 @@ msgstr "Paź"
 msgid "Octal"
 msgstr "Ósemkowo"
 
-#: include/forms.inc.php:1800 include/func.inc.php:125
+#: include/forms.inc.php:1806 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:122
 msgid "October"
 msgstr "Październik"
@@ -11484,7 +11484,7 @@ msgstr "Raz"
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z obiektów nadal nie ma grupy hostów."
 
-#: include/forms.inc.php:1687 include/maintenances.inc.php:31
+#: include/forms.inc.php:1693 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Jednorazowo"
 
@@ -11533,7 +11533,7 @@ msgstr "Tylko Super Administratorzy mogą zmieniać typy mediów."
 msgid "Only Super Admins can update global macros."
 msgstr "Tylko Super Administratorzy mogą aktualizować makra globalne."
 
-#: include/classes/api/services/CIconMap.php:205
+#: include/classes/api/services/CIconMap.php:214
 msgid "Only Super Admins can update icon maps."
 msgstr "Tylko Super Administratorzy mogą aktualizować mapy ikon."
 
@@ -11992,9 +11992,9 @@ msgstr "PROBLEM - tryb generowania zdarzenia"
 #: app/views/administration.proxy.edit.php:116
 #: app/views/administration.proxy.list.php:109
 #: app/views/administration.proxy.list.php:122
+#: include/views/configuration.host.edit.php:756
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.edit.php:776
-#: include/views/configuration.host.edit.php:786
 #: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.list.php:210
 #: include/views/configuration.host.list.php:213
@@ -12008,7 +12008,7 @@ msgid "PSK"
 msgstr "PSK"
 
 #: app/views/administration.proxy.edit.php:113
-#: include/views/configuration.host.edit.php:782
+#: include/views/configuration.host.edit.php:772
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
@@ -12172,7 +12172,7 @@ msgstr "Wykonuje zapytanie DNS. Zwraca ciąg znaków z wymaganym typem informacj
 msgid "Period"
 msgstr "Okres"
 
-#: include/forms.inc.php:1692
+#: include/forms.inc.php:1698
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.services.edit.php:192
 msgid "Period type"
@@ -12632,8 +12632,8 @@ msgstr "Odzyskiwanie"
 msgid "Recovery expression"
 msgstr "Wyrażenie dla przywracania"
 
-#: include/forms.inc.php:1511 include/forms.inc.php:1516
-#: include/forms.inc.php:1524
+#: include/forms.inc.php:1514 include/forms.inc.php:1519
+#: include/forms.inc.php:1527
 msgid "Recovery expression syntax error."
 msgstr "Błąd składni wyrażenia przywracania."
 
@@ -12870,15 +12870,15 @@ msgstr "Raporty"
 msgid "Required"
 msgstr "Wymagane"
 
-#: include/classes/api/services/CIconMap.php:399
+#: include/classes/api/services/CIconMap.php:418
 msgid "Required field \"expression\" is missing in icon mapping."
 msgstr "Brakuje wymaganego pola \"wyrażenie\" w mapowaniu ikon."
 
-#: include/classes/api/services/CIconMap.php:405
+#: include/classes/api/services/CIconMap.php:424
 msgid "Required field \"iconid\" is missing in icon mapping."
 msgstr "Brakuje wymaganego pola \"iconid\" w mapowaniu ikon."
 
-#: include/classes/api/services/CIconMap.php:402
+#: include/classes/api/services/CIconMap.php:421
 msgid "Required field \"inventory_link\" is missing in icon mapping."
 msgstr "Brakuje wymaganego pola \"inventory_link\" w mapowaniu ikon."
 
@@ -13292,7 +13292,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Sob"
 
-#: include/forms.inc.php:1748 include/forms.inc.php:1879
+#: include/forms.inc.php:1754 include/forms.inc.php:1885
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Saturday"
 msgstr "Sobota"
@@ -13509,7 +13509,7 @@ msgstr "Atrybut wyszukiwania"
 msgid "Search pattern is empty"
 msgstr "Pusty wzorzec wyszukiwania"
 
-#: include/forms.inc.php:1838 include/maintenances.inc.php:112
+#: include/forms.inc.php:1844 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Drugi"
 
@@ -13682,7 +13682,7 @@ msgstr "Wrz"
 msgid "Separated"
 msgstr "Rozdzielone"
 
-#: include/forms.inc.php:1790 include/func.inc.php:124
+#: include/forms.inc.php:1796 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:121
 msgid "September"
 msgstr "Wrzesień"
@@ -14302,7 +14302,7 @@ msgid "Subject"
 msgstr "Temat"
 
 #: app/views/administration.proxy.edit.php:122
-#: include/views/configuration.host.edit.php:794
+#: include/views/configuration.host.edit.php:784
 #: include/views/configuration.host.massupdate.php:367
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
@@ -14342,7 +14342,7 @@ msgstr "Suma wartości z okresu T NIE jest = N"
 msgid "Sun"
 msgstr "Nie"
 
-#: include/forms.inc.php:1754 include/forms.inc.php:1885
+#: include/forms.inc.php:1760 include/forms.inc.php:1891
 #: include/func.inc.php:142 include/func.inc.php:224
 msgid "Sunday"
 msgstr "Niedziela"
@@ -14493,6 +14493,8 @@ msgstr "Znaczniki"
 #: include/views/configuration.triggers.edit.php:174
 #: include/views/configuration.triggers.edit.php:355
 #: include/views/js/configuration.action.edit.js.php:63
+#: trigger_prototypes.php:50 trigger_prototypes.php:52 triggers.php:53
+#: triggers.php:55
 msgid "Target"
 msgstr "Cel"
 
@@ -14532,7 +14534,7 @@ msgstr "Szablon \"%1$s\" już istnieje."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Nie istnieje szablon \"%1$s\" dla hosta \"%2$s\"."
 
-#: templates.php:247
+#: templates.php:166
 msgid "Template added"
 msgstr "Dodano szablon"
 
@@ -14540,7 +14542,7 @@ msgstr "Dodano szablon"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Szablon nie może być połączony z innym szablonem więcej niż raz nawet poprzez inne szablony."
 
-#: templates.php:376 templates.php:390 templates.php:415
+#: templates.php:384 templates.php:398 templates.php:423
 msgid "Template deleted"
 msgstr "Usunięto szablon"
 
@@ -14574,7 +14576,7 @@ msgstr "Ekrany szablonu"
 msgid "Template trigger"
 msgstr "Wyzwalacz szablonu"
 
-#: templates.php:237
+#: templates.php:171
 msgid "Template updated"
 msgstr "Zaktualizowano szablon"
 
@@ -14777,11 +14779,11 @@ msgstr[0] "Istnieje \"%1$d\" grupa z dostępem do wewnętrznego interfejsu użyt
 msgstr[1] "Istnieją \"%1$d\" grupy z dostępem do wewnętrznego interfejsu użytkownika."
 msgstr[2] "Istnieje \"%1$d\" grup z dostępem do wewnętrznego interfejsu użytkownika."
 
-#: include/forms.inc.php:1839 include/maintenances.inc.php:113
+#: include/forms.inc.php:1845 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Trzeci"
 
-#: include/views/configuration.host.edit.php:738
+#: include/views/configuration.host.edit.php:728
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "To pole jest automatycznie uzupełniane przez pozycję \"%s\"."
@@ -14814,7 +14816,7 @@ msgstr "Próg"
 msgid "Thu"
 msgstr "Cz"
 
-#: include/forms.inc.php:1736 include/forms.inc.php:1867
+#: include/forms.inc.php:1742 include/forms.inc.php:1873
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Thursday"
 msgstr "Czwartek"
@@ -15271,7 +15273,7 @@ msgstr "Próba odczytu niedostępnej właściwości \"%s\"."
 msgid "Tue"
 msgstr "Wt"
 
-#: include/forms.inc.php:1724 include/forms.inc.php:1855
+#: include/forms.inc.php:1730 include/forms.inc.php:1861
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Tuesday"
 msgstr "Wtorek"
@@ -15708,7 +15710,7 @@ msgstr "Działa"
 #: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:378
 #: include/views/configuration.host.discovery.edit.php:365
-#: include/views/configuration.host.edit.php:807
+#: include/views/configuration.host.edit.php:797
 #: include/views/configuration.hostgroups.edit.php:87
 #: include/views/configuration.host.massupdate.php:397
 #: include/views/configuration.host.prototype.edit.php:399
@@ -16622,12 +16624,12 @@ msgstr "Scenariusze sieci www"
 msgid "Wed"
 msgstr "Śr"
 
-#: include/forms.inc.php:1730 include/forms.inc.php:1861
+#: include/forms.inc.php:1736 include/forms.inc.php:1867
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Wednesday"
 msgstr "Środa"
 
-#: app/views/report.services.php:27 include/forms.inc.php:1689
+#: app/views/report.services.php:27 include/forms.inc.php:1695
 #: include/maintenances.inc.php:35 report4.php:103
 msgid "Weekly"
 msgstr "Tygodniowo"
@@ -16801,7 +16803,7 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "MAX wartość osi Y"
 
-#: include/classes/api/services/CGraphGeneral.php:299
+#: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:689
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Wartość MAX osi Y musi być większa od wartości MIN osi Y."
