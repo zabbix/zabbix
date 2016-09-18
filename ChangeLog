@@ -1,6 +1,7 @@
 Changes for 3.2.1rc1
 
 New features:
+A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
