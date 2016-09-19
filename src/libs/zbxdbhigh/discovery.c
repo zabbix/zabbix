@@ -209,27 +209,22 @@ static void	discovery_register_service(DB_DCHECK *dcheck,
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*key_esc, *ip_esc, *dns_esc;
+	char		*ip_esc, *dns_esc;
 
 	zbx_uint64_t	dhostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' port:%d key:'%s'",
 			__function_name, ip, port, dcheck->key_);
 
-	key_esc = DBdyn_escape_string_len(dcheck->key_, DSERVICE_KEY_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
 	result = DBselect(
 			"select dserviceid,dhostid,status,lastup,lastdown,value,dns"
 			" from dservices"
 			" where dcheckid=" ZBX_FS_UI64
-				" and type=%d"
-				" and key_" ZBX_SQL_STRCMP
 				" and ip" ZBX_SQL_STRCMP
 				" and port=%d",
 			dcheck->dcheckid,
-			dcheck->type,
-			ZBX_SQL_STRVAL_EQ(key_esc),
 			ZBX_SQL_STRVAL_EQ(ip_esc),
 			port);
 
@@ -245,10 +240,10 @@ static void	discovery_register_service(DB_DCHECK *dcheck,
 
 			dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 
-			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,dns,port,status)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s','%s',%d,%d)",
-					dservice->dserviceid, dhost->dhostid, dcheck->dcheckid, dcheck->type,
-					key_esc, ip_esc, dns_esc, port, dservice->status);
+			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,ip,dns,port,status)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d)",
+					dservice->dserviceid, dhost->dhostid, dcheck->dcheckid,
+					ip_esc, dns_esc, port, dservice->status);
 
 			zbx_free(dns_esc);
 		}
@@ -291,7 +286,6 @@ static void	discovery_register_service(DB_DCHECK *dcheck,
 	DBfree_result(result);
 
 	zbx_free(ip_esc);
-	zbx_free(key_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
