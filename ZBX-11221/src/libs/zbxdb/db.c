@@ -322,7 +322,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	if (0 != mysql_autocommit(conn, 1))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL autocommit option.");
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
