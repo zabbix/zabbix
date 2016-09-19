@@ -46,6 +46,7 @@ A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "invento
 ..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
 ..F....... [ZBX-10987] fixed table header line not being visible in dark theme (Pavel)
 ........S. [ZBX-10797] fixed evaluation of user macros in calculated items (Andris)
+....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0 (vlad)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.4
