@@ -388,7 +388,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 							CONFIG_TRAPPER_TIMEOUT);
 					break;
 				default:
-					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]",
+					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",
 							(int)script->execute_on);
 			}
 			break;
@@ -397,10 +397,10 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
 			{
 				if (NULL != result)
-					*result = zbx_strdup(*result, "IPMI command successfully executed");
+					*result = zbx_strdup(*result, "IPMI command successfully executed.");
 			}
 #else
-			zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
+			zbx_strlcpy(error, "Support for IPMI commands was not compiled in.", max_error_len);
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
@@ -411,7 +411,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			/* break; is not missing here */
 #else
-			zbx_strlcpy(error, "Support for SSH script was not compiled in", max_error_len);
+			zbx_strlcpy(error, "Support for SSH script was not compiled in.", max_error_len);
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
@@ -425,19 +425,19 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
 			{
-				zbx_strlcpy(error, "Unknown script identifier", max_error_len);
+				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
 				break;
 			}
 			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
-				zbx_strlcpy(error, "Script does not have permission to execute on the host",
+				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 						max_error_len);
 				break;
 			}
 			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
 				SUCCEED != check_user_permissions(user->userid, host, script))
 			{
-				zbx_strlcpy(error, "User does not have permission to execute this script on the host",
+				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
 						max_error_len);
 				break;
 			}
@@ -449,7 +449,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 
 			break;
 		default:
-			zbx_snprintf(error, max_error_len, "Invalid command type [%d]", (int)script->type);
+			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
 	}
 
 	if (SUCCEED != ret && NULL != result)
