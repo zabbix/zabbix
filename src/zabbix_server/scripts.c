@@ -366,7 +366,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 {
 	const char	*__function_name = "zbx_execute_script";
 	int		ret = FAIL;
-	zbx_uint64_t	groupid, userid;
+	zbx_uint64_t	groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

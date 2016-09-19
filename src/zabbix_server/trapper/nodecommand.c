@@ -54,7 +54,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 		zbx_strlcpy(error, "Unknown host identifier", sizeof(error));
 		goto fail;
 	}
-	if (SUCCEED != (rc = zbx_sql_get_user_by_active_session(&user, sessionid)))
+	if (SUCCEED != (rc = DBget_user_by_active_session(&user, sessionid)))
 	{
 		zbx_strlcpy(error, "Active session identifier is missing", sizeof(error));
 		goto fail;
