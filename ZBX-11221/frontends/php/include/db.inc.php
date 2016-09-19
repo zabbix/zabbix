@@ -61,6 +61,11 @@ function DBconnect(&$error) {
 					DBexecute('SET NAMES utf8');
 				}
 
+				if(TRUE != mysqli_autocommit($DB['DB'], TRUE))
+				{
+					info('POSSIBLE ERROR: Cannot set MySQL autocommit option.');
+				}
+
 				if ($result) {
 					$dbBackend = new MysqlDbBackend();
 				}
