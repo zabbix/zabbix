@@ -452,9 +452,12 @@ class CUserGroup extends CZBXAPI {
 
 			// check whether user tries to add himself to a disabled user group
 			$usrgrps = $this->get(array(
+				'output' => array('usrgrpid', 'gui_access', 'users_status'),
 				'usrgrpids' => $usrgrpids,
-				'output' => API_OUTPUT_EXTEND,
+				'selectUsers' => array('userid'),
+				'preservekeys' => true
 			));
+
 			if (uint_in_array(self::$userData['userid'], $userids)) {
 				foreach ($usrgrps as $usrgrp) {
 					if (($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
@@ -464,51 +467,31 @@ class CUserGroup extends CZBXAPI {
 				}
 			}
 
-			// get already linked users
-			$linkedUsers = array();
-			$sql = 'SELECT usrgrpid,userid'.
-				' FROM users_groups'.
-				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids);
-			$linkedUsersDb = DBselect($sql);
-			while ($link = DBfetch($linkedUsersDb)) {
-				if (!isset($linkedUsers[$link['usrgrpid']])) {
-					$linkedUsers[$link['usrgrpid']] = array();
-				}
-				$linkedUsers[$link['usrgrpid']][$link['userid']] = 1;
-			}
-
 			// get user-userGroup links to insert and get user ids to unlink
 			$userUsergroupLinksToInsert = array();
 			$userIdsToUnlink = array();
+
 			foreach ($usrgrpids as $usrgrpid) {
+				$linked_users = array();
+
+				foreach ($usrgrps[$usrgrpid]['users'] as $user) {
+					$linked_users[$user['userid']] = $user;
+				}
+
 				foreach ($userids as $userid) {
-					if (!isset($linkedUsers[$usrgrpid][$userid])) {
+					if (!array_key_exists($userid, $linked_users)) {
 						$userUsergroupLinksToInsert[] = array(
 							'usrgrpid' => $usrgrpid,
 							'userid' => $userid
 						);
 					}
 					else {
-						unset($linkedUsers[$usrgrpid][$userid]);
+						unset($linked_users[$userid]);
 					}
 				}
 
-				if (isset($linkedUsers[$usrgrpid]) && !empty($linkedUsers[$usrgrpid])) {
-					$userIdsToUnlink = array_merge($userIdsToUnlink, array_keys($linkedUsers[$usrgrpid]));
-				}
-			}
-
-			$users = API::User()->get(array(
-				'output' => array('userid', 'alias'),
-				'userids' => $userIdsToUnlink,
-				'selectUsrgrps' => array('usrgrpid')
-			));
-
-			foreach ($users as $user) {
-				if (count($user['usrgrps']) == 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('User "%s" cannot be without user group.', $user['alias'])
-					);
+				if ($linked_users) {
+					$userIdsToUnlink = array_merge($userIdsToUnlink, array_keys($linked_users));
 				}
 			}
 
@@ -519,6 +502,20 @@ class CUserGroup extends CZBXAPI {
 
 			// unlink users from user groups
 			if (!empty($userIdsToUnlink)) {
+				$users = API::User()->get(array(
+					'output' => array('userid', 'alias'),
+					'userids' => $userIdsToUnlink,
+					'selectUsrgrps' => array('usrgrps')
+				));
+
+				foreach ($users as $user) {
+					if (count($user['usrgrps']) == 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('User "%s" cannot be without user group.', $user['alias'])
+						);
+					}
+				}
+
 				DB::delete('users_groups', array(
 					'userid' => $userIdsToUnlink,
 					'usrgrpid' => $usrgrpids,
