@@ -488,32 +488,27 @@ class CUserGroup extends CZBXAPI {
 							'userid' => $userid
 						);
 					}
-					unset($linkedUsers[$usrgrpid][$userid]);
+					else {
+						unset($linkedUsers[$usrgrpid][$userid]);
+					}
 				}
 
 				if (isset($linkedUsers[$usrgrpid]) && !empty($linkedUsers[$usrgrpid])) {
-					foreach (array_keys($linkedUsers[$usrgrpid]) as $unlinkid) {
-						$users = API::User()->get(array(
-							'userids' => $unlinkid,
-							'output' => array('userid', 'alias'),
-							'selectUsrgrps' => array('usrgrpid'),
-							'preservekeys' => true
-						));
+					$userIdsToUnlink = array_merge($userIdsToUnlink, array_keys($linkedUsers[$usrgrpid]));
+				}
+			}
 
-						foreach ($users[$unlinkid]['usrgrps'] as $key => $user_group) {
-							if ($user_group['usrgrpid'] == $usrgrpid) {
-								unset($users[$unlinkid]['usrgrps'][$key]);
-							}
-						}
+			$users = API::User()->get(array(
+				'output' => array('userid', 'alias'),
+				'userids' => $userIdsToUnlink,
+				'selectUsrgrps' => array('usrgrpid')
+			));
 
-						if (!$users[$unlinkid]['usrgrps']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('User "%s" cannot be without user group.', $users[$unlinkid]['alias'])
-							);
-						}
-
-						$userIdsToUnlink[] = $unlinkid;
-					}
+			foreach ($users as $user) {
+				if (count($user['usrgrps']) == 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('User "%s" cannot be without user group.', $user['alias'])
+					);
 				}
 			}
 
