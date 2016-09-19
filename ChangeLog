@@ -12,6 +12,7 @@ A......... [ZBX-11196] implemented dynamic default sortorder for icon map mappin
 ..F....... [ZBX-11120] fixed checkbox functionality and display of undefined indexes in trigger expression and recovery expression constructor (Ivo)
 A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
 ..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
+....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0
