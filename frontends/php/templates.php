@@ -157,6 +157,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$templateId = getRequest('templateid', 0);
+		$cloneTemplateId = 0;
+
+		if (getRequest('form') === 'full_clone') {
+			$cloneTemplateId = $templateId;
+			$templateId = 0;
+		}
 
 		if ($templateId == 0) {
 			$messageSuccess = _('Template added');
@@ -168,21 +174,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$messageFailed = _('Cannot update template');
 			$auditAction = AUDIT_ACTION_UPDATE;
 		}
-
-		$templates = getRequest('templates', []);
-		$templateName = getRequest('template_name', '');
-
-		// clone template id
-		$cloneTemplateId = 0;
-		$templatesClear = getRequest('clear_templates', []);
-
-		if (getRequest('form') === 'full_clone') {
-			$cloneTemplateId = $templateId;
-			$templateId = 0;
-		}
-
-		// macros
-		$macros = getRequest('macros', []);
 
 		// groups
 		$groups = getRequest('groups', []);
@@ -214,12 +205,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		// linked templates
-		$linkedTemplates = $templates;
+		$linkedTemplates = getRequest('templates', []);
 		$templates = [];
 		foreach ($linkedTemplates as $linkedTemplateId) {
 			$templates[] = ['templateid' => $linkedTemplateId];
 		}
 
+		$templatesClear = getRequest('clear_templates', []);
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 
 		// discovered hosts
@@ -230,6 +222,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
+		$templateName = getRequest('template_name', '');
+
 		// create / update template
 		$template = [
 			'host' => $templateName,
@@ -237,7 +231,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'groups' => $groups,
 			'templates' => $templates,
 			'hosts' => $dbHosts,
-			'macros' => $macros,
+			'macros' => getRequest('macros', []),
 			'description' => getRequest('description', '')
 		];
 
