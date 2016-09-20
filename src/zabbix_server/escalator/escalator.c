@@ -2001,7 +2001,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
 
 		/* Skip escalations that must be checked later and that are not recovered */
-		/* (corresponding OK event hasn't occured yet, see process_actions()).    */
+		/* (corresponding OK event hasn't occurred yet, see process_actions()).   */
 		if (escalation.nextcheck > now && 0 == escalation.r_eventid)
 		{
 			if (escalation.nextcheck < *nextcheck)
