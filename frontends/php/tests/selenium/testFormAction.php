@@ -632,7 +632,6 @@ class testFormAction extends CWebTest {
 					'Or',
 					'Custom expression'
 			]);
-
 			$this->zbxTestAssertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']', 'selected');
 			switch ($evaltype) {
 				case 'And/Or':
@@ -1840,9 +1839,10 @@ class testFormAction extends CWebTest {
 	public function testFormAction_SimpleCreate($data) {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource='.$data['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
 
 		if (isset($data['name'])){
-			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 
