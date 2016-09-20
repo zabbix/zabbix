@@ -837,13 +837,20 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 	char		*exp, *tmp, *e, *func, *key, *host = NULL;
 	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
 	zbx_function_t	funcdata;
-	int		i;
+	int		i, macro_r, context_l, context_r;
 
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
 	for (e = *data; '\0' != *e; e += len)
 	{
+		if (SUCCEED == zbx_user_macro_parse(e, &macro_r, &context_l, &context_r))
+		{
+			len = macro_r + 1;
+			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
+			continue;
+		}
+
 		/* get function data or jump over part of the string that is not a function */
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
