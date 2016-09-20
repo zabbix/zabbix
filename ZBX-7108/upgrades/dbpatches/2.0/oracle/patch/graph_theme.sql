@@ -14,7 +14,7 @@ SELECT (SELECT MAX(graphthemeid) FROM graph_theme) + 1 AS graphthemeid, 'Dark or
 	'4F4F4F' AS maingridcolor, 'EFEFEF' AS gridbordercolor, 'DFDFDF' AS textcolor, 'FF5500' AS highlightcolor,
 	'FF5500' AS leftpercentilecolor, 'FF1111' AS rightpercentilecolor, '1F1F1F' AS nonworktimecolor, 1 AS gridview,
 	1 AS legendview
-	FROM DUAL WHERE EXISTS (SELECT NULL FROM graph_theme);
+FROM dual WHERE EXISTS (SELECT NULL FROM graph_theme);
 
 INSERT INTO graph_theme (graphthemeid, description, theme, backgroundcolor, graphcolor, graphbordercolor, gridcolor,
 	maingridcolor, gridbordercolor, textcolor, highlightcolor, leftpercentilecolor, rightpercentilecolor,
@@ -22,8 +22,8 @@ INSERT INTO graph_theme (graphthemeid, description, theme, backgroundcolor, grap
 SELECT (SELECT MAX(graphthemeid) FROM graph_theme) + 1 AS graphthemeid, 'Classic' AS description, 'classic' AS theme,
 	'F0F0F0' AS backgroundcolor, 'FFFFFF' AS graphcolor, '333333' AS graphbordercolor, 'CCCCCC' AS gridcolor,
 	'AAAAAA' AS maingridcolor, '000000' AS gridbordercolor, '222222' AS textcolor, 'AA4444' AS highlightcolor,
-	'11CC11' AS leftpercentilecolor, 'CC1111' AS rightpercentilecolor, 'E0E0E0' AS nonworktimecolor,
-	1 AS gridview, 1 AS legendview
-	FROM DUAL WHERE EXISTS (SELECT NULL FROM graph_theme);
+	'11CC11' AS leftpercentilecolor, 'CC1111' AS rightpercentilecolor, 'E0E0E0' AS nonworktimecolor, 1 AS gridview,
+	1 AS legendview
+FROM dual WHERE EXISTS (SELECT NULL FROM graph_theme);
 
 DELETE FROM ids WHERE table_name = 'graph_theme';
