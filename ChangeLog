@@ -12,6 +12,7 @@ A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix tra
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 ..F....... [ZBX-11050] changed translation string "Acknowledges" => "Acknowledgements" (Cemeris)
 A......... [ZBX-11196] implemented dynamic default sortorder for icon map mappings, now default sortorder increases by one with each entry of mapping (Cemeris)
@@ -19,7 +20,6 @@ A......... [ZBX-11196] implemented dynamic default sortorder for icon map mappin
 ..F....... [ZBX-11120] fixed checkbox functionality and display of undefined indexes in trigger expression and recovery expression constructor (Ivo)
 A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
 ..F....... [ZBX-11131] removed mistaken support of {ITEM.VALUE} and {ITEM.LASTVALUE} macros in trigger URLs (Sasha)
-....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0 (vlad)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.0
@@ -177,6 +177,7 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 A.F....... [ZBX-11151] implemented dynamic default sortorder for graph item, default sortorder increases by one with each entry of graph item (Cemeris)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
@@ -217,7 +218,6 @@ A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "invento
 ..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
 ..F....... [ZBX-10987] fixed table header line not being visible in dark theme (Pavel)
 ........S. [ZBX-10797] fixed evaluation of user macros in calculated items (Andris)
-....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0 (vlad)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.4
@@ -1646,6 +1646,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
@@ -1660,7 +1661,6 @@ A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "invento
 ...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
-....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0 (vlad)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
