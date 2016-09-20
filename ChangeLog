@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
@@ -18,7 +19,6 @@ A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "invento
 ...G....S. [ZBX-10721] made the third parameter (<port>) of "net.tcp.service" optional (Sergejs)
 ........S. [ZBX-11012] fixed expansion of macro {DISCOVERY.RULE.NAME} (viktors)
 ..F....... [ZBX-10903] prevented parsing "data-id" values with jQuery "data" method (Cemeris)
-....I..... [ZBX-11175] fixed compilation failure for openbsd 5.8, 5.9, 6.0 (vlad)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.14
