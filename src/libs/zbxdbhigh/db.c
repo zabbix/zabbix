@@ -2476,7 +2476,7 @@ int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __function_name, sessionid);
 
 	result = DBselect(
 		"select u.userid,u.type"
@@ -2489,7 +2489,7 @@ int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid)
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(user->userid, row[0]);
-		ZBX_STR2UCHAR(user->type, row[2]);
+		ZBX_STR2UCHAR(user->type, row[1]);
 
 		ret = SUCCEED;
 	}
