@@ -948,7 +948,7 @@ class CHttpTestManager {
 			));
 		}
 
-		self::createItemsApplications(array_diff($itemids, $linked_itemids));
+		self::createItemsApplications(array_diff($itemids, $linked_itemids), $applicationid);
 	}
 
 	/**
