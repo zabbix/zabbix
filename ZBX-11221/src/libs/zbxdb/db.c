@@ -321,8 +321,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (0 != mysql_autocommit(conn, 1))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL autocommit option.");
+	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
+	{
+		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		ret = ZBX_DB_FAIL;
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
