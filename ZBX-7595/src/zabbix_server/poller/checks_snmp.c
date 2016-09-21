@@ -415,9 +415,12 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 
 	snmp_sess_init(&session);
 	/* fix for OID higher than MAX_INT to be accepted */
-	/* noRangeCheck yes  disables the validation of varbind values against the MIB definition for the relevant OID. */
+	/* disables the validation of varbind values against the MIB definition for the relevant OID. */
 	/* this is equivalent to the -Ir option */
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_CHECK_RANGE, 1);
+	if( SNMPERR_SUCCESS != netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_CHECK_RANGE, 1))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"DontCheckRange\" option to %d for Net-SNMP");
+	}
 
 	switch (item->type)
 	{
