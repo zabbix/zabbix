@@ -61,7 +61,7 @@ function DBconnect(&$error) {
 					DBexecute('SET NAMES utf8');
 					if(TRUE != mysqli_autocommit($DB['DB'], TRUE))
 					{
-						$error = 'Error setting auto commit.');
+						$error = 'Error setting auto commit.';
 						$result = false;
 					}
 				}
