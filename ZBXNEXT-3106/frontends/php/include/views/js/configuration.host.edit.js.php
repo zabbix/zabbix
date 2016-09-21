@@ -121,7 +121,7 @@
 				handle: 'span.ui-icon-arrowthick-2-n-s',
 				revert: 'invalid',
 				stop: function(event, ui) {
-					var hostInterfaceId = jQuery(this).data('interfaceid');
+					var hostInterfaceId = jQuery(this).attr('data-interfaceid');
 					resetMainInterfaces();
 					resetUseipInterface(hostInterfaceId)
 				}
@@ -318,7 +318,7 @@
 		'use strict';
 
 		jQuery('#hostlist').on('click', 'button.remove', function() {
-			var interfaceId = jQuery(this).data('interfaceid');
+			var interfaceId = jQuery(this).attr('data-interfaceid');
 			jQuery('#hostInterfaceRow_' + interfaceId).remove();
 			hostInterfacesManager.remove(interfaceId);
 			hostInterfacesManager.resetMainInterfaces();
@@ -340,7 +340,7 @@
 			tolerance: 'pointer',
 			drop: function(event, ui) {
 				var hostInterfaceTypeName = jQuery('.formElementTable', this).data('type'),
-					hostInterfaceId = ui.draggable.data('interfaceid');
+					hostInterfaceId = ui.draggable.attr('data-interfaceid');
 
 				ui.helper.remove();
 

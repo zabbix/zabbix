@@ -833,14 +833,18 @@ char	*get_param_dyn(const char *param, int num);
  *                       will be 0; for their parameters - 1 or higher        *
  *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
+ *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: NULL if parameter doesn't change; a new string - otherwise   *
+ * Return value: SUCEED - if parameter doesn't change or has been changed     *
+ *                        successfully                                        *
+ *               FAIL   - otherwise                                           *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *
  *                                                                            *
  ******************************************************************************/
-typedef char	*(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data);
+typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param);
 #define ZBX_KEY_TYPE_ITEM	0
 #define ZBX_KEY_TYPE_OID	1
 int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
@@ -890,7 +894,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);

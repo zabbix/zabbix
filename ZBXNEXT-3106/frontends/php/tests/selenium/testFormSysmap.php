@@ -124,7 +124,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestCheckTitle('Network maps');
 		$this->zbxTestTextPresent('Network map deleted');

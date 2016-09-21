@@ -1573,16 +1573,29 @@ static int	DBpatch_2010101(void)
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
 			if (1 != (nparam = num_param(param)))
-				quote_key_param(&param, 0);
-			quote_key_param(&dsn, 0);
+			{
+				if (FAIL == (ret = quote_key_param(&param, 0)))
+					error_message = zbx_dsprintf(error_message, "unique description"
+							" \"%s\" contains invalid symbols and cannot be quoted", param);
+			}
+			if (FAIL == (ret = quote_key_param(&dsn, 0)))
+			{
+				error_message = zbx_dsprintf(error_message, "data source name"
+						" \"%s\" contains invalid symbols and cannot be quoted", dsn);
+			}
 
-			key_offset = 0;
-			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+			if (SUCCEED == ret)
+			{
+				key_offset = 0;
+				zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+
+				zbx_free(param);
+
+				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+			}
 
 			zbx_free(param);
-
-			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
-				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 		}
 
 		if (NULL == error_message)
@@ -2277,17 +2290,19 @@ static int	DBpatch_2010194(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: replace_key_param                                                *
+ * Function: DBpatch_2010195_replace_key_param_cb                             *
  *                                                                            *
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
  ******************************************************************************/
-static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+			char **new_param)
 {
-	char	*param, *new_param;
+	char	*param;
+	int	ret;
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
-		return NULL;
+		return SUCCEED;
 
 	param = zbx_strdup(NULL, data);
 
@@ -2296,16 +2311,17 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 	if ('\0' == *param)
 	{
 		zbx_free(param);
-		return NULL;
+		return SUCCEED;
 	}
 
-	new_param = zbx_dsprintf(NULL, "^%s$", param);
+	*new_param = zbx_dsprintf(NULL, "^%s$", param);
 
 	zbx_free(param);
 
-	quote_key_param(&new_param, quoted);
+	if (FAIL == (ret = quote_key_param(new_param, quoted)))
+		zbx_free(new_param);
 
-	return new_param;
+	return ret;
 }
 
 static int	DBpatch_2010195(void)
@@ -2321,8 +2337,8 @@ static int	DBpatch_2010195(void)
 	{
 		key = zbx_strdup(key, row[1]);
 
-		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
-				error, sizeof(error)))
+		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
+				NULL, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
 			continue;

@@ -299,7 +299,7 @@ jQuery(function($) {
 							var availableActive = $('.available li.hover', obj);
 
 							if (availableActive.length > 0) {
-								select(availableActive.data('id'), obj, values, options);
+								select(availableActive.attr('data-id'), obj, values, options);
 							}
 
 							// stop form submit
@@ -317,7 +317,9 @@ jQuery(function($) {
 								if ($('.selected li', obj).length > 0) {
 									if ($('.selected li.pressed', obj).length > 0) {
 										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
-											removeSelected($('.selected li.pressed', obj).data('id'), obj, values, options);
+											removeSelected($('.selected li.pressed', obj).attr('data-id'), obj, values,
+												options
+											);
 										}
 										else {
 											var prev = $('.selected li.pressed', obj).removeClass('pressed').prev();
@@ -940,7 +942,7 @@ jQuery(function($) {
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
 			var item = $(this),
-				id = item.data('id'),
+				id = item.attr('data-id'),
 				text = $(item.children()[0]),
 				t = empty(values.selected[id].prefix)
 					? values.selected[id].name

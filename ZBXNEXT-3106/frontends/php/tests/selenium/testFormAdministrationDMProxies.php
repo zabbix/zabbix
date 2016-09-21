@@ -387,7 +387,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('cancel');
 
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 
 		$this->zbxTestCheckTitle('Configuration of proxies');

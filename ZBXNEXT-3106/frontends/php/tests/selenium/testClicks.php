@@ -90,7 +90,7 @@ class testClicks extends CWebTest {
 			),
 			array('discoveryconf.php',
 				array('link=Local network','save'),
-				'Configuration of discovery',
+				'Configuration of discovery rules',
 				'Discovery rule updated'
 			),
 			// Administration

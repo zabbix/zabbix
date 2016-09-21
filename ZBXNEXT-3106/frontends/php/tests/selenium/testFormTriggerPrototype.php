@@ -483,7 +483,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host}',
 					'errors' => array(
-						'ERROR: Cannot add trigger',
+						'ERROR: Cannot add trigger prototype',
 						'Incorrect trigger expression. Check expression part starting from "{Simple form test host}".'
 					)
 				)
@@ -576,8 +576,8 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
-						'ERROR: Cannot add trigger',
-						'Cannot implode expression "{Simple form test host:someItem.uptime.last(0)}<0". Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
+						'ERROR: Cannot add trigger prototype',
+						'Trigger prototype "MyTrigger" must contain at least one item prototype.'
 					)
 				)
 			),
@@ -587,7 +587,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host:item-prototype-reuse.somefunc(0)}<0',
 					'errors' => array(
-						'ERROR: Cannot add trigger',
+						'ERROR: Cannot add trigger prototype',
 						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					)
 				)
@@ -725,7 +725,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'triggerName',
 					'expression' => 'default',
 					'errors' => array(
-						'ERROR: Cannot add trigger',
+						'ERROR: Cannot add trigger prototype',
 						'Trigger "triggerName" already exists on "Simple form test host".'
 					)
 				)

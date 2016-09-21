@@ -699,7 +699,7 @@ class CTemplateScreen extends CScreen {
 
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Screen "%1$s" already exists on template "%2$2".', $dbExistingScreen['name'], $dbTemplate['name'])
+				_s('Screen "%1$s" already exists on template "%2$s".', $dbExistingScreen['name'], $dbTemplate['name'])
 			);
 		}
 	}

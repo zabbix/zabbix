@@ -180,7 +180,7 @@ class CProfile {
 			'idx' => zbx_dbstr($idx),
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
-			'idx2' => $idx2
+			'idx2' => zbx_dbstr($idx2)
 		);
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}

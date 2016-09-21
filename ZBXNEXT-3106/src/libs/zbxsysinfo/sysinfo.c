@@ -1098,19 +1098,28 @@ void	unquote_key_param(char *param)
  *                            0 - do nothing if the paramter does not contain *
  *                                any special characters                      *
  *                                                                            *
+ * Return value: SUCEED - if parameter doesn't contain special characters and *
+ *                        is not forced to be quoted or when parameter is     *
+ *                        enclosed in quotes                                  *
+ *               FAIL   - if parameter ends with backslash                    *
+ *                                                                            *
  ******************************************************************************/
-void	quote_key_param(char **param, int forced)
+int	quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
 
 	if (0 == forced)
 	{
-		if ('"' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
-			return;
+		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+			return SUCCEED;
 	}
 
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 	sz_src = strlen(*param);
+
+	if ('\\' == (*param)[sz_src - 1])
+		return FAIL;
+
+	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
 	*param = zbx_realloc(*param, sz_dst);
 
@@ -1124,6 +1133,8 @@ void	quote_key_param(char **param, int forced)
 			(*param)[--sz_dst] = '\\';
 	}
 	(*param)[--sz_dst] = '"';
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_KSTAT_H

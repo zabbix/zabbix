@@ -1161,11 +1161,12 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		));
 
-		$descriptionChanged = false;
-		$expressionChanged = false;
 		$changedPriorityTriggerIds = array();
 
 		foreach ($triggers as &$trigger) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
@@ -1927,7 +1928,7 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT t.triggerid,t.description,t.expression'.
 				' FROM triggers t'.
 				' WHERE '.dbConditionInt('t.triggerid', $triggerIds).
-				'AND t.templateid IS NOT NULL',
+				' AND t.templateid IS NOT NULL',
 			1
 		));
 		if ($trigger) {

@@ -32,7 +32,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND i.name LIKE '.zbx_dbstr('%-layout-test%')
+					" AND i.name LIKE '%-layout-test%'"
 		);
 	}
 
@@ -131,7 +131,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+					" AND h.host LIKE '%-layout-test-%'"
 		);
 	}
 

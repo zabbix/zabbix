@@ -350,9 +350,19 @@ table.tableinfo tr.vertical_header td.vertical_rotation {
 	white-space: nowrap; align: center; font-family: arial; font-size: 11px;
 }
 table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_inner {
-	transform: rotate(270deg); white-space: nowrap;
-	-moz-transform: rotate(270deg); -webkit-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(180deg);
+	white-space: nowrap;
+	transform: rotate(270deg);
+	-moz-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	-o-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
 }
+
+.ie8_vertical_rotation {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=-0.00000000, M12=1.00000000, M21=-1.00000000, M22=-0.00000000, sizingMethod='auto expand')";
+	float: left;
+}
+
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
 table.tableinfo > tbody > tr > td:first-child { width: 1px; }
 table.tableinfo tr td.wraptext { white-space: normal; }

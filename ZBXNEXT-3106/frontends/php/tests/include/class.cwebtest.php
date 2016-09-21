@@ -31,8 +31,8 @@ define('TEST_BAD', 1);
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
+	protected $screenshotPath = PHPUNIT_SCREENSHOT_DIR;
+	protected $screenshotUrl = PHPUNIT_SCREENSHOT_URL;
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
@@ -74,21 +74,9 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected function setUp() {
 		global $DB;
 
-		$this->setHost(PHPUNIT_FRONTEND_HOST);
+		$this->setHost(PHPUNIT_HOST);
 		$this->setBrowser('*firefox');
-		if (strstr(PHPUNIT_URL, 'http://')) {
-			$this->setBrowserUrl(PHPUNIT_URL);
-		}
-		else {
-			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
-		}
-
-		/*
-		if (!DBConnect($error)) {
-			$this->assertTrue(FALSE, 'Unable to connect to the database: '.$error);
-			exit;
-		}
-		*/
+		$this->setBrowserUrl(PHPUNIT_URL);
 
 		if (!isset($DB['DB'])) {
 			DBConnect($error);

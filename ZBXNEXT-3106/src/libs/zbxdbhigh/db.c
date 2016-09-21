@@ -1104,7 +1104,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
 	int		*seq_len = NULL;
-
+#if defined(HAVE_SQLITE3)
+	int		expr_num, expr_cnt = 0;
+#endif
 	if (0 == num)
 		return;
 
@@ -1141,24 +1143,51 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
+#if defined(HAVE_SQLITE3)
+	expr_num = between_num + (in_num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
+
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+#endif
 	/* compose "between"s */
 	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
 		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
 			if (1 != first)
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			{
+#if defined(HAVE_SQLITE3)
+				if (MAX_EXPRESSIONS == ++expr_cnt)
+				{
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+					expr_cnt = 0;
+				}
+				else
+#endif
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			}
+			else
+				first = 0;
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 					fieldname, values[start], values[start + seq_len[i] - 1]);
-			first = 0;
 		}
 
 		start += seq_len[i];
 	}
 
 	if (0 < in_num && 0 < between_num)
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	{
+#if defined(HAVE_SQLITE3)
+		if (MAX_EXPRESSIONS == ++expr_cnt)
+		{
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+			expr_cnt = 0;
+		}
+		else
+#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
 
 	if (1 < in_num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -1182,7 +1211,21 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 					{
 						in_cnt = 0;
 						(*sql_offset)--;
-						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+#if defined(HAVE_SQLITE3)
+						if (MAX_EXPRESSIONS == ++expr_cnt)
+						{
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ")) or (%s in (",
+									fieldname);
+							expr_cnt = 0;
+						}
+						else
+						{
+#endif
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (",
+									fieldname);
+#if defined(HAVE_SQLITE3)
+						}
+#endif
 					}
 
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
@@ -1203,6 +1246,10 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_free(seq_len);
 
+#if defined(HAVE_SQLITE3)
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+#endif
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
@@ -2710,6 +2757,8 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
 
 	result = DBselect("%s" ZBX_FOR_UPDATE, sql);
+
+	zbx_free(sql);
 
 	if (NULL == DBfetch(result))
 		ret = FAIL;

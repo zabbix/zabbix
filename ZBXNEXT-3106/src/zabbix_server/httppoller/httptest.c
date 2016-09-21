@@ -450,6 +450,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
+
+			zbx_free(page.data);
 		}
 		while (0 != --httptest->httptest.retries);
 
@@ -517,11 +519,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 
 			zbx_free(var_err_str);
+			zbx_free(page.data);
 		}
 		else
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 
-		zbx_free(page.data);
 httpstep_error:
 		zbx_free(httpstep.status_codes);
 		zbx_free(httpstep.required);

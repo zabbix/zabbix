@@ -109,6 +109,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and i.type in (%s)"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
+				" and t.flags in (%d,%d)"
 				" and h.hostid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" and not exists ("
@@ -139,6 +140,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_STATE_NORMAL,
 			failed_type_buf,
 			TRIGGER_STATUS_ENABLED,
+			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
 			hostid,
 			HOST_STATUS_MONITORED,
 			failed_type_buf,
@@ -320,7 +322,7 @@ static int	host_get_availability(const DC_HOST *dc_host, unsigned char type, zbx
 	return SUCCEED;
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
 
@@ -348,13 +350,11 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
-
-	*available = HOST_AVAILABLE_TRUE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
 
@@ -364,11 +364,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
-		goto out;
-
-	/* if the item is still flagged as unreachable while the host is reachable, */
-	/* it means that this is item rather than network failure                   */
-	if (0 == in.errors_from && 0 != item->unreachable)
 		goto out;
 
 	if (FAIL == DChost_deactivate(ts, &in, &out))
@@ -409,8 +404,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, out.errors_from,
 			out.available);
-
-	*available = HOST_AVAILABLE_FALSE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -671,14 +664,20 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-					activate_host(&items[i], &timespec, &last_available);
+				{
+					activate_host(&items[i], &timespec);
+					last_available = HOST_AVAILABLE_TRUE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
-					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_available = HOST_AVAILABLE_FALSE;
+				}
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
@@ -718,7 +717,7 @@ static int	get_values(unsigned char poller_type)
 			}
 
 		}
-		else if (HOST_AVAILABLE_FALSE != last_available)
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,

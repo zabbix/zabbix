@@ -1494,7 +1494,10 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 		if (0 == strcmp(name, datastore->name))
 		{
 			if (NULL == datastore->uuid)
-				break;
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+				goto unlock;
+			}
 
 			ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
 					"datastore/totalReadLatency[average]", datastore->uuid, 1, result);

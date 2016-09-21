@@ -886,7 +886,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 			if (oci_ids_num >= oci_ids_alloc)
 			{
 				old_alloc = oci_ids_alloc;
-				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
+				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 3 / 2);
 				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber *));
 
 				for (i = old_alloc; i < oci_ids_alloc; i++)
@@ -1071,12 +1071,15 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
-				else
-					ret += (int)mysql_affected_rows(conn);
 
-				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
+				ret += (int)mysql_affected_rows(conn);
+
+				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
+				{
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+				}
 			}
 			while (0 == status);
 		}

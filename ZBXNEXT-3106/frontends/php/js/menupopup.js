@@ -420,7 +420,7 @@ jQuery(function($) {
 		}
 
 		var opener = $(this),
-			id = opener.data('menu-popup-id'),
+			id = opener.attr('data-menu-popup-id'),
 			menuPopup = $('#' + id),
 			mapContainer = null;
 
@@ -529,7 +529,7 @@ jQuery(function($) {
 			}
 			// set menu popup for common html elements
 			else {
-				opener.data('menu-popup-id', id);
+				opener.attr('data-menu-popup-id', id);
 
 				$('body').append(menuPopup);
 			}

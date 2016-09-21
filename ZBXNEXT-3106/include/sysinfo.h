@@ -118,6 +118,8 @@ while (0)
 
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
+#define ZBX_FLOAT_PRECISION	0.0001
+
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
 extern int	CONFIG_UNSAFE_USER_PARAMETERS;
@@ -189,7 +191,7 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
 void		set_log_result_empty(AGENT_RESULT *result);
 
 void	unquote_key_param(char *param);
-void	quote_key_param(char **param, int forced);
+int	quote_key_param(char **param, int forced);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 

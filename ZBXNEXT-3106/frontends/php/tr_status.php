@@ -437,8 +437,7 @@ $triggers = API::Trigger()->get(array(
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
-	'selectLastEvent' => true,
-	'expandDescription' => true,
+	'selectLastEvent' => array('eventid', 'objectid', 'clock', 'ns'),
 	'preservekeys' => true
 ));
 
@@ -582,7 +581,25 @@ foreach ($triggers as $trigger) {
 		);
 	}
 
-	$description = new CSpan($trigger['description'], 'link_menu');
+	// Trigger has events.
+	if ($trigger['lastEvent']) {
+		$event = array(
+			'clock' => $trigger['lastEvent']['clock'],
+			'ns' => $trigger['lastEvent']['ns']
+		);
+	}
+	// Trigger has no events.
+	else {
+		$event = array(
+			'clock' => $trigger['lastchange'],
+			'ns' => '999999999'
+		);
+	}
+
+	$description = new CSpan(
+		CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event)),
+		'link_menu'
+	);
 	$description->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {

@@ -265,7 +265,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	else
 		strscpy(ip, ip_str);
 
-	if (NULL != port_str && SUCCEED != is_ushort(port_str, &port))
+	if (NULL != port_str && '\0' != *port_str && SUCCEED != is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
 		return ret;
@@ -360,7 +360,10 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 			if (0 != value_int)
 			{
 				check_time = zbx_time() - check_time;
-				check_time = MAX(check_time, 0.0001);
+
+				if (ZBX_FLOAT_PRECISION > check_time)
+					check_time = ZBX_FLOAT_PRECISION;
+
 				SET_DBL_RESULT(result, check_time);
 			}
 			else
