@@ -360,7 +360,7 @@ class CHostGroup extends CApiService {
 
 		$groupids = [];
 		$groupids_with_rights = [];
-		$parent_childs = [];
+		$parent_children = [];
 
 		foreach ($groups as $group) {
 			$new_groupids = DB::insert('groups', [$group]);
@@ -379,7 +379,7 @@ class CHostGroup extends CApiService {
 				if ($parents) {
 					$parent = reset($parents);
 					$groupids_with_rights[$groupid] = $parent['groupid'];
-					$parent_childs[$parent['groupid']][] = $groupid;
+					$parent_children[$parent['groupid']][] = $groupid;
 				}
 			}
 		}
@@ -394,7 +394,7 @@ class CHostGroup extends CApiService {
 			$rights_to_insert = [];
 
 			while ($right = DBfetch($rights)) {
-				foreach ($parent_childs[$right['id']] as $parent_child) {
+				foreach ($parent_children[$right['id']] as $parent_child) {
 					$rights_to_insert[] = [
 						'groupid' => $right['groupid'],
 						'permission' => $right['permission'],
