@@ -364,7 +364,11 @@ $conditionFormList->addRow(_('New condition'),
 					$condition
 				])
 			)
-			->addRow((new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+			->addRow(
+				(new CSimpleButton(_('Add')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "add_condition", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -446,7 +450,11 @@ if ($this->data['action']['operations']) {
 				$esc_period_txt,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CSimpleButton(_('Edit')))
+							->onClick('javascript: submitFormWithParam('.
+								'"'.$actionForm->getName().'", "edit_operationid['.$operationid.']", "1"'.
+							');')
+							->addClass(ZBX_STYLE_BTN_LINK),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.');')
@@ -462,7 +470,11 @@ if ($this->data['action']['operations']) {
 				$details,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CSimpleButton(_('Edit')))
+							->onClick('javascript: submitFormWithParam('.
+								'"'.$actionForm->getName().'", "edit_operationid['.$operationid.']", "1"'.
+							');')
+							->addClass(ZBX_STYLE_BTN_LINK),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.');')
@@ -492,7 +504,9 @@ if ($this->data['action']['operations']) {
 
 $footer = null;
 if (empty($this->data['new_operation'])) {
-	$footer = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
+	$footer = (new CSimpleButton(_('New')))
+		->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "new_operation", "1");')
+		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $operationFormList->addRow(_('Action operations'),
@@ -1001,7 +1015,9 @@ if (!empty($this->data['new_operation'])) {
 
 		if (!isset($_REQUEST['new_opcondition'])) {
 			$operationConditionsTable->addRow((new CCol(
-				(new CSubmit('new_opcondition', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+				(new CSimpleButton(_('New')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "new_opcondition", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColspan(3));
 		}
 		$new_operation_formlist->addRow(_('Conditions'),
@@ -1063,8 +1079,16 @@ if (!empty($this->data['new_operation'])) {
 			(new CDiv([
 				$newOperationConditionTable,
 				new CHorList([
-					(new CSubmit('add_opcondition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-					(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$actionForm->getName().'", "add_opcondition", "1"'.
+						');')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					(new CSimpleButton(_('Cancel')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$actionForm->getName().'", "cancel_new_opcondition", "1"'.
+						');')
+						->addClass(ZBX_STYLE_BTN_LINK)
 				])
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -1077,9 +1101,13 @@ if (!empty($this->data['new_operation'])) {
 			$new_operation_vars,
 			$new_operation_formlist,
 			new CHorList([
-				(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))
+				(new CSimpleButton((isset($data['new_operation']['id'])) ? _('Update') : _('Add')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "add_operation", "1");')
 					->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSubmit('cancel_new_operation', _('Cancel')))
+				(new CSimpleButton(_('Cancel')))
+					->onClick('javascript: submitFormWithParam('.
+						'"'.$actionForm->getName().'", "cancel_new_operation", "1"'.
+					');')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			])
 		]))
