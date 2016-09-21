@@ -1725,12 +1725,11 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid,
-		int *records_processed)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
-	int		f, records_lim = ZBX_MAX_HRECORDS, retries = 1;
+	int		f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1739,7 +1738,6 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
-	*records_processed = 0;
 	*lastid = 0;
 
 	proxy_get_lastid(ht->table, ht->lastidfield, &id);
@@ -1789,7 +1787,7 @@ try_again:
 			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], ht->fields[f].jt);
 		}
 
-		(*records_processed)++;
+		records++;
 
 		zbx_json_close(j);
 
@@ -1798,9 +1796,9 @@ try_again:
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, *records_processed, *lastid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
 
-	return *records_processed;
+	return records;
 }
 
 /******************************************************************************
@@ -1850,9 +1848,15 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, int 
 	if (NULL == string_buffer)
 		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
 
-	*lastid = 0;
 
-	proxy_get_lastid("proxy_history", "history_lastid", &id);
+	if(0 == *lastid)
+	{
+		proxy_get_lastid("proxy_history", "history_lastid", &id);
+	}
+	else
+	{
+		id = *lastid;
+	}
 try_again:
 	zbx_snprintf(sql, sizeof(sql),
 			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
@@ -1980,19 +1984,31 @@ try_again:
 	return records;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data(j, lastid, records_processed);
+	int records_to_send = 0;
+	int records_processed_per_iteration;
+
+	*lastid = 0;
+
+	do
+	{
+		records_to_send += proxy_get_history_data(j, lastid, &records_processed_per_iteration);
+	}
+	while( records_to_send < ZBX_MAX_HRECORDS &&
+			records_processed_per_iteration == ZBX_MAX_HRECORDS);
+
+	return records_to_send;
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data_simple(j, &dht, lastid, records_processed);
+	return proxy_get_history_data_simple(j, &dht, lastid);
 }
 
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *records_processed)
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data_simple(j, &areg, lastid, records_processed);
+	return proxy_get_history_data_simple(j, &areg, lastid);
 }
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
