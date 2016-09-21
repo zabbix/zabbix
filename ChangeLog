@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix tra
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 ..F....... [ZBX-11050] changed translation string "Acknowledges" => "Acknowledgements" (Cemeris)
@@ -170,6 +171,7 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 A.F....... [ZBX-11151] implemented dynamic default sortorder for graph item, default sortorder increases by one with each entry of graph item (Cemeris)
@@ -1639,6 +1641,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
