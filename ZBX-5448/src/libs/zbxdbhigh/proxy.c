@@ -1995,8 +1995,8 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	{
 		records_to_send += proxy_get_history_data(j, lastid, &records_processed_per_iteration);
 	}
-	while( records_to_send < ZBX_MAX_HRECORDS &&
-			records_processed_per_iteration == ZBX_MAX_HRECORDS);
+	while(ZBX_MAX_HRECORDS > records_to_send &&
+			ZBX_MAX_HRECORDS == records_processed_per_iteration);
 
 	return records_to_send;
 }
