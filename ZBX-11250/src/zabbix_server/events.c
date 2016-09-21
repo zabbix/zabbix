@@ -1384,7 +1384,8 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 	zbx_vector_uint64_t	triggerids, lockids, eventids;
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*queue;
-	int			j, closed_num = 0;
+	int			j, closed_num = 0, index;
+	zbx_trigger_diff_t	*diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, event_queue.num_data);
 
@@ -1402,6 +1403,18 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			continue;
 
 		correlate_event_by_global_rules(event);
+
+		/* force value recalculation based on open problems for triggers with */
+		/* events closed by 'close new' correlation operation                */
+		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
+		{
+			if (FAIL != (index = zbx_vector_ptr_bsearch(trigger_diff, &event->objectid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+				diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
+			}
+		}
 	}
 
 	if (0 == event_queue.num_data)
@@ -1415,6 +1428,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 
 	zbx_vector_uint64_sort(triggerids_lock, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	/* create a list of triggers that must be locked to close queued events */
 	zbx_hashset_iter_reset(&event_queue, &iter);
 	while (NULL != (queue = zbx_hashset_iter_next(&iter)))
 	{
@@ -1438,6 +1452,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 
 		DCconfig_lock_triggers_by_triggerids(&lockids, triggerids_lock);
 
+		/* append the locked trigger ids to already locked trigger ids */
 		for (j = num; j < triggerids_lock->values_num; j++)
 			zbx_vector_uint64_append(&triggerids, triggerids_lock->values[j]);
 	}
@@ -1491,6 +1506,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 		zbx_hashset_iter_reset(&event_queue, &iter);
 		while (NULL != (queue = zbx_hashset_iter_next(&iter)))
 		{
+			/* close event only if its source trigger has been locked */
 			if (FAIL == (index = zbx_vector_uint64_bsearch(&triggerids, queue->objectid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
