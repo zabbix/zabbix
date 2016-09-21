@@ -176,7 +176,11 @@ $correlation_tab
 						$condition
 					])
 				)
-				->addRow((new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+				->addRow(
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_condition", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				)
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -225,7 +229,11 @@ $operation_tab
 				->addRow(new CComboBox('new_operation[type]', $data['new_operation']['type'], null,
 					corrOperationTypes()
 				))
-				->addRow((new CSubmit('add_operation', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+				->addRow(
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_operation", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				)
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
