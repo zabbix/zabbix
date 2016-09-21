@@ -4,15 +4,6 @@
 			jQuery('#goodsla').prop('disabled', !this.checked);
 		});
 
-		jQuery('#add_service_time').click(function() {
-			var input = document.createElement('input');
-			input.setAttribute('type', 'hidden');
-			input.setAttribute('name', 'add_service_time');
-			input.setAttribute('value', 1);
-			jQuery('form[name=servicesForm]').append(input);
-			jQuery('form[name=servicesForm]').submit();
-		});
-
 		jQuery('#algorithm').change(function() {
 			var statusDisabled = (jQuery(this).val() == <?= SERVICE_ALGORITHM_NONE ?>);
 			jQuery('#showsla, #trigger, #btn1, #goodsla').prop('disabled', statusDisabled);
