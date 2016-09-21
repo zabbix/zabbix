@@ -1848,15 +1848,8 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, int 
 	if (NULL == string_buffer)
 		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
 
+	id = *lastid;
 
-	if(0 == *lastid)
-	{
-		proxy_get_lastid("proxy_history", "history_lastid", &id);
-	}
-	else
-	{
-		id = *lastid;
-	}
 try_again:
 	zbx_snprintf(sql, sizeof(sql),
 			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
@@ -1986,17 +1979,15 @@ try_again:
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	int records_to_send = 0;
-	int records_processed_per_iteration;
+	int	records_to_send = 0, records_processed_per_iteration;
 
-	*lastid = 0;
+	proxy_get_lastid("proxy_history", "history_lastid", lastid);
 
 	do
 	{
 		records_to_send += proxy_get_history_data(j, lastid, &records_processed_per_iteration);
 	}
-	while(ZBX_MAX_HRECORDS > records_to_send &&
-			ZBX_MAX_HRECORDS == records_processed_per_iteration);
+	while (ZBX_MAX_HRECORDS > records_to_send && ZBX_MAX_HRECORDS == records_processed_per_iteration);
 
 	return records_to_send;
 }
