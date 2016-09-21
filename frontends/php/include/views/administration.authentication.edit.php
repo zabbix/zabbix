@@ -90,7 +90,11 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	else {
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			(new CSubmit('change_bind_password', _('Change password')))->addClass(ZBX_STYLE_BTN_GREY)
+			(new CSimpleButton(_('Change password')))
+				->onClick('javascript: submitFormWithParam('.
+					'"'.$authenticationForm->getName().'", "change_bind_password", "1"'.
+				');')
+				->addClass(ZBX_STYLE_BTN_GREY)
 		);
 	}
 

@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix tra
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
