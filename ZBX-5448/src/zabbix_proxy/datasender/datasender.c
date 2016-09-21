@@ -88,8 +88,8 @@ static void	host_availability_sender(struct zbx_json *j)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void history_sender(struct zbx_json *j, int *records, int *records_processed, const char *tag,
-		int (*f_get_data)(struct zbx_json *, zbx_uint64_t *, int *records_processed), void (*f_set_lastid)())
+static void	history_sender(struct zbx_json *j, int *records_sent, int *records_processed, const char *tag,
+		int (*f_get_data)(struct zbx_json *, zbx_uint64_t *, int *), void (*f_set_lastid)())
 {
 	const char	*__function_name = "history_sender";
 
@@ -106,11 +106,11 @@ static void history_sender(struct zbx_json *j, int *records, int *records_proces
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 
-	*records = f_get_data(j, &lastid, records_processed);
+	*records_sent = f_get_data(j, &lastid, records_processed);
 
 	zbx_json_close(j);
 
-	if (*records > 0)
+	if (*records_sent > 0)
 	{
 		char	*error = NULL;
 
@@ -122,7 +122,7 @@ static void history_sender(struct zbx_json *j, int *records, int *records_proces
 
 		if (SUCCEED != (ret = put_data_to_server(&sock, j, &error)))
 		{
-			*records = 0;
+			*records_sent = 0;
 			*records_processed = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "sending data to server failed: %s", error);
 		}
@@ -158,7 +158,7 @@ static void history_sender(struct zbx_json *j, int *records, int *records_proces
  ******************************************************************************/
 void	main_datasender_loop(void)
 {
-	int		records = 0, r, records_processed;
+	int		records_sent_total = 0, records_sent, records_processed;
 	double		sec = 0.0;
 	struct zbx_json	j;
 
@@ -171,30 +171,30 @@ void	main_datasender_loop(void)
 	for (;;)
 	{
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
-				get_process_type_string(process_type), records, sec);
+				get_process_type_string(process_type), records_sent_total, sec);
 
 		sec = zbx_time();
 		host_availability_sender(&j);
 
-		records = 0;
+		records_sent_total = 0;
 retry_history:
-		history_sender(&j, &r, &records_processed, ZBX_PROTO_VALUE_HISTORY_DATA,
+		history_sender(&j, &records_sent, &records_processed, ZBX_PROTO_VALUE_HISTORY_DATA,
 				proxy_get_hist_data, proxy_set_hist_lastid);
-		records += r;
+		records_sent_total += records_sent;
 
 		if (ZBX_MAX_HRECORDS == records_processed)
 			goto retry_history;
 retry_dhistory:
-		history_sender(&j, &r, &records_processed, ZBX_PROTO_VALUE_DISCOVERY_DATA,
+		history_sender(&j, &records_sent, &records_processed, ZBX_PROTO_VALUE_DISCOVERY_DATA,
 				proxy_get_dhis_data, proxy_set_dhis_lastid);
-		records += r;
+		records_sent_total += records_sent;
 
 		if (ZBX_MAX_HRECORDS == records_processed)
 			goto retry_dhistory;
 retry_autoreg_host:
-		history_sender(&j, &r, &records_processed, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA,
+		history_sender(&j, &records_sent, &records_processed, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA,
 				proxy_get_areg_data, proxy_set_areg_lastid);
-		records += r;
+		records_sent_total += records_sent;
 
 		if (ZBX_MAX_HRECORDS == records_processed)
 			goto retry_autoreg_host;
@@ -202,7 +202,8 @@ retry_autoreg_host:
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);
+				get_process_type_string(process_type), records_sent_total, sec,
+				CONFIG_PROXYDATA_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}

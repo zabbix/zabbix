@@ -1725,11 +1725,12 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid, int *records_processed)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid,
+		int *records_processed)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
-	int		f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
+	int		f, records_lim = ZBX_MAX_HRECORDS, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1738,6 +1739,7 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
+	*records_processed = 0;
 	*lastid = 0;
 
 	proxy_get_lastid(ht->table, ht->lastidfield, &id);
@@ -1787,7 +1789,7 @@ try_again:
 			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], ht->fields[f].jt);
 		}
 
-		records++;
+		(*records_processed)++;
 
 		zbx_json_close(j);
 
@@ -1796,9 +1798,9 @@ try_again:
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
-	*records_processed = records;
-	return records;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, *records_processed, *lastid);
+
+	return *records_processed;
 }
 
 /******************************************************************************
@@ -1967,11 +1969,13 @@ try_again:
 
 		records++;
 	}
-	*records_processed = i;
 	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
+	*records_processed = data_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d records_processed:%d lastid:" ZBX_FS_UI64,
+			__function_name, records, *records_processed, *lastid);
 
 	return records;
 }
