@@ -405,7 +405,7 @@ static char	**xml_read_props(const char *xml, char **propmap, int props_num)
 
 				if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 				{
-					props[i] = zbx_strdup(NULL, (char *)val);
+					props[i] = zbx_strdup(NULL, (const char *)val);
 					xmlFree(val);
 				}
 			}
@@ -481,7 +481,7 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
  * Purpose: frees shared resources allocated to store instance performance    *
  *          counter values                                                    *
  *                                                                            *
- * Parameters: instance - [IN] the performance counter instance value         *
+ * Parameters: pairs - [IN] vector of performance counter pairs               *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vector_ptr_pair_shared_clean(zbx_vector_ptr_pair_t *pairs)
@@ -618,7 +618,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
  *                                                                            *
  * Purpose: frees shared resources allocated to store file system object      *
  *                                                                            *
- * Parameters: dev   - [IN] the vm device                                     *
+ * Parameters: fs   - [IN] the file system                                    *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
@@ -3335,7 +3335,7 @@ out:
  *             doc       - [IN] the XML document containing performance       *
  *                              counter values for all entities               *
  *             node      - [IN] the XML node containing performance counter   *
- *                            values for the specified entity                 *
+ *                              values for the specified entity               *
  *                                                                            *
  * Return value: SUCCEED - the performance entity data was parsed             *
  *               FAIL    - the perofmance entity data did not contain valid   *
@@ -3477,8 +3477,8 @@ out:
  *                                                                            *
  * Purpose: updates vmware performance statistics data                        *
  *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
- *             data    - [IN] the performance data                            *
+ * Parameters: service  - [IN] the vmware service                             *
+ *             perfdata - [IN] the performance data                           *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vector_ptr_t *perfdata)
@@ -4254,7 +4254,7 @@ char	*zbx_xml_read_value(const char *data, const char *xpath)
 
 	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 	{
-		value = zbx_strdup(NULL, (char *)val);
+		value = zbx_strdup(NULL, (const char *)val);
 		xmlFree(val);
 	}
 clean:
@@ -4303,7 +4303,7 @@ char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 
 	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 	{
-		value = zbx_strdup(NULL, (char *)val);
+		value = zbx_strdup(NULL, (const char *)val);
 		xmlFree(val);
 	}
 clean:
@@ -4358,7 +4358,7 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 	{
 		if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
 		{
-			zbx_vector_str_append(values, zbx_strdup(NULL, (char *)val));
+			zbx_vector_str_append(values, zbx_strdup(NULL, (const char *)val));
 			xmlFree(val);
 		}
 	}
