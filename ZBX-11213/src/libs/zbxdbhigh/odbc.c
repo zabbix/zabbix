@@ -62,8 +62,6 @@ static void	odbc_free_row_data(ZBX_ODBC_DBH *pdbh)
 		zbx_free(pdbh->row_data);
 	}
 
-	zbx_free(pdbh->data_len);
-
 	pdbh->col_num = 0;
 }
 
@@ -254,14 +252,28 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
-		/* set NULL column value where appropriate */
-		if (SQL_NULL_DATA == pdbh->data_len[i])
-			zbx_free(pdbh->row_data[i]);
-		else
+		size_t		alloc = 0, offset = 0;
+		char		buffer[MAX_STRING_LEN + 1];
+		SQLLEN		len;
+
+		zbx_free(pdbh->row_data[i]);
+
+		while (SQL_NO_DATA != SQLGetData(pdbh->hstmt, i + 1, SQL_C_CHAR, buffer, MAX_STRING_LEN,
+				&len) && SQL_NULL_DATA != len)
+		{
+			if (SQL_NO_TOTAL == len)
+				len = sizeof(buffer);
+
+			buffer[len] = '\0';
+
+			zbx_strcpy_alloc(&pdbh->row_data[i], &alloc, &offset, buffer);
+		}
+
+		if (NULL != pdbh->row_data[i])
 			zbx_rtrim(pdbh->row_data[i], " ");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%i col]: '%s'", __function_name, i,
-				NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
+						NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
 	}
 
 	result_row = pdbh->row_data;
@@ -274,7 +286,6 @@ end:
 ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 {
 	const char	*__function_name = "odbc_DBselect";
-	int		i = 0;
 	ZBX_ODBC_RESULT	result = NULL;
 	SQLRETURN	rc;
 
@@ -296,30 +307,8 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		goto end;
 	}
 
-	pdbh->data_len = (SQLLEN *)zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * pdbh->col_num);
-
-	for (i = 0; i < pdbh->col_num; i++)
-	{
-		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_DESC_OCTET_LENGTH, NULL, 0,
-				NULL, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
-				"Cannot execute ODBC query"))
-		{
-			goto end;
-		}
-	}
-
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
-
-	for (i = 0; i < pdbh->col_num; i++)
-	{
-		pdbh->row_data[i] = zbx_malloc(NULL, pdbh->data_len[i]);
-		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				pdbh->data_len[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
-				"Cannot bind column in ODBC result"))
-		{
-			goto end;
-		}
-	}
+	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() selected %i columns", __function_name, pdbh->col_num);
 
