@@ -221,7 +221,7 @@ class CHttpTestManager {
 				}
 
 				if (!array_key_exists('applicationid', $httpTest)) {
-					$httpTest['applicationid'] = $db_http_test['application'];
+					$httpTest['applicationid'] = $db_http_test['applicationid'];
 				}
 				elseif (bccomp($httpTest['applicationid'], $db_http_test['applicationid'])) {
 					unset($httpTest['applicationid']);
