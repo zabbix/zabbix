@@ -309,6 +309,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		delay = atoi(tmp);
 
+		if (0 == delay)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "update interval must be higher than 0");
+			continue;
+		}
+
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)) ||
 				SUCCEED != is_uint64(tmp, &lastlogsize))
 		{
