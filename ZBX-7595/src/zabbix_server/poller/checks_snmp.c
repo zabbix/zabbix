@@ -414,12 +414,14 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	snmp_sess_init(&session);
-	/* fix for OID higher than MAX_INT to be accepted */
-	/* disables the validation of varbind values against the MIB definition for the relevant OID. */
-	/* this is equivalent to the -Ir option */
-	if( SNMPERR_SUCCESS != netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_CHECK_RANGE, 1))
+
+	/* Allow using sub-OIDs higher than MAX_INT, like in 'snmpwalk -Ir'. */
+	/* Disables the validation of varbind values against the MIB definition for the relevant OID. */
+	if (SNMPERR_SUCCESS != netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_CHECK_RANGE, 1))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"DontCheckRange\" option to %d for Net-SNMP");
+		/* This error is not fatal and should never happen (see netsnmp_ds_set_boolean() implementation). */
+		/* Only items with sub-OIDs higher than MAX_INT will be unsupported. */
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"DontCheckRange\" option for Net-SNMP");
 	}
 
 	switch (item->type)
