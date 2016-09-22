@@ -187,7 +187,7 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 
-			if (isset($httpTest['steps'])) {
+			if (array_key_exists('steps', $httpTest)) {
 				// update steps
 
 				$stepsCreate = $stepsUpdate = array();
@@ -235,7 +235,7 @@ class CHttpTestManager {
 		}
 
 		foreach ($httpTests as $key => $httpTest) {
-			if (isset($httpTest['steps'])) {
+			if (array_key_exists('steps', $httpTest)) {
 				if ($steps[$key]['update']) {
 					$this->updateStepsReal($httpTest, $steps[$key]['update']);
 				}
