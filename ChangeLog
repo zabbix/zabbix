@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
@@ -1460,6 +1461,7 @@ Changes for 2.0.19rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie database (vlad)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 
 --------------------------------------------------------------------------------
