@@ -172,7 +172,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (1 != num_param(parameters))
+	if (1 < num_param(parameters))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
@@ -234,7 +234,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (1 != num_param(parameters))
+	if (1 < num_param(parameters))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
@@ -285,9 +285,6 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
-		goto out;
-
-	if (0 != num_param(parameters))
 		goto out;
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
@@ -484,8 +481,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 4 < nparams)
+	if (4 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -639,8 +635,7 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -718,8 +713,7 @@ static int	evaluate_AVG(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -791,14 +785,10 @@ out:
 static int	evaluate_LAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LAST";
-	int				arg1, flag, ret = FAIL, nparams;
+	int				arg1, flag, ret = FAIL;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
-		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 1, &arg1, &flag,
 			1, ZBX_FLAG_VALUES))
@@ -812,7 +802,7 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *function, const
 		flag = ZBX_FLAG_VALUES;
 	}
 
-	if (2 == nparams)
+	if (2 == num_param(parameters))
 	{
 		int	time_shift, time_shift_flag;
 
@@ -870,8 +860,7 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -958,8 +947,7 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -984,10 +972,7 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *function, const 
 		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "TEST4 %d", nparams);
 		goto out;
-	}
 
 	if (0 < values.values_num)
 	{
@@ -1010,6 +995,7 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *function, const 
 			}
 		}
 		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
+
 		ret = SUCCEED;
 	}
 	else
@@ -1048,8 +1034,7 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *function, cons
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
@@ -1145,7 +1130,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 
 	zbx_history_record_vector_create(&values);
 
-	if (1 != num_param(parameters))
+	if (1 < num_param(parameters))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
@@ -1202,9 +1187,6 @@ static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const char *function, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_history_record_vector_create(&values);
-
-	if (0 != num_param(parameters))
-		goto out;
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
@@ -1278,9 +1260,6 @@ static int	evaluate_CHANGE(char *value, DC_ITEM *item, const char *function, con
 
 	zbx_history_record_vector_create(&values);
 
-	if (0 != num_param(parameters))
-		goto out;
-
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
 		goto out;
@@ -1349,9 +1328,6 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_history_record_vector_create(&values);
-
-	if (0 != num_param(parameters))
-		goto out;
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
@@ -1462,8 +1438,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	else
 		goto out;
 
-	nparams = num_param(parameters);
-	if (1 > nparams || 2 < nparams)
+	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
@@ -1603,7 +1578,7 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
 
-	if (1 != num_param(parameters))
+	if (1 < num_param(parameters))
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
@@ -1675,8 +1650,7 @@ static int	evaluate_BAND(char *value, DC_ITEM *item, const char *function, const
 	if (ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto clean;
 
-	nparams = num_param(parameters);
-	if (2 > nparams || 3 < nparams)
+	if (3 < (nparams = num_param(parameters)))
 		goto clean;
 
 	if (SUCCEED != get_function_parameter_uint64(item->host.hostid, parameters, 2, &mask, &mask_flag) ||

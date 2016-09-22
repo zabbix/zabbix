@@ -1865,34 +1865,44 @@ clean:
  *      param  - parameter list                                               *
  *      num    - requested parameter index                                    *
  *                                                                            *
- * Comments: Indexing starts from 1, delimiter for parameters is ','.         *
- *           Function respects quoted parameters and double quote escaping    *
- *           inside them but does not validate parameter list in any way.     *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
-void	remove_param(char *param, int num)
+void	remove_param(char *p, int num)
 {
-	int	quoted = 0;
-	char	*p;
+	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
+	int	idx = 1, skip_char = 0;
+	char	*buf, *prev = NULL;
 
-	for (p = param, num--; '\0' != *p; p++)
+	for (buf = p; '\0' != *p; p++)
 	{
-		if (0 != num)
-			*param++ = *p;
-
-		if (0 == quoted)
+		switch (state)
 		{
-			if (',' == *p)
-				num--;
-			else if ('"' == *p)
-				quoted = 1;
+			case 0:			/* in unquoted parameter */
+				if (',' == *p)
+				{
+					if (1 == idx && 1 == num)
+						skip_char = 1;
+					idx++;
+				}
+				else if ('"' == *p)
+					state = 1;
+				break;
+			case 1:			/* in quoted parameter */
+				if ('"' == *p && (NULL == prev || '\\' != *prev))
+					state = 0;
+				break;
 		}
-		else if ('"' == *p && '\\' != *(p - 1))
-			quoted = 0;
+		if (idx != num && 0 == skip_char)
+			*buf++ = *p;
+
+		skip_char = 0;
+		prev = p;
 	}
 
-	/* terminate the string, overwrite comma if the last parameter was removed */
-	*(0 == num ? --param : param) = '\0';
+	*buf = '\0';
 }
 
 /******************************************************************************
