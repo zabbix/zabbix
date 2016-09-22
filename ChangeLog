@@ -170,13 +170,13 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.5rc1
 
 New features:
-........S. [ZBX-7595] fixed long SNMP OID not being accepted (vlad)
 .......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian translations; thanks to Zabbix translators (zalex_ua)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+........S. [ZBX-7595] fixed long SNMP OID not being accepted (vlad)
 ....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
 ..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
