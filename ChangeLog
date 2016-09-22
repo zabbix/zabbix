@@ -13,6 +13,7 @@ A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix tra
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vlad)
 ....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
 ..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
@@ -182,6 +183,7 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vlad)
 ....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
 ..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
@@ -1654,6 +1656,7 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vlad)
 ....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
