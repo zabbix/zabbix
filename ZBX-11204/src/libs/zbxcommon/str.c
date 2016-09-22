@@ -1865,20 +1865,20 @@ clean:
  *      param  - parameter list                                               *
  *      num    - requested parameter index                                    *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments: delimiter for parameters is ','                                  *
+ * Comments: Indexing starts from 1, delimiter for parameters is ','.         *
+ *           Function respects quoted parameters and double quote escaping    *
+ *           inside them but does not validate parameter list in any way.     *
  *                                                                            *
  ******************************************************************************/
-void	remove_param(char *buf, int num)
+void	remove_param(char *param, int num)
 {
 	int	quoted = 0;
 	char	*p;
 
-	for (p = buf, num--; '\0' != *p; p++)
+	for (p = param, num--; '\0' != *p; p++)
 	{
 		if (0 != num)
-			*buf++ = *p;
+			*param++ = *p;
 
 		if (0 == quoted)
 		{
@@ -1887,12 +1887,12 @@ void	remove_param(char *buf, int num)
 			else if ('"' == *p)
 				quoted = 1;
 		}
-		else if ('"' == *p && '\\' != p[-1])
+		else if ('"' == *p && '\\' != *(p - 1))
 			quoted = 0;
 	}
 
 	/* terminate the string, overwrite comma if the last parameter was removed */
-	*(0 == num ? --buf : buf) = '\0';
+	*(0 == num ? --param : param) = '\0';
 }
 
 /******************************************************************************
