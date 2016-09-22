@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 3.2.1rc1
 
 New features:
+.......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
 A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
@@ -175,6 +176,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.5rc1
 
 New features:
+.......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian translations; thanks to Zabbix translators (zalex_ua)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
