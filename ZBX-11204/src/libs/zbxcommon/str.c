@@ -1870,13 +1870,13 @@ clean:
  * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
-void	remove_param(char *p, int num)
+void	remove_param(char *param, int num)
 {
 	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
 	int	idx = 1, skip_char = 0;
-	char	*buf, *prev = NULL;
+	char	*p;
 
-	for (buf = p; '\0' != *p; p++)
+	for (p = param; '\0' != *p; p++)
 	{
 		switch (state)
 		{
@@ -1891,18 +1891,17 @@ void	remove_param(char *p, int num)
 					state = 1;
 				break;
 			case 1:			/* in quoted parameter */
-				if ('"' == *p && (NULL == prev || '\\' != *prev))
+				if ('"' == *p && '\\' != *(p - 1))
 					state = 0;
 				break;
 		}
 		if (idx != num && 0 == skip_char)
-			*buf++ = *p;
+			*param++ = *p;
 
 		skip_char = 0;
-		prev = p;
 	}
 
-	*buf = '\0';
+	*param = '\0';
 }
 
 /******************************************************************************
