@@ -9,7 +9,7 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 Bug fixes:
 .......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
 .......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 ..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
@@ -1483,7 +1483,7 @@ New features:
 Bug fixes:
 .......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
 .......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
 ....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
@@ -2940,7 +2940,7 @@ Changes for 2.0.19rc1
 New features:
 
 Bug fixes:
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie database (vso)
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 
 --------------------------------------------------------------------------------
