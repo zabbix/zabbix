@@ -799,6 +799,7 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
+#define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);

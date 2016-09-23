@@ -1236,8 +1236,8 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 
 	now -= time_shift;
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, 0, &percentage) ||
-			0.0 > percentage || 100.0 < percentage)
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, ZBX_FLAG_DOUBLE_PLAIN,
+			&percentage) || 0.0 > percentage || 100.0 < percentage)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
