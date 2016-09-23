@@ -1979,17 +1979,17 @@ try_again:
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	int	records_to_send = 0, records_processed_per_iteration;
+	int	records = 0, records_processed;
 
 	proxy_get_lastid("proxy_history", "history_lastid", lastid);
 
 	do
 	{
-		records_to_send += proxy_get_history_data(j, lastid, &records_processed_per_iteration);
+		records += proxy_get_history_data(j, lastid, &records_processed);
 	}
-	while (ZBX_MAX_HRECORDS > records_to_send && ZBX_MAX_HRECORDS == records_processed_per_iteration);
+	while (ZBX_MAX_HRECORDS > records && ZBX_MAX_HRECORDS == records_processed);
 
-	return records_to_send;
+	return records;
 }
 
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)
