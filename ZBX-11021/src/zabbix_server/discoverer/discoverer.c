@@ -782,7 +782,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_init_snmp();
 #endif
 
-
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
