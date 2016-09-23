@@ -696,14 +696,16 @@ class CUserGroup extends CZBXAPI {
 		));
 
 		foreach ($dbUsers as $dbUser) {
-			if (count($dbUser['usrgrps']) == 1) {
-				$dbGroup = reset($dbUser['usrgrps']);
+			$db_usrgrpids = array();
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'User group "%1$s" is the only group that user "%2$s" belongs to.',
-					$dbUserGroups[$dbGroup['usrgrpid']]['name'],
-					$dbUser['alias']
-				));
+			foreach ($dbUser['usrgrps'] as $usrgrp) {
+				$db_usrgrpids[] = $usrgrp['usrgrpid'];
+			}
+
+			if (!array_diff($db_usrgrpids, $userGroupIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%s" cannot be without user group.', $dbUser['alias'])
+				);
 			}
 		}
 	}
