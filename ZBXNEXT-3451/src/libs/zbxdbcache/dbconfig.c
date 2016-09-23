@@ -571,6 +571,13 @@ zbx_dc_correlation_t;
 
 typedef struct
 {
+	zbx_uint64_t	groupid;
+	const char	*name;
+}
+zbx_dc_hgroup_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			sync_ts;
@@ -617,6 +624,8 @@ typedef struct
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
+	zbx_hashset_t		hgroups;
+	zbx_vector_ptr_t	hgroups_name; 		/* host groups sorted by name */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -4041,6 +4050,80 @@ static void	DCsync_corr_operations(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static int	dc_compare_hgroups(const void *d1, const void *d2)
+{
+	const zbx_dc_hgroup_t	*g1 = *((const zbx_dc_hgroup_t **)d1);
+	const zbx_dc_hgroup_t	*g2 = *((const zbx_dc_hgroup_t **)d2);
+
+	return strcmp(g1->name, g2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_hgroups                                                   *
+ *                                                                            *
+ * Purpose: Updates host groups configuration cache                           *
+ *                                                                            *
+ * Parameters: result - [IN] the result of host groups database select        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - groupid                                                      *
+ *           1 - name                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_hgroups(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_hgroups";
+
+	DB_ROW			row;
+	zbx_vector_uint64_t	syncids;
+	zbx_uint64_t 		groupid;
+	zbx_dc_hgroup_t		*group;
+	int			found;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&syncids);
+
+	/* clear host group index */
+	zbx_vector_ptr_clear(&config->hgroups_name);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		zbx_vector_uint64_append(&syncids, groupid);
+
+		group = DCfind_id(&config->hgroups, groupid, sizeof(zbx_dc_hgroup_t), &found);
+
+		DCstrpool_replace(found, &group->name, row[1]);
+
+		zbx_vector_ptr_append(&config->hgroups_name, group);
+	}
+
+	zbx_vector_ptr_sort(&config->hgroups_name, dc_compare_hgroups);
+
+	/* remove deleted host groups */
+
+	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->hgroups, &iter);
+
+	while (NULL != (group = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&syncids, group->groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_strpool_release(group->name);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&syncids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_compare_action_conditions_by_type                             *
@@ -4272,6 +4355,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		correlation_result = NULL;
 	DB_RESULT		corr_condition_result = NULL;
 	DB_RESULT		corr_operation_result = NULL;
+	DB_RESULT		hgroups_result = NULL;
 
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
@@ -4279,6 +4363,7 @@ void	DCsync_configuration(void)
 				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
 				trigger_tag_sec, trigger_tag_sec2, correlation_sec, correlation_sec2,
 				corr_condition_sec, corr_condition_sec2, corr_operation_sec, corr_operation_sec2,
+				hgroups_sec, hgroups_sec2,
 				total, total2;
 	const zbx_strpool_t	*strpool;
 
@@ -4521,6 +4606,11 @@ void	DCsync_configuration(void)
 	}
 	corr_operation_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (NULL == (hgroups_result = DBselect("select groupid,name from groups")))
+		goto out;
+	hgroups_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4597,14 +4687,18 @@ void	DCsync_configuration(void)
 	DCsync_corr_operations(corr_operation_result);
 	corr_operation_sec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_hgroups(hgroups_result);
+	hgroups_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
 	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 			action_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
-			corr_condition_sec + corr_operation_sec;
+			corr_condition_sec + corr_operation_sec + hgroups_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 			expr_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 + correlation_sec2 +
-			corr_condition_sec2 + corr_operation_sec2;
+			corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -4642,6 +4736,8 @@ void	DCsync_configuration(void)
 			corr_condition_sec, corr_condition_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			corr_operation_sec, corr_operation_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			hgroups_sec, hgroups_sec2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
@@ -4737,6 +4833,8 @@ void	DCsync_configuration(void)
 			config->corr_conditions.num_data, config->corr_conditions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
 			config->corr_operations.num_data, config->corr_operations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
+			config->hgroups.num_data, config->hgroups.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -4781,6 +4879,7 @@ out:
 	DBfree_result(correlation_result);
 	DBfree_result(corr_condition_result);
 	DBfree_result(corr_operation_result);
+	DBfree_result(hgroups_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -5156,6 +5255,9 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->correlations, 0);
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
+	CREATE_HASHSET(config->hgroups, 0);
+	zbx_vector_ptr_create_ext(&config->hgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
+			__config_mem_free_func);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -9761,4 +9863,48 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(&rules->correlations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_nested_host_groupids                                  *
+ *                                                                            *
+ * Purpose: gets nested group ids                                             *
+ *                                                                            *
+ * Parameter: groupid         - [IN] the parent group id                      *
+ *            nested_groupids - [OUT] the nested + parent group ids           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_nested_host_groupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
+{
+	zbx_dc_hgroup_t	*parent_group, *group;
+
+	LOCK_CACHE;
+
+	if (NULL != (parent_group = zbx_hashset_search(&config->hgroups, &groupid)))
+	{
+		int	index, len;
+
+		index = zbx_vector_ptr_nearestindex(&config->hgroups_name, parent_group, dc_compare_hgroups);
+		len = strlen(parent_group->name);
+
+		while (index < config->hgroups_name.values_num)
+		{
+			group = (zbx_dc_hgroup_t *)config->hgroups_name.values[index];
+
+			if (0 != strncmp(group->name, parent_group->name, len))
+				break;
+
+			if ('\0' != group->name[len] && '/' != group->name[len])
+				break;
+
+			zbx_vector_uint64_append(nested_groupids, group->groupid);
+
+			index++;
+		}
+	}
+
+	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	UNLOCK_CACHE;
 }
