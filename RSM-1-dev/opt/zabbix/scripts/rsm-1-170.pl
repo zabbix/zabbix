@@ -48,9 +48,7 @@ my $zabbix = Zabbix->new(
 	{
 		'url' => $config->{'zapi'}->{'url'},
 		'user' => $config->{'zapi'}->{'user'},
-		'password' => $config->{'zapi'}->{'password'},
-		'timeout' => 5,
-		'attempts' => 2
+		'password' => $config->{'zapi'}->{'password'}
 	});
 
 if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')

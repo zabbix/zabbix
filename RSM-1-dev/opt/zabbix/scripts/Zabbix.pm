@@ -27,10 +27,12 @@ sub to_utf8($);
 sub get_authid($);
 sub set_authid($$);
 
-use constant _TIMEOUT => 60;
-use constant _ATTEMPTS => 10;
+use constant _LOGIN_TIMEOUT => 5;
 
-my ($ATTEMPTS, $TIMEOUT);
+use constant _DEFAULT_REQUEST_TIMEOUT => 60;
+use constant _DEFAULT_REQUEST_ATTEMPTS => 10;
+
+my ($REQUEST_TIMEOUT, $REQUEST_ATTEMPTS);
 
 sub new($$) {
     my ($class, $options) = @_;
@@ -39,10 +41,10 @@ sub new($$) {
 
 #    $ua->ssl_opts(verify_hostname => 0);
 
-    $TIMEOUT = (defined($options->{timeout}) ? $options->{timeout} : _TIMEOUT);
-    $ATTEMPTS = (defined($options->{attempts}) ? $options->{attempts} : _ATTEMPTS);
+    $REQUEST_TIMEOUT = (defined($options->{request_timeout}) ? $options->{request_timeout} : _DEFAULT_REQUEST_TIMEOUT);
+    $REQUEST_ATTEMPTS = (defined($options->{request_attempts}) ? $options->{request_attempts} : _DEFAULT_REQUEST_ATTEMPTS);
 
-    $ua->timeout($TIMEOUT);
+    $ua->timeout(_LOGIN_TIMEOUT);
 
     $ua->agent("Net::Zabbix");
 
@@ -61,7 +63,7 @@ sub new($$) {
             request   => $req,
             count     => 0,
             auth      => $authid,
-            error => undef,
+            error     => undef,
             };
 
 	bless( $self, $class );
@@ -71,28 +73,15 @@ sub new($$) {
 
     $req->content(encode_json( {
 	    jsonrpc => "2.0",
-    	method => "user.authenticate",
-        params => {
+	    method => "user.authenticate",
+	    params => {
             user => $options->{user},
             password => $options->{password},
         },
         id => 1,
     }));
 
-    my $res;
-    my $attempts = $ATTEMPTS;
-    my $sleep = 1;
-
-    while ($attempts-- > 0) {
-	$res = $ua->request($req);
-
-	last if ($res->is_success);
-
-	sleep($sleep);
-
-	$sleep *= 1.3;
-	$sleep = 3 if ($sleep > 3);
-    }
+    my $res = $ua->request($req);
 
     croak "cannot connect to Zabbix: " . $res->status_line unless ($res->is_success);
 
@@ -101,6 +90,8 @@ sub new($$) {
     croak "Zabbix API returned invalid JSON: " . $@ if $@;
 
     set_authid($domain, $auth);
+
+    $ua->timeout($REQUEST_TIMEOUT);
 
     return bless {
         UserAgent => $ua,
@@ -457,7 +448,7 @@ sub __send_request {
     })));
 
     my $res;
-    my $attempts = $ATTEMPTS;
+    my $attempts = $REQUEST_ATTEMPTS;
     my $sleep = 1;
 
     while ($attempts-- > 0) {
