@@ -163,8 +163,8 @@ out:
 	return ret;
 }
 
-static int	get_function_parameter_float(zbx_uint64_t hostid, const char *parameters, int Nparam, int flags,
-		double *value)
+static int	get_function_parameter_float(zbx_uint64_t hostid, const char *parameters, int Nparam,
+		unsigned char flags, double *value)
 {
 	const char	*__function_name = "get_function_parameter_float";
 	char		*parameter;

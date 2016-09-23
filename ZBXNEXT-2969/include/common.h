@@ -800,7 +800,7 @@ ZBX_TASK_EX;
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
-int	is_double_suffix(const char *str, int flags);
+int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
 int	is_time_suffix(const char *c, int *value);
 int	is_int_prefix(const char *c);

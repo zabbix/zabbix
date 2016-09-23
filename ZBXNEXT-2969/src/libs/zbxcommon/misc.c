@@ -2034,7 +2034,7 @@ int	zbx_double_compare(double a, double b)
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-int	is_double_suffix(const char *str, int flags)
+int	is_double_suffix(const char *str, unsigned char flags)
 {
 	size_t	i;
 	char	dot = 0;
