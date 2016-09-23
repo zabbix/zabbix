@@ -64,7 +64,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
 		$this->zbxTestWaitWindowClose();
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('update');
@@ -198,9 +198,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'unlink_and_clear[".$hostid."]')]"));
 		$this->zbxTestTextPresent('Inheritance test template for unlink');
-		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink_and_clear[".$hostid."]') and text()='Unlink and clear']");
 		$this->zbxTestTextNotPresent('Inheritance test template for unlink');
 
 		$this->zbxTestClickWait('update');
