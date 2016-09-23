@@ -1742,7 +1742,7 @@ button {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
 	border-color: $btn-form-border-color;
-	vertical-align: top;
+	//vertical-align: top;
 
 	&:hover {
 		color: $btn-form-font-color;
@@ -1814,6 +1814,7 @@ button {
 
 .filter-trigger {
 	position: relative;
+	margin: 0;
 	padding-right: 21px;
 	min-width: 94px;
 	@include border-radius(2px 2px 0 0);
