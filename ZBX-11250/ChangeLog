@@ -1,14 +1,20 @@
 Changes for 3.2.1rc1
 
 New features:
+.......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
 A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
-....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
+.......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
+..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 ..F....... [ZBX-11050] changed translation string "Acknowledges" => "Acknowledgements" (Cemeris)
-A......... [ZBX-11196] implemented dynamic default sortorder for icon map mappings, now default sortorder increases by one with each entry of mapping (Cemeris)
+A......... [ZBX-11196] implemented dynamic default sortorder for icon mappings, now default sortorder increases by one with each entry of mapping (Cemeris)
 ..F....... [ZBX-11202] fixed timeline in Problem view which shows "Yesterday" instead of "Today" (Sasha)
 ..F....... [ZBX-11120] fixed checkbox functionality and display of undefined indexes in trigger expression and recovery expression constructor (Ivo)
 A......... [ZBX-10758] added converting of SNMP lld rules in XML import (Sasha)
@@ -165,12 +171,18 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.5rc1
 
 New features:
+.......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian translations; thanks to Zabbix translators (zalex_ua)
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
-....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
+.......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
+..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 A.F....... [ZBX-11151] implemented dynamic default sortorder for graph item, default sortorder increases by one with each entry of graph item (Cemeris)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
@@ -1639,7 +1651,11 @@ New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
-....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
+.......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
+...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
@@ -3094,6 +3110,7 @@ Changes for 2.0.19rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie database (vso)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 
 --------------------------------------------------------------------------------

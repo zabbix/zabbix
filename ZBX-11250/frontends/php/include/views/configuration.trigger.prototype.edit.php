@@ -107,40 +107,36 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$expression_row[] = BR();
 
 	if ($data['expression_formula'] === '') {
-		// add button
-		$add_expression_button = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$add_expression_button->setAttribute('disabled', 'disabled');
-		}
-		$expression_row[] = $add_expression_button;
+		// Append "Add" button.
+		$expression_row[] = (new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 	else {
-		// add button
-		$add_expression_button = (new CSubmit('and_expression', _('And')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$add_expression_button->setAttribute('disabled', 'disabled');
-		}
-		$expression_row[] = $add_expression_button;
+		// Append "And" button.
+		$expression_row[] = (new CSimpleButton(_('And')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// or button
-		$orExpressionButton = (new CSubmit('or_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$orExpressionButton->setAttribute('disabled', 'disabled');
-		}
+		// Append "Or" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expression_row[] = $orExpressionButton;
+		$expression_row[] = (new CSimpleButton(_('Or')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// replace button
-		$replaceExpressionButton = (new CSubmit('replace_expression', _('Replace')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$replaceExpressionButton->setAttribute('disabled', 'disabled');
-		}
+		// Append "Replace" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expression_row[] = $replaceExpressionButton;
+		$expression_row[] = (new CSimpleButton(_('Replace')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 }
 elseif ($data['expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
@@ -207,7 +203,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					$e['list'],
 					!$data['limited']
 						? (new CCol(
-							(new CButton(null, _('Remove')))
+							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -250,7 +246,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
@@ -297,43 +293,36 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$recovery_expression_row[] = BR();
 
 	if ($data['recovery_expression_formula'] === '') {
-		// add button
-		$add_recovery_expression_button = (new CSubmit('add_recovery_expression', _('Add')))
-			->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$add_recovery_expression_button->setAttribute('disabled', 'disabled');
-		}
-		$recovery_expression_row[] = $add_recovery_expression_button;
+		// Append "Add" button.
+		$recovery_expression_row[] = (new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_recovery_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 	else {
-		// add button
-		$add_recovery_expression_button = (new CSubmit('and_recovery_expression', _('And')))
-			->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$add_recovery_expression_button->setAttribute('disabled', 'disabled');
-		}
-		$recovery_expression_row[] = $add_recovery_expression_button;
+		// Append "And" button.
+		$recovery_expression_row[] = (new CSimpleButton(_('And')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_recovery_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// or button
-		$or_recovery_expression_button = (new CSubmit('or_recovery_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$or_recovery_expression_button->setAttribute('disabled', 'disabled');
-		}
+		// Append "Or" button.
 		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$recovery_expression_row[] = $or_recovery_expression_button;
+		$recovery_expression_row[] = (new CSimpleButton(_('Or')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_recovery_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// replace button
-		$replace_recovery_expression_button = (new CSubmit('replace_recovery_expression', _('Replace')))
-			->addClass(ZBX_STYLE_BTN_GREY);
-		if ($data['limited']) {
-			$replace_recovery_expression_button->setAttribute('disabled', 'disabled');
-		}
+		// Append "Replace" button.
 		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$recovery_expression_row[] = $replace_recovery_expression_button;
+		$recovery_expression_row[] = (new CSimpleButton(_('Replace')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_recovery_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 }
 elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
@@ -404,7 +393,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					$e['list'],
 					!$data['limited']
 						? (new CCol(
-							(new CButton(null, _('Remove')))
+							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -446,7 +435,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	], null, 'recovery_expression_constructor_row');
 
-	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
