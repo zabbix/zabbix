@@ -163,7 +163,8 @@ out:
 	return ret;
 }
 
-static int	get_function_parameter_float(zbx_uint64_t hostid, const char *parameters, int Nparam, double *value)
+static int	get_function_parameter_float(zbx_uint64_t hostid, const char *parameters, int Nparam, int flags,
+		double *value)
 {
 	const char	*__function_name = "get_function_parameter_float";
 	char		*parameter;
@@ -177,7 +178,7 @@ static int	get_function_parameter_float(zbx_uint64_t hostid, const char *paramet
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
-		if (SUCCEED != is_double_suffix(parameter))
+		if (SUCCEED != is_double_suffix(parameter, flags))
 			goto clean;
 
 		*value = str2double(parameter);
@@ -452,7 +453,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
 
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
-			if (SUCCEED != is_double_suffix(arg2))
+			if (SUCCEED != is_double_suffix(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				return FAIL;
 			arg2_double = str2double(arg2);
 
@@ -1235,7 +1236,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 
 	now -= time_shift;
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &percentage) ||
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, 0, &percentage) ||
 			0.0 > percentage || 100.0 < percentage)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -2186,8 +2187,11 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &threshold))
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, ZBX_FLAG_DOUBLE_SUFFIX,
+			&threshold))
+	{
 		goto out;
+	}
 
 	if (4 == nparams)
 	{

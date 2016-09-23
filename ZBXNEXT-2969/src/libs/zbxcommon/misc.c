@@ -2021,7 +2021,9 @@ int	zbx_double_compare(double a, double b)
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - string to check                                        *
+ *             flags - extra options including:                               *
+ *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
@@ -2032,7 +2034,7 @@ int	zbx_double_compare(double a, double b)
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-int	is_double_suffix(const char *str)
+int	is_double_suffix(const char *str, int flags)
 {
 	size_t	i;
 	char	dot = 0;
@@ -2053,7 +2055,7 @@ int	is_double_suffix(const char *str)
 		}
 
 		/* last character is suffix */
-		if (NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
+		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
 			continue;
 
 		return FAIL;

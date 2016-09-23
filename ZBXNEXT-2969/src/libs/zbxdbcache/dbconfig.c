@@ -7537,7 +7537,7 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *macro, const char *value, char **error)
 {
-	if (SUCCEED == is_double_suffix(value))
+	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
 		return SUCCEED;
 
 	if (NULL != error)
