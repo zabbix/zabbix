@@ -1979,8 +1979,8 @@ try_again:
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	int	records = 0, records_processed;
-	static zbx_uint64_t id;
+	int		records = 0, records_processed;
+	zbx_uint64_t	id;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
