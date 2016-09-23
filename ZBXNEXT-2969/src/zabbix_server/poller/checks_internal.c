@@ -150,7 +150,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
-		int	from = 6, to = -1;
+		int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
 		if (3 < nparams)
 		{
@@ -170,7 +170,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		if (-1 != to && from > to)
+		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
 		{
 			error = zbx_strdup(error, "Parameters represent an invalid interval.");
 			goto out;
