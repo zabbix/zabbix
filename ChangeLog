@@ -13,6 +13,7 @@ A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix tra
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
+........S. [ZBX-11250] fixed trigger update after executing event correlation 'close new' operation (wiper)
 .......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
 .......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
 ....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vso)
