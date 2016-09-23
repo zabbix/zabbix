@@ -27,7 +27,10 @@ sub to_utf8($);
 sub get_authid($);
 sub set_authid($$);
 
-use constant ATTEMPTS => 10;
+use constant _TIMEOUT => 60;
+use constant _ATTEMPTS => 10;
+
+my ($ATTEMPTS, $TIMEOUT);
 
 sub new($$) {
     my ($class, $options) = @_;
@@ -36,7 +39,10 @@ sub new($$) {
 
 #    $ua->ssl_opts(verify_hostname => 0);
 
-    $ua->timeout(60);
+    $TIMEOUT = (defined($options->{timeout}) ? $options->{timeout} : _TIMEOUT);
+    $ATTEMPTS = (defined($options->{attempts}) ? $options->{attempts} : _ATTEMPTS);
+
+    $ua->timeout($TIMEOUT);
 
     $ua->agent("Net::Zabbix");
 
@@ -74,7 +80,7 @@ sub new($$) {
     }));
 
     my $res;
-    my $attempts = ATTEMPTS;
+    my $attempts = $ATTEMPTS;
     my $sleep = 1;
 
     while ($attempts-- > 0) {
@@ -451,7 +457,7 @@ sub __send_request {
     })));
 
     my $res;
-    my $attempts = ATTEMPTS;
+    my $attempts = $ATTEMPTS;
     my $sleep = 1;
 
     while ($attempts-- > 0) {

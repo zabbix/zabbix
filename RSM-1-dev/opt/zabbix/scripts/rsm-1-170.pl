@@ -43,11 +43,14 @@ setopt('nolog');
 
 my $config = get_rsm_config();
 
+print("Connecting to Zabbix API...\n");
 my $zabbix = Zabbix->new(
 	{
 		'url' => $config->{'zapi'}->{'url'},
 		'user' => $config->{'zapi'}->{'user'},
-		'password' => $config->{'zapi'}->{'password'}
+		'password' => $config->{'zapi'}->{'password'},
+		'timeout' => 5,
+		'attempts' => 2
 	});
 
 if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
