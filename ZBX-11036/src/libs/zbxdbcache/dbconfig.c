@@ -1692,8 +1692,7 @@ done:
 
 		ipmi_authtype = (signed char)atoi(row[3]);
 		ipmi_privilege = (unsigned char)atoi(row[4]);
-
-		if (0 != ipmi_authtype || 2 != ipmi_privilege || '\0' != *row[5] || '\0' != *row[6])	/* useipmi */
+		if (-1 != ipmi_authtype || 2 != ipmi_privilege || '\0' != *row[5] || '\0' != *row[6])	/* useipmi */
 		{
 			ipmihost = DCfind_id(&config->ipmihosts, hostid, sizeof(ZBX_DC_IPMIHOST), &found);
 
@@ -1705,7 +1704,6 @@ done:
 		else if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &hostid)))
 		{
 			/* remove IPMI connection parameters for hosts without IPMI */
-
 			zbx_strpool_release(ipmihost->ipmi_username);
 			zbx_strpool_release(ipmihost->ipmi_password);
 
@@ -5375,7 +5373,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	}
 	else
 	{
-		dst_host->ipmi_authtype = 0;
+		dst_host->ipmi_authtype = -1;
 		dst_host->ipmi_privilege = 2;
 		*dst_host->ipmi_username = '\0';
 		*dst_host->ipmi_password = '\0';
