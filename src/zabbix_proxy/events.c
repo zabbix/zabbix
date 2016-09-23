@@ -85,7 +85,7 @@ int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *
 	return 0;
 }
 
-int	flush_correlated_events()
+int	flush_correlated_events(void)
 {
 	return 0;
 }

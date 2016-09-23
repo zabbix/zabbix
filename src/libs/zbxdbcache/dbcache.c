@@ -2210,7 +2210,11 @@ int	DCsync_history(int sync_type, int *total_num)
 	}
 
 	if (0 == cache->history_num)
+	{
+		/* even with no history there might be events queued to be closed, flush them */
+		flush_correlated_events();
 		goto finish;
+	}
 
 	sync_start = time(NULL);
 
