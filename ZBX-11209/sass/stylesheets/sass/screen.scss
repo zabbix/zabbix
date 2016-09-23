@@ -990,6 +990,10 @@ footer {
 	button {
 		margin: 10px 5px 0 5px;
 	}
+
+	select {
+		vertical-align: top;
+	}
 }
 
 .multiselect-wrapper {
@@ -1700,6 +1704,7 @@ button {
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	border: 1px solid $btn-bg-color;
+	margin: 0;
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
@@ -1742,7 +1747,6 @@ button {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
 	border-color: $btn-form-border-color;
-	//vertical-align: top;
 
 	&:hover {
 		color: $btn-form-font-color;
