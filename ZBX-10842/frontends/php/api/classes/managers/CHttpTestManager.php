@@ -201,7 +201,6 @@ class CHttpTestManager {
 					elseif (!isset($webstep['httpstepid'])) {
 						$stepsCreate[] = $webstep;
 					}
-					// TODO: Exception should be thrown if incorrect httpstepid is provided.
 
 					$steps[$key]['create'] = $stepsCreate;
 					$steps[$key]['update'] = $stepsUpdate;
@@ -230,7 +229,6 @@ class CHttpTestManager {
 		}
 
 		if ($deleteStepItemIds) {
-			// TODO: API::Item()->delete() should not be used for deleting items with ITEM_TYPE_HTTPTEST type.
 			API::Item()->delete($deleteStepItemIds, true);
 		}
 
