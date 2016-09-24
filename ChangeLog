@@ -1728,7 +1728,7 @@ New features:
 Changes for 1.8.23rc1
 
 A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
-....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
+....I..... [ZBX-10364] fixed inconsistencies in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 
