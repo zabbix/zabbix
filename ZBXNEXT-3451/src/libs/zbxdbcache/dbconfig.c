@@ -9881,19 +9881,17 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_nested_hostgroupids                                   *
+ * Function: dc_get_nested_hostgroupids                                       *
  *                                                                            *
- * Purpose: gets nested group ids                                             *
+ * Purpose: gets nested group ids for the specified host group                *
  *                                                                            *
- * Parameter: groupid         - [IN] the parent group id                      *
+ * Parameter: groupid         - [IN] the parent group identifier              *
  *            nested_groupids - [OUT] the nested + parent group ids           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
+static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
 {
 	zbx_dc_hostgroup_t	*parent_group, *group;
-
-	LOCK_CACHE;
 
 	if (NULL != (parent_group = zbx_hashset_search(&config->hostgroups, &groupid)))
 	{
@@ -9921,8 +9919,30 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *n
 		zbx_vector_uint64_append(nested_groupids, parent_group->groupid);
 		zbx_vector_uint64_append_vector(nested_groupids, &parent_group->nested_groupids);
 	}
+}
 
-	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_nested_hostgroupids                                   *
+ *                                                                            *
+ * Purpose: gets nested group ids for the specified host groups               *
+ *                                                                            *
+ * Parameter: groupids        - [IN] the parent group identifiers             *
+ *            groupids_num    - [IN] the number of parent groups              *
+ *            nested_groupids - [OUT] the nested + parent group ids           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids)
+{
+	int	i;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < groupids_num; i++)
+		dc_get_nested_hostgroupids(groupids[i], nested_groupids);
 
 	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }

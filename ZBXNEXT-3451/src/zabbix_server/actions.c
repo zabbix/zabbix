@@ -114,7 +114,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		ZBX_STR2UINT64(condition_value, condition->value);
 
 		zbx_vector_uint64_create(&groupids);
-		zbx_dc_get_nested_hostgroupids(condition_value, &groupids);
+		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct hg.groupid"
@@ -1032,7 +1032,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 		ZBX_STR2UINT64(condition_value, condition->value);
 
 		zbx_vector_uint64_create(&groupids);
-		zbx_dc_get_nested_hostgroupids(condition_value, &groupids);
+		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 		switch (event->object)
 		{

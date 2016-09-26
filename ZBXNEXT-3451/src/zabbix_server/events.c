@@ -756,7 +756,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_vector_uint64_create(&groupids);
-	zbx_dc_get_nested_hostgroupids(groupid, &groupids);
+	zbx_dc_get_nested_hostgroupids(&groupid, 1, &groupids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hg.groupid"
