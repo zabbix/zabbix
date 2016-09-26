@@ -1466,9 +1466,13 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 
 					state = 0;
 				}
-				else if ('\\' == *p && '"' == p[1] && 0 == array)
+				else if ('\\' == *p && '"' == p[1])
 				{
+					if (idx == num && 0 != array)
+						ZBX_ASSIGN_PARAM;
+
 					p++;
+
 					if (idx == num)
 						ZBX_ASSIGN_PARAM;
 				}
@@ -1598,9 +1602,13 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 
 				state = 0;
 			}
-			else if ('\\' == *p && '"' == p[1] && 0 == array)
+			else if ('\\' == *p && '"' == p[1])
 			{
+				if (idx == num && 0 != array)
+					(*sz)++;
+
 				p++;
+
 				if (idx == num)
 					(*sz)++;
 			}
