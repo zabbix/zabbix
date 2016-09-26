@@ -569,12 +569,18 @@ typedef struct
 }
 zbx_dc_correlation_t;
 
+#define ZBX_DC_HOSTGROUP_FLAGS_NONE		0
+#define ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS	1
+
 typedef struct
 {
-	zbx_uint64_t	groupid;
-	const char	*name;
+	zbx_uint64_t		groupid;
+	const char		*name;
+
+	zbx_vector_uint64_t	nested_groupids;
+	unsigned char		flags;
 }
-zbx_dc_hgroup_t;
+zbx_dc_hostgroup_t;
 
 typedef struct
 {
@@ -624,8 +630,8 @@ typedef struct
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
-	zbx_hashset_t		hgroups;
-	zbx_vector_ptr_t	hgroups_name; 		/* host groups sorted by name */
+	zbx_hashset_t		hostgroups;
+	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -4052,15 +4058,15 @@ static void	DCsync_corr_operations(DB_RESULT result)
 
 static int	dc_compare_hgroups(const void *d1, const void *d2)
 {
-	const zbx_dc_hgroup_t	*g1 = *((const zbx_dc_hgroup_t **)d1);
-	const zbx_dc_hgroup_t	*g2 = *((const zbx_dc_hgroup_t **)d2);
+	const zbx_dc_hostgroup_t	*g1 = *((const zbx_dc_hostgroup_t **)d1);
+	const zbx_dc_hostgroup_t	*g2 = *((const zbx_dc_hostgroup_t **)d2);
 
 	return strcmp(g1->name, g2->name);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_hgroups                                                   *
+ * Function: DCsync_hostgroups                                                *
  *                                                                            *
  * Purpose: Updates host groups configuration cache                           *
  *                                                                            *
@@ -4071,14 +4077,14 @@ static int	dc_compare_hgroups(const void *d1, const void *d2)
  *           1 - name                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_hgroups(DB_RESULT result)
+static void	DCsync_hostgroups(DB_RESULT result)
 {
-	const char		*__function_name = "DCsync_hgroups";
+	const char		*__function_name = "DCsync_hostgroups";
 
 	DB_ROW			row;
 	zbx_vector_uint64_t	syncids;
 	zbx_uint64_t 		groupid;
-	zbx_dc_hgroup_t		*group;
+	zbx_dc_hostgroup_t		*group;
 	int			found;
 	zbx_hashset_iter_t	iter;
 
@@ -4087,7 +4093,7 @@ static void	DCsync_hgroups(DB_RESULT result)
 	zbx_vector_uint64_create(&syncids);
 
 	/* clear host group index */
-	zbx_vector_ptr_clear(&config->hgroups_name);
+	zbx_vector_ptr_clear(&config->hostgroups_name);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -4095,20 +4101,28 @@ static void	DCsync_hgroups(DB_RESULT result)
 
 		zbx_vector_uint64_append(&syncids, groupid);
 
-		group = DCfind_id(&config->hgroups, groupid, sizeof(zbx_dc_hgroup_t), &found);
+		group = DCfind_id(&config->hostgroups, groupid, sizeof(zbx_dc_hostgroup_t), &found);
+
+		if (0 == found)
+			zbx_vector_uint64_create_ext(&group->nested_groupids, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+		else
+			zbx_vector_uint64_clear(&group->nested_groupids);
 
 		DCstrpool_replace(found, &group->name, row[1]);
 
-		zbx_vector_ptr_append(&config->hgroups_name, group);
+		group->flags = ZBX_DC_HOSTGROUP_FLAGS_NONE;
+
+		zbx_vector_ptr_append(&config->hostgroups_name, group);
 	}
 
-	zbx_vector_ptr_sort(&config->hgroups_name, dc_compare_hgroups);
+	zbx_vector_ptr_sort(&config->hostgroups_name, dc_compare_hgroups);
 
 	/* remove deleted host groups */
 
 	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_iter_reset(&config->hgroups, &iter);
+	zbx_hashset_iter_reset(&config->hostgroups, &iter);
 
 	while (NULL != (group = zbx_hashset_iter_next(&iter)))
 	{
@@ -4688,7 +4702,7 @@ void	DCsync_configuration(void)
 	corr_operation_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_hgroups(hgroups_result);
+	DCsync_hostgroups(hgroups_result);
 	hgroups_sec2 = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
@@ -4834,7 +4848,7 @@ void	DCsync_configuration(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
 			config->corr_operations.num_data, config->corr_operations.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
-			config->hgroups.num_data, config->hgroups.num_slots);
+			config->hostgroups.num_data, config->hostgroups.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -5255,8 +5269,8 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->correlations, 0);
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
-	CREATE_HASHSET(config->hgroups, 0);
-	zbx_vector_ptr_create_ext(&config->hgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
+	CREATE_HASHSET(config->hostgroups, 0);
+	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
@@ -9867,7 +9881,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_nested_host_groupids                                  *
+ * Function: zbx_dc_get_nested_hostgroupids                                   *
  *                                                                            *
  * Purpose: gets nested group ids                                             *
  *                                                                            *
@@ -9875,31 +9889,37 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
  *            nested_groupids - [OUT] the nested + parent group ids           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_nested_host_groupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
+void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
 {
-	zbx_dc_hgroup_t	*parent_group, *group;
+	zbx_dc_hostgroup_t	*parent_group, *group;
 
 	LOCK_CACHE;
 
-	if (NULL != (parent_group = zbx_hashset_search(&config->hgroups, &groupid)))
+	if (NULL != (parent_group = zbx_hashset_search(&config->hostgroups, &groupid)))
 	{
-		int	index, len;
-
-		index = zbx_vector_ptr_nearestindex(&config->hgroups_name, parent_group, dc_compare_hgroups);
-		len = strlen(parent_group->name);
-
-		while (index < config->hgroups_name.values_num)
+		if (0 == (parent_group->flags & ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS))
 		{
-			group = (zbx_dc_hgroup_t *)config->hgroups_name.values[index];
+			int	index, len;
 
-			if (0 != strncmp(group->name, parent_group->name, len))
-				break;
+			index = zbx_vector_ptr_bsearch(&config->hostgroups_name, parent_group, dc_compare_hgroups);
+			len = strlen(parent_group->name);
 
-			if ('\0' == group->name[len] || '/' == group->name[len])
-				zbx_vector_uint64_append(nested_groupids, group->groupid);
+			while (++index < config->hostgroups_name.values_num)
+			{
+				group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
 
-			index++;
+				if (0 != strncmp(group->name, parent_group->name, len))
+					break;
+
+				if ('\0' == group->name[len] || '/' == group->name[len])
+					zbx_vector_uint64_append(&parent_group->nested_groupids, group->groupid);
+			}
+
+			parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
 		}
+
+		zbx_vector_uint64_append(nested_groupids, parent_group->groupid);
+		zbx_vector_uint64_append_vector(nested_groupids, &parent_group->nested_groupids);
 	}
 
 	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
