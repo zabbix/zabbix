@@ -637,6 +637,35 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_operation_groupids                                           *
+ *                                                                            *
+ * Purpose: get groups (including nested groups) used by an operation         *
+ *                                                                            *
+ * Parameters: operationid - [IN] the maintenance period id                   *
+ *             groupids    - [OUT] the group ids                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t *groupids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	parent_groupids;
+
+	zbx_vector_uint64_create(&parent_groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select groupid from opcommand_grp where operationid=" ZBX_FS_UI64, operationid);
+
+	DBselect_uint64(sql, &parent_groupids);
+
+	zbx_dc_get_nested_hostgroupids(parent_groupids.values, parent_groupids.values_num, groupids);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&parent_groupids);
+}
+
 static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
 {
 	const char		*__function_name = "execute_commands";
@@ -646,7 +675,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 	int			alerts_num = 0;
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
-	zbx_vector_uint64_t	executed_on_hosts;
+	zbx_vector_uint64_t	executed_on_hosts, groupids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -664,15 +693,27 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
 #endif
 			);
+
+	/* get hosts by assigned maintenance groups */
+
+	zbx_vector_uint64_create(&groupids);
+	get_operation_groupids(operationid, &groupids);
+
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
-			" where o.operationid=og.operationid"
-				" and og.groupid=hg.groupid"
+			" from opcommand o,hosts_groups hg,hosts h"
+			" where o.operationid=" ZBX_FS_UI64
 				" and hg.hostid=h.hostid"
-				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
-			" union ",
+				" and",
 			operationid, HOST_STATUS_MONITORED);
+
+	DBadd_condition_alloc(&buffer, &buffer_alloc, &buffer_offset, "hg.groupid", groupids.values,
+			groupids.values_num);
+
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " union ");
+
+	zbx_vector_uint64_destroy(&groupids);
+
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
