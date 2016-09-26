@@ -798,7 +798,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 					break;
 			}
 
-			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+			rc = zbx_execute_script(&host, &script, NULL, NULL, error, sizeof(error));
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);

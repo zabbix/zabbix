@@ -678,6 +678,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
 #define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
+typedef struct
+{
+	zbx_uint64_t	userid;
+	unsigned char	type;
+}
+zbx_user_t;
+
 /* user permissions */
 typedef enum
 {
@@ -709,6 +716,7 @@ typedef struct
 	char		*privatekey;
 	char		*command;
 	zbx_uint64_t	scriptid;
+	unsigned char	host_access;
 }
 zbx_script_t;
 

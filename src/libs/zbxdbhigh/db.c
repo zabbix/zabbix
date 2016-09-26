@@ -2471,3 +2471,34 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 	return SUCCEED;
 }
 
+int	DBget_user_by_active_session(zbx_user_t *user, const char *sessionid)
+{
+	const char	*__function_name = "zbx_sql_get_user_by_active_session";
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __function_name, sessionid);
+
+	result = DBselect(
+		"select u.userid,u.type"
+			" from sessions s,users u"
+		" where s.userid=u.userid"
+			" and s.sessionid='%s'"
+			" and s.status=%d",
+		sessionid, ZBX_SESSION_ACTIVE);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(user->userid, row[0]);
+		ZBX_STR2UCHAR(user->type, row[1]);
+
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}

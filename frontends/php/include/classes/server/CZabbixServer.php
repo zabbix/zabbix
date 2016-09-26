@@ -123,11 +123,12 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript($scriptId, $hostId) {
+	public function executeScript($scriptId, $hostId, $sessionId) {
 		return $this->request([
 			'request' => 'command',
 			'scriptid' => $scriptId,
-			'hostid' => $hostId
+			'hostid' => $hostId,
+			'sid' => $sessionId
 		]);
 	}
 
