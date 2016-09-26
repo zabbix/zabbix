@@ -1,12 +1,13 @@
-# Translated by Yaochiu Huang. 
-# In case of wrong translation, please contact brian.huang@primillet.com
-# 20120720T0924
+# Translated by Wesli. 
+# In case of wrong translation, please contact tom3000@126.com
+# my blog www.dajianren.com
+# 20160923
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-18 20:24+0300\n"
-"PO-Revision-Date: 2016-08-18 07:14+0300\n"
+"PO-Revision-Date: 2016-09-23 09:11+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1471497288.000000\n"
+"X-POOTLE-MTIME: 1474614696.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -705,7 +706,7 @@ msgstr "所有问题"
 #: include/views/configuration.trigger.prototype.edit.php:470
 #: include/views/configuration.triggers.edit.php:471
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "所有问题如果标签值匹配"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -725,7 +726,7 @@ msgstr "所有模板"
 #: include/views/configuration.triggers.edit.php:521
 #: include/views/configuration.triggers.massupdate.php:140
 msgid "Allow manual close"
-msgstr ""
+msgstr "允许手动关闭"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:504
@@ -1197,7 +1198,7 @@ msgstr "CERT"
 #: include/classes/screens/CScreenProblem.php:741
 #: include/classes/screens/CScreenProblem.php:882
 msgid "CLOSING"
-msgstr ""
+msgstr "关闭中"
 
 #: triggers.php:584
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1270,7 +1271,7 @@ msgstr[0] "无法确认事件"
 #: include/classes/api/services/CEvent.php:764
 #, c-format
 msgid "Cannot acknowledge problem: %1$s."
-msgstr ""
+msgstr "无法确认问题: %1$s."
 
 #: include/classes/api/services/CHttpTest.php:619
 #, c-format
@@ -1304,12 +1305,12 @@ msgstr "无法添加应用集"
 
 #: correlation.php:146
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "无法添加关联"
 
 #: correlation.php:228 correlation.php:238 correlation.php:244
 #: correlation.php:264 correlation.php:268 correlation.php:281
 msgid "Cannot add correlation condition"
-msgstr ""
+msgstr "无法添加关联条件"
 
 #: include/classes/api/services/CTrigger.php:953
 #: include/classes/api/services/CTriggerPrototype.php:832
@@ -1502,7 +1503,7 @@ msgstr "无法克隆触发器原型"
 #: include/classes/api/services/CEvent.php:843
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "无法关闭问题: %1$s."
 
 #: include/classes/setup/CSetupWizard.php:264
 msgid "Cannot connect to the database."
@@ -1596,7 +1597,7 @@ msgstr[0] "无法删除分类"
 
 #: correlation.php:162
 msgid "Cannot delete correlation"
-msgstr ""
+msgstr "无法删除关联"
 
 #: include/classes/api/services/CTrigger.php:857
 #: include/classes/api/services/CTriggerPrototype.php:629
@@ -1734,7 +1735,7 @@ msgstr "无法删除所选的动作"
 
 #: correlation.php:374
 msgid "Cannot delete selected correlations"
-msgstr ""
+msgstr "无法删除选择的关联项"
 
 #: services.php:117
 msgid "Cannot delete service"
@@ -1825,7 +1826,7 @@ msgstr[0] "无法禁用动作"
 #: correlation.php:361
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
+msgstr[0] "无法停用关联项"
 
 #: discoveryconf.php:211 host_discovery.php:357
 msgid "Cannot disable discovery rule"
@@ -1879,7 +1880,7 @@ msgstr[0] "无法启用动作"
 #: correlation.php:360
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
+msgstr[0] "无法启用关联项"
 
 #: discoveryconf.php:210 host_discovery.php:356
 msgid "Cannot enable discovery rule"
@@ -2185,7 +2186,7 @@ msgstr "无法发送命令, 检查于Zabbix 服务器 \"%1$s\" 的连接."
 #: include/classes/api/services/CAction.php:2381
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "在动作 \"%2$s\" 中无法设置 \"%1$s\" "
 
 #: include/classes/api/services/CApplication.php:300
 #, c-format
@@ -2195,12 +2196,12 @@ msgstr "不能设置\"%1$s\"在程序\"%2$s\"。"
 #: include/classes/api/services/CGraphGeneral.php:487
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "在图形 \"%2$s\" 中无法设置 \"%1$s\""
 
 #: include/classes/api/services/CGraphGeneral.php:491
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 
 #: include/classes/api/services/CHostGroup.php:700
 #, c-format
@@ -2226,7 +2227,7 @@ msgstr "无法设置 \"%1$s\" 为触发器 \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:498
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "在触发器模板 \"%2$s\" 中 无法设置 \"%1$s\" "
 
 #: include/classes/api/services/CItemPrototype.php:304
 #, c-format
@@ -2318,12 +2319,12 @@ msgstr "无法更新 \"%1$s\"在应用\"%2$s\"。"
 #: include/classes/api/services/CGraphGeneral.php:621
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "图形 \"%2$s\" 无法更新 \"%1$s\""
 
 #: include/classes/api/services/CGraphGeneral.php:625
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "图形模板 \"%2$s\" 无法更新 \"%1$s\" "
 
 #: include/classes/api/services/CHostGroup.php:808
 #, c-format
@@ -2338,12 +2339,12 @@ msgstr "无法更新 \"%1$s\" 为监控项 \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:647
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr ""
+msgstr "触发器模板 \"%2$s\" 无法更新 \"%1$s\""
 
 #: include/classes/api/services/CTriggerGeneral.php:653
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" 触发器模板\"%1$s\" 无法更新"
 
 #: include/classes/api/services/CTriggerGeneral.php:646
 #, c-format
@@ -2353,7 +2354,7 @@ msgstr "无法更新 \"%1$s\" 为触发器 \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:652
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "无法更新触发器模板\"%2$s\"的\"%1$s\""
 
 #: include/classes/api/services/CHost.php:1793
 #, c-format
@@ -2411,7 +2412,7 @@ msgstr "无法更新配置"
 
 #: correlation.php:140
 msgid "Cannot update correlation"
-msgstr ""
+msgstr "无法更新关联"
 
 #: usergrps.php:284
 msgid "Cannot update debug mode"
@@ -2466,7 +2467,6 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "无法更新主机的加密设置，配置两端的设置规则不正确。"
 
 #: host_prototypes.php:192 host_prototypes.php:235
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "无法更新主机模板"
@@ -2493,7 +2493,6 @@ msgid "Cannot update item"
 msgstr "无法更新监控项"
 
 #: disc_prototypes.php:396 disc_prototypes.php:422
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "无法更新监控项目模板"
@@ -2572,10 +2571,9 @@ msgstr "无法更新触发器"
 #: include/classes/api/services/CTriggerGeneral.php:1604
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法更新触发器 \"%1$s\": %2$s "
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:455
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "无法更新触发器模板"
@@ -2583,7 +2581,7 @@ msgstr[0] "无法更新触发器模板"
 #: include/classes/api/services/CTriggerGeneral.php:1460
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法更新触发器模板 \"%1$s\": %2$s。"
 
 #: trigger_prototypes.php:419
 msgid "Cannot update trigger prototypes"
@@ -2867,17 +2865,17 @@ msgstr "关闭表达式构造器"
 
 #: include/correlation.inc.php:70
 msgid "Close new event"
-msgstr ""
+msgstr "关闭新的事件"
 
 #: include/correlation.inc.php:69
 msgid "Close old events"
-msgstr ""
+msgstr "关闭过去的事件"
 
 #: app/views/monitoring.acknowledge.edit.php:42
 #: app/views/monitoring.acknowledge.edit.php:74 include/acknow.inc.php:57
 #: include/events.inc.php:539
 msgid "Close problem"
-msgstr ""
+msgstr "关闭问题"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:170
 msgid "Collapse"
@@ -2961,7 +2959,7 @@ msgstr "对于动作\"%1$s\"条件\"%2$s\"不可以应用于计算式\"%3$s\"中
 #: include/classes/api/services/CCorrelation.php:1242
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
-msgstr ""
+msgstr "在关联\"%1$s\"中，条件\"%2$s\"无法使用公式 \"%3$s\" "
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #, c-format
@@ -2976,7 +2974,7 @@ msgstr "对于动作\"%1$s\"应用于计算式 \"%3$s\"中的\"%2$s\"条件未�
 #: include/classes/api/services/CCorrelation.php:1230
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
-msgstr ""
+msgstr "在关联项 \"%1$s\" 中 条件 \"%2$s\" 在表达式 \"%3$s\"没有被使用"
 
 #: include/classes/api/services/CDiscoveryRule.php:971
 #, c-format
@@ -2994,7 +2992,7 @@ msgstr "条件"
 #: include/classes/api/services/CCorrelation.php:1160
 #, c-format
 msgid "Conditions duplicates for correlation \"%1$s\"."
-msgstr ""
+msgstr "条件复制关联项 \"%1$s\"。"
 
 #: include/menu.inc.php:184 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
@@ -3303,49 +3301,49 @@ msgstr[0] "复制元素%1$s到..."
 
 #: include/views/configuration.correlation.edit.php:236
 msgid "Correlation"
-msgstr ""
+msgstr "相关性"
 
 #: include/classes/api/services/CCorrelation.php:559
 #: include/classes/api/services/CCorrelation.php:748
 #, c-format
 msgid "Correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "关联项 \"%1$s\" 已经存在"
 
 #: correlation.php:145
 msgid "Correlation added"
-msgstr ""
+msgstr "关联项添加"
 
 #: correlation.php:162
 msgid "Correlation deleted"
-msgstr ""
+msgstr "删除关联项"
 
 #: correlation.php:358
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
-msgstr[0] ""
+msgstr[0] "禁用关联项"
 
 #: correlation.php:357
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
-msgstr[0] ""
+msgstr[0] "启用关联项"
 
 #: include/classes/api/services/CCorrelation.php:529
 #, c-format
 msgid "Correlation is missing parameters: %1$s"
-msgstr ""
+msgstr "%1$s找不到关联项参数"
 
 #: include/classes/api/services/CCorrelation.php:538
 #: include/classes/api/services/CCorrelation.php:717
 msgid "Correlation name cannot be empty."
-msgstr ""
+msgstr "关联项名字不能为空。"
 
 #: include/events.inc.php:218
 msgid "Correlation rule"
-msgstr ""
+msgstr "关联规则"
 
 #: correlation.php:139
 msgid "Correlation updated"
-msgstr ""
+msgstr "关联项已更新"
 
 #: include/classes/api/services/CImage.php:350
 msgid "Could not save image!"
@@ -3378,13 +3376,13 @@ msgstr "创建背景"
 
 #: include/views/configuration.correlation.list.php:27
 msgid "Create correlation"
-msgstr ""
+msgstr "创建关联项"
 
 #: include/views/configuration.host.prototype.list.php:134
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:170
 msgid "Create disabled"
-msgstr ""
+msgstr "禁止创建"
 
 #: include/views/configuration.discovery.list.php:25
 #: include/views/configuration.host.discovery.list.php:26
@@ -3401,7 +3399,7 @@ msgstr "创建发现规则"
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.trigger.prototype.list.php:167
 msgid "Create enabled"
-msgstr ""
+msgstr "启用新的"
 
 #: include/views/configuration.graph.list.php:34
 msgid "Create graph"
@@ -4023,7 +4021,7 @@ msgstr "删除目前的动作?"
 
 #: include/views/configuration.correlation.edit.php:249
 msgid "Delete current correlation?"
-msgstr ""
+msgstr "删除当前的关联项？"
 
 #: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:358
@@ -4111,7 +4109,7 @@ msgstr "删除所选的应用集?"
 
 #: include/views/configuration.correlation.list.php:121
 msgid "Delete selected correlations?"
-msgstr ""
+msgstr "删除选择的关联项？"
 
 #: include/views/configuration.discovery.list.php:88
 #: include/views/configuration.host.discovery.list.php:147
@@ -4554,7 +4552,7 @@ msgstr "停用所选的应用集?"
 
 #: include/views/configuration.correlation.list.php:120
 msgid "Disable selected correlations?"
-msgstr ""
+msgstr "禁用选择的关联项？"
 
 #: include/views/configuration.discovery.list.php:87
 #: include/views/configuration.host.discovery.list.php:144
@@ -4859,19 +4857,19 @@ msgstr "下拉记住所选的 \"%1$s\"."
 #: include/classes/api/services/CCorrelation.php:1297
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "复制关联项\"%3$s\"中\"%1$s\" 的值  \"%2$s\" 。"
 
 #: include/classes/api/services/CCorrelation.php:546
 #: include/classes/api/services/CCorrelation.php:732
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
-msgstr ""
+msgstr "在关联项中复制\"%1$s\"的值 \"%2$s\""
 
 #: include/classes/api/services/CHostGroup.php:709
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for host group."
-msgstr ""
+msgstr "复制\"%1$s\" 的值 \"%2$s\" 在主机组"
 
 #: include/classes/api/services/CMediatype.php:208
 #: include/classes/api/services/CMediatype.php:449
@@ -5087,7 +5085,7 @@ msgstr "未指定颜色"
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Empty correlation ID."
-msgstr ""
+msgstr "空的关联ID。"
 
 #: include/classes/api/services/CAction.php:2267
 #, c-format
@@ -5106,7 +5104,7 @@ msgstr "针对自动发现规则 \"%1$s\"的过滤器条件宏变量为空"
 
 #: include/classes/api/services/CHostGroup.php:743
 msgid "Empty group ID."
-msgstr ""
+msgstr "空的组ID。"
 
 #: include/classes/api/services/CHostPrototype.php:467
 msgid "Empty host ID for host prototype."
@@ -5303,7 +5301,7 @@ msgstr "启用所选的应用集"
 
 #: include/views/configuration.correlation.list.php:119
 msgid "Enable selected correlations?"
-msgstr ""
+msgstr "开启选择的关联项？"
 
 #: include/views/configuration.discovery.list.php:86
 #: include/views/configuration.host.discovery.list.php:141
@@ -5439,7 +5437,7 @@ msgstr[0] "事件已确认"
 #: app/controllers/CControllerAcknowledgeEdit.php:210
 #: app/views/monitoring.acknowledge.edit.php:86
 msgid "Event acknowledgements"
-msgstr ""
+msgstr "确认事件"
 
 #: include/profiles.inc.php:162
 #, c-format
@@ -5449,11 +5447,11 @@ msgstr "事件确认 \"%1$s\"."
 #: include/menu.inc.php:233
 #: include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
-msgstr ""
+msgstr "关联项事件"
 
 #: correlation.php:26 include/views/configuration.correlation.edit.php:24
 msgid "Event correlation rules"
-msgstr ""
+msgstr "关联项事件规则"
 
 #: tr_events.php:30 tr_events.php:111 tr_events.php:136
 msgid "Event details"
@@ -5481,7 +5479,7 @@ msgstr "事件来源细节"
 
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr ""
+msgstr "事件标签对"
 
 #: include/actions.inc.php:60
 msgid "Event type"
@@ -5622,7 +5620,7 @@ msgstr "表达式构造器"
 #: include/forms.inc.php:1471 include/forms.inc.php:1476
 #: include/forms.inc.php:1484
 msgid "Expression syntax error."
-msgstr ""
+msgstr "表达式语法错误。"
 
 #: include/views/administration.general.regularexpressions.edit.php:43
 #: include/views/administration.general.regularexpressions.edit.php:117
@@ -5679,7 +5677,7 @@ msgstr "失败审计"
 
 #: include/actions.inc.php:1575
 msgid "Failures"
-msgstr ""
+msgstr "失败"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
@@ -6002,7 +6000,7 @@ msgstr "一般"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Generated by"
-msgstr ""
+msgstr "生成的"
 
 #: chart4.php:170 chart5.php:220
 #, c-format
@@ -6282,7 +6280,7 @@ msgstr "组\"%1$s\" 不可以被删除，因为它正在被主机模板使用"
 #: include/classes/api/services/CHostGroup.php:536
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr ""
+msgstr "\"%1$s\" 组因为他的关联条件无法删除。"
 
 #: include/classes/import/importers/CTemplateImporter.php:245
 #, c-format
@@ -6409,7 +6407,7 @@ msgstr "头"
 
 #: include/locales.inc.php:64
 msgid "Hebrew (he_IL)"
-msgstr ""
+msgstr "Hebrew (he_IL)"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:82
 #: include/views/configuration.graph.list.php:73
@@ -6655,7 +6653,7 @@ msgstr "主机群组组件"
 #: include/classes/api/services/CHostGroup.php:689
 #, c-format
 msgid "Host group is missing parameters: %1$s"
-msgstr ""
+msgstr "找不到主机组参数: %1$s"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
@@ -6761,7 +6759,6 @@ msgid "Host prototype deleted"
 msgstr "主机模板已删除"
 
 #: host_prototypes.php:192 host_prototypes.php:234
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "主机模板已更新"
@@ -7487,7 +7484,7 @@ msgstr "错误的动作操作步骤停留时间."
 #: include/classes/api/services/CAction.php:1457
 #, c-format
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
-msgstr ""
+msgstr "在事件源 \"%2$s\" 中有错误的动作类型 \"%1$s\" "
 
 #: include/classes/api/services/CAction.php:1688
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -7617,7 +7614,7 @@ msgstr "自动发现规则\"%1$s\"的条件不正确."
 
 #: include/classes/api/services/CCorrelation.php:690
 msgid "Incorrect correlation ID."
-msgstr ""
+msgstr "错误的关联项ID。"
 
 #: include/classes/api/services/CAction.php:2218
 #, c-format
@@ -7627,7 +7624,7 @@ msgstr "动作\"%1$s\": %3$s自定义的表达式\"%2$s\" 不正确."
 #: include/classes/api/services/CCorrelation.php:1186
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
-msgstr ""
+msgstr "在关联项\"%1$s\": %3$s中使用了错误的表达式\"%2$s\"。"
 
 #: include/classes/api/services/CDiscoveryRule.php:970
 #, c-format
@@ -7678,7 +7675,7 @@ msgstr "自动发现规则\"%1$s\"的条件计算式ID不正确."
 #: include/classes/api/services/CCorrelation.php:1219
 #, c-format
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
-msgstr ""
+msgstr "错误的过滤条件公式给出相关ID \"%1$s\" 。"
 
 #: include/classes/api/services/CDiscoveryRule.php:992
 #, c-format
@@ -7722,7 +7719,7 @@ msgstr "聚合图形元素中使用了不正确的数据图模板ID\"%1$s\"。"
 
 #: include/classes/api/services/CHostGroup.php:744
 msgid "Incorrect group ID."
-msgstr ""
+msgstr "错误的组ID。"
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7991,7 +7988,7 @@ msgstr "错误的服务时间类型."
 #: include/classes/api/services/CService.php:950
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
-msgstr ""
+msgstr "服务\"%1$s\" 中的排序不正确。"
 
 #: include/classes/api/services/CEvent.php:423
 #: include/classes/api/services/CProblem.php:390
@@ -8096,7 +8093,7 @@ msgstr "动作\"%1$s\"的计算类型不正确."
 #: include/classes/api/services/CCorrelation.php:618
 #, c-format
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"的关联项计算类型错误。"
 
 #: include/classes/api/services/CDiscoveryRule.php:958
 #, c-format
@@ -8190,7 +8187,7 @@ msgstr "错误的值\"%1$s\"于无正负的整数栏位\"%2$s\"中."
 #: include/classes/api/services/CCorrelation.php:1285
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
-msgstr ""
+msgstr "在关联项中\"%3$s\"，\"%2$s\"使用了错误的值\"%1$s\"。"
 
 #: include/classes/api/services/CMediatype.php:237
 #: include/classes/api/services/CMediatype.php:253
@@ -8849,7 +8846,6 @@ msgid "Item prototype deleted"
 msgstr "项目模板已删除"
 
 #: disc_prototypes.php:396 disc_prototypes.php:421
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "项目模板已更新"
@@ -10104,7 +10100,7 @@ msgstr "Mozilla Firefox"
 #: include/views/configuration.trigger.prototype.edit.php:463
 #: include/views/configuration.triggers.edit.php:464
 msgid "Multiple"
-msgstr ""
+msgstr "多重"
 
 #: include/triggers.inc.php:1113
 msgid "Multiple PROBLEM events"
@@ -10311,16 +10307,16 @@ msgstr "新的组件"
 
 #: include/correlation.inc.php:51 include/correlation.inc.php:204
 msgid "New event host group"
-msgstr ""
+msgstr "新的主机组事件"
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:199
 #: include/correlation.inc.php:223
 msgid "New event tag"
-msgstr ""
+msgstr "新的事件标记"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr ""
+msgstr "新的事件标记值"
 
 #: include/views/configuration.host.edit.php:92
 #: include/views/configuration.template.edit.php:122
@@ -10333,7 +10329,7 @@ msgstr "新的主机群组"
 
 #: include/views/configuration.correlation.edit.php:221
 msgid "New operation"
-msgstr ""
+msgstr "新的操作"
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "New regular expression"
@@ -10380,12 +10376,12 @@ msgstr "不"
 #: include/classes/api/services/CCorrelation.php:1269
 #, c-format
 msgid "No \"%1$s\" given for correlation \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\"没有返回关联项\"%2$s\"。"
 
 #: include/classes/api/services/CCorrelation.php:688
 #, c-format
 msgid "No \"%1$s\" given for correlation."
-msgstr ""
+msgstr " \"%1$s\" 没有返回关联项。"
 
 #: include/classes/api/services/CGraphPrototype.php:39
 #, c-format
@@ -10400,7 +10396,7 @@ msgstr "图形没有\"%1$s\"."
 #: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "No \"%1$s\" given for group."
-msgstr ""
+msgstr "\"%1$s\" 没有返回组"
 
 #: include/classes/api/services/CHostPrototype.php:466
 #, c-format
@@ -10532,7 +10528,7 @@ msgstr "没有指定给动作操作的命令类型."
 #: include/classes/api/services/CCorrelation.php:998
 #, c-format
 msgid "No condition type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "关联项 \"%1$s\" 没有条件类型"
 
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.correlation.edit.php:42
@@ -10750,7 +10746,7 @@ msgstr "没有找到匹配"
 #: include/classes/api/services/CCorrelation.php:1276
 #, c-format
 msgid "No operation type given for correlation \"%1$s\"."
-msgstr ""
+msgstr "关联项 \"%1$s\" 没有操作类型"
 
 #: slides.php:92
 msgid "No permissions"
@@ -11033,7 +11029,7 @@ msgstr "警报"
 
 #: include/actions.inc.php:808
 msgid "Notify all who received any messages regarding the problem before"
-msgstr ""
+msgstr "关于这个问题之前通知所有人收到所有消息"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -11079,11 +11075,11 @@ msgstr "队列中延时秒数的项目的数量，包括."
 
 #: include/classes/items/CHelpItems.php:371
 msgid "Number of matching lines since the last check of the item with log rotation support. Returns integer"
-msgstr ""
+msgstr "匹配的行数自上次检查的项目日志轮转的支持。返回整型"
 
 #: include/classes/items/CHelpItems.php:367
 msgid "Number of matching lines since the last check of the item. Returns integer"
-msgstr ""
+msgstr "匹配的行数自上次检查的项目。返回整型"
 
 #: include/classes/items/CHelpItems.php:911
 msgid "Number of monitored hosts"
@@ -11251,12 +11247,12 @@ msgstr "正常"
 #: include/views/configuration.trigger.prototype.edit.php:467
 #: include/views/configuration.triggers.edit.php:468
 msgid "OK event closes"
-msgstr ""
+msgstr "事件成功关闭"
 
 #: include/views/configuration.trigger.prototype.edit.php:262
 #: include/views/configuration.triggers.edit.php:277
 msgid "OK event generation"
-msgstr ""
+msgstr "事件成功迭代"
 
 #: include/hosts.inc.php:299
 msgid "OOB IP address"
@@ -11316,11 +11312,11 @@ msgstr "正常"
 #: include/correlation.inc.php:49 include/correlation.inc.php:194
 #: include/correlation.inc.php:209 include/correlation.inc.php:216
 msgid "Old event tag"
-msgstr ""
+msgstr "过去的事件标签"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr ""
+msgstr "过去的时间标签值"
 
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47 jsLoader.php:137
@@ -11440,11 +11436,11 @@ msgstr "每次仅有一个用户群组可以被改变."
 #: app/views/monitoring.acknowledge.edit.php:61
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
+msgstr[0] "只选择问题"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
-msgstr ""
+msgstr "只有超级管理员才能创建关联项。"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11452,7 +11448,7 @@ msgstr "只有管理员才能创建拓扑图值"
 
 #: include/classes/api/services/CCorrelation.php:474
 msgid "Only super admins can delete correlations."
-msgstr ""
+msgstr "只有超级管理员才能删除关联项。"
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
@@ -11460,7 +11456,7 @@ msgstr "只有管理员才能删除拓扑图的值"
 
 #: include/classes/api/services/CCorrelation.php:679
 msgid "Only super admins can update correlations."
-msgstr ""
+msgstr "只有超级管理员才能更新关联项。"
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
@@ -11841,7 +11837,7 @@ msgstr "问题"
 #: include/views/configuration.trigger.prototype.edit.php:460
 #: include/views/configuration.triggers.edit.php:461
 msgid "PROBLEM event generation mode"
-msgstr ""
+msgstr "问题事件生成模式"
 
 #: app/views/administration.proxy.edit.php:102
 #: app/views/administration.proxy.edit.php:109
@@ -11978,7 +11974,7 @@ msgstr "密码不能为空"
 
 #: actionconf.php:88 include/views/configuration.action.edit.php:388
 msgid "Pause operations while in maintenance"
-msgstr ""
+msgstr "维护期间暂停操作"
 
 #: include/classes/debug/CProfiler.php:137
 #, c-format
@@ -12267,7 +12263,7 @@ msgstr "问题显示"
 #: include/triggers.inc.php:1105
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
-msgstr ""
+msgstr "问题表现形式"
 
 #: jsrpc.php:116
 msgid "Problem on"
@@ -12404,7 +12400,7 @@ msgstr "项目队列已被更新"
 #: include/classes/screens/CScreenProblem.php:725
 #: include/classes/screens/CScreenProblem.php:868
 msgid "RESOLVED"
-msgstr ""
+msgstr "已解决"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12453,7 +12449,7 @@ msgstr "接收到的值"
 #: app/views/monitoring.problem.view.php:81
 #: include/views/common.filter.trigger.php:36
 msgid "Recent problems"
-msgstr ""
+msgstr "最近的问题"
 
 #: include/actions.inc.php:1279 include/classes/screens/CScreenActions.php:129
 #: include/views/administration.auditacts.list.php:27
@@ -12484,21 +12480,21 @@ msgstr "恢复"
 #: include/views/configuration.triggers.edit.php:345 trigger_prototypes.php:39
 #: trigger_prototypes.php:51 triggers.php:42 triggers.php:54
 msgid "Recovery expression"
-msgstr ""
+msgstr "恢复表达式"
 
 #: include/forms.inc.php:1514 include/forms.inc.php:1519
 #: include/forms.inc.php:1527
 msgid "Recovery expression syntax error."
-msgstr ""
+msgstr "恢复表达式语法错误。"
 
 #: include/views/configuration.action.edit.php:1654
 msgid "Recovery operations"
-msgstr ""
+msgstr "恢复操作"
 
 #: include/classes/screens/CScreenProblem.php:673
 #: include/classes/screens/CScreenProblem.php:852
 msgid "Recovery time"
-msgstr ""
+msgstr "恢复时间"
 
 #: include/views/administration.users.edit.php:180 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
@@ -12711,7 +12707,7 @@ msgstr "替换主机群组"
 #: include/views/configuration.trigger.prototype.massupdate.php:137
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace tags"
-msgstr ""
+msgstr "替换标记"
 
 #: include/menu.inc.php:144
 msgid "Reports"
@@ -12790,20 +12786,20 @@ msgstr "已解决"
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
-msgstr ""
+msgstr "通过关联规则解析\"%1$s\"。"
 
 #: include/classes/screens/CScreenProblem.php:761
 msgid "Resolved by correlation rule."
-msgstr ""
+msgstr "通过关联规则解析。"
 
 #: include/classes/screens/CScreenProblem.php:767
 #, c-format
 msgid "Resolved by user \"%1$s\"."
-msgstr ""
+msgstr "用户解决\"%1$s\"。"
 
 #: include/classes/screens/CScreenProblem.php:768
 msgid "Resolved by user."
-msgstr ""
+msgstr "用户已解决。"
 
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.auditlogs.list.php:64
@@ -13472,11 +13468,11 @@ msgstr "所选的动作已删除"
 
 #: app/views/monitoring.acknowledge.edit.php:66
 msgid "Selected and all other unacknowledged problems of related triggers"
-msgstr ""
+msgstr "选择和所有其他相关的触发隐而未现的问题"
 
 #: correlation.php:374
 msgid "Selected correlations deleted"
-msgstr ""
+msgstr "删除选择的关联项"
 
 #: include/views/js/monitoring.sysmaps.js.php:209
 msgid "Selected elements"
@@ -13501,7 +13497,7 @@ msgstr "仅送到"
 
 #: include/actions.inc.php:1067
 msgid "Send recovery message"
-msgstr ""
+msgstr "发送恢复信息"
 
 #: include/views/administration.users.edit.php:200 popup_media.php:134
 msgid "Send to"
@@ -13748,7 +13744,7 @@ msgstr[0] "显示未确认的(%1$s 天)"
 
 #: app/views/monitoring.problem.view.php:234
 msgid "Show unacknowledged only"
-msgstr ""
+msgstr "仅显示未确认"
 
 #: include/views/configuration.item.edit.php:503
 #: include/views/configuration.item.massupdate.php:452
@@ -13795,7 +13791,7 @@ msgstr "简单数据图模板"
 #: include/views/configuration.trigger.prototype.edit.php:462
 #: include/views/configuration.triggers.edit.php:463
 msgid "Single"
-msgstr ""
+msgstr "单个"
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -14312,16 +14308,16 @@ msgstr "标签"
 #: include/classes/api/services/CTriggerGeneral.php:269
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr ""
+msgstr "标签 \"%1$s\"与值 \"%2$s\" 重复存在。"
 
 #: include/views/configuration.trigger.prototype.edit.php:475
 #: include/views/configuration.triggers.edit.php:476
 msgid "Tag for matching"
-msgstr ""
+msgstr "匹配标记"
 
 #: include/actions.inc.php:63
 msgid "Tag value"
-msgstr ""
+msgstr "标记值"
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/screens/CScreenProblem.php:681
@@ -14329,7 +14325,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:505
 #: include/views/configuration.triggers.edit.php:514
 msgid "Tags"
-msgstr ""
+msgstr "标记"
 
 #: include/views/configuration.action.edit.php:796
 #: include/views/configuration.action.edit.php:1485
@@ -14855,7 +14851,7 @@ msgstr "触发器\"%1$s\"已存在于\"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1531
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "触发器\"%1$s\"属于不同的联系，以模板。"
 
 #: include/classes/import/CConfigurationImport.php:1445
 #, c-format
@@ -14960,12 +14956,12 @@ msgstr "触发器类型"
 #: include/classes/api/services/CTriggerGeneral.php:297
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "在\"%2$s\"中触发器原型模板\"%1$s\"重复。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1535
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "触发器原型模板\"%1$s\"属于不同的联系，以模板。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1454
 #, c-format
@@ -14995,7 +14991,6 @@ msgid "Trigger prototype deleted"
 msgstr "触发器模板已删除"
 
 #: trigger_prototypes.php:335 trigger_prototypes.php:454
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "触发器模板已更新"
@@ -15021,7 +15016,7 @@ msgstr "触发器模板已更新"
 
 #: include/classes/api/services/CTriggerGeneral.php:461
 msgid "Trigger recovery expression must contain at least one host:key reference."
-msgstr ""
+msgstr "必须包含至少一个触发恢复表达式，例子 host:key 。"
 
 #: include/html.inc.php:838
 #: include/views/administration.general.triggerSeverity.edit.php:25
@@ -15729,7 +15724,7 @@ msgstr "用户\"%s\"不能没有用户群组."
 #: app/views/monitoring.acknowledge.edit.php:35 include/acknow.inc.php:50
 #: include/events.inc.php:530
 msgid "User action"
-msgstr ""
+msgstr "用户动作"
 
 #: users.php:253
 msgid "User added"
@@ -16379,7 +16374,7 @@ msgstr "Web 场景 \"%1$s\" 已经存在."
 #: include/classes/import/CConfigurationImport.php:1218
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "Web 脚本\"%1$s\"在\"%2$s\":应用\"%3$s\"不存在。"
 
 #: httpconf.php:201
 msgid "Web scenario added"
@@ -16596,7 +16591,7 @@ msgstr "错误的服务\"%1$s\"其时间栏位."
 #: include/classes/api/services/CTriggerGeneral.php:497
 #: include/classes/api/services/CTriggerGeneral.php:651
 msgid "Wrong fields for trigger prototype."
-msgstr ""
+msgstr "错误的触发的原型字段。"
 
 #: include/classes/api/services/CTriggerGeneral.php:492
 #: include/classes/api/services/CTriggerGeneral.php:645
@@ -16896,7 +16891,7 @@ msgstr "一个数值预计"
 
 #: include/classes/validators/CNewValidator.php:272
 msgid "a time is expected"
-msgstr ""
+msgstr "a 预计时间"
 
 #: include/forms.inc.php:504
 msgid "affects only filtered data"
@@ -17063,7 +17058,7 @@ msgstr "esc_step_from和esc_step_to必须一起设定."
 #: include/classes/api/services/CEvent.php:764
 #: include/classes/api/services/CEvent.php:836
 msgid "event is not in PROBLEM state"
-msgstr ""
+msgstr "事件不是问题状态"
 
 #: include/views/inventory.host.list.php:48
 msgid "exactly"
@@ -17139,7 +17134,7 @@ msgstr "事件源"
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:48
 #, c-format
 msgid "invalid group name \"%1$s\""
-msgstr ""
+msgstr "无效的用户组名字\"%1$s\""
 
 #: include/classes/screens/CScreenServerInfo.php:49
 msgid "is"
@@ -17241,7 +17236,7 @@ msgstr "毫秒"
 
 #: include/classes/validators/hostgroup/CHostGroupNameValidator.php:35
 msgid "must be a string"
-msgstr ""
+msgstr "只能是字符串"
 
 #: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"
@@ -17265,7 +17260,7 @@ msgstr "新"
 #: include/correlation.inc.php:211
 #: include/views/configuration.correlation.edit.php:135
 msgid "new event tag"
-msgstr ""
+msgstr "新的事件标记"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2101
 #: include/classes/graphdraw/CPieGraphDraw.php:316
@@ -17323,7 +17318,7 @@ msgstr "关闭"
 
 #: include/views/configuration.correlation.edit.php:138
 msgid "old event tag"
-msgstr ""
+msgstr "旧的事件标记"
 
 #: include/classes/setup/CFrontendSetup.php:312
 #: include/classes/setup/CFrontendSetup.php:329
@@ -17401,7 +17396,7 @@ msgstr "简要描述"
 #: include/classes/api/services/CTriggerGeneral.php:778
 #: include/classes/api/services/CTriggerGeneral.php:796
 msgid "should be empty"
-msgstr ""
+msgstr "可能是空的"
 
 #: include/views/monitoring.sysmap.edit.php:128
 msgid "show icon mappings"
@@ -17425,7 +17420,7 @@ msgstr "展示值映射"
 #: include/views/configuration.triggers.massupdate.php:112
 #: include/views/js/configuration.triggers.edit.js.php:6
 msgid "tag"
-msgstr ""
+msgstr "标记"
 
 #: include/classes/api/services/CHostBase.php:50
 #, c-format
@@ -17446,15 +17441,15 @@ msgstr "触发器"
 
 #: include/classes/api/services/CEvent.php:843
 msgid "trigger does not allow manual closing"
-msgstr ""
+msgstr "触发器不允许手动关闭"
 
 #: include/classes/api/services/CTriggerGeneral.php:1461
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr ""
+msgstr "触发器原型无法移动到另外一个模板或者主机"
 
 #: include/classes/api/services/CTriggerGeneral.php:1606
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr ""
+msgstr "触发器原型以及关联项无法移动到另外一个模板或者主机"
 
 #: include/classes/html/CMultiSelect.php:52 jsLoader.php:175
 msgid "type here to search"
@@ -17464,7 +17459,7 @@ msgstr "在此输入搜索"
 #: include/classes/api/services/CTriggerGeneral.php:810
 #: include/classes/validators/CTagValidator.php:61
 msgid "unacceptable characters are used"
-msgstr ""
+msgstr "非法字符"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2196
 msgid "unexpected end of interval"

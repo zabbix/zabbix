@@ -2,7 +2,7 @@ Changes for 3.2.1rc1
 
 New features:
 .......PS. [ZBXNEXT-3106] improved concurrent VMware item polling speed, reduced size of cached VMware data (wiper)
-A.F....... [ZBX-1357] updated French, Italian translations; thanks to Zabbix translators (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Portuguese (Brazil) translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-11136] increased width of input fields (Sasha)
 
 Bug fixes:
