@@ -107,9 +107,16 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 	if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
+		zbx_vector_uint64_t	groupids;
+		char			*sql = NULL;
+		size_t			sql_alloc = 0, sql_offset = 0;
+
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		result = DBselect(
+		zbx_vector_uint64_create(&groupids);
+		zbx_dc_get_nested_hostgroupids(condition_value, &groupids);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct hg.groupid"
 				" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 				" where hg.hostid=h.hostid"
@@ -117,9 +124,15 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 					" and i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
 					" and t.triggerid=" ZBX_FS_UI64
-					" and hg.groupid=" ZBX_FS_UI64,
-				event->objectid,
-				condition_value);
+					" and",
+				event->objectid);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselect("%s", sql);
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&groupids);
 
 		switch (condition->operator)
 		{
@@ -1012,12 +1025,19 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 	}
 	else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
+		zbx_vector_uint64_t	groupids;
+		char			*sqlcond = NULL;
+		size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
+
 		ZBX_STR2UINT64(condition_value, condition->value);
+
+		zbx_vector_uint64_create(&groupids);
+		zbx_dc_get_nested_hostgroupids(condition_value, &groupids);
 
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				zbx_snprintf(sql, sizeof(sql),
+				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
 						"select null"
 						" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 						" where hg.hostid=h.hostid"
@@ -1025,21 +1045,27 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 							" and i.itemid=f.itemid"
 							" and f.triggerid=t.triggerid"
 							" and t.triggerid=" ZBX_FS_UI64
-							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, condition_value);
+							" and",
+						event->objectid);
 				break;
 			default:
-				zbx_snprintf(sql, sizeof(sql),
+				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
 						"select null"
 						" from hosts_groups hg,hosts h,items i"
 						" where hg.hostid=h.hostid"
 							" and h.hostid=i.hostid"
 							" and i.itemid=" ZBX_FS_UI64
-							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, condition_value);
+							" and",
+						event->objectid);
 		}
 
-		result = DBselectN(sql, 1);
+		DBadd_condition_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselectN(sqlcond, 1);
+
+		zbx_free(sqlcond);
+		zbx_vector_uint64_destroy(&groupids);
 
 		switch (condition->operator)
 		{
