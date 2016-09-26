@@ -17,21 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+/*
+ * 3.2 maintenance database patches
+ */
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"13 September 2016"
-#define ZABBIX_VERSION_MAJOR	3
-#define ZABBIX_VERSION_MINOR	3
-#define ZABBIX_VERSION_PATCH	0
-#define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#define ZABBIX_VERSION_RC	""
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_3020000(void)
+{
+	return SUCCEED;
+}
 
 #endif
+
+DBPATCH_START(3020)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3020000, 0, 1)
+
+DBPATCH_END()

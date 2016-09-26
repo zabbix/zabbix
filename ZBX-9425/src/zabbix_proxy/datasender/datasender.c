@@ -175,21 +175,21 @@ retry_history:
 				proxy_get_hist_data, proxy_set_hist_lastid);
 		records += r;
 
-		if (ZBX_MAX_HRECORDS == r)
+		if (ZBX_MAX_HRECORDS <= r)
 			goto retry_history;
 retry_dhistory:
 		history_sender(&j, &r, ZBX_PROTO_VALUE_DISCOVERY_DATA,
 				proxy_get_dhis_data, proxy_set_dhis_lastid);
 		records += r;
 
-		if (ZBX_MAX_HRECORDS == r)
+		if (ZBX_MAX_HRECORDS <= r)
 			goto retry_dhistory;
 retry_autoreg_host:
 		history_sender(&j, &r, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA,
 				proxy_get_areg_data, proxy_set_areg_lastid);
 		records += r;
 
-		if (ZBX_MAX_HRECORDS == r)
+		if (ZBX_MAX_HRECORDS <= r)
 			goto retry_autoreg_host;
 
 		sec = zbx_time() - sec;

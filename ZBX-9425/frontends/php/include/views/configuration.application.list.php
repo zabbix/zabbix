@@ -74,8 +74,6 @@ foreach ($this->data['applications'] as $application) {
 		array_pop($name);
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
-
-		$info_icons[] = '';
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {
 		$name = [(new CLink(CHtml::encode($application['discoveryRule']['name']),
@@ -90,17 +88,12 @@ foreach ($this->data['applications'] as $application) {
 				$current_time, $application['applicationDiscovery']['ts_delete']
 			);
 		}
-		else {
-			$info_icons[] = '';
-		}
 	}
 	else {
 		$name = new CLink($application['name'],
 			'applications.php?form=update&applicationid='.$application['applicationid'].
 				'&hostid='.$application['hostid']
 		);
-
-		$info_icons[] = '';
 	}
 
 	$checkBox = new CCheckBox('applications['.$application['applicationid'].']', $application['applicationid']);
@@ -120,7 +113,7 @@ foreach ($this->data['applications'] as $application) {
 			),
 			CViewHelper::showNum(count($application['items']))
 		],
-		$data['showInfoColumn'] ? $info_icons : null
+		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
 

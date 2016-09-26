@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.2.0beta2');
-define('ZABBIX_API_VERSION',	'3.2.0');
+define('ZABBIX_VERSION',		'3.3.0');
+define('ZABBIX_API_VERSION',	'3.3.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010079);
+define('ZABBIX_DB_VERSION',		3020000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -406,6 +406,11 @@ define('ZBX_ICON_PREVIEW_WIDTH',	24);
 
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
+
+/**
+ * Starting from Zabbix 2.2 items could not have ITEM_STATUS_NOTSUPPORTED status
+ * this constant is left for importing data from versions 1.8 and 2.0.
+ */
 define('ITEM_STATUS_NOTSUPPORTED',	3);
 
 define('ITEM_STATE_NORMAL',			0);
@@ -748,7 +753,6 @@ define('EVENT_ACKNOWLEDGED',		'1');
 
 define('ZBX_ACKNOWLEDGE_SELECTED',	0);
 define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
-define('ZBX_ACKNOWLEDGE_ALL',		2);
 
 define('ZBX_ACKNOWLEDGE_ACTION_NONE',			0x00);
 define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
@@ -1013,11 +1017,12 @@ define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
-define('ZBX_TEXTAREA_FILTER_BIG_WIDTH',			524);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
 define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
-define('ZBX_TEXTAREA_STANDARD_WIDTH',			300);
-define('ZBX_TEXTAREA_BIG_WIDTH',				524);
+define('ZBX_TEXTAREA_TAG_WIDTH',				218);
+define('ZBX_TEXTAREA_MEDIUM_WIDTH',				270);
+define('ZBX_TEXTAREA_STANDARD_WIDTH',			453);
+define('ZBX_TEXTAREA_BIG_WIDTH',				540);
 define('ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH',	75);
 define('ZBX_TEXTAREA_NUMERIC_BIG_WIDTH',		150);
 define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
@@ -1180,10 +1185,12 @@ define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
+define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
+define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
@@ -1193,7 +1200,6 @@ define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
-define('ZBX_STYLE_LIST_HOR_MIN_WIDTH', 'list-hor-min-width');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
@@ -1253,6 +1259,7 @@ define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
+define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
@@ -1270,6 +1277,12 @@ define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TIME_ZONE', 'time-zone');
+define('ZBX_STYLE_TIMELINE_AXIS', 'timeline-axis');
+define('ZBX_STYLE_TIMELINE_DATE', 'timeline-date');
+define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
+define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
+define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
+define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
 define('ZBX_STYLE_TOP', 'top');
 define('ZBX_STYLE_TOP_NAV', 'top-nav');
 define('ZBX_STYLE_TOP_NAV_CONTAINER', 'top-nav-container');

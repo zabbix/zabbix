@@ -81,6 +81,7 @@ $events = API::Event()->get([
 	'select_alerts' => API_OUTPUT_EXTEND,
 	'select_acknowledges' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_EXTEND,
+	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
@@ -110,10 +111,10 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			$config['event_ack_enable']
+			($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE)
 				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-					->setHeader(_('Acknowledges'), [], false, 'tr_events.php')
+					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
 				: null,
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($event['alerts'])))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))

@@ -214,7 +214,7 @@ if ($itemPrototypeId && !API::ItemPrototype()->isWritable([$itemPrototypeId])) {
  */
 if (hasRequest('delete') && hasRequest('itemid')) {
 	DBstart();
-	$result = API::Itemprototype()->delete([getRequest('itemid')]);
+	$result = API::ItemPrototype()->delete([getRequest('itemid')]);
 	$result = DBend($result);
 
 	if ($result) {
@@ -380,10 +380,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
 
-			$result = API::Itemprototype()->update($item);
+			$result = API::ItemPrototype()->update($item);
 		}
 		else {
-			$result = API::Itemprototype()->create($item);
+			$result = API::ItemPrototype()->create($item);
 		}
 	}
 
@@ -410,7 +410,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['itemprototy
 		$item_prototypes[] = ['itemid' => $itemid, 'status' => $status];
 	}
 
-	$result = (bool) API::Itemprototype()->update($item_prototypes);
+	$result = (bool) API::ItemPrototype()->update($item_prototypes);
 
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
@@ -418,19 +418,15 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['itemprototy
 
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
-		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
-		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+	$messageSuccess = _n('Item prototype updated', 'Item prototypes updated', $updated);
+	$messageFailed = _n('Cannot update item prototype', 'Cannot update item prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$result = API::Itemprototype()->delete(getRequest('group_itemid'));
+	$result = API::ItemPrototype()->delete(getRequest('group_itemid'));
 	$result = DBend($result);
 
 	if ($result) {

@@ -111,8 +111,15 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol(
 			new CHorList([
-				(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
+				(new CSimpleButton(_('Edit')))
+					->onClick('javascript: submitFormWithParam('.
+						'"'.$maintenanceForm->getName().'", "edit_timeperiodid['.$id.']", "1"'.
+					');')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSimpleButton(_('Remove')))
+					->onClick('javascript: submitFormWithParam('.
+						'"'.$maintenanceForm->getName().'", "del_timeperiodid['.$id.']", "1"'.
+					');')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			])
 		))->addClass(ZBX_STYLE_NOWRAP)
@@ -135,7 +142,11 @@ $periodsDiv = (new CDiv($maintenancePeriodTable))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
 if (!isset($_REQUEST['new_timeperiod'])) {
-	$periodsDiv->addItem((new CSubmit('new_timeperiod', _('New')))->addClass(ZBX_STYLE_BTN_LINK));
+	$periodsDiv->addItem(
+		(new CSimpleButton(_('New')))
+			->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "new_timeperiod", "1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	);
 }
 $maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
 
@@ -151,8 +162,11 @@ if (isset($_REQUEST['new_timeperiod'])) {
 		(new CDiv([
 			get_timeperiod_form(),
 			new CHorList([
-				(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSubmit('cancel_new_timeperiod', _('Cancel')))
+				(new CSimpleButton($saveLabel))
+					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "add_timeperiod", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSimpleButton(_('Cancel')))
+					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "cancel_new_timeperiod", "1");')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			])
 		]))
