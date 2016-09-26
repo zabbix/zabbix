@@ -57,7 +57,7 @@
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
 #endif
 
-#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* forward-compatibility for pre-1.1.0 */
 #	define TLS_method				TLSv1_2_method
 #	define TLS_client_method			TLSv1_2_client_method
 #	define SSL_CTX_get_ciphers(ciphers)		((ciphers)->cipher_list)
@@ -3073,6 +3073,17 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 
 void	zbx_tls_init_child(void)
 {
+#define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
+#define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+#	define ZBX_CIPHERS_PSK_ECDHE	"kECDHEPSK+AES128:"
+#	define ZBX_CIPHERS_PSK		"kPSK+AES128"
+#else
+#	define ZBX_CIPHERS_PSK_ECDHE	""
+#	define ZBX_CIPHERS_PSK		"PSK-AES128-CBC-SHA"
+#endif
+
 	const char	*__function_name = "zbx_tls_init_child";
 	char		*error = NULL;
 	size_t		error_alloc = 0, error_offset = 0;
@@ -3325,9 +3336,9 @@ void	zbx_tls_init_child(void)
 
 		/* try to enable ECDH ciphersuites */
 		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_cert))
-			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128";
+			ciphers = ZBX_CIPHERS_CERT_ECDHE ZBX_CIPHERS_CERT;
 		else
-			ciphers = "RSA+aRSA+AES128";
+			ciphers = ZBX_CIPHERS_CERT;
 
 		/* set up ciphersuites */
 		if (1 != SSL_CTX_set_cipher_list(ctx_cert, ciphers))
@@ -3360,12 +3371,11 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
 
-#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
-		ciphers = "kECDHEPSK+AES128:kPSK+AES128";
-#else
-		/* OpenSSL does not support ECDHE-PSK ciphersuites before version 1.1.0 */
-		ciphers = "PSK-AES128-CBC-SHA";
-#endif
+		if (0 != strcmp("", ZBX_CIPHERS_PSK_ECDHE) && SUCCEED == zbx_set_ecdhe_parameters(ctx_psk))
+			ciphers = ZBX_CIPHERS_PSK_ECDHE ZBX_CIPHERS_PSK;
+		else
+			ciphers = ZBX_CIPHERS_PSK;
+
 		if (1 != SSL_CTX_set_cipher_list(ctx_psk, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
@@ -3390,21 +3400,9 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
 
 		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_all))
-		{
-#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
-			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128:kECDHEPSK+AES128:kPSK+AES128";
-#else
-			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
-#endif
-		}
+			ciphers = ZBX_CIPHERS_CERT_ECDHE ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK_ECDHE ZBX_CIPHERS_PSK;
 		else
-		{
-#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
-			ciphers = "RSA+aRSA+AES128:kPSK+AES128";
-#else
-			ciphers = "RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
-#endif
-		}
+			ciphers = ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK;
 
 		if (1 != SSL_CTX_set_cipher_list(ctx_all, ciphers))
 		{
@@ -3431,6 +3429,11 @@ out1:
 	zbx_free(error);
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
+
+#undef ZBX_CIPHERS_CERT_ECDHE
+#undef ZBX_CIPHERS_CERT
+#undef ZBX_CIPHERS_PSK_ECDHE
+#undef ZBX_CIPHERS_PSK
 }
 #endif
 
