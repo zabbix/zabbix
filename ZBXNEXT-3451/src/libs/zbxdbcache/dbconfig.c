@@ -9895,10 +9895,8 @@ void	zbx_dc_get_nested_host_groupids(zbx_uint64_t groupid, zbx_vector_uint64_t *
 			if (0 != strncmp(group->name, parent_group->name, len))
 				break;
 
-			if ('\0' != group->name[len] && '/' != group->name[len])
-				break;
-
-			zbx_vector_uint64_append(nested_groupids, group->groupid);
+			if ('\0' == group->name[len] || '/' == group->name[len])
+				zbx_vector_uint64_append(nested_groupids, group->groupid);
 
 			index++;
 		}
