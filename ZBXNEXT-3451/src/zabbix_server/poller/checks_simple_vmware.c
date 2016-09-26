@@ -1815,7 +1815,7 @@ int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *usernam
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	char			*url, *uuid;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
