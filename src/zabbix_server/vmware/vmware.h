@@ -94,13 +94,23 @@ typedef struct
 }
 zbx_vmware_dev_t;
 
+/* file system data */
+typedef struct
+{
+	char		*path;
+	zbx_uint64_t	capacity;
+	zbx_uint64_t	free_space;
+}
+zbx_vmware_fs_t;
+
 /* the vmware virtual machine data */
 typedef struct
 {
 	char			*uuid;
 	char			*id;
-	char			*details;
+	char			**props;
 	zbx_vector_ptr_t	devs;
+	zbx_vector_ptr_t	file_systems;
 }
 zbx_vmware_vm_t;
 
@@ -109,13 +119,21 @@ typedef struct
 {
 	char			*uuid;
 	char			*id;
-	char			*details;
 	char			*clusterid;
 	char			*datacenter_name;
+	char			**props;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
 }
 zbx_vmware_hv_t;
+
+/* index virtual machines by uuids */
+typedef struct
+{
+	zbx_vmware_vm_t	*vm;
+	zbx_vmware_hv_t	*hv;
+}
+zbx_vmware_vm_index_t;
 
 /* the vmware cluster data */
 typedef struct
@@ -132,7 +150,8 @@ typedef struct
 	char	*error;
 	char	*events;
 
-	zbx_vector_ptr_t	hvs;
+	zbx_hashset_t		hvs;
+	zbx_hashset_t		vms_index;
 	zbx_vector_ptr_t	clusters;
 }
 zbx_vmware_data_t;
@@ -165,7 +184,7 @@ typedef struct
 	/* list of entities to monitor with performance counters */
 	zbx_hashset_t		entities;
 
-	/* The service data object that is swapped with a new one during service update */
+	/* the service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
 }
 zbx_vmware_service_t;
@@ -227,6 +246,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
+#define ZBX_XPATH_VM_GUESTDISKS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+	"/*/*[local-name()='GuestDiskInfo']"
+
 #define ZBX_XPATH_VM_UUID()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
 		"/*[local-name()='val']"
@@ -259,7 +282,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
-
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
@@ -270,6 +292,45 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 char	*zbx_xml_read_value(const char *data, const char *xpath);
 int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
+
+/* hypervisor properties */
+#define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
+#define ZBX_VMWARE_HVPROP_FULL_NAME			1
+#define ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES		2
+#define ZBX_VMWARE_HVPROP_HW_CPU_MHZ			3
+#define ZBX_VMWARE_HVPROP_HW_CPU_MODEL			4
+#define ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS		5
+#define ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE		6
+#define ZBX_VMWARE_HVPROP_HW_MODEL			7
+#define ZBX_VMWARE_HVPROP_HW_UUID			8
+#define ZBX_VMWARE_HVPROP_HW_VENDOR			9
+#define ZBX_VMWARE_HVPROP_MEMORY_USED			10
+#define ZBX_VMWARE_HVPROP_STATUS			11
+#define ZBX_VMWARE_HVPROP_UPTIME			12
+#define ZBX_VMWARE_HVPROP_VERSION			13
+#define ZBX_VMWARE_HVPROP_NAME				14
+
+#define ZBX_VMWARE_HVPROPS_NUM				15
+
+/* virtual machine properties */
+#define ZBX_VMWARE_VMPROP_CPU_NUM			0
+#define ZBX_VMWARE_VMPROP_CPU_USAGE			1
+#define ZBX_VMWARE_VMPROP_NAME				2
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE			3
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED		4
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED	5
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED		6
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST	7
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST	8
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE		9
+#define ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED		10
+#define ZBX_VMWARE_VMPROP_POWER_STATE			11
+#define ZBX_VMWARE_VMPROP_STORAGE_COMMITED		12
+#define ZBX_VMWARE_VMPROP_STORAGE_UNSHARED		13
+#define ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED		14
+#define ZBX_VMWARE_VMPROP_UPTIME			15
+
+#define ZBX_VMWARE_VMPROPS_NUM				16
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

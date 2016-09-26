@@ -36,19 +36,14 @@ void	add_alias(const char *name, const char *value)
 {
 	ALIAS	*alias = NULL;
 
-	assert(name);
-	assert(value);
-
 	for (alias = aliasList; ; alias = alias->next)
 	{
 		/* add new Alias */
 		if (NULL == alias)
 		{
 			alias = (ALIAS *)zbx_malloc(alias, sizeof(ALIAS));
-			memset(alias, 0, sizeof(ALIAS));
 
-			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME - 1);
-
+			alias->name = strdup(name);
 			alias->value = strdup(value);
 			alias->next = aliasList;
 			aliasList = alias;
@@ -77,6 +72,7 @@ void	alias_list_free()
 		curr = next;
 		next = curr->next;
 		zbx_free(curr->value);
+		zbx_free(curr->name);
 		zbx_free(curr);
 	}
 
@@ -85,12 +81,38 @@ void	alias_list_free()
 
 const char	*zbx_alias_get(const char *orig)
 {
-	ALIAS	*alias;
+	ALIAS				*alias;
+	size_t				len_name, len_value;
+	ZBX_THREAD_LOCAL static char	*buffer = NULL;
+	ZBX_THREAD_LOCAL static size_t	buffer_alloc = 0;
+	size_t				buffer_offset = 0;
+	const char			*p = orig;
+
+	if (SUCCEED != parse_key((char **)&p) || '\0' != *p)
+		return orig;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
 		if (0 == strcmp(alias->name, orig))
 			return alias->value;
+	}
+
+	for (alias = aliasList; NULL != alias; alias = alias->next)
+	{
+		len_name = strlen(alias->name);
+		if (3 >= len_name || 0 != strcmp(alias->name + len_name - 3, "[*]"))
+			continue;
+
+		if (0 != strncmp(alias->name, orig, len_name - 2))
+			continue;
+
+		len_value = strlen(alias->value);
+		if (3 >= len_value || 0 != strcmp(alias->value + len_value - 3, "[*]"))
+			return alias->value;
+
+		zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset, alias->value, len_value - 3);
+		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, orig + len_name - 3);
+		return buffer;
 	}
 
 	return orig;

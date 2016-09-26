@@ -115,22 +115,16 @@ foreach ($this->data['items'] as $item) {
 
 	// info
 	if ($data['showInfoColumn']) {
-		$infoIcons = [];
+		$info_icons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$infoIcons[] = makeErrorIcon($item['error']);
+			$info_icons[] = makeErrorIcon($item['error']);
 		}
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			if ($infoIcons) {
-				$infoIcons[] = SPACE;
-			}
-			$infoIcons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 		}
-	}
-	else {
-		$infoIcons = null;
 	}
 
 	// triggers info
@@ -162,15 +156,9 @@ foreach ($this->data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$triggerDescription[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$triggerDescription[] = new CLink(
-				CHtml::encode($trigger['description']),
-				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
-			);
-		}
+		$triggerDescription[] = new CLink(CHtml::encode($trigger['description']),
+			'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -257,7 +245,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		$infoIcons
+		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
 

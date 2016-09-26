@@ -223,7 +223,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 	}
 
@@ -254,6 +254,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickButton($value) {
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath("//button[@value='".$value."']"));
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
 	}
 
@@ -376,6 +377,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
+	public function zbxTestWaitUntilElementClickable($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::elementToBeClickable($by));
+	}
+
 	public function zbxTestWaitUntilElementPresent($by) {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
 	}
@@ -388,6 +393,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	public function zbxTestTabSwitch($tab) {
 		$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
+		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function zbxTestTabSwitchById($id, $tab) {
+		$this->zbxTestClickWait($id);
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != $tab ) {
+			$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
+		}
 		$this->zbxTestCheckFatalErrors();
 	}
 

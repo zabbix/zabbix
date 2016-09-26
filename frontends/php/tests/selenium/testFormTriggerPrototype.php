@@ -293,7 +293,7 @@ class testFormTriggerPrototype extends CWebTest {
 				$this->zbxTestAssertAttribute("//button[@id='insert']", 'disabled');
 			}
 
-			$this->zbxTestAssertElementNotPresentId('add_expression');
+			$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			$this->zbxTestAssertElementNotPresentId('insert_macro');
 			$this->zbxTestAssertElementNotPresentId('exp_list');
 			}
@@ -306,11 +306,10 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
-				$this->zbxTestAssertVisibleId('add_expression');
-				$this->zbxTestAssertElementValue('add_expression', 'Add');
+				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression') and text()='Add']");
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentId('add_expression');
+				$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			}
 
 			$this->zbxTestAssertVisibleId('insert');
@@ -388,7 +387,7 @@ class testFormTriggerPrototype extends CWebTest {
 			}
 		}
 
-		$this->zbxTestTextPresent('Enabled');
+		$this->zbxTestTextPresent('Create enabled');
 		$this->zbxTestAssertVisibleId('status');
 		$this->zbxTestAssertAttribute("//input[@id='status']", 'type', 'checkbox');
 
@@ -828,8 +827,8 @@ class testFormTriggerPrototype extends CWebTest {
 				else {
 					$this->zbxTestAssertElementPresentId('test_expression');
 
-					$this->zbxTestAssertElementValue('and_expression', 'And');
-					$this->zbxTestAssertElementValue('or_expression', 'Or');
+					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
+					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
 					$this->zbxTestAssertElementPresentXpath("//button[text()='Remove']");
 					if (isset($constructor['elements'])) {
 						foreach($constructor['elements'] as $elem) {
@@ -837,10 +836,10 @@ class testFormTriggerPrototype extends CWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 
 					if (isset($constructor['text'])) {

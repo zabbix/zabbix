@@ -114,7 +114,15 @@ $clock-lines-color: #4f4f4f;
 .list-table {
 
 	thead th {
-		border-bottom: 2px solid lighten($table-border-color, 3%) !important;
+		border-color: lighten($table-border-color, 3%) !important;;
+	}
+}
+
+.timeline-axis {
+	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
+
+	&::before {
+		background-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
 	}
 }
 

@@ -9703,13 +9703,6 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
  * Purpose: gets correlation rules from configuration cache                   *
  *                                                                            *
  * Parameter: rules   - [IN/OUT] the correlation rules                        *
- *            sync_ts - [IN/OUT] the configuration synchronization timestamp  *
- *                               of the correlation rules passed to this      *
- *                               function.                                    *
- *                                                                            *
- * Comments: The correlation rules are refreshed only if the passed timestamp *
- *           does not match current configuration cache sync timestamp. This  *
- *           allows to locally cache the correlation rules.                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
@@ -9723,6 +9716,9 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 	LOCK_CACHE;
 
+	/* The correlation rules are refreshed only if the sync timestamp   */
+	/* does not match current configuration cache sync timestamp. This  */
+	/* allows to locally cache the correlation rules.                   */
 	if (config->sync_ts == rules->sync_ts)
 	{
 		UNLOCK_CACHE;

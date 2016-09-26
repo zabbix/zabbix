@@ -25,7 +25,16 @@
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 
-#define ZBX_MODULE_API_VERSION_ONE	1
+/* zbx_module_api_version() MUST return this constant */
+#define ZBX_MODULE_API_VERSION	2
+
+/* old name alias is kept for source compatibility only, SHOULD NOT be used */
+#define ZBX_MODULE_API_VERSION_ONE	ZBX_MODULE_API_VERSION
+
+/* HINT: For conditional compilation with different module.h versions modules can use: */
+/* #if ZBX_MODULE_API_VERSION == X                                                     */
+/*         ...                                                                         */
+/* #endif                                                                              */
 
 #define get_rkey(request)		(request)->key
 #define get_rparams_num(request)	(request)->nparam
@@ -134,5 +143,64 @@ AGENT_RESULT;
 
 #define SYSINFO_RET_OK		0
 #define SYSINFO_RET_FAIL	1
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	double		value;
+}
+ZBX_HISTORY_FLOAT;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	zbx_uint64_t	value;
+}
+ZBX_HISTORY_INTEGER;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
+}
+ZBX_HISTORY_STRING;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
+}
+ZBX_HISTORY_TEXT;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
+	const char	*source;
+	int		timestamp;
+	int		logeventid;
+	int		severity;
+}
+ZBX_HISTORY_LOG;
+
+typedef struct
+{
+	void	(*history_float_cb)(const ZBX_HISTORY_FLOAT *history, int history_num);
+	void	(*history_integer_cb)(const ZBX_HISTORY_INTEGER *history, int history_num);
+	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
+	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
+	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
+}
+ZBX_HISTORY_WRITE_CBS;
 
 #endif

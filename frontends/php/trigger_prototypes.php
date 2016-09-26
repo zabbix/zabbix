@@ -47,9 +47,9 @@ $fields = [
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
 	'recovery_expression_constructor' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_recovery_expression_constructor})'],
 	'expr_temp' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
-	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
-	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))'],
+	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
 	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -365,22 +365,51 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	$visible = getRequest('visible', []);
 
 	if ($visible) {
-		$triggersToUpdate = [];
+		$triggerids = getRequest('g_triggerid');
+		$triggers_to_update = [];
 
-		foreach (getRequest('g_triggerid') as $triggerId) {
-			$trigger = ['triggerid' => $triggerId];
+		$triggers = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'templateid'],
+			'triggerids' => $triggerids,
+			'preservekeys' => true
+		]);
 
-			if (isset($visible['priority'])) {
-				$trigger['priority'] = getRequest('priority');
+		if ($triggers) {
+			$tags = getRequest('tags', []);
+
+			// Remove empty new tag lines.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
 			}
-			if (isset($visible['dependencies'])) {
-				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-			}
 
-			$triggersToUpdate[] = $trigger;
+			foreach ($triggerids as $triggerid) {
+				if (array_key_exists($triggerid, $triggers)) {
+					$trigger = ['triggerid' => $triggerid];
+
+					if (array_key_exists('priority', $visible)) {
+						$trigger['priority'] = getRequest('priority');
+					}
+
+					if (array_key_exists('dependencies', $visible)) {
+						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+					}
+
+					if (array_key_exists('tags', $visible)) {
+						$trigger['tags'] = $tags;
+					}
+
+					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+						$trigger['manual_close'] = getRequest('manual_close');
+					}
+
+					$triggers_to_update[] = $trigger;
+				}
+			}
 		}
 
-		$result = (bool) API::TriggerPrototype()->update($triggersToUpdate);
+		$result = (bool) API::TriggerPrototype()->update($triggers_to_update);
 	}
 
 	if ($result) {
@@ -390,8 +419,9 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') == 'triggerprototype.massenable');
-	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$status = (getRequest('action') == 'triggerprototype.massenable')
+		? TRIGGER_STATUS_ENABLED
+		: TRIGGER_STATUS_DISABLED;
 	$update = [];
 
 	// get requested triggers with permission check
@@ -421,12 +451,8 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 
 	$updated = count($update);
 
-	$messageSuccess = $enable
-		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
-		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
-		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
+	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
+	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
