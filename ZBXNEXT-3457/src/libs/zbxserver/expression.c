@@ -3755,6 +3755,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
+				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+							event->trigger.recovery_expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					pos = token.token.r;
+				}
 			}
 		}
 
