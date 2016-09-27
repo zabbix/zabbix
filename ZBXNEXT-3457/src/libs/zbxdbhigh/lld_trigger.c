@@ -2048,6 +2048,24 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static int validate_tag(const char *tag)
+{
+	int	rc = SUCCEED, pos = 0;
+	zbx_token_t	token;
+
+	while (SUCCEED == zbx_token_find(tag, pos, &token))
+	{
+		if (NULL != memchr(tag + pos, '/', token.token.l - pos))
+			return FAIL;
+
+		pos = token.token.r + 1;
+	}
+	if (NULL != strchr(tag + pos, '/'))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_validate_trigger_tag_field                                   *
@@ -2077,8 +2095,9 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 	{
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
 	}
-	else if (ZBX_FLAG_LLD_TAG_UPDATE_TAG == flag && NULL != strchr(field, '/'))
+	else if (ZBX_FLAG_LLD_TAG_UPDATE_TAG == flag && SUCCEED != validate_tag(field))
 	{
+
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\" contains '/' character.\n", field);
 	}
 	else
