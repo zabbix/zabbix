@@ -641,7 +641,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(3000), "3.0 maintenance"},
 	{DBPATCH_VERSION(3010), "3.2 development"},
 	{DBPATCH_VERSION(3020), "3.2 maintenance"},
-	{DBPATCH_VERSION(3030), "3.2 development"},
+	{DBPATCH_VERSION(3030), "3.4 development"},
 	{NULL}
 };
 

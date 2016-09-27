@@ -22,14 +22,15 @@
 #include "dbupgrade.h"
 
 /*
- * 3.2 maintenance database patches
+ * 3.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
 static int	DBpatch_3030000(void)
 {
-	const ZBX_FIELD	field = {"ipmi_authtype", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL|ZBX_PROXY, 0};
+	const ZBX_FIELD	field = {"ipmi_authtype", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
 	return DBset_default("hosts", &field);
 }
 
