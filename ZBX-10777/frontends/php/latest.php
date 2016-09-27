@@ -45,9 +45,6 @@ $fields = [
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'favobj' =>				[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'toggle_ids' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'toggle_open_state' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"host","lastclock","name"'),				null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -64,39 +61,7 @@ if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
 	access_deny();
 }
 
-/*
- * Ajax
- */
-if (hasRequest('favobj')) {
-	if ($_REQUEST['favobj'] == 'toggle') {
-		// $_REQUEST['toggle_ids'] can be single id or list of ids,
-		// where id xxxx is application id and id 0_xxxx is 0_ + host id
-		if (!is_array($_REQUEST['toggle_ids'])) {
-			if ($_REQUEST['toggle_ids'][1] == '_') {
-				$hostId = substr($_REQUEST['toggle_ids'], 2);
-				CProfile::update('web.latest.toggle_other', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $hostId);
-			}
-			else {
-				$applicationId = $_REQUEST['toggle_ids'];
-				CProfile::update('web.latest.toggle', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $applicationId);
-			}
-		}
-		else {
-			foreach ($_REQUEST['toggle_ids'] as $toggleId) {
-				if ($toggleId[1] == '_') {
-					$hostId = substr($toggleId, 2);
-					CProfile::update('web.latest.toggle_other', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $hostId);
-				}
-				else {
-					$applicationId = $toggleId;
-					CProfile::update('web.latest.toggle', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $applicationId);
-				}
-			}
-		}
-	}
-}
-
-if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']){
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
@@ -413,7 +378,7 @@ if (!$filterSet) {
 }
 
 $toggle_all = (new CColHeader(
-	(new CDiv())
+	(new CSimpleButton())
 		->addClass(ZBX_STYLE_TREEVIEW)
 		->addClass('app-list-toggle-all')
 		->addItem(new CSpan())
@@ -626,7 +591,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	// add toggle row
 	$table->addRow([
-		(new CDiv())
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->addClass('app-list-toggle')
 			->setAttribute('data-app-id', $dbApp['applicationid'])
@@ -797,10 +762,10 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	// add toggle row
 	$table->addRow([
-		(new CDiv())
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->addClass('app-list-toggle')
-			->setAttribute('data-app-id', '0_'.$host['hostid'])
+			->setAttribute('data-host-id', $host['hostid'])
 			->setAttribute('data-open-state', $open_state)
 			->addItem(new CSpan()),
 		'',
@@ -811,7 +776,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
-		$row->setAttribute('parent_app_id', '0_'.$host['hostid']);
+		$row->setAttribute('parent_host_id', $host['hostid']);
 		$table->addRow($row);
 	}
 }

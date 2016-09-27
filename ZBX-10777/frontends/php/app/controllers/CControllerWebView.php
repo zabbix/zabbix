@@ -31,7 +31,8 @@ class CControllerWebView extends CController {
 			'groupid' =>	'db groups.groupid',
 			'hostid' =>		'db hosts.hostid',
 			'sort' =>		'in hostname,name',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
+			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'page' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,10 +83,9 @@ class CControllerWebView extends CController {
 
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
-			'httptests' => [],
-			'paging' => null,
 			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sortorder' => $sortOrder,
+			'page' => $this->getInput('page', 1)
 		];
 
 		$data['pageFilter'] = new CPageFilter([
@@ -100,63 +100,6 @@ class CControllerWebView extends CController {
 			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
 			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
 		]);
-
-		$data['hostid']= $data['pageFilter']->hostid;
-		$data['groupid'] = $data['pageFilter']->groupid;
-
-		if ($data['pageFilter']->hostsSelected) {
-			$config = select_config();
-
-			$options = [
-				'output' => ['httptestid', 'name', 'hostid'],
-				'selectHosts' => ['name', 'status'],
-				'selectSteps' => API_OUTPUT_COUNT,
-				'templated' => false,
-				'preservekeys' => true,
-				'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
-				'limit' => $config['search_limit'] + 1
-			];
-			if ($data['hostid'] != 0) {
-				$options['hostids'] = $data['hostid'];
-			}
-			elseif ($data['groupid'] != 0) {
-				$options['groupids'] = $data['groupid'];
-			}
-			$httptests = API::HttpTest()->get($options);
-
-			foreach ($httptests as &$httptest) {
-				$httptest['host'] = reset($httptest['hosts']);
-				$httptest['hostname'] = $httptest['host']['name'];
-				unset($httptest['hosts']);
-			}
-			unset($httptest);
-
-			order_result($httptests, $sortField, $sortOrder);
-
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'web.view')
-				->setArgument('groupid', $data['groupid'])
-				->setArgument('hostid', $data['hostid'])
-				->setArgument('fullscreen', $data['fullscreen']);
-
-			$data['paging'] = getPagingLine($httptests, $sortOrder, $url);
-			$httptests = resolveHttpTestMacros($httptests, true, false);
-			order_result($httptests, $sortField, $sortOrder);
-
-			// fetch the latest results of the web scenario
-			$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
-
-			foreach ($httptests as &$httptest) {
-				if (array_key_exists($httptest['httptestid'], $last_httptest_data)) {
-					$httptest['lastcheck'] = $last_httptest_data[$httptest['httptestid']]['lastcheck'];
-					$httptest['lastfailedstep'] = $last_httptest_data[$httptest['httptestid']]['lastfailedstep'];
-					$httptest['error'] = $last_httptest_data[$httptest['httptestid']]['error'];
-				}
-
-				$data['httptests'][] = $httptest;
-			}
-			unset($httptest);
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

@@ -137,10 +137,10 @@ class testFormAction extends CWebTest {
 				['eventsource' => 'Triggers', 'recovery_msg' => true]
 			],
 			[
-				['eventsource' => 'Triggers', 'evaltype' => 'AND']
+				['eventsource' => 'Triggers', 'evaltype' => 'And']
 			],
 			[
-				['eventsource' => 'Triggers', 'evaltype' => 'OR']
+				['eventsource' => 'Triggers', 'evaltype' => 'Or']
 			],
 			[
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Application']
@@ -448,6 +448,7 @@ class testFormAction extends CWebTest {
 		];
 	}
 
+
 	/**
 	 * @dataProvider layout
 	 */
@@ -473,59 +474,43 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['recovery_msg'])) {
 			$this->zbxTestCheckboxSelect('recovery_msg');
-			$this->wait();
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('r_shortdata'));
 			$recovery_msg = true;
 		}
 		else {
 			$recovery_msg = false;
 		}
 
-		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
-		}
-		$new_condition_conditiontype = $this->getSelectedLabel('//select[@id=\'new_condition_conditiontype\']');
-
-		if ($eventsource == 'Triggers') {
-			if (isset($data['evaltype'])) {
-				$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
-			}
-			$evaltype = $this->getSelectedLabel('//select[@id=\'evaltype\']');
-		}
-
-
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent([
-				'CONFIGURATION OF ACTIONS',
-				'Action', 'Conditions', 'Operations'
-		]);
+		$this->zbxTestTextPresent(['Action', 'Conditions', 'Operations']);
 
 		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('name');
-		$this->assertAttribute("//input[@id='name']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='name']/@size", 50);
-		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		$this->zbxTestAssertVisibleId('name');
+		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
+		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 
 		$this->zbxTestTextPresent('Default subject');
-		$this->assertVisible('def_shortdata');
-		$this->assertAttribute("//input[@id='def_shortdata']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='def_shortdata']/@size", 50);
+		$this->zbxTestAssertVisibleId('def_shortdata');
+		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'size', 20);
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->assertAttribute('//input[@id=\'def_shortdata\']/@value', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+				$this->zbxTestAssertElementValue('def_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 				break;
 			case 'Discovery':
-				$this->assertAttribute('//input[@id=\'def_shortdata\']/@value', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
 				break;
 			case 'Auto registration':
-				$this->assertAttribute('//input[@id=\'def_shortdata\']/@value', 'Auto registration: {HOST.HOST}');
+				$this->zbxTestAssertElementValue('def_shortdata', 'Auto registration: {HOST.HOST}');
 				break;
 			case 'Internal':
-				$this->assertEquals($this->getValue('def_shortdata'), "");
+				$this->zbxTestAssertElementValue('def_shortdata', '');
 				break;
 		}
 		$this->zbxTestTextPresent('Default message');
-		$this->assertVisible('def_longdata');
-		$this->assertAttribute("//textarea[@id='def_longdata']/@rows", 7);
+		$this->zbxTestAssertVisibleId('def_longdata');
+		$this->zbxTestAssertAttribute("//textarea[@id='def_longdata']", 'rows', 7);
 		switch ($eventsource) {
 			case 'Triggers':
 				$def_longdata_val = 'Trigger: {TRIGGER.NAME}'.
@@ -558,36 +543,36 @@ class testFormAction extends CWebTest {
 				$def_longdata_val = "";
 				break;
 		}
-		$this->assertEquals($this->getText('def_longdata'), $def_longdata_val);
+		$this->zbxTestAssertElementText('//textarea[@id="def_longdata"]', $def_longdata_val);
 
 		if ($eventsource == 'Triggers' || $eventsource == 'Internal') {
 			$this->zbxTestTextPresent('Recovery message');
-			$this->assertElementPresent('recovery_msg');
-			$this->assertElementPresent("//input[@type='checkbox' and @id='recovery_msg']");
+			$this->zbxTestAssertElementPresentId('recovery_msg');
+			$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='recovery_msg']");
 		}
 		else {
 			$this->zbxTestTextNotPresent('Recovery message');
-			$this->assertElementNotPresent('recovery_msg');
-			$this->assertElementNotPresent("//input[@type='checkbox' and @id='recovery_msg']");
+			$this->zbxTestAssertElementNotPresentId('recovery_msg');
+			$this->zbxTestAssertElementNotPresentXpath("//input[@type='checkbox' and @id='recovery_msg']");
 		}
 
 		if ($recovery_msg == true) {
 			$this->zbxTestTextPresent('Recovery subject');
-			$this->assertVisible('r_shortdata');
-			$this->assertAttribute("//input[@id='r_shortdata']/@maxlength", 255);
-			$this->assertAttribute("//input[@id='r_shortdata']/@size", 50);
+			$this->zbxTestAssertVisibleId('r_shortdata');
+			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'size', 20);
 			switch ($eventsource) {
 				case 'Triggers':
-					$this->assertAttribute('//input[@id=\'r_shortdata\']/@value', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+					$this->zbxTestAssertElementValue('r_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 					break;
 				case 'Internal':
-					$this->assertEquals($this->getValue('r_shortdata'), "");
+					$this->zbxTestAssertElementValue('r_shortdata', '');
 					break;
 			}
 
 			$this->zbxTestTextPresent('Recovery message');
-			$this->assertVisible('r_longdata');
-			$this->assertAttribute("//textarea[@id='r_longdata']/@rows", 7);
+			$this->zbxTestAssertVisibleId('r_longdata');
+			$this->zbxTestAssertAttribute("//textarea[@id='r_longdata']", 'rows', 7);
 			switch ($eventsource) {
 				case 'Triggers':
 					$r_longdata_val = 'Trigger: {TRIGGER.NAME}'.
@@ -604,46 +589,63 @@ class testFormAction extends CWebTest {
 					$r_longdata_val = "";
 					break;
 			}
-			$this->assertEquals($this->getText('r_longdata'), $r_longdata_val);
+			$this->zbxTestAssertElementText('//textarea[@id="r_longdata"]', $r_longdata_val);
 		}
-		elseif ($eventsource == 'Triggers') {
-			$this->assertNotVisible('r_shortdata');
-			$this->assertNotVisible('r_longdata');
+		elseif ($eventsource == 'Triggers' || $eventsource == 'Internal') {
+			$this->zbxTestAssertNotVisibleId('r_shortdata');
+			$this->zbxTestAssertNotVisibleId('r_longdata');
 		}
 		else {
-			$this->assertElementNotPresent('r_shortdata');
-			$this->assertElementNotPresent('r_longdata');
+			$this->zbxTestAssertElementNotPresentId('r_shortdata');
+			$this->zbxTestAssertElementNotPresentId('r_longdata');
 		}
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->assertElementPresent('status');
-		$this->assertElementPresent("//input[@type='checkbox' and @id='status']");
-		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
+		$this->zbxTestAssertElementPresentId('status');
+		$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='status']");
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestClick('link=Conditions');
+		$this->zbxTestTabSwitch('Conditions');
+
+		if (isset($data['new_condition_conditiontype'])) {
+			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
+		}
+		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('new_condition_conditiontype');
+
+		if ($eventsource == 'Triggers') {
+			if (isset($data['evaltype'])) {
+				$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
+				$evaltype = $data['evaltype'];
+			}
+			else {
+				$select_options = $this->zbxTestGetDropDownElements('evaltype');
+				$evaltype = $select_options[0]['content'];
+			}
+		}
 
 		if ($eventsource == 'Triggers') {
 			$this->zbxTestTextPresent('Type of calculation');
-			$this->assertElementPresent('evaltype');
+			$this->zbxTestAssertElementPresentId('evaltype');
 			$this->zbxTestDropdownHasOptions('evaltype', [
-					'AND / OR',
-					'AND',
-					'OR'
+					'And/Or',
+					'And',
+					'Or',
+					'Custom expression'
 			]);
-			$this->assertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']/@selected', 'selected');
+			$this->zbxTestAssertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']', 'selected');
 			switch ($evaltype) {
-				case 'AND / OR':
-				case 'AND':
-					$this->zbxTestTextPresent('(A) and (B)');
+				case 'And/Or':
+				case 'And':
+					$this->zbxTestTextPresent('A and B');
 					break;
 				default:
-					$this->zbxTestTextPresent('(A) or (B)');
+					$this->zbxTestTextPresent('A or B');
 					break;
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Type of calculation');
-			$this->assertNotVisible('evaltype');
+			$this->zbxTestTextNotVisibleOnPage('Type of calculation');
+			$this->zbxTestAssertNotVisibleId('evaltype');
 		}
 
 		$this->zbxTestTextPresent([
@@ -652,26 +654,27 @@ class testFormAction extends CWebTest {
 		]);
 
 		if ($eventsource == 'Triggers') {
+			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Maintenance status not in maintenance');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger value = PROBLEM');
 			$this->zbxTestTextPresent([
-					'(A)', 'Maintenance status not in maintenance','(B)', 'Trigger value = PROBLEM'
+					'A', 'Maintenance status','B', 'Trigger value'
 			]);
-			$this->assertElementPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
+			$this->zbxTestAssertElementPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
-			$this->assertElementPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
+			$this->zbxTestAssertElementPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(1);"]');
 		}
 		else {
-			$this->zbxTestTextNotPresent([
-					'(A)', 'Maintenance status not in maintenance','(B)', 'Trigger value = PROBLEM'
-			]);
-			$this->assertElementNotPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
+			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
+			$this->zbxTestTextNotPresent(['Maintenance status', 'Trigger value']);
+			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
-			$this->assertElementNotPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
+			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(1);"]');
 		}
 
 		$this->zbxTestTextPresent('New condition');
-		$this->assertElementPresent('new_condition_conditiontype');
+		$this->zbxTestAssertElementPresentId('new_condition_conditiontype');
 		switch ($eventsource) {
 			case 'Triggers':
 				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
@@ -720,27 +723,26 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
-			$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\''.
-				$new_condition_conditiontype.'\']/@selected', 'selected');
+			$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', $new_condition_conditiontype);
 		}
 		else {
 			switch ($eventsource) {
 				case 'Triggers':
-					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Trigger name\']/@selected', 'selected');
+					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Trigger name');
 					break;
 				case 'Discovery':
-					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host IP\']/@selected', 'selected');
+					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Host IP');
 					break;
 				case 'Auto registration':
-					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Host name\']/@selected', 'selected');
+					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Host name');
 					break;
 				case 'Internal':
-					$this->assertAttribute('//*[@id=\'new_condition_conditiontype\']/option[text()=\'Application\']/@selected', 'selected');
+					$this->zbxTestDropdownAssertSelected('new_condition[conditiontype]', 'Application');
 					break;
 			}
 		}
 
-		$this->assertElementPresent('new_condition_operator');
+		$this->zbxTestAssertElementPresentId('new_condition_operator');
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
@@ -823,15 +825,15 @@ class testFormAction extends CWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->assertElementPresent('//input[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_condition_value\']');
 				break;
 			case 'Proxy':
 			case 'Discovery rule':
 			case 'Discovery check':
-				$this->assertNotVisible('//input[@id=\'new_condition_value\']');
+				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_condition_value\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_condition_value\']');
 				break;
 		}
 
@@ -844,12 +846,12 @@ class testFormAction extends CWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 255);
-				$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 50);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'size', 20);
 				break;
 			case 'Uptime/Downtime':
-				$this->assertAttribute('//input[@id=\'new_condition_value\']/@maxlength', 15);
-				$this->assertAttribute('//input[@id=\'new_condition_value\']/@size', 15);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'maxlength', 15);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_condition_value\']', 'size', 20);
 				break;
 		}
 
@@ -859,19 +861,19 @@ class testFormAction extends CWebTest {
 			case 'Received value':
 			case 'Host name':
 			case 'Host metadata':
-				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), "");
+				$this->zbxTestAssertElementValue('new_condition_value', "");
 				break;
 			case 'Time period':
-				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '1-7,00:00-24:00');
+				$this->zbxTestAssertElementValue('new_condition_value', '1-7,00:00-24:00');
 				break;
 			case 'Service port':
-				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '0-1023,1024-49151');
+				$this->zbxTestAssertElementValue('new_condition_value', '0-1023,1024-49151');
 				break;
 			case 'Host IP':
-				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), '192.168.0.1-127,192.168.2.1');
+				$this->zbxTestAssertElementValue('new_condition_value', '192.168.0.1-127,192.168.2.1');
 				break;
 			case 'Uptime/Downtime':
-				$this->assertEquals($this->getValue('//input[@id=\'new_condition_value\']'), 600);
+				$this->zbxTestAssertElementValue('new_condition_value', 600);
 				break;
 		}
 
@@ -880,10 +882,10 @@ class testFormAction extends CWebTest {
 			case 'Template':
 			case 'Host':
 			case 'Trigger':
-				$this->assertElementPresent('//*[@id=\'new_condition_value_\']/input[@placeholder]');
+				$this->zbxTestAssertElementPresentXpath('//*[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
 			default:
-				$this->assertElementNotPresent('//*[@id=\'new_condition_value_\']/input[@placeholder]');
+				$this->zbxTestAssertElementNotPresentXpath('//*[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
 		}
 
@@ -894,10 +896,10 @@ class testFormAction extends CWebTest {
 			case 'Discovery object':
 			case 'Discovery status':
 			case 'Event type':
-				$this->assertElementPresent('//select[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementPresentXpath('//select[@id=\'new_condition_value\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//select[@id=\'new_condition_value\']');
+				$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_condition_value\']');
 				break;
 		}
 
@@ -966,55 +968,55 @@ class testFormAction extends CWebTest {
 
 		switch ($new_condition_conditiontype) {
 			case 'Trigger severity':
-				$this->assertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Not classified\']/@selected', 'selected');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Not classified\']', 'selected');
 				break;
 			case 'Event type':
-				$this->assertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']/@selected', 'selected');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']', 'selected');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Maintenance status':
-				$this->assertElementPresent('//td[text()=\'maintenance\']');
+				$this->zbxTestAssertElementPresentXpath('//td[text()=\'maintenance\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//td[text()=\'maintenance\']');
+				$this->zbxTestAssertElementNotPresentXpath('//td[text()=\'maintenance\']');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Discovery rule':
-				$this->assertElementPresent('//input[@id=\'drule\']');
-				$this->assertAttribute('//input[@id=\'drule\']/@maxlength', 255);
-				$this->assertAttribute('//input[@id=\'drule\']/@size', 50);
-				$this->assertAttribute('//input[@id=\'drule\']/@readonly', 'readonly');
+				$this->zbxTestAssertElementPresentXpath('//input[@id=\'drule\']');
+				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'readonly');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'drule\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'drule\']');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Discovery check':
-				$this->assertElementPresent('//input[@id=\'dcheck\']');
-				$this->assertAttribute('//input[@id=\'dcheck\']/@maxlength', 255);
-				$this->assertAttribute('//input[@id=\'dcheck\']/@size', 50);
-				$this->assertAttribute('//input[@id=\'dcheck\']/@readonly', 'readonly');
+				$this->zbxTestAssertElementPresentXpath('//input[@id=\'dcheck\']');
+				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'readonly');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'dcheck\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'dcheck\']');
 				break;
 		}
 
 		switch ($new_condition_conditiontype) {
 			case 'Proxy':
-				$this->assertElementPresent('//input[@id=\'proxy\']');
-				$this->assertAttribute('//input[@id=\'proxy\']/@maxlength', 255);
-				$this->assertAttribute('//input[@id=\'proxy\']/@size', 50);
-				$this->assertAttribute('//input[@id=\'proxy\']/@readonly', 'readonly');
+				$this->zbxTestAssertElementPresentXpath('//input[@id=\'proxy\']');
+				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//input[@id=\'proxy\']', 'readonly');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'proxy\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'proxy\']');
 				break;
 		}
 
@@ -1022,21 +1024,20 @@ class testFormAction extends CWebTest {
 			case 'Discovery rule':
 			case 'Discovery check':
 			case 'Proxy':
-				$this->assertElementPresent('//input[@id=\'btn1\']');
-				$this->assertAttribute('//input[@id=\'btn1\']/@value', 'Select');
+				$this->zbxTestAssertElementPresentXpath('//button[@id=\'btn1\']');
+				$this->zbxTestAssertElementText('//button[@id=\'btn1\']', 'Select');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'btn1\']');
+				$this->zbxTestAssertElementNotPresentXpath('//button[@id=\'btn1\']');
 				break;
 		}
 
-		$this->assertElementPresent('add_condition');
-		$this->assertAttribute('//input[@id=\'add_condition\']/@value','Add');
+		$this->zbxTestAssertElementPresentXpath("//div[@id='conditionTab']//button[text()='Add' and contains(@onclick,'add_condition')]");
 
-		$this->zbxTestClick('link=Operations');
+		$this->zbxTestTabSwitch('Operations');
 		if (isset($data['new_operation_operationtype'])) {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
-			$this->zbxTestClickWait('new_operation');
+			$this->zbxTestClickXpathWait("//ul[@id='operationlist']//button[text()='New' and contains(@onclick,'new_operation')]");
 			switch ($eventsource) {
 				case 'Triggers':
 				case 'Discovery':
@@ -1057,7 +1058,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestDropdownSelect('new_operation_opcommand_type', $new_operation_opcommand_type);
 		}
 		elseif ($new_operation_operationtype == 'Remote command') {
-			$new_operation_opcommand_type = $this->getSelectedLabel('//select[@id=\'new_operation_opcommand_type\']');
+			$new_operation_opcommand_type = $this->zbxTestGetSelectedLabel('new_operation_opcommand_type');
 		}
 		else {
 			$new_operation_opcommand_type = null;
@@ -1068,7 +1069,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestDropdownSelect('new_operation_opcommand_authtype', $new_operation_opcommand_authtype);
 		}
 		elseif ($new_operation_opcommand_type == 'SSH' || $new_operation_opcommand_type == 'Telnet') {
-			$new_operation_opcommand_authtype = $this->getSelectedLabel('//select[@id=\'new_operation_opcommand_authtype\']');
+			$new_operation_opcommand_authtype = $this->zbxTestGetSelectedLabel('new_operation_opcommand_authtype');
 		}
 		else {
 			$new_operation_opcommand_authtype = null;
@@ -1077,7 +1078,6 @@ class testFormAction extends CWebTest {
 		if (isset($data['new_operation_opmessage_default_msg'])) {
 			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
 			$this->zbxTestCheckboxSelect('new_operation_opmessage_default_msg', false);
-			$this->wait();
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
 			$new_operation_opmessage_default_msg = 'checked';
@@ -1087,7 +1087,9 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['add_opcondition'])) {
-			$this->zbxTestClickWait('new_opcondition');
+			$this->zbxTestClickWait('search');
+			$this->zbxTestClickXpathWait("//table[@id='operationConditionTable']//button[text()='New' and contains(@onclick,'new_opcondition')]");
+			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('new_opcondition_conditiontype'));
 			$add_opcondition = $data['add_opcondition'];
 		}
 		else {
@@ -1096,7 +1098,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['opCmdTarget'])) {
 			$opCmdTarget = $data['opCmdTarget'];
-			$this->zbxTestClick('add');
+			$this->zbxTestClickXpath('//*[@id=\'opCmdListFooter\']//button[@id=\'add\']');
 			$this->zbxTestDropdownSelect('opCmdTarget', $opCmdTarget);
 		}
 		else {
@@ -1109,24 +1111,20 @@ class testFormAction extends CWebTest {
 				$this->zbxTestTextPresent([
 						'Default operation step duration',	'(minimum 60 seconds)'
 				]);
-				$this->assertVisible('esc_period');
-				$this->assertAttribute('//input[@id=\'esc_period\']/@maxlength', 6);
-				$this->assertAttribute('//input[@id=\'esc_period\']/@size', 6);
-				$this->assertAttribute('//input[@id=\'esc_period\']/@value', 3600);
+				$this->zbxTestAssertVisibleId('esc_period');
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 6);
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
+				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'value', 3600);
 				break;
 			default:
 				$this->zbxTestTextNotPresent([
 						'Default operation step duration',	'(minimum 60 seconds)'
 				]);
-				$this->assertElementNotPresent('esc_period');
+				$this->zbxTestAssertElementNotPresentId('esc_period');
 				break;
 		}
 
-		$this->zbxTestTextPresent([
-				'Action operations',
-				'Details', 'Action',
-				'No operations defined.'
-		]);
+		$this->zbxTestTextPresent(['Action operations', 'Details', 'Action']);
 
 		switch ($eventsource) {
 			case 'Triggers':
@@ -1143,11 +1141,10 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($new_operation_operationtype == null) {
-			$this->assertVisible('new_operation');
-			$this->assertAttribute('//input[@id=\'new_operation\']/@value','New');
+			$this->zbxTestAssertVisibleXpath("//div[@id='operationTab']//button[text()='New' and contains(@onclick,'new_operation')]");
 		}
 		else {
-			$this->assertElementNotPresent('new_operation');
+			$this->zbxTestAssertElementNotPresentXpath("//div[@id='operationTab']//button[text()='New' and contains(@onclick,'new_operation')]");
 		}
 
 		if ($new_operation_operationtype != null && $eventsource == 'Triggers' || $eventsource == 'Internal') 	{
@@ -1156,38 +1153,38 @@ class testFormAction extends CWebTest {
 				case 'Remote command':
 					$this->zbxTestTextPresent ('Step');
 
-					$this->zbxTestTextPresent ('From');
-					$this->assertVisible('new_operation_esc_step_from');
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@maxlength', 5);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@size', 6);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@value', 1);
+					$this->zbxTestTextPresent ('Steps');
+					$this->zbxTestAssertVisibleId('new_operation_esc_step_from');
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_from\']', 'maxlength', 5);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_from\']', 'size', 20);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_from\']', 'value', 1);
 
-					$this->zbxTestTextPresent (['To', '(0 - infinitely)']);
-					$this->assertVisible('new_operation_esc_step_to');
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@maxlength', 5);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@size', 6);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@value', 1);
+					$this->zbxTestTextPresent ('(0 - infinitely)');
+					$this->zbxTestAssertVisibleId('new_operation_esc_step_to');
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_to\']', 'maxlength', 5);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_to\']', 'size', 20);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_to\']', 'value', 1);
 
 					$this->zbxTestTextPresent (['Step duration', '(minimum 60 seconds, 0 - use action default)']);
-					$this->assertVisible('new_operation_esc_period');
-					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@maxlength', 6);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@size', 6);
-					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@value', 0);
+					$this->zbxTestAssertVisibleId('new_operation_esc_period');
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'maxlength', 6);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'size', 20);
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'value', 0);
 					break;
 				}
 			}
 			else {
-				$this->assertElementNotPresent('new_operation_esc_step_from');
-				$this->assertElementNotPresent('new_operation_esc_step_to');
-				$this->assertElementNotPresent('new_operation_esc_period');
+				$this->zbxTestAssertElementNotPresentId('new_operation_esc_step_from');
+				$this->zbxTestAssertElementNotPresentId('new_operation_esc_step_to');
+				$this->zbxTestAssertElementNotPresentId('new_operation_esc_period');
 			}
 
 		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
 			$this->zbxTestTextPresent ('Operation type');
-			$this->assertVisible('//select[@id=\'new_operation_operationtype\']');
+			$this->zbxTestAssertVisibleXpath('//select[@id=\'new_operation_operationtype\']');
 		}
 		else {
-			$this->assertElementNotPresent('//select[@id=\'new_operation_operationtype\']');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_operation_operationtype\']');
 		}
 
 		if (isset($data['new_operation_operationtype'])) {
@@ -1230,21 +1227,21 @@ class testFormAction extends CWebTest {
 				case 'Triggers':
 				case 'Discovery':
 				case 'Auto registration':
-					$this->assertAttribute('//*[@id=\'new_operation_operationtype\']/option[text()=\''.$new_operation_operationtype.'\']/@selected', 'selected');
+					$this->zbxTestDropdownAssertSelected('new_operation[operationtype]', $new_operation_operationtype);
 					break;
 			}
 		}
 
 		if ($opCmdTarget != null) {
-			$this->assertVisible('//*[@id=\'opcmdEditForm\']');
-			$this->assertVisible('//select[@name=\'opCmdTarget\']');
+			$this->zbxTestAssertVisibleXpath('//*[@id=\'opcmdEditForm\']');
+			$this->zbxTestAssertVisibleXpath('//select[@name=\'opCmdTarget\']');
 			$this->zbxTestDropdownHasOptions('opCmdTarget', ['Current host', 'Host', 'Host group']);
 
-			$this->assertVisible('//input[@value=\'Add\' and @name=\'save\']');
-			$this->assertVisible('//input[@value=\'Cancel\' and @name=\'cancel\']');
+			$this->zbxTestAssertVisibleXpath('//ul[@class=\'hor-list\']//button[@id=\'save\']');
+			$this->zbxTestAssertVisibleXpath('//ul[@class=\'hor-list\']//button[@id=\'cancel\']');
 		}
 		else {
-			$this->assertElementNotPresent('//div[@id=\'opcmdEditForm\']');
+			$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'opcmdEditForm\']');
 		}
 
 		if ($new_operation_operationtype == 'Send message') {
@@ -1252,14 +1249,14 @@ class testFormAction extends CWebTest {
 				'Send to User groups', 'User group', 'Action',
 				'Send to Users'
 			]);
-			$this->assertVisible('addusrgrpbtn');
-			$this->assertAttribute('//input[@id=\'addusrgrpbtn\']/@value', 'Add');
-			$this->assertVisible('adduserbtn');
-			$this->assertAttribute('//input[@id=\'adduserbtn\']/@value', 'Add');
+			$this->zbxTestAssertVisibleXpath('//tr[@id=\'opmsgUsrgrpListFooter\']//button[@class=\'btn-link\']');
+			$this->zbxTestAssertElementText('//tr[@id=\'opmsgUsrgrpListFooter\']//button[@class=\'btn-link\']', 'Add');
+			$this->zbxTestAssertVisibleXpath('//tr[@id=\'opmsgUserListFooter\']//button[@class=\'btn-link\']');
+			$this->zbxTestAssertElementText('//tr[@id=\'opmsgUserListFooter\']//button[@class=\'btn-link\']', 'Add');
 
 			$this->zbxTestTextPresent ('Send only to');
-			$this->assertVisible('//select[@id=\'new_operation_opmessage_mediatypeid\']');
-			$this->assertAttribute('//*[@id=\'new_operation_opmessage_mediatypeid\']/option[text()=\'- All -\']/@selected', 'selected');
+			$this->zbxTestAssertVisibleId('new_operation_opmessage_mediatypeid');
+			$this->zbxTestDropdownAssertSelected('new_operation[opmessage][mediatypeid]', '- All -');
 			$this->zbxTestDropdownHasOptions('new_operation_opmessage_mediatypeid', [
 					'- All -',
 					'Email',
@@ -1269,47 +1266,47 @@ class testFormAction extends CWebTest {
 			]);
 
 			$this->zbxTestTextPresent('Default message');
-			$this->assertVisible('new_operation_opmessage_default_msg');
-			$this->assertVisible('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
+			$this->zbxTestAssertVisibleId('new_operation_opmessage_default_msg');
+			$this->zbxTestAssertVisibleXpath('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
 			if ($new_operation_opmessage_default_msg == 'checked') {
-				$this->assertAttribute('//*[@id=\'new_operation_opmessage_default_msg\']/@checked', 'checked');
+				$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opmessage_default_msg'));
 			}
 			else {
-				$this->assertElementNotPresent('//*[@id=\'new_operation_opmessage_default_msg\']/@checked');
+				$this->assertFalse($this->zbxTestCheckboxSelected('new_operation_opmessage_default_msg'));
 			}
 
 		}
 		else {
-			$this->assertElementNotPresent('addusrgrpbtn');
-			$this->assertElementNotPresent('adduserbtn');
-			$this->assertElementNotPresent('//select[@id=\'new_operation_opmessage_mediatypeid\']');
-			$this->assertElementNotPresent('new_operation_opmessage_default_msg');
+			$this->zbxTestAssertElementNotPresentId('addusrgrpbtn');
+			$this->zbxTestAssertElementNotPresentId('adduserbtn');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_operation_opmessage_mediatypeid\']');
+			$this->zbxTestAssertElementNotPresentId('new_operation_opmessage_default_msg');
 		}
 
 		switch ($new_operation_opmessage_default_msg) {
 			case 'unchecked':
 				$this->zbxTestTextPresent('Subject');
-				$this->assertVisible('new_operation_opmessage_subject');
-				$this->assertAttribute("//input[@id='new_operation_opmessage_subject']/@maxlength", 255);
-				$this->assertAttribute("//input[@id='new_operation_opmessage_subject']/@size", 50);
+				$this->zbxTestAssertVisibleId('new_operation_opmessage_subject');
+				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opmessage_subject\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opmessage_subject\']', 'size', 20);
 				switch ($eventsource) {
 					case 'Triggers':
-						$this->assertAttribute('//input[@id=\'new_operation_opmessage_subject\']/@value', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 						break;
 					case 'Discovery':
-						$this->assertAttribute('//input[@id=\'new_operation_opmessage_subject\']/@value', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
 						break;
 					case 'Auto registration':
-						$this->assertAttribute('//input[@id=\'new_operation_opmessage_subject\']/@value', 'Auto registration: {HOST.HOST}');
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Auto registration: {HOST.HOST}');
 						break;
 					case 'Internal':
-						$this->assertEquals($this->getValue('new_operation_opmessage_subject'), "");
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', '');
 						break;
 				}
 
 				$this->zbxTestTextPresent('Message');
-				$this->assertVisible('new_operation_opmessage_message');
-				$this->assertAttribute("//textarea[@id='new_operation_opmessage_message']/@rows", 7);
+				$this->zbxTestAssertVisibleId('new_operation_opmessage_message');
+				$this->zbxTestAssertAttribute('//textarea[@id=\'new_operation_opmessage_message\']', 'rows', 7);
 				switch ($eventsource) {
 					case 'Triggers':
 						$new_operation_opmessage_message_val = 'Trigger: {TRIGGER.NAME}'.
@@ -1342,15 +1339,15 @@ class testFormAction extends CWebTest {
 						$new_operation_opmessage_message_val = "";
 						break;
 				}
-				$this->assertEquals($this->getText('new_operation_opmessage_message'), $new_operation_opmessage_message_val);
+				$this->zbxTestAssertElementText('//textarea[@id=\'new_operation_opmessage_message\']', $new_operation_opmessage_message_val);
 				break;
 			case 'checked':
-				$this->assertNotVisible('new_operation_opmessage_subject');
-				$this->assertNotVisible('new_operation_opmessage_message');
+				$this->zbxTestAssertNotVisibleId('new_operation_opmessage_subject');
+				$this->zbxTestAssertNotVisibleId('new_operation_opmessage_message');
 				break;
 			default:
-				$this->assertElementNotPresent('new_operation_opmessage_subject');
-				$this->assertElementNotPresent('new_operation_opmessage_message');
+				$this->zbxTestAssertElementNotPresentId('new_operation_opmessage_subject');
+				$this->zbxTestAssertElementNotPresentId('new_operation_opmessage_message');
 				break;
 		}
 
@@ -1360,27 +1357,25 @@ class testFormAction extends CWebTest {
 			]);
 
 			if ($add_opcondition == null) {
-				$this->assertVisible('new_opcondition');
-				$this->assertAttribute('//input[@id=\'new_opcondition\']/@value', 'New');
+				$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='New' and contains(@onclick,'new_opcondition')]");
 			}
 			else {
 				$this->zbxTestTextPresent ('Operation condition');
-				$this->assertVisible('cancel_new_opcondition');
-				$this->assertAttribute('//input[@id=\'cancel_new_opcondition\']/@value', 'Cancel');
+				$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Cancel' and contains(@onclick,'cancel_new_opcondition')]");
 
-				$this->assertVisible('//select[@id=\'new_opcondition_conditiontype\']');
-				$this->assertAttribute('//*[@id=\'new_opcondition_conditiontype\']/option[text()=\'Event acknowledged\']/@selected', 'selected');
+				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_conditiontype\']');
+				$this->zbxTestDropdownAssertSelected('new_opcondition[conditiontype]', 'Event acknowledged');
 				$this->zbxTestDropdownHasOptions('new_opcondition_conditiontype', [
 						'Event acknowledged'
 				]);
 
-				$this->assertVisible('//select[@id=\'new_opcondition_operator\']');
+				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_operator\']');
 				$this->zbxTestDropdownHasOptions('new_opcondition_operator', [
 						'='
 				]);
 
-				$this->assertVisible('//select[@id=\'new_opcondition_value\']');
-				$this->assertAttribute('//*[@id=\'new_opcondition_value\']/option[text()=\'Not Ack\']/@selected', 'selected');
+				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_value\']');
+				$this->zbxTestDropdownAssertSelected('new_opcondition[value]', 'Not Ack');
 				$this->zbxTestDropdownHasOptions('new_opcondition_value', [
 						'Not Ack',
 						'Ack'
@@ -1388,28 +1383,28 @@ class testFormAction extends CWebTest {
 			}
 		}
 		else {
-			$this->assertElementNotPresent('new_opcondition');
-			$this->assertElementNotPresent('cancel_new_opcondition');
+			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'new_opcondition')]");
+			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'cancel_new_opcondition')]");
 
-			$this->assertElementNotPresent('//select[@id=\'new_opcondition_conditiontype\']');
-			$this->assertElementNotPresent('//select[@id=\'new_opcondition_operator\']');
-			$this->assertElementNotPresent('//select[@id=\'new_opcondition_value\']');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_conditiontype\']');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_operator\']');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_value\']');
 		}
 
 		if ($new_operation_operationtype == 'Remote command') {
 			$this->zbxTestTextPresent ([
 				'Target list', 'Target', 'Action'
 			]);
-			$this->assertVisible('//input[@value=\'New\' and @id=\'add\']');
+			$this->zbxTestAssertElementText('//button[@id=\'add\']', 'New');
 		}
 		else {
-			$this->zbxTestTextNotPresent (['Target list', 'Target']);
+			$this->zbxTestTextNotPresent (['Target list', 'Execute on']);
 		}
 
 		if ($new_operation_opcommand_type != null) {
 			$this->zbxTestTextPresent ('Type');
-			$this->assertVisible('//select[@id=\'new_operation_opcommand_type\']');
-			$this->assertAttribute('//*[@id=\'new_operation_opcommand_type\']/option[text()=\'Custom script\']/@selected', 'selected');
+			$this->zbxTestAssertVisibleXpath('//select[@id=\'new_operation_opcommand_type\']');
+			$this->zbxTestDropdownAssertSelected('new_operation[opcommand][type]', 'Custom script');
 			$this->zbxTestDropdownHasOptions('new_operation_opcommand_type', [
 					'IPMI',
 					'Custom script',
@@ -1419,25 +1414,24 @@ class testFormAction extends CWebTest {
 			]);
 		}
 		else {
-			$this->assertElementNotPresent('//select[@id=\'new_operation_opcommand_type\']');
+			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_operation_opcommand_type\']');
 		}
 
 		if ($new_operation_opcommand_type == 'Custom script') {
 			$this->zbxTestTextPresent ([
 				'Execute on', 'Zabbix agent', 'Zabbix server']
 			);
-			$this->assertVisible('//input[@id=\'new_operation_opcommand_execute_on_1\']');
-			$this->assertAttribute('//*[@id=\'new_operation_opcommand_execute_on_1\']/@checked', 'checked');
-
-			$this->assertVisible('//input[@id=\'new_operation_opcommand_execute_on_2\']');
+			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
+			$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opcommand_execute_on_0'));
+			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 		}
 		elseif ($new_operation_opcommand_type != null) {
-			$this->assertNotVisible('//input[@id=\'new_operation_opcommand_execute_on_1\']');
-			$this->assertNotVisible('//input[@id=\'new_operation_opcommand_execute_on_2\']');
+			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
+			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 		}
 		else {
-			$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_execute_on_1\']');
-			$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_execute_on_2\']');
+			$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
+			$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 		}
 
 		switch ($new_operation_opcommand_type) {
@@ -1445,51 +1439,51 @@ class testFormAction extends CWebTest {
 			case 'SSH':
 			case 'Telnet':
 				$this->zbxTestTextPresent ('Commands');
-				$this->assertVisible('//textarea[@id=\'new_operation_opcommand_command\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_command\']/@rows', 7);
+				$this->zbxTestAssertVisibleXpath('//textarea[@id=\'new_operation_opcommand_command\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_command\']', 'rows', 7);
 				break;
 			case 'IPMI':
 			case 'Global script':
-				$this->assertNotVisible('//textarea[@id=\'new_operation_opcommand_command\']');
+				$this->zbxTestAssertNotVisibleXpath('//textarea[@id=\'new_operation_opcommand_command\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//textarea[@id=\'new_operation_opcommand_command\']');
+				$this->zbxTestAssertElementNotPresentXpath('//textarea[@id=\'new_operation_opcommand_command\']');
 				break;
 		}
 
 		if ($new_operation_opcommand_type == 'IPMI') {
 			$this->zbxTestTextPresent ('Commands');
-			$this->assertVisible('//input[@id=\'opcommand_command_ipmi\']');
-			$this->assertAttribute('//*[@id=\'opcommand_command_ipmi\']/@maxlength', 255);
-			$this->assertAttribute('//*[@id=\'opcommand_command_ipmi\']/@size', 50);
-			$this->assertEquals($this->getValue('//input[@id=\'opcommand_command_ipmi\']'), "");
+			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_command_ipmi\']');
+			$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_command_ipmi\']', 'maxlength', 255);
+			$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_command_ipmi\']', 'size', 20);
+			$this->zbxTestAssertElementValue('new_operation_opcommand_command_ipmi', '');
 		}
 		elseif ($new_operation_opcommand_type != null) {
-			$this->assertNotVisible('//input[@id=\'opcommand_command_ipmi\']');
+			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_command_ipmi\']');
 		}
 		else {
-			$this->assertElementNotPresent('//input[@id=\'opcommand_command_ipmi\']');
+			$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_command_ipmi\']');
 		}
 
 		switch ($new_operation_opcommand_type) {
 			case 'SSH':
 				$this->zbxTestTextPresent ('Authentication method');
-				$this->assertVisible('//select[@id=\'new_operation_opcommand_authtype\']');
+				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_operation_opcommand_authtype\']');
 				$this->zbxTestDropdownHasOptions('new_operation_opcommand_authtype', [
 						'Password',
 						'Public key'
 				]);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_authtype\']/option[text()=\'Password\']/@selected', 'selected');
+				$this->zbxTestDropdownAssertSelected('new_operation[opcommand][authtype]', 'Password');
 				break;
 			case 'IPMI':
 			case 'Custom script':
 			case 'Telnet':
 			case 'Global script':
-				$this->assertElementPresent('//*[@class=\'class_authentication_method hidden\']');
+				$this->zbxTestAssertNotVisibleXpath('//select[@id=\'new_operation_opcommand_authtype\']');
 				break;
 			default:
 				$this->zbxTestTextNotPresent ('Authentication method');
-				$this->assertElementNotPresent('//select[@id=\'new_operation_opcommand_authtype\']');
+				$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_operation_opcommand_authtype\']');
 				break;
 		}
 
@@ -1497,70 +1491,69 @@ class testFormAction extends CWebTest {
 			case 'SSH':
 			case 'Telnet':
 				$this->zbxTestTextPresent ('User name');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_username\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_username\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_username\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_username\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_username\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_username\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_username\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_username', '');
 				break;
 			case 'IPMI':
 			case 'Custom script':
 			case 'Global script':
-				$this->assertElementPresent('//*[@class=\'class_authentication_username hidden indent_both\']');
+				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_username\']');
 				break;
 			default:
 				$this->zbxTestTextNotPresent ('User name');
-				$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_username\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_username\']');
 				break;
 		}
 
 		switch ($new_operation_opcommand_authtype) {
 			case 'Password':
 				$this->zbxTestTextPresent ('Password');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_password\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_password\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_password\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_password\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_password\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_password\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_password\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_password', '');
 
-				$this->assertElementPresent('//input[@id=\'new_operation_opcommand_passphrase\']/@disabled');
+				$this->zbxTestAssertNotVisibleId('new_operation_opcommand_passphrase');
 
-				$this->assertElementPresent('//input[@id=\'new_operation_opcommand_publickey\']/@disabled');
-				$this->assertElementPresent('//input[@id=\'new_operation_opcommand_privatekey\']/@disabled');
+				$this->zbxTestAssertNotVisibleId('new_operation_opcommand_publickey');
+				$this->zbxTestAssertNotVisibleId('new_operation_opcommand_privatekey');
 				break;
 			case 'Public key':
 				$this->zbxTestTextPresent ('Key passphrase');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_passphrase\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_passphrase\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_passphrase\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_passphrase\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_passphrase\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_passphrase\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_passphrase\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_passphrase', '');
 
-				$this->assertElementPresent('//input[@id=\'new_operation_opcommand_password\']/@disabled');
+				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_password\']');
 
 				$this->zbxTestTextPresent ('Public key file');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_publickey\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_publickey\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_publickey\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_publickey\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_publickey\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_publickey\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_publickey\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_publickey', '');
 
 				$this->zbxTestTextPresent ('Private key file');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_privatekey\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_privatekey\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_privatekey\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_privatekey\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_privatekey\']');
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_privatekey\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_privatekey\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_privatekey', '');
 				break;
 			default:
 				if ($new_operation_opcommand_type != null) {
-					$this->assertElementPresent('//input[@id=\'new_operation_opcommand_publickey\']/@disabled');
-					$this->assertElementPresent('//input[@id=\'new_operation_opcommand_privatekey\']/@disabled');
+					$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_publickey\']');
+					$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_privatekey\']');
 
-					$this->assertElementPresent('//input[@id=\'new_operation_opcommand_passphrase\']/@disabled');
-					$this->assertElementPresent('//input[@id=\'new_operation_opcommand_password\']/@disabled');
+					$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_passphrase\']');
 				}
 				else {
-					$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_password\']');
-					$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_passphrase\']');
+					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_password\']');
+					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_passphrase\']');
 
-					$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_publickey\']');
-					$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_privatekey\']');
+					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_publickey\']');
+					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_privatekey\']');
 				}
 				break;
 		}
@@ -1569,69 +1562,66 @@ class testFormAction extends CWebTest {
 			case 'SSH':
 			case 'Telnet':
 				$this->zbxTestTextPresent ('Port');
-				$this->assertVisible('//input[@id=\'new_operation_opcommand_port\']');
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_port\']/@maxlength', 255);
-				$this->assertAttribute('//*[@id=\'new_operation_opcommand_port\']/@size', 25);
-				$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_port\']'), "");
+				$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_port\']');
+				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opcommand_port\']', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opcommand_port\']', 'size', 20);
+				$this->zbxTestAssertElementValue('new_operation_opcommand_port', '');
 				break;
 			case 'IPMI':
 			case 'Custom script':
 			case 'Global script':
-				$this->assertElementPresent('//*[@class=\'class_opcommand_port hidden indent_both\']');
+				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_port\']');
 				break;
 			default:
-				$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_port\']');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_port\']');
 				break;
 		}
 
 		if ($new_operation_opcommand_type == 'Global script') {
-			$this->assertVisible('//input[@id=\'new_operation_opcommand_script\']');
-			$this->assertAttribute('//*[@id=\'new_operation_opcommand_script\']/@maxlength', 255);
-			$this->assertAttribute('//*[@id=\'new_operation_opcommand_script\']/@size',32);
-			$this->assertAttribute('//*[@id=\'new_operation_opcommand_script\']/@readonly', 'readonly');
-			$this->assertEquals($this->getValue('//input[@id=\'new_operation_opcommand_script\']'), "");
+			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_script\']');
+			$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_script\']', 'maxlength', 255);
+			$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_script\']', 'size', 20);
+			$this->zbxTestAssertAttribute('//*[@id=\'new_operation_opcommand_script\']', 'readonly');
+			$this->zbxTestAssertElementValue('new_operation_opcommand_script', '');
 		}
 		elseif ($new_operation_operationtype == 'Remote command') {
-			$this->assertNotVisible('//input[@id=\'new_operation_opcommand_script\']');
+			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_script\']');
 		}
 		else {
-			$this->assertElementNotPresent('//input[@id=\'new_operation_opcommand_script\']');
+			$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_operation_opcommand_script\']');
 		}
 
 		switch ($new_operation_operationtype) {
 			case 'Add to host group':
 			case 'Remove from host group':
-				$this->assertVisible('//div[@id=\'discoveryHostGroup\']/input');
-				$this->assertElementNotPresent('//div[@id=\'discoveryTemplates\']/input');
+				$this->zbxTestAssertVisibleXpath('//div[@id=\'new_operation_groupids_\']/input');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_operation_templateids_\']/input');
 				break;
 			case 'Link to template':
 			case 'Unlink from template':
-				$this->assertVisible('//div[@id=\'discoveryTemplates\']/input');
-				$this->assertElementNotPresent('//div[@id=\'discoveryHostGroup\']/input');
+				$this->zbxTestAssertVisibleXpath('//div[@id=\'new_operation_templateids_\']/input');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_operation_groupids_\']/input');
 				break;
 			default:
-				$this->assertElementNotPresent('//div[@id=\'discoveryHostGroup\']/input');
-				$this->assertElementNotPresent('//div[@id=\'discoveryTemplates\']/input');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_operation_groupids_\']/input');
+				$this->zbxTestAssertElementNotPresentXpath('//div[@id=\'new_operation_templateids_\']/input');
 				break;
 		}
 
 		if ($new_operation_operationtype != null) {
-			$this->assertVisible('add_operation');
-			$this->assertAttribute('//input[@id=\'add_operation\']/@value', 'Add');
-
-			$this->assertVisible('cancel_new_operation');
-			$this->assertAttribute('//input[@id=\'cancel_new_operation\']/@value', 'Cancel');
+			$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Add' and contains(@onclick,'add_operation')]");
+			$this->zbxTestAssertVisibleXpath("//ul[@id='operationlist']//button[text()='Cancel' and contains(@onclick,'cancel_new_operation')]");
 		}
 		else {
-			$this->assertElementNotPresent('add_operation');
-			$this->assertElementNotPresent('cancel_new_operation');
+			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'add_operation')]");
+			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='operationlist']//button[contains(@onclick,'cancel_new_operation')]");
 		}
 
-		$this->assertVisible('update');
-		$this->assertAttribute('//input[@id=\'update\']/@value', 'Update');
+		$this->zbxTestAssertVisibleId('add');
+		$this->zbxTestAssertAttribute("//button[@id='add' and @type='submit']", 'value', 'Add');
 
-		$this->assertVisible('cancel');
-		$this->assertAttribute('//input[@id=\'cancel\']/@value', 'Cancel');
+		$this->zbxTestAssertVisibleId('cancel');
+		$this->zbxTestAssertAttribute('//button[@id=\'cancel\']', 'name', 'cancel');
 	}
 
 	public static function update() {
@@ -1665,19 +1655,19 @@ class testFormAction extends CWebTest {
 				break;
 		}
 
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent([
 				'Action updated',
-				'CONFIGURATION OF ACTIONS',
 				'Actions',
 				$name
 		]);
 
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
-
 
 	public static function create() {
 		return [
@@ -1721,7 +1711,7 @@ class testFormAction extends CWebTest {
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
 				'errors' => [
-						'ERROR: Page received incorrect data',
+						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
 				]
@@ -1756,7 +1746,7 @@ class testFormAction extends CWebTest {
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
 				'errors' => [
-						'ERROR: Page received incorrect data',
+						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
 				]
@@ -1791,7 +1781,7 @@ class testFormAction extends CWebTest {
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
 				'errors' => [
-						'ERROR: Page received incorrect data',
+						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
 				]
@@ -1828,7 +1818,7 @@ class testFormAction extends CWebTest {
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
 				'errors' => [
-						'ERROR: Page received incorrect data',
+						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
 				]
@@ -1842,21 +1832,31 @@ class testFormAction extends CWebTest {
 	public function testFormAction_SimpleCreate($data) {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource='.$data['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
 
 		if (isset($data['name'])){
-			$this->input_type('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
+			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 
 		if (isset($data['def_shortdata'])){
-			$this->input_type('def_shortdata', $data['def_shortdata']);
+			$this->zbxTestInputTypeOverwrite('def_shortdata', $data['def_shortdata']);
+			$this->zbxTestAssertElementValue('def_shortdata', $data['def_shortdata']);
 		}
 
 		if (isset($data['def_longdata'])){
-			$this->input_type('def_longdata', $data['def_longdata']);
+			$this->zbxTestInputTypeOverwrite('def_longdata', $data['def_longdata']);
+			$this->zbxTestAssertElementValue('def_longdata', $data['def_longdata']);
+		}
+
+		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+			$conditionCount = 2;
+		} else {
+			$conditionCount = 0;
 		}
 
 		if (isset($data['conditions'])) {
-			$this->zbxTestClick('link=Conditions');
+			$this->zbxTestTabSwitch('Conditions');
 			foreach ($data['conditions'] as $condition) {
 				$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $condition['type']);
 				switch ($condition['type']) {
@@ -1864,20 +1864,24 @@ class testFormAction extends CWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-						$this->input_type('new_condition_value', $condition['value']);
-						$this->zbxTestClickWait('add_condition');
+						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
+						$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
 						switch($condition['type']){
 							case 'Application':
-								$this->zbxTestTextPresent('Application = '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Host name':
-								$this->zbxTestTextPresent('Host name like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host name like '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Host metadata':
-								$this->zbxTestTextPresent('Host metadata like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata like '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Trigger name':
-								$this->zbxTestTextPresent('Trigger name like '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name like '.$condition['value']);
+								$conditionCount++;
 								break;
 						}
 						break;
@@ -1885,16 +1889,19 @@ class testFormAction extends CWebTest {
 					case 'Service type':
 					case 'Event type':
 						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestClickWait('add_condition');
+						$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
 						switch($condition['type']){
 							case 'Trigger severity':
-								$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Service type':
-								$this->zbxTestTextPresent('Service type = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Service type = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Event type':
-								$this->zbxTestTextPresent('Event type = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Event type = '.$condition['value']);
+								$conditionCount++;
 								break;
 						}
 						break;
@@ -1903,64 +1910,63 @@ class testFormAction extends CWebTest {
 		}
 
 		if (isset($data['operations'])) {
-			$this->zbxTestClick('link=Operations');
+			$this->zbxTestTabSwitch('Operations');
 			foreach ($data['operations'] as $operation) {
-				$this->zbxTestClickWait('new_operation');
+				$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'add_operation')]"));
 			if ($data['eventsource']!= EVENT_SOURCE_INTERNAL){
 				$this->zbxTestDropdownSelectWait('new_operation_operationtype', $operation['type']);
 			}
 				switch ($operation['type']) {
 					case 'Send message':
-						sleep(1);
-
-						$this->zbxTestLaunchPopup('addusrgrpbtn');
-						$this->zbxTestClick('all_usrgrps');
+						$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
+						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+						$this->zbxTestClickWait('all_usrgrps');
 						$this->zbxTestClick('select');
-						$this->selectWindow('null');
+						$this->zbxTestWaitWindowClose();
 
-						sleep(1);
-
-						$this->zbxTestLaunchPopup('adduserbtn');
-						$this->zbxTestClick('all_users');
+						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
+						$this->zbxTestSwitchToNewWindow();
+						$this->zbxTestClickWait('all_users');
 						$this->zbxTestClick('select');
-						$this->selectWindow('null');
+						$this->zbxTestWaitWindowClose();
 
-						$this->select('new_operation_opmessage_mediatypeid', $operation['media']);
+						$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', $operation['media']);
 						break;
 					case 'Remote command':
-						$this->zbxTestClick('add');
-						$this->zbxTestClick("//input[@name='add']");
-						$this->type('new_operation_opcommand_command', $operation['command']);
-						break;
-					case 'Remote command':
-						$this->zbxTestClick('add');
+						$this->zbxTestClickXpathWait('//tr[@id="opCmdListFooter"]//button[@id="add"]');
+						$this->zbxTestClickXpathWait('//*[@id="opcmdEditForm"]//button[@id="save"]');
+						$this->zbxTestInputType('new_operation_opcommand_command', $operation['command']);
 						break;
 				}
-				$this->zbxTestClickWait('add_operation');
+				$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
 		}
 
 		if (isset($data['esc_period'])){
-			$this->input_type('esc_period', $data['esc_period']);
-			$this->wait();
+			$this->zbxTestTabSwitch('Operations');
+			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
+			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
+			$this->zbxTestClickWait('search');
 		}
-
-		sleep(1);
-		$this->zbxTestClick('search');
-		sleep(1);
 
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
-				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
-				$this->zbxTestTextPresent('Action added');
+				$this->zbxTestCheckHeader('Actions');
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
+				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
+				$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
 				break;
 
 			case ACTION_BAD:
 				$this->zbxTestCheckTitle('Configuration of actions');
-				$this->zbxTestTextPresent('CONFIGURATION OF ACTIONS');
+				$this->zbxTestCheckHeader('Actions');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
@@ -1970,114 +1976,122 @@ class testFormAction extends CWebTest {
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->type("name", "action test");
-		$this->type("def_shortdata", "subject");
-		$this->type("def_longdata", "message");
+		$this->zbxTestInputTypeWait('name', 'action test');
+		$this->zbxTestInputType('def_shortdata', 'subject');
+		$this->zbxTestInputType('def_longdata', 'message');
 
 // adding conditions
-		$this->zbxTestClick('link=Conditions');
-		$this->type("new_condition_value", "trigger");
-		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Trigger name like trigger");
+		$this->zbxTestTabSwitch('Conditions');
+		$this->zbxTestInputTypeWait('new_condition_value', 'trigger');
+		$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Trigger name like trigger');
 
-		$this->select("new_condition_conditiontype", "label=Trigger severity");
-		$this->wait();
-		$this->select("new_condition_value", "label=Average");
-		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Trigger severity = Average");
+		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Trigger severity');
+		$this->zbxTestDropdownSelect('new_condition_value', 'Average');
+		$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_3']/td[2]", 'Trigger severity = Average');
 
-		$this->select("new_condition_conditiontype", "label=Application");
-		$this->wait();
-		$this->type("new_condition_value", "app");
-		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Application = app");
+		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Application');
+		$this->zbxTestInputTypeWait('new_condition_value', 'app');
+		$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
+		$this->zbxTestAssertElementText("//tr[@id='conditions_4']/td[2]", 'Application = app');
 
 // adding operations
-		$this->zbxTestClick('link=Operations');
-		$this->zbxTestClickWait('new_operation');
-		sleep(1);
-		$this->zbxTestLaunchPopup('addusrgrpbtn');
-		$this->zbxTestClick('usrgrps_7');
-		$this->zbxTestClick('usrgrps_11');
+		$this->zbxTestTabSwitch('Operations');
+				$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
+		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickWait('usrgrps_7');
+		$this->zbxTestClickWait('usrgrps_11');
 		$this->zbxTestClick('select');
-		$this->selectWindow('null');
-		sleep(1);
-		$this->zbxTestLaunchPopup('adduserbtn');
-		$this->zbxTestClick("users_'1'");
+		$this->zbxTestWaitWindowClose();
+
+		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickWait('users_1');
 		$this->zbxTestClick('select');
-		$this->selectWindow('null');
-		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
-		$this->zbxTestClickWait('add_operation');
-		$this->zbxTestTextPresent("Send message to users: Admin (Zabbix Administrator) via Jabber");
-		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
-		$this->zbxTestClickWait('new_operation');
-		$this->select("new_operation_operationtype", "label=Remote command");
-		$this->wait();
+		$this->zbxTestWaitWindowClose();
+
+		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'add_operation')]"));
+		$this->zbxTestDropdownSelectWait('new_operation_operationtype', 'Remote command');
+
 // add target current host
-		$this->zbxTestClick('add');
-		$this->zbxTestClick("//input[@name='add']");
+		$this->zbxTestClickXpathWait('//tr[@id="opCmdListFooter"]//button[@id="add"]');
+		$this->zbxTestClickXpathWait('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
 // add target host Zabbix server
-		$this->zbxTestClick('add');
-		sleep(1);
-		$this->select("opCmdTarget", "label=Host");
+		$this->zbxTestClickXpath('//tr[@id="opCmdListFooter"]//button[@id="add"]');
+		$this->zbxTestDropdownSelect('opCmdTarget', 'Host');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
-		sleep(1);
-		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
-		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClick("//input[@name='add']");
+		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		sleep(1);
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait('Simple form test host');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
+
 // add target group Zabbix servers
-		$this->zbxTestClick('add');
-		sleep(1);
-		$this->select("opCmdTarget", "label=Host group");
+		$this->zbxTestClickXpath('//tr[@id="opCmdListFooter"]//button[@id="add"]');
+		$this->zbxTestDropdownSelect('opCmdTarget', 'Host group');
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
-		sleep(1);
-		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
-		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClick("//input[@name='add']");
+		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		sleep(1);
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
 
-		$this->type("new_operation_opcommand_command", "command");
-		$this->zbxTestClickWait('add_operation');
-		$this->zbxTestTextPresent('Send message to users: Admin (Zabbix Administrator) via Jabber');
-		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
-		$this->zbxTestTextPresent("Run remote commands on current host");
-		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');
-		$this->zbxTestTextPresent('Run remote commands on host groups: Zabbix servers');
+		$this->zbxTestInputType('new_operation_opcommand_command', 'command');
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
+			"Run remote commands on current host ".
+			"Run remote commands on hosts: Simple form test host ".
+			"Run remote commands on host groups: Zabbix servers");
 
-		$this->zbxTestClickWait('new_operation');
-		$this->type("new_operation_esc_step_to", "2");
-		$this->select("new_operation_operationtype", "label=Remote command");
-		$this->wait();
-		$this->zbxTestClick('add');
-		$this->zbxTestClick("//input[@name='add']");
-		$this->select("new_operation_opcommand_type", "label=SSH");
-		$this->type("new_operation_opcommand_username", "user");
-		$this->type("new_operation_opcommand_password", "pass");
-		$this->type("new_operation_opcommand_port", "123");
-		$this->type("new_operation_opcommand_command", "command ssh");
-		$this->zbxTestClickWait('add_operation');
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'add_operation')]"));
+		$this->zbxTestInputTypeOverwrite('new_operation_esc_step_to', '2');
+		$this->zbxTestDropdownSelectWait('new_operation_operationtype', 'Remote command');
+		$this->zbxTestClickXpath('//tr[@id="opCmdListFooter"]//button[@id="add"]');
+		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
+		$this->zbxTestDropdownSelect('new_operation_opcommand_type', 'SSH');
+		$this->zbxTestInputTypeWait('new_operation_opcommand_username', 'user');
+		$this->zbxTestInputType('new_operation_opcommand_password', 'pass');
+		$this->zbxTestInputType('new_operation_opcommand_port', '123');
+		$this->zbxTestInputType('new_operation_opcommand_command', 'command ssh');
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
+			"Run remote commands on current host ".
+			"Run remote commands on hosts: Simple form test host ".
+			"Run remote commands on host groups: Zabbix servers");
+		$this->zbxTestAssertElementText("//tr[@id='operations_2']//span",
+			"Run remote commands on current host");
+		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
-		$this->zbxTestTextPresent('Send message to users: Admin (Zabbix Administrator) via Jabber');
-		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
-		$this->zbxTestTextPresent("Run remote commands on current host");
-		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');
-		$this->zbxTestTextPresent('Run remote commands on host groups: Zabbix servers');
-
-		$this->type("esc_period", "123");
-		sleep(1);
-		$this->type('new_condition_value', '');
-		sleep(1);
+		$this->zbxTestInputTypeOverwrite('esc_period', '123');
+		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Action added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
+
+		$sql = "SELECT actionid FROM actions WHERE name='action test'";
+		$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
 	}
 
 	public function testFormAction_Teardown() {

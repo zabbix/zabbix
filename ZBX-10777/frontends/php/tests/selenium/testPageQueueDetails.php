@@ -23,11 +23,12 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageQueueDetails extends CWebTest {
 	public function testPageQueueDetails_CheckLayout() {
 		$this->zbxTestLogin('queue.php?config=2');
-		$this->zbxTestCheckTitle('Queue \[refreshed every 30 sec.\]');
-		$this->zbxTestTextPresent('Queue');
-		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
-		// Header
-		$this->zbxTestTextPresent(['Next check', 'Delayed by', 'Host', 'Name']);
+		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
+		$this->zbxTestTextNotPresent('Cannot display item queue.');
+		$this->zbxTestCheckHeader('Queue of items to be updated');
+		$this->zbxTestDropdownSelectWait('config', 'Details');
+		$this->zbxTestDropdownHasOptions('config', ['Overview', 'Overview by proxy', 'Details']);
+		$this->zbxTestTextPresent(['Scheduled check', 'Delayed by', 'Host', 'Name']);
 		$this->zbxTestTextPresent('Total:');
 	}
 

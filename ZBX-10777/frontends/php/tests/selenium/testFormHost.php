@@ -21,24 +21,29 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormHost extends CWebTest {
-	public $host = "Test host 001";
-	public $host_tmp = "Test host 001A";
-	public $host_tmp_visible = "Test host 001A (visible)";
-	public $host_cloned = "Test host 001 cloned";
-	public $host_cloned_visible = "Test host 001 cloned (visible)";
-	public $host_fullcloned = "Test host 001 full cloned";
-	public $host_fullcloned_visible = "Test host 001 full cloned (visible)";
+	public $host = 'Test host 001';
+	public $host_tmp = 'Test host 001A';
+	public $host_tmp_visible = 'Test host 001A (visible)';
+	public $host_cloned = 'Test host 001 cloned';
+	public $host_cloned_visible = 'Test host 001 cloned (visible)';
+	public $host_fullcloned = 'Test host 001 full cloned';
+	public $host_fullcloned_visible = 'Test host 001 full cloned (visible)';
+	public $host_for_template = 'Visible host for template linkage';
+
+	public function testFormHost_backup() {
+		DBsave_tables('hosts');
+	}
 
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
 
-		$this->zbxTestClick('link=Host inventory');
+		$this->zbxTestTabSwitch('Host inventory');
 
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_toHash($inventoryFields, 'db_field');
 		foreach ($inventoryFields as $fieldId => $fieldName) {
 			$this->zbxTestTextPresent($fieldName['title']);
-			$this->assertElementPresent('host_inventory['.$fieldId.']');
+			$this->zbxTestAssertElementPresentId('host_inventory_'.$fieldId.'');
 		}
 	}
 
@@ -46,11 +51,14 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $this->host);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeWait('host', $this->host);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
 		$this->zbxTestTextPresent($this->host);
+
+		$sql = "SELECT * FROM hosts WHERE host='$this->host'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_CreateLongHostName() {
@@ -59,20 +67,23 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeWait('host', $host);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
 		$this->zbxTestTextPresent($host);
+
+		$sql = "SELECT * FROM hosts WHERE host='$host'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_SimpleUpdate() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($this->host);
 	}
 
@@ -81,16 +92,17 @@ class testFormHost extends CWebTest {
 	 */
 	public function testFormHost_AddMacros() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClick('tab_macroTab');
-		$this->input_type('macros_0_macro', '{$TEST_MACRO}');
-		$this->input_type('macros_0_value', '1');
+		$this->zbxTestClickLinkTextWait($this->host);
+		$this->zbxTestTabSwitch('Macros');
+		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
+		$this->zbxTestInputType('macros_0_value', '1');
 		$this->zbxTestClick('macro_add');
-		$this->verifyElementPresent('macros_1_macro');
-		$this->input_type('macros_1_macro', '{$TEST_MACRO2}');
-		$this->input_type('macros_1_value', '2');
-		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestAssertElementPresentId('macros_1_macro');
+		$this->zbxTestInputTypeWait('macros_1_macro', '{$TEST_MACRO2}');
+		$this->zbxTestInputType('macros_1_value', '2');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestTextPresent($this->host);
 	}
 
 	public function testFormHost_CreateHostNoGroups() {
@@ -102,12 +114,12 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
+		$this->zbxTestInputTypeWait('host', $host);
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('ERROR: Cannot add host');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
 		$this->zbxTestTextPresent('No groups for host "'.$host.'".');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
@@ -122,11 +134,11 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeWait('host', $host);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('ERROR: Cannot add host');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
 		$this->zbxTestTextPresent('Host with the same name "'.$host.'" already exists.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
@@ -142,83 +154,87 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
-		$this->input_type('visiblename', $hostVisible);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeWait('host', $host);
+		$this->zbxTestInputType('visiblename', $hostVisible);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('ERROR: Cannot add host');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
 		$this->zbxTestTextPresent('Host with the same visible name "'.$hostVisible.'" already exists.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
 
 	public function testFormHost_CloneHost() {
-		// Clone Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('clone');
-		$this->input_type('host', $this->host_cloned);
-		$this->input_type('visiblename', $this->host_cloned_visible);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeOverwrite('host', $this->host_cloned);
+		$this->zbxTestInputType('visiblename', $this->host_cloned_visible);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
+		$this->zbxTestTextPresent($this->host_cloned_visible);
+
+		$sql = "SELECT * FROM hosts WHERE host='$this->host_cloned'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_DeleteClonedHost() {
-		$this->chooseOkOnNextConfirmation();
-
-		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host_cloned_visible);
+		$this->zbxTestClickLinkTextWait($this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
+
+		$sql = "SELECT * FROM hosts WHERE host='$this->host_cloned'";
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public function testFormHost_FullCloneHost() {
-		// Full clone Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('full_clone');
-		$this->input_type('host', $this->host_fullcloned);
-		$this->input_type('visiblename', $this->host_fullcloned_visible);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputTypeOverwrite('host', $this->host_fullcloned);
+		$this->zbxTestInputType('visiblename', $this->host_fullcloned_visible);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
+		$this->zbxTestTextPresent($this->host_fullcloned_visible);
+
+		$sql = "SELECT * FROM hosts WHERE host='$this->host_fullcloned'";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_DeleteFullClonedHost() {
-		$this->chooseOkOnNextConfirmation();
-
-		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host_fullcloned_visible);
+		$this->zbxTestClickLinkTextWait($this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
+
+		$sql = "SELECT * FROM hosts WHERE host='$this->host_fullcloned'";
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public function testFormHost_UpdateHostName() {
-		// Update Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->input_type('host', $this->host_tmp);
+		$this->zbxTestClickLinkTextWait($this->host);
+		$this->zbxTestInputTypeOverwrite('host', $this->host_tmp);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestTextPresent($this->host_tmp);
 	}
 
 	public function testFormHost_Delete() {
-		$this->chooseOkOnNextConfirmation();
-
 		// save the ID of the host
 		$host = DBfetch(DBSelect("select hostid from hosts where host='".$this->host_tmp."'"));
 		$hostid=$host['hostid'];
@@ -226,11 +242,11 @@ class testFormHost extends CWebTest {
 		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$this->host_tmp);
+		$this->zbxTestClickLinkTextWait($this->host_tmp);
 		$this->zbxTestClickWait('delete');
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
 		// check if all records have been deleted
 		$tables=['hosts','items','applications','interface','hostmacro','hosts_groups','hosts_templates','maintenances_hosts','host_inventory'];
@@ -243,19 +259,21 @@ class testFormHost extends CWebTest {
 	public function testFormHost_TemplateLink() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link=Visible host for template linkage');
+		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$this->zbxTestClick('tab_templateTab');
-		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestTabSwitch('Templates');
+		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClick('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
 	public function testFormHost_TemplateUnlink() {
@@ -263,7 +281,6 @@ class testFormHost extends CWebTest {
 
 		$template = 'Template OS Linux';
 		$host = 'Template linkage test host';
-		$name = 'Visible host for template linkage';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		$this->assertEquals(1, DBcount($sql));
@@ -277,17 +294,17 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
+		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink" next to a template by name
-		$this->zbxTestClickWait('unlink_'.$hostid2);
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink[".$hostid2."]') and text()='Unlink']");
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
@@ -305,36 +322,28 @@ class testFormHost extends CWebTest {
 	public function testFormHost_TemplateLinkUpdate() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link=Visible host for template linkage');
+		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$this->zbxTestClick('tab_templateTab');
-		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestTabSwitch('Templates');
+		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
 	public function testFormHost_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
 		$template = 'Template OS Linux';
-		$name = 'Visible host for template linkage';
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
-		$this->zbxTestTextPresent($template);
-
-		$template = 'Template OS Linux';
 		$host = 'Template linkage test host';
-		$name = 'Visible host for template linkage';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		$this->assertEquals(1, DBcount($sql));
@@ -348,16 +357,30 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClick('tab_templateTab');
+		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestTextPresent($template);
 
-		// clicks button named "Unlink" next to a template by name
-		$this->zbxTestClickWait('unlink_and_clear_'.$hostid2);
+		// clicks button named "Unlink and clear" next to a template by name
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink_and_clear[".$hostid2."]') and text()='Unlink and clear']");
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+
+		$this->zbxTestHrefClickWait('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestTextNotPresent($template.':');
+
+		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
+		$this->zbxTestTextNotPresent($template.':');
+		$this->zbxTestHrefClickWait('graphs.php?hostid='.$hostid);
+		$this->zbxTestTextNotPresent($template.':');
+		$this->zbxTestHrefClickWait('applications.php?hostid='.$hostid);
+		$this->zbxTestTextNotPresent($template.':');
+	}
+
+	public function testFormHost_restore() {
+		DBrestore_tables('hosts');
 	}
 }

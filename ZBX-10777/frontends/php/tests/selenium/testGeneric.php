@@ -26,28 +26,30 @@ class testGeneric extends CWebTest {
 		return [
 			// monitoring
 			['zabbix.php?action=dashboard.view',					'Dashboard'],
+
 			['dashconf.php',					'Dashboard configuration'],
 
-			['overview.php',												'Overview \[refreshed every 30 sec.\]'],
-			['overview.php?form_refresh=1&groupid=0&type=0&view_style=0',	'Overview \[refreshed every 30 sec.\]'],
-			['overview.php?form_refresh=1&groupid=0&type=0&view_style=1',	'Overview \[refreshed every 30 sec.\]'],
-			['overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview \[refreshed every 30 sec.\]'],
-			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview \[refreshed every 30 sec.\]'],
+			['overview.php',												'Overview [refreshed every 30 sec.]'],
+			['overview.php?form_refresh=1&groupid=0&type=0&view_style=0',	'Overview [refreshed every 30 sec.]'],
 
-			['zabbix.php?action=web.view',					'Status of Web monitoring \[refreshed every 30 sec.\]'],
-			['latest.php',						'Latest data \[refreshed every 30 sec.\]'],
-			['tr_status.php',					'Status of triggers \[refreshed every 30 sec.\]'],
+			['overview.php?form_refresh=1&groupid=0&type=0&view_style=1',	'Overview [refreshed every 30 sec.]'],
+			['overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview [refreshed every 30 sec.]'],
+			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview [refreshed every 30 sec.]'],
 
-			['events.php',						'Latest events \[refreshed every 30 sec.\]'],
-			['events.php?source=0',			'Latest events \[refreshed every 30 sec.\]'],
-			['events.php?source=1',			'Latest events \[refreshed every 30 sec.\]'],
+			['zabbix.php?action=web.view',					'Web monitoring'],
+			['latest.php',						'Latest data [refreshed every 30 sec.]'],
+			['tr_status.php',					'Status of triggers [refreshed every 30 sec.]'],
 
-			['charts.php',						'Custom graphs \[refreshed every 30 sec.\]'],
-			['screens.php',					'Custom screens \[refreshed every 30 sec.\]'],
-			['slides.php',						'Custom slides \[refreshed every 30 sec.\]'],
-			['zabbix.php?action=map.view',							'Network maps \[refreshed every 30 sec.\]'],
+			['events.php',						'Latest events [refreshed every 30 sec.]'],
+			['events.php?source=0',			'Latest events [refreshed every 30 sec.]'],
+			['events.php?source=1',			'Latest events [refreshed every 30 sec.]'],
+
+			['charts.php',						'Custom graphs [refreshed every 30 sec.]'],
+			['screens.php',					'Configuration of screens'],
+			['slides.php',						'Configuration of slide shows'],
+			['zabbix.php?action=map.view',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.view',					'Status of discovery'],
-			['srv_status.php',					'IT services \[refreshed every 30 sec.\]'],
+			['srv_status.php',					'IT services [refreshed every 30 sec.]'],
 
 			// inventory
 			['hostinventoriesoverview.php',	'Host inventory overview'],
@@ -105,10 +107,10 @@ class testGeneric extends CWebTest {
 			['auditlogs.php',					'Audit log'],
 			['auditacts.php',					'Action log'],
 
-			['queue.php',						'Queue \[refreshed every 30 sec.\]'],
-			['queue.php?config=0',				'Queue \[refreshed every 30 sec.\]'],
-			['queue.php?config=1',				'Queue \[refreshed every 30 sec.\]'],
-			['queue.php?config=2',				'Queue \[refreshed every 30 sec.\]'],
+			['queue.php',						'Queue [refreshed every 30 sec.]'],
+			['queue.php?config=0',				'Queue [refreshed every 30 sec.]'],
+			['queue.php?config=1',				'Queue [refreshed every 30 sec.]'],
+			['queue.php?config=2',				'Queue [refreshed every 30 sec.]'],
 
 			['report4.php',					'Notification report'],
 			['report4.php?period=daily',		'Notification report'],

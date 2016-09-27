@@ -25,30 +25,31 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 	public static function WorkingTime() {
 		return DBdata('SELECT work_period FROM config ORDER BY configid');
 	}
+
 	/**
 	* @dataProvider WorkingTime
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
 
 		$this->zbxTestLogin('adm.workingtime.php');
-		$this->assertElementPresent('configDropDown');
+		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
-		$this->zbxTestTextPresent(['CONFIGURATION OF WORKING TIME', 'Working time', 'Working time']);
-		$this->assertElementPresent('work_period');
-		$this->assertAttribute("//input[@id='work_period']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='work_period']/@size", '50');
-		$this->assertAttribute("//input[@id='work_period']/@value", $WorkingTime['work_period']);
+		$this->zbxTestCheckHeader('Working time');
+		$this->zbxTestAssertElementPresentId('work_period');
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "size", 20);
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
 
 	}
 
 	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod() {
 
 		$this->zbxTestLogin('adm.workingtime.php');
-		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
-		$this->zbxTestTextPresent(['CONFIGURATION OF WORKING TIME', 'Working time']);
+		$this->zbxTestCheckHeader('Working time');
+		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
 
 		$sqlHash = 'SELECT configid,refresh_unsupported,alert_usrgrpid,'.
 				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
@@ -62,7 +63,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 				' FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
 
-		$this->input_type('work_period', '1-7,09:00-20:00');
+		$this->zbxTestInputType('work_period', '1-7,09:00-20:00');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
@@ -74,21 +75,20 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$newHash=DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 
-		// checking also for the following error: ERROR: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
+		// checking also for the following error: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
-		$this->zbxTestTextPresent('CONFIGURATION OF WORKING TIME');
-		$this->zbxTestTextPresent('Working time');
-		$this->input_type('work_period', '1-8,09:00-25:00');
+		$this->zbxTestCheckHeader('Working time');
+		$this->zbxTestInputType('work_period', '1-8,09:00-25:00');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['ERROR: Cannot update configuration', 'Incorrect working time.']);
+		$this->zbxTestTextPresent(['Page received incorrect data', 'Field "Working time" is not correct: Incorrect time period "1-8,09:00-25:00".']);
 
 		// trying to save empty work period
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
-		$this->zbxTestTextPresent(['CONFIGURATION OF WORKING TIME', 'Working time']);
-		$this->input_type('work_period', '');
+		$this->zbxTestCheckHeader('Working time');
+		$this->zbxTestInputType('work_period', '');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['ERROR: Cannot update configuration', 'Incorrect working time.']);
+		$this->zbxTestTextPresent(['Page received incorrect data', 'ield "Working time" is not correct: Empty time period.']);
 	}
 }

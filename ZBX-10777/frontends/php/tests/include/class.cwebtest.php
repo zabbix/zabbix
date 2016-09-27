@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'PHPUnit/Extensions/Selenium2TestCase.php';
+require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
@@ -28,11 +28,7 @@ require_once dirname(__FILE__).'/dbfunc.php';
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
 
-class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
-
-	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
+class CWebTest extends PHPUnit_Framework_TestCase {
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = [
@@ -62,26 +58,23 @@ class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
 
 	// List of strings that SHOULD appear on every page
 	public $failIfNotExists = [
+		'Zabbix Share',
 		'Help',
-		'Get support',
-		'Print',
-		'Profile',
-		'Logout',
-		'Connected',
-		'Admin'
+		'Admin',
+		'Sign out'
 	];
+
+	protected function putBreak() {
+		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
+			while (fgets(STDIN, 1024) == '') {}
+			fwrite(STDOUT, "\033[u");
+		return;
+		}
 
 	protected function setUp() {
 		global $DB;
 
-		$this->setHost(PHPUNIT_FRONTEND_HOST);
-		$this->setBrowser('*firefox');
-		if (strpos(PHPUNIT_URL, 'http://') !== false) {
-			$this->setBrowserUrl(PHPUNIT_URL);
-		}
-		else {
-			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
-		}
+		$this->webDriver = RemoteWebDriver::create('http://localhost:4444/wd/hub', DesiredCapabilities::firefox());
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
@@ -89,67 +82,87 @@ class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
 	}
 
 	protected function tearDown() {
-		// DBclose();
+		$this->webDriver->quit();
+	}
+
+	public function authenticate() {
+		$this->webDriver->get(PHPUNIT_URL);
+		$row = DBfetch(DBselect("select null from sessions where sessionid='09e7d4286dfdca4ba7be15e0f3b2b55a'"));
+
+		if (!$row) {
+			DBexecute("insert into sessions (sessionid, userid) values ('09e7d4286dfdca4ba7be15e0f3b2b55a', 1)");
+		}
+
+		$domain = parse_url(PHPUNIT_URL, PHP_URL_HOST);
+		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
+
+		$cookie  = ['name' => 'zbx_sessionid', 'value' => '09e7d4286dfdca4ba7be15e0f3b2b55a', 'domain' => $domain, 'path' => $path];
+		$this->webDriver->manage()->addCookie($cookie);
 	}
 
 	public function zbxTestOpen($url) {
-		$this->open($url);
+		$this->webDriver->get(PHPUNIT_URL.$url);
 	}
 
-	public function zbxTestOpenWait($url) {
-		$this->zbxTestOpen($url);
-		$this->wait();
-	}
-
-	public function zbxTestLogin($url = null) {
+	public function zbxTestLogin($url, $server_name = true) {
 		global $ZBX_SERVER_NAME;
 
-		$this->zbxTestOpenWait('index.php');
-		// Login if not logged in already
-		if ($this->isElementPresent('id=password')) {
-			$this->input_type('name', PHPUNIT_LOGIN_NAME);
-			$this->input_type('password', PHPUNIT_LOGIN_PWD);
-			$this->zbxTestClickWait('enter');
+		$this->authenticate();
+		$this->zbxTestOpen($url);
+//$this->webDriver->takeScreenshot('/home/jenkins/public_html/screenshots/1.png');
+
+		if ($server_name && $ZBX_SERVER_NAME !== '') {
+			$this->zbxTestWaitUntilMessageTextPresent('server-name', $ZBX_SERVER_NAME);
 		}
-		if (isset($url)) {
-			$this->zbxTestOpenWait($url);
-		}
-		$this->zbxTestTextPresent([$ZBX_SERVER_NAME, 'Admin']);
+
 		$this->zbxTestTextNotPresent('Login name or password is incorrect');
 	}
 
 	public function zbxTestLogout() {
-		$this->zbxTestClickWait('link=Logout');
+		$this->zbxTestClickXpath('//a[@class="top-nav-signout"]');
 	}
 
 	public function zbxTestCheckFatalErrors() {
-		foreach ($this->failIfExists as $str) {
-			$this->assertTextNotPresent($str, 'Chuck Norris: I do not expect string "'.$str.'" here.');
-		}
+		$this->zbxTestTextNotPresent($this->failIfExists);
 	}
 
 	public function zbxTestCheckMandatoryStrings() {
-		foreach ($this->failIfNotExists as $str) {
-			$this->assertTextPresent($str, 'Chuck Norris: I expect string "'.$str.'" here.');
-		}
+		$this->zbxTestTextPresent($this->failIfNotExists);
 	}
 
-	public function zbxTestCheckTitle($title) {
+	public function zbxTestCheckTitle($title, $check_server_name = true) {
 		global $ZBX_SERVER_NAME;
 
-		if ($ZBX_SERVER_NAME !== '') {
+		if ($check_server_name && $ZBX_SERVER_NAME !== '') {
 			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
 		}
 
-		$this->assertTitle($title);
+		$this->assertEquals($title, $this->webDriver->getTitle());
+	}
+
+	public function zbxTestCheckHeader($header) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::tagName('h1'));
+		$headerElemnt = $this->webDriver->findElement(WebDriverBy::tagName('h1'));
+		$this->assertEquals($header, $headerElemnt->getText());
+	}
+
+	public function zbxTestHeaderNotPresent($header) {
+		$this->assertFalse($this->zbxTestIsElementPresent("//h1[contains(text(),'".$header."')]"), '"'.$header.'" must not exist.' );
 	}
 
 	public function zbxTestTextPresent($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
+		$page_source = $this->webDriver->getPageSource();
+
 		foreach ($strings as $string) {
-			$this->assertTextPresent('exact:'.$string, 'Chuck Norris: I expect string "'.$string.'" here');
+			if (empty($string)) {
+				$this->assertTrue(true);
+			}
+			else {
+				$this->assertTrue(strstr($page_source, $string) !== false, '"'.$string.'" must exist.');
+			}
 		}
 	}
 
@@ -157,212 +170,351 @@ class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
+
 		foreach ($strings as $string) {
-			$this->assertTextNotPresent($string, "Chuck Norris: I do not expect string '$string' here");
+			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			$this->assertTrue(count($elements) === 0, '"'.$string.'" must not exist.');
 		}
+	}
+
+	public function zbxTestTextVisibleOnPage($strings) {
+		if (!is_array($strings)) {
+			$strings = [$strings];
+		}
+
+		foreach ($strings as $string) {
+			if (empty($string)) {
+				$this->assertTrue(true);
+			}
+			else {
+				$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+				$this->assertTrue(count($elements) !== 0, '"'.$string.'" must exist.');
+			}
+		}
+	}
+
+	public function zbxTestTextNotVisibleOnPage($strings) {
+		if (!is_array($strings)) {
+			$strings = [$strings];
+		}
+
+		foreach ($strings as $string) {
+			$elements = $this->webDriver->findElement(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			$this->assertFalse($elements->isDisplayed());
+		}
+	}
+
+	public function zbxTestClickLinkText($link_text) {
+		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
+	}
+
+	public function zbxTestClickLinkTextWait($link_text) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::linkText($link_text));
+		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
+	}
+
+	public function zbxTestClickButtonText($button_text) {
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"));
+		$this->webDriver->findElement(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"))->click();
 	}
 
 	public function zbxTestClick($id) {
-		$this->click($id);
+		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->zbxTestClick($id);
-		$this->wait();
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id($id));
+		$this->webDriver->findElement(WebDriverBy::id($id))->click();
+	}
+
+	public function zbxTestClickXpath($xpath) {
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	public function zbxTestClickXpathWait($xpath) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
 	}
 
 	public function zbxTestHrefClickWait($href) {
-		$this->click("xpath=//a[contains(@href,'$href')]");
-		$this->wait();
+		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@href,'$href')]"))->click();
 	}
 
-	public function href_click($a) {
-		$this->click("xpath=//a[contains(@href,'$a')]");
-	}
-
-	public function zbxTestCheckboxSelect($a, $select = true) {
-		if ($select != $this->isChecked($a)) {
-			$this->click($a);
+	public function zbxTestCheckboxSelect($id, $select = true) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$checkbox = $this->webDriver->findElement(WebDriverBy::id($id));
+		if ($select != $checkbox->isSelected()) {
+			$checkbox->click();
 		}
 	}
 
-	public function input_type($id, $str) {
-		$this->type($id, $str);
+	public function zbxTestCheckboxSelected($id) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		return $this->webDriver->findElement(WebDriverBy::id($id))->isSelected();
+	}
+
+	public function zbxTestClickButton($value) {
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath("//button[@value='".$value."']"));
+		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
+	}
+
+	public function zbxTestInputType($id, $str) {
+		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
+	}
+
+	public function zbxTestInputTypeOverwrite($id, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$this->webDriver->findElement(WebDriverBy::id($id))->click();
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::CONTROL);
+		$this->webDriver->getKeyboard()->pressKey('a');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::CONTROL);
+		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
+	}
+
+	public function zbxTestInputTypeByXpath($xpath, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
+	}
+
+	public function zbxTestInputTypeWait($id, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
 	public function zbxTestDropdownHasOptions($id, array $strings) {
-		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
 
 		foreach ($strings as $string) {
-			$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+			$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
 		}
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
-		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
+		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
 
-		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
-		$this->select("//select[@".$attribute."='".$id."']", $string);
+		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']"))->click();
 	}
 
 	public function zbxTestDropdownSelectWait($id, $string) {
-		$attribute = $this->isElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
-		$this->assertElementPresent("//select[@".$attribute."='".$id."']");
-		$this->assertElementPresent("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
+		$attribute = $this->zbxTestIsElementPresent("//select[@id='".$id."']") ? 'id' : 'name';
+		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']");
+		$this->zbxTestAssertElementPresentXpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']");
 
-		$selected = $this->getSelectedLabel("//select[@".$attribute."='".$id."']");
+		$selected = $this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']/option[@selected='selected']"))->getText();
 
-		// select and wait if drop down selection should be changed
 		if ($selected != $string) {
-			$this->select("//select[@".$attribute."='".$id."']", $string);
-			$this->wait();
+			$this->webDriver->findElement(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']"))->click();
+			$this->zbxTestWaitUntil(WebDriverExpectedCondition::elementToBeSelected(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']")), 'element not selected');
 		}
 	}
 
-	/**
-	 * Assert that the element with the given name contains a specific text.
-	 *
-	 * @param $name
-	 * @param $text
-	 */
-	public function zbxTestDrowpdownAssertSelected($name, $text) {
-		$this->assertElementPresent("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
+	public function zbxTestDropdownAssertSelected($name, $text) {
+		$this->zbxTestAssertElementPresentXpath("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
 	}
 
-	public function wait() {
-		$this->waitForPageToLoad();
+	public function zbxTestGetSelectedLabel ($id) {
+		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']//option[@selected='selected']"))->getText();
+	}
+
+		public function zbxTestAssertElementPresentId($id) {
+		$elements = $this->webDriver->findElements(WebDriverBy::id($id));
+
+		if (count($elements) === 0) {
+			$this->fail("Element was not found");
+		}
+
+		$this->assertTrue(true);
+	}
+
+	public function zbxTestAssertElementPresentXpath($xpath) {
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
+
+		if (count($elements) === 0) {
+			$this->fail("Element was not found");
+		}
+
+		$this->assertTrue(true);
+	}
+
+	public function zbxTestAssertAttribute($xpath, $attribute, $value = 'true') {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
+		$this->assertEquals($element->getAttribute($attribute), $value);
+	}
+
+	public function zbxTestAssertElementNotPresentId($id) {
+		$elements = $this->webDriver->findElements(WebDriverBy::id($id));
+
+		if (count($elements) !== 0) {
+			$this->fail("Element was found");
+		}
+
+		$this->assertTrue(true);
+	}
+
+	public function zbxTestAssertElementNotPresentXpath($xpath) {
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
+
+		if (count($elements) !== 0) {
+			$this->fail("Element was found");
+		}
+
+		$this->assertTrue(true);
+	}
+
+	public function zbxTestIsElementPresent($xpath) {
+		return (count($this->webDriver->findElements(WebDriverBy::xpath($xpath))) > 0);
+	}
+
+	public function zbxTestWaitUntil($condition, $message) {
+		$this->webDriver->wait(60)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
 	}
 
-	public function tab_switch($tab) {
-		// switches tab by receiving tab title text
-		$this->click("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
-		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']");
+	public function zbxTestWaitUntilElementVisible($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
+	}
+
+	public function zbxTestWaitUntilElementClickable($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::elementToBeClickable($by));
+	}
+
+	public function zbxTestWaitUntilElementPresent($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
+	}
+
+	public function zbxTestWaitUntilMessageTextPresent($css, $string) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className($css));
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
+	}
+
+	public function zbxTestTabSwitch($tab) {
+		$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
+		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function zbxTestTabSwitchById($id, $tab) {
+		$this->zbxTestClickWait($id);
+		if ($this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a") != $tab ) {
+			$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
+		}
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='$buttonId']");	// and contains(@onclick, 'return PopUp')
-		$this->waitForPopUp($windowId, 6000);
-		$this->selectWindow($windowId);
+		$this->zbxTestClickWait($buttonId);
+		$this->zbxTestWaitWindowAndSwitchToIt($windowId);
+	}
+
+	public function zbxTestWaitWindowAndSwitchToIt($id) {
+		$this->webDriver->wait(90)->until(function () use ($id) {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles > 1) {
+						return $this->webDriver->switchTo()->window($id);
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
+	}
+
+	public function zbxTestSwitchToNewWindow() {
+		$this->webDriver->wait(60)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles > 1) {
+						$all = $this->webDriver->getWindowHandles();
+						return $this->webDriver->switchTo()->window(end($all));
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
+	}
+
+	public function zbxTestWaitWindowClose() {
+		$this->webDriver->wait(10)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles == 1) {
+						return $this->webDriver->switchTo()->window('');
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
+
 		$this->zbxTestCheckFatalErrors();
 	}
 
-	public function zbxGetDropDownElements($dropdownId) {
-		$optionCount = $this->getXpathCount('//*[@id="'.$dropdownId.'"]/option');
+	public function zbxTestGetDropDownElements($dropdownId) {
+		$optionCount = count($this->webDriver->findElements(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option')));
 		$optionList = [];
 		for ($i = 1; $i <= $optionCount; $i++) {
 			$optionList[] = [
-				'id' => $this->getAttribute('//*[@id="'.$dropdownId.'"]/option['.$i.']@value'),
-				'content' => $this->getText('//*[@id="'.$dropdownId.'"]/option['.$i.']')
+				'id' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getAttribute('value'),
+				'content' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getText()
 			];
 		}
 		return $optionList;
 	}
 
-	public function template_unlink_and_clear($template) {
-		// WARNING: not tested yet
-		// clicks button named "Unlink and clear" next to template named $template
-		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+	public function zbxTestAssertElementValue($id, $value) {
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
+		$element = $this->webDriver->findElement(WebDriverBy::id($id));
+		$this->assertEquals($value, $element->getAttribute('value'));
 	}
 
-	/**
-	 * Assert that the element with the given name has a specific value.
-	 *
-	 * @param $name
-	 * @param $value
-	 */
-	public function assertElementValue($name, $value) {
-		$this->assertElementPresent("//*[@name='".$name."' and @value='".$value."']");
+	public function zbxTestGetValue($xpath) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute('value');
 	}
 
-	/**
-	 * Assert that the element with the given name contains a specific text.
-	 *
-	 * @param $name
-	 * @param $text
-	 */
-	public function assertElementText($name, $text) {
-		$this->assertElementPresent("//*[@name='".$name."' and text()='".$text."']");
+	public function zbxTestGetAttributeValue($xpath, $attribute) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute($attribute);
 	}
 
-	public function templateLink($host, $template) {
-		// $template = "Template_Linux";
-		// $host = "Zabbix server";
-		$sql = "select hostid from hosts where name='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
-		$this->assertEquals(1, DBcount($sql), "Chuck Norris: No such host: $host");
-		$row = DBfetch(DBselect($sql));
-		$hostid = $row['hostid'];
+	public function zbxTestGetText($xpath) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
+	}
 
-		// using template by name for now only. id will be needed for linkage tests etc
-		// $sql = "select hostid from hosts where host='".$template."'";
-		// $this->assertEquals(1, DBcount($sql), "Chuck Norris: No such template: $template");
-		// $row = DBfetch(DBselect($sql));
-		// $templateid = $row['hostid'];
+	public function zbxTestAssertElementText($xpath, $text){
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
+		$element_text = trim(preg_replace('/\s+/', ' ', $element));
+		$this->assertEquals($text, $element_text);
+	}
 
-		// Link a template to a host from host properties page
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickWait('link='.$host);
-		$this->tab_switch("Templates");
-		$this->zbxTestTextNotPresent($template);
+	public function zbxTestAssertNotVisibleId($id){
+		$this->assertFalse($this->webDriver->findElement(WebDriverBy::id($id))->isDisplayed());
+	}
 
-		// adds template $template to the list of linked templates
-		// for now, ignores the fact that template might be already linked
-		$this->zbxTestLaunchPopup('add');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->check("//input[@value='$template' and @type='checkbox']");
-		$this->zbxTestClick('select');
-		$this->selectWindow();
-		$this->wait();
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
-		// no entities should be deleted, they all should be updated
-		$this->zbxTestTextNotPresent('deleted');
-		$this->zbxTestTextNotPresent('created');
+	public function zbxTestAssertNotVisibleXpath($xpath){
+		$this->assertFalse($this->webDriver->findElement(WebDriverBy::xpath($xpath))->isDisplayed());
+	}
 
-		// linking finished, checks proceed
-		// should check that items, triggers, graphs and applications exist on the host and are linked to the template
-		// should do that by looking in the db
-		// currently doing something very brutal - just looking whether Template_Linux is present on entity pages
-		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
-		$this->wait();
-		$this->zbxTestTextPresent($template.':');
-		// using "host navigation bar" at the top of entity list
-		$this->href_click("triggers.php?hostid=$hostid&sid=");
-		$this->wait();
-		$this->zbxTestTextPresent($template.':');
-		// default data.sql has a problem - graphs are not present in the template
-		// $this->href_click("graphs.php?hostid=$hostid&sid=");
-		// $this->wait();
-		$this->href_click("applications.php?hostid=$hostid&sid=");
-		$this->wait();
-		$this->zbxTestTextPresent($template.':');
+	public function zbxTestAssertVisibleId($id){
+		$this->assertTrue($this->webDriver->findElement(WebDriverBy::id($id))->isDisplayed());
+	}
 
-		// tests that items that should have interfaceid don't have it set to NULL
-		// checks all items on enabled and disabled hosts (types 0 and 1) except:
-		// ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST
-		// and item is not item prototype (flags!=2)
-		// if any found, something's wrong
-		$sql = 'SELECT i.itemid'.
-				' FROM items i, hosts h'.
-				' WHERE i.hostid=h.hostid'.
-					' AND h.status in (0,1)'.
-					' AND i.interfaceid is NULL'.
-					' AND i.type not in (2,5,7,8,9,15)'.
-					' AND i.flags NOT IN (2)';
+	public function zbxTestAssertVisibleXpath($xpath){
+		$this->assertTrue($this->webDriver->findElement(WebDriverBy::xpath($xpath))->isDisplayed());
+	}
 
-		$this->assertEquals(0, DBcount($sql), "Chuck Norris: There are items with interfaceid NULL not of types 2, 5, 7, 8, 9, 15");
-
+	public function zbxTestIsEnabled($xpath){
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->isEnabled();
 	}
 
 	// check that page does not have real (not visible) host or template names
-	public function checkNoRealHostnames() {
+	public function zbxTestCheckNoRealHostnames() {
 		$result = DBselect(
 			'SELECT host'.
 			' FROM hosts'.
@@ -373,4 +525,5 @@ class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
 			$this->zbxTestTextNotPresent($row['host']);
 		}
 	}
+
 }

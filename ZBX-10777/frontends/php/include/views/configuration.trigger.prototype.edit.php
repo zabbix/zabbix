@@ -87,40 +87,36 @@ if ($this->data['input_method'] == IM_TREE) {
 
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
-		// add button
-		$addExpressionButton = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$addExpressionButton->setAttribute('disabled', 'disabled');
-		}
-		$expressionRow[] = $addExpressionButton;
+		// Append "Add" button.
+		$expressionRow[] = (new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 	else {
-		// add button
-		$addExpressionButton = (new CSubmit('and_expression', _('And')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$addExpressionButton->setAttribute('disabled', 'disabled');
-		}
-		$expressionRow[] = $addExpressionButton;
+		// Append "And" button.
+		$expressionRow[] = (new CSimpleButton(_('And')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// or button
-		$orExpressionButton = (new CSubmit('or_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$orExpressionButton->setAttribute('disabled', 'disabled');
-		}
+		// Append "Or" button.
 		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expressionRow[] = $orExpressionButton;
+		$expressionRow[] = (new CSimpleButton(_('Or')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 
-		// replace button
-		$replaceExpressionButton = (new CSubmit('replace_expression', _('Replace')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$replaceExpressionButton->setAttribute('disabled', 'disabled');
-		}
+		// Append "Replace" button.
 		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expressionRow[] = $replaceExpressionButton;
+		$expressionRow[] = (new CSimpleButton(_('Replace')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_expression", "1");')
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(!$data['limited']);
 	}
 }
 elseif ($this->data['input_method'] != IM_FORCED) {
-	$inputMethodToggle = (new CButton(null, _('Expression constructor')))
+	$inputMethodToggle = (new CSimpleButton(_('Expression constructor')))
 		->onClick('javascript: '.
 			'document.getElementById("toggle_input_method").value=1;'.
 			'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
@@ -187,7 +183,7 @@ if ($this->data['input_method'] == IM_TREE) {
 					$e['list'],
 					!$this->data['limited']
 						? (new CCol(
-							(new CButton(null, _('Remove')))
+							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -228,7 +224,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
+	$inputMethodToggle = (new CSimpleButton(_('Close expression constructor')))
 		->onClick('javascript: '.
 			'document.getElementById("toggle_input_method").value=1;'.
 			'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.

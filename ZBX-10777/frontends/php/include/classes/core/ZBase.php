@@ -120,7 +120,7 @@ class ZBase {
 		$this->init();
 
 		$this->setMaintenanceMode();
-		$this->setErrorHandler();
+		set_error_handler('zbx_err_handler');
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
@@ -258,23 +258,6 @@ class ZBase {
 			'blue-theme' => _('Blue'),
 			'dark-theme' => _('Dark'),
 		];
-	}
-
-	/**
-	 * Set custom error handler for PHP errors.
-	 */
-	protected function setErrorHandler() {
-		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-			// necessary to suppress errors when calling with error control operator like @function_name()
-			if (error_reporting() === 0) {
-				return true;
-			}
-
-			// don't show the call to this handler function
-			error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
-		}
-
-		set_error_handler('zbx_err_handler');
 	}
 
 	/**

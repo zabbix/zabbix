@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageTemplates extends CWebTest {
-	// Returns all templates
+
 	public static function allTemplates() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
@@ -33,16 +33,13 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestCheckTitle('Configuration of templates');
-		$this->zbxTestTextPresent('TEMPLATES');
+		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('Displaying');
 
-		// header
 		$this->zbxTestTextPresent(['Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to']);
 
-		// data
 		$this->zbxTestTextPresent([$template['name']]);
-		$this->zbxTestDropdownHasOptions('action',
-				['Export selected', 'Delete selected', 'Delete selected with linked elements']);
+		$this->zbxTestTextPresent(['Export', 'Delete', 'Delete and clear']);
 	}
 
 	/**
@@ -54,11 +51,18 @@ class testPageTemplates extends CWebTest {
 
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = DBhash($sqlTemplate);
-		$sqlHosts = "select * from hosts order by hostid";
+		$sqlHosts =
+				'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,'.
+				'name,flags,templateid,description,tls_connect,tls_accept'.
+			' FROM hosts'.
+			' ORDER BY hostid';
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
-		$sqlTriggers = "select * from triggers order by triggerid";
+		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php');
@@ -66,13 +70,15 @@ class testPageTemplates extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of templates');
 
-		$this->zbxTestTextPresent($name); // link is present on the screen?
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Templates');
+		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('TEMPLATES');
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestCheckHeader('Templates');
 
 		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));

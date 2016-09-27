@@ -22,13 +22,6 @@
 class CScreenMap extends CScreenBase {
 
 	/**
-	 * Params for monitoring maps js.
-	 *
-	 * @var array
-	 */
-	private $data = [];
-
-	/**
 	 * Process screen.
 	 *
 	 * @return CDiv (screen inside container)
@@ -49,6 +42,10 @@ class CScreenMap extends CScreenBase {
 				'preservekeys' => true
 			]);
 			$sysmap = reset($sysmap);
+
+			if (array_key_exists('severity_min', $this->screenitem)) {
+				$sysmap['severity_min'] = $this->screenitem['severity_min'];
+			}
 
 			$image->setSrc($image->getAttribute('src').'&severity_min='.$sysmap['severity_min']);
 

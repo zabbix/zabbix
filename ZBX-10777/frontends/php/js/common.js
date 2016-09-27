@@ -200,7 +200,7 @@ function close_window() {
 }
 
 function Confirm(msg) {
-	return confirm(msg, 'title');
+	return confirm(msg);
 }
 
 function create_var(form_name, var_name, var_value, doSubmit) {
@@ -548,3 +548,19 @@ jQuery.fn.trimValues = function(selectors) {
 		obj.val(jQuery.trim(obj.val()));
 	});
 };
+
+/**
+ * Inserts hidden input into a form
+ *
+ * @param string form_name
+ * @param string input_name
+ * @param string input_value
+ */
+function submitFormWithParam(form_name, input_name, input_value) {
+	var input = document.createElement('input');
+	input.setAttribute('type', 'hidden');
+	input.setAttribute('name', input_name);
+	input.setAttribute('value', input_value);
+	document.forms[form_name].appendChild(input);
+	document.forms[form_name].submit();
+}

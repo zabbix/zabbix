@@ -118,8 +118,13 @@ else {
 
 	$header = [];
 	$users = [];
-	$db_users = DBselect('SELECT u.userid,u.alias,u.name,u.surname FROM users u ORDER BY u.alias,u.userid');
-	while ($user_data = DBfetch($db_users)) {
+
+	$db_users = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'sortfield' => 'alias'
+	]);
+
+	foreach ($db_users as $user_data) {
 		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
 		$users[] = $user_data['userid'];
 	}

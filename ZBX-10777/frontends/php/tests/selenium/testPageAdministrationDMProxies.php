@@ -49,38 +49,36 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->assertEquals($this->oldHashDRules, DBhash($this->sqlHashDRules));
 	}
 
-	public static function allProxies() {
+	public static function proxies() {
 		return DBdata(
 			'SELECT hostid,host'.
 			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
+			' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') AND hostid<>20003'
 		);
 	}
 
 	public function testPageAdministrationDMProxies_CheckLayout() {
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('Proxies');
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent('Displaying');
 
 		$this->zbxTestTextPresent([
-			'Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'
+			'Name', 'Mode', 'Encryption', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'
 		]);
 
-		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
-		$this->assertElementValue('goButton', 'Go (0)');
+		$this->zbxTestTextPresent(['Enable hosts', 'Disable hosts', 'Delete']);
 	}
 
 	/**
-	* @dataProvider allProxies
+	* @dataProvider proxies
 	*/
 	public function testPageAdministrationDMProxies_SimpleUpdate($proxy) {
 		$this->calculateHash($proxy['hostid']);
 
-		$this->zbxTestLogin('proxies.php');
-		$this->zbxTestClickWait('link='.$proxy['host']);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
+		$this->zbxTestClickLinkText($proxy['host']);
+		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestTextPresent($proxy['host']);

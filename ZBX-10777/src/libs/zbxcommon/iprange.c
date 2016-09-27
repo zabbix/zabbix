@@ -124,7 +124,9 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
  * Purpose: parse IPv4 address into IP range structure                        *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN] the IP address                                  *
+ *             address - [IN]  the IP address with optional ranges or         *
+ *                             network mask (see documentation for network    *
+ *                             discovery rule configuration)                  *
  *                                                                            *
  * Return value: SUCCEED - the IP range was successfully parsed               *
  *               FAIL    - otherwise                                          *
@@ -154,7 +156,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 	}
 
 	/* iterate through address numbers (bit groups) */
-	for (index = 0; ptr < end && index <= 4; address = ptr + 1)
+	for (index = 0; ptr < end && index < ZBX_IPRANGE_GROUPS_V4; address = ptr + 1)
 	{
 		if (NULL == (ptr = strchr(address, '.')))
 			ptr = end;
@@ -199,7 +201,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 	}
 
 	/* IPv4 address will always have 4 groups */
-	if (4 != index)
+	if (ZBX_IPRANGE_GROUPS_V4 != index)
 		return FAIL;
 
 	if (-1 != bits)
@@ -215,7 +217,9 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
  * Purpose: parse IPv6 address into IP range structure                        *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN] the IP address                                  *
+ *             address - [IN]  the IP address with optional ranges or         *
+ *                             network mask (see documentation for network    *
+ *                             discovery rule configuration)                  *
  *                                                                            *
  * Return value: SUCCEED - the IP range was successfully parsed               *
  *               FAIL    - otherwise                                          *
@@ -245,7 +249,7 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 	}
 
 	/* iterate through address numbers (bit groups) */
-	for (index = 0; ptr < end && index <= 8; address = ptr + 1)
+	for (index = 0; ptr < end && index < ZBX_IPRANGE_GROUPS_V6; address = ptr + 1)
 	{
 		if (NULL == (ptr = strchr(address, ':')))
 			ptr = end;
@@ -310,11 +314,11 @@ check_fill:
 	}
 
 	/* fail if the address contains 9+ groups */
-	if (8 < index)
+	if (ZBX_IPRANGE_GROUPS_V6 < index)
 		return FAIL;
 
 	/* expand the :: construct to the required number of zeroes */
-	if (8 > index)
+	if (ZBX_IPRANGE_GROUPS_V6 > index)
 	{
 		/* fail if the address contains less than 8 groups and no :: construct was used */
 		if (-1 == fill)
@@ -348,7 +352,9 @@ check_fill:
  * Purpose: parse IP address (v4 or v6) into IP range structure               *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN] the IP address                                  *
+ *             address - [IN]  the IP address with optional ranges or         *
+ *                             network mask (see documentation for network    *
+ *                             discovery rule configuration)                  *
  *                                                                            *
  * Return value: SUCCEED - the IP range was successfully parsed               *
  *               FAIL    - otherwise                                          *

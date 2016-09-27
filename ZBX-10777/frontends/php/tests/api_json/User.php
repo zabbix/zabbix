@@ -42,14 +42,14 @@ class API_JSON_User extends CZabbixTest {
 				'user' => [
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user'
+				'expected_error' => 'Wrong fields for user "".'
 			],
 			[
 				'user' => [
 					'alias' => 'Test User 1'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user'
+				'expected_error' => 'Wrong fields for user "Test User 1".'
 			],
 			[
 				'user' => [
@@ -57,7 +57,7 @@ class API_JSON_User extends CZabbixTest {
 					'passwd' => 'zabbix'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user'
+				'expected_error' => 'Wrong fields for user "Test User 1".'
 			],
 			[
 				'user' => [
@@ -90,7 +90,7 @@ class API_JSON_User extends CZabbixTest {
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'already exists'
+				'expected_error' => 'User with alias "Admin" already exists.'
 			],
 			[
 				'user' => [
@@ -107,7 +107,7 @@ class API_JSON_User extends CZabbixTest {
 					'lang' => 'en_gb',
 					'refresh' => 90,
 					'type' => 1,
-					'theme' => 'originalblue',
+					'theme' => 'blue-theme',
 					'rows_per_page' => 50
 				],
 				'success_expected' => true,
@@ -122,7 +122,7 @@ class API_JSON_User extends CZabbixTest {
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Maximum alias length'
+				'expected_error' => 'Value "qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm" is too long for field "alias" - 104 characters. Allowed length is 100 characters.'
 			]
 		];
 	}
@@ -138,10 +138,12 @@ class API_JSON_User extends CZabbixTest {
 		$result = $this->api_call('user.login', $data, $debug);
 
 		if ($expect) {
-			$this->assertTrue(isset($result['result']), $debug);
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
 		}
 		else {
-			$this->assertTrue(isset($result['error']), $debug);
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
 		}
 	}
 
@@ -149,25 +151,21 @@ class API_JSON_User extends CZabbixTest {
 	* @dataProvider user_data
 	*/
 	public function testUser_Create($user, $success_expected, $expected_error) {
-		$debug = null;
-
 		$result = $this->api_acall('user.create', [$user], $debug);
 
 		if ($success_expected) {
-			$this->assertFalse(array_key_exists('error', $result), $debug);
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
 
 			$dbResult = DBSelect('select * from users where userid='.$result['id']);
 			$dbRow = DBFetch($dbResult);
 			$this->assertTrue(!isset($dbRow['alias']) || $dbRow['alias'] != $user['alias'], print_r($dbRow, true));
 		}
 		else {
-			$this->assertTrue(array_key_exists('error', $result), $debug);
-			$this->assertTrue(strpos($result['error']['data'], $expected_error) !== false, print_r($result, true));
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
 
-			// checking if record was not inserted in the DB
-			$dbResult = DBSelect('select * from users where userid='.$result['id']);
-			$dbRow = DBFetch($dbResult);
-			$this->assertTrue(isset($dbRow['alias']), print_r($dbRow, true));
+			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 

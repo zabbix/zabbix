@@ -33,7 +33,7 @@ class testPageApplications extends CWebTest {
 			],
 			[
 				[
-					// "Test host" ("ЗАББИКС Сервер")
+					// "Test host" ("Zabbix server")
 					'hostid' => 10084,
 					'status' => HOST_STATUS_MONITORED
 				]
@@ -48,13 +48,24 @@ class testPageApplications extends CWebTest {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid='.$data['hostid']);
 
 		$this->zbxTestCheckTitle('Configuration of applications');
-		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
+		$this->zbxTestCheckHeader('Applications');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent($data['status'] == HOST_STATUS_TEMPLATE ? 'Template list' : 'Host list');
+		$this->zbxTestTextPresent($data['status'] == HOST_STATUS_TEMPLATE ? 'All templates' : 'All hosts');
 
-		// table
-		$this->zbxTestTextPresent(['Applications', 'Show']);
-
-		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
+		$this->zbxTestTextPresent(['Applications', 'Items']);
+		$this->zbxTestTextPresent(['Enable selected', 'Disable selected', 'Delete selected']);
+		$this->zbxTestTextPresent(
+				[
+					'CPU',
+					'Filesystems',
+					'General',
+					'Memory',
+					'Network interfaces',
+					'OS',
+					'Performance',
+					'Processes',
+					'Security'
+				]
+		);
 	}
 }

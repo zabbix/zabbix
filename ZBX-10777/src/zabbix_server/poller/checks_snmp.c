@@ -19,11 +19,15 @@
 
 #include "checks_snmp.h"
 
+#ifdef HAVE_NETSNMP
+
+#define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
+
 #include "comms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-
-#ifdef HAVE_NETSNMP
 
 /*
  * SNMP Dynamic Index Cache
@@ -426,6 +430,15 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	snmp_sess_init(&session);
+
+	/* Allow using sub-OIDs higher than MAX_INT, like in 'snmpwalk -Ir'. */
+	/* Disables the validation of varbind values against the MIB definition for the relevant OID. */
+	if (SNMPERR_SUCCESS != netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_CHECK_RANGE, 1))
+	{
+		/* This error is not fatal and should never happen (see netsnmp_ds_set_boolean() implementation). */
+		/* Only items with sub-OIDs higher than MAX_INT will be unsupported. */
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"DontCheckRange\" option for Net-SNMP");
+	}
 
 	switch (item->type)
 	{
@@ -899,6 +912,85 @@ numeric:
 
 /******************************************************************************
  *                                                                            *
+ * Functions for detecting looping in SNMP OID sequence using hashset         *
+ *                                                                            *
+ * Once there is a possibility of looping we start putting OIDs into hashset. *
+ * We do it until a duplicate OID shows up or ZBX_OIDS_MAX_NUM OIDs have been *
+ * collected.                                                                 *
+ *                                                                            *
+ * The hashset key is array of elements of type 'oid'. Element 0 holds the    *
+ * number of OID components (sub-OIDs), element 1 and so on - OID components  *
+ * themselves.                                                                *
+ *                                                                            *
+ * OIDs may contain up to 128 sub-OIDs, so 1 byte is sufficient to keep the   *
+ * number of them. On the other hand, sub-OIDs are of type 'oid' which can be *
+ * defined in NetSNMP as 'uint8_t' or 'u_long'. Sub-OIDs are compared as      *
+ * numbers, so some platforms may require they to be properly aligned in      *
+ * memory. To ensure proper alignment we keep number of elements in element 0 *
+ * instead of using a separate structure element for it.                      *
+ *                                                                            *
+ ******************************************************************************/
+
+static zbx_hash_t	__oids_seen_key_hash(const void *data)
+{
+	const oid	*key = (const oid *)data;
+
+	return ZBX_DEFAULT_HASH_ALGO(key, (key[0] + 1) * sizeof(oid), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	__oids_seen_key_compare(const void *d1, const void *d2)
+{
+	const oid	*k1 = (const oid *)d1;
+	const oid	*k2 = (const oid *)d2;
+
+	if (d1 == d2)
+		return 0;
+
+	return snmp_oid_compare(k1 + 1, k1[0], k2 + 1, k2[0]);
+}
+
+static void	zbx_detect_loop_init(zbx_hashset_t *hs)
+{
+#define ZBX_OIDS_SEEN_INIT_SIZE	500		/* minimum initial number of slots in hashset */
+
+	zbx_hashset_create(hs, ZBX_OIDS_SEEN_INIT_SIZE, __oids_seen_key_hash, __oids_seen_key_compare);
+
+#undef ZBX_OIDS_SEEN_INIT_SIZE
+}
+
+static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, size_t oid_len)
+{
+#define ZBX_OIDS_MAX_NUM	1000000		/* max number of OIDs to store for checking duplicates */
+
+	const oid	*var_oid;		/* points to the first element in the variable part */
+	size_t		var_len;		/* number of elements in the variable part */
+	oid		oid_k[MAX_OID_LEN + 1];	/* array for constructing a hashset key */
+
+	/* OIDs share a common initial part. Save space by storing only the variable part. */
+
+	var_oid = p_oid + root_len;
+	var_len = oid_len - root_len;
+
+	if (ZBX_OIDS_MAX_NUM == hs->num_data)
+		return FAIL;
+
+	oid_k[0] = var_len;
+	memcpy(oid_k + 1, var_oid, var_len * sizeof(oid));
+
+	if (NULL != zbx_hashset_search(hs, oid_k))
+		return FAIL;					/* OID already seen */
+
+	if (NULL != zbx_hashset_insert(hs, oid_k, (var_len + 1) * sizeof(oid)))
+		return SUCCEED;					/* new OID */
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	return FAIL;						/* hashset fail */
+
+#undef ZBX_OIDS_MAX_NUM
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_snmp_walk                                                    *
  *                                                                            *
  * Purpose: retrieve information by walking an OID tree                       *
@@ -935,8 +1027,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			snmp_oid[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			status, level, running, num_vars, ret = SUCCEED;
+	int			status, level, running, num_vars, check_oid_increase = 1, ret = SUCCEED;
 	AGENT_RESULT		snmp_result;
+	zbx_hashset_t		oids_seen;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' bulk:%d", __function_name, (int)item->type, OID, bulk);
 
@@ -1056,9 +1149,38 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			{
 				/* not an exception value */
 
-				if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
+				if (1 == check_oid_increase)	/* typical case */
 				{
-					zbx_strlcpy(error, "OID not increasing.", max_error_len);
+					int	res;
+
+					/* normally devices return OIDs in increasing order, */
+					/* snmp_oid_compare() will return -1 in this case */
+
+					if (-1 != (res = snmp_oid_compare(anOID, anOID_len, var->name,
+							var->name_length)))
+					{
+						if (0 == res)	/* got the same OID */
+						{
+							zbx_strlcpy(error, "OID not changing.", max_error_len);
+							ret = NOTSUPPORTED;
+							running = 0;
+							break;
+						}
+						else	/* 1 == res */
+						{
+							/* OID decreased. Disable further checks of increasing */
+							/* and set up a protection against endless looping. */
+
+							check_oid_increase = 0;
+							zbx_detect_loop_init(&oids_seen);
+						}
+					}
+				}
+
+				if (0 == check_oid_increase && FAIL == zbx_oid_is_new(&oids_seen, rootOID_len,
+						var->name, var->name_length))
+				{
+					zbx_strlcpy(error, "OID loop detected or too many OIDs.", max_error_len);
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -1118,6 +1240,9 @@ next:
 		if (NULL != response)
 			snmp_free_pdu(response);
 	}
+
+	if (0 == check_oid_increase)
+		zbx_hashset_destroy(&oids_seen);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2022,6 +2147,11 @@ exit:
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+void	zbx_init_snmp(void)
+{
+	init_snmp(progname);
 }
 
 #endif	/* HAVE_NETSNMP */

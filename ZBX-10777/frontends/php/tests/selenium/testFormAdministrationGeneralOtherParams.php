@@ -43,24 +43,25 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
+		$this->zbxTestDropdownAssertSelected('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
-		$this->assertAttribute("//input[@id='refresh_unsupported']/@value", $allValues['refresh_unsupported']);
+		$this->zbxTestCheckHeader('Other configuration parameters');
+		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
 		if ($allValues['snmptrap_logging']) {
-			$this->assertElementPresent("//input[@id='snmptrap_logging' and @checked]");
+			$this->assertTrue($this->zbxTestCheckboxSelected('snmptrap_logging'));
 		}
 		if ($allValues['snmptrap_logging']==0) {
-			$this->assertElementPresent("//input[@id='snmptrap_logging' and not (@checked)]");
+			$this->assertFalse($this->zbxTestCheckboxSelected('snmptrap_logging'));
 
-			$this->assertElementPresent('refresh_unsupported');
-			$this->assertElementPresent('snmptrap_logging');
+			$this->zbxTestAssertElementPresentId('refresh_unsupported');
+			$this->zbxTestAssertElementPresentId('snmptrap_logging');
+			$this->zbxTestAssertElementPresentId('default_inventory_mode');
 
 			// ckecking presence of drop-down elements
-			$this->assertElementPresent('discovery_groupid');
-			$this->assertElementPresent('alert_usrgrpid');
+			$this->zbxTestAssertElementPresentId('discovery_groupid');
+			$this->zbxTestAssertElementPresentId('alert_usrgrpid');
 		}
 	}
 
@@ -70,12 +71,12 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
+		$this->zbxTestCheckHeader('Other configuration parameters');
 
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
 		foreach ($hgroups as $group) {
-			$this->assertElementPresent("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
 		}
 	}
 
@@ -85,30 +86,26 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
+		$this->zbxTestCheckHeader('Other configuration parameters');
 
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
 		foreach ($usrgrp as $usrgroup) {
-			$this->assertElementPresent("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
 		}
 
-		$this->assertElementPresent("//select[@id='alert_usrgrpid']/option[text()='None']");
+		$this->zbxTestDropdownHasOptions('alert_usrgrpid', ['None']);
 
 	}
 
-	/**
-	* @dataProvider RefreshUnsupported
-	*/
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
 
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
-		$this->zbxTestTextPresent('Other parameters');
+		$this->zbxTestCheckHeader('Other configuration parameters');
 
-		$this->input_type('refresh_unsupported', '700');
+		$this->zbxTestInputType('refresh_unsupported', '700');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
 		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no
@@ -122,11 +119,9 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
-		$this->zbxTestTextPresent('Other parameters');
 
 		// trying to enter max possible value
-		$this->input_type('refresh_unsupported', '65535');
+		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '65535');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
 		$this->zbxTestCheckboxSelect('snmptrap_logging', false);
@@ -140,11 +135,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		// trying to enter value > max_value
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
-		$this->zbxTestTextPresent('Other parameters');
-		$this->input_type('refresh_unsupported', '65536');
+		$this->zbxTestCheckHeader('Other configuration parameters');
+		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '65536');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.']);
+		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.']);
 	}
 
 }

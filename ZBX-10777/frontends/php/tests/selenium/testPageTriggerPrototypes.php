@@ -32,7 +32,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND i.name LIKE '.zbx_dbstr('%-layout-test%')
+					' AND i.name LIKE \'%-layout-test%\''
 		);
 	}
 
@@ -43,19 +43,19 @@ class testPageTriggerPrototypes extends CWebTest {
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
-		// We are in the list of protos
+
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
+		$this->zbxTestCheckHeader('Trigger prototypes');
+		$this->zbxTestTextPresent($drule);
+		$this->zbxTestTextPresent($data['description']);
 		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$this->zbxTestTextPresent('Host list');
+			$this->zbxTestTextPresent('All hosts');
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->zbxTestTextPresent('Template list');
+			$this->zbxTestTextPresent('All templates');
 		}
-		// Header
 		$this->zbxTestTextPresent(
 			[
 				'Severity',
@@ -64,14 +64,9 @@ class testPageTriggerPrototypes extends CWebTest {
 				'Status'
 			]
 		);
-		$this->zbxTestTextNotPresent('Error');
+		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('action', [
-				'Enable selected',
-				'Disable selected',
-				'Mass update',
-				'Delete selected'
-		]);
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Delete']);
 	}
 
 	/**
@@ -87,21 +82,18 @@ class testPageTriggerPrototypes extends CWebTest {
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->zbxTestTextPresent('Trigger prototypes of '.$data['d_name']);
+		$this->zbxTestCheckHeader('Trigger prototypes');
+		$this->zbxTestTextPresent($data['d_name']);
+		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, DBcount($sql));
@@ -131,7 +123,7 @@ class testPageTriggerPrototypes extends CWebTest {
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+					' AND h.host LIKE \'%-layout-test%\''
 		);
 	}
 
@@ -143,20 +135,16 @@ class testPageTriggerPrototypes extends CWebTest {
 		$triggerids = DBdata('select i.itemid from item_discovery id, items i where parent_itemid='.$druleid.' and i.itemid = id.itemid');
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('triggerprototype.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->zbxTestTextPresent('Trigger prototypes of '.$rule['d_name']);
+		$this->zbxTestCheckHeader('Trigger prototypes');
+		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
 		$this->assertEquals(0, DBcount($sql));
