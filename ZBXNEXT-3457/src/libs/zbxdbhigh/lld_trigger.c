@@ -2060,6 +2060,7 @@ static int validate_tag(const char *tag)
 
 		pos = token.token.r + 1;
 	}
+
 	if (NULL != strchr(tag + pos, '/'))
 		return FAIL;
 
