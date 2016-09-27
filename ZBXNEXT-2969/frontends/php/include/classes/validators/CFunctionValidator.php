@@ -34,7 +34,8 @@ class CFunctionValidator extends CValidator {
 	 *   )
 	 * )
 	 *
-	 * <parameter_type> can be 'num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str'
+	 * <parameter_type> can be 'fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent', 'sec_neg',
+	 *                         'sec_num', 'sec_num_zero', 'sec_zero'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -334,7 +335,8 @@ class CFunctionValidator extends CValidator {
 	 * Validate trigger function parameter.
 	 *
 	 * @param string $param
-	 * @param string $type  type of $param ('num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str')
+	 * @param string $type  type of $param ('fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent',
+	 *                                      'sec_neg', 'sec_num', 'sec_num_zero', 'sec_zero')
 	 *
 	 * @return bool
 	 */
@@ -353,7 +355,7 @@ class CFunctionValidator extends CValidator {
 				return $this->validateSecNumZero($param);
 
 			case 'num_unsigned':
-				return $this->validateNumUnsigned($param);
+				return CNewValidator::is_uint64($param);
 
 			case 'num_suffix':
 				return $this->validateNumSuffix($param);
@@ -439,17 +441,6 @@ class CFunctionValidator extends CValidator {
 		}
 
 		return $this->validateSecValue($param);
-	}
-
-	/**
-	 * Validate trigger function parameter which can contain unsigned integer number.
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateNumUnsigned($param) {
-		return preg_match('/^\d+$/', $param);
 	}
 
 	/**
