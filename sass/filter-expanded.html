@@ -177,7 +177,7 @@
 		<thead>
 			<tr>
 				<th><button type="button" class="treeview"><span class="arrow-down"></span></button><button type="button" class="treeview"><span class="arrow-right"></span></button></th>
-				<th class="cell-width"><input type="checkbox"></th>
+				<th class="cell-width"><input type="checkbox" id="1" class="checkbox-radio"><label for="1"><span></span></label></th>
 				<th><a href="">Hosts<span class="arrow-down"></span></a></th>
 				<th><a href="">Applications<span class="arrow-up"></span></a></th>
 				<th>Items</th>
@@ -197,7 +197,7 @@
 		<tbody>
 			<tr>
 			    <td><div class="progress-bar-container" title="Only the last 20% of the indicator is displayed."><a href=""><span class="progress-bar-label"><span>80%</span><span>100%</span></span><span class="progress-bar-bg red-bg" style="width: 50px">&nbsp;</span><span class="progress-bar-bg green-bg" style="width: 110px">&nbsp;</span></a></div> <span class="green">0.000</span></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="2" class="checkbox-radio"><label for="2"><span></span></label></td>
 				<td><a href="">Test host</a></td>
 				<td><a href="">Applications</a></td>
 				<td><a href="">Items</a></td>
@@ -215,7 +215,7 @@
 			</tr>
 			<tr class="row-selected">
 			    <td>root</td>
-				<td><input type="checkbox" checked></td>
+				<td><input type="checkbox" id="3" class="checkbox-radio" checked><label for="3"><span></span></label></td>
 				<td><a href="">Zabbix server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
@@ -233,7 +233,7 @@
 			</tr>
 			<tr>
 			    <td><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">Public Cloud Service</a></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="4" class="checkbox-radio"><label for="4"><span></span></label></td>
 				<td><a href="">Main server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
@@ -251,7 +251,7 @@
 			</tr>
 			<tr>
 			    <td><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">Business System</a></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="5" class="checkbox-radio"><label for="5"><span></span></label></td>
 				<td><a href="">Backup server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
@@ -269,7 +269,7 @@
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="6" class="checkbox-radio"><label for="6"><span></span></label></td>
 				<td><a href="">HQ server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
@@ -287,7 +287,7 @@
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="7" class="checkbox-radio"><label for="7"><span></span></label></td>
 				<td><a href="">Riga server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>673</sup></td>
@@ -305,7 +305,7 @@
 			</tr>
 			<tr>
 			    <td style="padding-left: 4em;"><a href="">ERP 2</a>-<a href="">ERP 2 is unavailable by ICMP</a></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="8" class="checkbox-radio"><label for="8"><span></span></label></td>
 				<td><a href="">Backup server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
@@ -323,7 +323,7 @@
 			</tr>
 			<tr>
 			    <td></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="9" class="checkbox-radio"><label for="9"><span></span></label></td>
 				<td><a href="">HQ server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
@@ -341,7 +341,7 @@
 			</tr>
 			<tr>
 			    <td></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="10" class="checkbox-radio"><label for="10"><span></span></label></td>
 				<td><a href="">Riga server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>673</sup></td>
@@ -359,7 +359,7 @@
 			</tr>
 			<tr class="row-selected">
 			    <td></td>
-				<td><input type="checkbox" checked></td>
+				<td><input type="checkbox" id="11" class="checkbox-radio" checked><label for="11"><span></span></label></td>
 				<td><a href="">Zabbix server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
@@ -377,7 +377,7 @@
 			</tr>
 			<tr>
 			    <td></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="12" class="checkbox-radio"><label for="12"><span></span></label></td>
 				<td><a href="">Main server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
 				<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
@@ -395,7 +395,7 @@
 			</tr>
 			<tr>
 			    <td></td>
-				<td><input type="checkbox"></td>
+				<td><input type="checkbox" id="13" class="checkbox-radio"><label for="13"><span></span></label></td>
 				<td><a href="">Backup server</a></td>
 				<td><a href="">Applications</a> <sup>8</sup></td>
 				<td><a href="">Items</a> <sup>9</sup></td>

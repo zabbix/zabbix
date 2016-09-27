@@ -770,15 +770,17 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 	)
 	->addRow(_('Connections from host'), [
-		new CLabel([(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-			_('No encryption')
-		]),
+		(new CCheckBox('tls_in_none'))
+			->setLabel(_('No encryption'))
+			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
 		BR(),
-		new CLabel([(new CCheckBox('tls_in_psk'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('PSK')]),
+		(new CCheckBox('tls_in_psk'))
+			->setLabel(_('PSK'))
+			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
 		BR(),
-		new CLabel([(new CCheckBox('tls_in_cert'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-			_('Certificate')
-		])
+		(new CCheckBox('tls_in_cert'))
+			->setLabel(_('Certificate'))
+			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
 	])
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))

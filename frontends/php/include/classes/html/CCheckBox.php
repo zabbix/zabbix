@@ -21,9 +21,12 @@
 
 class CCheckBox extends CInput {
 
+	private $label = '';
+
 	public function __construct($name = 'checkbox', $value = '1') {
 		parent::__construct('checkbox', $name, $value);
 		$this->setChecked(false);
+		$this->addClass(ZBX_STYLE_CHECKBOX_RADIO);
 	}
 
 	public function setChecked($checked) {
@@ -35,5 +38,15 @@ class CCheckBox extends CInput {
 		}
 
 		return $this;
+	}
+
+	public function setLabel($label) {
+		$this->label = $label;
+
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		return parent::toString($destroy).((new CLabel([new CSpan(), $this->label], $this->getId()))->toString(true));
 	}
 }
