@@ -1121,8 +1121,8 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	addrs[0] = strdup(h->ip);
 	ports[0] = zbx_dsprintf(NULL, "%d", h->port);
 
-	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1,
-			h->authtype == ZBX_IPMI_DEFAULT_AUTHTYPE ? (unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype,
+	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1, (h->authtype == ZBX_IPMI_DEFAULT_AUTHTYPE ?
+			(unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype),
 			(unsigned int)h->privilege, h->username, strlen(h->username),
 			h->password, strlen(h->password), os_hnd, NULL, &h->con)))
 	{
