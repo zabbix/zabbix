@@ -21,7 +21,11 @@
 
 class CCheckBox extends CInput {
 
+	const LABEL_POSITION_LEFT = 0;
+	const LABEL_POSITION_RIGHT = 1;
+
 	private $label = '';
+	private $label_position = self::LABEL_POSITION_RIGHT;
 
 	public function __construct($name = 'checkbox', $value = '1') {
 		parent::__construct('checkbox', $name, $value);
@@ -46,7 +50,17 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
+	public function setLabelPosition($label_position) {
+		$this->label_position = $label_position;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
-		return parent::toString($destroy).((new CLabel([new CSpan(), $this->label], $this->getId()))->toString(true));
+		$elements = ($this->label_position == self::LABEL_POSITION_LEFT)
+			? [$this->label, new CSpan()]
+			: [new CSpan(), $this->label];
+
+		return parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
 	}
 }
