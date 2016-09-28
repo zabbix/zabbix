@@ -51,7 +51,7 @@ function makeAckTab($acknowledges) {
 	foreach ($acknowledges as $acknowledge) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
-			array_key_exists('name', $acknowledge)
+			array_key_exists('alias', $acknowledge)
 				? getUserFullname($acknowledge)
 				: _('Inaccessible user'),
 			zbx_nl2br($acknowledge['message'])

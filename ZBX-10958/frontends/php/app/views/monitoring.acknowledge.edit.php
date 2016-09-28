@@ -37,7 +37,7 @@ if (array_key_exists('event', $data)) {
 	foreach ($data['event']['acknowledges'] as $acknowledge) {
 		$acknowledgesTable->addRow([
 			(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock'])))->addClass(ZBX_STYLE_NOWRAP),
-			(new CCol(array_key_exists('name', $acknowledge)
+			(new CCol(array_key_exists('alias', $acknowledge)
 				? getUserFullname($acknowledge)
 				: _('Inaccessible user')
 			))->addClass(ZBX_STYLE_NOWRAP),
