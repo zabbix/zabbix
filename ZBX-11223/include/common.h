@@ -1083,8 +1083,15 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 typedef struct
 {
 	char	*name;
-	char	**params;
-	int	nparam;
+	short	quoted;
+}
+zbx_func_param_t;
+
+typedef struct
+{
+	char			*name;
+	int			nparam;
+	zbx_func_param_t	*params;
 }
 zbx_function_t;
 

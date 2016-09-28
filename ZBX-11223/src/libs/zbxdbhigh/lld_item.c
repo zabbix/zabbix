@@ -527,16 +527,21 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *                                                                            *
  * Purpose: substitutes lld macros in calculated item formula expression      *
  *                                                                            *
- * Parameters: data   - [IN/OUT] the expression                               *
- *             jp_row - [IN] the lld data row                                 *
+ * Parameters: data          - [IN/OUT] the expression                        *
+ *             jp_row        - [IN] the lld data row                          *
+ *             error         - [IN] pointer to string for reporting errors    *
+ *             max_error_len - [IN] size of 'error' string                    *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
+static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
 {
+	const char		*__function_name = "substitute_formula_macros";
+
 	char		*exp, *tmp, *e, *func, *key, *host = NULL;
 	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
 	zbx_function_t	funcdata;
-	int		i;
+	int		ret = SUCCEED, i;
 
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
@@ -570,40 +575,47 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 		if (0 < funcdata.nparam)
 		{
 			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
-			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
+			if (SUCCEED == parse_host_key(funcdata.params[0].name, &host, &key))
 			{
-				zbx_free(funcdata.params[0]);
+				zbx_free(funcdata.params[0].name);
+				funcdata.params[0].quoted = 0;
 				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (NULL != host)
 				{
-					funcdata.params[0] = zbx_dsprintf(NULL, "%s:%s", host, key);
+					funcdata.params[0].name = zbx_dsprintf(NULL, "%s:%s", host, key);
 					zbx_free(host);
 					zbx_free(key);
 				}
 				else
 				{
-					funcdata.params[0] = key;
+					funcdata.params[0].name = key;
 					key = NULL;
 				}
 			}
 
 			/* substitute LLD macros in the rest of the parameters (simple replacement) */
 			for (i = 1; i < funcdata.nparam; i++)
-				substitute_discovery_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, 0);
+				substitute_discovery_macros(&funcdata.params[i].name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		}
 
 		/* substitute the original function in the string with the new one (with substituted LLD macros) */
-		zbx_function_tostr(&funcdata, e, len, &func);
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
+		ret = zbx_function_tostr(&funcdata, e, len, &func);
+		if (SUCCEED == ret)
+			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
+		else if (NULL != error)
+			zbx_snprintf(error, max_error_len, "Invalid formula syntax \"%s\")", e);
 
 		/* cleanup */
 		zbx_free(func);
 		zbx_function_clean(&funcdata);
+
+		if (FAIL == ret)
+			break;
 	}
 
 	/* substitute the LLD macros in the remainder of the string that was jumped over */
-	if (0 != tmp_offset)
+	if (SUCCEED == ret && 0 != tmp_offset)
 	{
 		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
@@ -611,18 +623,27 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 
 	zbx_free(tmp);
 
-	zbx_free(*data);
-	*data = exp;
+	if (SUCCEED == ret)
+	{
+		zbx_free(*data);
+		*data = exp;
+	}
+	else
+		zbx_free(exp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
-static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
+static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		unsigned char type, struct zbx_json_parse *jp_row)
+		unsigned char type, struct zbx_json_parse *jp_row, char **error)
 {
 	const char	*__function_name = "lld_make_item";
 
-	char		*buffer = NULL;
-	int		i;
+	char		*buffer = NULL, err[MAX_STRING_LEN];
+	int		ret = FAIL, i;
 	zbx_lld_item_t	*item = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -635,7 +656,8 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 			continue;
 
 		buffer = zbx_strdup(buffer, item->key_proto);
-		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		if (FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+			goto out;
 
 		if (0 == strcmp(item->key, buffer))
 			break;
@@ -657,13 +679,19 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		item->key = zbx_strdup(NULL, key_proto);
 		item->key_orig = NULL;
-		substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+		if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
+				err, sizeof(err)))
+			goto out;
 
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
 
 		if (ITEM_TYPE_CALCULATED == type)
-			substitute_formula_macros(&item->params, jp_row);
+		{
+			if (FAIL == substitute_formula_macros(&item->params, jp_row, err, sizeof(err)))
+				goto out;
+		}
 		else
 			substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
@@ -671,8 +699,14 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
 		item->snmp_oid_orig = NULL;
-		substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-		zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
+		if (ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type)
+		{
+			if (FAIL == substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
+					err, sizeof(err)))
+				goto out;
+
+			zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
+		}
 
 		item->description = zbx_strdup(NULL, description_proto);
 		item->description_orig = NULL;
@@ -701,14 +735,20 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 		{
 			item->key_orig = item->key;
 			item->key = zbx_strdup(NULL, key_proto);
-			substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+			if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
+					err, sizeof(err)))
+				goto out;
+
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
 
 		buffer = zbx_strdup(buffer, params_proto);
 
 		if (ITEM_TYPE_CALCULATED == type)
-			substitute_formula_macros(&buffer, jp_row);
+		{
+			if (FAIL == substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
+				goto out;
+		}
 		else
 			substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
@@ -721,15 +761,21 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
 		}
 
-		buffer = zbx_strdup(buffer, snmp_oid_proto);
-		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->snmp_oid, buffer))
+		if (ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type)
 		{
-			item->snmp_oid_orig = item->snmp_oid;
-			item->snmp_oid = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
+			buffer = zbx_strdup(buffer, snmp_oid_proto);
+			if (FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
+					err, sizeof(err)))
+				goto out;
+
+			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+			if (0 != strcmp(item->snmp_oid, buffer))
+			{
+				item->snmp_oid_orig = item->snmp_oid;
+				item->snmp_oid = buffer;
+				buffer = NULL;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
+			}
 		}
 
 		buffer = zbx_strdup(buffer, description_proto);
@@ -748,14 +794,24 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 	item->jp_row = jp_row;
 
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: %s.\n",
+				(i == items->values_num ? "create" : "update"), err);
+	}
+
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		unsigned char type, zbx_vector_ptr_t *lld_rows)
+		unsigned char type, zbx_vector_ptr_t *lld_rows, char **error)
 {
 	int	i;
 
@@ -764,7 +820,7 @@ static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, cons
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
-				type, &lld_row->jp_row);
+				type, &lld_row->jp_row, error);
 	}
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1568,7 +1624,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 				password, publickey, privatekey, description_proto, interfaceid, snmpv3_contextname);
 
 		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto, type,
-				lld_rows);
+				lld_rows, error);
 
 		lld_items_validate(hostid, &items, error);
 
