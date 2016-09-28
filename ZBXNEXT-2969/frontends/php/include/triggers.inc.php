@@ -1855,7 +1855,7 @@ function get_item_function_info($expr) {
 			$result = [
 				'value_type' => $value_type[ITEM_VALUE_TYPE_FLOAT],
 				'type' => T_ZBX_STR,
-				'validation' => 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u", {})'
+				'validation' => 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})'
 			];
 		}
 		elseif ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)) {
@@ -1907,7 +1907,7 @@ function get_item_function_info($expr) {
 
 				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
-					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
+					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/", {})';
 				}
 			}
 		}

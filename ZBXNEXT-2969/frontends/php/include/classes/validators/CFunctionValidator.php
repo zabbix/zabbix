@@ -452,7 +452,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateNumSuffix($param) {
-		return preg_match('/^'.ZBX_PREG_NUMBER.'$/u', $param);
+		return preg_match('/^'.ZBX_PREG_NUMBER.'$/', $param);
 	}
 
 	/**
