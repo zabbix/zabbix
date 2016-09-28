@@ -19,7 +19,6 @@
 
 #include <stddef.h>
 
-
 #include "common.h"
 #include "log.h"
 #include "threads.h"
