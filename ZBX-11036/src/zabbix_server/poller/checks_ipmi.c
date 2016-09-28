@@ -19,6 +19,7 @@
 
 #include "checks_ipmi.h"
 
+#include "zbxipmi.h"
 #ifdef HAVE_OPENIPMI
 
 /* Theoretically it should be enough max 16 bytes for sensor ID and terminating '\0' (see SDR record format in IPMI */
@@ -1121,7 +1122,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	ports[0] = zbx_dsprintf(NULL, "%d", h->port);
 
 	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1,
-			h->authtype == -1 ? (unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype,
+			h->authtype == ZBX_IPMI_DEFAULT_AUTHTYPE ? (unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype,
 			(unsigned int)h->privilege, h->username, strlen(h->username),
 			h->password, strlen(h->password), os_hnd, NULL, &h->con)))
 	{
