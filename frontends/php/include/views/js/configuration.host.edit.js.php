@@ -11,8 +11,8 @@
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
-			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
+			<input class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
+			<label for="interfaces[#{iface.interfaceid}][bulk]"><span></span><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
@@ -31,8 +31,8 @@
 		<input name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
 	</td>
 	<td class="interface-default">
-		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
-		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
+		<input class="mainInterface <?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
+		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"><span></span></label>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?> interface-control">
 		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{attrs.disabled}><?= _('Remove') ?></button>
@@ -369,7 +369,7 @@
 						// append checkbox
 						bulkDiv.append(jQuery('<input>', {
 							id: 'interfaces[' + hostInterfaceId + '][bulk]',
-							'class': 'input checkbox pointer',
+							'class': 'input checkbox <?= ZBX_STYLE_CHECKBOX_RADIO ?> pointer',
 							type: 'checkbox',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
 							value: 1,
@@ -377,10 +377,14 @@
 						}));
 
 						// append label
-						bulkDiv.append(jQuery('<label>', {
+						var bulkLabel = jQuery('<label>', {
 							'for': 'interfaces[' + hostInterfaceId + '][bulk]',
-							text: '<?= _('Use bulk requests') ?>'
-						}));
+						});
+
+						bulkLabel.append(jQuery('<span>'));
+						bulkLabel.append('<?= _('Use bulk requests') ?>');
+
+						bulkDiv.append(bulkLabel);
 
 						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkDiv);
 					}
