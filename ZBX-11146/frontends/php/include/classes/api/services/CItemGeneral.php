@@ -188,11 +188,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
 
-			if ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				$item['delay_flex'] = '';
-			}
-
-			$fullItem = $item;
+			$fullItem = $items[$inum];
 
 			if (!check_db_fields($itemDbFields, $item)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -253,6 +249,10 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $db_hosts[$fullItem['hostid']];
 
+			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+				$item['delay_flex'] = '';
+				$fullItem['delay_flex'] = '';
+			}
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
 				$item['delta'] = 0;
 			}
