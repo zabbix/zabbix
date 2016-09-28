@@ -4055,7 +4055,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
 {
 	int		ret = FAIL, index = 0;
-	size_t		right, len, offset, next_pos, param_pos, next_offset, last_pos;
+	size_t		right, len, offset, next_pos, param_pos, next_offset;
 	char		*param;
 
 	*out = zbx_malloc(NULL, expr_len + 1);
