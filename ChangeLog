@@ -170,6 +170,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.5rc2
+
+Bug fixes:
+..F....... [ZBX-11220] fixed visibility of latest event in Monitoring->Events page (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.5rc1
 
 New features:
