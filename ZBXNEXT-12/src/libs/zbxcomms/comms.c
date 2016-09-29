@@ -1873,7 +1873,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				for (i = 0; NULL != hp->h_addr_list[i]; i++)
 				{
-					if(cidr_separator)
+					if (cidr_separator)
 					{
 						if (SUCCEED == subnet_match(prefix_size,
 							*((struct in_addr *)hp->h_addr_list[i]), name.sin_addr))
