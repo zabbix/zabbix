@@ -58,6 +58,8 @@
 #endif
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
+#	define OPENSSL_VERSION				SSLEAY_VERSION
+#	define OpenSSL_version				SSLeay_version
 #	define TLS_method				TLSv1_2_method
 #	define TLS_client_method			TLSv1_2_client_method
 #	define SSL_CTX_get_ciphers(ciphers)		((ciphers)->cipher_list)
@@ -2540,15 +2542,25 @@ static void	zbx_tls_library_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+	if (1 != OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
+		exit(EXIT_FAILURE);
+	}
+#else
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();             /* always returns "1" */
+#endif
+
 #if defined(_WINDOWS)
 	zbx_openssl_thread_setup();
 #endif
 	init_done = 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", SSLeay_version(SSLEAY_VERSION));
+	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
 #endif
 }
 #endif
@@ -2573,8 +2585,10 @@ void	zbx_tls_library_deinit(void)
 	if (1 == init_done)
 	{
 		init_done = 0;
-		RAND_cleanup();         /* erase PRNG state */
+#if OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
+		RAND_cleanup();         	/* erase PRNG state */
 		ERR_free_strings();
+#endif
 #if defined(_WINDOWS)
 		zbx_openssl_thread_cleanup();
 #endif
