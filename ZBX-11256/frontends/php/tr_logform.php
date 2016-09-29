@@ -172,18 +172,6 @@ if (hasRequest('add') || hasRequest('update')) {
 //------------------------ <FORM> ---------------------------
 
 if (hasRequest('sform')) {
-
-	$form = (new CForm())
-		->setName('sform')
-		->addVar('sform', '1')
-		->addVar('itemid', $itemid);
-
-	if (hasRequest('triggerid')) {
-		$form->addVar('triggerid', getRequest('triggerid'));
-	}
-
-	$form_list = new CFormList();
-
 	if (hasRequest('triggerid') && !hasRequest('form_refresh')) {
 		$result = DBselect(
 			'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
@@ -220,7 +208,13 @@ if (hasRequest('sform')) {
 		$priority = getRequest('priority', 0);
 		$comments = getRequest('comments', '');
 		$url = getRequest('url', '');
-		$status = hasRequest('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+
+		if (!hasRequest('form_refresh')) {
+			$status = TRIGGER_STATUS_ENABLED;
+		}
+		else {
+			$status = hasRequest('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+		}
 	}
 
 	$keys = getRequest('keys', []);
@@ -239,54 +233,43 @@ if (hasRequest('sform')) {
 		$item_name = '';
 	}
 
-	$form_list->addRow(_('Name'), (new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$form_list->addRow(_('Item'), [
-		(new CTextBox('item', $item_name))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('item')
-			->setAttribute('disabled', 'disabled'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton(null, _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=itemid&dstfld2=item".
-				"&srctbl=items&srcfld1=itemid&srcfld2=name');"
-			)
-	]);
+	$form = (new CForm())
+		->setName('sform')
+		->addVar('sform', '1')
+		->addVar('itemid', $itemid);
 
-	$form_list->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $priority]));
-	$form_list->addRow(_('Expression'),
-		(new CTextBox('expression'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('logexpr')
-	);
+	if (hasRequest('triggerid')) {
+		$form->addVar('triggerid', getRequest('triggerid'));
+	}
 
-	$form_list->addRow(null, [
-		new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('add_key_and', _('AND')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('javascript: add_keyword_and();'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('add_key_or', _('OR')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('javascript: add_keyword_or();'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('expr_type', null, null, [
-			CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
-			CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
-		]))->setId('expr_type'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('add_exp', _('Add')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('javascript: add_logexpr();')
-	]);
-
-	$keyTable = (new CTable())
+	$key_table = (new CTable())
 		->setId('key_list')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
-	$table = (new CTable())
+	$maxId = 0;
+	foreach ($keys as $id => $val) {
+		$row = new CRow([
+			htmlspecialchars($val['value']),
+			$val['type'],
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('javascript: remove_keyword("keytr'.$id.'");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]);
+		$row->setId('keytr'.$id);
+		$key_table->addRow($row);
+
+		$form->addVar('keys['.$id.'][value]', $val['value']);
+		$form->addVar('keys['.$id.'][type]', $val['type']);
+
+		$maxId = max($maxId, $id);
+	}
+
+	zbx_add_post_js('key_count='.($maxId + 1).';');
+
+	$expression_table = (new CTable())
 		->setId('exp_list')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
@@ -314,7 +297,7 @@ if (hasRequest('sform')) {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 		$row->setId('logtr'.$id);
-		$table->addRow($row);
+		$expression_table->addRow($row);
 
 		$form->addVar('expressions['.$id.'][value]', $expr['value']);
 		$form->addVar('expressions['.$id.'][type]', $expr['type']);
@@ -325,59 +308,72 @@ if (hasRequest('sform')) {
 	zbx_add_post_js('logexpr_count='.($maxId + 1).';');
 	zbx_add_post_js('processExpressionList();');
 
-	$maxId = 0;
-	foreach ($keys as $id => $val) {
-		$row = new CRow([
-			htmlspecialchars($val['value']),
-			$val['type'],
-			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript: remove_keyword("keytr'.$id.'");')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]);
-		$row->setId('keytr'.$id);
-		$keyTable->addRow($row);
-
-		$form->addVar('keys['.$id.'][value]', $val['value']);
-		$form->addVar('keys['.$id.'][type]', $val['type']);
-
-		$maxId = max($maxId, $id);
-	}
-
-	zbx_add_post_js('key_count='.($maxId + 1).';');
-
-	$form_list->addRow(null,
-		(new CDiv($keyTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	$form->addItem(
+		(new CTabView())
+			->addTab('trigger_tab', null,
+				(new CFormList())
+					->addRow(_('Name'),
+						(new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					)
+					->addRow(_('Item'), [
+						(new CTextBox('item', $item_name))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setId('item')
+							->setAttribute('disabled', 'disabled'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName().
+								"&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name');"
+							)
+					])
+					->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $priority]))
+					->addRow(_('Expression'),
+						(new CTextBox('expression'))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setId('logexpr')
+					)
+					->addRow(null, [
+						new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton('add_key_and', _('AND')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('javascript: add_keyword_and();'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton('add_key_or', _('OR')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('javascript: add_keyword_or();'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CComboBox('expr_type', null, null, [
+							CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
+							CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
+						]))->setId('expr_type'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton('add_exp', _('Add')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('javascript: add_logexpr();')
+					])
+					->addRow(null,
+						(new CDiv($key_table))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					)
+					->addRow(null,
+						(new CDiv($expression_table))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					)
+					->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+					->addRow(_('Description'),
+						(new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					)
+					->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_ENABLED))
+			)
+			->setFooter(makeFormFooter(
+				(hasRequest('triggerid') ? new CSubmit('update', _('Update')) : new CSubmit('add', _('Add'))),
+				[(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')]
+			))
 	);
-	$form_list->addRow(null,
-		(new CDiv($table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-	$form_list->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$form_list->addRow(_('Description'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_ENABLED));
-
-	$tab = (new CTabView())->addTab('trigger_tab', null, $form_list);
-
-	if (hasRequest('triggerid')) {
-		$tab->setFooter(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			[(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')]
-		));
-	}
-	else {
-		$tab->setFooter(makeFormFooter(
-			new CSubmit('add', _('Add')),
-			[(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')]
-		));
-	}
-
-	$form->addItem($tab);
 
 	(new CWidget())
 		->setTitle(_('Trigger'))
