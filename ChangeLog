@@ -1,6 +1,7 @@
 Changes for 3.0.5rc2
 
 Bug fixes:
+..F....... [ZBX-11220] fixed visibility of latest event in Monitoring->Events page (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.5rc1
