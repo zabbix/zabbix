@@ -438,7 +438,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 	$url = (new CUrl('events.php'))
 		->setArgument('fullscreen', getRequest('fullscreen'));
 
-	$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN, $url);
+	$paging = getPagingLine($dsc_events, ZBX_SORT_UP, $url);
 
 	$objectids = [];
 	foreach ($dsc_events as $event_data) {
@@ -630,7 +630,7 @@ else {
 			->setArgument('groupid', $pageFilter->groupid)
 			->setArgument('hostid', $pageFilter->hostid);
 
-		$paging = getPagingLine($events, ZBX_SORT_DOWN, $url);
+		$paging = getPagingLine($events, ZBX_SORT_UP, $url);
 
 		// query event with extend data
 		$events = API::Event()->get([
