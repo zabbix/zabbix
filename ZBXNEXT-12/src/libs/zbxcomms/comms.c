@@ -1707,8 +1707,27 @@ out:
 #undef ZBX_TCP_EXPECT_XML_END
 }
 
+static int subnet_match(int af, unsigned int prefix_size, void * address1,  void * address2)
+{
+	unsigned char	netmask[16] = {0};
+	unsigned int	bytes = af == AF_INET  ? 4 : 16;
+
+	/* CIDR notation to subnet mask */
+	for (int i = prefix_size, j = 0; i > 0  && j < sizeof(netmask); i -= 8, ++j)
+		netmask[j] = i >= 8 ? 0xFF : (( 0xFF << ( 8 - i ) ) & 0xFF );
+
+	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
+	/* All hosts on a subnetwork have the same network prefix. */
+	for (int i = 0; i < bytes; i++)
+	{
+		if((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
+			return FAIL;
+	}
+	return SUCCEED;
+}
+
 #if defined(HAVE_IPV6)
-static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+static int	zbx_ip_cmp(unsigned int prefix_size, unsigned int prefix_size_ipv6, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
@@ -1730,14 +1749,15 @@ static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 		switch (current_ai->ai_family)
 		{
 			case AF_INET:
-				if (name4->sin_addr.s_addr == ai_addr4->sin_addr.s_addr)
+				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
+						&name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
 				break;
 			case AF_INET6:
-				if (0 == memcmp(name6->sin6_addr.s6_addr, ai_addr6->sin6_addr.s6_addr,
-						sizeof(struct in6_addr)))
+				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size_ipv6,
+						name6->sin6_addr.s6_addr, ai_addr6->sin6_addr.s6_addr))
 				{
 					return SUCCEED;
 				}
@@ -1752,18 +1772,17 @@ static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 				/* incoming AF_INET6, must see whether it is compatible or mapped */
 				if ((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
 						0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						0 == memcmp(&name6->sin6_addr.s6_addr[12],
-						(unsigned char *)&ai_addr4->sin_addr.s_addr, 4))
+						SUCCEED == subnet_match(AF_INET, prefix_size,
+								&name6->sin6_addr.s6_addr[12], &ai_addr4->sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
 				break;
-			case AF_INET6:
-				/* incoming AF_INET, must see whether the given is compatible or mapped */
+			case AF_INET6:				/* incoming AF_INET, must see whether the given is compatible or mapped */
 				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
 						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						0 == memcmp(&ai_addr6->sin6_addr.s6_addr[12],
-						(unsigned char *)&name4->sin_addr.s_addr, 4))
+						SUCCEED == subnet_match(AF_INET, prefix_size,
+								&ai_addr6->sin6_addr.s6_addr[12], &name4->sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
@@ -1775,24 +1794,7 @@ static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 }
 #endif
 
-int subnet_match(unsigned int prefix_size, struct in_addr in_addr1, struct in_addr in_addr2)
-{
-	struct in_addr	mask;
 
-	if (prefix_size == 0)
-		return SUCCEED;
-	else if (prefix_size <= 32)
-	{
-		/* CIDR notation to subnet mask */
-		mask.s_addr = htonl(~((1 << 32 - prefix_size) - 1));
-		/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
-		/* All hosts on a subnetwork have the same network prefix. */
-		if ((in_addr1.s_addr & mask.s_addr) == (in_addr2.s_addr & mask.s_addr))
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -1819,8 +1821,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
-	int		i, prefix_size;
+	int		i
 #endif
+	int	prefix_size, prefix_size_ipv6;
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
@@ -1849,7 +1852,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			if(NULL != (cidr_separator = strchr(start, '/')))
 			{
 				*cidr_separator = 0;
-				prefix_size = atoi(cidr_separator + 1);
+				prefix_size_ipv6 = prefix_size = atoi(cidr_separator + 1);
+			}
+			else
+			{
+				prefix_size = 32;
+				prefix_size_ipv6 = 128;
 			}
 
 			/* allow IP addresses or DNS names for authorization */
@@ -1860,7 +1868,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 				{
-					if (SUCCEED == zbx_ip_cmp(current_ai, name))
+					if (SUCCEED == zbx_ip_cmp(prefix_size, prefix_size_ipv6, current_ai, name))
 					{
 						freeaddrinfo(ai);
 						return SUCCEED;
@@ -1873,13 +1881,8 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				for (i = 0; NULL != hp->h_addr_list[i]; i++)
 				{
-					if (cidr_separator)
-					{
-						if (SUCCEED == subnet_match(prefix_size,
-							*((struct in_addr *)hp->h_addr_list[i]), name.sin_addr))
-							return SUCCEED;
-					}
-					else if (name.sin_addr.s_addr == ((struct in_addr *)hp->h_addr_list[i])->s_addr)
+					if (SUCCEED == subnet_match(AF_INET, prefix_size,
+							hp->h_addr_list[i].s_addr, &name.sin_addr.s_addr))
 						return SUCCEED;
 				}
 			}
