@@ -111,7 +111,14 @@ class DB {
 			$sql = $sql.' FOR UPDATE';
 		}
 
-		$res = DBfetch(DBselect($sql));
+		$cursor = DBselect($sql);
+
+		if ($cursor) {
+			$res = DBfetch($cursor);
+		}
+		else {
+			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+		}
 
 		if ($res) {
 			$maxNextId = bcadd($res['nextid'], $count, 0);
