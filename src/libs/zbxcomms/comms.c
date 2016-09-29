@@ -1821,7 +1821,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
-	int		i
+	int		i;
 #endif
 	int	prefix_size, prefix_size_ipv6;
 	ZBX_SOCKADDR	name;
@@ -1882,7 +1882,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 				for (i = 0; NULL != hp->h_addr_list[i]; i++)
 				{
 					if (SUCCEED == subnet_match(AF_INET, prefix_size,
-							hp->h_addr_list[i].s_addr, &name.sin_addr.s_addr))
+							&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
 						return SUCCEED;
 				}
 			}
