@@ -106,10 +106,12 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * Any system field passed to the function will be unset.
 	 *
-	 * @param array $items   Reference to an array of items.
-	 * @param bool  $update  Flag indicating update procedure.
-	 *
 	 * @throw APIException
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		if ($update) {
@@ -128,6 +130,15 @@ abstract class CItemGeneral extends CApiService {
 				'editable' => true,
 				'preservekeys' => true
 			]);
+
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'status', 'name'],
+				'hostids' => zbx_objectValues($dbItems, 'hostid'),
+				'templated_hosts' => true,
+				'editable' => true,
+				'selectApplications' => ['applicationid', 'flags'],
+				'preservekeys' => true
+			]);
 		}
 		else {
 			$itemDbFields = [
@@ -139,22 +150,21 @@ abstract class CItemGeneral extends CApiService {
 				'delay' => '0',
 				'delay_flex' => ''
 			];
-		}
 
-		$db_hosts = API::Host()->get(
-			[
+			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'status', 'name'],
+				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
 				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
-			]
-			+ ['hostids' => ($update ? zbx_objectValues($dbItems, 'hostid') : zbx_objectValues($items, 'hostid'))]
-		);
+			]);
+		}
 
+		// interfaces
 		$interfaces = API::HostInterface()->get([
 			'output' => ['interfaceid', 'hostid', 'type'],
-			'hostids' => array_keys($db_hosts),
+			'hostids' => zbx_objectValues($dbHosts, 'hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
@@ -233,7 +243,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
-				if (!isset($db_hosts[$item['hostid']])) {
+				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
@@ -247,11 +257,10 @@ abstract class CItemGeneral extends CApiService {
 				);
 			}
 
-			$host = $db_hosts[$fullItem['hostid']];
+			$host = $dbHosts[$fullItem['hostid']];
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
-				$fullItem['delay_flex'] = '';
 			}
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
 				$item['delta'] = 0;
@@ -472,10 +481,16 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 			}
+
+			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
 
 		$this->checkExistingItems($items);
+	}
+
+	protected function checkSpecificFields(array $item) {
+		return true;
 	}
 
 	protected function clearValues(array $item) {
