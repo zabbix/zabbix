@@ -144,8 +144,6 @@ class CHttpTestManager {
 			'preservekeys' => true
 		]);
 
-		$deleteStepItemIds = [];
-
 		foreach ($httpTests as $httpTest) {
 			DB::update('httptest', [
 				'values' => $httpTest,
@@ -190,6 +188,12 @@ class CHttpTestManager {
 			if (isset($httpTest['steps'])) {
 				$stepsCreate = $stepsUpdate = [];
 				$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
+
+				// IF application ID was not set, use the ID from DB so new items can be linked.
+				if (!array_key_exists('applicationid', $httpTest)) {
+					$httpTest['applicationid'] = $dbHttpTest[$httpTest['httptestid']]['applicationid'];
+				}
+
 				foreach ($httpTest['steps'] as $webstep) {
 					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
 						$stepsUpdate[] = $webstep;
@@ -197,6 +201,10 @@ class CHttpTestManager {
 					}
 					elseif (!isset($webstep['httpstepid'])) {
 						$stepsCreate[] = $webstep;
+					}
+
+					if ($dbHttpTest[$httpTest['httptestid']]['templateid'] != 0) {
+						unset($dbSteps[$webstep['httpstepid']]);
 					}
 				}
 				$stepidsDelete = array_keys($dbSteps);
@@ -206,11 +214,18 @@ class CHttpTestManager {
 						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
 					);
 
-					foreach (DBfetchColumn($result, 'itemid') as $itemId) {
-						$deleteStepItemIds[] = $itemId;
+					$itemids_to_delete = [];
+
+					foreach (DBfetchColumn($result, 'itemid') as $itemid) {
+						$itemids_to_delete[] = $itemid;
 					}
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
+
+					// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
+					if ($itemids_to_delete) {
+						API::Item()->delete($itemids_to_delete, true);
+					}
 				}
 				if (!empty($stepsUpdate)) {
 					$this->updateStepsReal($httpTest, $stepsUpdate);
@@ -247,10 +262,6 @@ class CHttpTestManager {
 					]);
 				}
 			}
-		}
-
-		if ($deleteStepItemIds) {
-			API::Item()->delete($deleteStepItemIds, true);
 		}
 
 		// TODO: REMOVE info
@@ -594,7 +605,7 @@ class CHttpTestManager {
 		}
 
 		if (!empty($httpTestsCreate)) {
-			$newHttpTests = $this->create($httpTestsCreate, true);
+			$newHttpTests = $this->create($httpTestsCreate);
 			foreach ($newHttpTests as $num => $newHttpTest) {
 				$httpTests[$num]['httptestid'] = $newHttpTest['httptestid'];
 			}
@@ -742,7 +753,6 @@ class CHttpTestManager {
 		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
 		}
-
 
 		$httpTestItems = [];
 		foreach ($checkitems as $inum => $item) {
