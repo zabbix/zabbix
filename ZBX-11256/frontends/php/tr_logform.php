@@ -48,7 +48,7 @@ $fields = [
 	'expr_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
 	'comments' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
 	'url' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'status' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'status' =>			[T_ZBX_INT, O_OPT, null,		IN([TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),	null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
 	// actions
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null],
@@ -91,7 +91,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$now = time();
-		$status = hasRequest('status') ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED;
+		$status = hasRequest('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 		$type = TRIGGER_MULT_EVENT_ENABLED;
 
 		if (hasRequest('triggerid')) {
@@ -172,7 +172,6 @@ if (hasRequest('add') || hasRequest('update')) {
 //------------------------ <FORM> ---------------------------
 
 if (hasRequest('sform')) {
-	$widget = (new CWidget())->setTitle(_('Trigger'));
 
 	$form = (new CForm())
 		->setName('sform')
@@ -221,7 +220,7 @@ if (hasRequest('sform')) {
 		$priority = getRequest('priority', 0);
 		$comments = getRequest('comments', '');
 		$url = getRequest('url', '');
-		$status = getRequest('status', 0);
+		$status = hasRequest('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	}
 
 	$keys = getRequest('keys', []);
@@ -254,6 +253,7 @@ if (hasRequest('sform')) {
 			)
 	]);
 
+	$form_list->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $priority]));
 	$form_list->addRow(_('Expression'),
 		(new CTextBox('expression'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -358,22 +358,9 @@ if (hasRequest('sform')) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-	$sev_select = new CComboBox('priority', $priority);
-
-	$config = select_config();
-
-	$severityNames = [];
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$severityNames[] = getSeverityName($severity, $config);
-	}
-	$sev_select->addItems($severityNames);
-
-	$form_list->addRow(_('Severity'), $sev_select);
-	$form_list->addRow(_('Comments'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 	$form_list->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$form_list->addRow(_('Disabled'),
-		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)
-	);
+	$form_list->addRow(_('Description'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	$form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_ENABLED));
 
 	$tab = (new CTabView())->addTab('trigger_tab', null, $form_list);
 
@@ -392,7 +379,8 @@ if (hasRequest('sform')) {
 
 	$form->addItem($tab);
 
-	$widget
+	(new CWidget())
+		->setTitle(_('Trigger'))
 		->addItem($form)
 		->show();
 }
