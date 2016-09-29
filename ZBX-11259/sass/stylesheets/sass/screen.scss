@@ -2039,31 +2039,19 @@ button[disabled] {
 */
 .tabs {
 	white-space: nowrap;
-	//border-top: 1px solid $table-border-color;
+	overflow: hidden;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
 		position: relative;
 		display: inline-block;
-		margin: 0 -1px 0 0;
-		padding: 8px 0;
-
-		//&:first-child label {
-		//	@include border-radius(2px 0 0 2px);
-		//}
-
-		//&:last-child label {
-		//	@include border-radius(0 2px 2px 0);
-		//}
-
-		//&:only-child label {
-		//	@include border-radius(2px);
-		//}
+		//margin: 0 -1px 0 0;
+		padding: 7px 0;
 	}
 
 	label {
 		color: $link-color;
-		padding: 8px 10px;
+		padding: 9px 10px;
 		cursor: pointer;
 		//border: 1px solid $transparent;
 		@include transition(background-color .2s ease-out);
@@ -2087,15 +2075,16 @@ button[disabled] {
 			&:active {
 				//border-color: $ui-bg-color;
 				//border-color: $transparent;
-				background-color: $btn-form-hover-color;
+				//background-color: $btn-form-hover-color;
 			}
 		}
 
 		&:focus + label {
 			//border-color: $form-border-focus-color;
 			//background-color: $ui-bg-color;
-			position: relative;
-			z-index: 2;
+			//background-color: $btn-form-hover-color;
+			//position: relative;
+			//z-index: 2;
 		}
 
 		&:checked + label {
@@ -2105,13 +2094,13 @@ button[disabled] {
 			//border-bottom: 3px solid $form-border-focus-color;
 			//background-color: $ui-bg-color;
 			//background-color: $transparent;
-			//position: relative;
-			//z-index: 1;
+			position: relative;
+			z-index: 1;
 
 			&::after {
 				content: '';
 				position: absolute;
-				bottom: -1px;
+				bottom: 1px;
 				height: 3px;
 				left: 0;
 				right: 0;
@@ -2127,7 +2116,7 @@ button[disabled] {
 			&::after {
 				content: '';
 				position: absolute;
-				bottom: -1px;
+				bottom: -2px;
 				height: 3px;
 				left: 0;
 				right: 0;
