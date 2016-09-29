@@ -1775,6 +1775,25 @@ static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 }
 #endif
 
+int subnet_match(unsigned int prefix_size, struct in_addr in_addr1, struct in_addr in_addr2)
+{
+	struct in_addr	mask;
+
+	if (prefix_size == 0)
+		return SUCCEED;
+	else if (prefix_size <= 32)
+	{
+		/* CIDR notation to subnet mask */
+		mask.s_addr = htonl(~((1 << 32 - prefix_size) - 1));
+		/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
+		/* All hosts on a subnetwork have the same network prefix. */
+		if ((in_addr1.s_addr & mask.s_addr) == (in_addr2.s_addr & mask.s_addr))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_check_security                                           *
@@ -1800,12 +1819,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
-	int		i;
+	int		i, prefix_size;
 #endif
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
-	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL;
+	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_separator;
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
@@ -1826,6 +1845,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
+
+			if(NULL != (cidr_separator = strchr(start, '/')))
+			{
+				*cidr_separator = 0;
+				prefix_size = atoi(cidr_separator + 1);
+			}
 
 			/* allow IP addresses or DNS names for authorization */
 #if defined(HAVE_IPV6)
@@ -1848,7 +1873,13 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				for (i = 0; NULL != hp->h_addr_list[i]; i++)
 				{
-					if (name.sin_addr.s_addr == ((struct in_addr *)hp->h_addr_list[i])->s_addr)
+					if(cidr_separator)
+					{
+						if (SUCCEED == subnet_match(prefix_size,
+							*((struct in_addr *)hp->h_addr_list[i]), name.sin_addr))
+							return SUCCEED;
+					}
+					else if (name.sin_addr.s_addr == ((struct in_addr *)hp->h_addr_list[i])->s_addr)
 						return SUCCEED;
 				}
 			}
