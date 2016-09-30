@@ -2120,6 +2120,7 @@ $form-icon-btn: (
 
 .drag-icon {
 	margin-left: -9px;
+	height: 24px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
