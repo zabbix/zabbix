@@ -548,7 +548,6 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 	for (e = *data; '\0' != *e; e += len)
 	{
-
 		/* get function data or jump over part of the string that is not a function */
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
