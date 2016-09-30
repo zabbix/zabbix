@@ -22,6 +22,9 @@
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 
+#define IPV4_MAX_CIDR_PREFIX	32
+#define IPV6_MAX_CIDR_PREFIX	128
+
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
 #else
@@ -1711,10 +1714,14 @@ static int	subnet_match(int af, unsigned int prefix_size, void * address1,  void
 {
 	unsigned char	netmask[16] = {0};
 	unsigned int	bytes = af == AF_INET ? 4 : 16;
-	int i, j;
+	int	i, j;
+
+	if ((af == AF_INET && prefix_size > IPV4_MAX_CIDR_PREFIX) || prefix_size > IPV6_MAX_CIDR_PREFIX)
+		return FAIL;
+
 	/* CIDR notation to subnet mask */
-	for (i = prefix_size, j = 0; i > 0  && j < sizeof(netmask); i -= 8, ++j)
-		netmask[j] = i >= 8 ? 0xFF : (( 0xFF << ( 8 - i ) ) & 0xFF );
+	for (i = prefix_size, j = 0; i > 0  && j < bytes; i -= 8, j++)
+		netmask[j] = i >= 8 ? 0xFF : ((0xFF << (8 - i)) & 0xFF);
 
 	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
 	/* All hosts on a subnetwork have the same network prefix. */
@@ -1827,7 +1834,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
-	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_separator;
+	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
@@ -1846,27 +1853,27 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 		for (start = tmp; '\0' != *start;)
 		{
-			prefix_size = 32;
+			prefix_size = IPV4_MAX_CIDR_PREFIX;
 #if defined(HAVE_IPV6)
-			prefix_size_ipv6 = 128;
+			prefix_size_ipv6 = IPV6_MAX_CIDR_PREFIX;
 #endif
 
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
 
-			if (NULL != (cidr_separator = strchr(start, '/')))
+			if (NULL != (cidr_sep = strchr(start, '/')))
 			{
-				*cidr_separator = 0;
+				*cidr_sep = 0;
 
 				if (SUCCEED == is_ip(start))
 				{
-					prefix_size = atoi(cidr_separator + 1);
+					prefix_size = atoi(cidr_sep + 1);
 #if defined(HAVE_IPV6)
 					prefix_size_ipv6 = prefix_size;
 #endif
 				}
 				else
-					*cidr_separator = '/';	/* CIDR is only supported for IP */
+					*cidr_sep = '/';	/* CIDR is only supported for IP */
 			}
 
 			/* allow IP addresses or DNS names for authorization */
