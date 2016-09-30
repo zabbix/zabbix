@@ -295,7 +295,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			ret_unknown = 1;
 		}
 
-		if (1 == ret_unknown || SUCCEED != is_double_suffix(f->value, ZBX_FLAG_DOUBLE_SUFFIX) || '-' == *f->value)
+		if (1 == ret_unknown || SUCCEED != is_double_suffix(f->value) || '-' == *f->value)
 		{
 			char	*wrapped;
 
