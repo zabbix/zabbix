@@ -1,6 +1,9 @@
-Changes for 2.0.19rc1
+Changes for 2.0.19
 
-New features:
+2.0.19rc1 was released as 2.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
 
 Bug fixes:
 ....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
