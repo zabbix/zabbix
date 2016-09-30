@@ -328,9 +328,10 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	zbx_vector_uint64_t		itemids;
 	history_value_t			value, item_result;
 	zbx_history_record_t		group_value;
-	int				ret = FAIL, now, *errcodes = NULL, i, count, seconds;
+	int				ret = FAIL, now, *errcodes = NULL, i, count;
 	DC_ITEM				*items = NULL;
 	zbx_vector_history_record_t	values, group_values;
+	unsigned int			seconds;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
 			__function_name, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
@@ -361,7 +362,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	}
 	else
 	{
-		if (FAIL == is_time_suffix(param, &seconds))
+		if (FAIL == is_uint_suffix(param, &seconds))
 		{
 			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto clean2;
