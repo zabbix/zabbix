@@ -3,6 +3,7 @@ Changes for 2.2.16rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.15
