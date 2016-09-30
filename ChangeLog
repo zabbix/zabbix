@@ -1,6 +1,7 @@
 Changes for 3.2.2rc1
 
 New features:
+........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
@@ -187,6 +188,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.6rc1
 
 New features:
+........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
