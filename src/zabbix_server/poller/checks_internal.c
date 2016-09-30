@@ -150,7 +150,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
-		int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+		unsigned int	from = 6, to = (unsigned int)-1;
 
 		if (3 < nparams)
 		{
@@ -158,19 +158,19 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp && FAIL == is_time_suffix(tmp, &from))
+		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp && FAIL == is_uint_suffix(tmp, &from))
 		{
 			error = zbx_strdup(error, "Invalid second parameter.");
 			goto out;
 		}
 
-		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp && FAIL == is_time_suffix(tmp, &to))
+		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp &&  FAIL == is_uint_suffix(tmp, &to))
 		{
 			error = zbx_strdup(error, "Invalid third parameter.");
 			goto out;
 		}
 
-		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+		if ((unsigned int)-1 != to && from > to)
 		{
 			error = zbx_strdup(error, "Parameters represent an invalid interval.");
 			goto out;

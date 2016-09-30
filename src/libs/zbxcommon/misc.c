@@ -2021,9 +2021,7 @@ int	zbx_double_compare(double a, double b)
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
- * Parameters: str   - string to check                                        *
- *             flags - extra options including:                               *
- *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
+ * Parameters: str - string to check                                          *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
@@ -2034,7 +2032,7 @@ int	zbx_double_compare(double a, double b)
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-int	is_double_suffix(const char *str, unsigned char flags)
+int	is_double_suffix(const char *str)
 {
 	size_t	i;
 	char	dot = 0;
@@ -2055,7 +2053,7 @@ int	is_double_suffix(const char *str, unsigned char flags)
 		}
 
 		/* last character is suffix */
-		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
+		if (NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
 			continue;
 
 		return FAIL;
@@ -2128,15 +2126,14 @@ int	is_double(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_time_suffix                                                   *
+ * Function: is_uint_suffix                                                   *
  *                                                                            *
- * Purpose: check if the string is a non-negative integer with or without     *
- *          supported time suffix                                             *
+ * Purpose: check if the string is unsigned integer                           *
  *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
- *             value - [OUT] a pointer to converted value (optional)          *
+ * Parameters: str   - string to check                                        *
+ *             value - a pointer to converted value (optional)                *
  *                                                                            *
- * Return value: SUCCEED - the string is valid and within reasonable limits   *
+ * Return value: SUCCEED - the string is unsigned integer                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
@@ -2144,22 +2141,22 @@ int	is_double(const char *str)
  * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
-int	is_time_suffix(const char *str, int *value)
+int	is_uint_suffix(const char *str, unsigned int *value)
 {
-	const int	max = 0x7fffffff;	/* minimum acceptable value for INT_MAX is 2 147 483 647 */
-	int		value_tmp = 0, c, factor = 1;
+	const unsigned int	max_uint = ~0U;
+	unsigned int		value_uint = 0, c, factor = 1;
 
-	if ('\0' == *str || 0 == isdigit(*str))
+	if ('\0' == *str || '0' > *str || *str > '9')
 		return FAIL;
 
 	while ('\0' != *str && 0 != isdigit(*str))
 	{
-		c = (int)(unsigned char)(*str - '0');
+		c = (unsigned int)(unsigned char)(*str - '0');
 
-		if ((max - c) / 10 < value_tmp)
+		if ((max_uint - c) / 10 < value_uint)
 			return FAIL;	/* overflow */
 
-		value_tmp = value_tmp * 10 + c;
+		value_uint = value_uint * 10 + c;
 
 		str++;
 	}
@@ -2192,11 +2189,11 @@ int	is_time_suffix(const char *str, int *value)
 	if ('\0' != *str)
 		return FAIL;
 
-	if (max / factor < value_tmp)
+	if (max_uint / factor < value_uint)
 		return FAIL;	/* overflow */
 
 	if (NULL != value)
-		*value = value_tmp * factor;
+		*value = value_uint * factor;
 
 	return SUCCEED;
 }
