@@ -33,7 +33,6 @@
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "zbxipmi.h"
 
 static int	sync_in_progress = 0;
 
@@ -53,6 +52,9 @@ static int	sync_in_progress = 0;
 /* trigger is functional unless its expression contains disabled or not monitored items */
 #define TRIGGER_FUNCTIONAL_TRUE		0
 #define TRIGGER_FUNCTIONAL_FALSE	1
+
+#define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
+#define ZBX_IPMI_DEFAULT_PRIVILEGE	2
 
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
