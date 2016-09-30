@@ -33,6 +33,7 @@
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "zbxipmi.h"
 
 static int	sync_in_progress = 0;
 
@@ -1693,7 +1694,8 @@ done:
 		ipmi_authtype = (signed char)atoi(row[3]);
 		ipmi_privilege = (unsigned char)atoi(row[4]);
 
-		if (0 != ipmi_authtype || 2 != ipmi_privilege || '\0' != *row[5] || '\0' != *row[6])	/* useipmi */
+		if (ZBX_IPMI_DEFAULT_AUTHTYPE != ipmi_authtype || ZBX_IPMI_DEFAULT_PRIVILEGE != ipmi_privilege ||
+				'\0' != *row[5] || '\0' != *row[6])	/* useipmi */
 		{
 			ipmihost = DCfind_id(&config->ipmihosts, hostid, sizeof(ZBX_DC_IPMIHOST), &found);
 
@@ -5375,8 +5377,8 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	}
 	else
 	{
-		dst_host->ipmi_authtype = 0;
-		dst_host->ipmi_privilege = 2;
+		dst_host->ipmi_authtype = ZBX_IPMI_DEFAULT_AUTHTYPE;
+		dst_host->ipmi_privilege = ZBX_IPMI_DEFAULT_PRIVILEGE;
 		*dst_host->ipmi_username = '\0';
 		*dst_host->ipmi_password = '\0';
 	}
