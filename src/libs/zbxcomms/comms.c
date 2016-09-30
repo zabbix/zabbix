@@ -1828,6 +1828,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	ZBX_SOCKLEN_T	nlen;
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_separator;
+	char straddr[INET_ADDRSTRLEN];
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
@@ -1846,18 +1847,21 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 		for (start = tmp; '\0' != *start;)
 		{
+			prefix_size = 32;
+			prefix_size_ipv6 = 128;
+
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
 
 			if(NULL != (cidr_separator = strchr(start, '/')))
 			{
 				*cidr_separator = 0;
-				prefix_size_ipv6 = prefix_size = atoi(cidr_separator + 1);
-			}
-			else
-			{
-				prefix_size = 32;
-				prefix_size_ipv6 = 128;
+
+				if (1 == inet_pton(AF_INET, start, straddr) ||
+						1 == inet_pton(AF_INET6, start, straddr))
+					prefix_size_ipv6 = prefix_size = atoi(cidr_separator + 1);
+				else
+					*cidr_separator = '/';	/* CIDR is only supported for IP */
 			}
 
 			/* allow IP addresses or DNS names for authorization */
