@@ -1794,8 +1794,6 @@ static int	zbx_ip_cmp(unsigned int prefix_size, unsigned int prefix_size_ipv6, c
 }
 #endif
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_check_security                                           *
@@ -1828,7 +1826,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	ZBX_SOCKLEN_T	nlen;
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_separator;
-	char straddr[INET_ADDRSTRLEN];
+
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
@@ -1857,8 +1855,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				*cidr_separator = 0;
 
-				if (1 == inet_pton(AF_INET, start, straddr) ||
-						1 == inet_pton(AF_INET6, start, straddr))
+				if (SUCCEED == is_ip(start))
 					prefix_size_ipv6 = prefix_size = atoi(cidr_separator + 1);
 				else
 					*cidr_separator = '/';	/* CIDR is only supported for IP */
