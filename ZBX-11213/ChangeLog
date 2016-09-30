@@ -1,3 +1,15 @@
+Changes for 2.2.16rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.15
+
+2.2.15rc1 was released as 2.2.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.15rc1
 
 New features:
@@ -1459,9 +1471,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.19rc1
+Changes for 2.0.20rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19
+
+2.0.19rc1 was released as 2.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
 
 Bug fixes:
 ....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
