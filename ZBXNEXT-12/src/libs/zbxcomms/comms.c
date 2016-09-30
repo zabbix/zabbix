@@ -1818,11 +1818,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
+	int	prefix_size_ipv6;
 #else
 	struct hostent	*hp;
 	int		i;
 #endif
-	int	prefix_size, prefix_size_ipv6;
+	int	prefix_size;
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
@@ -1846,7 +1847,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		for (start = tmp; '\0' != *start;)
 		{
 			prefix_size = 32;
+#if defined(HAVE_IPV6)
 			prefix_size_ipv6 = 128;
+#endif
 
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
@@ -1856,7 +1859,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 				*cidr_separator = 0;
 
 				if (SUCCEED == is_ip(start))
-					prefix_size_ipv6 = prefix_size = atoi(cidr_separator + 1);
+				{
+					prefix_size = atoi(cidr_separator + 1);
+#if defined(HAVE_IPV6)
+					prefix_size_ipv6 = prefix_size;
+#endif
+				}
 				else
 					*cidr_separator = '/';	/* CIDR is only supported for IP */
 			}
