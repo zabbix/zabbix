@@ -1412,8 +1412,6 @@ class testFormDiscoveryRule extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormDiscoveryRule_SimpleCreate($data) {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
-
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -1601,8 +1599,6 @@ class testFormDiscoveryRule extends CWebTest {
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
-
-			DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 		}
 	}
 

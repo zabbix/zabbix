@@ -179,7 +179,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TEMPLATE:
@@ -194,7 +194,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST:
@@ -209,7 +209,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=hostid&writeonly=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER:
@@ -224,11 +224,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_VALUE:
@@ -241,7 +241,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TIME_PERIOD:
 		$condition = (new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -259,7 +259,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('drule', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('drule', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -271,7 +271,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -283,7 +283,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -295,7 +295,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_DHOST_IP:
 		$condition = (new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSERVICE_TYPE:
@@ -306,7 +306,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DSERVICE_PORT:
-		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSTATUS:
@@ -328,15 +328,15 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DVALUE:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_APPLICATION:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST_NAME:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case CONDITION_TYPE_EVENT_TYPE:
@@ -344,7 +344,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_HOST_METADATA:
-		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	default:
@@ -364,7 +364,11 @@ $conditionFormList->addRow(_('New condition'),
 					$condition
 				])
 			)
-			->addRow((new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+			->addRow(
+				(new CSimpleButton(_('Add')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "add_condition", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -446,7 +450,11 @@ if ($this->data['action']['operations']) {
 				$esc_period_txt,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CSimpleButton(_('Edit')))
+							->onClick('javascript: submitFormWithParam('.
+								'"'.$actionForm->getName().'", "edit_operationid['.$operationid.']", "1"'.
+							');')
+							->addClass(ZBX_STYLE_BTN_LINK),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.');')
@@ -462,7 +470,11 @@ if ($this->data['action']['operations']) {
 				$details,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CSimpleButton(_('Edit')))
+							->onClick('javascript: submitFormWithParam('.
+								'"'.$actionForm->getName().'", "edit_operationid['.$operationid.']", "1"'.
+							');')
+							->addClass(ZBX_STYLE_BTN_LINK),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.');')
@@ -492,7 +504,9 @@ if ($this->data['action']['operations']) {
 
 $footer = null;
 if (empty($this->data['new_operation'])) {
-	$footer = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
+	$footer = (new CSimpleButton(_('New')))
+		->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "new_operation", "1");')
+		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $operationFormList->addRow(_('Action operations'),
@@ -1001,7 +1015,9 @@ if (!empty($this->data['new_operation'])) {
 
 		if (!isset($_REQUEST['new_opcondition'])) {
 			$operationConditionsTable->addRow((new CCol(
-				(new CSubmit('new_opcondition', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+				(new CSimpleButton(_('New')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "new_opcondition", "1");')
+					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColspan(3));
 		}
 		$new_operation_formlist->addRow(_('Conditions'),
@@ -1063,8 +1079,16 @@ if (!empty($this->data['new_operation'])) {
 			(new CDiv([
 				$newOperationConditionTable,
 				new CHorList([
-					(new CSubmit('add_opcondition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-					(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$actionForm->getName().'", "add_opcondition", "1"'.
+						');')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					(new CSimpleButton(_('Cancel')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$actionForm->getName().'", "cancel_new_opcondition", "1"'.
+						');')
+						->addClass(ZBX_STYLE_BTN_LINK)
 				])
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -1077,9 +1101,13 @@ if (!empty($this->data['new_operation'])) {
 			$new_operation_vars,
 			$new_operation_formlist,
 			new CHorList([
-				(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))
+				(new CSimpleButton((isset($data['new_operation']['id'])) ? _('Update') : _('Add')))
+					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "add_operation", "1");')
 					->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSubmit('cancel_new_operation', _('Cancel')))
+				(new CSimpleButton(_('Cancel')))
+					->onClick('javascript: submitFormWithParam('.
+						'"'.$actionForm->getName().'", "cancel_new_operation", "1"'.
+					');')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			])
 		]))
