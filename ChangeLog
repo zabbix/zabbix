@@ -1,3 +1,9 @@
+Changes for 3.2.1
+
+Bug fixes:
+..F....... [ZBX-11210] fixed link "Help" to a proper version of Zabbix manual (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 3.2.1rc1
 
 New features:
