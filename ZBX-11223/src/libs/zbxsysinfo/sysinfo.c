@@ -1100,7 +1100,8 @@ void	unquote_key_param(char *param)
  *                                                                            *
  * Return value: SUCCEED - if parameter successfully quoted or it was not     *
  *                         necessary                                          *
- *               FAIL    - if quoted parameter ends with backslash            *
+ *               FAIL    - if parameter will be quoted, but it ends with      *
+ *                         backslash                                          *
  *                                                                            *
  ******************************************************************************/
 int	quote_key_param(char **param, int forced)

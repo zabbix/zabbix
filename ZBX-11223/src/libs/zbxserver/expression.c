@@ -4318,6 +4318,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           echo.sh[{$MACRO}]       |  a]    | echo.sh[" a]"]    | SUCCEED   *
  *           echo.sh[{$MACRO}]       |  a,    | echo.sh[" a,"]    | SUCCEED   *
  *           echo.sh[{$MACRO}]       |  a\    | echo.sh[{$MACRO}] | FAIL      *
+ *           echo.sh[{$MACRO}]       |  a]\   | echo.sh[{$MACRO}] | FAIL      *
+ *           echo.sh[{$MACRO}]       |  a,\   | echo.sh[{$MACRO}] | FAIL      *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,

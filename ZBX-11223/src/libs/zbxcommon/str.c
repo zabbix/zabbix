@@ -3836,7 +3836,8 @@ static char	*function_unquote_param_dyn(const char *param, size_t len)
  *                                                                            *
  * Return value: SUCCEED - if parameter successfully quoted or it was not     *
  *                         necessary                                          *
- *               FAIL    - if quoted parameter ends with backslash            *
+ *               FAIL    - if parameter will be quoted, but it ends with      *
+ *                         backslash                                          *
  *                                                                            *
  * Comments: The 'param' is quoted if either of the following is true:        *
  *           * the 'quoted' parameter is 1;                                   *
