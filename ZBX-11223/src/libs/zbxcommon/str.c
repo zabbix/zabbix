@@ -3828,58 +3828,14 @@ static char	*function_unquote_param_dyn(const char *param, size_t len)
 
 /******************************************************************************
  *                                                                            *
- * Function: function_quoted_param_len                                        *
- *                                                                            *
- * Purpose: calculates length of the function parameter                       *
- *                                                                            *
- * Parameters: param  - [IN] the parameter                                    *
- *             quoted - [IN/OUT] 1 - the parameter must be quoted,            *
- *                               0 - otherwise                                *
- *                                                                            *
- * Return value: The length of quoted (if necessary) parameter. The quoting   *
- *               is applied either if it was initially forced with quoted     *
- *               parameter, or if it starts with ' ' or '"' character, or     *
- *               contains ',' or ')' characters.                              *
- *                                                                            *
- ******************************************************************************/
-static int	function_quoted_param_len(const char *param, int *quoted)
-{
-	int	len = 0, quotes = 0;
-
-	if (' ' == *param || '"' == *param)
-		*quoted = 1;
-
-	for(;'\0' != *param; param++)
-	{
-		switch (*param)
-		{
-			case '"':
-				quotes++;
-				break;
-			case ',':
-			case ')':
-				*quoted = 1;
-				break;
-		}
-
-		len++;
-	}
-
-	if (0 != quoted)
-		len += 2 + quotes;
-
-	return len;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: function_quote_param_dyn                                         *
+ * Function: function_quote_param                                             *
  *                                                                            *
  * Purpose: quotes function parameter                                         *
  *                                                                            *
  * Parameters: param  - [IN/OUT] function parameter                           *
  *                                                                            *
- * Return value: SUCCEED - if parameter successfully processed                *
+ * Return value: SUCCEED - if parameter successfully quoted or it was not     *
+ *                         necessary                                          *
  *               FAIL    - if quoted parameter ends with backslash            *
  *                                                                            *
  * Comments: The 'param' is quoted if either of the following is true:        *
@@ -3888,45 +3844,33 @@ static int	function_quoted_param_len(const char *param, int *quoted)
  *           * the 'param' contains ',' or ')' character.                     *
  *                                                                            *
  ******************************************************************************/
-static int	function_quote_param_dyn(zbx_func_param_t *param)
+static int	function_quote_param(zbx_func_param_t *param)
 {
-	int	len, clen, quoted;
-	char	*out;
+	size_t	sz_src, sz_dst;
 
-	quoted = param->quoted;
-	len = function_quoted_param_len(param->name, &quoted);
-	clen = len - (quoted ? 2 : 0);
+	if ('"' != *param->name && ' ' != *param->name && NULL == strchr(param->name, ',') &&
+			NULL == strchr(param->name, ')'))
+		return SUCCEED;
 
-	/* quoted parameter cannot ending with a backslash */
-	if (0 == param->quoted && 1 == quoted && '\\' == param->name[clen - 1])
+	sz_src = strlen(param->name);
+
+	if ('\\' == param->name[sz_src - 1])
 		return FAIL;
 
-	out = zbx_malloc(NULL, len + 1);
+	sz_dst = zbx_get_escape_string_len(param->name, "\"") + 3;
 
-	if (0 == quoted)
+	param->name = zbx_realloc(param->name, sz_dst);
+
+	param->name[--sz_dst] = '\0';
+	param->name[--sz_dst] = '"';
+
+	while (0 < sz_src)
 	{
-		/* quoting is not required, simply copy the parameter */
-		memcpy(out, param->name, len);
-		out[len] = '\0';
+		param->name[--sz_dst] = param->name[--sz_src];
+		if ('"' == param->name[sz_src])
+			param->name[--sz_dst] = '\\';
 	}
-	else
-	{
-		/* quoting is required - apply the enclosing quotes and escape " with \" sequences */
-		const char	*pin = param->name;
-		char		*pout = out;
-
-		*pout++ = '"';
-
-		while ('\0' != *pin)
-		{
-			if ('"' == *pin)
-				*pout++ = '\\';
-			*pout++ = *pin++;
-		}
-
-		*pout++ = '"';
-		*pout = '\0';
-	}
+	param->name[--sz_dst] = '"';
 
 	return SUCCEED;
 }
@@ -4052,54 +3996,28 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
  *           data.                                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
+int	zbx_function_tostr(const zbx_function_t *func, char **out)
 {
-	int		ret = FAIL, index = 0;
-	size_t		right, len, offset, next_pos, param_pos, next_offset;
+	int		ret = FAIL, i = 0;
+	size_t		out_alloc = 128, out_offset = 0;
 	char		*param;
 
-	*out = zbx_malloc(NULL, expr_len + 1);
-	memcpy(*out, expr, expr_len);
-	(*out)[expr_len] = '\0';
+	*out = zbx_malloc(NULL, out_alloc);
 
-	if (FAIL == function_parse_name(*out, &len, &next_pos))
-		goto out;
+	zbx_strncpy_alloc(out, &out_alloc, &out_offset, func->name, strlen(func->name));
+	zbx_strncpy_alloc(out, &out_alloc, &out_offset, "(", 1);
 
-	/* calculate offset from the last name character to the first parameter */
-	offset = next_pos - len;
-	right = len - 1;
-	zbx_replace_string(out, 0, &right, func->name);
-
-	/* recalculate first parameter position in the updated expression */
-	next_pos = right + offset + 1;
-
-	do
+	for (i = 0; i < func->nparam; i++)
 	{
-		if (SUCCEED != function_parse_param(*out + next_pos, &param_pos, &len, &next_offset))
+		if (FAIL == function_quote_param(&func->params[i]))
 			goto out;
 
-		/* the param_pos and next_offset values are relative offsets from next_pos, */
-		/* convert to the absolute positions from the expression start              */
-		param_pos += next_pos;
-		next_pos += next_offset;
-
-		/* if the only parameter is empty - it's a function without parameters */
-		if (')' == (*out)[next_pos] && 0 == len &&  0 == func->nparam)
-			break;
-
-		if (FAIL == function_quote_param_dyn(&func->params[index]))
-			goto out;
-
-		/* calculate parameter last character position and the offset to the next parameter */
-		right = param_pos + len - 1;
-		offset = next_pos - right;
-
-		zbx_replace_string(out, param_pos, &right, func->params[index++].name);
-
-		/* recalculate next parameter position in the updated expression */
-		next_pos = right + offset;
+		if (0 < i)
+			zbx_strncpy_alloc(out, &out_alloc, &out_offset, ",", 1);
+		zbx_strncpy_alloc(out, &out_alloc, &out_offset, func->params[i].name, strlen(func->params[i].name));
 	}
-	while (')' != (*out)[next_pos]);
+
+	zbx_strncpy_alloc(out, &out_alloc, &out_offset, ")", 1);
 
 	ret = SUCCEED;
 out:

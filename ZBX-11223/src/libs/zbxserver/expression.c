@@ -4299,25 +4299,27 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	return ret;
 }
 
-/**********************************************************************************
- *                                                                                *
- * Function: substitute_key_macros                                                *
- *                                                                                *
- * Purpose: safely substitutes macros in parameters of an item key and OID        *
- *                                                                                *
- * Example:  key                     | macro       | result            | return   *
- *          -------------------------+-------------+-------------------+--------  *
- *           echo.sh[{$MACRO}]       | a           | echo.sh[a]        | SUCCEED  *
- *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]     | SUCCEED  *
- *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]      | SUCCEED  *
- *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}] | FAIL     *
- *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]  | SUCCEED  *
- *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]  | SUCCEED  *
- *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]    | SUCCEED  *
- *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]    | SUCCEED  *
- *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1      | SUCCEED  *
- *                                                                                *
- *********************************************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_key_macros                                            *
+ *                                                                            *
+ * Purpose: safely substitutes macros in parameters of an item key and OID    *
+ *                                                                            *
+ * Example:  key                     | macro  | result            | return    *
+ *          -------------------------+--------+-------------------+--------   *
+ *           echo.sh[{$MACRO}]       | a      | echo.sh[a]        | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a     | echo.sh[" a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a      | echo.sh["a"]      | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a]    | echo.sh[" a]"]    | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a,    | echo.sh[" a,"]    | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a\    | echo.sh[{$MACRO}] | FAIL      *
+ *                                                                            *
+ ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t maxerrlen)
 {

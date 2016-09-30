@@ -548,6 +548,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 	for (e = *data; '\0' != *e; e += len)
 	{
+
 		/* get function data or jump over part of the string that is not a function */
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
@@ -600,7 +601,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 		}
 
 		/* substitute the original function in the string with the new one (with substituted LLD macros) */
-		ret = zbx_function_tostr(&funcdata, e, len, &func);
+		ret = zbx_function_tostr(&funcdata, &func);
 		if (SUCCEED == ret)
 			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
 		else if (NULL != error)
