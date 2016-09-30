@@ -4,6 +4,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+.......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
 
 --------------------------------------------------------------------------------
@@ -27,7 +28,6 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
-.......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
 ........S. [ZBX-11204] fixed parameter parsing in calculated items when it contains double quote escaping (Sergejs)
 .......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
 .......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
