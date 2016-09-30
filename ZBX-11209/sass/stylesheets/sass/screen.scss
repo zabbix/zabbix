@@ -994,6 +994,14 @@ footer {
 	select {
 		vertical-align: top;
 	}
+
+	.table-forms .table-forms-td-right {
+
+		td {
+			padding: 0 5px 5px 0;
+			vertical-align: middle;
+		}
+	}
 }
 
 .multiselect-wrapper {
