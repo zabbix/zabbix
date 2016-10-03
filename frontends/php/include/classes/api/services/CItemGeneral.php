@@ -257,6 +257,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
+				$fullItem['delay_flex'] = '';
 			}
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
 				$item['delta'] = 0;
