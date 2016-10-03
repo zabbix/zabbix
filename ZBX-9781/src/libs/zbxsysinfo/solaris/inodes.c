@@ -138,7 +138,7 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	vfs_fs_inode(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -179,4 +179,9 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			return (fl[i].function)(cmd, fsname, flags, result);
 
 	return SYSINFO_RET_FAIL;
+}
+
+int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return zbx_agent_execute_threaded_metric(vfs_fs_inode, cmd, param, flags, result);
 }
