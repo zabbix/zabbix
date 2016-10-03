@@ -1,3 +1,24 @@
+Changes for 3.0.6rc1
+
+New features:
+........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
+
+Bug fixes:
+.......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.5
+
+3.0.5rc2 was released as 3.0.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.5rc2
+
+Bug fixes:
+..F....... [ZBX-11220] fixed visibility of latest event in Monitoring->Events page (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.5rc1
 
 New features:
@@ -7,10 +28,13 @@ A.F....... [ZBX-1357] updated Chinese (China), French, German, Korean, Persian t
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
+........S. [ZBX-11204] fixed parameter parsing in calculated items when it contains double quote escaping (Sergejs)
+.......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 ..F....... [ZBX-9068] fixed forms behaviour when enter key is pressed (Sasha)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
-....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-11137] fixed validation of new host group when creating/updating template (Gunars)
 A.F....... [ZBX-11151] implemented dynamic default sortorder for graph item, default sortorder increases by one with each entry of graph item (Cemeris)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
@@ -1473,15 +1497,31 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.16rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.15
+
+2.2.15rc1 was released as 2.2.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.15rc1
 
 New features:
 ...G...... [ZBXNEXT-3389] removed value length limitation in zabbix_sender when reading data from file/stream (wiper)
 
 Bug fixes:
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie (vlad)
+........S. [ZBX-11204] fixed parameter parsing in calculated items when it contains double quote escaping (Sergejs)
+.......PS. [ZBX-5448] fixed possible delay when proxy sends cached history to server (vso)
+.......PS. [ZBX-7595] fixed long SNMP OID not being accepted (vso)
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 ...G...PS. [ZBX-11245] fixed escaped double quote parsing in quoted parameters in array in item key parameters (gleb)
-....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vlad)
+....I..... [ZBX-11175] fixed compilation failure for OpenBSD 5.8, 5.9, 6.0 (vso)
 ..F....... [ZBX-8897] increased performance of Monitoring->Events page (Sasha)
 A......... [ZBX-11143] added missing space in CTrigger.php SQL query (Cemeris)
 A......... [ZBX-11020] fixed "host.create" so that both "inventory" and "inventory_mode" are optional (asaveljevs)
@@ -2931,12 +2971,22 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.19rc1
+Changes for 2.0.20rc1
 
 New features:
 
 Bug fixes:
-....I..... [ZBX-7108] fixed duplicate entry error on graph_theme when upgrading proxie database (vlad)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19
+
+2.0.19rc1 was released as 2.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
+
+Bug fixes:
+....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 
 --------------------------------------------------------------------------------
@@ -2971,7 +3021,7 @@ Bug fixes:
 A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
-....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
+....I..... [ZBX-10365] fixed inconsistencies in schema.inc.php with schema.tmpl (Sasha)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
@@ -4661,7 +4711,7 @@ New features:
 Changes for 1.8.23rc1
 
 A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
-....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
+....I..... [ZBX-10364] fixed inconsistencies in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 

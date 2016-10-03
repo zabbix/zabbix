@@ -3558,7 +3558,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 		if (1 == require_numeric && NULL != replace_to)
 		{
-			if (SUCCEED == (res = is_double_suffix(replace_to)))
+			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
 				wrap_negative_double_suffix(&replace_to, NULL);
 			else if (NULL != error)
 				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
@@ -3941,7 +3941,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 				break;
 			}
 
-			if (SUCCEED != is_double_suffix(func->value) || '-' == *func->value)
+			if (SUCCEED != is_double_suffix(func->value, ZBX_FLAG_DOUBLE_SUFFIX) || '-' == *func->value)
 			{
 				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, '(');
 				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
@@ -4258,7 +4258,7 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			}
 			else if (0 != (flags & ZBX_MACRO_NUMERIC))
 			{
-				if (SUCCEED == is_double_suffix(replace_to))
+				if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 				}
