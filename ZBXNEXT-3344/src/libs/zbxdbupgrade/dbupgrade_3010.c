@@ -1642,71 +1642,6 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3010080(void)
-{
-	const ZBX_FIELD field = {"snmp_oid", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("items", &field);
-}
-
-static int	DBpatch_3010081(void)
-{
-	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("dchecks", &field);
-}
-
-static int	DBpatch_3010082(void)
-{
-	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("proxy_dhistory", &field);
-}
-
-static int	DBpatch_3010083(void)
-{
-	return DBdrop_foreign_key("dservices", 1);
-}
-
-static int	DBpatch_3010084(void)
-{
-	return DBdrop_foreign_key("dservices", 2);
-}
-
-static int	DBpatch_3010085(void)
-{
-	return DBdrop_index("dservices", "dservices_1");
-}
-
-static int	DBpatch_3010086(void)
-{
-	return DBdrop_field("dservices", "type");
-}
-
-static int	DBpatch_3010087(void)
-{
-	return DBdrop_field("dservices", "key_");
-}
-
-static int	DBpatch_3010088(void)
-{
-	return DBcreate_index("dservices", "dservices_1", "dcheckid,ip,port", 1);
-}
-
-static int	DBpatch_3010089(void)
-{
-	const ZBX_FIELD	field = {"dhostid", NULL, "dhosts", "dhostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dservices", 1, &field);
-}
-
-static int	DBpatch_3010090(void)
-{
-	const ZBX_FIELD	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dservices", 2, &field);
-}
-
 #endif
 
 DBPATCH_START(3010)
@@ -1791,16 +1726,5 @@ DBPATCH_ADD(3010076, 0, 0)
 DBPATCH_ADD(3010077, 0, 1)
 DBPATCH_ADD(3010078, 0, 1)
 DBPATCH_ADD(3010079, 0, 1)
-DBPATCH_ADD(3010080, 0, 1)
-DBPATCH_ADD(3010081, 0, 1)
-DBPATCH_ADD(3010082, 0, 1)
-DBPATCH_ADD(3010083, 0, 1)
-DBPATCH_ADD(3010084, 0, 1)
-DBPATCH_ADD(3010085, 0, 1)
-DBPATCH_ADD(3010086, 0, 1)
-DBPATCH_ADD(3010087, 0, 1)
-DBPATCH_ADD(3010088, 0, 1)
-DBPATCH_ADD(3010089, 0, 1)
-DBPATCH_ADD(3010090, 0, 1)
 
 DBPATCH_END()
