@@ -2454,7 +2454,7 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 }
 #endif
 
-#if defined(HAVE_OPENSSL) && defined(_WINDOWS)
+#if defined(HAVE_OPENSSL) && defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* before OpenSSL 1.1.0 */
 /* see "man 3ssl threads" and example in OpenSSL crypto/threads/mttest.c */
 
 static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
@@ -2553,10 +2553,9 @@ static void	zbx_tls_library_init(void)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();             /* always returns "1" */
-#endif
-
 #if defined(_WINDOWS)
 	zbx_openssl_thread_setup();
+#endif
 #endif
 	init_done = 1;
 
@@ -2588,9 +2587,9 @@ void	zbx_tls_library_deinit(void)
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
 		RAND_cleanup();         	/* erase PRNG state */
 		ERR_free_strings();
-#endif
 #if defined(_WINDOWS)
 		zbx_openssl_thread_cleanup();
+#endif
 #endif
 	}
 #endif
