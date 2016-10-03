@@ -569,18 +569,21 @@ else {
 
 	$config = select_config();
 
-	$controls = (new CList())
-		->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
-		->addItem(new CSubmit('form', _('Create template')))
-		->addItem(
-			(new CButton('form', _('Import')))
-				->onClick('redirect("conf.import.php?rules_preset=template")')
-		);
-	$frmForm = (new CForm('get'))
+	$templateWidget->setControls((new CForm('get'))
 		->cleanItems()
-		->addItem($controls);
-
-	$templateWidget->setControls($frmForm);
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$pageFilter->getGroupsCB()
+			])
+			->addItem(new CSubmit('form', _('Create template')))
+			->addItem(
+				(new CButton('form', _('Import')))
+					->onClick('redirect("conf.import.php?rules_preset=template")')
+			)
+		)
+	);
 
 	$form = (new CForm())->setName('templates');
 
