@@ -75,7 +75,7 @@ static int	DBpatch_3030007(void)
 
 static int	DBpatch_3030008(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from deservices"
+	if (ZBX_DB_OK > DBexecute("delete from dservices"
 				" where dserviceid not in"
 					" (select t2.dserviceid from"
 						" (select ds.dserviceid from"
