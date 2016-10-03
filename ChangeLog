@@ -4,6 +4,7 @@ New features:
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+........S. [ZBX-11300] fixed variable used in forecast function (gleb)
 .......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
@@ -14,6 +15,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+........S. [ZBX-11300] fixed variable used in forecast function (gleb)
 A..G...... [ZBX-11146] fixed validation of item update interval 0 (Gunars, Vladislavs)
 .......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
@@ -203,6 +205,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+........S. [ZBX-11300] fixed variable used in forecast function (gleb)
 A..G...... [ZBX-11146] fixed validation of item update interval 0 (Gunars, Vladislavs)
 .......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
