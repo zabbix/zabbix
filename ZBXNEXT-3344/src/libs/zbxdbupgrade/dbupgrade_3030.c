@@ -75,12 +75,7 @@ static int	DBpatch_3030007(void)
 
 static int	DBpatch_3030008(void)
 {
-	return DBcreate_index("dservices", "dservices_1", "dcheckid,ip,port", 1);
-}
-
-static int	DBpatch_3030009(void)
-{
-	if (ZBX_DB_OK > DBexecute("select dserviceid from deservices"
+	if (ZBX_DB_OK > DBexecute("delete from deservices"
 				" where dserviceid not in"
 					" (select t2.dserviceid from"
 						" (select ds.dserviceid from"
@@ -95,6 +90,11 @@ static int	DBpatch_3030009(void)
 		}
 
 		return SUCCEED;
+}
+
+static int	DBpatch_3030009(void)
+{
+	return DBcreate_index("dservices", "dservices_1", "dcheckid,ip,port", 1);
 }
 
 static int	DBpatch_3030010(void)
