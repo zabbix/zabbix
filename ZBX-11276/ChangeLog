@@ -1,3 +1,20 @@
+Changes for 3.0.6rc1
+
+New features:
+........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
+
+Bug fixes:
+........S. [ZBX-11300] fixed variable used in forecast function (gleb)
+A..G...... [ZBX-11146] fixed validation of item update interval 0 (Gunars, vso)
+.......PS. [ZBX-11021] fixed discoverer to log that it has started before SNMP library initialization (vso)
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.5
+
+3.0.5rc2 was released as 3.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.5rc2
 
 Bug fixes:
@@ -1482,6 +1499,19 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.16rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.15
+
+2.2.15rc1 was released as 2.2.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.15rc1
 
 New features:
@@ -2943,9 +2973,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.19rc1
+Changes for 2.0.20rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19
+
+2.0.19rc1 was released as 2.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
 
 Bug fixes:
 ....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)
