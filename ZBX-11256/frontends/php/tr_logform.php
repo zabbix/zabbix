@@ -247,34 +247,35 @@ if (hasRequest('sform')) {
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
-	$maxId = 0;
+	$max_id = 0;
 	foreach ($keys as $id => $val) {
-		$row = new CRow([
-			htmlspecialchars($val['value']),
-			$val['type'],
-			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript: remove_keyword("keytr'.$id.'");')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]);
-		$row->setId('keytr'.$id);
-		$key_table->addRow($row);
+		$key_table->addRow(
+			(new CRow([
+				htmlspecialchars($val['value']),
+				$val['type'],
+				(new CCol(
+					(new CButton(null, _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->onClick('javascript: remove_keyword("keytr'.$id.'");')
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->setId('keytr'.$id)
+		);
 
-		$form->addVar('keys['.$id.'][value]', $val['value']);
-		$form->addVar('keys['.$id.'][type]', $val['type']);
+		$form
+			->addVar('keys['.$id.'][value]', $val['value'])
+			->addVar('keys['.$id.'][type]', $val['type']);
 
-		$maxId = max($maxId, $id);
+		$max_id = max($max_id, $id);
 	}
 
-	zbx_add_post_js('key_count='.($maxId + 1).';');
+	zbx_add_post_js('key_count='.($max_id + 1).';');
 
 	$expression_table = (new CTable())
 		->setId('exp_list')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
-	$maxId = 0;
+	$max_id = 0;
 	foreach ($expressions as $id => $expr) {
 		$imgup = (new CImg('images/general/arrow_up.png', 'up', 12, 14))
 			->onClick('javascript: element_up("logtr'.$id.'");')
@@ -286,26 +287,27 @@ if (hasRequest('sform')) {
 			->onMouseover('javascript: this.style.cursor = "pointer";')
 			->addClass('updown');
 
-		$row = new CRow([
-			htmlspecialchars($expr['value']),
-			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
-			[$imgup, ' ', $imgdn],
-			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript: remove_expression("logtr'.$id.'");')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]);
-		$row->setId('logtr'.$id);
-		$expression_table->addRow($row);
+		$expression_table->addRow(
+			(new CRow([
+				htmlspecialchars($expr['value']),
+				($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
+				[$imgup, ' ', $imgdn],
+				(new CCol(
+					(new CButton(null, _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->onClick('javascript: remove_expression("logtr'.$id.'");')
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->setId('logtr'.$id)
+		);
 
-		$form->addVar('expressions['.$id.'][value]', $expr['value']);
-		$form->addVar('expressions['.$id.'][type]', $expr['type']);
+		$form
+			->addVar('expressions['.$id.'][value]', $expr['value'])
+			->addVar('expressions['.$id.'][type]', $expr['type']);
 
-		$maxId = max($maxId, $id);
+		$max_id = max($max_id, $id);
 	}
 
-	zbx_add_post_js('logexpr_count='.($maxId + 1).';');
+	zbx_add_post_js('logexpr_count='.($max_id + 1).';');
 	zbx_add_post_js('processExpressionList();');
 
 	$form->addItem(
