@@ -118,5 +118,6 @@ typedef off_t	zbx_offset_t;
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
 #define ZBX_CONST_STRING(str) ""str
+#define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)
 
 #endif

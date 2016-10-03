@@ -167,6 +167,8 @@ typedef enum
 }
 ZBX_SYSINFO_RET;
 
+typedef	int (*zbx_agent_metric_func_t)(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 typedef struct
 {
 	char		*key;
@@ -297,5 +299,8 @@ typedef struct
 	int		(*function)();
 }
 MODE_FUNCTION;
+
+int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
+		unsigned flags, AGENT_RESULT *result);
 
 #endif

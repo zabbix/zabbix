@@ -662,6 +662,29 @@ void	zbx_sigusr_handler(zbx_task_t task)
 }
 #endif
 
+#ifndef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Function: alarm_signal_handler                                             *
+ *                                                                            *
+ * Purpose: handle alarm signal SIGALRM for -t, -p options                    *
+ *                                                                            *
+ ******************************************************************************/
+static void     alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
+{
+}
+
+static void	init_signal_handlers()
+{
+	struct sigaction        phan;
+
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = SA_SIGINFO;
+	phan.sa_sigaction = alarm_signal_handler;
+	sigaction(SIGALRM, &phan, NULL);
+}
+#endif
+
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
@@ -720,6 +743,8 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
+#else
+			init_signal_handlers();
 #endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);

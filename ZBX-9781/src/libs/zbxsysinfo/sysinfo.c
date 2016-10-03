@@ -483,7 +483,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 notsupported:
 
 	if (NOTSUPPORTED == ret)
+	{
+		UNSET_MSG_RESULT(result);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
+	}
 
 	return ret;
 }
@@ -810,3 +813,130 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_agent_execute_threaded_metric                                *
+ *                                                                            *
+ * Purpose: execute agent metric in a separate process/thread so it can be    *
+ *          killed/terminated when timeout is detected.                       *
+ *                                                                            *
+ * Parameters: metric_func - [IN] the metric function to execute              *
+ *             ...                the metric function parameters              *
+ *                                                                            *
+ * Return value:                                                              *
+ *         SYSINFO_RET_OK - the metric was executed successfully              *
+ *         SYSINFO_RET_FAIL - otherwise                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
+		unsigned flags, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_OK;
+#ifndef _WINDOWS
+	pid_t		pid;
+	int		fds[2], n, now, status;
+	char		buffer[8], *str;
+	size_t		str_alloc = MAX_STRING_LEN, str_offset = 0;
+
+	if (-1 == pipe(fds))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(errno)));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	if (-1 == (pid = fork()))
+	{
+		close(fds[0]);
+		close(fds[1]);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(errno)));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	if (0 == pid)
+	{
+		char	**pmessage;
+
+		close(STDOUT_FILENO);
+		close(fds[0]);
+
+		if (FAIL == (ret = metric_func(cmd, param, flags, result)) ||
+				(NULL == (pmessage = get_result_str_value(result))))
+		{
+			write(fds[1], ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED) + 1);
+
+			if (NULL != (pmessage = GET_MSG_RESULT(result)))
+				write(fds[1], *pmessage, strlen(*pmessage));
+		}
+		else
+			write(fds[1], *pmessage, strlen(*pmessage));
+
+		free_result(result);
+
+		close(fds[1]);
+
+		exit(0);
+	}
+
+	close(fds[1]);
+
+	str = zbx_malloc(NULL, str_alloc);
+
+	alarm(CONFIG_TIMEOUT);
+	now = time(NULL);
+
+	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
+	{
+		if (-1 == n || CONFIG_TIMEOUT < time(NULL) - now)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while executing check"));
+			str_offset = 0;
+			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+
+		if ((int)(str_alloc - str_offset) < n + 1)
+		{
+			while ((int)(str_alloc - str_offset) < n + 1)
+				str_alloc *= 1.5;
+
+			str = zbx_realloc(str, str_alloc);
+		}
+
+		memcpy(str + str_offset, buffer, n);
+		str_offset += n;
+		str[str_offset] = '\0';
+	}
+
+	alarm(0);
+
+	close(fds[0]);
+
+	waitpid(pid, &status, 0);
+
+	if (SYSINFO_RET_OK == ret && 0 != strcmp(str, ZBX_NOTSUPPORTED))
+	{
+		SET_STR_RESULT(result, str);
+	}
+	else
+	{
+		ret = SYSINFO_RET_FAIL;
+
+		if (NULL == GET_MSG_RESULT(result))
+		{
+			if (str_offset > ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED) + 1)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, str + ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED) + 1));
+		}
+
+		zbx_free(str);
+	}
+
+#else
+
+#endif
+out:
+	return ret;
+}
