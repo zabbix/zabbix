@@ -1982,61 +1982,6 @@ button[disabled] {
 }
 
 // Tabs
-/*.ui-tabs-nav {
-	height: 30px;
-	line-height: 30px;
-	border-bottom: 1px solid $table-border-color;
-
-	li {
-		display: inline-block;
-
-		a {
-			@extend %no-border;
-			padding: 8px 10px;
-			@include transition(background-color .2s ease-out);
-
-			&:hover {
-				background-color: $ui-hover-color;
-			}
-
-			&:focus {
-				background-color: $ui-hover-color;
-			}
-
-			&:active {
-				background-color: $ui-hover-color;
-			}
-		}
-
-		&.ui-tabs-active:first-child {
-			border-left: 0;
-		}
-
-		&.ui-tabs-active {
-
-			a {
-				padding: 8px 10px 6px 10px;
-				background-color: $transparent;
-				color: $font-color;
-				text-decoration: none;
-				position: relative;
-				cursor: default;
-				border-bottom: 3px solid $ui-tab-bg-selected-color;
-			}
-		}
-
-		&.ui-state-disabled {
-
-			a {
-				cursor: default;
-				color: $btn-disabled-font-color;
-				background-color: $transparent;
-				@extend %no-border;
-			}
-		}
-	}
-}
-*/
 .tabs {
 	white-space: nowrap;
 	overflow: hidden;
@@ -2045,16 +1990,14 @@ button[disabled] {
 	li {
 		position: relative;
 		display: inline-block;
-		//margin: 0 -1px 0 0;
 		padding: 7px 0;
 	}
 
 	label {
-		color: $link-color;
+		color: rgba($link-color,0.85);
 		padding: 9px 10px;
 		cursor: pointer;
-		//border: 1px solid $transparent;
-		@include transition(background-color .2s ease-out);
+		@include transition(color, background-color .2s ease-out);
 	}
 
 	input[type="radio"] {
@@ -2062,40 +2005,25 @@ button[disabled] {
 		clip: rect(1px, 1px, 1px, 1px);
 
 		+ label {
-			color: $link-color;
-			//border-color: $ui-bg-color;
-			//border-color: $transparent;
-			//background-color: $transparent;
-			//background-color: $ui-bg-color;
+			color: rgba($link-color,0.85);
 
 			&:hover {
-				background-color: $btn-form-hover-color;
+				color: rgba($link-color,1);
 			}
 
 			&:active {
-				//border-color: $ui-bg-color;
-				//border-color: $transparent;
-				//background-color: $btn-form-hover-color;
+				color: rgba($link-color,1);
 			}
 		}
 
 		&:focus + label {
-			//border-color: $form-border-focus-color;
-			//background-color: $ui-bg-color;
-			//background-color: $btn-form-hover-color;
-			//position: relative;
-			//z-index: 2;
+			background-color: $ui-hover-color;
 		}
 
 		&:checked + label {
 			color: $font-color;
 			cursor: default;
-			//border-color: $ui-bg-selected-color;
-			//border-bottom: 3px solid $form-border-focus-color;
-			//background-color: $ui-bg-color;
-			//background-color: $transparent;
 			position: relative;
-			z-index: 1;
 
 			&::after {
 				content: '';
@@ -2109,46 +2037,28 @@ button[disabled] {
 		}
 
 		&:checked:focus + label {
-			//border-color: $form-border-focus-color;
-			position: relative;
-			z-index: 1;
-
-			&::after {
-				content: '';
-				position: absolute;
-				bottom: -2px;
-				height: 3px;
-				left: 0;
-				right: 0;
-				background-color: $form-border-focus-color;
-			}
+			background-color: $ui-hover-color;
 		}
 
 		&:checked[disabled] + label {
-			//background-color: lighten($ui-bg-selected-color, 33%) !important;
+			background-color: $transparent;
 			color: $form-disabled-font-color;
 			cursor: default;
 			@include transition(none);
+
+			&::after {
+				background-color: $form-disabled-border-color;
+			}
 		}
 
 		&[disabled] + label {
+			background-color: $transparent;
 			color: $form-disabled-font-color;
 			cursor: default;
 			@include transition(none);
-			//@extend %form-disabled;
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
 
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
