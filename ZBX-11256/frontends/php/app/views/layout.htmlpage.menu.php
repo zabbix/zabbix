@@ -36,7 +36,7 @@ $icons = (new CList())
 			->setAttribute('title', _('Zabbix Share'))
 	)
 	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.0/'))
+		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.2/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Help'))
