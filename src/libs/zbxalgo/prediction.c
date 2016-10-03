@@ -908,7 +908,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 
 int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
 {
-	if ('\0' == *mode || 0 == strcmp(mode_str, "value"))
+	if ('\0' == *mode_str || 0 == strcmp(mode_str, "value"))
 	{
 		*mode = MODE_VALUE;
 	}
