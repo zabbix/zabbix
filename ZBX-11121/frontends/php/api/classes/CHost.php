@@ -673,14 +673,16 @@ class CHost extends CHostGeneral {
 				}
 
 				if (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".',
-						$dbHosts[$hostId]['host'])
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $dbHosts[$hostId]['host'])
 					);
 				}
 			}
 			else {
 				if (!isset($host['groups']) || !is_array($host['groups']) || !$host['groups']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $host['host'])
+					);
 				}
 
 				foreach ($host['groups'] as $group) {

@@ -515,7 +515,7 @@ class CUserGroup extends CZBXAPI {
 				foreach ($db_users as $user) {
 					if (count($user['usrgrps']) <= $amount_of_usrgrps_to_unlink[$user['userid']]) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('User "%s" cannot be without user group.', $user['alias'])
+							_s('User "%1$s" cannot be without user group.', $user['alias'])
 						);
 					}
 				}
@@ -704,7 +704,7 @@ class CUserGroup extends CZBXAPI {
 
 			if (!array_diff($db_usrgrpids, $userGroupIds)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('User "%s" cannot be without user group.', $dbUser['alias'])
+					_s('User "%1$s" cannot be without user group.', $dbUser['alias'])
 				);
 			}
 		}
