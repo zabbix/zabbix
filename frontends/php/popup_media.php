@@ -121,10 +121,9 @@ unset($mediatype);
 $frm_row = [];
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$frm_row[] = new CLabel([
-		(new CCheckBox('severity['.$severity.']', $severity))->setChecked(str_in_array($severity, $severities)),
-		getSeverityName($severity, $config)
-	], 'severity['.$severity.']');
+	$frm_row[] = (new CCheckBox('severity['.$severity.']', $severity))
+		->setLabel(getSeverityName($severity, $config))
+		->setChecked(str_in_array($severity, $severities));
 	$frm_row[] = BR();
 }
 array_pop($frm_row);

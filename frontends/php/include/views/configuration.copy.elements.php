@@ -65,29 +65,23 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] ==
 $targets = [];
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
-		$targets[] = new CLabel([
-			(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
-				->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid'])), $host['name']],
-			'copy_targetid['.$host['hostid'].']'
-		);
+		$targets[] = (new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
+				->setLabel($host['name'])
+				->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid']));
 		$targets[] = BR();
 	}
 } elseif ($this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
 	foreach ($this->data['templates'] as $template) {
-		$targets[] = new CLabel([
-			(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
-				->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid'])), $template['name']],
-			'copy_targetid['.$template['templateid'].']'
-		);
+		$targets[] = (new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
+				->setLabel($template['name'])
+				->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid']));
 		$targets[] = BR();
 	}
 } else {
 	foreach ($this->data['groups'] as $group) {
-		$targets[] = new CLabel([
-			(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
-				->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid'])), $group['name']],
-			'copy_targetid['.$group['groupid'].']'
-		);
+		$targets[] = (new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
+				->setLabel($group['name'])
+				->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid']));
 		$targets[] = BR();
 	}
 }
