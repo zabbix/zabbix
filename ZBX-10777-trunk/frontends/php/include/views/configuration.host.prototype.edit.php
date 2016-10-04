@@ -364,11 +364,17 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setEnabled(false)
 	)
 	->addRow(_('Connections from host'), [
-		new CLabel([(new CCheckBox('tls_in_none'))->setAttribute('disabled', 'disabled'), _('No encryption')]),
+		(new CCheckBox('tls_in_none'))
+			->setLabel(_('No encryption'))
+			->setAttribute('disabled', 'disabled'),
 		BR(),
-		new CLabel([(new CCheckBox('tls_in_psk'))->setAttribute('disabled', 'disabled'), _('PSK')]),
+		(new CCheckBox('tls_in_psk'))
+			->setLabel(_('PSK'))
+			->setAttribute('disabled', 'disabled'),
 		BR(),
-		new CLabel([(new CCheckBox('tls_in_cert'))->setAttribute('disabled', 'disabled'), _('Certificate')])
+		(new CCheckBox('tls_in_cert'))
+			->setLabel(_('Certificate'))
+			->setAttribute('disabled', 'disabled')
 	])
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
