@@ -1041,6 +1041,7 @@ typedef struct
 	const char		*param;
 	unsigned		flags;
 	AGENT_RESULT		*result;
+	int			agent_ret;
 }
 zbx_metric_thread_args_t;
 
@@ -1048,7 +1049,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
 
-	if (SYSINFO_RET_FAIL == args->func(args->cmd, args->param, args->flags, args->result))
+	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->cmd, args->param, args->flags, args->result)))
 	{
 		if (NULL == GET_MSG_RESULT(args->result))
 			SET_MSG_RESULT(args->result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
@@ -1105,7 +1106,7 @@ int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const
 		return SYSINFO_RET_FAIL;
 	}
 
-	return (NULL == GET_MSG_RESULT(result) ? SYSINFO_RET_OK : SYSINFO_RET_FAIL);
+	return metric_args.agent_ret;
 }
 
 #endif
