@@ -669,12 +669,12 @@ class CHttpTest extends CApiService {
 			]
 		);
 
-		if ($dbHttpTest['templateid'] != 0 && count($httpTest['steps']) != count($dbHttpTest['steps'])) {
+		if ($dbHttpTest && $dbHttpTest['templateid'] != 0 && count($httpTest['steps']) != count($dbHttpTest['steps'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
 		}
 
 		foreach ($httpTest['steps'] as $step) {
-			if ($dbHttpTest['templateid'] != 0) {
+			if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
 				// Handle templated webscenario steps first by checking the keys.
 
 				$missing_keys = checkRequiredKeys($step, ['httpstepid']);
