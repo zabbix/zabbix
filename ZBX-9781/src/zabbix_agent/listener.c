@@ -37,7 +37,7 @@ static void	process_listener(zbx_sock_t *s)
 {
 	AGENT_RESULT	result;
 	char		*command;
-	char		**value = NULL;
+	char		**value = NULL, type;
 	int		ret;
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, &command, CONFIG_TIMEOUT)))
