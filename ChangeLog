@@ -1,9 +1,11 @@
 Changes for 3.0.6rc1
 
 New features:
+........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
 ..F....... [ZBX-11276] removed extra double quotes in host interface form (Gunars)
 ........S. [ZBX-11300] fixed variable used in forecast function (gleb)
 A..G...... [ZBX-11146] fixed validation of item update interval 0 (Gunars, vso)
@@ -1503,8 +1505,10 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.16rc1
 
 New features:
+........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
 
 --------------------------------------------------------------------------------
