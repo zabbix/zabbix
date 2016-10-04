@@ -46,7 +46,9 @@ class CFormList extends CList {
 			$input_class = strtolower(get_class($input));
 
 			if (in_array($input_class, $this->formInputs)) {
-				$input_id = $input->getAttribute('id');
+				if ($input_class !== 'ccheckbox' || $input->getLabel() === '') {
+					$input_id = $input->getAttribute('id');
+				}
 			}
 		}
 
