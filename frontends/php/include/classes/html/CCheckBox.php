@@ -50,6 +50,10 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
+	public function getLabel() {
+		return $this->label;
+	}
+
 	public function setLabelPosition($label_position) {
 		$this->label_position = $label_position;
 
