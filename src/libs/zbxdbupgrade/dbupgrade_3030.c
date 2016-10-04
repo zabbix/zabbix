@@ -77,14 +77,8 @@ static int	DBpatch_3030008(void)
 {
 	if (ZBX_DB_OK > DBexecute("delete from dservices"
 				" where dserviceid not in"
-					" (select t2.dserviceid from"
-						" (select ds.dserviceid from"
-							" dservices ds, dchecks dc where dc.dcheckid=ds.dcheckid) t1"
-					" inner join"
-						" (select max(ds.dserviceid) as dserviceid from"
-							" dservices group by dchecksid, ip, port) t2"
-					" on"
-						" t1.dserviceid=t2.dserviceid)"))
+					" (select max(dserviceid) as dserviceid from"
+						" dservices group by dchecksid, ip, port)"))
 		{
 			return FAIL;
 		}
