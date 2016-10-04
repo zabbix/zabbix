@@ -172,12 +172,12 @@ static char	*hv_propmap[] = {
 	ZBX_XPATH_HV_HARDWARE("uuid"), 					/* ZBX_VMWARE_HVPROP_HW_UUID */
 	ZBX_XPATH_HV_HARDWARE("vendor"), 				/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_XPATH_HV_QUICKSTATS("overallMemoryUsage"),			/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"),	/* ZBX_VMWARE_HVPROP_STATUS */
+	ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"),	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_XPATH_HV_QUICKSTATS("uptime"),				/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_XPATH_HV_CONFIG_PRODUCT("version"),				/* ZBX_VMWARE_HVPROP_VERSION */
-	ZBX_XPATH_HV_CONFIG("name")					/* ZBX_VMWARE_HVPROP_NAME */
+	ZBX_XPATH_HV_CONFIG("name"),					/* ZBX_VMWARE_HVPROP_NAME */
+	ZBX_XPATH_HV_STATUS()					        /* ZBX_VMWARE_HVPROP_STATUS */
 };
-
 
 static char	*vm_propmap[] = {
 	ZBX_XPATH_VM_CONFIG("numCpu"),					/* ZBX_VMWARE_VMPROP_CPU_NUM */
@@ -2191,6 +2191,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
 					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>overallStatus</ns0:pathSet>"		\
 					"<ns0:pathSet>vm</ns0:pathSet>"				\
 					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
 					"<ns0:pathSet>summary.config</ns0:pathSet>"		\

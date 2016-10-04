@@ -1174,16 +1174,16 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 	return ret;
 }
 
-int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_status";
+	const char	*__function_name = "check_vcenter_hv_sensor_health_state";
 
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_STATUS, result);
+	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HEALTH_STATE, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
@@ -1206,6 +1206,37 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 	return ret;
 }
 
+int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char	*__function_name = "check_vcenter_hv_status";
+
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_STATUS, result);
+
+	if (SYSINFO_RET_OK == ret)
+	{
+		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
+			SET_UI64_RESULT(result, 0);
+		else if (0 == strcmp(result->str, "green"))
+			SET_UI64_RESULT(result, 1);
+		else if (0 == strcmp(result->str, "yellow"))
+			SET_UI64_RESULT(result, 2);
+		else if (0 == strcmp(result->str, "red"))
+			SET_UI64_RESULT(result, 3);
+		else
+			ret = SYSINFO_RET_FAIL;
+
+		UNSET_STR_RESULT(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+
+	return ret;
+}
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
