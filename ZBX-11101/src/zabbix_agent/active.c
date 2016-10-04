@@ -1518,7 +1518,13 @@ static void	process_active_checks(char *server, unsigned short port)
 		lastlogsize_sent = metric->lastlogsize;
 		mtime_sent = metric->mtime;
 
-		if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
+		/* before processing make sure refresh is not 0 to avoid overload */
+		if (0 == metric->refresh)
+		{
+			ret = FAIL;
+			error = zbx_strdup(error, "Incorrect update interval.");
+		}
+		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 			ret = process_log_check(server, port, metric, &lastlogsize_sent, &mtime_sent, &error);
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 			ret = process_eventlog_check(server, port, metric, &lastlogsize_sent, &error);

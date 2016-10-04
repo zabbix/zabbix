@@ -799,9 +799,11 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_double_suffix(const char *str);
+#define ZBX_FLAG_DOUBLE_PLAIN	0x00
+#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
+int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
-int	is_uint_suffix(const char *c, unsigned int *value);
+int	is_time_suffix(const char *c, int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
@@ -988,6 +990,12 @@ int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
 
 /* IP range support */
+#define ZBX_IPRANGE_V4	0
+#define ZBX_IPRANGE_V6	1
+
+#define ZBX_IPRANGE_GROUPS_V4	4
+#define ZBX_IPRANGE_GROUPS_V6	8
+
 typedef struct
 {
 	int	from;
@@ -997,16 +1005,18 @@ zbx_range_t;
 
 typedef struct
 {
-	zbx_range_t	range[8];
+	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V46 */
+	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)            */
+	/*                                  0       1       2       3             */
+	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
+
 	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
 	unsigned char	type;
+
 	/* 1 if the range was defined with network mask, 0 otherwise */
 	unsigned char   mask;
 }
 zbx_iprange_t;
-
-#define ZBX_IPRANGE_V4	0
-#define ZBX_IPRANGE_V6	1
 
 int	iprange_parse(zbx_iprange_t *range, const char *address);
 void	iprange_first(const zbx_iprange_t *range, int *address);

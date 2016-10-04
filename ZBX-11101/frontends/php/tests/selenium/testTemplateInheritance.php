@@ -64,7 +64,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestSwitchToNewWindow();
 		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
 		$this->zbxTestWaitWindowClose();
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('update');
@@ -128,16 +128,17 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('multiplier');
 		$this->zbxTestInputTypeOverwrite('delay', '33');
 		$this->zbxTestInputTypeOverwrite('formula', 3);
-		$this->zbxTestInputType('history', '54');
-		$this->zbxTestInputType('trends', '55');
+		$this->zbxTestInputTypeOverwrite('history', '54');
+		$this->zbxTestInputTypeOverwrite('trends', '55');
 		$this->zbxTestInputType('description', 'description');
-		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
 
 		switch ($result) {
 			case TEST_GOOD:
+				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add item']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
@@ -197,9 +198,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'unlink_and_clear[".$hostid."]')]"));
 		$this->zbxTestTextPresent('Inheritance test template for unlink');
-		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink_and_clear[".$hostid."]') and text()='Unlink and clear']");
 		$this->zbxTestTextNotPresent('Inheritance test template for unlink');
 
 		$this->zbxTestClickWait('update');
@@ -481,8 +482,6 @@ class testTemplateInheritance extends CWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
-
 		$this->zbxTestLogin('templates.php');
 
 		// create a graph
@@ -496,7 +495,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph');
 		$this->zbxTestInputTypeOverwrite('width', '950');
 		$this->zbxTestInputTypeOverwrite('height', '250');
-		if ('250' != $this->zbxTestGetValue("//input[@id='height']")) {
+		if ($this->zbxTestGetValue("//input[@id='height']") != '250') {
 				$this->zbxTestInputTypeOverwrite('height', '250');
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
@@ -554,7 +553,6 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->templateName);
 
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**

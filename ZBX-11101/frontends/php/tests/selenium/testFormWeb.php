@@ -512,10 +512,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementNotPresentId('update');
 		}
 
-		$this->zbxTestClickWait('tab_authenticationTab');
-		if ( 'Authentication' != $this->zbxTestGetText("//li[contains(@class, 'ui-tabs-active')]/a")) {
-			$this->zbxTestTabSwitch('Authentication');
-		}
+		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
@@ -546,7 +543,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}
 
-		$this->zbxTestTabSwitch('Steps');
+		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes', 'Action']);
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
@@ -1462,7 +1459,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestInputType('variables', $data['variables']);
 		}
 
-		$this->zbxTestTabSwitch('Authentication');
+		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
 		}
@@ -1478,7 +1475,7 @@ class testFormWeb extends CWebTest {
 
 		$check = false;
 		if (isset($data['add_step'])) {
-			$this->zbxTestTabSwitch('Steps');
+			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 			foreach($data['add_step'] as $item) {
 				$this->zbxTestClickWait('add_step');
 				$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
@@ -1540,7 +1537,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestDropdownAssertSelected('agent', $data['agent']);
 			if (isset($data['add_step'])) {
-				$this->zbxTestTabSwitch('Steps');
+				$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 				foreach($data['add_step'] as $item) {
 					$step = $item['step']." step";
 					$this->zbxTestTextPresent($step);

@@ -7046,26 +7046,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 			/* Store time at which no-data maintenance ended for the host (either */
 			/* because no-data maintenance ended or because maintenance type was */
 			/* changed to normal), this is needed for nodata() trigger function. */
-			/* Also, recalculate "nextcheck" time for items for which we usually */
-			/* update it upon receiving a value (i.e., items without a poller). */
-
-			ZBX_DC_ITEM		*dc_item;
-			zbx_hashset_iter_t	iter;
-
 			dc_host->data_expected_from = now;
-
-			zbx_hashset_iter_reset(&config->items, &iter);
-
-			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
-			{
-				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
-					continue;
-
-				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
-					continue;
-
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
-			}
 		}
 
 		dc_host->maintenance_status = maintenance_status;
@@ -7556,7 +7537,7 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *macro, const char *value, char **error)
 {
-	if (SUCCEED == is_double_suffix(value))
+	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
 		return SUCCEED;
 
 	if (NULL != error)
@@ -7842,10 +7823,9 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
  * Parameters: queue - [OUT] the vector of delayed items (optional)           *
- *             from  - [IN] the minimum delay time in seconds or -1 if there  *
- *                          is no minimum limit                               *
- *             to    - [IN] the maximum delay time in seconds or -1 if there  *
- *                          is no maximum limit                               *
+ *             from  - [IN] the minimum delay time in seconds (non-negative)  *
+ *             to    - [IN] the maximum delay time in seconds or              *
+ *                          ZBX_QUEUE_TO_INFINITY if there is no limit        *
  *                                                                            *
  * Return value: the number of delayed items                                  *
  *                                                                            *
@@ -7854,7 +7834,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	int			now, nitems = 0;
+	int			now, nitems = 0, data_expected_from;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -7888,6 +7868,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				if (HOST_AVAILABLE_TRUE != dc_host->available)
 					continue;
 				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
+					data_expected_from = dc_host->data_expected_from;
+				if (data_expected_from + dc_item->delay > now)
+					continue;
+				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
@@ -7904,7 +7890,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				break;
 		}
 
-		if ((-1 != from && from > now - dc_item->nextcheck) || (-1 != to && now - dc_item->nextcheck >= to))
+		if (now - dc_item->nextcheck < from || (ZBX_QUEUE_TO_INFINITY != to && now - dc_item->nextcheck >= to))
 			continue;
 
 		if (NULL != queue)

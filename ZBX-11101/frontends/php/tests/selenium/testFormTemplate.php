@@ -62,7 +62,6 @@ class testFormTemplate extends CWebTest {
 					'error_msg' => 'Cannot add template',
 					'errors' => [
 						'Host group "Selenium new group" already exists.',
-						'Cannot add group.'
 					]
 
 				]
@@ -112,7 +111,7 @@ class testFormTemplate extends CWebTest {
 					]
 
 				]
-			],
+			]
 		];
 	}
 
