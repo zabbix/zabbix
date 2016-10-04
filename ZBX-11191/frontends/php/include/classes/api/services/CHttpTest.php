@@ -504,6 +504,11 @@ class CHttpTest extends CApiService {
 
 			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as &$httpTestStep) {
+					if (isset($httpTestStep['httpstepid'])
+							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
+						$httpTestStep['name'] = $dbHttpTest['steps'][$httpTestStep['httpstepid']]['name'];
+					}
+
 					if ($dbHttpTest['templateid'] != 0) {
 						unset($httpTestStep['no']);
 					}
@@ -739,8 +744,15 @@ class CHttpTest extends CApiService {
 	 * @param array $dbHttpTest
 	 */
 	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = []) {
+		if ($dbHttpTest) {
+			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
+			$httpTest['steps'] = $this->extendFromObjects($httpTest['steps'], $dbHttpTest['steps'], ['name']);
+		}
+
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Web scenario step "%1$s" already exists.', $duplicate['name'])
+			);
 		}
 	}
 
