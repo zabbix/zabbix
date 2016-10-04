@@ -2631,6 +2631,8 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 	result = DBselect("%s" ZBX_FOR_UPDATE, sql);
 
+	zbx_free(sql);
+
 	if (NULL == DBfetch(result))
 		ret = FAIL;
 	else

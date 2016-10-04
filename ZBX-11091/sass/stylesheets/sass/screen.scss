@@ -25,7 +25,6 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -35,16 +34,19 @@ a {
 	}
 
 	&:hover {
+		outline: 0;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
+		position: relative;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
+		outline: 0;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
@@ -259,8 +261,8 @@ nav {
 				height: 0;
 				font-size: 0;
 				line-height: 0;
-				border-left: 9px solid transparent;
-				border-right: 9px solid transparent;
+				border-left: 9px solid $transparent;
+				border-right: 9px solid $transparent;
 				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
@@ -291,6 +293,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
+			background-color: $ui-hover-color;
 		}
 
 		&:active {
@@ -332,6 +335,7 @@ ul.top-nav-icons {
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
+		outline: 0;
 		@include opacity(0.75);
 		@include transition(opacity .2s ease-out);
 
@@ -340,6 +344,7 @@ ul.top-nav-icons {
 		}
 
 		&:focus {
+			background-color: $ui-hover-color !important;
 			@include opacity(1);
 		}
 	}
@@ -568,13 +573,6 @@ footer {
 	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
-
-	a {
-
-		&.logo {
-			border: none;
-		}
-	}
 }
 
 .footer {
@@ -586,8 +584,13 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 10px 10px 0 0;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
+}
+
+.header-logo {
+	float: left;
+	display: block;
+	margin: 10px 10px 0 0;
 }
 
 // Tables
@@ -728,6 +731,7 @@ footer {
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $font-color;
+	outline: 0;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
@@ -827,10 +831,16 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 16px;
-	height: 18px;
-	line-height: 18px;
+	width: 14px;
+	height: 16px;
+	min-height: auto;
+	line-height: 16px;
+	padding: 0;
+	margin: 0 2px 0 0;
+	cursor: auto;
 	text-align: center;
+	border: none;
+	background-color: $transparent;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -841,20 +851,16 @@ footer {
 		border-top-color: $font-alt-color;
 	}
 
-	&:hover .arrow-right {
-		border-left-color: $link-color;
-	}
+	&:hover, &:focus {
+		background-color: $transparent;
 
-	&:focus .arrow-right {
-		border-left-color: $link-color;
-	}
+		.arrow-right {
+			border-left-color: $link-color;
+		}
 
-	&:hover .arrow-down {
-		border-top-color: $link-color;
-	}
-
-	&:focus .arrow-down {
-		border-top-color: $link-color;
+		.arrow-down {
+			border-top-color: $link-color;
+		}
 	}
 }
 
@@ -1115,8 +1121,8 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $action-hover-color;
-	background-color: $action-hover-color;
+	border: 1px solid $table-border-color;
+	background-color: $table-border-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 
@@ -1703,6 +1709,7 @@ button {
 	}
 
 	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
@@ -1784,6 +1791,7 @@ button {
 	right: 4px;
 	width: 24px;
 	min-height: 22px;
+	height: 22px;
 	padding: 0;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
@@ -1881,6 +1889,7 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
+		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
@@ -2403,6 +2412,7 @@ $form-icon-btn: (
 		color: $font-color;
 		text-decoration: none;
 		border: none;
+		outline: 0;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
@@ -2410,6 +2420,10 @@ $form-icon-btn: (
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&:focus {
 			background-color: $action-hover-color;
 		}
 
@@ -3237,7 +3251,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $green;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3262,7 +3276,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $red;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3363,6 +3377,7 @@ td.inactive-bg {
 
 %close-icon {
 	display: block;
+	padding: 0;
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
@@ -3382,26 +3397,32 @@ td.inactive-bg {
 	&:hover {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:focus {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
 	}
 }
 
 .overlay-close-btn {
 	position: absolute;
 	z-index: 1000;
-	top: 0;
-	right: 0;
+	top: 1px;
+	right: 1px;
+	min-height: auto;
+	border: none;
+	background-color: $transparent !important;
 	@extend %close-icon;
-	@include border-radius(0 0 0 2px);
+	@include border-radius(2px);
 }
 
 a.overlay-close-btn {

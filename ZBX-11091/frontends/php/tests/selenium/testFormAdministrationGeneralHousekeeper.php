@@ -296,19 +296,19 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_events_trigger'])) {
-				$this->zbxTestInputType('hk_events_trigger', $data['hk_events_trigger']);
+				$this->zbxTestInputTypeOverwrite('hk_events_trigger', $data['hk_events_trigger']);
 			}
 
 			if (isset($data['hk_events_internal'])) {
-				$this->zbxTestInputType('hk_events_internal', $data['hk_events_internal']);
+				$this->zbxTestInputTypeOverwrite('hk_events_internal', $data['hk_events_internal']);
 			}
 
 			if (isset($data['hk_events_discovery'])) {
-				$this->zbxTestInputType('hk_events_discovery', $data['hk_events_discovery']);
+				$this->zbxTestInputTypeOverwrite('hk_events_discovery', $data['hk_events_discovery']);
 			}
 
 			if (isset($data['hk_events_autoreg'])) {
-				$this->zbxTestInputType('hk_events_autoreg', $data['hk_events_autoreg']);
+				$this->zbxTestInputTypeOverwrite('hk_events_autoreg', $data['hk_events_autoreg']);
 			}
 
 			// IT services
@@ -318,7 +318,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_services'])) {
-				$this->zbxTestInputType('hk_services', $data['hk_services']);
+				$this->zbxTestInputTypeOverwrite('hk_services', $data['hk_services']);
 			}
 
 			// audit
@@ -328,7 +328,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_audit'])) {
-				$this->zbxTestInputType('hk_audit', $data['hk_audit']);
+				$this->zbxTestInputTypeOverwrite('hk_audit', $data['hk_audit']);
 			}
 
 			// user sessions

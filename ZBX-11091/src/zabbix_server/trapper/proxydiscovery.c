@@ -70,7 +70,7 @@ void	send_discovery_data(zbx_socket_t *sock)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
-	int		records, ret = FAIL;
+	int		ret = FAIL;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -85,7 +85,7 @@ void	send_discovery_data(zbx_socket_t *sock)
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	records = proxy_get_dhis_data(&j, &lastid);
+	proxy_get_dhis_data(&j, &lastid);
 
 	zbx_json_close(&j);
 
@@ -100,7 +100,7 @@ void	send_discovery_data(zbx_socket_t *sock)
 	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
 		goto out;
 
-	if (0 != records)
+	if (0 != lastid)
 		proxy_set_dhis_lastid(lastid);
 
 	ret = SUCCEED;

@@ -979,7 +979,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 			if (oci_ids_num >= oci_ids_alloc)
 			{
 				old_alloc = oci_ids_alloc;
-				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
+				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 3 / 2);
 				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber *));
 
 				for (i = old_alloc; i < oci_ids_alloc; i++)
@@ -2157,12 +2157,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; '\0' != *s;)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */

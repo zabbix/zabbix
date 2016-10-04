@@ -394,7 +394,7 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<span>', {
+			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn'}
 				)
 				.click(function() {

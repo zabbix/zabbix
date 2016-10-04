@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.5rc1');
-define('ZABBIX_API_VERSION',	'3.0.5');
+define('ZABBIX_VERSION',		'3.0.6rc1');
+define('ZABBIX_API_VERSION',	'3.0.6');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
 define('ZABBIX_DB_VERSION',		3000000);
 
@@ -974,8 +974,9 @@ define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
 define('ZBX_TEXTAREA_FILTER_BIG_WIDTH',			524);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
 define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
-define('ZBX_TEXTAREA_STANDARD_WIDTH',			300);
-define('ZBX_TEXTAREA_BIG_WIDTH',				524);
+define('ZBX_TEXTAREA_MEDIUM_WIDTH',				270);
+define('ZBX_TEXTAREA_STANDARD_WIDTH',			453);
+define('ZBX_TEXTAREA_BIG_WIDTH',				540);
 define('ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH',	75);
 define('ZBX_TEXTAREA_NUMERIC_BIG_WIDTH',		150);
 define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
@@ -1133,6 +1134,7 @@ define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
