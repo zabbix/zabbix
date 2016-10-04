@@ -5,6 +5,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11091] fixed parsing of XML file which contains tag with attributes but without child tags; it could cause significant memeory leak (Sasha)
 ........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
 ..F....... [ZBX-11276] removed extra double quotes in host interface form (Gunars)
 ..F....... [ZBX-11256] synchronized the trigger wizzard form with trigger edit form changes (Gunars)
