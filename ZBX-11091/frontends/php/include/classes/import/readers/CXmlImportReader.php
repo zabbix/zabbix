@@ -51,38 +51,37 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = $this->xmlToArray($xml);
+		$data = $this->xml_to_array($xml);
 		$xml->close();
-
 		return $data;
 	}
 
 	/**
 	 * Method for recursive processing of xml dom nodes.
-	 * Node attributes will be stored in array as siblings of child elements.
 	 *
 	 * @param XMLReader $xml
 	 * @param string    $path
 	 *
 	 * @return array|string
 	 */
-	protected function xmlToArray(XMLReader $xml, $path = '') {
+	protected function xml_to_array(XMLReader $xml, $path = '') {
 		$data = null;
 
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					$this->validateElement($data, $path);
-
 					if ($data === null) {
 						$data = [];
+					}
+					elseif (!is_array($data)) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
+							_s('unexpected text "%1$s"', trim($data))
+						));
 					}
 
 					$node_name = $xml->name;
 					$sub_path = $path.'/'.$node_name;
 					if (array_key_exists($node_name, $data)) {
-						// Add identifier number for repeated element keys.
-
 						$node_name .= count($data);
 						$sub_path .= '('.count($data).')';
 					}
@@ -97,13 +96,10 @@ class CXmlImportReader extends CImportReader {
 						}
 
 						/*
-						 * We assume that an element with attributes never contains text node
+						 * We assume that an element with attributes always contains child elements, not a text node
 						 * works for 1.8 XML.
 						 */
-						$child_data = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
-
-						$this->validateChildElement($child_data, $sub_path);
-
+						$child_data = $this->xml_to_array($xml, $sub_path);
 						if (is_array($child_data)) {
 							foreach ($child_data as $child_node_name => $child_node_value) {
 								if (array_key_exists($child_node_name, $data[$node_name])) {
@@ -112,18 +108,27 @@ class CXmlImportReader extends CImportReader {
 								$data[$node_name][$child_node_name] = $child_node_value;
 							}
 						}
+						elseif ($child_data !== '') {
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
+								_s('unexpected text "%1$s"', trim($child_data))
+							));
+						}
 					}
 					else {
-						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml, $sub_path);
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $sub_path);
 					}
 					break;
 
 				case XMLReader::TEXT:
-					$this->validateText($data, $path, $xml->value);
-
 					if ($data === null) {
 						$data = $xml->value;
 					}
+					elseif (is_array($data)) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
+							_s('unexpected text "%1$s"', trim($xml->value))
+						));
+					}
+
 					break;
 
 				case XMLReader::END_ELEMENT:
@@ -139,48 +144,5 @@ class CXmlImportReader extends CImportReader {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Validate node of type TEXT.
-	 *
-	 * @param mixed  $data     Data for validation.
-	 * @param string $path     XML path (for error reporting).
-	 * @param string $value    XML node value.
-	 *
-	 * @throws Exception if $data is an array.
-	 */
-	private function validateText($data, $path, $value) {
-		if (is_array($data)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($value))));
-		}
-	}
-
-	/**
-	 * Validate node of type ELEMENT.
-	 *
-	 * @param mixed  $data    Data for validation.
-	 * @param string $path    XML path (for error reporting).
-	 *
-	 * @throws Exception if $data is not an array.
-	 */
-	private function validateElement($data, $path) {
-		if ($data !== null && !is_array($data)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($data))));
-		}
-	}
-
-	/**
-	 * Validate child element.
-	 *
-	 * @param mixed  $data    Data for validation.
-	 * @param string $path    XML path (for error reporting).
-	 *
-	 * @throws Exception if $data is not an empty string.
-	 */
-	private function validateChildElement($data, $path) {
-		if ($data !== '' && !is_array($data)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected text "%1$s"', trim($data))));
-		}
 	}
 }
