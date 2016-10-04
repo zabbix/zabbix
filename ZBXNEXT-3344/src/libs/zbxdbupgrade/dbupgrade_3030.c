@@ -50,59 +50,38 @@ static int	DBpatch_3030002(void)
 
 static int	DBpatch_3030003(void)
 {
-	return DBdrop_foreign_key("dservices", 1);
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_uint64_t		dserviceid;
+
+	/* After dropping fields type and key_ from table dservices there is no guarantee that a unique
+	index with fields dcheckid, ip and port can be created. To create a unique index for the same
+	fields later this will delete rows where all three of them are identical only leaving the latest. */
+	result = DBselect("select dserviceid from dservices"
+			" where dserviceid not in (select max(dserviceid) from dservices group by dcheckid, ip, port)");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(dserviceid, row[0]);
+
+		if (ZBX_DB_OK > DBexecute("delete from dservices where dserviceid=" ZBX_FS_UI64, dserviceid))
+		{
+			return FAIL;
+		}
+	}
+	DBfree_result(result);
+
+	return SUCCEED;
 }
 
 static int	DBpatch_3030004(void)
 {
-	return DBdrop_foreign_key("dservices", 2);
+	return DBdrop_field("dservices", "type");
 }
 
 static int	DBpatch_3030005(void)
 {
-	return DBdrop_index("dservices", "dservices_1");
-}
-
-static int	DBpatch_3030006(void)
-{
-	return DBdrop_field("dservices", "type");
-}
-
-static int	DBpatch_3030007(void)
-{
 	return DBdrop_field("dservices", "key_");
-}
-
-static int	DBpatch_3030008(void)
-{
-	if (ZBX_DB_OK > DBexecute("delete from dservices"
-				" where dserviceid not in"
-					" (select max(dserviceid) as dserviceid from"
-						" dservices group by dchecksid, ip, port)"))
-		{
-			return FAIL;
-		}
-
-		return SUCCEED;
-}
-
-static int	DBpatch_3030009(void)
-{
-	return DBcreate_index("dservices", "dservices_1", "dcheckid,ip,port", 1);
-}
-
-static int	DBpatch_3030010(void)
-{
-	const ZBX_FIELD	field = {"dhostid", NULL, "dhosts", "dhostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dservices", 1, &field);
-}
-
-static int	DBpatch_3030011(void)
-{
-	const ZBX_FIELD	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dservices", 2, &field);
 }
 
 #endif
@@ -117,11 +96,5 @@ DBPATCH_ADD(3030002, 0, 1)
 DBPATCH_ADD(3030003, 0, 1)
 DBPATCH_ADD(3030004, 0, 1)
 DBPATCH_ADD(3030005, 0, 1)
-DBPATCH_ADD(3030006, 0, 1)
-DBPATCH_ADD(3030007, 0, 1)
-DBPATCH_ADD(3030008, 0, 1)
-DBPATCH_ADD(3030009, 0, 1)
-DBPATCH_ADD(3030010, 0, 1)
-DBPATCH_ADD(3030011, 0, 1)
 
 DBPATCH_END()
