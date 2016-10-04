@@ -1,8 +1,10 @@
 Changes for 2.2.16rc1
 
 New features:
+........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
 
 --------------------------------------------------------------------------------
