@@ -282,6 +282,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
+#define ZBX_XPATH_HV_STATUS()										\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"		\
+		"/*[local-name()='val']"
+
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
@@ -305,12 +309,13 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 #define ZBX_VMWARE_HVPROP_HW_UUID			8
 #define ZBX_VMWARE_HVPROP_HW_VENDOR			9
 #define ZBX_VMWARE_HVPROP_MEMORY_USED			10
-#define ZBX_VMWARE_HVPROP_STATUS			11
+#define ZBX_VMWARE_HVPROP_HEALTH_STATE			11
 #define ZBX_VMWARE_HVPROP_UPTIME			12
 #define ZBX_VMWARE_HVPROP_VERSION			13
 #define ZBX_VMWARE_HVPROP_NAME				14
+#define ZBX_VMWARE_HVPROP_STATUS			15
 
-#define ZBX_VMWARE_HVPROPS_NUM				15
+#define ZBX_VMWARE_HVPROPS_NUM				16
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
