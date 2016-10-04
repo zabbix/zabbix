@@ -83,13 +83,13 @@ if ($this->data['grpswitch']) {
 }
 
 // append host in maintenance checkbox to form list
-$maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['maintenance'] == 1);
+$maintenanceCheckBox = (new CCheckBox('maintenance'))
+	->setLabel(_('Show hosts in maintenance'))
+	->setChecked($this->data['maintenance'] == 1);
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
-$form_list->addRow(_('Hosts'),
-	new CLabel([$maintenanceCheckBox, _('Show hosts in maintenance')], 'maintenance')
-);
+$form_list->addRow(_('Hosts'), $maintenanceCheckBox);
 
 // append trigger severities to form list
 $severities = [];
