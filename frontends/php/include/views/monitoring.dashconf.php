@@ -94,12 +94,10 @@ $form_list->addRow(_('Hosts'),
 // append trigger severities to form list
 $severities = [];
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
+	$severities[] = (new CCheckBox('trgSeverity['.$severity.']'))
+		->setLabel(getSeverityName($severity, $this->data['config']))
 		->setChecked(isset($this->data['severity'][$severity]))
 		->setEnabled($this->data['isFilterEnable']);
-	$severities[] = new CLabel([$serverityCheckBox, getSeverityName($severity, $this->data['config'])],
-		'trgSeverity['.$severity.']'
-	);
 	$severities[] = BR();
 }
 array_pop($severities);
