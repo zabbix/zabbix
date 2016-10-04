@@ -926,6 +926,10 @@ footer {
 
 	.filter-forms {
 		padding: 0 10px;
+
+		.btn-grey {
+			vertical-align: baseline;
+		}
 	}
 
 	.list-table {
@@ -1756,6 +1760,7 @@ button {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
 	border-color: $btn-form-border-color;
+	vertical-align: top;
 
 	&:hover {
 		color: $btn-form-font-color;
