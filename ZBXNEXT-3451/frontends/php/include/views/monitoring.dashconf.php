@@ -63,7 +63,6 @@ if ($this->data['grpswitch']) {
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'nested' => true,
 		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
 				'&srcfld1=groupid&multiselect=1'
@@ -74,7 +73,6 @@ if ($this->data['grpswitch']) {
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'nested' => true,
 		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=hidegroupids_'.
 				'&srcfld1=groupid&multiselect=1'

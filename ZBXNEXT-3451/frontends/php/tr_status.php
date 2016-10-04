@@ -293,7 +293,7 @@ if ($pageFilter->hostsSelected) {
 		$options['hostids'] = $pageFilter->hostid;
 	}
 	elseif ($pageFilter->groupid > 0) {
-		$options['groupids'] = $pageFilter->groupid;
+		$options['groupids'] = $pageFilter->groupids;
 	}
 }
 else {

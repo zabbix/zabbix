@@ -156,7 +156,6 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
-	 * @param bool   options['nested']				allow to select subgroups
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
@@ -190,7 +189,6 @@ jQuery(function($) {
 			disabled: false,
 			selectedLimit: 0,
 			limit: 20,
-			nested: false,
 			popup: [],
 			styles: []
 		};
@@ -306,10 +304,6 @@ jQuery(function($) {
 										var request_data = {
 											search: values.search,
 											limit: getLimit(values, options)
-										}
-
-										if (options.nested) {
-											request_data.nested = options.nested;
 										}
 
 										jqxhr = $.ajax({
@@ -722,15 +716,6 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
-			if (hasSubGroupPostfix(item.name) && options.nested) {
-				// Add hidden input.
-				obj.append($('<input>', {
-					type: 'hidden',
-					name: options.name.slice(0, -2) + '_subgroupids[]',
-					value: item.id
-				}));
-			}
-
 			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
 			});
@@ -1008,13 +993,5 @@ jQuery(function($) {
 		}
 
 		return length;
-	}
-
-	function hasSubGroupPostfix(str) {
-		if ('/*' === str.slice(-2)) {
-			return true;
-		}
-
-		return false;
 	}
 });

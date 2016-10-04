@@ -331,7 +331,6 @@ $filterColumn1 = (new CFormList())
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $multiSelectHostGroupData,
-			'nested' => true,
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
