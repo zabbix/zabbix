@@ -2077,7 +2077,7 @@ $var-icons: (
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
