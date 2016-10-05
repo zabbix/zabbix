@@ -374,6 +374,7 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
 			for (i = 0; i < request->nparam; i++)
 				request->params[i] = get_param_dyn(params, i + 1);
+
 			break;
 		case ZBX_COMMAND_ERROR:
 			goto out;	/* key is badly formatted */
@@ -1110,7 +1111,8 @@ int	quote_key_param(char **param, int forced)
 
 	if (0 == forced)
 	{
-		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') &&
+				NULL == strchr(*param, ']') && NULL == strchr(*param, '['))
 			return SUCCEED;
 	}
 

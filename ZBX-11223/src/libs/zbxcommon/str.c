@@ -3849,7 +3849,7 @@ static int	function_quote_param(zbx_func_param_t *param)
 {
 	size_t	sz_src, sz_dst;
 
-	if ('"' != *param->name && ' ' != *param->name && NULL == strchr(param->name, ',') &&
+	if (1 != param->quoted && '"' != *param->name && ' ' != *param->name && NULL == strchr(param->name, ',') &&
 			NULL == strchr(param->name, ')'))
 		return SUCCEED;
 
@@ -3948,6 +3948,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 	{
 		ptr += next_pos;
 
+		func->params[func->nparam].quoted = ('"' == *(ptr + 1));
 		if (SUCCEED != function_parse_param(ptr, &param_pos, &len, &next_pos))
 		{
 			zbx_function_clean(func);
@@ -3967,7 +3968,6 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 		}
 
 		func->params[func->nparam].name = function_unquote_param_dyn(ptr + param_pos, len);
-		func->params[func->nparam].quoted = ('"' == *(ptr + param_pos));
 		func->nparam++;
 	}
 	while (')' != ptr[next_pos]);
