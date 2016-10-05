@@ -5147,18 +5147,6 @@ return [
 				'ref_table' => 'dhosts',
 				'ref_field' => 'dhostid',
 			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'key_' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 512,
-				'default' => '',
-			],
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
