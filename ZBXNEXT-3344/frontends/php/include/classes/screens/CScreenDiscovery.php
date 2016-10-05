@@ -60,11 +60,12 @@ class CScreenDiscovery extends CScreenBase {
 				'output' => ['druleid', 'name'],
 				'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
 				'filter' => ['status' => DRULE_STATUS_ACTIVE],
-				'sortfield' => 'name',
 				'preservekeys' => true
 			]
 			+ (($druleid > 0) ? ['druleids' => [$druleid]] : [])
 		);
+
+		order_result($drules, 'name');
 
 		$dservices = API::DService()->get([
 			'output' => ['dserviceid', 'port', 'status', 'lastup', 'lastdown', 'dcheckid', 'ip', 'dns'],
