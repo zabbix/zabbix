@@ -154,7 +154,7 @@ class CScreenActions extends CScreenBase {
 				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 			}
 
-			$recipient = $alert['userid'] != 0
+			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
@@ -165,7 +165,7 @@ class CScreenActions extends CScreenBase {
 
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-				$actions[$alert['actionid']]['name'],
+				array_key_exists($alert['actionid'], $actions) ? $actions[$alert['actionid']]['name'] : '',
 				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
 				$recipient,
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
