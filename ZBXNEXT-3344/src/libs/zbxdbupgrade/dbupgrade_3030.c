@@ -50,6 +50,21 @@ static int	DBpatch_3030002(void)
 
 static int	DBpatch_3030003(void)
 {
+	return DBdrop_foreign_key("dservices", 1);
+}
+
+static int	DBpatch_3030004(void)
+{
+	return DBdrop_foreign_key("dservices", 2);
+}
+
+static int	DBpatch_3030005(void)
+{
+	return DBdrop_index("dservices", "dservices_1");
+}
+
+static int	DBpatch_3030006(void)
+{
 	DB_ROW			row;
 	DB_RESULT		result;
 	zbx_uint64_t		dserviceid;
@@ -74,14 +89,33 @@ static int	DBpatch_3030003(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3030004(void)
+static int	DBpatch_3030007(void)
 {
 	return DBdrop_field("dservices", "type");
 }
 
-static int	DBpatch_3030005(void)
+static int	DBpatch_3030008(void)
 {
 	return DBdrop_field("dservices", "key_");
+}
+
+static int	DBpatch_3030009(void)
+{
+	return DBcreate_index("dservices", "dservices_1", "dcheckid,ip,port", 1);
+}
+
+static int	DBpatch_3030010(void)
+{
+	const ZBX_FIELD	field = {"dhostid", NULL, "dhosts", "dhostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dservices", 1, &field);
+}
+
+static int	DBpatch_3030011(void)
+{
+	const ZBX_FIELD	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dservices", 2, &field);
 }
 
 #endif
@@ -96,5 +130,11 @@ DBPATCH_ADD(3030002, 0, 1)
 DBPATCH_ADD(3030003, 0, 1)
 DBPATCH_ADD(3030004, 0, 1)
 DBPATCH_ADD(3030005, 0, 1)
+DBPATCH_ADD(3030006, 0, 1)
+DBPATCH_ADD(3030007, 0, 1)
+DBPATCH_ADD(3030008, 0, 1)
+DBPATCH_ADD(3030009, 0, 1)
+DBPATCH_ADD(3030010, 0, 1)
+DBPATCH_ADD(3030011, 0, 1)
 
 DBPATCH_END()
