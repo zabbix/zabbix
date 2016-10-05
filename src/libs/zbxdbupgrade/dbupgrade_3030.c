@@ -22,7 +22,7 @@
 #include "dbupgrade.h"
 
 /*
- * 3.2 development database patches
+ * 3.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
