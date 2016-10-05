@@ -17,33 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXODBC_H
-#define ZABBIX_ZBXODBC_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
+/*
+ * 3.4 development database patches
+ */
 
-#define ZBX_ODBC_ROW	char **
-#define ZBX_ODBC_RESULT	ZBX_ODBC_DBH *
+#ifndef HAVE_SQLITE3
 
-typedef struct
+static int	DBpatch_3030000(void)
 {
-	SQLHENV		henv;
-	SQLHDBC		hdbc;
-	unsigned short	connected;
-	SQLHSTMT	hstmt;
-	SQLSMALLINT     col_num;
-	ZBX_ODBC_ROW	row_data;
+	const ZBX_FIELD	field = {"ipmi_authtype", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("hosts", &field);
 }
-ZBX_ODBC_DBH;
-
-int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
-void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
-
-ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query);
-ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
-
-const char	*get_last_odbc_strerror(void);
 
 #endif
+
+DBPATCH_START(3030)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3030000, 0, 1)
+
+DBPATCH_END()
