@@ -2072,8 +2072,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: lld_validate_trigger_tag_field                                   *
