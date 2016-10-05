@@ -29,6 +29,13 @@ class CTagValidator {
 	private $macro_function_parser;
 
 	/**
+	 * Parser for user macros.
+	 *
+	 * @var CUserMacroParser
+	 */
+	protected $user_macro_parser;
+
+	/**
 	 * Validation errors.
 	 *
 	 * @var string
@@ -37,6 +44,7 @@ class CTagValidator {
 
 	public function __construct() {
 		$this->macro_function_parser = new CMacroFunctionParser(['{ITEM.VALUE}'], ['allow_reference' => true]);
+		$this->user_macro_parser = new CUserMacroParser();
 	}
 
 	/**
@@ -64,6 +72,9 @@ class CTagValidator {
 			}
 			elseif ($this->macro_function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 				$p += $this->macro_function_parser->getLength();
+			}
+			elseif ($this->user_macro_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+				$p += $this->user_macro_parser->getLength();
 			}
 			else {
 				$p++;
