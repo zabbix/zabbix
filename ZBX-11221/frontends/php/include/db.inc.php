@@ -57,13 +57,12 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
 					$result = false;
 				}
+				elseif (mysqli_autocommit($DB['DB'], true) === false) {
+					$error = 'Error setting auto commit.';
+					$result = false;
+				}
 				else {
 					DBexecute('SET NAMES utf8');
-					if(TRUE != mysqli_autocommit($DB['DB'], TRUE))
-					{
-						$error = 'Error setting auto commit.';
-						$result = false;
-					}
 				}
 
 				if ($result) {
