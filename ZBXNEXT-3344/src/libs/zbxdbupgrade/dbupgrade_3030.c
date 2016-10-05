@@ -65,20 +65,18 @@ static int	DBpatch_3030006(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	zbx_uint64_t		dserviceid;
 
 	/* After dropping fields type and key_ from table dservices there is no guarantee that a unique
 	index with fields dcheckid, ip and port can be created. To create a unique index for the same
 	fields later this will delete rows where all three of them are identical only leaving the latest. */
 	result = DBselect("select dserviceid from dservices"
-			" where dserviceid not in (select max(dserviceid) from dservices group by dcheckid, ip, port)");
+			" where dserviceid not in (select max(dserviceid) from dservices group by dcheckid,ip,port)");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(dserviceid, row[0]);
-
-		if (ZBX_DB_OK > DBexecute("delete from dservices where dserviceid=" ZBX_FS_UI64, dserviceid))
+		if (ZBX_DB_OK > DBexecute("delete from dservices where dserviceid=%s", row[0]))
 		{
+			DBfree_result(result);
 			return FAIL;
 		}
 	}
