@@ -55,15 +55,18 @@ class CScreenDiscovery extends CScreenBase {
 		$sort_order = $this->data['sortorder'];
 		$druleid = $this->data['druleid'];
 
-		$drules = API::DRule()->get(
-			[
-				'output' => ['druleid', 'name'],
-				'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE],
-				'preservekeys' => true
-			]
-			+ (($druleid > 0) ? ['druleids' => [$druleid]] : [])
-		);
+		$options = [
+			'output' => ['druleid', 'name'],
+			'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
+			'preservekeys' => true
+		];
+
+		if ($druleid != 0) {
+			$options['druleids'] = [$druleid];
+		}
+
+		$drules = API::DRule()->get($options);
 
 		order_result($drules, 'name');
 
