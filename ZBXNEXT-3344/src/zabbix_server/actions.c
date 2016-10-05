@@ -717,7 +717,8 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 			result = DBselect(
 					"select dc.type"
 					" from dservices ds,dchecks dc"
-					" where ds.dserviceid=" ZBX_FS_UI64,
+					" where ds.dserviceid=" ZBX_FS_UI64
+						" and ds.dcheckid=dc.dcheckid",
 					event->objectid);
 
 			if (NULL != (row = DBfetch(result)))
