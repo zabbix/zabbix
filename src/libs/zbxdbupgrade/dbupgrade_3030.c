@@ -43,14 +43,12 @@ static int	DBpatch_3030001(void)
 
 static int	DBpatch_3030002(void)
 {
-	const ZBX_FIELD field = {"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("proxy_dhistory", &field);
+	return DBdrop_field("proxy_dhistory", "type");
 }
 
 static int	DBpatch_3030003(void)
 {
-	return DBdrop_foreign_key("dservices", 1);
+	return DBdrop_field("proxy_dhistory", "key_");
 }
 
 static int	DBpatch_3030004(void)
@@ -106,13 +104,6 @@ static int	DBpatch_3030009(void)
 
 static int	DBpatch_3030010(void)
 {
-	const ZBX_FIELD	field = {"dhostid", NULL, "dhosts", "dhostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dservices", 1, &field);
-}
-
-static int	DBpatch_3030011(void)
-{
 	const ZBX_FIELD	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("dservices", 2, &field);
@@ -135,6 +126,5 @@ DBPATCH_ADD(3030007, 0, 1)
 DBPATCH_ADD(3030008, 0, 1)
 DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
-DBPATCH_ADD(3030011, 0, 1)
 
 DBPATCH_END()

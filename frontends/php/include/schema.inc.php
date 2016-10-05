@@ -4648,12 +4648,6 @@ return [
 				'ref_table' => 'drules',
 				'ref_field' => 'druleid',
 			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'ip' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4665,12 +4659,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'key_' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 512,
-				'default' => '',
 			],
 			'value' => [
 				'null' => false,
