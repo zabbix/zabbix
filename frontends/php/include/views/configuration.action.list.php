@@ -23,7 +23,9 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
-			->addItem([_('Event source'), SPACE,
+			->addItem([
+				new CLabel(_('Event source'), 'eventsource'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				new CComboBox('eventsource', $data['eventsource'], 'submit()', [
 					EVENT_SOURCE_TRIGGERS => _('Triggers'),
 					EVENT_SOURCE_DISCOVERY => _('Discovery'),
