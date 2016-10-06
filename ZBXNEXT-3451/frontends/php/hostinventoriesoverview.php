@@ -109,7 +109,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 		'output' => ['hostid', 'name'],
 		'selectInventory' => [$_REQUEST['groupby']], // only one field is required
 		'withInventory' => true,
-		'groupids' => $pageFilter->groupid
+		'groupids' => $pageFilter->groupids
 	];
 
 	$hosts = API::Host()->get($options);
