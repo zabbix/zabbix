@@ -167,12 +167,16 @@ if ($triggerData) {
 		->show();
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
-	$controls = new CList();
-	$controls->addItem([_('Mode').SPACE, new CComboBox('mode', $availabilityReportMode, 'submit()', [
-		AVAILABILITY_REPORT_BY_HOST => _('By host'),
-		AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
-	])]);
-	$headerForm = (new CForm('get'))->addItem($controls);
+	$headerForm = (new CForm('get'))->addItem((new CList())
+		->addItem([
+			new CLabel(_('Mode'), 'mode'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CComboBox('mode', $availabilityReportMode, 'submit()', [
+				AVAILABILITY_REPORT_BY_HOST => _('By host'),
+				AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
+			])
+		])
+	);
 	$reportWidget->setControls($headerForm);
 
 	$triggerOptions = [
