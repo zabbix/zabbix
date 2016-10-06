@@ -2545,7 +2545,6 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		*dns = '\0';
 		port = 0;
 		status = 0;
-		dcheck.key_ = key_;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
@@ -2615,7 +2614,7 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " type:%d time:'%s %s' ip:'%s' dns:'%s' port:%d key:'%s' value:'%s'",
 				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
-				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
+				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, key_, value);
 
 		DBbegin();
 
