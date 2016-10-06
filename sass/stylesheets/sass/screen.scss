@@ -926,6 +926,10 @@ footer {
 
 	.filter-forms {
 		padding: 0 10px;
+
+		.btn-grey {
+			vertical-align: baseline;
+		}
 	}
 
 	.list-table {
@@ -989,6 +993,18 @@ footer {
 
 	button {
 		margin: 10px 5px 0 5px;
+	}
+
+	select {
+		vertical-align: top;
+	}
+
+	.table-forms .table-forms-td-right {
+
+		td {
+			padding: 0 5px 5px 0;
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -1669,6 +1685,7 @@ select {
 }
 
 %form-input-height-padding {
+	margin: 0;
 	padding: 0 5px;
 	min-height: 24px;
 }
@@ -1693,10 +1710,14 @@ button::-moz-focus-inner {
 }
 
 button {
-	font-family: $font-stack;
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	border: 1px solid $btn-bg-color;
+	margin: 0;
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
@@ -1811,6 +1832,7 @@ button {
 
 .filter-trigger {
 	position: relative;
+	margin: 0;
 	padding-right: 21px;
 	min-width: 94px;
 	@include border-radius(2px 2px 0 0);
@@ -1900,7 +1922,7 @@ $icon-widget-btn: (
 
 %button-icon-size {
 	width: 24px;
-	height: 24px;
+	height: auto;
 	padding: 0;
 }
 
@@ -2055,7 +2077,7 @@ $var-icons: (
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
@@ -2103,6 +2125,7 @@ $form-icon-btn: (
 
 .drag-icon {
 	margin-left: -9px;
+	height: 24px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
