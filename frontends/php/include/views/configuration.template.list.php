@@ -25,7 +25,11 @@ $widget = (new CWidget())
 		->cleanItems()
 		->addItem(
 			(new CList())
-				->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getGroupsCB()
+				])
 				->addItem(new CSubmit('form', _('Create template')))
 				->addItem(
 					(new CButton('form', _('Import')))
