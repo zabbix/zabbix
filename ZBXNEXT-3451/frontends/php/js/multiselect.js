@@ -301,17 +301,15 @@ jQuery(function($) {
 
 										values.isAjaxLoaded = false;
 
-										var request_data = {
-											search: values.search,
-											limit: getLimit(values, options)
-										}
-
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: request_data,
+											data: {
+												search: values.search,
+												limit: getLimit(values, options)
+											},
 											success: function(data) {
 												values.isAjaxLoaded = true;
 
@@ -726,8 +724,6 @@ jQuery(function($) {
 				});
 			}
 
-			var postfix = '';
-
 			var li = $('<li>', {
 				'data-id': item.id
 			}).append(
@@ -735,7 +731,7 @@ jQuery(function($) {
 					'class': 'subfilter-enabled'
 				})
 					.append($('<span>', {
-						text: prefix + item.name + postfix
+						text: prefix + item.name
 					}))
 					.append(close_btn)
 			);

@@ -376,7 +376,6 @@ elseif ($withMonitoredTriggers) {
 
 $pageFilter = new CPageFilter($options);
 
-// get groupid
 $groupids = $pageFilter->groupids;
 
 // get hostid
