@@ -1516,7 +1516,7 @@ static int is_autoreg_host_dup(zbx_uint64_t proxy_hostid, const char *host_esc, 
 	}
 	else
 	{
-		if(*autoreg_hostid == 0)
+		if (*autoreg_hostid == 0)
 			*autoreg_hostid = DBget_maxid("autoreg_host");
 		else
 			(*autoreg_hostid)++;
