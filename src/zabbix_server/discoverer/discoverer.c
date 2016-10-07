@@ -58,7 +58,7 @@ static void	proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, const char 
 	value_esc = DBdyn_escape_string_len(value, PROXY_DHISTORY_VALUE_LEN);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,ip,dns,port,value,status)"
-			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s',%d,'%s',%d)",
+			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,'%s',%d)",
 			now, drule->druleid, dcheck->dcheckid, ip_esc, dns_esc, port, value_esc, status);
 
 	zbx_free(value_esc);
