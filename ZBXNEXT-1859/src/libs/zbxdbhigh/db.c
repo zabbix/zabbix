@@ -1520,7 +1520,7 @@ static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t
 		const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata, time_t itemtime, zbx_uint64_t autoreg_hostid)
 {
-	DB_DSICOVERED_HOST	*discovered_host_new = malloc(sizeof(DB_DSICOVERED_HOST));
+	DB_DSICOVERED_HOST	*discovered_host_new = zbx_malloc(NULL, sizeof(DB_DSICOVERED_HOST));
 	DB_DSICOVERED_HOST	*discovered_host;
 	unsigned char	replaced = 0;
 
@@ -1529,7 +1529,7 @@ static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t
 	zbx_strlcpy(discovered_host_new->ip, ip, INTERFACE_IP_LEN_MAX);
 	zbx_strlcpy(discovered_host_new->dns, dns, INTERFACE_DNS_LEN_MAX);
 	discovered_host_new->port = port;
-	discovered_host_new->host_metadata = strdup(host_metadata);
+	discovered_host_new->host_metadata = zbx_strdup(NULL, host_metadata);
 	discovered_host_new->itemtime = itemtime;
 	discovered_host_new->autoreg_hostid = autoreg_hostid;
 
@@ -1538,8 +1538,8 @@ static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t
 		discovered_host = hosts_vector->values[i];
 		if (0 == strncmp(discovered_host_new->host, discovered_host->host, HOST_HOST_LEN_MAX))
 		{
-			free(discovered_host->host_metadata);
-			free(discovered_host);
+			zbx_free(discovered_host->host_metadata);
+			zbx_free(discovered_host);
 			hosts_vector->values[i] = discovered_host_new;
 			return;
 		}
@@ -1641,8 +1641,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
 				discovered_host->dns, discovered_host->port, discovered_host->host_metadata,
 				discovered_host->itemtime, insert, discovered_host->autoreg_hostid);
 
-		free(discovered_host->host_metadata);
-		free(discovered_host);
+		zbx_free(discovered_host->host_metadata);
+		zbx_free(discovered_host);
 	}
 	process_events();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __FUNCTION__);
