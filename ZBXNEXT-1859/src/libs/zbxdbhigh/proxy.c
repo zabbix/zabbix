@@ -2603,8 +2603,13 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	zbx_vector_ptr_t	discovered_hosts;
+	zbx_uint64_t	autoreg_hostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&discovered_hosts);
+	zbx_vector_ptr_reserve(&discovered_hosts, ZBX_MAX_HRECORDS);
 
 	now = time(NULL);
 
@@ -2648,19 +2653,21 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == is_ushort(tmp, &port))
 			port = ZBX_DEFAULT_AGENT_PORT;
 
-		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
-		DBcommit();
+		DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, itemtime, &autoreg_hostid);
 
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
 exit:
+	DBbegin();
+	DBregister_host_flush(&discovered_hosts);
+	DBcommit();
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
 	zbx_free(host_metadata);
+	zbx_vector_ptr_destroy(&discovered_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }

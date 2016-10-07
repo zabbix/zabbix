@@ -1461,10 +1461,115 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now)
 {
+	zbx_vector_ptr_t	discovered_hosts;
+	zbx_uint64_t autoreg_hostid = 0;
+
+	zbx_vector_ptr_create(&discovered_hosts);
+	zbx_vector_ptr_reserve(&discovered_hosts, 1);
+	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now, &autoreg_hostid);
+
+	DBregister_host_flush(&discovered_hosts);
+	zbx_vector_ptr_destroy(&discovered_hosts);
+}
+
+static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
+{
+	DB_RESULT	result;
+	int		res = SUCCEED;
+
+	result = DBselect(
+			"select hostid"
+			" from hosts"
+			" where proxy_hostid=" ZBX_FS_UI64
+			" and host='%s'"
+			ZBX_SQL_NODE,
+			proxy_hostid, host_esc,
+			DBand_node_local("hostid"));
+
+	if (NULL != DBfetch(result))
+		res = FAIL;
+	DBfree_result(result);
+
+	return res;
+}
+
+
+static int is_autoreg_host_dup(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	unsigned char	is_duplicate = 0;
+
+	result = DBselect(
+			"select autoreg_hostid"
+			" from autoreg_host"
+			" where proxy_hostid%s"
+			" and host='%s'"
+			ZBX_SQL_NODE,
+			DBsql_id_cmp(proxy_hostid), host_esc,
+			DBand_node_local("autoreg_hostid"));
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		is_duplicate = 1;
+		ZBX_STR2UINT64(*autoreg_hostid, row[0]);
+	}
+	else
+	{
+		if(*autoreg_hostid == 0)
+			*autoreg_hostid = DBget_maxid("autoreg_host");
+		else
+			(*autoreg_hostid)++;
+
+	}
+
+	DBfree_result(result);
+	return is_duplicate;
+}
+
+
+static unsigned char	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, unsigned char already_exists,
+		zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, time_t itemtime, zbx_uint64_t autoreg_hostid)
+{
+	DB_DSICOVERED_HOST	*discovered_host_new = malloc(sizeof(DB_DSICOVERED_HOST));
+	DB_DSICOVERED_HOST	*discovered_host;
+	unsigned char	replaced = 0;
+
+	discovered_host_new->proxy_hostid = proxy_hostid;
+	zbx_strlcpy(discovered_host_new->host, host, HOST_HOST_LEN_MAX);
+	zbx_strlcpy(discovered_host_new->ip, ip, INTERFACE_IP_LEN_MAX);
+	zbx_strlcpy(discovered_host_new->dns, dns, INTERFACE_DNS_LEN_MAX);
+	discovered_host_new->port = port;
+	discovered_host_new->host_metadata = strdup(host_metadata);
+	discovered_host_new->itemtime = itemtime;
+	discovered_host_new->autoreg_hostid = autoreg_hostid;
+	discovered_host_new->already_exists = already_exists;
+
+	for (int i = 0; i < hosts_vector->values_num; i++)	/* duplicate check */
+	{
+		discovered_host = hosts_vector->values[i];
+		if (0 == strncmp(discovered_host_new->host, discovered_host->host, HOST_HOST_LEN_MAX))
+		{
+			/* we replace so id must stay the same */
+			discovered_host_new->autoreg_hostid = discovered_host->autoreg_hostid;
+			free(discovered_host->host_metadata);
+			free(discovered_host);
+			hosts_vector->values[i] = discovered_host_new;
+			return 1;
+		}
+	}
+
+	zbx_vector_ptr_append(hosts_vector, discovered_host_new);
+	return 0;
+}
+
+static void	DBregister_host_insert(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now, unsigned char already_exists, zbx_uint64_t autoreg_hostid)
+{
 	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	autoreg_hostid;
 	zbx_timespec_t	ts;
 	int		res = SUCCEED;
 
@@ -1473,69 +1578,84 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	ts.sec = now;
 	ts.ns = 0;
 
-	if (0 != proxy_hostid)
-	{
-		result = DBselect(
-				"select hostid"
-				" from hosts"
-				" where proxy_hostid=" ZBX_FS_UI64
-					" and host='%s'"
-					ZBX_SQL_NODE,
-				proxy_hostid, host_esc,
-				DBand_node_local("hostid"));
+	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
-		if (NULL != DBfetch(result))
-			res = FAIL;
-		DBfree_result(result);
+	if (1 == already_exists)
+	{
+		DBexecute("update autoreg_host"
+				" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
+				" where autoreg_hostid=" ZBX_FS_UI64,
+				ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
 	}
+	else
+	{
+		DBexecute("insert into autoreg_host"
+				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
+					"host_metadata)"
+				" values"
+				" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
+				autoreg_hostid, DBsql_id_ins(proxy_hostid),
+				host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
+	}
+
+	zbx_free(host_metadata_esc);
+	zbx_free(dns_esc);
+	zbx_free(ip_esc);
+
+	add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+			TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+
+	zbx_free(host_esc);
+}
+
+void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid, const char *host,
+		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now,
+		zbx_uint64_t *autoreg_hostid)
+{
+	char		*host_esc;
+	int		res = SUCCEED;
+	unsigned char	update_host = 0;
+	unsigned char	replaced_host = 0;
+
+	zbx_uint64_t	autoreg_hostid_new = *autoreg_hostid;
+
+	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+
+	if (0 != proxy_hostid)
+		res = proxy_and_host_id_match(proxy_hostid, host_esc);
 
 	if (SUCCEED == res)
 	{
-		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-		host_metadata_esc = DBdyn_escape_string(host_metadata);
+		update_host = is_autoreg_host_dup(proxy_hostid, host_esc, &autoreg_hostid_new);
+		replaced_host = replace_discovered_host(discovered_hosts, update_host, proxy_hostid, host, ip,
+				dns, port, host_metadata, now, autoreg_hostid_new);
 
-		result = DBselect(
-				"select autoreg_hostid"
-				" from autoreg_host"
-				" where proxy_hostid%s"
-					" and host='%s'"
-					ZBX_SQL_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBand_node_local("autoreg_hostid"));
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(autoreg_hostid, row[0]);
-
-			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
-					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
-		}
-		else
-		{
-			autoreg_hostid = DBget_maxid("autoreg_host");
-			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
-						"host_metadata)"
-					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
-					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
-		}
-		DBfree_result(result);
-
-		zbx_free(host_metadata_esc);
-		zbx_free(dns_esc);
-		zbx_free(ip_esc);
-
-		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
-		process_events();
+		if(0 == update_host && 0 == replaced_host)	/* we must increase host id when inserting new hosts */
+			*autoreg_hostid = autoreg_hostid_new;
 	}
 
 	zbx_free(host_esc);
+}
+
+void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
+{
+	DB_DSICOVERED_HOST	*discovered_host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __FUNCTION__);
+
+	for (int i = 0; i < discovered_hosts->values_num; i++)
+	{
+		discovered_host = discovered_hosts->values[i];
+		DBregister_host_insert(discovered_host->proxy_hostid, discovered_host->host, discovered_host->ip,
+				discovered_host->dns, discovered_host->port, discovered_host->host_metadata,
+				discovered_host->itemtime, discovered_host->already_exists, discovered_host->autoreg_hostid);
+		free(discovered_host->host_metadata);
+		free(discovered_host);
+	}
+	process_events();
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __FUNCTION__);
 }
 
 /******************************************************************************
