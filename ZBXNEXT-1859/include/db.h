@@ -407,7 +407,7 @@ DB_ESCALATION;
 
 typedef struct
 {
-
+	zbx_uint64_t	autoreg_hostid;
 	zbx_uint64_t	proxy_hostid;
 	char	host[HOST_HOST_LEN_MAX];
 	char	ip[INTERFACE_IP_LEN_MAX];
@@ -415,8 +415,6 @@ typedef struct
 	unsigned short	port;
 	char	*host_metadata;
 	time_t	itemtime;
-	unsigned char	already_exists;
-	zbx_uint64_t	autoreg_hostid;
 }
 DB_DSICOVERED_HOST;
 
@@ -548,7 +546,7 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
 void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid, const char *host,
-		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now, zbx_uint64_t *autoreg_hostid);
+		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now);
 void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);

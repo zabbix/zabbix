@@ -2604,7 +2604,6 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	discovered_hosts;
-	zbx_uint64_t	autoreg_hostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2653,7 +2652,7 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == is_ushort(tmp, &port))
 			port = ZBX_DEFAULT_AGENT_PORT;
 
-		DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, itemtime, &autoreg_hostid);
+		DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
 
 		continue;
 json_parse_error:

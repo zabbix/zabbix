@@ -1462,11 +1462,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		unsigned short port, const char *host_metadata, int now)
 {
 	zbx_vector_ptr_t	discovered_hosts;
-	zbx_uint64_t autoreg_hostid = 0;
 
 	zbx_vector_ptr_create(&discovered_hosts);
 	zbx_vector_ptr_reserve(&discovered_hosts, 1);
-	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now, &autoreg_hostid);
+	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
 
 	DBregister_host_flush(&discovered_hosts);
 	zbx_vector_ptr_destroy(&discovered_hosts);
@@ -1494,11 +1493,10 @@ static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 }
 
 
-static int is_autoreg_host_dup(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
+static void select_autoreg_host_id(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	is_duplicate = 0;
 
 	result = DBselect(
 			"select autoreg_hostid"
@@ -1510,27 +1508,17 @@ static int is_autoreg_host_dup(zbx_uint64_t proxy_hostid, const char *host_esc, 
 			DBand_node_local("autoreg_hostid"));
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		is_duplicate = 1;
 		ZBX_STR2UINT64(*autoreg_hostid, row[0]);
-	}
 	else
-	{
-		if (*autoreg_hostid == 0)
-			*autoreg_hostid = DBget_maxid("autoreg_host");
-		else
-			(*autoreg_hostid)++;
-
-	}
+		*autoreg_hostid = 0;
 
 	DBfree_result(result);
-	return is_duplicate;
 }
 
 
-static unsigned char	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, unsigned char already_exists,
-		zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, time_t itemtime, zbx_uint64_t autoreg_hostid)
+static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t proxy_hostid,
+		const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata, time_t itemtime, zbx_uint64_t autoreg_hostid)
 {
 	DB_DSICOVERED_HOST	*discovered_host_new = malloc(sizeof(DB_DSICOVERED_HOST));
 	DB_DSICOVERED_HOST	*discovered_host;
@@ -1544,28 +1532,24 @@ static unsigned char	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, uns
 	discovered_host_new->host_metadata = strdup(host_metadata);
 	discovered_host_new->itemtime = itemtime;
 	discovered_host_new->autoreg_hostid = autoreg_hostid;
-	discovered_host_new->already_exists = already_exists;
 
 	for (int i = 0; i < hosts_vector->values_num; i++)	/* duplicate check */
 	{
 		discovered_host = hosts_vector->values[i];
 		if (0 == strncmp(discovered_host_new->host, discovered_host->host, HOST_HOST_LEN_MAX))
 		{
-			/* we replace so id must stay the same */
-			discovered_host_new->autoreg_hostid = discovered_host->autoreg_hostid;
 			free(discovered_host->host_metadata);
 			free(discovered_host);
 			hosts_vector->values[i] = discovered_host_new;
-			return 1;
+			return;
 		}
 	}
 
 	zbx_vector_ptr_append(hosts_vector, discovered_host_new);
-	return 0;
 }
 
-static void	DBregister_host_insert(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, int now, unsigned char already_exists, zbx_uint64_t autoreg_hostid)
+static void	DBregister_host_add(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now, unsigned char insert, zbx_uint64_t autoreg_hostid)
 {
 	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 	DB_RESULT	result;
@@ -1582,7 +1566,7 @@ static void	DBregister_host_insert(zbx_uint64_t proxy_hostid, const char *host, 
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
 	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
-	if (1 == already_exists)
+	if (0 == insert)
 	{
 		DBexecute("update autoreg_host"
 				" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
@@ -1611,15 +1595,12 @@ static void	DBregister_host_insert(zbx_uint64_t proxy_hostid, const char *host, 
 }
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid, const char *host,
-		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now,
-		zbx_uint64_t *autoreg_hostid)
+		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now)
+
 {
 	char		*host_esc;
 	int		res = SUCCEED;
-	unsigned char	update_host = 0;
-	unsigned char	replaced_host = 0;
-
-	zbx_uint64_t	autoreg_hostid_new = *autoreg_hostid;
+	zbx_uint64_t autoreg_hostid;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 
@@ -1628,12 +1609,9 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t pr
 
 	if (SUCCEED == res)
 	{
-		update_host = is_autoreg_host_dup(proxy_hostid, host_esc, &autoreg_hostid_new);
-		replaced_host = replace_discovered_host(discovered_hosts, update_host, proxy_hostid, host, ip,
-				dns, port, host_metadata, now, autoreg_hostid_new);
-
-		if(0 == update_host && 0 == replaced_host)	/* we must increase host id when inserting new hosts */
-			*autoreg_hostid = autoreg_hostid_new;
+		select_autoreg_host_id(proxy_hostid, host_esc, &autoreg_hostid);
+		replace_discovered_host(discovered_hosts, proxy_hostid, host, ip,
+				dns, port, host_metadata, now, autoreg_hostid);
 	}
 
 	zbx_free(host_esc);
@@ -1642,15 +1620,27 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t pr
 void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
 {
 	DB_DSICOVERED_HOST	*discovered_host;
+	zbx_uint64_t	autoreg_hostid;
+	unsigned char	insert = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __FUNCTION__);
+
+	autoreg_hostid = DBget_maxid("autoreg_host");
 
 	for (int i = 0; i < discovered_hosts->values_num; i++)
 	{
 		discovered_host = discovered_hosts->values[i];
-		DBregister_host_insert(discovered_host->proxy_hostid, discovered_host->host, discovered_host->ip,
+
+		if (0 == discovered_host->autoreg_hostid)
+		{
+			insert = 1;
+			discovered_host->autoreg_hostid = autoreg_hostid++;
+		}
+
+		DBregister_host_add(discovered_host->proxy_hostid, discovered_host->host, discovered_host->ip,
 				discovered_host->dns, discovered_host->port, discovered_host->host_metadata,
-				discovered_host->itemtime, discovered_host->already_exists, discovered_host->autoreg_hostid);
+				discovered_host->itemtime, insert, discovered_host->autoreg_hostid);
+
 		free(discovered_host->host_metadata);
 		free(discovered_host);
 	}
