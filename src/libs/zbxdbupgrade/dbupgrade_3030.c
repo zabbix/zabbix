@@ -65,24 +65,42 @@ static int	DBpatch_3030006(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
+	zbx_vector_uint64_t	dserviceids;
+	zbx_uint64_t		dserviceid;
+	int			ret = SUCCEED;
+
+	zbx_vector_uint64_create(&dserviceids);
 
 	/* After dropping fields type and key_ from table dservices there is no guarantee that a unique
 	index with fields dcheckid, ip and port can be created. To create a unique index for the same
 	fields later this will delete rows where all three of them are identical only leaving the latest. */
-	result = DBselect("select dserviceid from dservices"
-			" where dserviceid not in (select max(dserviceid) from dservices group by dcheckid,ip,port)");
+	result = DBselect(
+			"select ds.dserviceid"
+			" from dservices ds"
+			" where not exists ("
+				"select null"
+				" from dchecks dc"
+				" where ds.dcheckid = dc.dcheckid"
+					" and ds.type = dc.type"
+					" and ds.key_ = dc.key_"
+			")");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute("delete from dservices where dserviceid=%s", row[0]))
-		{
-			DBfree_result(result);
-			return FAIL;
-		}
+		ZBX_STR2UINT64(dserviceid, row[0]);
+
+		zbx_vector_uint64_append(&dserviceids, dserviceid);
 	}
 	DBfree_result(result);
 
-	return SUCCEED;
+	zbx_vector_uint64_sort(&dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 != dserviceids.values_num)
+		ret = DBexecute_multiple_query("delete from dservices where", "dserviceid", &dserviceids);
+
+	zbx_vector_uint64_destroy(&dserviceids);
+
+	return ret;
 }
 
 static int	DBpatch_3030007(void)
