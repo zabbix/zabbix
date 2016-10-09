@@ -2504,7 +2504,7 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 	struct zbx_json_parse	jp_data, jp_row;
 	int			port, status, ret;
 	const char		*p = NULL;
-	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
+	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
 	size_t			value_alloc = 128;
@@ -2538,7 +2538,6 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 			goto json_parse_error;
 
 		memset(&dcheck, 0, sizeof(dcheck));
-		*key_ = '\0';
 		*value = '\0';
 		*dns = '\0';
 		port = 0;
@@ -2554,24 +2553,13 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 
 		ZBX_STR2UINT64(drule.druleid, tmp);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
-			goto json_parse_error;
-
-		dcheck.type = atoi(tmp);
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
 		if ('\0' != *tmp)
-		{
 			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
-		}
-		else if (-1 != dcheck.type)
-		{
-			*error = zbx_strdup(*error, "null service check ID");
-			ret = FAIL;
-			break;
-		}
+		else
+			dcheck.dcheckid = 0;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
@@ -2579,7 +2567,6 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
 
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_));
 		zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc);
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
 
@@ -2610,13 +2597,13 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
-				ZBX_FS_UI64 " type:%d time:'%s %s' ip:'%s' dns:'%s' port:%d key:'%s' value:'%s'",
-				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
-				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, key_, value);
+				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%d value:'%s'",
+				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid,
+				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, value);
 
 		DBbegin();
 
-		if (-1 == dcheck.type)
+		if (0 == dcheck.dcheckid)
 		{
 			if (SUCCEED != DBlock_druleid(drule.druleid))
 			{
