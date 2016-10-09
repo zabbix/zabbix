@@ -2498,9 +2498,8 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_DRULE		drule;
-	DB_DCHECK		dcheck;
 	DB_DHOST		dhost;
-	zbx_uint64_t		last_druleid = 0;
+	zbx_uint64_t		last_druleid = 0, dcheckid;
 	struct zbx_json_parse	jp_data, jp_row;
 	int			port, status, ret;
 	const char		*p = NULL;
@@ -2537,7 +2536,6 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
-		memset(&dcheck, 0, sizeof(dcheck));
 		*value = '\0';
 		*dns = '\0';
 		port = 0;
@@ -2557,9 +2555,9 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 			goto json_parse_error;
 
 		if ('\0' != *tmp)
-			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
+			ZBX_STR2UINT64(dcheckid, tmp);
 		else
-			dcheck.dcheckid = 0;
+			dcheckid = 0;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
@@ -2598,12 +2596,12 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%d value:'%s'",
-				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid,
-				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, value);
+				__function_name, drule.druleid, dcheckid, drule.unique_dcheckid, zbx_date2str(itemtime),
+				zbx_time2str(itemtime), ip, dns, port, value);
 
 		DBbegin();
 
-		if (0 == dcheck.dcheckid)
+		if (0 == dcheckid)
 		{
 			if (SUCCEED != DBlock_druleid(drule.druleid))
 			{
@@ -2618,17 +2616,17 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		}
 		else
 		{
-			if (SUCCEED != DBlock_dcheckid(dcheck.dcheckid, drule.druleid))
+			if (SUCCEED != DBlock_dcheckid(dcheckid, drule.druleid))
 			{
 				DBrollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
-						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
+						" belong to druleid:" ZBX_FS_UI64, dcheckid, drule.druleid);
 
 				continue;
 			}
 
-			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
+			discovery_update_service(&drule, dcheckid, &dhost, ip, dns, port, status, value, itemtime);
 		}
 
 		DBcommit();
