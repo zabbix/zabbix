@@ -1601,12 +1601,12 @@ void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
 {
 #define ZBX_MAX_IDS	950
 	char	*sql = NULL;
 	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	int	i;
+	int	i, ret = SUCCEED;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -1619,17 +1619,21 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 				&ids->values[i], MIN(ZBX_MAX_IDS, ids->values_num - i));
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			break;
 	}
 
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		DBexecute("%s", sql);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
 	}
 
 	zbx_free(sql);
+
+	return ret;
 }
 
 #ifdef HAVE_ORACLE
