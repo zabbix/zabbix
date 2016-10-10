@@ -10,10 +10,12 @@
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
-		<div class="interface-bulk">
-			<input class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="checkbox" id="interfaces_#{iface.interfaceid}_bulk" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
-			<label for="interfaces_#{iface.interfaceid}_bulk"><span></span><?= _('Use bulk requests') ?></label>
-		</div>
+		<ul class="interface-bulk <?= ZBX_STYLE_LIST_HOR_CHECK_RADIO ?>">
+			<li>
+				<input class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="checkbox" id="interfaces_#{iface.interfaceid}_bulk" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
+				<label for="interfaces_#{iface.interfaceid}_bulk"><span></span><?= _('Use bulk requests') ?></label>
+			</li>
+		</ul>
 	</td>
 	<td class="interface-dns">
 		<input name="interfaces[#{iface.interfaceid}][dns]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_DNS_WIDTH ?>px" maxlength="64" value="#{iface.dns}">
@@ -362,12 +364,14 @@
 
 				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
-						var bulkDiv = jQuery('<div>', {
-							'class': 'interface-bulk'
+						var bulkList = jQuery('<ul>', {
+							'class': 'interface-bulk <?= ZBX_STYLE_LIST_HOR_CHECK_RADIO ?>'
 						});
 
+						var bulkItem = jQuery('<li>');
+
 						// append checkbox
-						bulkDiv.append(jQuery('<input>', {
+						bulkItem.append(jQuery('<input>', {
 							id: 'interfaces_' + hostInterfaceId + '_bulk',
 							'class': '<?= ZBX_STYLE_CHECKBOX_RADIO ?>',
 							type: 'checkbox',
@@ -384,9 +388,10 @@
 						bulkLabel.append(jQuery('<span>'));
 						bulkLabel.append('<?= _('Use bulk requests') ?>');
 
-						bulkDiv.append(bulkLabel);
+						bulkItem.append(bulkLabel);
+						bulkList.append(bulkItem);
 
-						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkDiv);
+						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkList);
 					}
 				}
 				else {
