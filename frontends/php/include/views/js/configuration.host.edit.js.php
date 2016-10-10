@@ -369,7 +369,7 @@
 						// append checkbox
 						bulkDiv.append(jQuery('<input>', {
 							id: 'interfaces_' + hostInterfaceId + '_bulk',
-							'class': 'input checkbox <?= ZBX_STYLE_CHECKBOX_RADIO ?> pointer',
+							'class': '<?= ZBX_STYLE_CHECKBOX_RADIO ?>',
 							type: 'checkbox',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
 							value: 1,
