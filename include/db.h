@@ -108,7 +108,7 @@ struct	_DC_TRIGGER;
 #define ITEM_UNITS_LEN			255
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
-#define ITEM_SNMP_OID_LEN		255
+#define ITEM_SNMP_OID_LEN		512
 #define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
 #define ITEM_ERROR_LEN			2048
 #define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
@@ -164,13 +164,11 @@ struct	_DC_TRIGGER;
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	(GRAPH_ITEM_COLOR_LEN + 1)
 
-#define DSERVICE_KEY_LEN		255
 #define DSERVICE_VALUE_LEN		255
 
 #define HTTPTEST_HTTP_USER_LEN		64
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 
-#define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
@@ -586,7 +584,7 @@ int	DBtxn_ongoing(void);
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
-void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
 
