@@ -1638,7 +1638,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
 {
 	DB_DSICOVERED_HOST	*discovered_host;
 	zbx_uint64_t	autoreg_hostid;
-	unsigned char	insert = 0;
+	unsigned char	insert;
 	int	i, num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __FUNCTION__);
@@ -1662,6 +1662,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
 			insert = 1;
 			discovered_host->autoreg_hostid = autoreg_hostid++;
 		}
+		else
+			insert = 0;
 
 		DBregister_host_add(discovered_host->proxy_hostid, discovered_host->host, discovered_host->ip,
 				discovered_host->dns, discovered_host->port, discovered_host->host_metadata,

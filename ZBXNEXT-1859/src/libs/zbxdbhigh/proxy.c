@@ -2662,6 +2662,7 @@ json_parse_error:
 	DBbegin();
 	DBregister_host_flush(&discovered_hosts);
 	DBcommit();
+
 exit:
 
 	if (SUCCEED != ret)
