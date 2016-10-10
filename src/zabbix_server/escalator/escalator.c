@@ -798,7 +798,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 					break;
 			}
 
-			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+			rc = zbx_execute_script(&host, &script, NULL, NULL, error, sizeof(error));
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
@@ -1752,8 +1752,8 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* Action recovery operations have a single escalation step so alerts created
-	* by escalation operations must have esc_step field set to 1. */
+	/* Action recovery operations have a single escalation step, so alerts */
+	/* created by escalation operations must have esc_step field set to 1. */
 	escalation->esc_step = 1;
 
 	escalation_execute_recovery_operations(escalation, event, r_event, action);
@@ -2001,7 +2001,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
 
 		/* Skip escalations that must be checked later and that are not recovered */
-		/* (corresponding OK event hasn't occured yet, see process_actions()).    */
+		/* (corresponding OK event hasn't occurred yet, see process_actions()).   */
 		if (escalation.nextcheck > now && 0 == escalation.r_eventid)
 		{
 			if (escalation.nextcheck < *nextcheck)

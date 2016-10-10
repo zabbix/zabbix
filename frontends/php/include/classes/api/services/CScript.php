@@ -287,7 +287,7 @@ class CScript extends CApiService {
 
 		// execute script
 		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-		$result = $zabbixServer->executeScript($scriptId, $hostId);
+		$result = $zabbixServer->executeScript($scriptId, $hostId, CWebUser::$data['sessionid']);
 		if ($result !== false) {
 			// return the result in a backwards-compatible format
 			return [

@@ -146,7 +146,11 @@ $new_permissions_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow([(new CSubmit('add_permission', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$userGroupForm->getName().'", "add_permission", "1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 $permissionsFormList->addRow(null,
 	(new CDiv($new_permissions_table))

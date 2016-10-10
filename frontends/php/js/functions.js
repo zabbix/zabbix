@@ -29,8 +29,16 @@ function getIdFromNodeId(id) {
 	return null;
 }
 
-function check_target(e) {
-	var targets = document.getElementsByName('expr_target_single');
+function check_target(e, type) {
+	// If type is expression.
+	if (type == 0) {
+		var targets = document.getElementsByName('expr_target_single');
+	}
+	// Type is recovery expression.
+	else {
+		var targets = document.getElementsByName('recovery_expr_target_single');
+	}
+
 	for (var i = 0; i < targets.length; ++i) {
 		targets[i].checked = targets[i] == e;
 	}

@@ -51,7 +51,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->zbxTestClickWait('change_password');
+		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', $pwd);
 		$this->zbxTestInputType('password2', $pwd);
 
@@ -66,7 +66,7 @@ class testFormUserProfile extends CWebTest {
 		/* set default password */
 		$this->zbxTestOpen('profile.php');
 
-		$this->zbxTestClickWait('change_password');
+		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', PHPUNIT_LOGIN_PWD);
 		$this->zbxTestInputType('password2', PHPUNIT_LOGIN_PWD);
 
@@ -82,7 +82,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->zbxTestClickWait('change_password');
+		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', '');
 		$this->zbxTestInputType('password2', '');
 
@@ -99,7 +99,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestLogin('profile.php');
 
-		$this->zbxTestClickWait('change_password');
+		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', 'abc');
 		$this->zbxTestInputType('password2', 'def');
 

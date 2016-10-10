@@ -1303,7 +1303,9 @@ function getActionMessages(array $alerts) {
 		}
 
 		$recipient = $alert['userid']
-			? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+			? array_key_exists($alert['userid'], $dbUsers)
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+				: _('Inaccessible user')
 			: $alert['sendto'];
 
 		$info_icons = [];
@@ -1400,7 +1402,10 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 
 			switch ($alert['alerttype']) {
 				case ALERT_TYPE_MESSAGE:
-					$user = array_key_exists($alert['userid'], $users) ? getUserFullname($users[$alert['userid']]) : '';
+					$user = array_key_exists($alert['userid'], $users)
+						? getUserFullname($users[$alert['userid']])
+						: _('Inaccessible user');
+
 					$message = array_key_exists($alert['mediatypeid'], $mediatypes)
 						? $mediatypes[$alert['mediatypeid']]['description']
 						: '';

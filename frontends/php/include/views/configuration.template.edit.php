@@ -412,9 +412,16 @@ foreach ($data['linkedTemplates'] as $template) {
 		$templateLink,
 		(new CCol(
 			new CHorList([
-				(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSimpleButton(_('Unlink')))
+					->onClick('javascript: submitFormWithParam('.
+						'"'.$frmHost->getName().'", "unlink['.$template['templateid'].']", "1"'.
+					');')
+					->addClass(ZBX_STYLE_BTN_LINK),
 				(array_key_exists($template['templateid'], $data['original_templates']) && !$cloneOrFullClone)
-					? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+					? (new CSimpleButton(_('Unlink and clear')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$frmHost->getName().'", "unlink_and_clear['.$template['templateid'].']", "1"'.
+						');')
 						->addClass(ZBX_STYLE_BTN_LINK)
 					: null
 			])
@@ -447,7 +454,11 @@ $newTemplateTable = (new CTable())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
-	->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "add_template", "1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 $tmplList->addRow(_('Link new templates'),
 	(new CDiv($newTemplateTable))

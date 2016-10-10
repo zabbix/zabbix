@@ -11,8 +11,8 @@
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
-			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
+			<input type="checkbox" id="interfaces_#{iface.interfaceid}_bulk" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
+			<label for="interfaces_#{iface.interfaceid}_bulk"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
@@ -171,7 +171,7 @@
 
 			if (hostInterface.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				if (hostInterface.bulk == 1) {
-					attrs.checked_bulk = 'checked="checked"';
+					attrs.checked_bulk = 'checked=checked';
 				}
 				else {
 					attrs.checked_bulk = '';
@@ -368,7 +368,7 @@
 
 						// append checkbox
 						bulkDiv.append(jQuery('<input>', {
-							id: 'interfaces[' + hostInterfaceId + '][bulk]',
+							id: 'interfaces_' + hostInterfaceId + '_bulk',
 							'class': 'input checkbox pointer',
 							type: 'checkbox',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
@@ -378,7 +378,7 @@
 
 						// append label
 						bulkDiv.append(jQuery('<label>', {
-							'for': 'interfaces[' + hostInterfaceId + '][bulk]',
+							'for': 'interfaces_' + hostInterfaceId + '_bulk',
 							text: '<?= _('Use bulk requests') ?>'
 						}));
 

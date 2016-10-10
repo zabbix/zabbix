@@ -1482,6 +1482,9 @@ function getTriggerFormData(array $data) {
 		}
 		else {
 			show_messages(false, '', _('Expression syntax error.'));
+			$data['expression_field_name'] = 'expression';
+			$data['expression_field_value'] = $data['expression'];
+			$data['expression_field_readonly'] = $readonly;
 			$data['expression_constructor'] = IM_ESTABLISHED;
 		}
 	}
@@ -1522,6 +1525,9 @@ function getTriggerFormData(array $data) {
 		}
 		else {
 			show_messages(false, '', _('Recovery expression syntax error.'));
+			$data['recovery_expression_field_name'] = 'recovery_expression';
+			$data['recovery_expression_field_value'] = $data['recovery_expression'];
+			$data['recovery_expression_field_readonly'] = $readonly;
 			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
 		}
 	}

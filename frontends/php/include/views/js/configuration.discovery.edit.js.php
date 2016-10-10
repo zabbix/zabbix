@@ -33,7 +33,7 @@
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
-		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>">
+		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
 			<table>
 				<tbody>
 				<tr>
@@ -44,42 +44,42 @@
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
 						<input type="text" id="ports" name="ports" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
 					<td>
 						<input type="text" id="snmp_community" name="snmp_community" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckKeyRow">
 					<td><label for="key_"><?= _('Key') ?></label></td>
 					<td>
 						<input type="text" id="key_" name="key_" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="new_check_snmp_oid_row">
 					<td><label for="snmp_oid"><?= _('SNMP OID') ?></label></td>
 					<td>
 						<input type="text" id="snmp_oid" name="snmp_oid" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="512">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="512">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow">
 					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
 						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckSecNameRow">
 					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
 					<td>
 						<input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
 					</td>
 				</tr>
 				<tr id="newCheckSecLevRow">
@@ -106,7 +106,7 @@
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
 					<td>
 						<input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
 					</td>
 				</tr>
 				<?= (new CRow([
@@ -123,7 +123,7 @@
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
 					<td>
 						<input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
-							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64">
+							style="width: <?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px" maxlength="64">
 					</td>
 				</tr>
 				</tbody>
