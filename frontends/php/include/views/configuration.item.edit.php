@@ -140,7 +140,7 @@ if ($data['interfaces']) {
 
 // Append SNMP common fields fields.
 $itemFormList->addRow(_('SNMP OID'),
-	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
