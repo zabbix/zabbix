@@ -57,7 +57,7 @@
 			softCheckbox.setAttribute('value', '1');
 			softCheckbox.setAttribute('name', 'children[' + serviceid + '][soft]');
 			softCheckbox.setAttribute('id', 'children_' + serviceid + '_soft');
-			softCheckbox.setAttribute('class', 'input checkbox <?= ZBX_STYLE_CHECKBOX_RADIO ?> pointer');
+			softCheckbox.setAttribute('class', '<?= ZBX_STYLE_CHECKBOX_RADIO ?>');
 
 			var softCheckboxLabel = document.createElement('label');
 			softCheckboxLabel.setAttribute('for', 'children_' + serviceid + '_soft');
