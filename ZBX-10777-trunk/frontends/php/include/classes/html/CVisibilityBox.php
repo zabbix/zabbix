@@ -42,7 +42,7 @@ class CVisibilityBox extends CCheckBox {
 
 	public function setLabel($label) {
 		parent::setLabel($label.SPACE);
-		parent::setLabelPosition(self::LABEL_POSITION_LEFT);
+		$this->setLabelPosition(self::LABEL_POSITION_LEFT);
 
 		return $this;
 	}
