@@ -1515,7 +1515,7 @@ static void select_autoreg_hostid(zbx_uint64_t proxy_hostid, const char *host_es
 	DBfree_result(result);
 }
 
-static int	areg_active(void)
+static int	autoreg_active(void)
 {
 	DB_RESULT	result;
 	int		res = SUCCEED;
@@ -1625,7 +1625,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t pr
 	if (0 != proxy_hostid)
 		res = proxy_and_host_id_match(proxy_hostid, host_esc);
 
-	if (SUCCEED == res && SUCCEED == areg_active())
+	if (SUCCEED == res && SUCCEED == autoreg_active())
 	{
 		select_autoreg_hostid(proxy_hostid, host_esc, &autoreg_hostid);
 		add_dhost(discovered_hosts, proxy_hostid, host, ip,
