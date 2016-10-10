@@ -22,7 +22,7 @@
 class CFormList extends CList {
 
 	protected $editable = true;
-	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
+	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox'];
 
 	public function __construct($id = null) {
 		parent::__construct();
