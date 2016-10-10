@@ -1098,9 +1098,10 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// check if hosts have at least 1 group
 		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host "%1$s" cannot be without host group.', reset($updHosts)['name'])
+			);
 		}
 
 		/*

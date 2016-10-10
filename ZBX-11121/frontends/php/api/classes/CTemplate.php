@@ -457,7 +457,9 @@ class CTemplate extends CHostGeneral {
 		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach ($templates as $tnum => $template) {
 			if (empty($template['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Template "%1$s" cannot be without host group.', $template['host'])
+				);
 			}
 			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
 
@@ -837,12 +839,11 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP {{{
 		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Template "%1$s" cannot be without host group.', reset($updTemplates)['name'])
+			);
 		}
-		// }}} CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP
-
 
 		// UPDATE TEMPLATES PROPERTIES {{{
 		if (isset($data['name'])) {
