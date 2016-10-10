@@ -1493,7 +1493,7 @@ static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 }
 
 
-static void select_autoreg_host_id(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
+static void select_autoreg_hostid(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1515,7 +1515,7 @@ static void select_autoreg_host_id(zbx_uint64_t proxy_hostid, const char *host_e
 	DBfree_result(result);
 }
 
-static int	auto_reg_active(void)
+static int	areg_active(void)
 {
 	DB_RESULT	result;
 	int		res = SUCCEED;
@@ -1535,7 +1535,7 @@ static int	auto_reg_active(void)
 	return res;
 }
 
-static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t proxy_hostid,
+static void	add_dhost(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t proxy_hostid,
 		const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata, time_t itemtime, zbx_uint64_t autoreg_hostid)
 {
@@ -1625,10 +1625,10 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t pr
 	if (0 != proxy_hostid)
 		res = proxy_and_host_id_match(proxy_hostid, host_esc);
 
-	if (SUCCEED == res && SUCCEED == auto_reg_active())
+	if (SUCCEED == res && SUCCEED == areg_active())
 	{
-		select_autoreg_host_id(proxy_hostid, host_esc, &autoreg_hostid);
-		replace_discovered_host(discovered_hosts, proxy_hostid, host, ip,
+		select_autoreg_hostid(proxy_hostid, host_esc, &autoreg_hostid);
+		add_dhost(discovered_hosts, proxy_hostid, host, ip,
 				dns, port, host_metadata, now, autoreg_hostid);
 	}
 
