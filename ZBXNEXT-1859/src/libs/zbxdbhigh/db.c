@@ -1471,7 +1471,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	zbx_vector_ptr_destroy(&discovered_hosts);
 }
 
-static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
+static int	proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 {
 	DB_RESULT	result;
 	int		res = SUCCEED;
@@ -1492,7 +1492,7 @@ static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 	return res;
 }
 
-static void select_autoreg_hostid(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
+static void	select_autoreg_hostid(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
