@@ -61,7 +61,7 @@ FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|ipmi_authtype	|t_integer	|'-1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_PROXY
@@ -1450,4 +1450,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030010	|3030010
+ROW		|3030011	|3030011

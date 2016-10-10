@@ -65,8 +65,6 @@ static void	odbc_free_row_data(ZBX_ODBC_DBH *pdbh)
 		zbx_free(pdbh->row_data);
 	}
 
-	zbx_free(pdbh->data_len);
-
 	pdbh->col_num = 0;
 }
 
@@ -217,6 +215,39 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 		goto end;
 	}
 
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char	driver_name[MAX_STRING_LEN + 1], driver_ver[MAX_STRING_LEN + 1], db_name[MAX_STRING_LEN + 1],
+			db_ver[MAX_STRING_LEN + 1];
+
+		if (0 != CALLODBC(SQLGetInfo(pdbh->hdbc, SQL_DRIVER_NAME, driver_name, MAX_STRING_LEN, NULL),
+				rc, SQL_HANDLE_DBC, pdbh->hdbc, "Cannot obtain driver name"))
+		{
+			zbx_strlcpy(driver_name, "unknown", sizeof(driver_name));
+		}
+
+		if (0 != CALLODBC(SQLGetInfo(pdbh->hdbc, SQL_DRIVER_VER, driver_ver, MAX_STRING_LEN, NULL),
+				rc, SQL_HANDLE_DBC, pdbh->hdbc, "Cannot obtain driver version"))
+		{
+			zbx_strlcpy(driver_ver, "unknown", sizeof(driver_ver));
+		}
+
+		if (0 != CALLODBC(SQLGetInfo(pdbh->hdbc, SQL_DBMS_NAME, db_name, MAX_STRING_LEN, NULL),
+				rc, SQL_HANDLE_DBC, pdbh->hdbc, "Cannot obtain database name"))
+		{
+			zbx_strlcpy(db_name, "unknown", sizeof(db_name));
+		}
+
+		if (0 != CALLODBC(SQLGetInfo(pdbh->hdbc, SQL_DBMS_VER, db_ver, MAX_STRING_LEN, NULL),
+				rc, SQL_HANDLE_DBC, pdbh->hdbc, "Cannot obtain database version"))
+		{
+			zbx_strlcpy(db_ver, "unknown", sizeof(db_ver));
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connected to %s(%s) using %s(%s)", __function_name,
+				db_name, db_ver, driver_name, driver_ver);
+	}
+
 	pdbh->connected = 1;
 
 	ret = SUCCEED;
@@ -257,14 +288,51 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
-		/* set NULL column value where appropriate */
-		if (SQL_NULL_DATA == pdbh->data_len[i])
-			zbx_free(pdbh->row_data[i]);
-		else
+		size_t		alloc = 0, offset = 0;
+		char		buffer[MAX_STRING_LEN + 1];
+		SQLLEN		len, col_type;
+		SQLSMALLINT	c_type;
+
+		zbx_free(pdbh->row_data[i]);
+
+		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, i + 1, SQL_DESC_TYPE, NULL, 0, NULL, &col_type),
+				retcode, SQL_HANDLE_STMT, pdbh->hstmt, "Cannot get column type"))
+		{
+			goto end;
+		}
+
+		/* force col_type to integer value for DB2 compatibility */
+		switch ((int)col_type)
+		{
+			case SQL_WLONGVARCHAR:
+				c_type = SQL_C_BINARY;
+				break;
+			default:
+				c_type = SQL_C_CHAR;
+		}
+
+		/* force len to integer value for DB2 compatibility */
+		while (SQL_NO_DATA != (retcode = SQLGetData(pdbh->hstmt, i + 1, c_type, buffer, MAX_STRING_LEN, &len)))
+		{
+			if (0 == SQL_SUCCEEDED(retcode))
+			{
+				odbc_Diag(SQL_HANDLE_STMT, pdbh->hstmt, retcode, "Cannot get column data");
+				goto end;
+			}
+
+			if (SQL_NULL_DATA == (int)len)
+				break;
+
+			buffer[(int)len] = '\0';
+
+			zbx_strcpy_alloc(&pdbh->row_data[i], &alloc, &offset, buffer);
+		}
+
+		if (NULL != pdbh->row_data[i])
 			zbx_rtrim(pdbh->row_data[i], " ");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%i col]: '%s'", __function_name, i,
-				NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%i col (%d)]: '%s'", __function_name, i, (int)col_type,
+						NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
 	}
 
 	result_row = pdbh->row_data;
@@ -277,7 +345,6 @@ end:
 ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 {
 	const char	*__function_name = "odbc_DBselect";
-	int		i = 0;
 	ZBX_ODBC_RESULT	result = NULL;
 	SQLRETURN	rc;
 
@@ -299,30 +366,8 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		goto end;
 	}
 
-	pdbh->data_len = (SQLLEN *)zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * pdbh->col_num);
-
-	for (i = 0; i < pdbh->col_num; i++)
-	{
-		if (0 != CALLODBC(SQLColAttribute(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_DESC_OCTET_LENGTH, NULL, 0,
-				NULL, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
-				"Cannot execute ODBC query"))
-		{
-			goto end;
-		}
-	}
-
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
-
-	for (i = 0; i < pdbh->col_num; i++)
-	{
-		pdbh->row_data[i] = zbx_malloc(NULL, pdbh->data_len[i]);
-		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				pdbh->data_len[i], &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
-				"Cannot bind column in ODBC result"))
-		{
-			goto end;
-		}
-	}
+	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() selected %i columns", __function_name, pdbh->col_num);
 

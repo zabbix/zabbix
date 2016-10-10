@@ -778,11 +778,12 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+			server_num, get_process_type_string(process_type), process_num);
+
 #ifdef HAVE_NETSNMP
 	zbx_init_snmp();
 #endif
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

@@ -54,7 +54,7 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 
-#define ZBX_IDS_SIZE	10
+#define ZBX_IDS_SIZE	8
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
@@ -2210,7 +2210,11 @@ int	DCsync_history(int sync_type, int *total_num)
 	}
 
 	if (0 == cache->history_num)
+	{
+		/* even with no history there might be events queued to be closed, flush them */
+		flush_correlated_events();
 		goto finish;
+	}
 
 	sync_start = time(NULL);
 

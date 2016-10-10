@@ -247,17 +247,18 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select type,execute_on,command,groupid"
+			"select type,execute_on,command,groupid,host_access"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64,
 			scriptid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		script->type = (unsigned char)atoi(row[0]);
-		script->execute_on = (unsigned char)atoi(row[1]);
+		ZBX_STR2UCHAR(script->type, row[0]);
+		ZBX_STR2UCHAR(script->execute_on, row[1]);
 		script->command = zbx_strdup(script->command, row[2]);
 		ZBX_DBROW2UINT64(*groupid, row[3]);
+		ZBX_STR2UCHAR(script->host_access, row[4]);
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -267,7 +268,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 	return ret;
 }
 
-static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, char *error, size_t max_error_len)
+static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
 	const char	*__function_name = "check_script_permissions";
 	DB_RESULT	result;
@@ -287,12 +288,45 @@ static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid, c
 			hostid, groupid);
 
 	if (NULL == DBfetch(result))
-	{
-		zbx_strlcpy(error, "Insufficient permissions. Host is not in an allowed host group.", max_error_len);
 		ret = FAIL;
-	}
+
 	DBfree_result(result);
 exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	check_user_permissions(zbx_uint64_t userid, DC_HOST *host, zbx_script_t *script)
+{
+	const char	*__function_name = "check_user_permissions";
+	int		ret = SUCCEED;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
+			__function_name, userid, host->hostid, script->scriptid);
+
+	result = DBselect(
+		"select null"
+			" from hosts_groups hg,rights r,users_groups ug"
+		" where hg.groupid=r.id"
+			" and r.groupid=ug.usrgrpid"
+			" and hg.hostid=" ZBX_FS_UI64
+			" and ug.userid=" ZBX_FS_UI64
+		" group by hg.hostid"
+		" having min(r.permission)>%d"
+			" and max(r.permission)>=%d",
+		host->hostid,
+		userid,
+		PERM_DENY,
+		script->host_access);
+
+	if (NULL == (row = DBfetch(result)))
+		ret = FAIL;
+
+	DBfree_result(result);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -327,7 +361,8 @@ void	zbx_script_clean(zbx_script_t *script)
  *           'zbx_execute_script' to clear allocated memory                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len)
+int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, char **result, char *error,
+		size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script";
 	int		ret = FAIL;
@@ -353,7 +388,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 							CONFIG_TRAPPER_TIMEOUT);
 					break;
 				default:
-					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]",
+					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",
 							(int)script->execute_on);
 			}
 			break;
@@ -362,10 +397,10 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
 			{
 				if (NULL != result)
-					*result = zbx_strdup(*result, "IPMI command successfully executed");
+					*result = zbx_strdup(*result, "IPMI command successfully executed.");
 			}
 #else
-			zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
+			zbx_strlcpy(error, "Support for IPMI commands was not compiled in.", max_error_len);
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
@@ -376,7 +411,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			/* break; is not missing here */
 #else
-			zbx_strlcpy(error, "Support for SSH script was not compiled in", max_error_len);
+			zbx_strlcpy(error, "Support for SSH script was not compiled in.", max_error_len);
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
@@ -390,21 +425,31 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
 			{
-				zbx_snprintf(error, max_error_len,
-						"Unknown Script ID [" ZBX_FS_UI64 "]", script->scriptid);
+				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
+				break;
+			}
+			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
+			{
+				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+						max_error_len);
+				break;
+			}
+			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
+				SUCCEED != check_user_permissions(user->userid, host, script))
+			{
+				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
+						max_error_len);
 				break;
 			}
 
-			if (SUCCEED == check_script_permissions(groupid, host->hostid, error, max_error_len))
-			{
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
-						&script->command, MACRO_TYPE_SCRIPT, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+			&script->command, MACRO_TYPE_SCRIPT, NULL, 0);
 
-				ret = zbx_execute_script(host, script, result, error, max_error_len);	/* recursion */
-			}
+			ret = zbx_execute_script(host, script, user, result, error, max_error_len);	/* recursion */
+
 			break;
 		default:
-			zbx_snprintf(error, max_error_len, "Invalid command type [%d]", (int)script->type);
+			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
 	}
 
 	if (SUCCEED != ret && NULL != result)

@@ -177,9 +177,16 @@ abstract class CGraphGeneral extends CApiService {
 	protected function createReal($graph) {
 		$graphids = DB::insert('graphs', [$graph]);
 		$graphid = reset($graphids);
+		$sort_order = 0;
 
 		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
+
+			if (!array_key_exists('sortorder', $gitem)) {
+				$gitem['sortorder'] = $sort_order;
+			}
+
+			$sort_order++;
 		}
 		unset($gitem);
 
@@ -209,6 +216,7 @@ abstract class CGraphGeneral extends CApiService {
 		if ($graph['gitems']) {
 			$insertGitems = [];
 			$deleteGitemIds = $dbGitemIds;
+			$sort_order = 0;
 
 			foreach ($graph['gitems'] as $gitem) {
 				// updating an existing item
@@ -223,6 +231,13 @@ abstract class CGraphGeneral extends CApiService {
 				// adding a new item
 				else {
 					$gitem['graphid'] = $graph['graphid'];
+
+					if (!array_key_exists('sortorder', $gitem)) {
+						$gitem['sortorder'] = $sort_order;
+					}
+
+					$sort_order++;
+
 					$insertGitems[] = $gitem;
 				}
 			}
