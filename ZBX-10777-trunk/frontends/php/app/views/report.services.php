@@ -21,7 +21,9 @@
 $widget = (new CWidget())->setTitle(_('IT services availability report').': '.$data['service']['name']);
 
 $controls = (new CList())
-	->addItem([_('Period'), SPACE,
+	->addItem([
+		new CLabel(_('Period'), 'period'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CComboBox('period', $data['period'], 'submit()', [
 			'daily' => _('Daily'),
 			'weekly' => _('Weekly'),
@@ -35,7 +37,11 @@ if ($data['period'] != 'yearly') {
 	for ($y = (date('Y') - $data['YEAR_LEFT_SHIFT']); $y <= date('Y'); $y++) {
 		$years[$y] = $y;
 	}
-	$controls->addItem([_('Year'), SPACE, new CComboBox('year', $data['year'], 'submit();', $years)]);
+	$controls->addItem([
+		new CLabel(_('Year'), 'year'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CComboBox('year', $data['year'], 'submit();', $years)
+	]);
 }
 
 $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));

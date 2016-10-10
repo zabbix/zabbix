@@ -158,9 +158,9 @@ $itemFormList->addRow(
 
 // append snmpv3 privpassphrase to form list
 $itemFormList->addRow(
-	(new CVisibilityBox('visible[privpassphras]', 'snmpv3_privpassphrase', _('Original')))
+	(new CVisibilityBox('visible[privpassphrase]', 'snmpv3_privpassphrase', _('Original')))
 		->setLabel(_('Privacy passphrase'))
-		->setChecked(isset($this->data['visible']['privpassphras'])),
+		->setChecked(isset($this->data['visible']['privpassphrase'])),
 	(new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );

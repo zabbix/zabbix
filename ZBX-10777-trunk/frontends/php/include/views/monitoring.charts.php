@@ -18,26 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$chartsWidget = (new CWidget())->setTitle(_('Graphs'));
-
 $controls = (new CList())
-	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
-	->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()])
-	->addItem([_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()]);
+	->addItem([
+		new CLabel(_('Group'), 'groupid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$this->data['pageFilter']->getGroupsCB()
+	])
+	->addItem([
+		new CLabel(_('Host'), 'hostid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$this->data['pageFilter']->getHostsCB()
+	])
+	->addItem([
+		new CLabel(_('Graph'), 'graphid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$this->data['pageFilter']->getGraphsCB()
+	]);
 
 if ($this->data['graphid']) {
 	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
 	$controls->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
-	$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-}
-else {
-	$controls->addItem([get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])]);
 }
 
-$chartForm = (new CForm('get'))
-	->addVar('fullscreen', $this->data['fullscreen'])
-	->addItem($controls);
-$chartsWidget->setControls($chartForm);
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+
+$chartsWidget = (new CWidget())
+	->setTitle(_('Graphs'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('fullscreen', $this->data['fullscreen'])
+		->addItem($controls)
+	);
 
 $filterForm = (new CFilter('web.charts.filter.state'))->addNavigator();
 $chartsWidget->addItem($filterForm);
