@@ -1492,7 +1492,6 @@ static int proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 	return res;
 }
 
-
 static void select_autoreg_hostid(zbx_uint64_t proxy_hostid, const char *host_esc, zbx_uint64_t *autoreg_hostid)
 {
 	DB_RESULT	result;
@@ -1640,12 +1639,21 @@ void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts)
 	DB_DSICOVERED_HOST	*discovered_host;
 	zbx_uint64_t	autoreg_hostid;
 	unsigned char	insert = 0;
+	int	i, num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __FUNCTION__);
 
-	autoreg_hostid = DBget_maxid("autoreg_host");
+	for (i = 0; i < discovered_hosts->values_num; i++)
+	{
+		discovered_host = discovered_hosts->values[i];
+		if (0 == discovered_host->autoreg_hostid)
+			num++;
+	}
 
-	for (int i = 0; i < discovered_hosts->values_num; i++)
+	if (0 != num)
+		autoreg_hostid = DBget_maxid_num("autoreg_host", num);
+
+	for (i = 0; i < discovered_hosts->values_num; i++)
 	{
 		discovered_host = discovered_hosts->values[i];
 
