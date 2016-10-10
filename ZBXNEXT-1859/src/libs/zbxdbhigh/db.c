@@ -1515,6 +1515,25 @@ static void select_autoreg_host_id(zbx_uint64_t proxy_hostid, const char *host_e
 	DBfree_result(result);
 }
 
+static int	auto_reg_active(void)
+{
+	DB_RESULT	result;
+	int		res = SUCCEED;
+	result = DBselect(
+			"select actionid"
+			" from actions"
+			" where eventsource=%d"
+			" and status=%d"
+			ZBX_SQL_NODE,
+			EVENT_SOURCE_AUTO_REGISTRATION,
+			ACTION_STATUS_ACTIVE,
+			DBand_node_local("actionid"));
+
+	if (NULL == DBfetch(result))
+		res = FAIL;
+	DBfree_result(result);
+	return res;
+}
 
 static void	replace_discovered_host(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t proxy_hostid,
 		const char *host, const char *ip, const char *dns, unsigned short port,
@@ -1596,18 +1615,17 @@ static void	DBregister_host_add(zbx_uint64_t proxy_hostid, const char *host, con
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid, const char *host,
 		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now)
-
 {
 	char		*host_esc;
 	int		res = SUCCEED;
-	zbx_uint64_t autoreg_hostid;
+	zbx_uint64_t	autoreg_hostid;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 
 	if (0 != proxy_hostid)
 		res = proxy_and_host_id_match(proxy_hostid, host_esc);
 
-	if (SUCCEED == res)
+	if (SUCCEED == res && SUCCEED == auto_reg_active())
 	{
 		select_autoreg_host_id(proxy_hostid, host_esc, &autoreg_hostid);
 		replace_discovered_host(discovered_hosts, proxy_hostid, host, ip,
