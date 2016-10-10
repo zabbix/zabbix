@@ -18,12 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
-
-$hostInventoryWidget->setControls(
-	$rForm = (new CForm('get'))
-		->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]))
-);
+$hostInventoryWidget = (new CWidget())
+	->setTitle(_('Host inventory'))
+	->setControls((new CForm('get'))
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$this->data['pageFilter']->getGroupsCB()
+			])
+		)
+	);
 
 // filter
 $filterForm = new CFilter('web.hostinventories.filter.state');

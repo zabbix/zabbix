@@ -22,20 +22,22 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 
-$widget = (new CWidget())->setTitle(_('Status of discovery'));
-
-// create header form
-$controls = (new CList())
-	->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()])
-	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
-
-$widget->setControls(
-	(new CForm('get'))
-		->setName('slideHeaderForm')
-		->addVar('action', 'discovery.view')
-		->addVar('fullscreen', $data['fullscreen'])
-		->addItem($controls)
-);
+$widget = (new CWidget())
+	->setTitle(_('Status of discovery'))
+	->setControls(
+		(new CForm('get'))
+			->cleanItems()
+			->addVar('action', 'discovery.view')
+			->addVar('fullscreen', $data['fullscreen'])
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Discovery rule'), 'druleid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$data['pageFilter']->getDiscoveryCB()
+				])
+				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			)
+	);
 
 $discovery_table = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_DISCOVERY,
