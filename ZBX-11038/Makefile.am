@@ -32,7 +32,7 @@ dist-hook:
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests
-	rm -r $(top_distdir)/sass/*.html
+	rm -f $(top_distdir)/sass/*.html
 	rm -rf $(top_distdir)/sass/img_source
 
 dbschema_ibm_db2:
