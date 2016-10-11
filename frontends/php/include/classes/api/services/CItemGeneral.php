@@ -354,45 +354,43 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				// Don't parse empty strings, they will not be valid.
-				if ($fullItem['delay_flex'] === '') {
-					continue;
-				}
+				if ($fullItem['delay_flex'] !== '') {
+					// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
+					$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
 
-				// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
-				$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
+					if ($item_delay_flex_parser->isValid()) {
+						$delay_flex_validator = new CItemDelayFlexValidator();
 
-				if ($item_delay_flex_parser->isValid()) {
-					$delay_flex_validator = new CItemDelayFlexValidator();
+						if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
+							// Some valid intervals exist at this point.
+							$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
 
-					if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
-						// Some valid intervals exist at this point.
-						$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
+							// If there are no flexible intervals, skip the next check calculation.
+							if (!$flexible_intervals) {
+								continue;
+							}
 
-						// If there are no flexible intervals, skip the next check calculation.
-						if (!$flexible_intervals) {
-							continue;
-						}
-
-						$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
-							$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
-							time()
-						);
-
-						if ($nextCheck == ZBX_JAN_2038) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('Item will not be refreshed. Please enter a correct update interval.')
+							$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
+								$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
+								time()
 							);
+
+							if ($nextCheck == ZBX_JAN_2038) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Item will not be refreshed. Please enter a correct update interval.')
+								);
+							}
+						}
+						else {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
 						}
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
+							$fullItem['delay_flex'],
+							$item_delay_flex_parser->getError())
+						);
 					}
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
-						$fullItem['delay_flex'],
-						$item_delay_flex_parser->getError())
-					);
 				}
 			}
 
