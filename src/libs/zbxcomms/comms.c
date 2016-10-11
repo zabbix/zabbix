@@ -1866,7 +1866,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 			if (NULL != (cidr_sep = strchr(start, '/')))
 			{
-				*cidr_sep = 0;
+				*cidr_sep = '\0';
 
 				if (SUCCEED == is_ip(start))
 				{
