@@ -2659,9 +2659,12 @@ json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
 
-	DBbegin();
-	DBregister_host_flush(&discovered_hosts);
-	DBcommit();
+	if (0 != discovered_hosts.values_num)
+	{
+		DBbegin();
+		DBregister_host_flush(&discovered_hosts);
+		DBcommit();
+	}
 exit:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
