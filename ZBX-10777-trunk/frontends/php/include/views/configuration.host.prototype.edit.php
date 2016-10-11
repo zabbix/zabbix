@@ -363,19 +363,22 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setModern(true)
 			->setEnabled(false)
 	)
-	->addRow(_('Connections from host'), [
-		(new CCheckBox('tls_in_none'))
-			->setLabel(_('No encryption'))
-			->setAttribute('disabled', 'disabled'),
-		BR(),
-		(new CCheckBox('tls_in_psk'))
-			->setLabel(_('PSK'))
-			->setAttribute('disabled', 'disabled'),
-		BR(),
-		(new CCheckBox('tls_in_cert'))
-			->setLabel(_('Certificate'))
-			->setAttribute('disabled', 'disabled')
-	])
+	->addRow(_('Connections from host'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('tls_in_none'))
+				->setLabel(_('No encryption'))
+				->setAttribute('disabled', 'disabled')
+			)
+			->addItem((new CCheckBox('tls_in_psk'))
+				->setLabel(_('PSK'))
+				->setAttribute('disabled', 'disabled')
+			)
+			->addItem((new CCheckBox('tls_in_cert'))
+				->setLabel(_('Certificate'))
+				->setAttribute('disabled', 'disabled')
+			)
+	)
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
