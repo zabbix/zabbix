@@ -1765,7 +1765,7 @@ int	is_ip4(const char *ip)
 {
 	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
-	int		nums = 0, dots = 0, res = FAIL;
+	int		digits = 0, dots = 0, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1773,24 +1773,24 @@ int	is_ip4(const char *ip)
 	{
 		if (0 != isdigit(*p))
 		{
-			nums++;
+			digits++;
 		}
 		else if ('.' == *p)
 		{
-			if (0 == nums || 3 < nums)
+			if (0 == digits || 3 < digits)
 				break;
-			nums = 0;
+			digits = 0;
 			dots++;
 		}
 		else
 		{
-			nums = 0;
+			digits = 0;
 			break;
 		}
 
 		p++;
 	}
-	if (dots == 3 && 1 <= nums && nums <= 3)
+	if (dots == 3 && 1 <= digits && digits <= 3)
 		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -1798,7 +1798,7 @@ int	is_ip4(const char *ip)
 	return res;
 }
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 /******************************************************************************
  *                                                                            *
  * Function: is_ip6                                                           *
@@ -1819,7 +1819,7 @@ int	is_ip6(const char *ip)
 {
 	const char	*__function_name = "is_ip6";
 	const char	*p = ip;
-	int		nums = 0, is_nums = 0, colons = 0, dcolons = 0, res = FAIL;
+	int		digits = 0, only_digits = 0, colons = 0, dcolons = 0, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1827,35 +1827,35 @@ int	is_ip6(const char *ip)
 	{
 		if (0 != isxdigit(*p))
 		{
-			nums++;
-			is_nums = 1;
+			digits++;
+			only_digits = 1;
 		}
 		else if (':' == *p)
 		{
-			if (0 == nums && 0 < colons)
+			if (0 == digits && 0 < colons)
 				dcolons++;
-			if (4 < nums || 1 < dcolons)
+			if (4 < digits || 1 < dcolons)
 				break;
-			nums = 0;
+			digits = 0;
 			colons++;
 		}
 		else
 		{
-			is_nums = 0;
+			only_digits = 0;
 			break;
 		}
 
 		p++;
 	}
 
-	if (2 <= colons && colons <= 7 && 4 >= nums && 1 == is_nums)
+	if (2 <= colons && colons <= 7 && 4 >= digits && 1 == only_digits)
 		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
-#endif	/*HAVE_IPV6*/
+#endif	/* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *
@@ -1877,7 +1877,7 @@ int	is_ip(const char *ip)
 
 	if (SUCCEED == is_ip4(ip))
 		return SUCCEED;
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 	if (SUCCEED == is_ip6(ip))
 		return SUCCEED;
 #endif
@@ -1891,7 +1891,7 @@ int	is_ip(const char *ip)
  * Purpose: check if ip matches range of ip addresses                         *
  *                                                                            *
  * Parameters: list - [IN] comma-separated list of ip ranges                  *
- *                    192.168.0.1-64,192.168.0.128,10.10.0.0/24,12fc::21      *
+ *                         192.168.0.1-64,192.168.0.128,10.10.0.0/24,12fc::21 *
  *             ip   - [IN] ip address                                         *
  *                                                                            *
  * Return value: FAIL - out of range, SUCCEED - within the range              *
@@ -2198,7 +2198,7 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	return SUCCEED;
 }
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 int	_wis_uint(const wchar_t *wide_string)
 {
 	const wchar_t	*wide_char = wide_string;
