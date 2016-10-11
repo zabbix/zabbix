@@ -14,7 +14,8 @@ EXTRA_DIST = \
 	build \
 	frontends \
 	include \
-	conf
+	conf \
+	sass
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
@@ -31,6 +32,8 @@ dist-hook:
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests
+	rm -r $(top_distdir)/sass/*.html
+	rm -rf $(top_distdir)/sass/img_source
 
 dbschema_ibm_db2:
 	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
