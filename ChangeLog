@@ -15,6 +15,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11291] fixed LLD rule not validating "lifetime" field (Ivo)
 ..F....... [ZBX-11329] fixed host scripts pop-up menu not being displayed in Monitoring -> Problems section (Ivo)
 ..F....... [ZBX-11209] fixed visual bugs in various browsers (Pavel, Sasha)
 ..F....... [ZBX-10958] fixed displaying of user name for inaccessible users; fixed warnings in PHPUnit test; fixed undefined offsets in screen "Action logs" (Gunars)
@@ -213,6 +214,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11291] fixed LLD rule not validating "lifetime" field (Ivo)
 ..F....... [ZBX-11209] fixed visual bugs in various browsers (Pavel, Sasha)
 ..F....... [ZBX-10958] fixed displaying of user name for inaccessible users; fixed warnings in PHPUnit test; fixed undefined offsets in screen "Action logs" (Gunars)
 A......... [ZBX-11091] fixed parsing of XML file which contains tag with attributes but without child tags; it could cause significant memeory leak (Sasha)
