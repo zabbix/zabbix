@@ -22,6 +22,16 @@
 class CTagValidator {
 
 	/**
+	 * An options array
+	 *
+	 * Supported options:
+	 *   'item_macros' => true  allow {{ITEM.VALUE}.func()} macros
+	 *
+	 * @var array
+	 */
+	public $options = ['item_macros' => true];
+
+	/**
 	 * Parser for function macros.
 	 *
 	 * @var CMacroFunctionParser
@@ -42,8 +52,18 @@ class CTagValidator {
 	 */
 	private $error;
 
-	public function __construct() {
-		$this->macro_function_parser = new CMacroFunctionParser(['{ITEM.VALUE}'], ['allow_reference' => true]);
+	/**
+	 * @param array $options
+	 * @param bool $options['item_macros']
+	 */
+	public function __construct(array $options = []) {
+		if (array_key_exists('item_macros', $options)) {
+			$this->options['item_macros'] = $options['item_macros'];
+		}
+
+		if ($this->options['item_macros']) {
+			$this->macro_function_parser = new CMacroFunctionParser(['{ITEM.VALUE}'], ['allow_reference' => true]);
+		}
 		$this->user_macro_parser = new CUserMacroParser();
 	}
 
@@ -70,7 +90,8 @@ class CTagValidator {
 
 				return false;
 			}
-			elseif ($this->macro_function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+			elseif ($this->options['item_macros']
+					&& $this->macro_function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 				$p += $this->macro_function_parser->getLength();
 			}
 			elseif ($this->user_macro_parser->parse($source, $p) != CParser::PARSE_FAIL) {

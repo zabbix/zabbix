@@ -20,9 +20,9 @@
 
 
 /**
- * Class containing tests for CTagValidator class functionality.
+ * Class containing tests for CCorrelationTagValidator class functionality.
  */
-class CTagValidatorTest extends PHPUnit_Framework_TestCase {
+class CCorrelationTagValidatorTest extends PHPUnit_Framework_TestCase {
 
 	public function testProvider() {
 		return [
@@ -30,30 +30,29 @@ class CTagValidatorTest extends PHPUnit_Framework_TestCase {
 				'rc' => true,
 				'error' => ''
 			]],
-			['{$MACRO: "{#LLD}"}', [
+			['{$MACRO: /}', [
 				'rc' => true,
 				'error' => ''
 			]],
-			['{$MACRO: "/"}', [
+			['abc{$MACRO: /}def', [
 				'rc' => true,
 				'error' => ''
-			]],
-			['{{ITEM.VALUE}.regsub("CLASS:([a-zA-Z0-9/]+)","\1")}', [
-				'rc' => true,
-				'error' => ''
-			]],
-			['abc{{ITEM.VALUE}.regsub("CLASS:([a-zA-Z0-9/]+)","\1")}def', [
-				'rc' => true,
-				'error' => ''
-			]],
-
-			['', [
-				'rc' => false,
-				'error' => 'cannot be empty'
 			]],
 			['{h:k[/].f()}', [
 				'rc' => false,
 				'error' => 'unacceptable characters are used'
+			]],
+			['{{ITEM.VALUE}.regsub("CLASS:([a-zA-Z0-9/]+)","\1")}', [
+				'rc' => false,
+				'error' => 'unacceptable characters are used'
+			]],
+			['abc{{ITEM.VALUE}.regsub("CLASS:([a-zA-Z0-9/]+)","\1")}def', [
+				'rc' => false,
+				'error' => 'unacceptable characters are used'
+			]],
+			['', [
+				'rc' => false,
+				'error' => 'cannot be empty'
 			]],
 			['/', [
 				'rc' => false,
@@ -77,7 +76,7 @@ class CTagValidatorTest extends PHPUnit_Framework_TestCase {
 	 * @param array  $expected
 	*/
 	public function testTagValidator($value, $expected) {
-		$validator = new CTagValidator();
+		$validator = new CTagValidator(['item_macros' => false]);
 
 		$rc = $validator->validate($value);
 
