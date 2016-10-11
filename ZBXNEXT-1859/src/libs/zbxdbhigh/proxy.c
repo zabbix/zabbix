@@ -2662,9 +2662,7 @@ json_parse_error:
 	DBbegin();
 	DBregister_host_flush(&discovered_hosts);
 	DBcommit();
-
 exit:
-
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
