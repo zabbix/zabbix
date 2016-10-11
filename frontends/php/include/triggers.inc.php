@@ -2107,7 +2107,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			]);
 		}
 
-		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+		$scripts_by_hosts = API::Script()->getScriptsByHosts(array_keys($hostids));
 	}
 
 	foreach ($triggers_hosts as &$hosts) {
