@@ -1384,7 +1384,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			if (0 > (delta = now - lastcheck))
 			{
-
+				zabbix_log(LOG_LEVEL_WARNING, "the system time has been pushed back,"
+						" adjusting active check schedule");
 				update_schedule(delta);
 				nextcheck += delta;
 				nextsend += delta;
