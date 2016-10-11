@@ -1850,74 +1850,74 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 				strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
 	}
-	else
+
+	strscpy(tmp, ip_list);
+
+	for (start = tmp; '\0' != *start;)
 	{
-		strscpy(tmp, ip_list);
+		prefix_size = IPV4_MAX_CIDR_PREFIX;
+#if defined(HAVE_IPV6)
+		prefix_size_ipv6 = IPV6_MAX_CIDR_PREFIX;
+#endif
+		if (NULL != (end = strchr(start, ',')))
+			*end = '\0';
 
-		for (start = tmp; '\0' != *start;)
+		if (NULL != (cidr_sep = strchr(start, '/')))
 		{
-			prefix_size = IPV4_MAX_CIDR_PREFIX;
+			*cidr_sep = '\0';
+
+			if (SUCCEED == is_ip(start))
+			{
+				prefix_size = atoi(cidr_sep + 1);
 #if defined(HAVE_IPV6)
-			prefix_size_ipv6 = IPV6_MAX_CIDR_PREFIX;
+				prefix_size_ipv6 = prefix_size;
 #endif
-
-			if (NULL != (end = strchr(start, ',')))
-				*end = '\0';
-
-			if (NULL != (cidr_sep = strchr(start, '/')))
-			{
-				*cidr_sep = '\0';
-
-				if (SUCCEED == is_ip(start))
-				{
-					prefix_size = atoi(cidr_sep + 1);
-#if defined(HAVE_IPV6)
-					prefix_size_ipv6 = prefix_size;
-#endif
-				}
-				else
-					*cidr_sep = '/';	/* CIDR is only supported for IP */
-			}
-
-			/* allow IP addresses or DNS names for authorization */
-#if defined(HAVE_IPV6)
-			memset(&hints, 0, sizeof(hints));
-			hints.ai_family = PF_UNSPEC;
-			if (0 == getaddrinfo(start, NULL, &hints, &ai))
-			{
-				for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
-				{
-					if (SUCCEED == zbx_ip_cmp(prefix_size, prefix_size_ipv6, current_ai, name))
-					{
-						freeaddrinfo(ai);
-						return SUCCEED;
-					}
-				}
-				freeaddrinfo(ai);
-			}
-#else
-			if (NULL != (hp = gethostbyname(start)))
-			{
-				for (i = 0; NULL != hp->h_addr_list[i]; i++)
-				{
-					if (SUCCEED == subnet_match(AF_INET, prefix_size,
-						&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
-						return SUCCEED;
-				}
-			}
-#endif	/* HAVE_IPV6 */
-			if (NULL != end)
-			{
-				*end = ',';
-				start = end + 1;
 			}
 			else
-				break;
+				*cidr_sep = '/';	/* CIDR is only supported for IP */
 		}
 
+		/* allow IP addresses or DNS names for authorization */
+#if defined(HAVE_IPV6)
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = PF_UNSPEC;
+		if (0 == getaddrinfo(start, NULL, &hints, &ai))
+		{
+			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
+			{
+				if (SUCCEED == zbx_ip_cmp(prefix_size, prefix_size_ipv6, current_ai, name))
+				{
+					freeaddrinfo(ai);
+					return SUCCEED;
+				}
+			}
+			freeaddrinfo(ai);
+		}
+#else
+		if (NULL != (hp = gethostbyname(start)))
+		{
+			for (i = 0; NULL != hp->h_addr_list[i]; i++)
+			{
+				if (SUCCEED == subnet_match(AF_INET, prefix_size,
+						&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
+				{
+					return SUCCEED;
+				}
+			}
+		}
+#endif	/* HAVE_IPV6 */
 		if (NULL != end)
+		{
 			*end = ',';
+			start = end + 1;
+		}
+		else
+			break;
 	}
+
+	if (NULL != end)
+		*end = ',';
+
 #if defined(HAVE_IPV6)
 	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
 		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, ip_list);
