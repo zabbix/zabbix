@@ -58,6 +58,35 @@
 #endif
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
+#	define OPENSSL_INIT_LOAD_SSL_STRINGS	0
+#	define OPENSSL_INIT_LOAD_CRYPTO_STRINGS	0
+
+#	ifdef _WINDOWS
+#		define CALL_ON_WINDOWS_ONLY(func)	func()
+#	else
+#		define CALL_ON_WINDOWS_ONLY(func)	0
+#	endif
+
+#	define OPENSSL_init_ssl(opts, settings)		\
+(							\
+	SSL_load_error_strings(),			\
+	ERR_load_BIO_strings(),				\
+	SSL_library_init(),				\
+	CALL_ON_WINDOWS_ONLY(zbx_openssl_thread_setup),	\
+	1						\
+)
+
+#	define OPENSSL_cleanup()				\
+do								\
+{								\
+	RAND_cleanup();						\
+	ERR_free_strings();					\
+	CALL_ON_WINDOWS_ONLY(zbx_openssl_thread_cleanup);	\
+}								\
+while (0)
+
+#	undef CALL_ON_WINDOWS_ONLY
+
 #	define OPENSSL_VERSION				SSLEAY_VERSION
 #	define OpenSSL_version				SSLeay_version
 #	define TLS_method				TLSv1_2_method
@@ -2542,21 +2571,12 @@ static void	zbx_tls_library_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
-
-#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
 	if (1 != OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
 		exit(EXIT_FAILURE);
 	}
-#else
-	SSL_load_error_strings();
-	ERR_load_BIO_strings();
-	SSL_library_init();             /* always returns "1" */
-#if defined(_WINDOWS)
-	zbx_openssl_thread_setup();
-#endif
-#endif
+
 	init_done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
@@ -2584,13 +2604,7 @@ void	zbx_tls_library_deinit(void)
 	if (1 == init_done)
 	{
 		init_done = 0;
-#if OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
-		RAND_cleanup();         	/* erase PRNG state */
-		ERR_free_strings();
-#if defined(_WINDOWS)
-		zbx_openssl_thread_cleanup();
-#endif
-#endif
+		OPENSSL_cleanup();
 	}
 #endif
 }
