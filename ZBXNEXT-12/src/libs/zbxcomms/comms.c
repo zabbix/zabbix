@@ -1713,14 +1713,16 @@ out:
 static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
 {
 	unsigned char	netmask[16] = {0};
-	unsigned int	bytes = af == AF_INET ? 4 : 16;
+	unsigned int	bytes;
 	int		i, j;
+
+	bytes = af == AF_INET ? 4 : 16;
 
 	if ((af == AF_INET && prefix_size > IPV4_MAX_CIDR_PREFIX) || prefix_size > IPV6_MAX_CIDR_PREFIX)
 		return FAIL;
 
 	/* CIDR notation to subnet mask */
-	for (i = prefix_size, j = 0; i > 0  && j < bytes; i -= 8, j++)
+	for (i = prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
 		netmask[j] = i >= 8 ? 0xFF : ((0xFF << (8 - i)) & 0xFF);
 
 	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
@@ -1730,6 +1732,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 		if ((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
 			return FAIL;
 	}
+
 	return SUCCEED;
 }
 
