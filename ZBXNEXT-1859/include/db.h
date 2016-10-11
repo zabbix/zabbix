@@ -409,12 +409,12 @@ typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
 	zbx_uint64_t	proxy_hostid;
-	char	host[HOST_HOST_LEN_MAX];
-	char	ip[INTERFACE_IP_LEN_MAX];
-	char	dns[INTERFACE_DNS_LEN_MAX];
+	char		host[HOST_HOST_LEN_MAX];
+	char		ip[INTERFACE_IP_LEN_MAX];
+	char		dns[INTERFACE_DNS_LEN_MAX];
 	unsigned short	port;
-	char	*host_metadata;
-	time_t	itemtime;
+	char		*host_metadata;
+	time_t		itemtime;
 }
 DB_DSICOVERED_HOST;
 
