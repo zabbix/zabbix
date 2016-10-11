@@ -189,15 +189,16 @@ $newTemplateTable = (new CTable())
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addRow([
-		(new CDiv([
-			(new CCheckBox('mass_replace_tpls'))
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('mass_replace_tpls'))
 				->setLabel(_('Replace'))
-				->setChecked($data['mass_replace_tpls'] == 1),
-			BR(),
-			(new CCheckBox('mass_clear_tpls'))
+				->setChecked($data['mass_replace_tpls'] == 1)
+			)
+			->addItem((new CCheckBox('mass_clear_tpls'))
 				->setLabel(_('Clear when unlinking'))
 				->setChecked($data['mass_clear_tpls'] == 1)
-		]))->addClass('floatleft')
+			)
 	]);
 
 $templatesFormList->addRow(
@@ -304,13 +305,13 @@ $encryption_table = (new CTable())
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 			->setModern(true)
 	])
-	->addRow([_('Connections from host'), [
-		(new CCheckBox('tls_in_none'))->setLabel(_('No encryption')),
-		BR(),
-		(new CCheckBox('tls_in_psk'))->setLabel(_('PSK')),
-		BR(),
-		(new CCheckBox('tls_in_cert'))->setLabel(_('Certificate'))
-	]])
+	->addRow([_('Connections from host'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('tls_in_none'))->setLabel(_('No encryption')))
+			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
+			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
+	])
 	->addRow([_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	])
