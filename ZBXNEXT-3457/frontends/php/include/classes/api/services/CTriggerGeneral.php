@@ -231,8 +231,6 @@ abstract class CTriggerGeneral extends CApiService {
 			return $trigger;
 		}
 
-		$tag_validator = new CTagValidator();
-
 		foreach ($trigger['tags'] as &$tag) {
 			if (!array_key_exists('tag', $tag)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'tag'));
@@ -244,9 +242,9 @@ abstract class CTriggerGeneral extends CApiService {
 				);
 			}
 
-			if (!$tag_validator->validate($tag['tag'])) {
+			if ($tag['tag'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag_validator->getError())
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty'))
 				);
 			}
 
@@ -508,8 +506,6 @@ abstract class CTriggerGeneral extends CApiService {
 		];
 		$read_only_fields = ['triggerid', 'value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
 
-		$correlation_tag_validator = new CTagValidator(['item_macros' => false]);
-
 		foreach ($triggers as &$trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
@@ -568,10 +564,10 @@ abstract class CTriggerGeneral extends CApiService {
 						));
 					}
 
-					if (!$correlation_tag_validator->validate($trigger['correlation_tag'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'correlation_tag', $correlation_tag_validator->getError()
-						));
+					if (!array_key_exists('correlation_tag', $trigger) || $trigger['correlation_tag'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+						);
 					}
 					break;
 
@@ -705,8 +701,6 @@ abstract class CTriggerGeneral extends CApiService {
 		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
 
-		$correlation_tag_validator = new CTagValidator(['item_macros' => false]);
-
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
 			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
@@ -797,10 +791,10 @@ abstract class CTriggerGeneral extends CApiService {
 					break;
 
 				case ZBX_TRIGGER_CORRELATION_TAG:
-					if (!$correlation_tag_validator->validate($trigger['correlation_tag'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'correlation_tag', $correlation_tag_validator->getError()
-						));
+					if ($trigger['correlation_tag'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+						);
 					}
 					break;
 

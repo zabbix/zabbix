@@ -56,12 +56,6 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	if ('\0' == *tag->tag)
 		return FAIL;
 
-	if (NULL != strchr(tag->tag, '/'))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot add tag: tag \"%s\" contains '/' character.\n", tag->tag);
-		return FAIL;
-	}
-
 	/* check for duplicated tags */
 	for (i = 0; i < event->tags.values_num; i++)
 	{
@@ -135,14 +129,6 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 
 		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
 				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-		if (ZBX_TRIGGER_CORRELATION_TAG == trigger_correlation_mode &&
-				NULL != strchr(events[events_num].trigger.correlation_tag, '/'))
-		{
-			trigger_tags = NULL;	/* user macro contains '/', don't add tags so user see problem */
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot add correlation tag: tag \"%s\" contains '/' character.\n",
-					events[events_num].trigger.correlation_tag);
-		}
 
 		zbx_vector_ptr_create(&events[events_num].tags);
 
