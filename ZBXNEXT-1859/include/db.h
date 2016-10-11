@@ -547,7 +547,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		unsigned short port, const char *host_metadata, int now);
 void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid, const char *host,
 		const char *ip, const char *dns, unsigned short port, const char *host_metadata, int now);
-void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts);
+void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);

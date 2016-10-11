@@ -2662,7 +2662,7 @@ json_parse_error:
 	if (0 != discovered_hosts.values_num)
 	{
 		DBbegin();
-		DBregister_host_flush(&discovered_hosts);
+		DBregister_host_flush(&discovered_hosts, proxy_hostid);
 		DBcommit();
 	}
 exit:
