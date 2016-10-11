@@ -368,8 +368,8 @@ int	iprange_parse(zbx_iprange_t *iprange, const char *address)
 
 	if (NULL != strchr(address, '.'))
 		return iprangev4_parse(iprange, address);
-	else
-		return iprangev6_parse(iprange, address);
+
+	return iprangev6_parse(iprange, address);
 }
 
 /******************************************************************************
