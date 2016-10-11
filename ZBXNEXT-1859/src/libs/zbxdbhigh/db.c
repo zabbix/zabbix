@@ -1461,14 +1461,17 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now)
 {
-	zbx_vector_ptr_t	discovered_hosts;
+	if (SUCCEED == DBregister_host_active())
+	{
+		zbx_vector_ptr_t	discovered_hosts;
 
-	zbx_vector_ptr_create(&discovered_hosts);
+		zbx_vector_ptr_create(&discovered_hosts);
 
-	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
-	DBregister_host_flush(&discovered_hosts, proxy_hostid);
+		DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
+		DBregister_host_flush(&discovered_hosts, proxy_hostid);
 
-	zbx_vector_ptr_destroy(&discovered_hosts);
+		zbx_vector_ptr_destroy(&discovered_hosts);
+	}
 }
 
 static int	proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
@@ -1493,7 +1496,7 @@ static int	proxy_and_host_id_match(zbx_uint64_t proxy_hostid, char *host_esc)
 	return res;
 }
 
-static int	autoreg_active(void)
+int	DBregister_host_active(void)
 {
 	DB_RESULT	result;
 	int		res = SUCCEED;
@@ -1620,7 +1623,6 @@ static int	update_autoreg_hostids(zbx_vector_ptr_t *discovered_hosts, zbx_uint64
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(autoreg_hostid, row[1]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "host %s id "ZBX_FS_UI64, row[0], autoreg_hostid);
 		for (i = 0; i < discovered_hosts->values_num; i++)
 		{
 			discovered_host = discovered_hosts->values[i];
@@ -1650,7 +1652,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t pr
 	if (0 != proxy_hostid)
 		res = proxy_and_host_id_match(proxy_hostid, host_esc);
 
-	if (SUCCEED == res && SUCCEED == autoreg_active())
+	if (SUCCEED == res)
 	{
 		add_dhost(discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now, 0);
 	}

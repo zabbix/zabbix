@@ -2608,7 +2608,6 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&discovered_hosts);
-	zbx_vector_ptr_reserve(&discovered_hosts, ZBX_MAX_HRECORDS);
 
 	now = time(NULL);
 
@@ -2617,6 +2616,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 		goto exit;
+
+	if (SUCCEED != DBregister_host_active())
+		goto exit;
+
+	zbx_vector_ptr_reserve(&discovered_hosts, ZBX_MAX_HRECORDS);
 
 	hosttime = atoi(tmp);
 
