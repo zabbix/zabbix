@@ -1544,7 +1544,6 @@ static void	add_dhost(zbx_vector_ptr_t *hosts_vector, zbx_uint64_t proxy_hostid,
 {
 	DB_DSICOVERED_HOST	*discovered_host_new;
 	DB_DSICOVERED_HOST	*discovered_host;
-	unsigned char		replaced = 0;
 	int 			i;
 
 	discovered_host_new = zbx_malloc(NULL, sizeof(DB_DSICOVERED_HOST));
@@ -1577,10 +1576,7 @@ static void	DBregister_host_add(zbx_uint64_t proxy_hostid, const char *host, con
 		unsigned short port, const char *host_metadata, int now, unsigned char insert, zbx_uint64_t autoreg_hostid)
 {
 	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_timespec_t	ts;
-	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 
