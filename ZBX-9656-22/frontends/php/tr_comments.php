@@ -63,10 +63,10 @@ $trigger = reset($trigger);
 if (isset($_REQUEST['save'])) {
 	$comments = getRequest('comments');
 
-	$result = API::Trigger()->update([
+	$result = API::Trigger()->update(array(
 		'triggerid' => getRequest('triggerid'),
 		'comments' => $comments
-	]);
+	));
 
 	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 
