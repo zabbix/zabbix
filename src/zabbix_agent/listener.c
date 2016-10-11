@@ -147,10 +147,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			}
 
 			zbx_tcp_unaccept(&s);
-
-			zabbix_log(LOG_LEVEL_WARNING, "DIMIR: security:%s", ret == SUCCEED ? "PASSED" : "REJECTED");
-
-			exit(EXIT_SUCCESS);
 		}
 
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
