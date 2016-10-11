@@ -579,6 +579,8 @@ class CHostGroup extends CZBXAPI {
 			'groupids' => $groupids,
 			'editable' => true,
 			'output' => array('groupid', 'name', 'internal'),
+			'selectHosts' => array('hostid', 'host'),
+			'selectTemplates' => array('templateid', 'host'),
 			'preservekeys' => true,
 			'nopermissions' => $nopermissions
 		));
@@ -609,16 +611,20 @@ class CHostGroup extends CZBXAPI {
 			);
 		}
 
-		$dltGroupids = getDeletableHostGroups($groupids);
-		if (count($groupids) != count($dltGroupids)) {
-			foreach ($groupids as $groupid) {
-				if (!array_key_exists($groupid, $dltGroupids)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host "%1$s" cannot be without host group.', $delGroups[$groupid]['name'])
-					);
-				}
+		$hosts_to_unlink = array();
+		$templates_to_unlink = array();
+
+		foreach ($delGroups as $group) {
+			foreach ($group['hosts'] as $host) {
+				$hosts_to_unlink[] = $host;
+			}
+
+			foreach ($group['templates'] as $template) {
+				$templates_to_unlink[] = $template;
 			}
 		}
+
+		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupids);
 
 		$dbScripts = API::Script()->get(array(
 			'groupids' => $groupids,
@@ -992,9 +998,9 @@ class CHostGroup extends CZBXAPI {
 
 		$dbGroups = $this->get(array(
 			'output' => array('groupid'),
-			'selectHosts' => array('hostid'),
-			'selectTemplates' => array('templateid'),
-			'groupids' => $groupIds
+			'groupids' => $groupIds,
+			'selectHosts' => array('hostid', 'host'),
+			'selectTemplates' => array('templateid', 'host')
 		));
 
 		if (!$dbGroups) {
@@ -1013,15 +1019,6 @@ class CHostGroup extends CZBXAPI {
 		 * from groups that will be removed.
 		 */
 		$objectIds = array();
-
-		// Collect both given host and template IDs.
-		$currentObjectIds = array_merge($hostIds, $templateIds);
-		if ($currentObjectIds) {
-			$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
-		}
-
-		// Collect both host and template IDs that also belong to given groups, but are not given in parameters.
-		$objectIdsToRemove = array();
 
 		/*
 		 * New or existing hosts have been passed in parameters. First check write permissions to hosts
@@ -1062,19 +1059,6 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		/*
-		 * Some existing hosts may not have been passed in parameters. In this case check what other hosts the groups
-		 * have and if those hosts can be removed from given groups. This will also validate those hosts permissions and
-		 * make sure hosts have at least one group left.
-		 */
-		foreach ($dbGroups as $dbGroup) {
-			foreach ($dbGroup['hosts'] as $dbHost) {
-				if (!isset($currentObjectIds[$dbHost['hostid']])) {
-					$objectIdsToRemove[$dbHost['hostid']] = $dbHost['hostid'];
-				}
-			}
-		}
-
-		/*
 		 * New or existing templates have been passed in parameters. First check write permissions to templates.
 		 * Then check if groups should be added and/or removed from given templates.
 		 */
@@ -1108,19 +1092,6 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
-		/*
-		 * Some existing templates may not have been passed in parameters. In this case check what other templates the
-		 * groups have and if those templates can be removed from given groups. This will also validate those template
-		 * permissions and make sure templates have at least one group left.
-		 */
-		foreach ($dbGroups as $dbGroup) {
-			foreach ($dbGroup['templates'] as $dbTemplate) {
-				if (!isset($currentObjectIds[$dbTemplate['templateid']])) {
-					$objectIdsToRemove[$dbTemplate['templateid']] = $dbTemplate['templateid'];
-				}
-			}
-		}
-
 		// Continue to check new, existing or removable groups for given hosts and templates.
 		$groupIdsToUpdate = array_merge($groupIdsToAdd, $groupIdsToRemove);
 
@@ -1140,14 +1111,26 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
-		// Check the other way around - if other existing hosts and templates from those groups are left without groups.
-		if ($objectIdsToRemove) {
-			$unlinkableObjectIds = getUnlinkableHosts($groupIds, $objectIdsToRemove);
+		$hosts_to_unlink = array();
+		$templates_to_unlink = array();
+		$hostIds = array_flip($hostIds);
+		$templateIds = array_flip($templateIds);
 
-			if (count($objectIdsToRemove) != count($unlinkableObjectIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
+		foreach ($dbGroups as $group) {
+			foreach ($group['hosts'] as $host) {
+				if (!array_key_exists($host['hostid'], $hostIds)) {
+					$hosts_to_unlink[] = $host;
+				}
+			}
+
+			foreach ($group['templates'] as $template) {
+				if (!array_key_exists($template['templateid'], $templateIds)) {
+					$templates_to_unlink[] = $template;
+				}
 			}
 		}
+
+		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupIds);
 	}
 
 	/**
@@ -1166,11 +1149,12 @@ class CHostGroup extends CZBXAPI {
 		$groupIdsToRemove = array();
 		$hostIds = isset($data['hostids']) ? $data['hostids'] : array();
 		$templateIds = isset($data['templateids']) ? $data['templateids'] : array();
-		$objectIds = array();
+		$hosts_to_unlink = array();
+		$templates_to_unlink = array();
 
 		if ($hostIds) {
 			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
+				'output' => array('hostid', 'host'),
 				'selectGroups' => array('groupid'),
 				'hostids' => $hostIds,
 				'editable' => true,
@@ -1190,7 +1174,7 @@ class CHostGroup extends CZBXAPI {
 				$hostGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);
 
 				if ($hostGroupIdsToRemove) {
-					$objectIds[] = $dbHost['hostid'];
+					$hosts_to_unlink[] = $dbHost;
 
 					foreach ($hostGroupIdsToRemove as $groupId) {
 						$groupIdsToRemove[$groupId] = $groupId;
@@ -1201,7 +1185,7 @@ class CHostGroup extends CZBXAPI {
 
 		if ($templateIds) {
 			$dbTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
+				'output' => array('templateid', 'host'),
 				'selectGroups' => array('groupid'),
 				'templateids' => $templateIds,
 				'editable' => true,
@@ -1217,7 +1201,7 @@ class CHostGroup extends CZBXAPI {
 				$templateGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);
 
 				if ($templateGroupIdsToRemove) {
-					$objectIds[] = $dbTemplate['templateid'];
+					$templates_to_unlink[] = $dbTemplate;
 
 					foreach ($templateGroupIdsToRemove as $groupId) {
 						$groupIdsToRemove[$groupId] = $groupId;
@@ -1226,22 +1210,13 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
-		if ($groupIdsToRemove) {
-			if (!$this->isWritable($groupIdsToRemove)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			// check if host group can be removed from given hosts and templates leaving them with at least one more host group
-			$unlinkableObjectIds = getUnlinkableHosts($groupIdsToRemove, $objectIds);
-
-			if (count($objectIds) != count($unlinkableObjectIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('One of the objects is left without a host group.')
-				);
-			}
+		if ($groupIdsToRemove && !$this->isWritable($groupIdsToRemove)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
 		}
+
+		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupIdsToRemove);
 	}
 
 	/**
@@ -1440,5 +1415,50 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Verify that hosts and templates are unlinkable from groups.
+	 *
+	 * @param array     $hosts
+	 * @param integer   $hosts[]['hostid']
+	 * @param string    $hosts[]['host']
+	 * @param array     $templates
+	 * @param integer   $templates[]['templateid']
+	 * @param string    $templates[]['host']
+	 * @param array     $groupids
+	 */
+	protected function verifyHostsAndTemplatesAreUnlinkable(array $hosts, array $templates, array $groupids) {
+		$objectids = array();
+		$host_names = array();
+		$template_names = array();
+
+		foreach ($hosts as $host) {
+			$objectids[] = $host['hostid'];
+			$host_names[$host['hostid']] = $host['host'];
+		}
+
+		foreach ($templates as $template) {
+			$objectids[] = $template['templateid'];
+			$template_names[$template['templateid']] = $template['host'];
+		}
+
+		if ($objectids && $groupids) {
+			$not_unlinkable_objectids = array_diff($objectids, getUnlinkableHosts($groupids, $objectids));
+
+			if ($not_unlinkable_objectids) {
+				$objectid = reset($not_unlinkable_objectids);
+
+				if (array_key_exists($objectid, $host_names)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $host_names[$objectid])
+					);
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Template "%1$s" cannot be without host group.', $template_names[$objectid])
+				);
+			}
+		}
 	}
 }
