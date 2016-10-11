@@ -1710,11 +1710,11 @@ out:
 #undef ZBX_TCP_EXPECT_XML_END
 }
 
-static int	subnet_match(int af, unsigned int prefix_size, void * address1,  void * address2)
+static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
 {
 	unsigned char	netmask[16] = {0};
 	unsigned int	bytes = af == AF_INET ? 4 : 16;
-	int	i, j;
+	int		i, j;
 
 	if ((af == AF_INET && prefix_size > IPV4_MAX_CIDR_PREFIX) || prefix_size > IPV6_MAX_CIDR_PREFIX)
 		return FAIL;
@@ -1727,7 +1727,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void * address1,  void
 	/* All hosts on a subnetwork have the same network prefix. */
 	for (i = 0; i < bytes; i++)
 	{
-		if((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
+		if ((((unsigned char *)address1)[i] & netmask[i]) != (((unsigned char *)address2)[i] & netmask[i]))
 			return FAIL;
 	}
 	return SUCCEED;
@@ -1825,12 +1825,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
-	int	prefix_size_ipv6;
+	int		prefix_size_ipv6;
 #else
 	struct hostent	*hp;
 	int		i;
 #endif
-	int	prefix_size;
+	int		prefix_size;
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
