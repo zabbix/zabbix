@@ -92,13 +92,14 @@ if (!$this->data['isFilterEnable']) {
 $form_list->addRow(_('Hosts'), $maintenanceCheckBox);
 
 // append trigger severities to form list
-$severities = new CList();
-$severities->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
 foreach ($this->data['severities'] as $severity) {
-	$severities->addItem((new CCheckBox('trgSeverity['.$severity.']'))
-		->setLabel(getSeverityName($severity, $this->data['config']))
-		->setChecked(isset($this->data['severity'][$severity]))
-		->setEnabled($this->data['isFilterEnable'])
+	$severities->addItem(
+		(new CCheckBox('trgSeverity['.$severity.']'))
+			->setLabel(getSeverityName($severity, $this->data['config']))
+			->setChecked(isset($this->data['severity'][$severity]))
+			->setEnabled($this->data['isFilterEnable'])
 	);
 }
 
