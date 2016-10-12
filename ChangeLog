@@ -5,6 +5,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
 A......... [ZBX-11291] fixed LLD rule not validating "lifetime" field (Ivo)
 ..F....... [ZBX-11209] fixed visual bugs in various browsers (Pavel, Sasha)
 ..F....... [ZBX-10958] fixed displaying of user name for inaccessible users; fixed warnings in PHPUnit test; fixed undefined offsets in screen "Action logs" (Gunars)
@@ -1512,6 +1513,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
 ........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
 .......PS. [ZBX-11213] fixed database monitoring keys (wiper)
 
