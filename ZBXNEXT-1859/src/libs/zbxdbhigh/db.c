@@ -1582,7 +1582,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *discovered_hosts, zbx_uint64
 				" from hosts"
 				" where proxy_hostid="ZBX_FS_UI64
 					" and host in ('%s');",
-					proxy_hostid, hosts);
+				proxy_hostid, hosts);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -1611,7 +1611,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *discovered_hosts, zbx_uint64
 				" from autoreg_host"
 				" where proxy_hostid="ZBX_FS_UI64
 					" and host in ('%s');",
-					proxy_hostid, hosts);
+				proxy_hostid, hosts);
 
 		while (NULL != (row = DBfetch(result)))
 		{
