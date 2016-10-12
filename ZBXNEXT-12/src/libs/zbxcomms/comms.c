@@ -1879,6 +1879,11 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		}
 
 		/* allow IP addresses or DNS names for authorization */
+
+		/* When adding IPv6 support it was decided to leave current implementation   */
+		/* (based on gethostbyname()) for handling non-IPv6-enabled components. In   */
+		/* the future it should be considered to switch completely to getaddrinfo(). */
+
 #if defined(HAVE_IPV6)
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = PF_UNSPEC;
