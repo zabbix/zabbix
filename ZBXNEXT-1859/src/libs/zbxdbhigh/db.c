@@ -1567,8 +1567,8 @@ static char	*alloc_in_hosts(zbx_vector_ptr_t *discovered_hosts)
 
 static void	process_autoreg_hosts(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid)
 {
-	char			*host_esc, *hosts = NULL;
-	int			i, num;
+	char			*hosts = NULL;
+	int			i;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		autoreg_hostid;
