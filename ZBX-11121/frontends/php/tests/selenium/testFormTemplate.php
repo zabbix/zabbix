@@ -89,13 +89,15 @@ class testFormTemplate extends CWebTest {
 	public function testFormTemplate_CreateExistingTemplateNoGroups() {
 		// Attempt to create a template with a name that already exists and not add it to any groups
 		// In future should also check these conditions individually
+		$name = 'Template OS Linkux';
+
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
-		$this->input_type('template_name', 'Template OS Linux');
+		$this->input_type('template_name', $name);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of templates');
-		$this->zbxTestTextPresent('No groups for template');
+		$this->zbxTestTextPresent('Template "' . $name . '" cannot be without host group.');
 		$this->assertEquals(1, DBcount("select * from hosts where host='Template OS Linux'"));
 	}
 
