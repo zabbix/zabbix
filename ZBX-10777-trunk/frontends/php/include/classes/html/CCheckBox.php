@@ -55,6 +55,8 @@ class CCheckBox extends CInput {
 	 * Check or uncheck the checkbox.
 	 *
 	 * @param bool $checked
+	 *
+	 * @return CCheckBox
 	 */
 	public function setChecked($checked) {
 		if ($checked) {
@@ -71,6 +73,8 @@ class CCheckBox extends CInput {
 	 * Set the label for the checkbox.
 	 *
 	 * @param string $label
+	 *
+	 * @return CCheckBox
 	 */
 	public function setLabel($label) {
 		$this->label = $label;
@@ -97,6 +101,8 @@ class CCheckBox extends CInput {
 	 *    <input ...><label ...><span></span>$label</label>
 	 *
 	 * @param int $label_position One of LABEL_POSITION_LEFT or LABEL_POSITION_RIGHT.
+	 *
+	 * @return CCheckBox
 	 */
 	public function setLabelPosition($label_position) {
 		$this->label_position = $label_position;
