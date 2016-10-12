@@ -118,13 +118,13 @@ foreach ($mediatypes as &$mediatype) {
 }
 unset($mediatype);
 
-$frm_row = new CList();
-$frm_row->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+$frm_row = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$frm_row->addItem((new CCheckBox('severity['.$severity.']', $severity))
-		->setLabel(getSeverityName($severity, $config))
-		->setChecked(str_in_array($severity, $severities))
+	$frm_row->addItem(
+		(new CCheckBox('severity['.$severity.']', $severity))
+			->setLabel(getSeverityName($severity, $config))
+			->setChecked(str_in_array($severity, $severities))
 	);
 }
 

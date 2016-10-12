@@ -62,27 +62,32 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] ==
 }
 
 // append targets to form list
-$targets = new CList();
-$targets->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+$targets = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
-		$targets->addItem((new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
-			->setLabel($host['name'])
-			->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid']))
+		$targets->addItem(
+			(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
+				->setLabel($host['name'])
+				->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid']))
 		);
 	}
-} elseif ($this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
+}
+elseif ($this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
 	foreach ($this->data['templates'] as $template) {
-		$targets->addItem((new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
-			->setLabel($template['name'])
-			->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid']))
+		$targets->addItem(
+			(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
+				->setLabel($template['name'])
+				->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid']))
 		);
 	}
-} else {
+}
+else {
 	foreach ($this->data['groups'] as $group) {
-		$targets->addItem((new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
-			->setLabel($group['name'])
-			->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid']))
+		$targets->addItem(
+			(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
+				->setLabel($group['name'])
+				->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid']))
 		);
 	}
 }
