@@ -449,6 +449,7 @@ $triggerIds = zbx_objectValues($triggers, 'triggerid');
 $triggerEditable = API::Trigger()->get(array(
 	'triggerids' => $triggerIds,
 	'output' => array('triggerid'),
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 	'editable' => true,
 	'preservekeys' => true
 ));
