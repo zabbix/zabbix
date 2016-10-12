@@ -1490,24 +1490,24 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 int	DBregister_host_active(void)
 {
 	DB_RESULT	result;
-	int		res = SUCCEED;
+	int		ret = SUCCEED;
 
 	result = DBselect(
-			"select actionid"
+			"select null"
 			" from actions"
 			" where eventsource=%d"
 				" and status=%d"
 				ZBX_SQL_NODE,
-				EVENT_SOURCE_AUTO_REGISTRATION,
-				ACTION_STATUS_ACTIVE,
-				DBand_node_local("actionid"));
+			EVENT_SOURCE_AUTO_REGISTRATION,
+			ACTION_STATUS_ACTIVE,
+			DBand_node_local("actionid"));
 
 	if (NULL == DBfetch(result))
-		res = FAIL;
+		ret = FAIL;
 
 	DBfree_result(result);
 
-	return res;
+	return ret;
 }
 
 static void	free_autoreg_host(zbx_vector_ptr_t *discovered_hosts, int i)
