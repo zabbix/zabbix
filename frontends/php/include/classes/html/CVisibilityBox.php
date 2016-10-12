@@ -44,6 +44,8 @@ class CVisibilityBox extends CCheckBox {
 	 * Set the label for the checkbox and put it on the left.
 	 *
 	 * @param string $label
+	 *
+	 * @return CVisibilityBox
 	 */
 	public function setLabel($label) {
 		parent::setLabel($label.SPACE);
