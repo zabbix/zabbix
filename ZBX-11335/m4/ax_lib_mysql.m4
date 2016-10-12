@@ -88,7 +88,11 @@ AC_DEFUN([AX_LIB_MYSQL],
 
             for i in $_full_libmysql_libs; do
                 case $i in
-                -lmysqlclient)
+                   -lmysqlclient)
+                       _client_lib_name="mysqlclient"
+             ;;
+                   -lmariadbclient)
+                       _client_lib_name="mariadbclient"
              ;;
                    -L*)
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
@@ -99,7 +103,7 @@ AC_DEFUN([AX_LIB_MYSQL],
             if test "x$enable_static" = "xyes"; then
                for i in $_full_libmysql_libs; do
                    case $i in
-           	      -lmysqlclient)
+                     -lmysqlclient|-lmariadbclient)
            	    ;;
                       -l*)
 				_lib_name="`echo "$i" | cut -b3-`"
@@ -120,8 +124,8 @@ AC_DEFUN([AX_LIB_MYSQL],
 		LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
-		AC_CHECK_LIB(mysqlclient, main, [
-			MYSQL_LIBS="-lmysqlclient ${MYSQL_LIBS}"
+		AC_CHECK_LIB($_client_lib_name, main, [
+			MYSQL_LIBS="-l${_client_lib_name} ${MYSQL_LIBS}"
 			],[
 			AC_MSG_ERROR([Not found mysqlclient library])
 			])
