@@ -1884,6 +1884,19 @@ int	is_ip(const char *ip)
 	return FAIL;
 }
 
+int	is_ip_pton(const char *ip)
+{
+	unsigned char	dst[16];
+
+	if (1 == inet_pton(AF_INET, ip, dst))
+		return SUCCEED;
+#ifdef HAVE_IPV6
+	if (1 == inet_pton(AF_INET6, ip, dst))
+		return SUCCEED;
+#endif
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: ip_in_list                                                       *
