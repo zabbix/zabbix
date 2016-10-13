@@ -19,6 +19,9 @@ use RSMSLV;
 use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
 use TLDs;
 
+# auto-flush stdout
+$| = 1;
+
 sub __get_host_macro($$$)
 {
 	my $hostid = shift;
@@ -43,7 +46,7 @@ setopt('nolog');
 
 my $config = get_rsm_config();
 
-print("Connecting to Zabbix API...\n");
+print("Connecting to Zabbix API");
 my $zabbix = Zabbix->new(
 	{
 		'url' => $config->{'zapi'}->{'url'},
@@ -53,17 +56,19 @@ my $zabbix = Zabbix->new(
 
 if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 {
-	pfail("cannot connect to Zabbix API. ", $zabbix->{'error'}, "\n");
+	pfail("\ncannot connect to Zabbix API. ", $zabbix->{'error'}, "\n");
 }
 
 set_slv_config($config);
 db_connect();
 
-print("Fixing TLD macros RDDS.ENABLED...\n");
+print("\nFixing TLD macros RDDS.ENABLED");
 my $tlds_ref = get_tlds(ENABLED_DNS);
 foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
+
+    print(".");
 
 	my $templateid = get_hostid("Template $tld");
 
@@ -88,10 +93,12 @@ foreach (@{$tlds_ref})
 }
 undef($tld);
 
-print("Fixing probe macros RDDS.ENABLED...\n");
+print("\nFixing probe macros RDDS.ENABLED");
 my $probes_ref = get_probes(ENABLED_DNS);
 foreach my $host (keys(%{$probes_ref}))
 {
+    print(".");
+
 	my $templateid = get_hostid("Template $host");
 
 	my $rdds = __get_host_macro($templateid, '{$RSM.RDDS.ENABLED}', 1);	# optional
@@ -116,13 +123,14 @@ foreach my $host (keys(%{$probes_ref}))
 
 if (0)
 {
-	print("Deleting triggers...\n");
+	print("\nDeleting triggers");
 	my $triggerids;
 
 	my $rows_ref = db_select("select triggerid from triggers where description like '% under 99%'");
 
 	foreach my $row_ref (@{$rows_ref})
 	{
+        print(".");
 		push(@{$triggerids}, $row_ref->[0]);
 	}
 	__delete_triggers($triggerids);
@@ -132,9 +140,9 @@ foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
 
-	my $hostid = get_hostid($tld);
+    print(".");
 
-	print("  $tld\n");
+	my $hostid = get_hostid($tld);
 
 	my $rows_ref = db_select("select key_ from items where hostid=$hostid and key_ like 'rsm.slv.dns.ns.downtime[%]'");
 
@@ -144,7 +152,7 @@ foreach (@{$tlds_ref})
 
 		my ($ns, $ip) = split(',', get_nsip_from_key($key));
 
-		print("    $ns ($ip) [$key]\n");
+		#print("    $ns ($ip) [$key]\n");
 
 		my $options = {
 			'description' => "Name Server $ns ($ip)".' has been down for over {$RSM.SLV.NS.AVAIL} minutes',
@@ -157,11 +165,12 @@ foreach (@{$tlds_ref})
 }
 undef($tld);
 
-print("Fixing value mappings...\n");
+print("\nFixing value mappings");
 db_exec("update valuemaps set name='RSM Service Availability' where valuemapid=16");
 my $rows_ref = db_select("select mappingid from mappings where mappingid=113");
 if (scalar(@{$rows_ref}) == 0)
 {
+    print(".");
 	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (113,16,'2','Up (inconclusive)')");
 }
 db_exec("update valuemaps set name='RSM RDDS probe result' where valuemapid=18");
@@ -169,14 +178,14 @@ db_exec("update valuemaps set name='RSM EPP result' where valuemapid=19");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.dns.udp[{$RSM.TLD}]' . "'");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]' . "'");
 
-print("Deleting obsoleted triggers...\n");
+print("\nDeleting obsoleted triggers");
 foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
 
-	my $host = "Template $tld";
+	print(".");
 
-	print("  $tld\n");
+    my $host = "Template $tld";
 
 	my @triggerids;
 	my $result = $zabbix->get('trigger', {'filter' => {'host' => $host}, 'output' => ['triggerid', 'description']});
@@ -231,35 +240,40 @@ my $item_names_to_rename =
 	'EPP $2 command RTT of $1' => 'EPP $2 command RTT',
 };
 
-print("Renaming triggers...\n");
+print("\nRenaming triggers");
 foreach my $from (keys(%{$trigger_names_to_rename}))
 {
+    print(".");
 	my $to = $trigger_names_to_rename->{$from};
 
 	db_exec("update triggers set description='$to' where description='$from'");
 }
 
-print("Renaming item keys...\n");
+print("\nRenaming item keys");
 foreach my $key (@{$item_keys_to_remove})
 {
+    print(".");
 	db_exec("delete from items where key_='$key'");
 }
 
-print("Renaming item names...\n");
+print("\nRenaming item names");
 foreach my $from (keys(%{$item_names_to_rename}))
 {
+    print(".");
 	my $to = $item_names_to_rename->{$from};
 
 	db_exec("update items set name='$to' where name='$from'");
 }
 
-print("Deleting obsoleted items...\n");
+print("\nDeleting obsoleted items");
 foreach my $key (@{$slv_items_to_remove_like})
 {
+    print(".");
 	db_exec("delete from items where key_ like '$key'");
 }
 foreach my $key (@{$item_keys_to_remove})
 {
+    print(".");
 	db_exec("delete from items where key_='$key'");
 }
 
@@ -274,7 +288,7 @@ foreach my $key (@{$item_keys_to_remove})
 	my $templateid = $result->{'templateid'};
 	unless ($zabbix->exist('item', {'hostid' => $templateid, 'key_' => $item}))
 	{
-		print("Creating probe mon items...\n");
+		print("\nCreating probe mon items");
 
 		my $applicationid = __get_applicationid($templateid, $application);
 
@@ -289,15 +303,17 @@ foreach my $key (@{$item_keys_to_remove})
 	}
 }
 
-print("Creating SLV monthly items and triggers...\n");
+print("\nCreating SLV monthly items and triggers");
 __create_missing_slv_montly_items_and_triggers();
 
-print("Fixing applications...\n");
+print("\nFixing applications");
 my $name_from = 'SLV current month';
 my $name_to = 'SLV monthly';
 foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
+
+    print(".");
 
 	my $rows_ref = db_select(
 		"select a.applicationid".
@@ -307,8 +323,6 @@ foreach (@{$tlds_ref})
 			" and a.name='$name_from'");
 
 	next if (scalar(@{$rows_ref}) == 0);
-
-	print("  $tld\n");
 
 	my $applicationid_from = $rows_ref->[0]->[0];
 
@@ -330,7 +344,7 @@ foreach (@{$tlds_ref})
 }
 undef($tld);
 
-print("Creating macros...\n");
+print("\nCreating macros");
 my $global_macros = {
 	'{$RSM.SLV.DNS.AVAIL}' => 0,
 	'{$RSM.SLV.NS.AVAIL}' => 432,
@@ -339,9 +353,10 @@ my $global_macros = {
 };
 foreach my $m (keys(%{$global_macros}))
 {
+    print(".");
 	__create_macro($m, $global_macros->{$m}, undef, 1);	# global, force update
 }
-print("Done!\n");
+print("\nDone!\n");
 
 sub __create_item
 {
@@ -601,7 +616,7 @@ sub __create_missing_slv_montly_items_and_triggers
 	{
 		$tld = $_;	# set globally
 
-		print("  $tld\n");
+		print(".");
 
 		my $rows_ref = db_select("select hostid from hosts where host='$tld'");
 
