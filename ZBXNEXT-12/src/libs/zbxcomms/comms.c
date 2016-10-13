@@ -1845,13 +1845,16 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	int		prefix_size_ipv6;
+	int		prefix_range = IPV6_MAX_CIDR_PREFIX;
 #else
 	struct hostent	*hp;
 	int		i;
+	int		prefix_range = IPV4_MAX_CIDR_PREFIX;
 #endif
 	int		prefix_size;
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
+
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
@@ -1883,9 +1886,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			*cidr_sep = '\0';
 
-			if (SUCCEED == is_ip_pton(start))
+			if (SUCCEED == is_ip_pton(start) &&
+					SUCCEED == is_uint_range(cidr_sep + 1, &prefix_size, 0, prefix_range))
 			{
-				prefix_size = atoi(cidr_sep + 1);
 #if defined(HAVE_IPV6)
 				prefix_size_ipv6 = prefix_size;
 #endif
