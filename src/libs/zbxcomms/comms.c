@@ -1886,11 +1886,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	int		prefix_size_ipv6;
-	int		prefix_range = IPV6_MAX_CIDR_PREFIX;
 #else
 	struct hostent	*hp;
 	int		i;
-	int		prefix_range = IPV4_MAX_CIDR_PREFIX;
 #endif
 	int		prefix_size;
 	ZBX_SOCKADDR	name;
@@ -1967,9 +1965,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			{
 				if (SUCCEED == subnet_match(AF_INET, prefix_size,
 						&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
-				{
 					return SUCCEED;
-				}
 			}
 		}
 #endif	/* HAVE_IPV6 */
