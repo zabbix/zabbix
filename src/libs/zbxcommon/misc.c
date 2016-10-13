@@ -1884,14 +1884,34 @@ int	is_ip(const char *ip)
 	return FAIL;
 }
 
-int	is_ip_pton(const char *ip)
+int	is_ip4_pton(const char *ip)
 {
-	unsigned char	dst[16];
+	unsigned char	dst[sizeof(struct in_addr)];
 
 	if (1 == inet_pton(AF_INET, ip, dst))
 		return SUCCEED;
+
+	return FAIL;
+}
+
 #ifdef HAVE_IPV6
+int	is_ip6_pton(const char *ip)
+{
+	unsigned char	dst[sizeof(struct in6_addr)];
+
 	if (1 == inet_pton(AF_INET6, ip, dst))
+		return SUCCEED;
+
+	return FAIL;
+}
+#endif
+
+int	is_ip_pton(const char *ip)
+{
+	if (SUCCEED == is_ip4_pton(ip))
+		return SUCCEED;
+#ifdef HAVE_IPV6
+	if (SUCCEED == is_ip6_pton(ip))
 		return SUCCEED;
 #endif
 	return FAIL;

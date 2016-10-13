@@ -542,12 +542,20 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	char	*ch_error;
 	int	err = 0;
 
-	if (NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
+	if (0 != CONFIG_PASSIVE_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "StartAgents is not 0, parameter Server must be defined");
-		err = 1;
+		if (NULL == CONFIG_HOSTS_ALLOWED)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "StartAgents is not 0, parameter Server must be defined");
+			err = 1;
+		}
+		else if (SUCCEED != zbx_validate_ip_list(CONFIG_HOSTS_ALLOWED, &ch_error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "the value of \"Server\" configuration parameter cannot contain %s", ch_error);
+			zbx_free(ch_error);
+			err = 1;
+		}
 	}
-
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
