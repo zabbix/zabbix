@@ -1046,6 +1046,8 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 int	is_ip(const char *ip);
 int	is_ip_pton(const char *ip);
+int	is_ip4_pton(const char *ip);
+int	is_ip6_pton(const char *ip);
 
 void	zbx_on_exit(void); /* calls exit() at the end! */
 

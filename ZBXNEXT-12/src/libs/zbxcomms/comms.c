@@ -1819,7 +1819,48 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 }
 #endif
 
+static int	validate_cidr(const char *ip, const char *cidr, void * value)
+{
+	if (SUCCEED == is_ip4_pton(ip))
+		return is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);
+#ifdef HAVE_IPV6
+	if (SUCCEED == is_ip6_pton(ip))
+		return is_uint_range(cidr, value, 0, IPV6_MAX_CIDR_PREFIX);
+#endif
+	return FAIL;
+}
 
+int	zbx_validate_ip_list(const char *ip_list, char **error)
+{
+	char	*pch, *cidr_sep;
+	char	tmp[MAX_STRING_LEN];
+
+	if(NULL == ip_list)
+		return FAIL;
+
+	strscpy(tmp, ip_list);
+
+	pch = strtok (tmp, ",");
+	while (pch != NULL)
+	{
+		if (NULL != (cidr_sep = strchr(pch, '/')))
+		{
+			*cidr_sep = '\0';
+			if(FAIL == validate_cidr(pch, cidr_sep + 1, NULL))
+			{
+				if (NULL != error)
+				{
+					*cidr_sep = '/';
+					*error = zbx_dsprintf(NULL, "invalid CIDR notation \"%s\"", pch);
+				}
+				return FAIL;
+			}
+		}
+		pch = strtok (NULL, ",");
+	}
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1886,8 +1927,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			*cidr_sep = '\0';
 
-			if (SUCCEED == is_ip_pton(start) &&
-					SUCCEED == is_uint_range(cidr_sep + 1, &prefix_size, 0, prefix_range))
+			if (SUCCEED == validate_cidr(start, cidr_sep + 1, &prefix_size))
 			{
 #if defined(HAVE_IPV6)
 				prefix_size_ipv6 = prefix_size;
