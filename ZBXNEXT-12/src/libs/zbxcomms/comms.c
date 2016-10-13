@@ -1716,10 +1716,18 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	unsigned int	bytes;
 	int		i, j;
 
-	bytes = af == AF_INET ? 4 : 16;
-
-	if ((af == AF_INET && prefix_size > IPV4_MAX_CIDR_PREFIX) || prefix_size > IPV6_MAX_CIDR_PREFIX)
-		return FAIL;
+	if (af == AF_INET)
+	{
+		if (prefix_size > IPV4_MAX_CIDR_PREFIX)
+			return FAIL;
+		bytes = 4;
+	}
+	else
+	{
+		if (prefix_size > IPV6_MAX_CIDR_PREFIX)
+			return FAIL;
+		bytes = 16;
+	}
 
 	/* CIDR notation to subnet mask */
 	for (i = prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
