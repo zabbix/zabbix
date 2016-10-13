@@ -112,7 +112,7 @@ if (CRemedyService::$enabled) {
 			->addRow([_('Status'), $ticket['status']])
 			->addRow([_('Created'), $ticket['created']]);
 
-		$ticket_details_widget = (new CUIWidget(WIDGET_HAT_TICKETDETAILS, $ticket_table))
+		$ticket_details_widget = (new CUiWidget(WIDGET_HAT_TICKETDETAILS, $ticket_table))
 			->setHeader(_('Ticket details'));
 	}
 }
