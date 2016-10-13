@@ -166,23 +166,24 @@ class CTag extends CObject {
 	 *													Syntax:
 	 *														property1: value1; property2: value2; property(n): value(n)
 	 *
-	 * @return bool
+	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		if (empty($text)) {
-			return $this;
-		}
+		$id = 'hintbox_'.uniqid();
 
-		encodeValues($text);
-		$text = unpack_object($text);
+		$this->addItem(
+			(new CSpan(
+				(new CSpan($text))->setId($id)
+			))->setAttribute('style', 'display: none;')
+		);
 
 		$this->onMouseover(
-			'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", "'.$styles.'");'
+			'hintBox.HintWraper(event, this, jQuery("#'.$id.'"), "'.$span_class.'", "'.$styles.'");'
 		);
 
 		if ($freeze_on_click) {
 			$this->onClick(
-				'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", false, "'.$styles.'");'
+				'hintBox.showStaticHint(event, this, jQuery("#'.$id.'"), "'.$span_class.'", false, "'.$styles.'");'
 			);
 		}
 
