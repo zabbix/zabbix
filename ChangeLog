@@ -1725,6 +1725,9 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
+A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)  
+A......... [ZBX-10842] fixed connecting web scenario applicationid to created steps when updating with API httptest.update mehtod (Cemeris)
 ..F....... [ZBX-9656] prevented updating comments for discovered triggers (Ivo)
 ..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
 ........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
