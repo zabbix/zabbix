@@ -1789,10 +1789,16 @@ static int	zbx_ip_cmp(unsigned int prefix_size, unsigned int prefix_size_ipv6, c
 				}
 				break;
 			case AF_INET6:
+				/* IPv4-compatible, the first 96 bits are zeros, but our CIDR is in IPV6 */
+				if (prefix_size_ipv6 > 96)
+					prefix_size_ipv6 -= 96;
+				else
+					prefix_size_ipv6 = 0;
+
 				/* incoming AF_INET, must see whether the given is compatible or mapped */
 				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
 						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						SUCCEED == subnet_match(AF_INET, prefix_size,
+						SUCCEED == subnet_match(AF_INET, prefix_size_ipv6,
 						&ai_addr6->sin6_addr.s6_addr[12], &name4->sin_addr.s_addr))
 				{
 					return SUCCEED;
@@ -1804,6 +1810,8 @@ static int	zbx_ip_cmp(unsigned int prefix_size, unsigned int prefix_size_ipv6, c
 	return FAIL;
 }
 #endif
+
+
 
 /******************************************************************************
  *                                                                            *
@@ -1867,7 +1875,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			*cidr_sep = '\0';
 
-			if (SUCCEED == is_ip(start))
+			if (SUCCEED == is_ip_pton(start))
 			{
 				prefix_size = atoi(cidr_sep + 1);
 #if defined(HAVE_IPV6)
