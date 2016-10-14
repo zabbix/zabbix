@@ -65,7 +65,7 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, (double)(ullTotalVirtual - ullAvailVirtual) / ullTotalVirtual * 100);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
