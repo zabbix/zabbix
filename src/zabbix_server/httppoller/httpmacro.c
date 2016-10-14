@@ -89,15 +89,6 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
 			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
 
-	if (NULL == data)
-	{
-		/* Ignore regex variables when no input data is specified. For example,   */
-		/* scenario level regex variables don't have input data before the first  */
-		/* web scenario step is processed.                                        */
-		ret = SUCCEED;
-		goto out;
-	}
-
 	if (0 == nkey || 0 == nvalue)
 	{
 		if (0 == nkey && 0 != nvalue)
