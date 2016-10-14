@@ -2604,11 +2604,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	discovered_hosts;
-	unsigned char		is_active_checked = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&discovered_hosts);
+	zbx_vector_ptr_reserve(&discovered_hosts, ZBX_MAX_HRECORDS);
 
 	now = time(NULL);
 
@@ -2617,8 +2617,6 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 		goto exit;
-
-
 
 	hosttime = atoi(tmp);
 
@@ -2635,16 +2633,6 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			goto json_parse_error;
-
-		if (0 == is_active_checked)
-		{
-			is_active_checked = 1;
-
-			if (FAIL == DBregister_host_active())
-				break;
-
-			zbx_vector_ptr_reserve(&discovered_hosts, ZBX_MAX_HRECORDS);
-		}
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
 				&host_metadata, &host_metadata_alloc))

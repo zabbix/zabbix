@@ -1474,23 +1474,24 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now)
 {
-	if (SUCCEED == DBregister_host_active())
-	{
-		zbx_vector_ptr_t	discovered_hosts;
+	zbx_vector_ptr_t	discovered_hosts;
 
-		zbx_vector_ptr_create(&discovered_hosts);
+	zbx_vector_ptr_create(&discovered_hosts);
 
-		DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
-		DBregister_host_flush(&discovered_hosts, proxy_hostid);
+	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
+	DBregister_host_flush(&discovered_hosts, proxy_hostid);
 
-		zbx_vector_ptr_destroy(&discovered_hosts);
-	}
+	zbx_vector_ptr_destroy(&discovered_hosts);
 }
 
-int	DBregister_host_active(void)
+static int	DBregister_host_active(void)
 {
+	const char	*__function_name = "DBregister_host_active";
+
 	DB_RESULT	result;
 	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select null"
@@ -1506,6 +1507,8 @@ int	DBregister_host_active(void)
 		ret = FAIL;
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1665,12 +1668,16 @@ static void	DBregister_host_add(zbx_uint64_t proxy_hostid, const char *host_esc,
 void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid)
 {
 	const char		*__function_name = "DBregister_host_flush";
+
 	zbx_autoreg_host_t	*discovered_host;
 	zbx_uint64_t		autoreg_hostid;
 	unsigned char		insert;
 	int			i, num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != DBregister_host_active())
+		goto exit;
 
 	process_autoreg_hosts(discovered_hosts, proxy_hostid);
 
@@ -1703,7 +1710,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t prox
 	}
 
 	process_events();
-
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
