@@ -21,6 +21,57 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
+int	SYSTEM_VIRTUAL_MEMORY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	MEMORYSTATUSEX	ms_ex;
+	MEMORYSTATUS	ms;
+	zbx_uint64_t	ullTotalVirtual, ullAvailVirtual;
+	char		*mode;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+
+	if (NULL != zbx_GlobalMemoryStatusEx)
+	{
+		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
+
+		zbx_GlobalMemoryStatusEx(&ms_ex);
+
+		ullTotalVirtual = ms_ex.ullTotalVirtual;
+		ullAvailVirtual = ms_ex.ullAvailVirtual;
+	}
+	else
+	{
+		GlobalMemoryStatus(&ms);
+
+		ullTotalVirtual = ms.dwTotalVirtual;
+		ullAvailVirtual = ms.dwAvailVirtual;
+	}
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, ullTotalVirtual);
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, ullTotalVirtual - ullAvailVirtual);
+	else if (0 == strcmp(mode, "available"))
+		SET_UI64_RESULT(result, ullAvailVirtual);
+	else if (0 == strcmp(mode, "pavailable"))
+		SET_DBL_RESULT(result, (ullAvailVirtual / (double)ullTotalVirtual) * 100.0);
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, (double)(ullTotalVirtual - ullAvailVirtual) / ullTotalVirtual * 100);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
+}
+
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
