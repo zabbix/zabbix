@@ -11,6 +11,7 @@ Bug fixes:
 Changes for 3.2.2rc1
 
 New features:
+A.......S. [ZBXNEXT-3457] added support of user macros for event tags (vso, sasha)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 

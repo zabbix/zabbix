@@ -231,8 +231,6 @@ abstract class CTriggerGeneral extends CApiService {
 			return $trigger;
 		}
 
-		$tag_validator = new CTagValidator();
-
 		foreach ($trigger['tags'] as &$tag) {
 			if (!array_key_exists('tag', $tag)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'tag'));
@@ -244,9 +242,9 @@ abstract class CTriggerGeneral extends CApiService {
 				);
 			}
 
-			if (!$tag_validator->validate($tag['tag'])) {
+			if ($tag['tag'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag_validator->getError())
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty'))
 				);
 			}
 
@@ -571,12 +569,6 @@ abstract class CTriggerGeneral extends CApiService {
 							_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
 						);
 					}
-
-					if (strpos($trigger['correlation_tag'], '/') !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'correlation_tag', _('unacceptable characters are used')
-						));
-					}
 					break;
 
 				default:
@@ -803,12 +795,6 @@ abstract class CTriggerGeneral extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
 						);
-					}
-
-					if (strpos($trigger['correlation_tag'], '/') !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'correlation_tag', _('unacceptable characters are used')
-						));
 					}
 					break;
 
