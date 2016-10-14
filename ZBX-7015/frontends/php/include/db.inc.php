@@ -115,7 +115,7 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect, 'AL32UTF8');
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
