@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
-int	VM_VIRTUAL_MEMORY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
