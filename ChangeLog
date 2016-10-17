@@ -6,6 +6,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for event tags (vso, sash
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...PS. [ZBX-11122] fixed comparisons between signed and unsigned integer expressions to eliminate build warnings (Sergejs)
 .......PS. [ZBX-11326] fixed processing of web monitoring scenario level variables (wiper)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
 A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
@@ -211,6 +212,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...PS. [ZBX-11122] fixed comparisons between signed and unsigned integer expressions to eliminate build warnings (Sergejs)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
 A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
 A......... [ZBX-10842] fixed connecting web scenario applicationid to created steps when updating with API httptest.update mehtod (Cemeris)
