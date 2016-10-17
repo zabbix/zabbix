@@ -14,7 +14,8 @@ EXTRA_DIST = \
 	build \
 	frontends \
 	include \
-	conf
+	conf \
+	sass
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
@@ -31,6 +32,8 @@ dist-hook:
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests
+	rm -f $(top_distdir)/sass/*.html
+	rm -rf $(top_distdir)/sass/img_source
 
 dbschema_ibm_db2:
 	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
@@ -61,11 +64,11 @@ gettext:
 	frontends/php/locale/make_mo.sh
 
 css_theme_blue:
-	sass --no-cache --sourcemap=none --style=compressed sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
 	cp frontends/php/styles/blue-theme.css sass/stylesheets/screen.css
 
 css_theme_dark:
-	sass --no-cache --sourcemap=none --style=compressed sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
 css_icons:
