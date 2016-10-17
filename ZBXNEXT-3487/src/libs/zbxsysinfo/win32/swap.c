@@ -25,7 +25,7 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
-	zbx_uint64_t	ullTotalVirtual, ullAvailVirtual;
+	zbx_uint64_t	ullTotalPageFile, ullAvailPageFile;
 	char		*mode;
 
 	if (1 < request->nparam)
@@ -42,33 +42,32 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		ullTotalVirtual = ms_ex.ullTotalVirtual;
-		ullAvailVirtual = ms_ex.ullAvailVirtual;
+		ullTotalPageFile = ms_ex.ullTotalPageFile;
+		ullAvailPageFile = ms_ex.ullAvailPageFile;
 	}
 	else
 	{
 		GlobalMemoryStatus(&ms);
 
-		ullTotalVirtual = ms.dwTotalVirtual;
-		ullAvailVirtual = ms.dwAvailVirtual;
+		ullTotalPageFile = ms.dwTotalPageFile;
+		ullAvailPageFile = ms.dwAvailPageFile;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		SET_UI64_RESULT(result, ullTotalVirtual);
+		SET_UI64_RESULT(result, ullTotalPageFile);
 	else if (0 == strcmp(mode, "used"))
-		SET_UI64_RESULT(result, ullTotalVirtual - ullAvailVirtual);
+		SET_UI64_RESULT(result, ullTotalPageFile - ullAvailPageFile);
 	else if (0 == strcmp(mode, "available"))
-		SET_UI64_RESULT(result, ullAvailVirtual);
+		SET_UI64_RESULT(result, ullAvailPageFile);
 	else if (0 == strcmp(mode, "pavailable"))
-		SET_DBL_RESULT(result, (ullAvailVirtual / (double)ullTotalVirtual) * 100.0);
+		SET_DBL_RESULT(result, (ullAvailPageFile / (double)ullTotalPageFile) * 100.0);
 	else if (0 == strcmp(mode, "pused"))
-		SET_DBL_RESULT(result, (double)(ullTotalVirtual - ullAvailVirtual) / ullTotalVirtual * 100);
+		SET_DBL_RESULT(result, (double)(ullTotalPageFile - ullAvailPageFile) / ullTotalPageFile * 100);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
-
 	return SYSINFO_RET_OK;
 }
 
