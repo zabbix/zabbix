@@ -552,7 +552,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		else if (SUCCEED != zbx_validate_ip_list(CONFIG_HOSTS_ALLOWED, &ch_error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "the value of \"Server\" configuration parameter cannot"
-					"contain %s", ch_error);
+					" contain %s", ch_error);
 			zbx_free(ch_error);
 			err = 1;
 		}
