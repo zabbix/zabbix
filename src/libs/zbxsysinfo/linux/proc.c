@@ -1183,8 +1183,8 @@ static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 
 	if (NULL != cmdline)
 	{
-		char	*ptr;
-		int	i;
+		char		*ptr;
+		unsigned int	i;
 
 		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
 		{

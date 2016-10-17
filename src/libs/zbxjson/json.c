@@ -653,7 +653,7 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 				*out++ = *p++;
 		}
 
-		if (out - start == size)
+		if ((size_t)(out - start) == size)
 			break;
 	}
 
