@@ -1821,10 +1821,10 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 
 static int	validate_cidr(const char *ip, const char *cidr, void * value)
 {
-	if (SUCCEED == is_ip4_pton(ip))
+	if (SUCCEED == is_ip4(ip))
 		return is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);
 #ifdef HAVE_IPV6
-	if (SUCCEED == is_ip6_pton(ip))
+	if (SUCCEED == is_ip6(ip))
 		return is_uint_range(cidr, value, 0, IPV6_MAX_CIDR_PREFIX);
 #endif
 	return FAIL;
