@@ -1812,8 +1812,6 @@ int	is_ip4(const char *ip)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
- *                                                                            *
  ******************************************************************************/
 int	is_ip6(const char *ip)
 {
@@ -1854,8 +1852,8 @@ int	is_ip6(const char *ip)
 	{
 		last_colon = strrchr(ip, ':');
 
-		if (2 <= colons && colons <= 6 && last_colon < p && SUCCEED == is_ip4(last_colon + 1))
-			res = SUCCEED;	/* past last column is ipv4 mapped address */
+		if (2 <= colons && colons <= 6 && last_colon < p)
+			res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -1890,7 +1888,6 @@ int	is_ip(const char *ip)
 #endif
 	return FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *
