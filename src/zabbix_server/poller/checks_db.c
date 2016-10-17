@@ -37,7 +37,7 @@ static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
 	{
 		rc = SQLColAttribute(dbh->hstmt, i + 1, SQL_DESC_LABEL, str, sizeof(str), &len, NULL);
 
-		if (SQL_SUCCESS != rc || sizeof(str) <= len || '\0' == *str)
+		if (SQL_SUCCESS != rc || sizeof(str) <= (size_t)len || '\0' == *str)
 		{
 			for (j = 0; j < i; j++)
 				zbx_free(buffer[j]);
