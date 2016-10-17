@@ -407,6 +407,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (0 != mysql_set_character_set(conn, "utf8"))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8\"");
 
+	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
+	{
+		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		ret = ZBX_DB_FAIL;
+	}
+
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
