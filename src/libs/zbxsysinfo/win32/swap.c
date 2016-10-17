@@ -21,6 +21,56 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
+int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	MEMORYSTATUSEX	ms_ex;
+	MEMORYSTATUS	ms;
+	zbx_uint64_t	ullTotalPageFile, ullAvailPageFile;
+	char		*mode;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+
+	if (NULL != zbx_GlobalMemoryStatusEx)
+	{
+		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
+
+		zbx_GlobalMemoryStatusEx(&ms_ex);
+
+		ullTotalPageFile = ms_ex.ullTotalPageFile;
+		ullAvailPageFile = ms_ex.ullAvailPageFile;
+	}
+	else
+	{
+		GlobalMemoryStatus(&ms);
+
+		ullTotalPageFile = ms.dwTotalPageFile;
+		ullAvailPageFile = ms.dwAvailPageFile;
+	}
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, ullTotalPageFile);
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, ullTotalPageFile - ullAvailPageFile);
+	else if (0 == strcmp(mode, "available"))
+		SET_UI64_RESULT(result, ullAvailPageFile);
+	else if (0 == strcmp(mode, "pavailable"))
+		SET_DBL_RESULT(result, (ullAvailPageFile / (double)ullTotalPageFile) * 100.0);
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, (double)(ullTotalPageFile - ullAvailPageFile) / ullTotalPageFile * 100);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+	return SYSINFO_RET_OK;
+}
+
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
