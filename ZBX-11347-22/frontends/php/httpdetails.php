@@ -324,7 +324,6 @@ $graphTimeScreen = new CScreenBase(array(
 ));
 
 $src = 'chart3.php?height=150'.
-	'&name='.$httpTest['name'].
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
 	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
