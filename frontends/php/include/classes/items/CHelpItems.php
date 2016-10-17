@@ -249,6 +249,10 @@ class CHelpItems {
 					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
 					'key' => 'system.uname',
 					'description' => _('Detailed host information. Returns string')
 				],
