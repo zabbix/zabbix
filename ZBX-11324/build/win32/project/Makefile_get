@@ -1,0 +1,49 @@
+# detect target architecture
+!IF "$(CPU)" == ""
+CPU=$(PROCESSOR_ARCHITECTURE)
+!ENDIF
+
+!IF "$(CPU)" == "i386"
+TARGETDIR = ..\..\..\bin\win32
+ADD_LFLAGS = /MACHINE:X86
+
+!ELSEIF "$(CPU)" == "AMD64"
+TARGETDIR = ..\..\..\bin\win64
+ADD_LFLAGS = /MACHINE:X64
+
+!ELSE
+!ERROR Unsupported CPU architecture: $(CPU)
+!ENDIF
+
+PROJECTNAME = zabbix_get
+PROJECTDIR = ..\..\..\src\$(PROJECTNAME)
+TARGETNAME = zabbix_get
+TARGETEXT = exe
+PROGNAME = $(TARGETDIR)\$(TARGETNAME).$(TARGETEXT)
+
+ADD_CFLAGS = $(ADD_CFLAGS) /D NDEBUG /Fd$(TARGETNAME).$(TARGETEXT).pdb
+ADD_RFLAGS = /d "ZABBIX_GET"
+
+!INCLUDE Makefile_common.inc
+
+OBJS = \
+	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
+	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxcommon\xml.o \
+	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
+	..\..\..\src\libs\zbxcomms\comms.o \
+	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxlog\log.o \
+	..\..\..\src\libs\zbxsys\mutexs.o \
+	..\..\..\src\libs\zbxsys\symbols.o \
+	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\zabbix_get\zabbix_get.o \
+	..\..\..\src\libs\zbxwin32\fatal.o
+
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+
+!INCLUDE Makefile_tls.inc
+!INCLUDE Makefile_targets.inc
