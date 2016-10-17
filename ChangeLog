@@ -20,7 +20,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 Bug fixes:
 ..F....... [ZBX-11324] fixed undefined index in screen and map import pages (Oleg)
 ....I..... [ZBX-11038] removed compression for the generated CSS files, added "sass" folder to the distribution archive (asaveljevs)
-....I..... [ZBX-11335] added MariaDB database support when compiling with --with-mysql configuration option; thanks to Dmitry Smirnov for patch (vikotrs)
+....I..... [ZBX-11335] added MariaDB database support when compiling with --with-mysql configuration option; thanks to Dmitry Smirnov for patch (viktors)
 ...G...PS. [ZBX-11122] fixed comparisons between signed and unsigned integer expressions to eliminate build warnings (Sergejs)
 .......PS. [ZBX-11326] fixed processing of web monitoring scenario level variables (wiper)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
