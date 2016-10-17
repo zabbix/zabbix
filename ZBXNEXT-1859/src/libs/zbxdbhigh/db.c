@@ -31,13 +31,12 @@
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	proxy_hostid;
-	char		*host_esc;
-	char		*ip_esc;
-	char		*dns_esc;
+	char		*host;
+	char		*ip;
+	char		*dns;
+	char		*host_metadata;
+	int		now;
 	unsigned short	port;
-	char		*host_metadata_esc;
-	time_t		itemtime;
 }
 zbx_autoreg_host_t;
 
@@ -1474,14 +1473,14 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now)
 {
-	zbx_vector_ptr_t	discovered_hosts;
+	zbx_vector_ptr_t	autoreg_hosts;
 
-	zbx_vector_ptr_create(&discovered_hosts);
+	zbx_vector_ptr_create(&autoreg_hosts);
 
-	DBregister_host_prepare(&discovered_hosts, proxy_hostid, host, ip, dns, port, host_metadata, now);
-	DBregister_host_flush(&discovered_hosts, proxy_hostid);
+	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, now);
+	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 
-	zbx_vector_ptr_destroy(&discovered_hosts);
+	zbx_vector_ptr_destroy(&autoreg_hosts);
 }
 
 static int	DBregister_host_active(void)
@@ -1513,205 +1512,250 @@ static int	DBregister_host_active(void)
 	return ret;
 }
 
-static void	free_autoreg_host(zbx_vector_ptr_t *discovered_hosts, int i)
+static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 {
-	zbx_free(((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_esc);
-	zbx_free(((zbx_autoreg_host_t *)discovered_hosts->values[i])->ip_esc);
-	zbx_free(((zbx_autoreg_host_t *)discovered_hosts->values[i])->dns_esc);
-	zbx_free(((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_metadata_esc);
-	zbx_free(discovered_hosts->values[i]);
+	zbx_free(autoreg_host->host);
+	zbx_free(autoreg_host->ip);
+	zbx_free(autoreg_host->dns);
+	zbx_free(autoreg_host->host_metadata);
+	zbx_free(autoreg_host);
 }
 
-void	DBregister_host_prepare(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid,
-		const char *host, const char *ip, const char *dns, unsigned short port,
-		const char *host_metadata, time_t itemtime)
+void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now)
 {
-	zbx_autoreg_host_t	*discovered_host_new;
+	zbx_autoreg_host_t	*autoreg_host;
 	int 			i;
 
-	discovered_host_new = zbx_malloc(NULL, sizeof(zbx_autoreg_host_t));
-	discovered_host_new->host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	discovered_host_new->ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	discovered_host_new->dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	discovered_host_new->host_metadata_esc = DBdyn_escape_string(host_metadata);
-
-	discovered_host_new->proxy_hostid = proxy_hostid;
-	discovered_host_new->port = port;
-	discovered_host_new->itemtime = itemtime;
-	discovered_host_new->autoreg_hostid = 0;
-
-	for (i = 0; i < discovered_hosts->values_num; i++)	/* duplicate check */
+	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
 	{
-		if (0 == strcmp(discovered_host_new->host_esc, ((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_esc))
+		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+		if (0 == strcmp(host, autoreg_host->host))
 		{
-			free_autoreg_host(discovered_hosts, i);
-			discovered_hosts->values[i] = discovered_host_new;
-			return;
+			zbx_vector_ptr_remove(autoreg_hosts, i);
+			autoreg_host_free(autoreg_host);
+			break;
 		}
 	}
 
-	zbx_vector_ptr_append(discovered_hosts, discovered_host_new);
+	autoreg_host = (zbx_autoreg_host_t *)zbx_malloc(NULL, sizeof(zbx_autoreg_host_t));
+	autoreg_host->autoreg_hostid = 0;
+	autoreg_host->host = zbx_strdup(NULL, host);
+	autoreg_host->ip = zbx_strdup(NULL, ip);
+	autoreg_host->dns = zbx_strdup(NULL, dns);
+	autoreg_host->port = port;
+	autoreg_host->host_metadata = zbx_strdup(NULL, host_metadata);
+	autoreg_host->now = now;
+
+	zbx_vector_ptr_append(autoreg_hosts, autoreg_host);
 }
 
-static char	*alloc_in_hosts(zbx_vector_ptr_t *discovered_hosts)
+static void	autoreg_get_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_vector_str_t *hosts)
 {
 	int	i;
-	char	*hosts = NULL;
 
-	for (i = 0; i < discovered_hosts->values_num; i++)
+	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		if (i != 0)
-			hosts = zbx_strdcat(hosts, "','");
-		hosts = zbx_strdcat(hosts, ((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_esc);
-	}
+		zbx_autoreg_host_t	*autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
-	return hosts;
+		zbx_vector_str_append(hosts, autoreg_host->host);
+	}
 }
 
-static void	process_autoreg_hosts(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid)
+static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
-	char			*hosts = NULL;
-	int			i;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_vector_str_t	hosts;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	zbx_autoreg_host_t	*autoreg_host;
+	int			i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_str_create(&hosts);
 
 	if (0 != proxy_hostid)
 	{
+		autoreg_get_hosts(autoreg_hosts, &hosts);
+
 		/* delete from vector if already exist in hosts table */
-		hosts = alloc_in_hosts(discovered_hosts);
-		result = DBselect(
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select host"
 				" from hosts"
-				" where proxy_hostid="ZBX_FS_UI64
-					" and host in ('%s');",
-				proxy_hostid, hosts);
+				" where proxy_hostid=" ZBX_FS_UI64
+					" and",
+				proxy_hostid);
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+				(const char **)hosts.values, hosts.values_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBand_node_local("hostid"));
+
+		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			for (i = 0; i < discovered_hosts->values_num; i++)
+			for (i = 0; i < autoreg_hosts->values_num; i++)
 			{
-				if (0 == strcmp(((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_esc, row[0]))
+				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+				if (0 == strcmp(autoreg_host->host, row[0]))
 				{
-					free_autoreg_host(discovered_hosts, i);
-					zbx_vector_ptr_remove(discovered_hosts, i);
+					zbx_vector_ptr_remove(autoreg_hosts, i);
+					autoreg_host_free(autoreg_host);
 					break;
 				}
 			}
 
 		}
-
 		DBfree_result(result);
-		zbx_free(hosts);
+
+		hosts.values_num = 0;
 	}
 
-	if (0 != discovered_hosts->values_num)
+	if (0 != autoreg_hosts->values_num)
 	{
-		hosts = alloc_in_hosts(discovered_hosts);
+		autoreg_get_hosts(autoreg_hosts, &hosts);
+
 		/* update autoreg_id in vector if already exists in autoreg_host table */
-		result = DBselect(
-				"select host,autoreg_hostid"
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select autoreg_hostid,host"
 				" from autoreg_host"
-				" where proxy_hostid="ZBX_FS_UI64
-					" and host in ('%s');",
-				proxy_hostid, hosts);
+				" where proxy_hostid%s"
+					" and",
+				DBsql_id_cmp(proxy_hostid));
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+				(const char **)hosts.values, hosts.values_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBand_node_local("autoreg_hostid"));
+
+		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(autoreg_hostid, row[1]);
-			for (i = 0; i < discovered_hosts->values_num; i++)
+			for (i = 0; i < autoreg_hosts->values_num; i++)
 			{
-				if (0 == strcmp(((zbx_autoreg_host_t *)discovered_hosts->values[i])->host_esc, row[0]))
+				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
 				{
-					((zbx_autoreg_host_t *)discovered_hosts->values[i])->autoreg_hostid = autoreg_hostid;
+					ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
 					break;
 				}
 			}
 		}
-
 		DBfree_result(result);
-		zbx_free(hosts);
+
+		hosts.values_num = 0;
 	}
+
+	zbx_vector_str_destroy(&hosts);
+	zbx_free(sql);
 }
 
-static void	DBregister_host_add(zbx_uint64_t proxy_hostid, const char *host_esc, const char *ip_esc, const char *dns_esc,
-		unsigned short port, const char *host_metadata_esc, int now, unsigned char insert, zbx_uint64_t autoreg_hostid)
-{
-	zbx_timespec_t	ts;
-
-	ts.sec = now;
-	ts.ns = 0;
-
-	if (0 == insert)
-	{
-		DBexecute("update autoreg_host"
-				" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
-	}
-	else
-	{
-		DBexecute("insert into autoreg_host"
-				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
-					"host_metadata)"
-				" values"
-				" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
-				autoreg_hostid, DBsql_id_ins(proxy_hostid),
-				host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
-	}
-
-	add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-			TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
-}
-
-
-void	DBregister_host_flush(zbx_vector_ptr_t *discovered_hosts, zbx_uint64_t proxy_hostid)
+void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	const char		*__function_name = "DBregister_host_flush";
 
-	zbx_autoreg_host_t	*discovered_host;
+	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid;
-	unsigned char		insert;
-	int			i, num = 0;
+	zbx_db_insert_t		db_insert;
+	int			i, new = 0, upd = 0;
+	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_timespec_t		ts = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != DBregister_host_active())
 		goto exit;
 
-	process_autoreg_hosts(discovered_hosts, proxy_hostid);
+	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
 
-	for (i = 0; i < discovered_hosts->values_num; i++)
+	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		if (((zbx_autoreg_host_t *)discovered_hosts->values[i])->autoreg_hostid == 0)
-			num++;
+		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+		if (0 == autoreg_host->autoreg_hostid)
+			new++;
 	}
 
-	if (0 != num)
-		autoreg_hostid = DBget_maxid_num("autoreg_host", num);
-
-	for (i = 0; i < discovered_hosts->values_num; i++)
+	if (0 != new)
 	{
-		discovered_host = discovered_hosts->values[i];
+		autoreg_hostid = DBget_maxid_num("autoreg_host", new);
 
-		if (0 == discovered_host->autoreg_hostid)
+		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
+				"listen_dns", "listen_port", "host_metadata", NULL);
+	}
+
+	if (0 != (upd = autoreg_hosts->values_num - new))
+	{
+		sql = zbx_malloc(sql, sql_alloc);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	}
+
+	zbx_vector_ptr_sort(autoreg_hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+		if (0 == autoreg_host->autoreg_hostid)
 		{
-			insert = 1;
-			discovered_host->autoreg_hostid = autoreg_hostid++;
+			autoreg_host->autoreg_hostid = autoreg_hostid++;
+
+			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
+					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
+					(int)autoreg_host->port, autoreg_host->host_metadata);
 		}
 		else
-			insert = 0;
+		{
+			ip_esc = DBdyn_escape_string(autoreg_host->ip);
+			dns_esc = DBdyn_escape_string(autoreg_host->dns);
+			host_metadata_esc = DBdyn_escape_string(autoreg_host->host_metadata);
 
-		DBregister_host_add(discovered_host->proxy_hostid, discovered_host->host_esc, discovered_host->ip_esc,
-				discovered_host->dns_esc, discovered_host->port, discovered_host->host_metadata_esc,
-				discovered_host->itemtime, insert, discovered_host->autoreg_hostid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update autoreg_host"
+					" set listen_ip='%s',"
+						"listen_dns='%s',"
+						"listen_port=%hu,"
+						"host_metadata='%s'"
+					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->autoreg_hostid);
 
-		free_autoreg_host(discovered_hosts, i);
+			zbx_free(host_metadata_esc);
+			zbx_free(dns_esc);
+			zbx_free(ip_esc);
+		}
+
+		ts.sec = autoreg_host->now;
+
+		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+	}
+
+	if (0 != new)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	if (0 != upd)
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		DBexecute("%s", sql);
+		zbx_free(sql);
 	}
 
 	process_events();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
+{
+	zbx_vector_ptr_clean(autoreg_hosts, (zbx_mem_free_func_t)autoreg_host_free);
 }
 
 /******************************************************************************
