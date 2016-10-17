@@ -1894,7 +1894,6 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
-
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
 	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
@@ -1948,9 +1947,10 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
+				if (current_ai->ai_family != AF_INET)
+					prefix_size = prefix_size_ipv6;
 
-				if (SUCCEED == zbx_ip_cmp(current_ai->ai_family == AF_INET ? prefix_size : prefix_size_ipv6,
-						current_ai, name))
+				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai, name))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
