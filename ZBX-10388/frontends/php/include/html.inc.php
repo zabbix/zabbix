@@ -597,7 +597,7 @@ function getHostAvailabilityTable($host) {
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_RED);
 
 				if ($host[$prefix.'error'] !== '') {
-					$ai = (new CSpan($type))
+					$ai
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				}

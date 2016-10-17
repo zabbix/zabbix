@@ -169,7 +169,7 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
-		$id = 'hintbox_'.uniqid();
+		$id = uniqid('hintbox_');
 
 		$this->addItem(
 			(new CSpan(
