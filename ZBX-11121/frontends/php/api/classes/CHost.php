@@ -1098,9 +1098,11 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (isset($data['groups']) && empty($data['groups'])) {
+		if (array_key_exists('groups', $data) && !$data['groups'] && $updHosts) {
+			$host = reset($updHosts);
+
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" cannot be without host group.', reset($updHosts)['name'])
+				_s('Host "%1$s" cannot be without host group.', $host['name'])
 			);
 		}
 

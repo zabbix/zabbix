@@ -839,9 +839,11 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		if (isset($data['groups']) && empty($data['groups'])) {
+		if (array_key_exists('groups', $data) && !$data['groups'] && $updTemplates) {
+			$template = reset($updTemplates);
+
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Template "%1$s" cannot be without host group.', reset($updTemplates)['name'])
+				_s('Template "%1$s" cannot be without host group.', $template['name'])
 			);
 		}
 
