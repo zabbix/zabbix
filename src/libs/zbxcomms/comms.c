@@ -1835,7 +1835,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 	char	*pch, *cidr_sep;
 	char	tmp[MAX_STRING_LEN];
 
-	if(NULL == ip_list)
+	if (NULL == ip_list)
 		return FAIL;
 
 	strscpy(tmp, ip_list);
@@ -1846,7 +1846,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 		if (NULL != (cidr_sep = strchr(pch, '/')))
 		{
 			*cidr_sep = '\0';
-			if(FAIL == validate_cidr(pch, cidr_sep + 1, NULL))
+			if (FAIL == validate_cidr(pch, cidr_sep + 1, NULL))
 			{
 				if (NULL != error)
 				{
