@@ -1947,7 +1947,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
-				if (current_ai->ai_family != AF_INET)
+				if (AF_INET != current_ai->ai_family)
 					prefix_size = prefix_size_ipv6;
 
 				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai, name))
