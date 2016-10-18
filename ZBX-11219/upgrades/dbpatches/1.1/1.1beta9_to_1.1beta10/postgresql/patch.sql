@@ -94,7 +94,7 @@ insert into help_items values(0,'kernel.maxproc','Maximum number of processes su
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interfice input statistic. Integer value. If mode is missing &lt;b&gt;bytes&lt;/b&gt; is used.');
 insert into help_items values(0,'net.if.out[if &lt;,mode&gt;]','Network interfice output statistic. Integer value. If mode is missing &lt;b&gt;bytes&lt;/b&gt; is used.');
-insert into help_items values(0,'net.tcp.dns[ip, zone]','Checks if DNS service is up. 0 - DNS is down, 1 - DNS is up.');
+insert into help_items values(0,'net.tcp.dns[ip, name]','Checks if DNS service is up. 0 - DNS is down, 1 - DNS is up.');
 insert into help_items values(0,'net.tcp.listen[port]','Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.');
 insert into help_items values(0,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]');
 insert into help_items values(0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].');
