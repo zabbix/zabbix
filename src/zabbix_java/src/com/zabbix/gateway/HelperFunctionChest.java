@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 class HelperFunctionChest
 {
-	public static <T> boolean arrayContains(T[] array, T key)
+	static <T> boolean arrayContains(T[] array, T key)
 	{
 		for (T element : array)
 			if (key.equals(element))
@@ -32,7 +32,7 @@ class HelperFunctionChest
 		return false;
 	}
 
-	public static int separatorIndex(String input)
+	static int separatorIndex(String input)
 	{
 		byte[] inputByteArray = input.getBytes();
 		int i, inputLength = inputByteArray.length;
@@ -52,7 +52,7 @@ class HelperFunctionChest
 		return -1;
 	}
 
-	public static String unescapeUserInput(String input)
+	static String unescapeUserInput(String input)
 	{
 		byte[] inputByteArray = input.getBytes(), outputByteArray;
 		ArrayList<Byte> outputByteList = new ArrayList<Byte>();

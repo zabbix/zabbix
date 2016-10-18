@@ -46,7 +46,7 @@ class JMXItemChecker extends ItemChecker
 	private String username;
 	private String password;
 
-	public JMXItemChecker(JSONObject request) throws ZabbixException
+	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
 
@@ -72,7 +72,7 @@ class JMXItemChecker extends ItemChecker
 	}
 
 	@Override
-	public JSONArray getValues() throws ZabbixException
+	JSONArray getValues() throws ZabbixException
 	{
 		JSONArray values = new JSONArray();
 

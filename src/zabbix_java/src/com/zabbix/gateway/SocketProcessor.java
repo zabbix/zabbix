@@ -32,7 +32,7 @@ class SocketProcessor implements Runnable
 
 	private Socket socket;
 
-	public SocketProcessor(Socket socket)
+	SocketProcessor(Socket socket)
 	{
 		this.socket = socket;
 	}

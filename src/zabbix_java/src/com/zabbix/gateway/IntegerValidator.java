@@ -24,7 +24,7 @@ class IntegerValidator implements InputValidator
 	private int lo;
 	private int hi;
 
-	public IntegerValidator(int lo, int hi)
+	IntegerValidator(int lo, int hi)
 	{
 		if (lo > hi)
 			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
