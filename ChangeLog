@@ -7,6 +7,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-10388] removed duplicated data and reduced traffic for hint popups (Gunars)
 ..F....... [ZBX-11331] fixed JS error in Configuration->Discovery edit page (Oleg)
 ...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
 ..F....... [ZBX-11324] fixed undefined index in screen and map import pages (Oleg)
