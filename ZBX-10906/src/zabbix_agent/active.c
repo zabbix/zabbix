@@ -1342,7 +1342,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	init_active_metrics();
 
-	lastcheck = time(NULL);
+	lastcheck = 0;
 
 	while (ZBX_IS_RUNNING())
 	{
