@@ -185,8 +185,8 @@ $itemFormList->addRow(
 	[
 		_('Privacy passphrase'),
 		SPACE,
-		(new CVisibilityBox('visible[privpassphras]', 'snmpv3_privpassphrase', _('Original')))
-			->setChecked(isset($this->data['visible']['privpassphras']))
+		(new CVisibilityBox('visible[privpassphrase]', 'snmpv3_privpassphrase', _('Original')))
+			->setChecked(isset($this->data['visible']['privpassphrase']))
 	],
 	(new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

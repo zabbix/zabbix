@@ -23,13 +23,16 @@ $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addVar('imagetype', $data['imagetype'])
 		->addItem(
 			(new CList())
 				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
-				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $data['imagetype'], 'submit();', [
-					IMAGE_TYPE_ICON => _('Icon'),
-					IMAGE_TYPE_BACKGROUND => _('Background')])
+				->addItem([
+					new CLabel(_('Type'), 'imagetype'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('imagetype', $data['imagetype'], 'submit();', [
+						IMAGE_TYPE_ICON => _('Icon'),
+						IMAGE_TYPE_BACKGROUND => _('Background')
+					])
 				])
 				->addItem(
 					new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON)

@@ -283,19 +283,33 @@ else {
 			$frmForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$controls->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()]);
-		$controls->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()]);
+		$controls
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$pageFilter->getGroupsCB()
+			])
+			->addItem([
+				new CLabel(_('Host'), 'hostid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$pageFilter->getHostsCB()
+			]);
 	}
 
 	if ($allow_discovery) {
-		$controls->addItem([_('Source'), SPACE, new CComboBox('source', $source, 'submit()', [
-			EVENT_SOURCE_TRIGGERS => _('Trigger'),
-			EVENT_SOURCE_DISCOVERY => _('Discovery')
-		])]);
+		$controls->addItem([
+			new CLabel(_('Source'), 'source'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CComboBox('source', $source, 'submit()', [
+				EVENT_SOURCE_TRIGGERS => _('Trigger'),
+				EVENT_SOURCE_DISCOVERY => _('Discovery')
+			])
+		]);
 	}
 
-	$controls->addItem(new CSubmit('csv_export', _('Export to CSV')));
-	$controls->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]));
+	$controls
+		->addItem(new CSubmit('csv_export', _('Export to CSV')))
+		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]));
 
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);
@@ -438,7 +452,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 	$url = (new CUrl('events.php'))
 		->setArgument('fullscreen', getRequest('fullscreen'));
 
-	$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN, $url);
+	$paging = getPagingLine($dsc_events, ZBX_SORT_UP, $url);
 
 	$objectids = [];
 	foreach ($dsc_events as $event_data) {
@@ -630,7 +644,7 @@ else {
 			->setArgument('groupid', $pageFilter->groupid)
 			->setArgument('hostid', $pageFilter->hostid);
 
-		$paging = getPagingLine($events, ZBX_SORT_DOWN, $url);
+		$paging = getPagingLine($events, ZBX_SORT_UP, $url);
 
 		// query event with extend data
 		$events = API::Event()->get([

@@ -190,17 +190,22 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  */
 $triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
-$rightForm = (new CForm('get'))
-	->addVar('fullscreen', $_REQUEST['fullscreen']);
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-
-$rightForm->addItem($controls);
-
-$triggerWidget->setControls($rightForm);
+$triggerWidget->setControls((new CForm('get'))
+	->addVar('fullscreen', $_REQUEST['fullscreen'])
+	->addItem((new CList())
+		->addItem([
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getGroupsCB()
+		])
+		->addItem([
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getHostsCB()
+		])
+		->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+	)
+);
 
 // filter
 $filterFormView = new CView('common.filter.trigger', [
@@ -407,6 +412,7 @@ $triggerIds = zbx_objectValues($triggers, 'triggerid');
 $triggerEditable = API::Trigger()->get([
 	'triggerids' => $triggerIds,
 	'output' => ['triggerid'],
+	'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 	'editable' => true,
 	'preservekeys' => true
 ]);
