@@ -765,6 +765,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemNames(array $items) {
+		$items = array_values($items);
+
 		// define resolving fields
 		foreach ($items as &$item) {
 			$item['name_expanded'] = $item['name'];
@@ -877,6 +879,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemKeys(array $items) {
+		$items = array_values($items);
+
 		// define resolving field
 		foreach ($items as &$item) {
 			$item['key_expanded'] = $item['key_'];
@@ -989,7 +993,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							foreach ($interfaces as $hostid => $interface) {
 								if ($hostid == $host['hostid']
 										&& $iface_macros = $this->findMacros(self::PATTERN_INTERFACE,
-											array($items[$macroData['itemid']]['key_expanded']))) {
+											array($items[$key]['key_expanded']))) {
 									foreach ($iface_macros as $macro) {
 										switch ($macro) {
 											case '{IPADDRESS}':
