@@ -37,6 +37,7 @@ class SocketProcessor implements Runnable
 		this.socket = socket;
 	}
 
+	@Override
 	public void run()
 	{
 		logger.debug("starting to process incoming connection");

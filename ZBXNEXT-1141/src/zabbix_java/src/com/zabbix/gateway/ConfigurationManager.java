@@ -41,6 +41,7 @@ class ConfigurationManager
 				null,
 				new PostInputValidator()
 				{
+					@Override
 					public void execute(Object value)
 					{
 						logger.debug("received {} configuration parameter, daemonizing", PID_FILE);

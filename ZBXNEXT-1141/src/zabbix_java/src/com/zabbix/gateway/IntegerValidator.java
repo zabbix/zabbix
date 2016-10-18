@@ -33,6 +33,7 @@ class IntegerValidator implements InputValidator
 		this.hi = hi;
 	}
 
+	@Override
 	public boolean validate(Object value)
 	{
 		if (value instanceof Integer)
