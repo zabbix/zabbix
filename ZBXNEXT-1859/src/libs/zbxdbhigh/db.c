@@ -1480,6 +1480,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, now);
 	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 
+	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 }
 
