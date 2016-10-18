@@ -989,7 +989,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							foreach ($interfaces as $hostid => $interface) {
 								if ($hostid == $host['hostid']
 										&& $iface_macros = $this->findMacros(self::PATTERN_INTERFACE,
-											array($item['key_expanded']))) {
+											array($items[$macroData['itemid']]['key_expanded']))) {
 									foreach ($iface_macros as $macro) {
 										switch ($macro) {
 											case '{IPADDRESS}':
