@@ -1325,7 +1325,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2, now, delta, lastcheck;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2, now, delta, lastcheck = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1341,8 +1341,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(args);
 
 	init_active_metrics();
-
-	lastcheck = 0;
 
 	while (ZBX_IS_RUNNING())
 	{
