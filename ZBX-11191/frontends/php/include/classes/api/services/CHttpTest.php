@@ -429,10 +429,15 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function validateCreate(array $httpTests) {
+		$required_fields = ['name', 'hostid', 'steps'];
+
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, ['name', 'hostid', 'steps']);
-			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
+			$missing_keys = array_diff($required_fields, array_keys($httpTest));
+
+			if ($missing_keys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Web scenario missing parameters: %1$s', implode(', ', $missing_keys))
+				);
 			}
 		}
 
@@ -678,11 +683,14 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
 		}
 
+		$required_fields = ['httpstepid'];
+
 		foreach ($httpTest['steps'] as $step) {
 			if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
 				// Handle templated webscenario steps first by checking the keys.
 
-				$missing_keys = checkRequiredKeys($step, ['httpstepid']);
+				$missing_keys = array_diff($required_fields, array_keys($step));
+
 				if ($missing_keys) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Web scenario step is missing parameters: %1$s', implode(', ', $missing_keys))
