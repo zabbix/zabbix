@@ -485,8 +485,7 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-		->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -662,8 +661,7 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-		->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
