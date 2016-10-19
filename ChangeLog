@@ -1,6 +1,6 @@
 Changes for 2.2.16rc1
 
-New features:i
+New features:
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
