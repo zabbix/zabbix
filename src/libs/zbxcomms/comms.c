@@ -1807,7 +1807,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				/* incoming AF_INET, must see whether the given is compatible or mapped */
 				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
 						&ai_addr6->sin6_addr.s6_addr, ipv6_compat_address) ||
-						SUCCEED == subnet_match(AF_INET6, prefix_size,
+						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
 						&ai_addr6->sin6_addr.s6_addr, ipv6_mapped_address))
 				{
 					return SUCCEED;
