@@ -771,8 +771,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemNames(array $items) {
-		$items = array_values($items);
-
 		// define resolving fields
 		foreach ($items as &$item) {
 			$item['name_expanded'] = $item['name'];
@@ -885,8 +883,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemKeys(array $items) {
-		$items = array_values($items);
-
 		// define resolving field
 		foreach ($items as &$item) {
 			$item['key_expanded'] = $item['key_'];
