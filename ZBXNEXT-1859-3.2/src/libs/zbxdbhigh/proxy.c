@@ -2701,8 +2701,6 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&autoreg_hosts);
-
 	now = time(NULL);
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
@@ -2713,6 +2711,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 
 	hosttime = atoi(tmp);
 
+	zbx_vector_ptr_create(&autoreg_hosts);
 	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
@@ -2755,13 +2754,13 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 		DBcommit();
 	}
-out:
-	if (SUCCEED != ret)
-		*error = zbx_strdup(*error, zbx_json_strerror());
 
 	zbx_free(host_metadata);
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
+out:
+	if (SUCCEED != ret)
+		*error = zbx_strdup(*error, zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
