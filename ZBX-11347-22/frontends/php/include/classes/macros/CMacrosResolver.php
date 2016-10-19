@@ -239,7 +239,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$interfaces = DBfetchArray(DBselect(
 				'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
 				' FROM interface i'.
-				' WHERE '.dbConditionInt('i.hostid', $hostIds).
+				' WHERE i.main='.INTERFACE_PRIMARY.
+					' AND '.dbConditionInt('i.hostid', $hostIds).
 					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
 			));
 
@@ -940,8 +941,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$hostid = $interface['hostid'];
 					$priority = $this->interfacePriorities[$interface['type']];
 
-					if (!array_key_exists($hostid, $interfaces_by_priority)
-							|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
+					if ($interface['main'] == INTERFACE_PRIMARY && (!array_key_exists($hostid, $interfaces_by_priority)
+							|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']])) {
 						$interfaces_by_priority[$hostid] = $interface;
 					}
 				}
