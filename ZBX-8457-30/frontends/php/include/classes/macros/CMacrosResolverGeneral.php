@@ -767,7 +767,7 @@ class CMacrosResolverGeneral {
 		$hostids = [];
 		foreach ($data as $element) {
 			foreach ($element['hostids'] as $hostid) {
-				$hostids[$hostid] = $hostid;
+				$hostids[$hostid] = true;
 			}
 		}
 
@@ -794,7 +794,9 @@ class CMacrosResolverGeneral {
 
 		do {
 			$db_host_macros = DBselect(
-				'SELECT hm.hostid,hm.macro,hm.value FROM hostmacro hm WHERE '.dbConditionInt('hm.hostid', $hostids)
+				'SELECT hm.hostid,hm.macro,hm.value'.
+				' FROM hostmacro hm'.
+				' WHERE '.dbConditionInt('hm.hostid', array_keys($hostids))
 			);
 			while ($db_host_macro = DBfetch($db_host_macros)) {
 				if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
@@ -815,27 +817,29 @@ class CMacrosResolverGeneral {
 
 			$templateids = [];
 			$db_host_templates = DBselect(
-				'SELECT ht.hostid,ht.templateid FROM hosts_templates ht WHERE '.dbConditionInt('ht.hostid', $hostids)
+				'SELECT ht.hostid,ht.templateid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionInt('ht.hostid', array_keys($hostids))
 			);
 			while ($db_host_template = DBfetch($db_host_templates)) {
 				$host_templates[$db_host_template['hostid']][] = $db_host_template['templateid'];
-				$templateids[$db_host_template['templateid']] = $db_host_template['templateid'];
+				$templateids[$db_host_template['templateid']] = true;
 
 				if (!array_key_exists($db_host_template['hostid'], $host_macros)) {
 					$host_macros[$db_host_template['hostid']] = [];
 				}
 			}
 
-			foreach ($hostids as $hostid) {
-				if (!array_key_exists($hostid, $host_templates)) {
-					$host_templates[$hostid] = [];
+			foreach ($hostids as $key => $value) {
+				if (!array_key_exists($key, $host_templates)) {
+					$host_templates[$key] = [];
 				}
 			}
 
 			$hostids = [];
-			foreach ($templateids as $templateid) {
-				if (!array_key_exists($templateid, $host_macros)) {
-					$hostids[$templateid] = $templateid;
+			foreach ($templateids as $key => $value) {
+				if (!array_key_exists($key, $host_templates)) {
+					$hostids[$key] = true;
 				}
 			}
 		} while ($hostids);
