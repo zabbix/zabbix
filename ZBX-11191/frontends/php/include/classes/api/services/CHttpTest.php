@@ -496,6 +496,9 @@ class CHttpTest extends CApiService {
 			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
 		]);
 
+		// Required fields for steps.
+		$required_fields = ['httpstepid'];
+
 		foreach ($httpTests as &$httpTest) {
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
 
@@ -509,6 +512,27 @@ class CHttpTest extends CApiService {
 
 			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as &$httpTestStep) {
+					if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
+						/*
+						 * Handle templated webscenario steps first by checking the keys and then check name before
+						 * populating the name field from parent.
+						 */
+
+						$missing_keys = array_diff($required_fields, array_keys($httpTestStep));
+
+						if ($missing_keys) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Web scenario step is missing parameters: %1$s', implode(', ', $missing_keys))
+							);
+						}
+
+						if (array_key_exists('name', $httpTestStep)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Cannot update step name for a templated web scenario "%1$s".', $httpTest['name'])
+							);
+						}
+					}
+
 					if (isset($httpTestStep['httpstepid'])
 							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
 						$httpTestStep['name'] = $dbHttpTest['steps'][$httpTestStep['httpstepid']]['name'];
@@ -679,31 +703,15 @@ class CHttpTest extends CApiService {
 			]
 		);
 
-		if ($dbHttpTest && $dbHttpTest['templateid'] != 0 && count($httpTest['steps']) != count($dbHttpTest['steps'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
+		if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
+			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
+
+			if (count($httpTest['steps']) != count($dbHttpTest['steps'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
+			}
 		}
 
-		$required_fields = ['httpstepid'];
-
 		foreach ($httpTest['steps'] as $step) {
-			if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
-				// Handle templated webscenario steps first by checking the keys.
-
-				$missing_keys = array_diff($required_fields, array_keys($step));
-
-				if ($missing_keys) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Web scenario step is missing parameters: %1$s', implode(', ', $missing_keys))
-					);
-				}
-
-				if (array_key_exists('name', $step)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot update step name for a templated web scenario "%1$s".', $httpTest['name'])
-					);
-				}
-			}
-
 			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
 					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
