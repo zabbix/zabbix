@@ -1752,7 +1752,8 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 	const unsigned char	ipv4_compat_mask[12] = {0};
 	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
-
+	unsigned char		ipv6_compat_address[16];
+	unsigned char		ipv6_mapped_address[16];
 	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
 	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
@@ -1797,17 +1798,17 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				}
 				break;
 			case AF_INET6:
-				/* IPv4-compatible, the first 96 bits are zeros, but our CIDR is in IPV6 */
-				if (prefix_size > 96)
-					prefix_size -= 96;
-				else
-					prefix_size = 0;
+				memcpy(ipv6_compat_address, ipv4_compat_mask, sizeof(ipv4_compat_mask));
+				memcpy(&ipv6_compat_address[sizeof(ipv4_compat_mask)], &name4->sin_addr.s_addr, 4);
+
+				memcpy(ipv6_mapped_address, ipv4_mapped_mask, sizeof(ipv4_mapped_mask));
+				memcpy(&ipv6_mapped_address[sizeof(ipv4_mapped_mask)], &name4->sin_addr.s_addr, 4);
 
 				/* incoming AF_INET, must see whether the given is compatible or mapped */
-				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
-						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						SUCCEED == subnet_match(AF_INET, prefix_size,
-						&ai_addr6->sin6_addr.s6_addr[12], &name4->sin_addr.s_addr))
+				if (SUCCEED == subnet_match(AF_INET6, prefix_size,
+						&ai_addr6->sin6_addr.s6_addr, ipv6_compat_address) ||
+						SUCCEED == subnet_match(AF_INET6, prefix_size,
+						&ai_addr6->sin6_addr.s6_addr, ipv6_mapped_address))
 				{
 					return SUCCEED;
 				}
