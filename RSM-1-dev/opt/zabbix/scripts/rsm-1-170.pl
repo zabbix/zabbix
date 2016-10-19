@@ -19,8 +19,27 @@ use RSMSLV;
 use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
 use TLDs;
 
+my %OPTS;
+
+my $usage_str = "usage: $0 [--no-obsolete-triggers --no-create-ns-triggers --debug --dry-run --help]";
+
+if (!GetOptions(\%OPTS, 'no-obsolete-triggers!', 'no-create-ns-triggers!', 'debug!', 'dry-run!', 'help!'))
+{
+	print("$usage_str\n");
+	exit(1);
+}
+
+if ($OPTS{'help'})
+{
+	print("$usage_str\n");
+	exit(0);
+}
+
 # auto-flush stdout
 $| = 1;
+
+setopt('debug') if ($OPTS{'debug'});
+setopt('dry-run') if ($OPTS{'dry-run'});
 
 sub __get_host_macro($$$)
 {
@@ -68,7 +87,7 @@ foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
 
-    print(".");
+	print(".");
 
 	my $templateid = get_hostid("Template $tld");
 
@@ -97,7 +116,7 @@ print("\nFixing probe macros RDDS.ENABLED");
 my $probes_ref = get_probes(ENABLED_DNS);
 foreach my $host (keys(%{$probes_ref}))
 {
-    print(".");
+	print(".");
 
 	my $templateid = get_hostid("Template $host");
 
@@ -130,47 +149,51 @@ if (0)
 
 	foreach my $row_ref (@{$rows_ref})
 	{
-        print(".");
+		print(".");
 		push(@{$triggerids}, $row_ref->[0]);
 	}
 	__delete_triggers($triggerids);
 }
 
-foreach (@{$tlds_ref})
+if (!$OPTS{'no-create-ns-triggers'})
 {
-	$tld = $_;	# set globally
-
-    print(".");
-
-	my $hostid = get_hostid($tld);
-
-	my $rows_ref = db_select("select key_ from items where hostid=$hostid and key_ like 'rsm.slv.dns.ns.downtime[%]'");
-
-	foreach my $row_ref (@{$rows_ref})
+	print("\nCreating NS downtime triggers");
+	foreach (@{$tlds_ref})
 	{
-		my $key = $row_ref->[0];
+		$tld = $_;	# set globally
 
-		my ($ns, $ip) = split(',', get_nsip_from_key($key));
+		print(".");
+		my $hostid = get_hostid($tld);
 
-		#print("    $ns ($ip) [$key]\n");
+		my $rows_ref = db_select("select key_ from items where hostid=$hostid and key_ like 'rsm.slv.dns.ns.downtime[%]'");
 
-		my $options = {
-			'description' => "Name Server $ns ($ip)".' has been down for over {$RSM.SLV.NS.AVAIL} minutes',
-			'expression' => '{'.$tld.':'.$key.'.last(0)}>{$RSM.SLV.NS.AVAIL}',
-			'priority' => '4'
-		};
+		foreach my $row_ref (@{$rows_ref})
+		{
+			my $key = $row_ref->[0];
 
-		__create_trigger($options);
+			my ($ns, $ip) = split(',', get_nsip_from_key($key));
+
+			#print("    $ns ($ip) [$key]\n");
+
+			my $options =
+			{
+				'description' => "Name Server $ns ($ip)".' has been down for over {$RSM.SLV.NS.AVAIL} minutes',
+				'expression' => '{'.$tld.':'.$key.'.last(0)}>{$RSM.SLV.NS.AVAIL}',
+				'priority' => '4'
+			};
+
+			__create_trigger($options);
+		}
 	}
+	undef($tld);
 }
-undef($tld);
 
 print("\nFixing value mappings");
 db_exec("update valuemaps set name='RSM Service Availability' where valuemapid=16");
 my $rows_ref = db_select("select mappingid from mappings where mappingid=113");
 if (scalar(@{$rows_ref}) == 0)
 {
-    print(".");
+	print(".");
 	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (113,16,'2','Up (inconclusive)')");
 }
 db_exec("update valuemaps set name='RSM RDDS probe result' where valuemapid=18");
@@ -178,34 +201,50 @@ db_exec("update valuemaps set name='RSM EPP result' where valuemapid=19");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.dns.udp[{$RSM.TLD}]' . "'");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]' . "'");
 
-print("\nDeleting obsoleted triggers");
-foreach (@{$tlds_ref})
+if (!$OPTS{'no-obsolete-triggers'})
 {
-	$tld = $_;	# set globally
-
-	print(".");
-
-    my $host = "Template $tld";
-
-	my @triggerids;
-	my $result = $zabbix->get('trigger', {'filter' => {'host' => $host}, 'output' => ['triggerid', 'description']});
-
-	if (ref($result) eq 'ARRAY')
+	print("\nDeleting obsoleted triggers");
+	foreach (@{$tlds_ref})
 	{
-		foreach my $r (@{$result})
+		$tld = $_;	# set globally
+
+		my $host = "Template $tld";
+
+		print("\n$host");
+		my @triggerids;
+		my $result = $zabbix->get('trigger', {'filter' => {'host' => $host}, 'output' => ['triggerid', 'description']});
+
+		if (ref($result) eq 'ARRAY')
 		{
-			push(@triggerids, $r->{'triggerid'});
-			#printf("%30s | %10s | %s\n", $host, $r->{'triggerid'}, $r->{'description'});
+			foreach my $r (@{$result})
+			{
+				push(@triggerids, $r->{'triggerid'});
+				#print("," . $r->{'triggerid'});
+				#printf("%30s | %10s | %s\n", $host, $r->{'triggerid'}, $r->{'description'});
+			}
+		}
+
+		if (scalar(@triggerids) != 0)
+		{
+			my $part_limit = 3;
+			while (scalar(@triggerids) > 0)
+			{
+				my @part;
+
+				while (scalar(@part) < $part_limit && scalar(@triggerids) > 0)
+				{
+					push(@part, shift(@triggerids));
+				}
+
+				#my $result = $zabbix->remove('trigger', \@triggerids);
+				#pfail("cannot delete triggers by ID ", join(',', @triggerids), ": ", Dumper($zabbix->last_error())) unless ($result);
+				print("\n  feeding ", scalar(@part), " of ", scalar(@triggerids), ": ", join(',', @part));
+				__delete_triggers(\@part);
+			}
 		}
 	}
-
-	if (scalar(@triggerids) != 0)
-	{
-		my $result = $zabbix->remove('trigger', \@triggerids);
-		pfail("cannot delete triggers by ID ", join(',', @triggerids), ": ", Dumper($zabbix->last_error())) unless ($result);
-	}
+	undef($tld);
 }
-undef($tld);
 
 my $slv_items_to_remove_like =
 [
@@ -243,7 +282,7 @@ my $item_names_to_rename =
 print("\nRenaming triggers");
 foreach my $from (keys(%{$trigger_names_to_rename}))
 {
-    print(".");
+	print(".");
 	my $to = $trigger_names_to_rename->{$from};
 
 	db_exec("update triggers set description='$to' where description='$from'");
@@ -252,14 +291,14 @@ foreach my $from (keys(%{$trigger_names_to_rename}))
 print("\nRenaming item keys");
 foreach my $key (@{$item_keys_to_remove})
 {
-    print(".");
+	print(".");
 	db_exec("delete from items where key_='$key'");
 }
 
 print("\nRenaming item names");
 foreach my $from (keys(%{$item_names_to_rename}))
 {
-    print(".");
+	print(".");
 	my $to = $item_names_to_rename->{$from};
 
 	db_exec("update items set name='$to' where name='$from'");
@@ -268,12 +307,12 @@ foreach my $from (keys(%{$item_names_to_rename}))
 print("\nDeleting obsoleted items");
 foreach my $key (@{$slv_items_to_remove_like})
 {
-    print(".");
+	print(".");
 	db_exec("delete from items where key_ like '$key'");
 }
 foreach my $key (@{$item_keys_to_remove})
 {
-    print(".");
+	print(".");
 	db_exec("delete from items where key_='$key'");
 }
 
@@ -286,6 +325,7 @@ foreach my $key (@{$item_keys_to_remove})
 	my $result = $zabbix->get('template', {'filter' => {'host' => $host}});
 	pfail("cannot find template \"$host\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
 	my $templateid = $result->{'templateid'};
+
 	unless ($zabbix->exist('item', {'hostid' => $templateid, 'key_' => $item}))
 	{
 		print("\nCreating probe mon items");
@@ -313,7 +353,7 @@ foreach (@{$tlds_ref})
 {
 	$tld = $_;	# set globally
 
-    print(".");
+	print(".");
 
 	my $rows_ref = db_select(
 		"select a.applicationid".
@@ -353,7 +393,7 @@ my $global_macros = {
 };
 foreach my $m (keys(%{$global_macros}))
 {
-    print(".");
+	print(".");
 	__create_macro($m, $global_macros->{$m}, undef, 1);	# global, force update
 }
 print("\nDone!\n");
@@ -616,7 +656,7 @@ sub __create_missing_slv_montly_items_and_triggers
 	{
 		$tld = $_;	# set globally
 
-		print(".");
+		print("\n..$tld");
 
 		my $rows_ref = db_select("select hostid from hosts where host='$tld'");
 
