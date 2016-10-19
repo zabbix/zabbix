@@ -153,9 +153,9 @@ sub dw_get_id
 	my $id_type = shift;
 	my $name = shift;
 
-	if (!$name)
+	if (!defined($name))
 	{
-		wrn("cannot get $id_type ID by name: name undefined");
+		wrn("cannot get $id_type ID by undefined name!");
 		return undef;
 	}
 
@@ -257,6 +257,13 @@ sub dw_get_cycle_id
 
 	$ns_id = 0 unless (defined($ns_id));
 	$ip_id = 0 unless (defined($ip_id));
+
+	if (opt('dry-run'))
+	{
+		return sprintf(
+			"%0"._DIGITS_CLOCK."d%0"._DIGITS_SERVICE_CATEGORY_ID."s%0"._DIGITS_TLD_ID."s%0"._DIGITS_NS_ID."s%0".
+			_DIGITS_IP_ID."s", $clock, $service_category_id, $tld_id, $ns_id, $ip_id);
+	}
 
 	return sprintf(
 		"%0"._DIGITS_CLOCK."d%0"._DIGITS_SERVICE_CATEGORY_ID."d%0"._DIGITS_TLD_ID."d%0"._DIGITS_NS_ID."d%0".
