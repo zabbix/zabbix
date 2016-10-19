@@ -426,9 +426,10 @@ class CMacrosResolverGeneral {
 				}
 			}
 
+			// only unprocessed templates will be populated
 			$hostIds = array();
 			foreach ($templateids as $templateid) {
-				if (!array_key_exists($templateid, $hostMacros)) {
+				if (!array_key_exists($templateid, $hostTemplates)) {
 					$hostIds[$templateid] = $templateid;
 				}
 			}
