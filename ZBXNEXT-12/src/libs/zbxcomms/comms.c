@@ -1731,7 +1731,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 
 	/* CIDR notation to subnet mask */
 	for (i = prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
-		netmask[j] = i >= 8 ? 0xFF : 0xFF << 8 - i;
+		netmask[j] = i >= 8 ? 0xFF : ~((1 << (8 - i)) - 1);
 
 	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
 	/* All hosts on a subnetwork have the same network prefix. */
