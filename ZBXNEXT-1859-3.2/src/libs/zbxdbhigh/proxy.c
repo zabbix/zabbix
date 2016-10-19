@@ -2755,12 +2755,11 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 		DBcommit();
 	}
-
-	zbx_free(host_metadata);
 out:
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
 
+	zbx_free(host_metadata);
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 
