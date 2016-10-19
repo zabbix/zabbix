@@ -2697,8 +2697,11 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	zbx_vector_ptr_t	autoreg_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&autoreg_hosts);
 
 	now = time(NULL);
 
@@ -2743,8 +2746,13 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 		if (FAIL == is_ushort(tmp, &port))
 			port = ZBX_DEFAULT_AGENT_PORT;
 
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, itemtime);
+	}
+
+	if (0 != autoreg_hosts.values_num)
+	{
 		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
+		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 		DBcommit();
 	}
 
@@ -2752,6 +2760,9 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 out:
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
+
+	DBregister_host_clean(&autoreg_hosts);
+	zbx_vector_ptr_destroy(&autoreg_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
