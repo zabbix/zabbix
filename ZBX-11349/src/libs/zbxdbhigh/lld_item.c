@@ -635,6 +635,11 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
 				(0 != item->itemid ? "update" : "create"), *field);
 	}
+	else if (0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_NAME) && 0 == strcmp(*field, ""))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
+				(0 != item->itemid ? "update" : "create"));
+	}
 	else
 		return;
 
