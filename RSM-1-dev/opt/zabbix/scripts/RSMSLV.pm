@@ -154,7 +154,7 @@ my $_sender_values;	# used to send values to Zabbix server
 
 my $POD2USAGE_FILE;	# usage message file
 
-my ($_global_sql, $_lock_fh);
+my ($_global_sql, $_global_sql_bind_values, $_lock_fh);
 
 my $__rsm_slv_error = "";
 
@@ -1229,7 +1229,11 @@ sub handle_db_error
 
 	$prefix = "[tld:$tld] " if ($tld);
 
-	fail($prefix . "database error: $msg (query was: $_global_sql)");
+	my $bind_values_str = "";
+
+	$bind_values_str = ' bind values: ' . join(',', @{$_global_sql_bind_values}) if (defined($_global_sql_bind_values));
+
+	fail($prefix . "database error: $msg (query was: [$_global_sql]$bind_values_str)");
 }
 
 sub db_connect
@@ -1260,6 +1264,8 @@ sub db_disconnect
 sub db_select
 {
 	$_global_sql = shift;
+
+	undef($_global_sql_bind_values);
 
 	my $sec;
 	if (opt('stats'))
@@ -1320,7 +1326,7 @@ sub db_select
 sub db_select_binds
 {
 	$_global_sql = shift;
-	my $bind_values = shift;
+	$_global_sql_bind_values = shift;
 
 	my $sec;
 	if (opt('stats'))
@@ -1336,7 +1342,7 @@ sub db_select_binds
 	my ($start, $exe, $fetch, $total);
 
 	my @rows;
-	foreach my $bind_value (@$bind_values)
+	foreach my $bind_value (@{$_global_sql_bind_values})
 	{
 		dbg("bind_value:$bind_value");
 
@@ -1367,7 +1373,8 @@ sub db_select_binds
 			{
 				$fetch = $now - $exe;
 				$exe = $exe - $start;
-				wrn("slow query: [$_global_sql] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
+
+				wrn("slow query: [$_global_sql], bind values: [", join(',', @{$_global_sql_bind_values}), "] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
 			}
 		}
 	}
@@ -1391,6 +1398,8 @@ sub db_select_binds
 sub db_exec
 {
 	$_global_sql = shift;
+
+	undef($_global_sql_bind_values);
 
 	my $sec;
 	if (opt('stats'))
@@ -2988,11 +2997,11 @@ sub __find_probe_key_by_itemid
 	return ($probe, $key);
 }
 
-sub __get_rdds_interface_n_type
+sub __get_rdds_item_details
 {
 	my $key = shift;
 
-	my @keyparts = split(/./, substr($key, 0, index($key, '[')));
+	my @keyparts = split(/\./, substr($key, 0, index($key, '[')));
 
 	my $interface;
 	my $type;
@@ -3017,15 +3026,15 @@ sub __get_rdds_interface_n_type
 	{
 		if ($keyparts[3] eq 'rtt')
 		{
-			$interface = JSON_TAG_RTT;
+			$type = JSON_TAG_RTT;
 		}
 		elsif ($keyparts[3] eq 'upd')
 		{
-			$interface = JSON_TAG_UPD;
+			$type = JSON_TAG_UPD;
 		}
 		elsif ($keyparts[3] eq 'ip')
 		{
-			$interface = JSON_TAG_TARGET_IP;
+			$type = JSON_TAG_TARGET_IP;
 		}
 	}
 
@@ -3142,20 +3151,19 @@ sub get_rdds_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
 
-		fail("internal error: cannot get Probe-key pair by itemid:$itemid")
-			unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
-		my ($interface, $type) = __get_rdds_interface_n_type($key);
-		my $description;
+		my ($interface, $type) = __get_rdds_item_details($key);
 
-		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
-		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
+		fail("unknown RDDS interface in item $key (id:$itemid)") if (!defined($interface));
+		fail("unknown RDDS test type in item key $key (id:$itemid)") if (!defined($type));
 
 		if ($type ne JSON_TAG_RTT && $type ne JSON_TAG_UPD)
 		{
 			fail("internal error: unknown item key (itemid:$itemid), expected 'rtt' or 'upd' value involved in $interface test");
 		}
 
+		my $description;
 		$value = int($value);
 
 		if ($value < 0)
@@ -3185,10 +3193,10 @@ sub get_rdds_test_values
 
 		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
-		my ($interface, $type) = __get_rdds_interface_n_type($key);
+		my ($interface, $type) = __get_rdds_item_details($key);
 
-		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
-		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
+		fail("unknown RDDS interface in item $key (id:$itemid)") if (!defined($interface));
+		fail("unknown RDDS test type in item key $key (id:$itemid)") if (!defined($type));
 
 		if ($type ne JSON_TAG_TARGET_IP)
 		{
@@ -4576,7 +4584,7 @@ sub slv_stats_reset
 
 sub slv_lock
 {
-	#printf("%7d: %s\n", $$, 'TRY');
+	dbg(sprintf("%7d: %s", $$, 'TRY'));
 
 	my $tmp;
 	if (opt('stats'))
@@ -4596,7 +4604,7 @@ sub slv_lock
 		$lock_count++;
 	}
 
-	#printf("%7d: %s\n", $$, 'LOCK');
+	dbg(sprintf("%7d: %s", $$, 'LOCK'));
 }
 
 sub slv_unlock
@@ -4608,7 +4616,7 @@ sub slv_unlock
 		$lock_time += time() - $lock_tmp;
 	}
 
-	#printf("%7d: %s\n", $$, 'UNLOCK');
+	dbg(sprintf("%7d: %s", $$, 'UNLOCK'));
 }
 
 sub exit_if_running
@@ -4894,6 +4902,7 @@ sub __log
 	my $msg = shift;
 
 	my $priority;
+
 	my $stdout = 1;
 
 	if ($syslog_priority eq 'info')
