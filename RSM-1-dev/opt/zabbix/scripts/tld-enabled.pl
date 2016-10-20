@@ -27,9 +27,21 @@ sub __get_host_macro($$)
 
 set_slv_config(get_rsm_config());
 
+parse_opts('tld=s');
+
 db_connect();
 
-my $tlds_ref = get_tlds(ENABLED_DNS);
+my $tlds_ref;
+if (opt('tld'))
+{
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+
+	$tlds_ref = [ getopt('tld') ];
+}
+else
+{
+	$tlds_ref = get_tlds(ENABLED_DNS);
+}
 
 foreach (@{$tlds_ref})
 {
