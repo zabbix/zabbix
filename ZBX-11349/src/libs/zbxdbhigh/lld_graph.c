@@ -738,7 +738,7 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 		*error = zbx_strdcatf(*error, "Cannot %s graph: value \"%s\" is too long.\n",
 				(0 != graph->graphid ? "update" : "create"), *field);
 	}
-	else if (0 != (flag & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME) && 0 == strcmp(*field, ""))
+	else if (0 != (flag & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME) && '\0' == **field)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s graph: name is empty.\n",
 				(0 != graph->graphid ? "update" : "create"));
