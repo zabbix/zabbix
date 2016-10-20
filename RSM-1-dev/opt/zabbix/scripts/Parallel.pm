@@ -11,8 +11,8 @@ use Data::Dumper;
 
 our @EXPORT = qw(fork_without_pipe fork_with_pipe handle_children print_children children_running set_max_children);
 
-my $MAX_CHILDREN = 64;
-my %PIDS;
+my $_MAX_CHILDREN;
+my %_PIDS;
 
 sub ts_str
 {
@@ -34,13 +34,15 @@ $SIG{CHLD} = sub
 	{
 		#print(ts_str(), " child $pid exited\n");
 
-		$PIDS{$pid}{'alive'} = 0 if ($PIDS{$pid});
+		$_PIDS{$pid}{'alive'} = 0 if ($_PIDS{$pid});
         }
 };
 
 sub fork_without_pipe
 {
-	return undef if (children_running() >= $MAX_CHILDREN);
+	$_MAX_CHILDREN = __get_cpu_num() if (!defined($_MAX_CHILDREN));
+
+	return undef if (children_running() >= $_MAX_CHILDREN);
 
 	my $pid = fork();
 
@@ -49,12 +51,12 @@ sub fork_without_pipe
 	if ($pid)
 	{
 		# parent
-		$PIDS{$pid}{'alive'} = 1;
+		$_PIDS{$pid}{'alive'} = 1;
 	}
 	else
 	{
 		# child
-		undef(%PIDS);
+		undef(%_PIDS);
 	}
 
 	return $pid;
@@ -64,7 +66,9 @@ sub fork_with_pipe
 {
 	my $setfh_ref = shift;
 
-	return undef if (children_running() >= $MAX_CHILDREN);
+	$_MAX_CHILDREN = __get_cpu_num() if (!defined($_MAX_CHILDREN));
+
+	return undef if (children_running() >= $_MAX_CHILDREN);
 
 	my $pipe = IO::Pipe->new();
 
@@ -78,14 +82,14 @@ sub fork_with_pipe
 		my $fh = $pipe->reader();
 		$fh->blocking(0);	# set non-blocking I/O
 
-		$PIDS{$pid}{'alive'} = 1;
-		$PIDS{$pid}{'pipe'} = $pipe;
+		$_PIDS{$pid}{'alive'} = 1;
+		$_PIDS{$pid}{'pipe'} = $pipe;
 
 		return $pid;
 	}
 
 	# child
-	undef(%PIDS);
+	undef(%_PIDS);
 
 	my $fh = $pipe->writer();
 
@@ -98,9 +102,9 @@ sub handle_children
 {
 	my $t0 = time();
 
-	foreach my $pid (keys(%PIDS))
+	foreach my $pid (keys(%_PIDS))
 	{
-		if (my $pipe = $PIDS{$pid}{'pipe'})
+		if (my $pipe = $_PIDS{$pid}{'pipe'})
 		{
 			while (my $line = $pipe->getline())
 			{
@@ -108,7 +112,7 @@ sub handle_children
 			}
 		}
 
-		delete($PIDS{$pid}) unless ($PIDS{$pid}{'alive'});
+		delete($_PIDS{$pid}) unless ($_PIDS{$pid}{'alive'});
 	}
 
 	my $t1 = time();
@@ -124,9 +128,9 @@ sub print_children
 	my $alive = 0;
 	my $dead = 0;
 
-	foreach my $pid (keys(%PIDS))
+	foreach my $pid (keys(%_PIDS))
         {
-		if ($PIDS{$pid}{'alive'} != 0)
+		if ($_PIDS{$pid}{'alive'} != 0)
 		{
 			$alive++;
 		}
@@ -150,12 +154,21 @@ sub print_children
 
 sub children_running
 {
-	return scalar(keys(%PIDS));
+	return scalar(keys(%_PIDS));
 }
 
 sub set_max_children
 {
-	$MAX_CHILDREN = shift;
+	$_MAX_CHILDREN = shift;
+}
+
+sub __get_cpu_num
+{
+	open(CPU, "/proc/cpuinfo") or die("Can't open cpuinfo: $!\n");
+	my $cpu_num = scalar(map(/^processor\s+: [0-9]+$/, <CPU>));
+	close(CPU);
+
+	return $cpu_num
 }
 
 1;

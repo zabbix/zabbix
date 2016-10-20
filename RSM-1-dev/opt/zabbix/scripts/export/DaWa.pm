@@ -204,6 +204,15 @@ sub __csv_file_name
 	return $DATAFILES{$id_type};
 }
 
+sub __csv_catalog_name
+{
+	my $id_type = shift;
+
+	die("Catalog '$id_type' is unknown") unless ($CATALOGS{$id_type});
+
+	return $CATALOGS{$id_type};
+}
+
 sub dw_write_csv_files
 {
 	foreach my $id_type (keys(%DATAFILES))
@@ -316,7 +325,7 @@ sub dw_set_date
 
 sub __get_target_dir
 {
-	return '' if (!$tld);
+	return '' unless ($tld);
 
 	return $_year . '/' . $_month . '/' . $_day . '/' . $tld  . '/';
 }
@@ -446,15 +455,6 @@ sub __write_csv_catalog
 	}
 
 	return 1;
-}
-
-sub __csv_catalog_name
-{
-	my $id_type = shift;
-
-	die("Catalog '$id_type' is unknown") unless ($CATALOGS{$id_type});
-
-	return $CATALOGS{$id_type};
 }
 
 sub __make_path

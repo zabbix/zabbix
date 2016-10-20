@@ -17,6 +17,7 @@ use DaWa;
 use Data::Dumper;
 use Time::Local;
 use POSIX qw(floor);
+use Time::HiRes qw(time);
 use TLD_constants qw(:ec);
 use Parallel;
 
@@ -176,8 +177,6 @@ undef($tld);
 
 my $tld_index = 0;
 my $tld_count = scalar(@$tlds_ref);
-
-set_max_children(64);
 
 while ($tld_index < $tld_count)
 {
@@ -678,9 +677,11 @@ sub __get_test_data
 	{
 		$tld = $_;	# set to global variable
 
-		slv_lock();
+		slv_lock() unless (opt('dry-run'));
+		my $time_start = time();
 		dw_csv_init();
 		dw_load_ids_from_db();
+		my $time_load_ids = time();
 
 		my $ns_service_category_id = dw_get_id(ID_SERVICE_CATEGORY, 'ns');
 		my $dns_service_category_id = dw_get_id(ID_SERVICE_CATEGORY, 'dns');
@@ -692,6 +693,9 @@ sub __get_test_data
 
 		my $tld_id = dw_get_id(ID_TLD, $tld);
 		my $tld_type_id = dw_get_id(ID_TLD_TYPE, __get_tld_type($tld));
+
+		# RTT.LOW macros
+		my $rtt_low;
 
 		foreach my $service (sort(keys(%{$result->{$tld}})))
 		{
@@ -722,6 +726,10 @@ sub __get_test_data
 				$service_category_id = $epp_service_category_id;
 				$protocol_id = $tcp_protocol_id;
 				$proto = PROTO_TCP;
+			}
+			else
+			{
+				fail("THIS SHOULD NEVER HAPPEN");
 			}
 
 			my $incidents = $result->{$tld}->{$service}->{'incidents'};
@@ -800,7 +808,13 @@ sub __get_test_data
 								# __add_csv_test() 3 times, for each RTT.
 								# NB! Sync with RSMSLV.pm function get_epp_test_values()!
 
-								my $rtt_low = get_rtt_low($service, $proto);	# TODO: add third parameter (command) for EPP!
+								if (!defined($rtt_low) || !defined($rtt_low->{$tld}) || !defined($rtt_low->{$tld}->{$service})
+									|| !defined($rtt_low->{$tld}->{$service}->{$proto}))
+								{
+									$rtt_low->{$tld}->{$service}->{$proto} = get_rtt_low($service, $proto);	# TODO: add third parameter (command) for EPP!
+								}
+
+								my $rtt_low = $rtt_low->{$tld}->{$service}->{$proto};
 
 								if (__check_test($interface, $metric_ref->{JSON_TAG_RTT()}, $metric_ref->{JSON_TAG_DESCRIPTION()}, $rtt_low) == SUCCESS)
 								{
@@ -995,13 +1009,24 @@ sub __get_test_data
 			}
 		}
 
-		slv_unlock();
-	}
+		slv_unlock() unless (opt('dry-run'));
 
-	my $real_tld = $tld;
-	$tld = get_readable_tld($real_tld);
-	dw_write_csv_files();
-	$tld = $real_tld;
+		my $time_process_records = time();
+
+		my $real_tld = $tld;
+		$tld = get_readable_tld($real_tld);
+		dw_write_csv_files();
+		$tld = $real_tld;
+
+		my $time_write_csv = time();
+
+		dbg(sprintf("load ids: %.3fs, process records: %.3fs, write csv: %.3fs",
+			$time_load_ids - $time_start,
+			$time_process_records - $time_load_ids,
+			$time_write_csv - $time_process_records)) if (opt('debug') && !opt('dry-run'));
+
+	}
+	$tld = undef;
 }
 
 sub __add_csv_test
