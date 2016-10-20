@@ -37,11 +37,6 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 		if (0 != strcmp(name, kp->ks_name))		/* network interface name */
 			continue;
 
-		/* Assume that interfaces in our zone have instance 0. If instance > 0 then it belongs to other zone */
-		/* and should be monitored by Zabbix agent running in that zone where it will have instance number 0. */
-		if (0 != kp->ks_instance)
-			continue;
-
 		if (0 == strcmp("net", kp->ks_class))
 			break;
 	}
