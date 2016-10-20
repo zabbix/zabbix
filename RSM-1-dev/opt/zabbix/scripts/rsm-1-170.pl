@@ -21,9 +21,9 @@ use TLDs;
 
 my %OPTS;
 
-my $usage_str = "usage: $0 [--no-obsolete-triggers --no-create-ns-triggers --debug --dry-run --help]";
+my $usage_str = "usage: $0 [--no-obsolete-triggers --no-create-ns-triggers --no-rename-triggers --debug --dry-run --help]";
 
-if (!GetOptions(\%OPTS, 'no-obsolete-triggers!', 'no-create-ns-triggers!', 'debug!', 'dry-run!', 'help!'))
+if (!GetOptions(\%OPTS, 'no-obsolete-triggers!', 'no-create-ns-triggers!', 'no-rename-triggers!', 'debug!', 'dry-run!', 'help!'))
 {
 	print("$usage_str\n");
 	exit(1);
@@ -279,13 +279,16 @@ my $item_names_to_rename =
 	'EPP $2 command RTT of $1' => 'EPP $2 command RTT',
 };
 
-print("\nRenaming triggers");
-foreach my $from (keys(%{$trigger_names_to_rename}))
+if (!$OPTS{'no-rename-triggers'})
 {
-	print(".");
-	my $to = $trigger_names_to_rename->{$from};
+	print("\nRenaming triggers");
+	foreach my $from (keys(%{$trigger_names_to_rename}))
+	{
+		print(".");
+		my $to = $trigger_names_to_rename->{$from};
 
-	db_exec("update triggers set description='$to' where description='$from'");
+		db_exec("update triggers set description='$to' where description='$from'");
+	}
 }
 
 print("\nRenaming item keys");
