@@ -209,7 +209,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						}
 					}
 					else {
-						$dbInterface = array('ip' => UNRESOLVED_MACRO_STRING, 'dns' => UNRESOLVED_MACRO_STRING);
+						$dbInterface = array(
+							'ip' => UNRESOLVED_MACRO_STRING,
+							'dns' => UNRESOLVED_MACRO_STRING,
+							'useip' => false
+						);
 					}
 
 					foreach ($interfaceMacros as $interfaceMacro) {
