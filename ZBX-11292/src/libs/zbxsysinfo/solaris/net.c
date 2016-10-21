@@ -40,7 +40,7 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 		if (0 != strcmp("net", kp->ks_class))
 			continue;
 
-		/* Find instance with the smallest number. Other instances most likely belong to zones. */
+		/* find instance with the smallest number */
 
 		if (-1 == min_instance || kp->ks_instance < min_instance)
 		{
