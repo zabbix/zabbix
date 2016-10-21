@@ -824,7 +824,7 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function massUpdate($data) {
 		if (!array_key_exists('templates', $data) || !is_array($data['templates'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'templates');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Field "%1$s" is mandatory.', 'templates'));
 		}
 
 		$templates = zbx_toArray($data['templates']);
