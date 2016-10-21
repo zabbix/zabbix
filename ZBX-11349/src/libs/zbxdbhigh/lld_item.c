@@ -145,6 +145,7 @@ typedef struct
 	int			lastcheck;
 	int			ts_delete;
 	const zbx_lld_row_t	*lld_row;
+	int			type;
 }
 zbx_lld_item_t;
 
@@ -497,7 +498,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->key_orig = NULL;
 		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
-		if ((unsigned char)atoi(row[6]) != item_prototype->type)
+		ZBX_STR2UCHAR(item->type, row[6]);
+		if (item->type != item_prototype->type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
 
 		if ((unsigned char)atoi(row[7]) != item_prototype->value_type)
@@ -640,6 +642,24 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
 				(0 != item->itemid ? "update" : "create"));
 	}
+	else if ((0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR) && '\0' == **field))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: IPMI sensor name is empty.\n",
+				(0 != item->itemid ? "update" : "create"));
+	}
+	else if ((0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID) && '\0' == **field))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: SNMP OID is empty.\n",
+				(0 != item->itemid ? "update" : "create"));
+	}
+	else if ((0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS) && '\0' == **field))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: %s is empty.\n",
+				(0 != item->itemid ? "update" : "create"),
+				(ITEM_TYPE_SSH == item->type || ITEM_TYPE_TELNET == item->type ? "executed script" :
+				(ITEM_TYPE_DB_MONITOR == item->type ? "SQL script" :
+				(ITEM_TYPE_CALCULATED == item->type ? "formula" : "params"))));
+	}
 	else
 		return;
 
@@ -677,19 +697,37 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
-
 		lld_validate_item_field(item, &item->name, &item->name_proto,
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
 		lld_validate_item_field(item, &item->key, &item->key_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_KEY_LEN, error);
 		lld_validate_item_field(item, &item->units, &item->units_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_UNITS, ITEM_UNITS_LEN, error);
-		lld_validate_item_field(item, &item->params, &item->params_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ITEM_PARAM_LEN, error);
-		lld_validate_item_field(item, &item->ipmi_sensor, &item->ipmi_sensor_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR, ITEM_IPMI_SENSOR_LEN, error);
-		lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
+
+		switch(item->type)
+		{
+			case ITEM_TYPE_IPMI:
+				lld_validate_item_field(item, &item->ipmi_sensor, &item->ipmi_sensor_orig,
+						ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR, ITEM_IPMI_SENSOR_LEN, error);
+				break;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+				lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
+						ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_CALCULATED:
+				lld_validate_item_field(item, &item->params, &item->params_orig,
+						ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ITEM_PARAM_LEN, error);
+				break;
+			default:
+				break;
+
+		}
+
 		lld_validate_item_field(item, &item->description, &item->description_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ITEM_DESCRIPTION_LEN, error);
 	}
@@ -944,6 +982,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->itemid = 0;
 	item->parent_itemid = item_prototype->itemid;
+	item->type = item_prototype->type;
 	item->lastcheck = 0;
 	item->ts_delete = 0;
 	item->key_proto = NULL;
@@ -1015,6 +1054,12 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (item->type != item_prototype->type)
+	{
+		item->type = item_prototype->type;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
+	}
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
 	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1191,7 +1236,6 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
 			{
 				item = lld_item_make(item_prototype, item_index_local.lld_row);
-
 				/* add the created item to items vector and update index */
 				zbx_vector_ptr_append(items, item);
 				item_index_local.item = item;
