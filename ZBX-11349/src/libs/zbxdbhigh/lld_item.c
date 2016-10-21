@@ -697,6 +697,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
+
 		lld_validate_item_field(item, &item->name, &item->name_proto,
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
 		lld_validate_item_field(item, &item->key, &item->key_orig,
@@ -1236,6 +1237,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
 			{
 				item = lld_item_make(item_prototype, item_index_local.lld_row);
+
 				/* add the created item to items vector and update index */
 				zbx_vector_ptr_append(items, item);
 				item_index_local.item = item;
