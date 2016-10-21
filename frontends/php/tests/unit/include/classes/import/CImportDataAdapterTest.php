@@ -82,7 +82,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050',
-						'bulk' => '1',
 						'interface_ref' => 'if1',
 						'main' => '1'
 					]
@@ -201,7 +200,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'ip' => '0.0.0.0',
 						'dns' => '',
 						'port' => '10050',
-						'bulk' => '1',
 						'interface_ref' => 'if1',
 						'main' => '1'
 					],
@@ -211,7 +209,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '623',
-						'bulk' => '1',
 						'interface_ref' => 'if4',
 						'main' => '1'
 					],
@@ -231,7 +228,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '12345',
-						'bulk' => '1',
 						'interface_ref' => 'if3',
 						'main' => '1'
 					]
