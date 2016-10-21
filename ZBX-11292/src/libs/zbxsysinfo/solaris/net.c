@@ -24,9 +24,9 @@
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, min_instance = -1;
 	kstat_ctl_t	*kc;
-	kstat_t		*kp;
+	kstat_t		*kp, *min_kp;
 	kstat_named_t	*kn;
 
 	if (NULL == (kc = kstat_open()))
@@ -37,9 +37,20 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 		if (0 != strcmp(name, kp->ks_name))		/* network interface name */
 			continue;
 
-		if (0 == strcmp("net", kp->ks_class))
-			break;
+		if (0 != strcmp("net", kp->ks_class))
+			continue;
+
+		/* Find instance with the smallest number. Other instances most likely belong to zones. */
+
+		if (-1 == min_instance || kp->ks_instance < min_instance)
+		{
+			min_instance = kp->ks_instance;
+			min_kp = kp;
+		}
 	}
+
+	if (-1 != min_instance)
+		kp = min_kp;
 
 	if (NULL == kp || -1 == kstat_read(kc, kp, 0) ||
 			NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
