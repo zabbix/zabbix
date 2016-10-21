@@ -1049,7 +1049,8 @@ static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr
 		function->itemid_orig = 0;
 		function->function = zbx_strdup(NULL, function_proto->function);
 		function->function_orig = NULL;
-		function->parameter = zbx_strdup(NULL, proto_parameter);
+		function->parameter = proto_parameter;
+		proto_parameter = NULL;
 		function->parameter_orig = NULL;
 		function->flags = ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
 
@@ -1074,7 +1075,8 @@ static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr
 		if (0 != strcmp(function->parameter, proto_parameter))
 		{
 			function->parameter_orig = function->parameter;
-			function->parameter = zbx_strdup(NULL, proto_parameter);
+			function->parameter = proto_parameter;
+			proto_parameter = NULL;
 			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER;
 		}
 
