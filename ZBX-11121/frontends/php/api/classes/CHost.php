@@ -1080,6 +1080,10 @@ class CHost extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
+		if (!array_key_exists('hosts', $data) || !is_array($data['hosts'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,  _s('Field "%1$s" is mandatory.', 'hosts');
+		}
+
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
