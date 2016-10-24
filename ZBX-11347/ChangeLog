@@ -1,12 +1,22 @@
 Changes for 3.0.6rc1
 
 New features:
+........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
+..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
+..F....... [ZBX-11367] fixed xml import when non-snmp interfaces have incorrect parameter "bulk" (Gunars)
+..F....... [ZBX-10388] removed duplicated data and reduced traffic for hint popups (Gunars)
+..F....... [ZBX-11331] fixed JS error in Configuration->Discovery edit page (Oleg)
+...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
+....I..... [ZBX-11038] removed compression for the generated CSS files, added "sass" folder to the distribution archive (asaveljevs)
+....I..... [ZBX-11335] added MariaDB database support when compiling with --with-mysql configuration option; thanks to Dmitry Smirnov for patch (viktors)
+...G...PS. [ZBX-11122] fixed comparisons between signed and unsigned integer expressions to eliminate build warnings (Sergejs)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
-A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)  
+A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
 A......... [ZBX-10842] fixed connecting web scenario applicationid to created steps when updating with API httptest.update mehtod (Cemeris)
 ..F....... [ZBX-9656] prevented updating comments for discovered triggers (Ivo)
 ..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
@@ -1297,7 +1307,7 @@ A.F....... [ZBX-8397] removed outdated queue related code from frontend and API 
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ..F....... [ZBX-8375] fixed multiple issues in various forms: removed duplicate hidden fields, added missing field translations, added JS confirmation message encoding and fixed displaying submitted values on failure (Ivo)
 ..F....... [ZBX-8240] fixed multiselect input placeholder behaviour on IE8, input cursor issue and removed "clear field" button for multiselect in IE10+ (Oleg, Krists)
-..F....... [ZBXNEXT-1782] fixed trigger expression testing not working incorrectly for some expressions that contain nested parentheses (Pavels)
+..F....... [ZBXNEXT-1782] fixed testing of trigger expressions that contain nested parentheses (Pavels)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
 .......PS. [ZBX-8422] removed PHP mutex locking from server code because of not being used and incompatible licensing issues (wiper)
 ..F....... [ZBX-8377] fixed dark orange theme input fields being displayed light blue, submit button hover not displaying as disabled and made readonly and disabled input fields more readable on all browsers (Ivo)
@@ -1514,11 +1524,14 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.16rc1
 
 New features:
+........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
+...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
-A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)  
+A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
 A......... [ZBX-10842] fixed connecting web scenario applicationid to created steps when updating with API httptest.update mehtod (Cemeris)
 ..F....... [ZBX-9656] prevented updating comments for discovered triggers (Ivo)
 ..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
