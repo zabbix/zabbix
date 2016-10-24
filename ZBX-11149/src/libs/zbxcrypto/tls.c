@@ -171,7 +171,7 @@ ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* before OpenSSL 1.1.0 */
 /* array of mutexes for OpenSSL on multi-threaded systems (see "man 3ssl threads") */
 ZBX_MUTEX					*crypto_mutexes		= NULL;
 #endif
