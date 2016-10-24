@@ -85,8 +85,6 @@ do								\
 }								\
 while (0)
 
-#	undef CALL_ON_WINDOWS_ONLY
-
 #	define OPENSSL_VERSION				SSLEAY_VERSION
 #	define OpenSSL_version				SSLeay_version
 #	define TLS_method				TLSv1_2_method
