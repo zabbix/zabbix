@@ -24,7 +24,11 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())
-			->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$data['pageFilter']->getGroupsCB()
+			])
 			->addItem(new CSubmit('form', _('Create host')))
 			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
 		)

@@ -121,7 +121,7 @@ static int	get_swap_dev_stat(const char *swapdev, swap_stat_t *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN];
-	int		rdev_major, rdev_minor;
+	unsigned int	rdev_major, rdev_minor;
 	zbx_stat_t	dev_st;
 	FILE		*f;
 

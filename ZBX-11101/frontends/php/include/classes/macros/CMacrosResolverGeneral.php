@@ -793,50 +793,54 @@ class CMacrosResolverGeneral {
 		$user_macro_parser = new CUserMacroParser();
 
 		do {
-			$db_hosts = API::Host()->get([
-				'hostids' => array_keys($hostids),
-				'templated_hosts' => true,
-				'output' => ['hostid'],
-				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => ['macro', 'value']
-			]);
+			$db_host_macros = DBselect(
+				'SELECT hm.hostid,hm.macro,hm.value'.
+				' FROM hostmacro hm'.
+				' WHERE '.dbConditionInt('hm.hostid', array_keys($hostids))
+			);
+			while ($db_host_macro = DBfetch($db_host_macros)) {
+				if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
+					continue;
+				}
 
-			$hostids = [];
+				$macro = $user_macro_parser->getMacro();
+				$context = $user_macro_parser->getContext();
+				$host_macros[$db_host_macro['hostid']][$macro] = ['value' => null, 'contexts' => []];
 
-			foreach ($db_hosts as $db_host) {
-				$host_templates[$db_host['hostid']] = zbx_objectValues($db_host['parentTemplates'], 'templateid');
-
-				foreach ($db_host['macros'] as $db_macro) {
-					if ($user_macro_parser->parse($db_macro['macro']) != CParser::PARSE_SUCCESS) {
-						continue;
-					}
-
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-
-					if (!array_key_exists($db_host['hostid'], $host_macros)) {
-						$host_macros[$db_host['hostid']] = [];
-					}
-
-					if (!array_key_exists($macro, $host_macros[$db_host['hostid']])) {
-						$host_macros[$db_host['hostid']][$macro] = ['value' => null, 'contexts' => []];
-					}
-
-					if ($context === null) {
-						$host_macros[$db_host['hostid']][$macro]['value'] = $db_macro['value'];
-					}
-					else {
-						$host_macros[$db_host['hostid']][$macro]['contexts'][$context] = $db_macro['value'];
-					}
+				if ($context === null) {
+					$host_macros[$db_host_macro['hostid']][$macro]['value'] = $db_host_macro['value'];
+				}
+				else {
+					$host_macros[$db_host_macro['hostid']][$macro]['contexts'][$context] = $db_host_macro['value'];
 				}
 			}
 
-			foreach ($db_hosts as $db_host) {
-				// Only unprocessed templates will be populated.
-				foreach ($host_templates[$db_host['hostid']] as $templateid) {
-					if (!array_key_exists($templateid, $host_templates)) {
-						$hostids[$templateid] = true;
-					}
+			$templateids = [];
+			$db_host_templates = DBselect(
+				'SELECT ht.hostid,ht.templateid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionInt('ht.hostid', array_keys($hostids))
+			);
+			while ($db_host_template = DBfetch($db_host_templates)) {
+				$host_templates[$db_host_template['hostid']][] = $db_host_template['templateid'];
+				$templateids[$db_host_template['templateid']] = true;
+
+				if (!array_key_exists($db_host_template['hostid'], $host_macros)) {
+					$host_macros[$db_host_template['hostid']] = [];
+				}
+			}
+
+			foreach ($hostids as $key => $value) {
+				if (!array_key_exists($key, $host_templates)) {
+					$host_templates[$key] = [];
+				}
+			}
+
+			// only unprocessed templates will be populated
+			$hostids = [];
+			foreach ($templateids as $key => $value) {
+				if (!array_key_exists($key, $host_templates)) {
+					$hostids[$key] = true;
 				}
 			}
 		} while ($hostids);
