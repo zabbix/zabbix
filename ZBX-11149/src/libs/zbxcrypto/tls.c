@@ -40,7 +40,7 @@
 #	include <openssl/ssl.h>
 #	include <openssl/err.h>
 #	include <openssl/rand.h>
-#ifdef _WINDOWS
+#if defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010000fL   /* before OpenSSL 1.1.0 */
 #	include "mutexs.h"
 #endif
 #endif
