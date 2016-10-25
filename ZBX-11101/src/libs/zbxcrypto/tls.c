@@ -2223,10 +2223,10 @@ static int	zbx_get_issuer_subject(X509 *cert, char **issuer, char **subject)
 	/* XN_FLAG_RFC2253 - RFC 2253 is outdated, it was replaced by RFC 4514 "Lightweight Directory Access Protocol */
 	/* (LDAP): String Representation of Distinguished Names" */
 
-	if (0 >= X509_NAME_print_ex(issuer_bio, X509_get_issuer_name(cert), 0, XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
+	if (0 > X509_NAME_print_ex(issuer_bio, X509_get_issuer_name(cert), 0, XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
 		goto out;
 
-	if (0 >= X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0,
+	if (0 > X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0,
 			XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
 	{
 		goto out;
