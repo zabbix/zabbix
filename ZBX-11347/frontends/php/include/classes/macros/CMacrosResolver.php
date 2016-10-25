@@ -186,18 +186,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Interface macros, macro should be resolved to main agent interface.
 		if ($this->isTypeAvailable('agentInterface') && $interface_hostids) {
-			$dbInterfaces = DBfetchArray(DBselect(
+			$dbInterfaces = DBselect(
 				'SELECT i.hostid,i.ip,i.dns,i.useip'.
 				' FROM interface i'.
 				' WHERE i.main='.INTERFACE_PRIMARY.
 					' AND i.type='.INTERFACE_TYPE_AGENT.
 					' AND '.dbConditionInt('i.hostid', array_keys($interface_hostids))
-			));
+			);
 
-			if ($dbInterfaces) {
-				$dbInterface = $dbInterfaces[0];
-				$dbInterfaceTexts = [$dbInterface['ip'], $dbInterface['dns']];
+			while ($dbInterface = DBfetch($dbInterfaces)) {
 				$hostid = $dbInterface['hostid'];
+
+				$dbInterfaceTexts = [$dbInterface['ip'], $dbInterface['dns']];
 
 				if ($this->hasMacros($dbInterfaceTexts,
 						['macros' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'], 'usermacros' => true])) {
@@ -213,13 +213,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$dbInterface['dns'] = $dbInterfaceMacros[1];
 
 					$this->config = $saveCurrentConfig;
-				}
-				else {
-					$dbInterface = [
-						'ip' => UNRESOLVED_MACRO_STRING,
-						'dns' => UNRESOLVED_MACRO_STRING,
-						'useip' => false
-					];
 				}
 
 				if (array_key_exists($hostid, $macros)) {
@@ -270,22 +263,21 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			foreach ($interfaces_by_priority as $hostid => $interface) {
-				foreach ($this->findMacros(self::PATTERN_INTERFACE, $data[$hostid]) as $interfaceMacro) {
-					switch ($interfaceMacro) {
+				foreach ($macros[$hostid] as $macro => &$value) {
+					switch ($macro) {
 						case '{IPADDRESS}':
 						case '{HOST.IP}':
-							$macros[$hostid][$interfaceMacro] = $interface['ip'];
+							$value = $interface['ip'];
 							break;
 						case '{HOST.DNS}':
-							$macros[$hostid][$interfaceMacro] = $interface['dns'];
+							$value = $interface['dns'];
 							break;
 						case '{HOST.CONN}':
-							$macros[$hostid][$interfaceMacro] = $interface['useip']
-								? $interface['ip']
-								: $interface['dns'];
+							$value = $interface['useip'] ? $interface['ip'] : $interface['dns'];
 							break;
 					}
 				}
+				unset($value);
 			}
 		}
 
