@@ -1387,7 +1387,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($itemids) {
 			$options = [
-				'output' => ['itemid', 'interfaceid'],
+				'output' => ['interfaceid'],
 				'itemids' => array_keys($itemids),
 				'webitems' => true,
 				'filter' => ['flags' => null],
@@ -1396,27 +1396,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if ($host_macros) {
 				$options['selectHosts'] = ['hostid', 'host', 'name'];
 			}
-			if ($interface_macros) {
-				$options['selectInterfaces'] = ['ip', 'dns', 'useip'];
-			}
 
 			$db_items = API::Item()->get($options);
 
 			$hostids = [];
 
 			foreach ($macro_values as $key => $macros) {
-				$itemid = $items[$key]['itemid'];
+				if (array_key_exists('{HOST.IP}', $macros) || array_key_exists('{IPADDRESS}', $macros)
+						|| array_key_exists('{HOST.DNS}', $macros) || array_key_exists('{HOST.CONN}', $macros)) {
+					$itemid = $items[$key]['itemid'];
 
-				if (array_key_exists($itemid, $db_items)) {
-					foreach ($macros as $macro => $value) {
-						switch ($macro) {
-							case '{HOST.IP}':
-							case '{IPADDRESS}': // deprecated
-							case '{HOST.DNS}':
-							case '{HOST.CONN}':
-								$hostids[$db_items[$itemid]['hosts'][0]['hostid']] = true;
-								break 2;
-						}
+					if (array_key_exists($itemid, $db_items)) {
+						$hostids[$db_items[$itemid]['hosts'][0]['hostid']] = true;
+						break;
 					}
 				}
 			}
