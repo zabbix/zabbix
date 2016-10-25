@@ -102,7 +102,7 @@ class CDCheck extends CApiService {
 
 			$sqlParts['where']['ds'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
-			$sqlParts['where']['dhds'] = 'dh.hostid=ds.hostid';
+			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';

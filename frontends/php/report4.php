@@ -81,8 +81,6 @@ else {
 		$minYear = date('Y');
 	}
 
-	$form = (new CForm())->setMethod('get');
-
 	$controls = new CList();
 
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
@@ -96,25 +94,39 @@ else {
 			unset($media_types[$media_type_id]);
 		}
 	}
-	$controls->addItem([_('Media type'), SPACE, $cmbMedia]);
-
-	$controls->addItem([_('Period'), SPACE, new CComboBox('period', $period, 'submit()', [
-		'daily' => _('Daily'),
-		'weekly' => _('Weekly'),
-		'monthly' => _('Monthly'),
-		'yearly' => _('Yearly')
-	])]);
+	$controls
+		->addItem([
+			new CLabel(_('Media type'), 'media_type'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$cmbMedia
+		])
+		->addItem([
+			new CLabel(_('Period'), 'period'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CComboBox('period', $period, 'submit()', [
+				'daily' => _('Daily'),
+				'weekly' => _('Weekly'),
+				'monthly' => _('Monthly'),
+				'yearly' => _('Yearly')
+			])
+		]);
 
 	if ($period != 'yearly') {
 		$cmbYear = new CComboBox('year', $year, 'submit();');
 		for ($y = $minYear; $y <= date('Y'); $y++) {
 			$cmbYear->addItem($y, $y);
 		}
-		$controls->addItem([_('Year'), SPACE, $cmbYear]);
+		$controls->addItem([
+			new CLabel(_('Year'), 'year'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$cmbYear
+		]);
 	}
 
-	$form->addItem($controls);
-	$widget->setControls($form);
+	$widget->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem($controls)
+	);
 
 	$header = [];
 	$users = [];

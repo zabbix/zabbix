@@ -574,7 +574,7 @@ class CScreenProblem extends CScreenBase {
 				$breakpoint = strftime('%H:00', $last_clock);
 			}
 		}
-		if ($last_clock >= $yesterday) {
+		elseif ($last_clock >= $yesterday) {
 			if ($clock < $yesterday) {
 				$breakpoint = _('Yesterday');
 			}
