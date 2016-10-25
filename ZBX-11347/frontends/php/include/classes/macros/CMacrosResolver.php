@@ -1387,7 +1387,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($itemids) {
 			$options = [
-				'output' => ['interfaceid'],
+				'output' => ['hostid', 'interfaceid'],
 				'itemids' => array_keys($itemids),
 				'webitems' => true,
 				'filter' => ['flags' => null],
@@ -1408,7 +1408,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$itemid = $items[$key]['itemid'];
 
 						if (array_key_exists($itemid, $db_items)) {
-							$hostids[$db_items[$itemid]['hosts'][0]['hostid']] = true;
+							$hostids[$db_items[$itemid]['hostid']] = true;
 							break;
 						}
 					}
@@ -1445,17 +1445,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$itemid = $items[$key]['itemid'];
 
 				if (array_key_exists($itemid, $db_items)) {
-					$host = $db_items[$itemid]['hosts'][0];
+					$db_item = $db_items[$itemid];
 					$interface = null;
 
 					if ($interface_macros) {
-						$interfaceid = $db_items[$itemid]['interfaceid'];
-
-						if ($interfaceid != 0 && array_key_exists($interfaceid, $interfaces)) {
-							$interface = $interfaces[$interfaceid];
+						if ($db_item['interfaceid'] != 0 && array_key_exists($db_item['interfaceid'], $interfaces)) {
+							$interface = $interfaces[$db_item['interfaceid']];
 						}
-						elseif (array_key_exists($host['hostid'], $interfaces_by_priority)) {
-							$interface = $interfaces_by_priority[$host['hostid']];
+						elseif (array_key_exists($db_items[$itemid], $interfaces_by_priority)) {
+							$interface = $interfaces_by_priority[$db_items[$itemid]];
 						}
 					}
 
@@ -1463,12 +1461,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						if ($host_macros) {
 							switch ($macro) {
 								case '{HOST.NAME}':
-									$value = $host['name'];
+									$value = $db_item['hosts'][0]['name'];
 									continue 2;
 
 								case '{HOST.HOST}':
 								case '{HOSTNAME}': // deprecated
-									$value = $host['host'];
+									$value = $db_item['hosts'][0]['host'];
 									continue 2;
 							}
 						}
