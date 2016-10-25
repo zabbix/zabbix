@@ -1830,7 +1830,6 @@ int	is_ip6(const char *ip)
 		}
 		else if (':' == *p)
 		{
-			only_digits = 1;	/* IPv6 unspecified address 0:0:0:0:0:0:0:0, is reduced to :: */
 			if (0 == digits && 0 < colons)
 				dcolons++;
 			if (4 < digits || 1 < dcolons)
