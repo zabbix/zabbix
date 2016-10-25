@@ -1858,7 +1858,7 @@ class testFormAction extends CWebTest {
 					case 'Service type':
 					case 'Event type':
 						$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
-						$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
+						$this->zbxTestDoubleClickXpath("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]", "conditions_".$conditionCount);
 						switch($condition['type']){
 							case 'Trigger severity':
 								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity = '.$condition['value']);
@@ -1928,10 +1928,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
 			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
-			$this->zbxTestClickWait('search');
 		}
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 
 		switch ($data['expected']) {
 			case ACTION_GOOD:
@@ -2066,7 +2065,8 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
 		$this->zbxTestInputTypeOverwrite('esc_period', '123');
-		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
+		$this->zbxTestAssertElementValue('esc_period', '123');
+		$this->zbxTestDoubleClickXpath("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]", 'new_operation_esc_step_from');
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
