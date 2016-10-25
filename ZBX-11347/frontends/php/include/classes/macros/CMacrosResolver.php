@@ -1452,8 +1452,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						if ($db_item['interfaceid'] != 0 && array_key_exists($db_item['interfaceid'], $interfaces)) {
 							$interface = $interfaces[$db_item['interfaceid']];
 						}
-						elseif (array_key_exists($db_items[$itemid], $interfaces_by_priority)) {
-							$interface = $interfaces_by_priority[$db_items[$itemid]];
+						elseif (array_key_exists($db_item['hostid'], $interfaces_by_priority)) {
+							$interface = $interfaces_by_priority[$db_item['hostid']];
 						}
 					}
 
