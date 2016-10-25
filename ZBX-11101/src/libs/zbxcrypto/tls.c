@@ -2088,49 +2088,46 @@ static gnutls_x509_crt_t	zbx_get_peer_cert(const gnutls_session_t session, char 
  * Parameters:                                                                *
  *     function_name - [IN] caller function name                              *
  *     cert          - [IN] peer certificate                                  *
- *     error         - [OUT] dynamically allocated memory with error message  *
- *                                                                            *
- * Return value:                                                              *
- *     SUCCEED - no errors                                                    *
- *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_POLARSSL)
-static int	zbx_log_peer_cert(const char *function_name, const x509_crt *cert, char **error)
+static void	zbx_log_peer_cert(const char *function_name, const x509_crt *cert)
 {
-	char	issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX], serial[128];
+	char	issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX], serial[128], *error = NULL;
 
-	if (SUCCEED == zbx_x509_dn_gets(&cert->issuer, issuer, sizeof(issuer), error) &&
-			SUCCEED == zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), error) &&
+	if (SUCCEED == zbx_x509_dn_gets(&cert->issuer, issuer, sizeof(issuer), &error) &&
+			SUCCEED == zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), &error) &&
 			0 < x509_serial_gets(serial, sizeof(serial), &cert->serial))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() peer certificate issuer:\"%s\" subject:\"%s\" serial:\"%s\"",
 				function_name, issuer, subject, serial);
-
-		return SUCCEED;
 	}
 	else
-		return FAIL;
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate issuer, subject or serial: %s",
+				function_name, error);
+
+		zbx_free(error);
+	}
 }
 #elif defined(HAVE_GNUTLS)
-static int	zbx_log_peer_cert(const gnutls_x509_crt_t cert, char **error)
+static void	zbx_log_peer_cert(const gnutls_x509_crt_t cert)
 {
 	const char	*__function_name = "zbx_log_peer_cert";
 	int		res;
 	gnutls_datum_t	cert_print;
 
-	if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &cert_print)))
+	if (GNUTLS_E_SUCCESS == (res = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &cert_print)))
 	{
-		*error = zbx_dsprintf(*error, "%s(): gnutls_x509_crt_print() failed: %d %s", __function_name,
-				res, gnutls_strerror(res));
-		return FAIL;
+		zabbix_log(LOG_LEVEL_DEBUG, "peer certificate: %s", cert_print.data);
+
+		gnutls_free(cert_print.data);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "peer certificate: %s", cert_print.data);
-
-	gnutls_free(cert_print.data);
-
-	return SUCCEED;
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): gnutls_x509_crt_print() failed: %d %s",
+				__function_name, res, gnutls_strerror(res));
+	}
 }
 #endif
 
@@ -3740,12 +3737,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			/* log peer certificate information for debugging */
-
-			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
-			{
-				zbx_tls_close(s);
-				goto out1;
-			}
+			zbx_log_peer_cert(__function_name, peer_cert);
 		}
 
 		/* Basic validation of peer certificate was done during handshake. If required validate peer */
@@ -4011,8 +4003,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
-				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1))
 		{
 			if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx->ctx, error)))
 			{
@@ -4025,11 +4016,16 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		{
 			/* log peer certificate information for debugging */
 
-			if (SUCCEED != zbx_log_peer_cert(peer_cert, error))
+			char	*error_tmp = NULL;
+
+			if (NULL == peer_cert && (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx->ctx, &error_tmp))))
 			{
-				zbx_tls_close(s);
-				goto out1;
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot obtain peer certificate: %s",
+						__function_name, error_tmp);
+				zbx_free(error_tmp);
 			}
+			else
+				zbx_log_peer_cert(peer_cert);
 		}
 
 		/* verify peer certificate */
@@ -4291,8 +4287,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			err = 1;
 		}
 
-		if (0 == err && ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
-				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG)))
+		if (0 == err && ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1)))
 		{
 			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)) ||
 					SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
@@ -4302,7 +4297,23 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		}
 
 		if (0 == err && SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"", issuer, subject);
+		{
+			/* log peer certificate information for debugging */
+
+			if (NULL == peer_cert && NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate");
+			}
+			else if (SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate issuer or subject");
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"",
+						issuer, subject);
+			}
+		}
 
 		/* basic verification of peer certificate is done during handshake with OpenSSL built-in procedures */
 
@@ -4547,17 +4558,9 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			/* log peer certificate information for debugging */
 
 			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx->ctx)))
-			{
-				*error = zbx_strdup(*error, "no peer certificate");
-				zbx_tls_close(s);
-				goto out1;
-			}
-
-			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
-			{
-				zbx_tls_close(s);
-				goto out1;
-			}
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate", __function_name);
+			else
+				zbx_log_peer_cert(__function_name, peer_cert);
 		}
 
 		/* Basic verification of peer certificate was done during handshake. Issuer and Subject have to be */
@@ -4801,18 +4804,19 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			/* log peer certificate information for debugging */
 
 			gnutls_x509_crt_t	peer_cert;
+			char			*error_tmp = NULL;
 
-			if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx->ctx, error)) ||
-					SUCCEED != zbx_log_peer_cert(peer_cert, error))
+			if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx->ctx, &error_tmp)))
 			{
-				if (NULL != peer_cert)
-					gnutls_x509_crt_deinit(peer_cert);
-
-				zbx_tls_close(s);
-				goto out1;
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot obtain peer certificate: %s",
+						__function_name, error_tmp);
+				zbx_free(error_tmp);
 			}
-
-			gnutls_x509_crt_deinit(peer_cert);
+			else
+			{
+				zbx_log_peer_cert(peer_cert);
+				gnutls_x509_crt_deinit(peer_cert);
+			}
 		}
 
 		/* verify peer certificate */
@@ -5058,16 +5062,20 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 			X509	*peer_cert;
 			char	*issuer = NULL, *subject = NULL;
-			int	err = 0;
 
-			if (NULL != (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)) &&
-					SUCCEED == zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"", issuer,
-						subject);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate");
+			}
+			else if (SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate issuer or subject");
 			}
 			else
-				err = 1;
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"",
+						issuer, subject);
+			}
 
 			if (NULL != issuer)
 				OPENSSL_free(issuer);
@@ -5077,12 +5085,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 			if (NULL != peer_cert)
 				X509_free(peer_cert);
-
-			if (0 != err)
-			{
-				zbx_tls_close(s);
-				goto out1;
-			}
 		}
 
 		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified */
