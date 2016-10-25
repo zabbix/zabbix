@@ -11,4 +11,5 @@ libzbxdbupgrade_a_SOURCES = dbupgrade.c \
 	dbupgrade_3000.c \
 	dbupgrade_3010.c \
 	dbupgrade_3020.c \
+	dbupgrade_3030.c \
 	dbupgrade.h
