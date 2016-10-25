@@ -63,7 +63,7 @@ global $ZBX_SERVER_NAME;
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
-		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/3.0/'))
+		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/3.4/'))
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),

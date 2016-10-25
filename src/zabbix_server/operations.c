@@ -221,7 +221,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,ds.type"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -232,7 +232,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		else
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,ds.type"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"

@@ -2077,10 +2077,6 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 	{
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
 	}
-	else if (ZBX_FLAG_LLD_TAG_UPDATE_TAG == flag && NULL != strchr(field, '/'))
-	{
-		*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\" contains '/' character.\n", field);
-	}
 	else
 		return;
 
