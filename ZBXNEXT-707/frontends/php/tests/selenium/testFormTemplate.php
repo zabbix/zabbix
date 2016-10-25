@@ -62,7 +62,6 @@ class testFormTemplate extends CWebTest {
 					'error_msg' => 'Cannot add template',
 					'errors' => [
 						'Host group "Selenium new group" already exists.',
-						'Cannot add group.'
 					]
 
 				]
@@ -112,7 +111,7 @@ class testFormTemplate extends CWebTest {
 					]
 
 				]
-			],
+			]
 		];
 	}
 
@@ -124,9 +123,11 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
+		$this->zbxTestAssertElementValue('template_name', $data['name']);
 
 		if (isset ($data['visible_name'])) {
-			$this->zbxTestInputTypeWait('visiblename', $data['visible_name']);
+			$this->zbxTestInputTypeOverwrite('visiblename', $data['visible_name']);
+			$this->zbxTestAssertElementValue('visiblename', $data['visible_name']);
 		}
 
 		if (isset ($data['group'])) {
@@ -175,10 +176,10 @@ class testFormTemplate extends CWebTest {
 				$this->assertEquals($row['host'], $data['name']);
 				$this->assertEquals($row['status'], HOST_STATUS_TEMPLATE);
 				if (isset ($data['visible_name'])) {
-					$this->assertEquals($row['name'], $data['visible_name']);
+					$this->assertEquals($data['visible_name'], $row['name']);
 				}
 				if (isset ($data['description'])) {
-					$this->assertEquals($row['description'], $data['description']);
+					$this->assertEquals($data['description'], $row['description']);
 				}
 			}
 			if (isset ($data['new_group'])) {
@@ -269,7 +270,8 @@ class testFormTemplate extends CWebTest {
 		$cloned_template_name = 'Cloned template';
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickLinkTextWait($this->template_clone);
+		$this->zbxTestAssertElementPresentId('filter_name');
+		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");

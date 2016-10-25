@@ -57,6 +57,7 @@ $data = [
 		'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
 		'images' => ['updateExisting' => false, 'createMissing' => false],
@@ -78,6 +79,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			];
 			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
 			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
@@ -97,6 +99,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			];
 			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
 			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 

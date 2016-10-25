@@ -53,6 +53,9 @@ static int	sync_in_progress = 0;
 #define TRIGGER_FUNCTIONAL_TRUE		0
 #define TRIGGER_FUNCTIONAL_FALSE	1
 
+#define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
+#define ZBX_IPMI_DEFAULT_PRIVILEGE	2
+
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -1693,7 +1696,8 @@ done:
 		ipmi_authtype = (signed char)atoi(row[3]);
 		ipmi_privilege = (unsigned char)atoi(row[4]);
 
-		if (0 != ipmi_authtype || 2 != ipmi_privilege || '\0' != *row[5] || '\0' != *row[6])	/* useipmi */
+		if (ZBX_IPMI_DEFAULT_AUTHTYPE != ipmi_authtype || ZBX_IPMI_DEFAULT_PRIVILEGE != ipmi_privilege ||
+				'\0' != *row[5] || '\0' != *row[6])	/* useipmi */
 		{
 			ipmihost = DCfind_id(&config->ipmihosts, hostid, sizeof(ZBX_DC_IPMIHOST), &found);
 
@@ -5375,8 +5379,8 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	}
 	else
 	{
-		dst_host->ipmi_authtype = 0;
-		dst_host->ipmi_privilege = 2;
+		dst_host->ipmi_authtype = ZBX_IPMI_DEFAULT_AUTHTYPE;
+		dst_host->ipmi_privilege = ZBX_IPMI_DEFAULT_PRIVILEGE;
 		*dst_host->ipmi_username = '\0';
 		*dst_host->ipmi_password = '\0';
 	}
@@ -8291,7 +8295,7 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *macro, const char *value, char **error)
 {
-	if (SUCCEED == is_double_suffix(value))
+	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
 		return SUCCEED;
 
 	if (NULL != error)
@@ -8577,10 +8581,9 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
  * Parameters: queue - [OUT] the vector of delayed items (optional)           *
- *             from  - [IN] the minimum delay time in seconds or -1 if there  *
- *                          is no minimum limit                               *
- *             to    - [IN] the maximum delay time in seconds or -1 if there  *
- *                          is no maximum limit                               *
+ *             from  - [IN] the minimum delay time in seconds (non-negative)  *
+ *             to    - [IN] the maximum delay time in seconds or              *
+ *                          ZBX_QUEUE_TO_INFINITY if there is no limit        *
  *                                                                            *
  * Return value: the number of delayed items                                  *
  *                                                                            *
@@ -8645,7 +8648,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				break;
 		}
 
-		if ((-1 != from && from > now - dc_item->nextcheck) || (-1 != to && now - dc_item->nextcheck >= to))
+		if (now - dc_item->nextcheck < from || (ZBX_QUEUE_TO_INFINITY != to && now - dc_item->nextcheck >= to))
 			continue;
 
 		if (NULL != queue)
@@ -9703,13 +9706,6 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
  * Purpose: gets correlation rules from configuration cache                   *
  *                                                                            *
  * Parameter: rules   - [IN/OUT] the correlation rules                        *
- *            sync_ts - [IN/OUT] the configuration synchronization timestamp  *
- *                               of the correlation rules passed to this      *
- *                               function.                                    *
- *                                                                            *
- * Comments: The correlation rules are refreshed only if the passed timestamp *
- *           does not match current configuration cache sync timestamp. This  *
- *           allows to locally cache the correlation rules.                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
@@ -9723,6 +9719,9 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 	LOCK_CACHE;
 
+	/* The correlation rules are refreshed only if the sync timestamp   */
+	/* does not match current configuration cache sync timestamp. This  */
+	/* allows to locally cache the correlation rules.                   */
 	if (config->sync_ts == rules->sync_ts)
 	{
 		UNLOCK_CACHE;

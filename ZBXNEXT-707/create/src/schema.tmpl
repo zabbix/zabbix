@@ -61,7 +61,7 @@ FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|ipmi_authtype	|t_integer	|'-1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_PROXY
@@ -211,7 +211,7 @@ TABLE|dchecks|dcheckid|ZBX_DATA
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_PROXY		|1|drules
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|key_		|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
@@ -296,7 +296,7 @@ TABLE|items|itemid|ZBX_DATA
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|snmp_oid	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
@@ -1030,10 +1030,8 @@ TABLE|proxy_dhistory|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|0			|-|drules
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NULL		|0			|-|dchecks
@@ -1140,8 +1138,6 @@ INDEX		|1		|druleid
 TABLE|dservices|dserviceid|0
 FIELD		|dserviceid	|t_id		|	|NOT NULL	|0
 FIELD		|dhostid	|t_id		|	|NOT NULL	|0			|1|dhosts
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
@@ -1150,7 +1146,7 @@ FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|2|dchecks
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|0
-UNIQUE		|1		|dcheckid,type,key_,ip,port
+UNIQUE		|1		|dcheckid,ip,port
 INDEX		|2		|dhostid
 
 -- Other tables
@@ -1454,4 +1450,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3020000	|3020000
+ROW		|3030011	|3030011

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 3.2\n"
+"Project-Id-Version: Zabbix 3.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-12 23:51+0300\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
@@ -303,7 +303,7 @@ msgid "Acknowledged PROBLEM events"
 msgstr "Pripažinti PROBLEM įvykiai"
 
 #: tr_events.php:117
-msgid "Acknowledges"
+msgid "Acknowledgements"
 msgstr "Pripažinimai"
 
 #: app/views/administration.mediatype.edit.php:83

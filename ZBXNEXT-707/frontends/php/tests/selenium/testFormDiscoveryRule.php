@@ -468,7 +468,7 @@ class testFormDiscoveryRule extends CWebTest {
 		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
 

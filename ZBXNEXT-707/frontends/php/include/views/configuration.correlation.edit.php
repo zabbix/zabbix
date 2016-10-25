@@ -110,7 +110,7 @@ switch ($data['new_condition']['type']) {
 	case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 	case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		$condition = (new CTextBox('new_condition[tag]'))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag'));
 		break;
 
@@ -126,25 +126,25 @@ switch ($data['new_condition']['type']) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=new_condition_groupids_'.
 					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 		break;
 
 	case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 		$condition = (new CTextBox('new_condition[newtag]', $data['new_condition']['newtag']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('new event tag'));
 		$condition2 = (new CTextBox('new_condition[oldtag]', $data['new_condition']['oldtag']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('old event tag'));
 		break;
 
 	case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 	case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		$condition = (new CTextBox('new_condition[value]', $data['new_condition']['value']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value'));
 		$condition2 = (new CTextBox('new_condition[tag]'))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag'));
 		break;
 
@@ -176,7 +176,11 @@ $correlation_tab
 						$condition
 					])
 				)
-				->addRow((new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+				->addRow(
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_condition", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				)
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -225,7 +229,11 @@ $operation_tab
 				->addRow(new CComboBox('new_operation[type]', $data['new_operation']['type'], null,
 					corrOperationTypes()
 				))
-				->addRow((new CSubmit('add_operation', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
+				->addRow(
+					(new CSimpleButton(_('Add')))
+						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_operation", "1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				)
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
