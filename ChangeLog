@@ -1755,6 +1755,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+..F....... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 ..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
 ...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
