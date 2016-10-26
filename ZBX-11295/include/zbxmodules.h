@@ -68,6 +68,23 @@ extern zbx_history_string_cb_t	*history_string_cbs;
 extern zbx_history_text_cb_t	*history_text_cbs;
 extern zbx_history_log_cb_t	*history_log_cbs;
 
+typedef struct
+{
+	zbx_module_t	*module;
+	int		module_init_local;
+}
+zbx_module_init_local_cb_t;
+
+typedef struct
+{
+	zbx_module_t	*module;
+	int		module_uninit_local;
+}
+zbx_module_uninit_local_cb_t;
+
+extern zbx_module_init_local_cb_t	*module_init_local_cbs;
+extern zbx_module_uninit_local_cb_t	*module_uninit_local_cbs;
+
 int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose);
 void	zbx_unload_modules(void);
 

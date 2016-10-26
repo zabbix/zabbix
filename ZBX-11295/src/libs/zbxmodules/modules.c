@@ -26,11 +26,13 @@
 #include "zbxalgo.h"
 
 #define ZBX_MODULE_FUNC_INIT			"zbx_module_init"
+#define ZBX_MODULE_FUNC_INIT_LOCAL		"zbx_module_init_local"
 #define ZBX_MODULE_FUNC_API_VERSION		"zbx_module_api_version"
 #define ZBX_MODULE_FUNC_ITEM_LIST		"zbx_module_item_list"
 #define ZBX_MODULE_FUNC_ITEM_PROCESS		"zbx_module_item_process"
 #define ZBX_MODULE_FUNC_ITEM_TIMEOUT		"zbx_module_item_timeout"
 #define ZBX_MODULE_FUNC_UNINIT			"zbx_module_uninit"
+#define ZBX_MODULE_FUNC_UNINIT_LOCAL		"zbx_module_uninit_local"
 #define ZBX_MODULE_FUNC_HISTORY_WRITE_CBS	"zbx_module_history_write_cbs"
 
 static zbx_vector_ptr_t	modules;
@@ -40,6 +42,9 @@ zbx_history_integer_cb_t	*history_integer_cbs = NULL;
 zbx_history_string_cb_t		*history_string_cbs = NULL;
 zbx_history_text_cb_t		*history_text_cbs = NULL;
 zbx_history_log_cb_t		*history_log_cbs = NULL;
+
+zbx_module_init_local_cb_t	*module_init_local_cbs = NULL;
+zbx_module_uninit_local_cb_t	*module_uninit_local_cbs = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -90,6 +95,66 @@ static zbx_module_t	*zbx_register_module(void *lib, char *name)
 	zbx_vector_ptr_append(&modules, module);
 
 	return module;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_register_init_local_cbs                                      *
+ *                                                                            *
+ * Purpose: registers callback function for local process initialisation      *
+ *                                                                            *
+ * Parameters: module         - module pointer for later reference            *
+ *             init_local_cbs - callbacks                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_register_init_local_cbs(zbx_module_t *module, int init_local_cbs)
+{
+	int	j = 0;
+
+	if (NULL == module_init_local_cbs)
+	{
+		module_init_local_cbs = zbx_malloc(module_init_local_cbs, sizeof(zbx_module_t));
+		module_init_local_cbs[0].module = NULL;
+	}
+
+	while (NULL != module_init_local_cbs[j].module)
+		j++;
+
+	module_init_local_cbs = zbx_realloc(module_init_local_cbs, (j + 2) * sizeof(zbx_module_t));
+	module_init_local_cbs[j].module = module;
+	module_init_local_cbs[j].module_init_local = init_local_cbs;
+	module_init_local_cbs[j + 1].module = NULL;
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_register_uninit_local_cbs                                    *
+ *                                                                            *
+ * Purpose: registers callback function for local process uninitialisation    *
+ *                                                                            *
+ * Parameters: module           - module pointer for later reference          *
+ *             uninit_local_cbs - callbacks                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_register_uninit_local_cbs(zbx_module_t *module, int uninit_local_cbs)
+{
+	int	j = 0;
+
+	if (NULL == module_uninit_local_cbs)
+	{
+		module_uninit_local_cbs = zbx_malloc(module_uninit_local_cbs, sizeof(zbx_module_t));
+		module_uninit_local_cbs[0].module = NULL;
+	}
+
+	while (NULL != module_uninit_local_cbs[j].module)
+		j++;
+
+	module_uninit_local_cbs = zbx_realloc(module_uninit_local_cbs, (j + 2) * sizeof(zbx_module_t));
+	module_uninit_local_cbs[j].module = module;
+	module_uninit_local_cbs[j].module_uninit_local = uninit_local_cbs;
+	module_uninit_local_cbs[j + 1].module = NULL;
+
 }
 
 /******************************************************************************
@@ -229,7 +294,8 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 {
 	void			*lib;
 	char			full_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
-	int			(*func_init)(void), (*func_version)(void), version;
+	int			(*func_init)(void), (*func_version)(void), (*func_init_local_cbs)(void),
+				(*func_uninit_local_cbs)(void), version;
 	ZBX_METRIC		*(*func_list)(void);
 	void			(*func_timeout)(int);
 	ZBX_HISTORY_WRITE_CBS	(*func_history_write_cbs)(void);
@@ -309,6 +375,22 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	}
 	else
 		zbx_register_history_write_cbs(module, func_history_write_cbs());
+
+		if (NULL == (func_init_local_cbs = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_INIT_LOCAL)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_INIT_LOCAL "()\""
+				" function in module \"%s\": %s", name, dlerror());
+	}
+	else
+		zbx_register_init_local_cbs(module, func_init_local_cbs());
+
+	if (NULL == (func_uninit_local_cbs = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_UNINIT_LOCAL)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT_LOCAL "()\""
+				" function in module \"%s\": %s", name, dlerror());
+	}
+	else
+		zbx_register_uninit_local_cbs(module, func_uninit_local_cbs());
 
 	return SUCCEED;
 fail:

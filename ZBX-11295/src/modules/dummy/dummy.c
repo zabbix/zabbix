@@ -163,6 +163,43 @@ static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_module_init_local                                            *
+ *                                                                            *
+ * Purpose: the function is called on child process startup                   *
+ *          It should be used to call any initialization routines             *
+ *                                                                            *
+ * Return value: ZBX_MODULE_OK - success                                      *
+ *               ZBX_MODULE_FAIL - module initialization failed               *
+ *                                                                            *
+ * Comment: the module won't be loaded in case of ZBX_MODULE_FAIL             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_module_init_local(void)
+{
+	/* initialization for dummy.random */
+	srand(time(NULL));
+
+	return ZBX_MODULE_OK;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_module_uninit_local                                          *
+ *                                                                            *
+ * Purpose: the function is called on child process shutdown                  *
+ *          It should be used to cleanup used resources if there are any      *
+ *                                                                            *
+ * Return value: ZBX_MODULE_OK - success                                      *
+ *               ZBX_MODULE_FAIL - function failed                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_module_uninit_local(void)
+{
+	return ZBX_MODULE_OK;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_module_init                                                  *
  *                                                                            *
  * Purpose: the function is called on agent startup                           *
