@@ -165,4 +165,3 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	return zbx_agent_execute_threaded_metric(vfs_fs_inode, cmd, param, flags, result);
 }
-

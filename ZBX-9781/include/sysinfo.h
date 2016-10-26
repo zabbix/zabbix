@@ -167,7 +167,7 @@ typedef enum
 }
 ZBX_SYSINFO_RET;
 
-typedef	int (*zbx_agent_metric_func_t)(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+typedef int (*zbx_agent_metric_func_t)(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 typedef struct
 {

@@ -670,13 +670,14 @@ void	zbx_sigusr_handler(zbx_task_t task)
  * Purpose: handle alarm signal SIGALRM for -t, -p options                    *
  *                                                                            *
  ******************************************************************************/
-static void     alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
+static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* nothing to do */
 }
 
 static void	init_signal_handlers()
 {
-	struct sigaction        phan;
+	struct sigaction	phan;
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;

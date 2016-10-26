@@ -872,8 +872,8 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 	}
 
 	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
-
 	*data_offset += sizeof(int);
+
 	(*data)[(*data_offset)++] = result_type;
 
 	if ('-' != result_type)
@@ -897,7 +897,8 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  ******************************************************************************/
 static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 {
-	int	ret, agent_ret, type;
+	int	ret, agent_ret;
+	char	type;
 
 	memcpy(&agent_ret, data, sizeof(int));
 	data += sizeof(int);
@@ -937,7 +938,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  * Function: zbx_agent_execute_threaded_metric                                *
  *                                                                            *
  * Purpose: execute agent metric in a separate process/thread so it can be    *
- *          killed/terminated when timeout is detected.                       *
+ *          killed/terminated when timeout is detected                        *
  *                                                                            *
  * Parameters: metric_func - [IN] the metric function to execute              *
  *             ...                the metric function parameters              *
@@ -950,11 +951,11 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
 		unsigned flags, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_OK;
-	pid_t		pid;
-	int		fds[2], n, now, status;
-	char		buffer[MAX_STRING_LEN], *data;
-	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
+	int	ret = SYSINFO_RET_OK;
+	pid_t	pid;
+	int	fds[2], n, now, status;
+	char	buffer[MAX_STRING_LEN], *data;
+	size_t	data_alloc = MAX_STRING_LEN, data_offset = 0;
 
 	if (-1 == pipe(fds))
 	{
@@ -1063,7 +1064,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  * Function: zbx_agent_execute_threaded_metric                                *
  *                                                                            *
  * Purpose: execute agent metric in a separate process/thread so it can be    *
- *          killed/terminated when timeout is detected.                       *
+ *          killed/terminated when timeout is detected                        *
  *                                                                            *
  * Parameters: metric_func - [IN] the metric function to execute              *
  *             ...                the metric function parameters              *
@@ -1076,7 +1077,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
 		unsigned flags, AGENT_RESULT *result)
 {
-	ZBX_THREAD_HANDLE		thread = ZBX_THREAD_HANDLE_NULL;
+	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
 	zbx_metric_thread_args_t	metric_args = {metric_func, cmd, param, flags, result};
 	DWORD				rc;
