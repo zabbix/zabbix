@@ -81,11 +81,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[
@@ -367,11 +367,11 @@ class CHelpItems {
 					'description' => _('Log file monitoring with log rotation support. Returns log')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[

@@ -7,6 +7,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 ..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
 ..F....... [ZBX-11367] fixed xml import when non-snmp interfaces have incorrect parameter "bulk" (Gunars)
 ..F....... [ZBX-10388] removed duplicated data and reduced traffic for hint popups (Gunars)
