@@ -3237,6 +3237,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.19
