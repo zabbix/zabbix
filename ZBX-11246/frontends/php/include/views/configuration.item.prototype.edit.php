@@ -413,12 +413,15 @@ $itemTab = (new CTabView())->addTab('itemTab', $this->data['caption'], $itemForm
 if ($this->data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
-	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(_('Delete item prototype?'),
-			url_params(['form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'])
-		);
+	$delete_button = new CButtonDelete(_('Delete item prototype?'),
+		url_params(['form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'])
+	);
+
+	if ($data['limited']) {
+		$delete_button->setAttribute('disabled', 'disabled');
 	}
 
+	$buttons[] = $delete_button;
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
 	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
