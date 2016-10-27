@@ -32,7 +32,7 @@
 
 !	IF "$(TLSLIBDIR)" != ""
 !		IF "$(TLS)" == "openssl"
-ADDMSG =		You may specify path to libraries using TLSLIB="\somepath\libeay32.lib" TLSLIB2="\somepath\ssleay32.lib"
+ADDMSG =		For OpenSSL 1.0.x you may specify path to libraries using TLSLIB="\somepath\libeay32.lib" TLSLIB2="\somepath\ssleay32.lib", for OpenSSL 1.1.x: TLSLIB="\somepath\libcrypto.lib" TLSLIB2="\somepath\libssl.lib"
 !		ELSE
 ADDMSG =		You may specify path to library using TLSLIB="\somepath\lib\some.lib"
 !		ENDIF
@@ -50,8 +50,15 @@ CFLAGS =	$(CFLAGS) /DHAVE_GNUTLS
 	### OpenSSL ###
 !	ELSEIF "$(TLS)" == "openssl"
 !		IF "$(TLSLIBDIR)" != ""
-TLSLIB =		$(TLSLIBDIR)\libeay32.lib
-TLSLIB2 =		$(TLSLIBDIR)\ssleay32.lib
+!			IF !EXISTS("$(TLSLIBDIR)\libcrypto.lib") && !EXISTS("$(TLSLIBDIR)\libssl.lib")
+TLSLIB =			$(TLSLIBDIR)\libeay32.lib
+TLSLIB2 =			$(TLSLIBDIR)\ssleay32.lib
+!			ELSEIF !EXISTS("$(TLSLIBDIR)\libeay32.lib") && !EXISTS("$(TLSLIBDIR)\ssleay32.lib")
+TLSLIB =			$(TLSLIBDIR)\libcrypto.lib
+TLSLIB2 =			$(TLSLIBDIR)\libssl.lib
+!			ELSE
+!				ERROR TLSLIBDIR "$(TLSLIBDIR)" contains libraries from OpenSSL 1.0.x (libeay32.lib, ssleay32.lib) and 1.1.x (libcrypto.lib, libssl.lib). TLSLIBDIR cannot be used in this case. Use TLSLIB="$(TLSLIBDIR)\libeay32.lib" TLSLIB2="$(TLSLIBDIR)\ssleay32.lib" for OpenSSL 1.0.x or TLSLIB="$(TLSLIBDIR)\libcrypto.lib" TLSLIB2="$(TLSLIBDIR)\libssl.lib" for OpenSSL 1.1.x.
+!			ENDIF
 !		ENDIF
 CFLAGS =	$(CFLAGS) /DHAVE_OPENSSL
 !	ENDIF
