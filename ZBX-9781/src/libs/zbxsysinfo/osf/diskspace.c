@@ -161,5 +161,5 @@ static int	vfs_fs_size(const char *cmd, const char *param, unsigned flags, AGENT
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return zbx_agent_execute_threaded_metric(vfs_fs_size, cmd, param, flags, result);
+	return zbx_execute_threaded_metric(vfs_fs_size, cmd, param, flags, result);
 }

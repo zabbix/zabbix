@@ -935,7 +935,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_agent_execute_threaded_metric                                *
+ * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
  * Purpose: execute agent metric in a separate process/thread so it can be    *
  *          killed/terminated when timeout is detected                        *
@@ -948,7 +948,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param,
 		unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_OK;
@@ -979,6 +979,11 @@ int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const
 
 	if (0 == pid)
 	{
+		signal(SIGILL, SIG_DFL);
+		signal(SIGFPE, SIG_DFL);
+		signal(SIGSEGV, SIG_DFL);
+		signal(SIGBUS, SIG_DFL);
+
 		close(STDOUT_FILENO);
 		close(fds[0]);
 
@@ -1006,9 +1011,18 @@ int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const
 		zbx_timespec(&ts);
 		timediff = (zbx_uint64_t)(ts.sec - ts_start.sec) * 1000000000 + ts.ns - ts_start.ns;
 
-		if (-1 == n || (zbx_uint64_t)CONFIG_TIMEOUT * 1000000000 < timediff)
+		if ((zbx_uint64_t)CONFIG_TIMEOUT * 1000000000 < timediff)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while executing agent check."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for data."));
+			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+
+		if (-1 == n)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error while reading data: %s.",
+					zbx_strerror(errno)));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
 			break;
@@ -1032,7 +1046,16 @@ int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const
 	waitpid(pid, &status, 0);
 
 	if (SYSINFO_RET_OK == ret)
-		ret = deserialize_agent_result(data, result);
+	{
+		if (0 == WIFEXITED(status))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
+			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+		}
+		else
+			ret = deserialize_agent_result(data, result);
+	}
 
 	zbx_free(data);
 out:
@@ -1042,7 +1065,7 @@ out:
 
 typedef struct
 {
-	zbx_agent_metric_func_t	func;
+	zbx_metric_func_t	func;
 	const char		*cmd;
 	const char		*param;
 	unsigned		flags;
@@ -1066,7 +1089,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_agent_execute_threaded_metric                                *
+ * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
  * Purpose: execute agent metric in a separate process/thread so it can be    *
  *          killed/terminated when timeout is detected                        *
@@ -1079,7 +1102,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_agent_execute_threaded_metric(zbx_agent_metric_func_t metric_func, const char *cmd, const char *param,
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param,
 		unsigned flags, AGENT_RESULT *result)
 {
 	ZBX_THREAD_HANDLE		thread;
