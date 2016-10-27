@@ -18,6 +18,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11125] prohibited zero in first parameter of nodata() trigger function (Sasha, vso)
 ........S. [ZBX-11349] removed possibility to create items, triggers and graphs with empty names after low level discovery macro substitution (Sergejs)
 ........S. [ZBX-11310] fixed event tag conditions checking, that contains operator 'not like' or '<>' in events without tags (Sergejs)
 A......... [ZBX-11244] fixed parsing of JSON text when PHP is compiled without JSON library (Cemeris)
