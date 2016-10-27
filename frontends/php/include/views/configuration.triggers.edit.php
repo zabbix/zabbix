@@ -129,31 +129,35 @@ if ($data['expression_constructor'] == IM_TREE) {
 
 	if ($data['expression_formula'] === '') {
 		// Append "Add" button.
-		$expression_row[] = (new CSubmit('add_expression', _('Add')))
+		$expression_row[] = (new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
 	else {
 		// Append "And" button.
-		$expression_row[] = (new CSubmit('and_expression', _('And')))
+		$expression_row[] = (new CSimpleButton(_('And')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Or" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expression_row[] = (new CSubmit('or_expression', _('Or')))
+		$expression_row[] = (new CSimpleButton(_('Or')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Replace" button.
 		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expression_row[] = (new CSubmit('replace_expression', _('Replace')))
+		$expression_row[] = (new CSimpleButton(_('Replace')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
 }
 elseif ($data['expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
@@ -180,10 +184,8 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$allowed_testing = true;
 	if ($data['expression_tree']) {
 		foreach ($data['expression_tree'] as $i => $e) {
-			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
@@ -196,7 +198,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// Templated or discovered trigger.
@@ -222,7 +224,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					$e['list'],
 					!$readonly
 						? (new CCol(
-							(new CButton(null, _('Remove')))
+							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -232,7 +234,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
@@ -267,7 +269,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
@@ -309,31 +311,35 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	if ($data['recovery_expression_formula'] === '') {
 		// Append "Add" button.
-		$recovery_expression_row[] = (new CSubmit('add_recovery_expression', _('Add')))
+		$recovery_expression_row[] = (new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "add_recovery_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
 	else {
 		// Append "And" button.
-		$recovery_expression_row[] = (new CSubmit('and_recovery_expression', _('And')))
+		$recovery_expression_row[] = (new CSimpleButton(_('And')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "and_recovery_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Or" button.
 		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$recovery_expression_row[] = (new CSubmit('or_recovery_expression', _('Or')))
+		$recovery_expression_row[] = (new CSimpleButton(_('Or')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "or_recovery_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 
 		// Append "Replace" button.
 		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$recovery_expression_row[] = (new CSubmit('replace_recovery_expression', _('Replace')))
+		$recovery_expression_row[] = (new CSimpleButton(_('Replace')))
+			->onClick('javascript: submitFormWithParam("'.$triggersForm->getName().'", "replace_recovery_expression", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setEnabled(!$readonly);
 	}
 }
 elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
@@ -364,15 +370,13 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	if ($data['recovery_expression_tree']) {
 		foreach ($data['recovery_expression_tree'] as $i => $e) {
-			if (!isset($e['recovery_expression']['levelErrors'])) {
-				$errorImg = '';
-			}
-			else {
+			$info_icons = [];
+			if (isset($e['expression']['levelErrors'])) {
 				$allowed_testing = false;
 				$errors = [];
 
-				if (is_array($e['recovery_expression']['levelErrors'])) {
-					foreach ($e['recovery_expression']['levelErrors'] as $expVal => $errTxt) {
+				if (is_array($e['expression']['levelErrors'])) {
+					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
 						if ($errors) {
 							$errors[] = BR();
 						}
@@ -380,7 +384,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					}
 				}
 
-				$errorImg = makeErrorIcon($errors);
+				$info_icons[] = makeErrorIcon($errors);
 			}
 
 			// Templated or discovered trigger.
@@ -406,7 +410,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					$e['list'],
 					!$readonly
 						? (new CCol(
-							(new CButton(null, _('Remove')))
+							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -416,7 +420,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 								)
 						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
-					$errorImg
+					makeInformationList($info_icons)
 				])
 			);
 		}
@@ -451,7 +455,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	], null, 'recovery_expression_constructor_row');
 
-	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
@@ -489,10 +493,10 @@ $tags_table = (new CTable())->setId('tbl_tags');
 foreach ($data['tags'] as $tag_key => $tag) {
 	$tags = [
 		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag')),
 		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value'))
 	];
 

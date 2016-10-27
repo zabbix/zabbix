@@ -43,7 +43,7 @@ $hostTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('Templates'),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
@@ -100,10 +100,10 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = (new CLink(
-		item_status2str($hostPrototype['status']),
+		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		'?group_hostid='.$hostPrototype['hostid'].
 			'&parent_discoveryid='.$this->data['discovery_rule']['itemid'].
-			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
+			'&action='.(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
@@ -128,10 +128,10 @@ $itemForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
-			'hostprototype.massenable' => ['name' => _('Enable'),
+			'hostprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Enable selected host prototypes?')
 			],
-			'hostprototype.massdisable' => ['name' => _('Disable'),
+			'hostprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Disable selected host prototypes?')
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),

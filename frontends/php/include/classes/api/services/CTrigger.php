@@ -1367,7 +1367,7 @@ class CTrigger extends CTriggerGeneral {
 			'SELECT t.triggerid,t.description,t.expression'.
 				' FROM triggers t'.
 				' WHERE '.dbConditionInt('t.triggerid', $triggerIds).
-				'AND t.templateid IS NOT NULL',
+				' AND t.templateid IS NOT NULL',
 			1
 		));
 		if ($trigger) {

@@ -243,7 +243,7 @@ class testFormTrigger extends CWebTest {
 				$this->zbxTestAssertAttribute("//button[@id='insert']", 'disabled');
 			}
 
-			$this->zbxTestAssertElementNotPresentId('add_expression');
+			$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			$this->zbxTestAssertElementNotPresentId('insert_macro');
 			$this->zbxTestAssertElementNotPresentId('exp_list');
 		}
@@ -256,11 +256,10 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
-				$this->zbxTestAssertVisibleId('add_expression');
-				$this->zbxTestAssertElementValue('add_expression', 'Add');
+				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression') and text()='Add']");
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentId('add_expression');
+				$this->zbxTestAssertElementNotPresentXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression')]");
 			}
 
 			$this->zbxTestAssertVisibleId('insert');
@@ -826,11 +825,10 @@ class testFormTrigger extends CWebTest {
 					}
 				}
 				else {
-					$this->zbxTestAssertElementValue('and_expression', 'And');
+					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
+					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
+					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'replace_expression') and text()='Replace']");
 
-					$this->zbxTestAssertElementValue('or_expression', 'Or');
-
-					$this->zbxTestAssertElementValue('replace_expression', 'Replace');
 					if (isset($constructor['text'])) {
 						foreach($constructor['text'] as $txt) {
 							$this->zbxTestTextPresent($txt);
@@ -842,10 +840,10 @@ class testFormTrigger extends CWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="status-red cursor-pointer"]');
+						$this->zbxTestAssertElementNotPresentXpath('//table[@id="exp_list"]//span[@class="icon-info status-red"]');
 					}
 				}
 			}

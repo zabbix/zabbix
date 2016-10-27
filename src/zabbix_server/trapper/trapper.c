@@ -119,7 +119,7 @@ static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
-	int		records, ret = FAIL;
+	int		ret = FAIL;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -134,7 +134,7 @@ static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	records = proxy_get_hist_data(&j, &lastid);
+	proxy_get_hist_data(&j, &lastid);
 
 	zbx_json_close(&j);
 
@@ -150,7 +150,7 @@ static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
 	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
 		goto out;
 
-	if (0 != records)
+	if (0 != lastid)
 		proxy_set_hist_lastid(lastid);
 
 	ret = SUCCEED;
@@ -202,6 +202,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#define ZBX_GET_QUEUE_UNKNOWN		-1
 #define ZBX_GET_QUEUE_OVERVIEW		0
 #define ZBX_GET_QUEUE_PROXY		1
 #define ZBX_GET_QUEUE_DETAILS		2
@@ -347,7 +348,7 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
-	int			ret = FAIL, request_type = -1, now, i;
+	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
@@ -373,7 +374,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			request_type = ZBX_GET_QUEUE_DETAILS;
 	}
 
-	if (-1 == request_type)
+	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
 	{
 		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
@@ -381,7 +382,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	now = time(NULL);
 	zbx_vector_ptr_create(&queue);
-	DCget_item_queue(&queue, 6, -1);
+	DCget_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 

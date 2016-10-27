@@ -678,6 +678,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
 #define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
+typedef struct
+{
+	zbx_uint64_t	userid;
+	unsigned char	type;
+}
+zbx_user_t;
+
 /* user permissions */
 typedef enum
 {
@@ -709,6 +716,7 @@ typedef struct
 	char		*privatekey;
 	char		*command;
 	zbx_uint64_t	scriptid;
+	unsigned char	host_access;
 }
 zbx_script_t;
 
@@ -855,9 +863,11 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_double_suffix(const char *str);
+#define ZBX_FLAG_DOUBLE_PLAIN	0x00
+#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
+int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
-int	is_uint_suffix(const char *c, unsigned int *value);
+int	is_time_suffix(const char *c, int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);

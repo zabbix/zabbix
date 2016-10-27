@@ -585,7 +585,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							$result[$i][$j][] = BR();
 						}
 
-						if (array_key_exists('opmessage', $operation) && $operation['opmessage_grp']) {
+						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
 							$user_groups_list = [];
 
 							foreach ($operation['opmessage_grp'] as $userGroup) {
@@ -1286,22 +1286,32 @@ function getActionMessages(array $alerts) {
 
 		$mediaType = array_pop($alert['mediatypes']);
 
-		if ($alert['status'] == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-			$retries = '';
-		}
-		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
-		}
-		else {
-			$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
-			$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
+		switch ($alert['status']) {
+			case ALERT_STATUS_SENT:
+				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
+				$retries = '';
+				break;
+
+			case ALERT_STATUS_NOT_SENT:
+				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+				$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
+				break;
+
+			default:
+				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+				$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
 		}
 
 		$recipient = $alert['userid']
-			? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+			? array_key_exists($alert['userid'], $dbUsers)
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+				: _('Inaccessible user')
 			: $alert['sendto'];
+
+		$info_icons = [];
+		if ($alert['error'] !== '') {
+			$info_icons[] = makeErrorIcon($alert['error']);
+		}
 
 		$table->addRow([
 			$alert['esc_step'],
@@ -1311,7 +1321,7 @@ function getActionMessages(array $alerts) {
 			$retries,
 			$recipient,
 			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+			makeInformationList($info_icons)
 		]);
 	}
 
@@ -1350,7 +1360,7 @@ function getActionCommands(array $alerts) {
 				break;
 
 			default:
-				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
+				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 				break;
 		}
 
@@ -1366,112 +1376,160 @@ function getActionCommands(array $alerts) {
 	return $table;
 }
 
-function makeActionHints($alerts, $mediatypes, $users, $status) {
-	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
+function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recovery_alerts) {
+	$table = (new CTableInfo())->setHeader([_('Step'), _('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
 
 	$popup_rows = 0;
+	$recovery = true;
 
-	foreach ($alerts as $alert) {
-		switch ($status) {
-			case ALERT_STATUS_NOT_SENT:
-				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-				break;
+	foreach ([$r_alerts, $alerts] as $alerts_data) {
+		$show_header = $display_recovery_alerts;
 
-			case ALERT_STATUS_SENT:
-				$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
-					->addClass(ZBX_STYLE_GREEN);
-				break;
+		foreach ($alerts_data as $alert) {
+			switch ($alert['status']) {
+				case ALERT_STATUS_SENT:
+					$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
+						->addClass(ZBX_STYLE_GREEN);
+					break;
 
-			default:
-				$status_str = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
+				case ALERT_STATUS_NOT_SENT:
+					$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+					break;
+
+				default:
+					$status_str = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+			}
+
+			switch ($alert['alerttype']) {
+				case ALERT_TYPE_MESSAGE:
+					$user = array_key_exists($alert['userid'], $users)
+						? getUserFullname($users[$alert['userid']])
+						: _('Inaccessible user');
+
+					$message = array_key_exists($alert['mediatypeid'], $mediatypes)
+						? $mediatypes[$alert['mediatypeid']]['description']
+						: '';
+					break;
+				case ALERT_TYPE_COMMAND:
+					$user = '';
+					$message = _('Remote command');
+					break;
+				default:
+					$user = '';
+					$message = '';
+			}
+
+			$info_icons = [];
+			if ($alert['error'] !== '') {
+				$info_icons[] = makeErrorIcon($alert['error']);
+			}
+
+			if ($show_header) {
+				$table->addRow(
+					(new CRow(
+						(new CCol(
+							new CTag('h4', true, $recovery ? _('Recovery') : _('Problem'))
+						))->setColSpan($table->getNumCols())
+					))->addClass(ZBX_STYLE_HOVER_NOBG)
+				);
+				$show_header = false;
+			}
+
+			$table->addRow([
+				$alert['esc_step'],
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				$user,
+				$message,
+				$status_str,
+				makeInformationList($info_icons)
+			]);
+
+			if (++$popup_rows == ZBX_WIDGET_ROWS) {
+				break 2;
+			}
 		}
-
-		switch ($alert['alerttype']) {
-			case ALERT_TYPE_MESSAGE:
-				$user = array_key_exists($alert['userid'], $users) ? getUserFullname($users[$alert['userid']]) : '';
-				$message = array_key_exists($alert['mediatypeid'], $mediatypes)
-					? $mediatypes[$alert['mediatypeid']]['description']
-					: '';
-				break;
-			case ALERT_TYPE_COMMAND:
-				$user = '';
-				$message = [bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])];
-				break;
-			default:
-				$user = '';
-				$message = '';
-		}
-
-		$table->addRow([
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-			$user,
-			$message,
-			$status_str,
-			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
-		]);
-
-		if (++$popup_rows == ZBX_WIDGET_ROWS) {
-			break;
-		}
+		$recovery = false;
 	}
 
-	return $table;
+	$total = count($alerts) + count($r_alerts);
+
+	return [
+		$table,
+		($total > ZBX_WIDGET_ROWS)
+			? (new CDiv(
+				(new CDiv(
+					(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
+						->addClass(ZBX_STYLE_TABLE_STATS)
+				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			))->addClass(ZBX_STYLE_TABLE_PAGING)
+			: null
+	];
 }
 
-function makeEventsActions($eventids) {
-	if (!$eventids) {
+/**
+ * Get list of event actions.
+ *
+ * @param array  $problems
+ * @param string $problems[]['eventid']
+ * @param string $problems[]['r_eventid']  Recovery event ID (optional).
+ * @param bool   $display_recovery_alerts  Include recovery events.
+ * @param bool   $html                     If true, display action status with hint box in HTML format.
+ *
+ * @return array
+ */
+function makeEventsActions(array $problems, $display_recovery_alerts = false, $html = true) {
+	if (!$problems) {
 		return [];
 	}
 
+	$eventids = [];
+	foreach ($problems as $problem) {
+		$eventids[$problem['eventid']] = true;
+		if (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0) {
+			$eventids[$problem['r_eventid']] = true;
+		}
+	}
+
 	$result = DBselect(
-		'SELECT a.eventid,a.mediatypeid,a.userid,a.clock,a.message,a.status,a.alerttype,a.error'.
+		'SELECT a.eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
 		' FROM alerts a'.
-		' WHERE '.dbConditionInt('a.eventid', $eventids).
+		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 		' ORDER BY a.alertid DESC'
 	);
 
-	$events = [];
+	$alerts = [];
 	$userids = [];
 	$users = [];
 	$mediatypeids = [];
 	$mediatypes = [];
 
 	while ($row = DBfetch($result)) {
-		if (!array_key_exists($row['eventid'], $events)) {
-			$events[$row['eventid']] = [
-				ALERT_STATUS_NOT_SENT => [],
-				ALERT_STATUS_SENT => [],
-				ALERT_STATUS_FAILED => []
-			];
-		}
-
-		$event = [
+		$alert = [
+			'esc_step' => $row['esc_step'],
 			'clock' => $row['clock'],
+			'status' => $row['status'],
 			'alerttype' => $row['alerttype'],
 			'error' => $row['error']
 		];
 
-		switch ($event['alerttype']) {
-			case ALERT_TYPE_COMMAND:
-				$event['message'] = $row['message'];
-				break;
+		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
+			$alert['mediatypeid'] = $row['mediatypeid'];
+			$alert['userid'] = $row['userid'];
 
-			case ALERT_TYPE_MESSAGE:
-				$event['mediatypeid'] = $row['mediatypeid'];
-				$event['userid'] = $row['userid'];
+			if ($alert['mediatypeid'] != 0) {
+				$mediatypeids[$row['mediatypeid']] = true;
+			}
 
-				if ($event['mediatypeid'] != 0) {
-					$mediatypeids[$row['mediatypeid']] = true;
-				}
-
-				if ($event['userid'] != 0) {
-					$userids[$row['userid']] = true;
-				}
-				break;
+			if ($alert['userid'] != 0) {
+				$userids[$row['userid']] = true;
+			}
 		}
 
-		$events[$row['eventid']][$row['status']][] = $event;
+		if (!array_key_exists($row['eventid'], $alerts)) {
+			$alerts[$row['eventid']] = [];
+		}
+		$alerts[$row['eventid']][] = $alert;
 	}
 
 	if ($mediatypeids) {
@@ -1490,33 +1548,58 @@ function makeEventsActions($eventids) {
 		]);
 	}
 
-	foreach ($events as $eventid => &$event) {
-		$event = (new CList([
-			$event[ALERT_STATUS_SENT]
-				? (new CSpan(count($event[ALERT_STATUS_SENT])))
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_GREEN)
-					->setHint(makeActionHints($event[ALERT_STATUS_SENT], $mediatypes, $users, ALERT_STATUS_SENT))
-				: '',
-			$event[ALERT_STATUS_NOT_SENT]
-				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_YELLOW)
-					->setHint(
-						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
-					)
-				: '',
-			$event[ALERT_STATUS_FAILED]
-				? (new CSpan(count($event[ALERT_STATUS_FAILED])))
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_RED)
-					->setHint(makeActionHints($event[ALERT_STATUS_FAILED], $mediatypes, $users, ALERT_STATUS_FAILED))
-				: ''
-		]))->addClass(ZBX_STYLE_LIST_HOR_MIN_WIDTH);
-	}
-	unset($event);
+	foreach ($problems as $index => $problem) {
+		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']] : [];
+		$r_event_alerts = (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0)
+			? (array_key_exists($problem['r_eventid'], $alerts) ? $alerts[$problem['r_eventid']] : [])
+			: [];
 
-	return $events;
+		if ($event_alerts || $r_event_alerts) {
+			$status = ALERT_STATUS_SENT;
+			foreach ([$event_alerts, $r_event_alerts] as $alerts_data) {
+				foreach ($alerts_data as $alert) {
+					if ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+						$status = ALERT_STATUS_NOT_SENT;
+					}
+					elseif ($alert['status'] == ALERT_STATUS_FAILED && $status != ALERT_STATUS_NOT_SENT) {
+						$status = ALERT_STATUS_FAILED;
+					}
+				}
+			}
+
+			switch ($status) {
+				case ALERT_STATUS_SENT:
+					$status_str = $html ? (new CSpan(_('Done')))->addClass(ZBX_STYLE_GREEN) : _('Done');
+					break;
+
+				case ALERT_STATUS_NOT_SENT:
+					$status_str = $html ? (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW) : _('In progress');
+					break;
+
+				default:
+					$status_str = $html ? (new CSpan(_('Failures')))->addClass(ZBX_STYLE_RED) : _('Failures');
+			}
+
+			if ($html) {
+				$problems[$index] = [
+					$status_str
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setHint(
+							makeActionHints($event_alerts, $r_event_alerts, $mediatypes, $users, $display_recovery_alerts)
+						),
+					CViewHelper::showNum(count($event_alerts) + count($r_event_alerts))
+				];
+			}
+			else {
+				$problems[$index] = $status_str;
+			}
+		}
+		else {
+			unset($problems[$index]);
+		}
+	}
+
+	return $problems;
 }
 
 /**

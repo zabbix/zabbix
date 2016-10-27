@@ -34,7 +34,8 @@ class CFunctionValidator extends CValidator {
 	 *   )
 	 * )
 	 *
-	 * <parameter_type> can be 'num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str'
+	 * <parameter_type> can be 'fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent', 'sec_neg',
+	 *                         'sec_num', 'sec_num_zero', 'sec_zero'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -84,7 +85,7 @@ class CFunctionValidator extends CValidator {
 			'band' => [
 				'args' => [
 					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
-					['type' => 'num', 'mandat' => true],
+					['type' => 'num_unsigned', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesInt
@@ -129,9 +130,9 @@ class CFunctionValidator extends CValidator {
 				'args' => [
 					['type' => 'sec_num', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true],
-					['type' => 'sec_zero', 'mandat' => true],
-					['type' => 'str', 'can_be_empty' => true],
-					['type' => 'str', 'can_be_empty' => true]
+					['type' => 'sec_neg', 'mandat' => true],
+					['type' => 'fit', 'can_be_empty' => true],
+					['type' => 'mode', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesNum
 			],
@@ -243,8 +244,8 @@ class CFunctionValidator extends CValidator {
 				'args' => [
 					['type' => 'sec_num', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true],
-					['type' => 'num', 'mandat' => true],
-					['type' => 'str', 'can_be_empty' => true]
+					['type' => 'num_suffix', 'mandat' => true],
+					['type' => 'fit', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesNum
 			]
@@ -293,7 +294,8 @@ class CFunctionValidator extends CValidator {
 			_('Invalid first parameter.'),
 			_('Invalid second parameter.'),
 			_('Invalid third parameter.'),
-			_('Invalid fourth parameter.')
+			_('Invalid fourth parameter.'),
+			_('Invalid fifth parameter.')
 		];
 
 		$user_macro_parser = new CUserMacroParser();
@@ -333,7 +335,8 @@ class CFunctionValidator extends CValidator {
 	 * Validate trigger function parameter.
 	 *
 	 * @param string $param
-	 * @param string $type  type of $param ('num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str')
+	 * @param string $type  type of $param ('fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent',
+	 *                                      'sec_neg', 'sec_num', 'sec_num_zero', 'sec_zero')
 	 *
 	 * @return bool
 	 */
@@ -345,14 +348,26 @@ class CFunctionValidator extends CValidator {
 			case 'sec_zero':
 				return $this->validateSecZero($param);
 
+			case 'sec_neg':
+				return $this->validateSecNeg($param);
+
 			case 'sec_num':
 				return $this->validateSecNum($param);
 
 			case 'sec_num_zero':
 				return $this->validateSecNumZero($param);
 
-			case 'num':
-				return is_numeric($param);
+			case 'num_unsigned':
+				return CNewValidator::is_uint64($param);
+
+			case 'num_suffix':
+				return $this->validateNumSuffix($param);
+
+			case 'fit':
+				return $this->validateFit($param);
+
+			case 'mode':
+				return $this->validateMode($param);
 
 			case 'percent':
 				return $this->validatePercent($param);
@@ -400,6 +415,18 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
+	 * Validate trigger function parameter which can contain negative seconds.
+	 * Examples: 0, 1, 5w, -3h
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSecNeg($param) {
+		return preg_match('/^[-]?\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
+	}
+
+	/**
 	 * Validate trigger function parameter which can contain seconds greater zero or count.
 	 * Examples: 1, 5w, #1
 	 *
@@ -429,6 +456,42 @@ class CFunctionValidator extends CValidator {
 		}
 
 		return $this->validateSecValue($param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain suffixed decimal number.
+	 * Examples: 0, 1, 5w, -3h, 10.2G
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateNumSuffix($param) {
+		return preg_match('/^(\-?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain fit function (linear, polynomialN with 1 <= N <= 6,
+	 * exponential, logarithmic, power) or an empty value.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateFit($param) {
+		return preg_match('/^(linear|polynomial[1-6]|exponential|logarithmic|power|)$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain forecast mode (value, max, min, delta, avg) or
+	 * an empty value.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateMode($param) {
+		return preg_match('/^(value|max|min|delta|avg|)$/', $param);
 	}
 
 	/**

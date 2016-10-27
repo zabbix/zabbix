@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,37 +55,30 @@ class CScreenDiscovery extends CScreenBase {
 		$sort_order = $this->data['sortorder'];
 		$druleid = $this->data['druleid'];
 
-		// discovery rules
 		$options = [
 			'output' => ['druleid', 'name'],
 			'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
-			'filter' => ['status' => DRULE_STATUS_ACTIVE]
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
+			'preservekeys' => true
 		];
 
-		if ($druleid > 0) {
-			$options['druleids'] = $druleid; // set selected discovery rule id
+		if ($druleid != 0) {
+			$options['druleids'] = [$druleid];
 		}
 
 		$drules = API::DRule()->get($options);
-		if ($drules) {
-			order_result($drules, 'name');
-		}
 
-		// discovery services
-		$options = [
+		order_result($drules, 'name');
+
+		$dservices = API::DService()->get([
+			'output' => ['dserviceid', 'port', 'status', 'lastup', 'lastdown', 'dcheckid', 'ip', 'dns'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'output' => ['dserviceid', 'type', 'key_', 'port', 'status', 'lastup', 'lastdown', 'ip', 'dns'],
+			'druleids' => array_keys($drules),
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
-			'limitSelects' => 1
-		];
-		if ($druleid > 0) {
-			$options['druleids'] = $druleid;
-		}
-		else {
-			$options['druleids'] = zbx_objectValues($drules, 'druleid');
-		}
-		$dservices = API::DService()->get($options);
+			'limitSelects' => 1,
+			'preservekeys' => true
+		]);
 
 		// user macros
 		$macros = API::UserMacro()->get([
@@ -94,32 +87,34 @@ class CScreenDiscovery extends CScreenBase {
 		]);
 		$macros = zbx_toHash($macros, 'macro');
 
+		$dchecks = API::DCheck()->get([
+			'output' => ['type', 'key_'],
+			'dserviceids' => array_keys($dservices),
+			'preservekeys' => true
+		]);
+
 		// services
 		$services = [];
 		foreach ($dservices as $dservice) {
-			$key_ = $dservice['key_'];
+			$key_ = $dchecks[$dservice['dcheckid']]['key_'];
 			if ($key_ !== '') {
 				if (array_key_exists($key_, $macros)) {
 					$key_ = $macros[$key_]['value'];
 				}
 				$key_ = ': '.$key_;
 			}
-			$service_name = discovery_check_type2str($dservice['type']).
-				discovery_port2str($dservice['type'], $dservice['port']).$key_;
+			$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
+				discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_;
 			$services[$service_name] = 1;
 		}
 		ksort($services);
 
-		// discovery services to hash
-		$dservices = zbx_toHash($dservices, 'dserviceid');
-
-		// discovery hosts
 		$dhosts = API::DHost()->get([
-			'druleids' => zbx_objectValues($drules, 'druleid'),
-			'selectDServices' => ['dserviceid', 'ip', 'dns', 'type', 'status', 'key_'],
-			'output' => ['dhostid', 'lastdown', 'lastup', 'druleid']
+			'output' => ['dhostid'],
+			'selectDServices' => ['dserviceid'],
+			'druleids' => array_keys($drules),
+			'preservekeys' => true
 		]);
-		$dhosts = zbx_toHash($dhosts, 'dhostid');
 
 		$header = [
 			make_sorting_header(_('Discovered device'), 'ip', $sort_field, $sort_order,
@@ -197,7 +192,7 @@ class CScreenDiscovery extends CScreenBase {
 						$time = 'lastup';
 					}
 
-					$key_ = $dservice['key_'];
+					$key_ = $dchecks[$dservice['dcheckid']]['key_'];
 					if ($key_ !== '') {
 						if (array_key_exists($key_, $macros)) {
 							$key_ = $macros[$key_]['value'];
@@ -205,8 +200,8 @@ class CScreenDiscovery extends CScreenBase {
 						$key_ = NAME_DELIMITER.$key_;
 					}
 
-					$service_name = discovery_check_type2str($dservice['type']).
-						discovery_port2str($dservice['type'], $dservice['port']).$key_;
+					$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
+						discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_;
 
 					$discovery_info[$dservice['ip']]['services'][$service_name] = [
 						'class' => $class,

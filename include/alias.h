@@ -20,12 +20,10 @@
 #ifndef ZABBIX_ALIAS_H
 #define ZABBIX_ALIAS_H
 
-#define MAX_ALIAS_NAME        120
-
 typedef struct zbx_alias
 {
 	struct zbx_alias	*next;
-	char			name[MAX_ALIAS_NAME];
+	char			*name;
 	char			*value;
 }
 ALIAS;

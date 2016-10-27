@@ -54,6 +54,7 @@ class CControllerProblemView extends CController {
 			'filter_maintenance' =>		'in 1',
 			'filter_groupids_subgroupids' => 'array_id',
 			'filter_unacknowledged' =>	'in 1',
+			'filter_details' =>			'in 1',
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
 			'stime' =>					'time'
 		];
@@ -154,6 +155,7 @@ class CControllerProblemView extends CController {
 			CProfile::update('web.problem.filter.unacknowledged', $this->getInput('filter_unacknowledged', 0),
 				PROFILE_TYPE_INT
 			);
+			CProfile::update('web.problem.filter.details', $this->getInput('filter_details', 0), PROFILE_TYPE_INT);
 		}
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
@@ -172,6 +174,7 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.tags.value');
 			CProfile::delete('web.problem.filter.maintenance');
 			CProfile::delete('web.problem.filter.unacknowledged');
+			CProfile::delete('web.problem.filter.details');
 		}
 
 		$config = select_config();
@@ -278,7 +281,8 @@ class CControllerProblemView extends CController {
 				'inventory' => $filter_inventory,
 				'tags' => $filter_tags,
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
-				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0)
+				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
+				'details' => CProfile::get('web.problem.filter.details', 0)
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']

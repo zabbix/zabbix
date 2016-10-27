@@ -533,12 +533,16 @@ article {
 			padding: 4px 7px;
 		}
 
-		.status-container {
+		.status-container, .rel-container {
 			margin: 0 5px 0 0;
 
 			span {
 				padding: 2px 3px 1px 3px;
 			}
+		}
+
+		.rel-container {
+			margin: 0;
 		}
 	}
 
@@ -658,14 +662,37 @@ footer {
 	}
 
 	tbody tr {
-		@include transition(background-color .2s ease-out);
 
 		&:hover {
 			background-color: $ui-hover-color;
+
+			.timeline-axis {
+				background-color:  $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color!important;
+			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
+
+			.timeline-axis {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-date {
+				background-color: $ui-bg-color;
+			}
+
+			.timeline-td {
+				background-color: $ui-bg-color;
+			}
 		}
 
 		&.nothing-to-show {
@@ -675,11 +702,14 @@ footer {
 		&:last-child td {
 			border-bottom: none;
 		}
+
+		&.hover-nobg {
+			background-color: $ui-bg-color;
+		}
 	}
 
 	td {
 		padding: 6px 5px;
-		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -909,6 +939,76 @@ footer {
 	@extend %webkit-hor-scrollbar;
 }
 
+// Timeline in table view
+.timeline-date {
+	text-align: right;
+	white-space: nowrap;
+	border-bottom-color: $transparent !important;
+}
+
+.timeline-axis {
+	@extend %timeline-td;
+	padding: 6px .04em !important;
+	border-right: 2px solid lighten(desaturate($btn-bg-color, 27%), 44%);
+
+	&::before {
+		content: '';
+		position: absolute;
+		bottom: -1px;
+		right: -2px;
+		height: 100%;
+		width: 2px;
+		background-color: lighten(desaturate($btn-bg-color, 27%), 44%);
+	}
+}
+
+.timeline-dot {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 11px;
+		border: 2px solid $ui-bg-color;
+		background-color: $btn-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-dot-big {
+
+	&::after {
+		@extend %timeline-dot;
+		top: 10px;
+		border: 2px solid $btn-bg-color;
+		background-color: $ui-bg-color;
+		@include border-radius(100%);
+	}
+}
+
+.timeline-td {
+	@extend %timeline-td;
+	padding: 6px .25em !important;
+}
+
+.timeline-th {
+	padding: 6px .25em !important;
+}
+
+%timeline-dot {
+	content: '';
+	position: absolute;
+	z-index: 100;
+	display: block;
+	width: 4px;
+	height: 4px;
+	right: -5px;
+	@include border-radius(100%);
+}
+
+%timeline-td {
+	position: relative;
+	border-bottom-color: $ui-bg-color !important;
+}
+
 // Filters
 .filter-btn-container {
 	text-align: center;
@@ -926,6 +1026,10 @@ footer {
 
 	.filter-forms {
 		padding: 0 10px;
+
+		.btn-grey {
+			vertical-align: baseline;
+		}
 	}
 
 	.list-table {
@@ -989,6 +1093,18 @@ footer {
 
 	button {
 		margin: 10px 5px 0 5px;
+	}
+
+	select {
+		vertical-align: top;
+	}
+
+	.table-forms .table-forms-td-right {
+
+		td {
+			padding: 0 5px 5px 0;
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -1669,6 +1785,7 @@ select {
 }
 
 %form-input-height-padding {
+	margin: 0;
 	padding: 0 5px;
 	min-height: 24px;
 }
@@ -1693,10 +1810,14 @@ button::-moz-focus-inner {
 }
 
 button {
-	font-family: $font-stack;
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	border: 1px solid $btn-bg-color;
+	margin: 0;
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
@@ -1819,6 +1940,7 @@ button {
 
 .filter-trigger {
 	position: relative;
+	margin: 0;
 	padding-right: 21px;
 	min-width: 94px;
 	@include border-radius(2px 2px 0 0);
@@ -1908,7 +2030,7 @@ $icon-widget-btn: (
 
 %button-icon-size {
 	width: 24px;
-	height: 24px;
+	height: auto;
 	padding: 0;
 }
 
@@ -2063,7 +2185,7 @@ $var-icons: (
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
@@ -2111,8 +2233,28 @@ $form-icon-btn: (
 
 .drag-icon {
 	margin-left: -9px;
+	height: 24px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
+}
+
+.icon-info {
+	position: relative;
+	width: 8px;
+	height: 11px;
+	cursor: pointer;
+	margin: -12px 0 -4px 0;
+
+	&::before {
+		content: '';
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 14px;
+		height: 14px;
+		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
+	}
 }
 
 // Sign in, Installation
@@ -2528,6 +2670,11 @@ $form-icon-btn: (
 		}
 	}
 
+	.table-paging {
+		border: none;
+		border-top: 1px solid $table-border-color;
+	}
+
 	.table-forms-td-left {
 		text-align: left;
 	}
@@ -2797,7 +2944,7 @@ $form-icon-btn: (
 }
 
 .right {
-	text-align: right;
+	text-align: right !important;
 }
 
 .bottom {
@@ -3060,10 +3207,16 @@ a.blue {
 	@extend %status;
 }
 
+.status-dark-grey {
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	@extend %status;
+}
+
 .status-yellow {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
-	background-color: darken(desaturate($alt-yellow, 10%), 16%);
+	border: 1px solid darken(desaturate($alt-yellow, 9%), 20%);
+	background-color: darken(desaturate($alt-yellow, 9%), 18%);
 	@extend %status;
 }
 
@@ -3090,7 +3243,7 @@ a.blue {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 0.7em;
+	min-width: .7em;
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
@@ -3666,6 +3819,16 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-width: 16px;
+	white-space: nowrap;
+
+	.icon-info {
+		margin-right: 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }
 
 .server-name {
@@ -3674,20 +3837,6 @@ tr.cursor-move {
 	white-space: nowrap;
 	overflow: hidden;
 	@extend %overflow-ellipsis;
-}
-
-.list-hor-min-width {
-
-	li {
-		display: inline-block;
-		min-width: 1.4em;
-		margin-right: .4em;
-
-		&:last-child {
-			min-width: auto;
-			margin-right: 0;
-		}
-	}
 }
 
 .uppercase {

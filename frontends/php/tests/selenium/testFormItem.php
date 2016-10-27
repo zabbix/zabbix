@@ -762,7 +762,7 @@ class testFormItem extends CWebTest {
 		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
 				$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
@@ -2176,8 +2176,6 @@ class testFormItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItem_SimpleCreate($data) {
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
-
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
@@ -2389,8 +2387,6 @@ class testFormItem extends CWebTest {
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 				}
 			}
-
-			DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 		}
 
 	public function testFormItem_HousekeeperUpdate() {

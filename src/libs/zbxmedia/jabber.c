@@ -120,7 +120,7 @@ static int	zbx_io_send(void *socket, const char *data, size_t len)
 	if (NULL == sock)
 		return IKS_NET_RWERR;
 
-	if (write(*sock, data, len) < len)
+	if (write(*sock, data, len) < (ssize_t)len)
 		return IKS_NET_RWERR;
 
 	return IKS_OK;
