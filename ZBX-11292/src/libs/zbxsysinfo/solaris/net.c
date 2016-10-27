@@ -47,6 +47,9 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 			min_instance = kp->ks_instance;
 			min_kp = kp;
 		}
+
+		if (0 == min_instance)
+			break;
 	}
 
 	if (-1 != min_instance)
