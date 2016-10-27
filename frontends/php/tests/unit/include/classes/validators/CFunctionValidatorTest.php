@@ -91,6 +91,40 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
+	private static function parameterPeriod_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
+
+		$tests = [];
+
+		foreach ($valueTypesAny as $valueType) {
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '12345';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1s';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1m';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1h';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1d';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1w';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1K';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1M';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1G';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1T';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, false];
+		}
+
+		return $tests;
+	}
+
 	private static function parameterTimeShift_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
 		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT];
@@ -328,7 +362,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterTimeShift_TestCases('fuzzytime', $valueTypesNum),
 
 			// nodata() - (sec) [float, int, str, text, log]
-			self::parameterTimeShift_TestCases('nodata', $valueTypesAny),
+			self::parameterPeriod_TestCases('nodata', $valueTypesAny),
 
 			// iregexp() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('iregexp', $valueTypesStr),
