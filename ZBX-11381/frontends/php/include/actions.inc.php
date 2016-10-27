@@ -1491,14 +1491,22 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 	}
 
 	$result = DBselect(
-		'SELECT a.eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
+		'(SELECT "0" as is_r_alert,a.eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
 		' FROM alerts a'.
+		' LEFT JOIN event_recovery r ON r.eventid=a.eventid'.
 		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-		' ORDER BY a.alertid DESC'
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.'))'.
+		' UNION'.
+		' (SELECT "1" as is_r_alert,a.eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
+		' FROM alerts a'.
+			' LEFT JOIN event_recovery r ON r.eventid=a.eventid'.
+		' WHERE '.dbConditionInt('r.eventid', array_keys($eventids)).
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.'))'.
+		' ORDER BY eventid DESC'
 	);
 
-	$alerts = [];
+	$p_alerts = [];
+	$r_alerts = [];
 	$userids = [];
 	$users = [];
 	$mediatypeids = [];
@@ -1506,6 +1514,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 
 	while ($row = DBfetch($result)) {
 		$alert = [
+			'is_r_alert' => $row['is_r_alert'],
 			'esc_step' => $row['esc_step'],
 			'clock' => $row['clock'],
 			'status' => $row['status'],
@@ -1526,10 +1535,20 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			}
 		}
 
-		if (!array_key_exists($row['eventid'], $alerts)) {
-			$alerts[$row['eventid']] = [];
+		if ($alert['is_r_alert'] == 1)
+		{
+			if (!array_key_exists($row['eventid'], $r_alerts)) {
+				$r_alerts[$row['eventid']] = [];
+			}
+			$r_alerts[$row['eventid']][] = $alert;
 		}
-		$alerts[$row['eventid']][] = $alert;
+		else
+		{
+			if (!array_key_exists($row['eventid'], $p_alerts)) {
+				$p_alerts[$row['eventid']] = [];
+			}
+			$p_alerts[$row['eventid']][] = $alert;
+		}
 	}
 
 	if ($mediatypeids) {
@@ -1549,10 +1568,8 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 	}
 
 	foreach ($problems as $index => $problem) {
-		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']] : [];
-		$r_event_alerts = (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0)
-			? (array_key_exists($problem['r_eventid'], $alerts) ? $alerts[$problem['r_eventid']] : [])
-			: [];
+		$event_alerts = array_key_exists($problem['eventid'], $p_alerts) ? $p_alerts[$problem['eventid']] : [];
+		$r_event_alerts = array_key_exists($problem['eventid'], $r_alerts) ? $r_alerts[$problem['eventid']] : [];
 
 		if ($event_alerts || $r_event_alerts) {
 			$status = ALERT_STATUS_SENT;
