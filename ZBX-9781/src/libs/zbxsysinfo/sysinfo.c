@@ -988,7 +988,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		signal(SIGSEGV, SIG_DFL);
 		signal(SIGBUS, SIG_DFL);
 
-		close(STDOUT_FILENO);
 		close(fds[0]);
 
 		ret = metric_func(cmd, param, flags, result);
