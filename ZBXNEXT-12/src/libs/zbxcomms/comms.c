@@ -1886,7 +1886,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
-	int		prefix_size_ipv6;
+	int		prefix_size_ipv6, prefix_tmp;
 #else
 	struct hostent	*hp;
 	int		i;
@@ -1948,10 +1948,8 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
-				if (AF_INET != current_ai->ai_family)
-					prefix_size = prefix_size_ipv6;
-
-				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai, name))
+				prefix_tmp = current_ai->ai_family == AF_INET ? prefix_size : prefix_size_ipv6;
+				if (SUCCEED == zbx_ip_cmp(prefix_tmp, current_ai, name))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
