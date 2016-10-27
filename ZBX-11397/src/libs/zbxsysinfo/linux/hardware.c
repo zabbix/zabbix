@@ -95,57 +95,18 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 
 static int	get_dmi_info(char *buf, int bufsize, int flags)
 {
-	int		ret = SYSINFO_RET_FAIL, fd, offset = 0;
-	unsigned char	membuf[SMBIOS_ENTRY_POINT_SIZE], *smbuf = NULL, *data;
-	size_t		len, fp;
-	void		*mmp = NULL;
-	static long	pagesize = 0;
-	static int	smbios_status = SMBIOS_STATUS_UNKNOWN;
-	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
+	int		fd, ret = SYSINFO_RET_FAIL, smbios_len, offset = 0;
+	unsigned char	*smbuf, *data;
 
-	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
+	if (-1 == (fd = open(SYS_TABLE_FILE, O_RDONLY)))
 		return ret;
 
-	if (SMBIOS_STATUS_UNKNOWN == smbios_status)	/* look for SMBIOS table only once */
-	{
-		pagesize = sysconf(_SC_PAGESIZE);
+	if (-1 == (smbios_len = lseek(fd, 0, SEEK_END)))
+		return ret;
 
-		/* find smbios entry point - located between 0xF0000 and 0xFFFFF (according to the specs) */
-		for (fp = 0xf0000; 0xfffff > fp; fp += 16)
-		{
-			memset(membuf, 0, sizeof(membuf));
-
-			len = fp % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
-			if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED, fd, fp - len)))
-				goto close;
-
-			memcpy(membuf, (char *)mmp + len, sizeof(membuf));
-			munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
-
-			if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
-			{
-				smbios_len = membuf[7] << 8 | membuf[6];
-				smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 | (size_t)membuf[9] << 8 | membuf[8];
-				smbios_status = SMBIOS_STATUS_OK;
-				break;
-			}
-		}
-	}
-
-	if (SMBIOS_STATUS_OK != smbios_status)
-	{
-		smbios_status = SMBIOS_STATUS_ERROR;
-		goto close;
-	}
-
-	smbuf = zbx_malloc(smbuf, smbios_len);
-
-	len = smbios % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
-	if (MAP_FAILED == (mmp = mmap(0, len + smbios_len, PROT_READ, MAP_SHARED, fd, smbios - len)))
-		goto clean;
-
-	memcpy(smbuf, (char *)mmp + len, smbios_len);
-	munmap(mmp, len + smbios_len);
+	lseek(fd, 0, SEEK_SET);
+	smbuf = zbx_malloc(NULL, smbios_len);
+	smbios_len = read(fd, smbuf, smbios_len);
 
 	data = smbuf;
 	while (data + DMI_HEADER_SIZE <= smbuf + smbios_len)
@@ -189,9 +150,8 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 
 	if (0 < offset)
 		ret = SYSINFO_RET_OK;
-clean:
+
 	zbx_free(smbuf);
-close:
 	close(fd);
 
 	return ret;
