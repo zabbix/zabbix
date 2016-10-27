@@ -844,7 +844,7 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
-			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
