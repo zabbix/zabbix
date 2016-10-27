@@ -234,31 +234,28 @@ class CJson {
 	 *
 	 */
 	public function decode($encodedValue, $asArray = false) {
-		if (!$this->_config['bypass_ext'] && function_exists('json_decode')) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_decode') && function_exists('json_last_error')) {
 			$result = json_decode($encodedValue, $asArray);
 			$this->last_error = json_last_error();
+
 			return $result;
 		}
 
-		$this->last_error = JSON_ERROR_NONE;
-
 		$first_char = substr(ltrim($encodedValue), 0, 1);
+
 		if ($first_char != '{' && $first_char != '[') {
-			$this->last_error = JSON_ERROR_SYNTAX;
-			return null;
+			$result = null;
+		}
+		else {
+			ini_set('pcre.backtrack_limit', '10000000');
+
+			$this->_level = 0;
+
+			$result = $this->isValid($encodedValue) ? $this->_json_decode($encodedValue, $asArray) : null;
 		}
 
-		// fall back to php-only method
-		ini_set('pcre.backtrack_limit', '10000000');
+		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : JSON_ERROR_NONE;
 
-		$this->_level = 0;
-		$result = null;
-
-		if ($this->isValid($encodedValue)) {
-			$result = $this->_json_decode($encodedValue, $asArray);
-		}
-
-		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : $result;
 		return $result;
 	}
 
