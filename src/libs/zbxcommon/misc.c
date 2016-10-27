@@ -1765,7 +1765,7 @@ int	is_ip4(const char *ip)
 {
 	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
-	int		digits = 0, dots = 0, res = FAIL;
+	int		digits = 0, dots = 0, res = FAIL, octet = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1773,13 +1773,16 @@ int	is_ip4(const char *ip)
 	{
 		if (0 != isdigit(*p))
 		{
+			octet = octet * 10 + (*p - '0');
 			digits++;
 		}
 		else if ('.' == *p)
 		{
-			if (0 == digits || 3 < digits)
+			if (0 == digits || 3 < digits || 255 < octet)
 				break;
+
 			digits = 0;
+			octet = 0;
 			dots++;
 		}
 		else
@@ -1790,7 +1793,7 @@ int	is_ip4(const char *ip)
 
 		p++;
 	}
-	if (dots == 3 && 1 <= digits && digits <= 3)
+	if (dots == 3 && 1 <= digits && digits <= 3 && 255 >= octet)
 		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
