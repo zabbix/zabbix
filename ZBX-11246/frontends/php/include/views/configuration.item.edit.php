@@ -463,12 +463,8 @@ if ($this->data['itemid'] != 0) {
 		);
 	}
 
-	$delete_button = new CButtonDelete(_('Delete item?'), url_params(['form', 'groupid', 'itemid', 'hostid']));
-	if ($data['limited']) {
-		$delete_button->setAttribute('disabled', 'disabled');
-	}
-
-	$buttons[] = $delete_button;
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'groupid', 'itemid', 'hostid'])))
+		->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 
 	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

@@ -964,7 +964,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'privatekey' => getRequest('privatekey', ''),
 		'formula' => getRequest('formula', 1),
 		'logtimefmt' => getRequest('logtimefmt', ''),
-		'add_groupid' => getRequest('add_groupid', getRequest('groupid', 0)),
 		'valuemaps' => null,
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,

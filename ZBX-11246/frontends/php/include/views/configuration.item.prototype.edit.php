@@ -411,25 +411,20 @@ $itemTab = (new CTabView())->addTab('itemTab', $this->data['caption'], $itemForm
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
-	$buttons = [new CSubmit('clone', _('Clone'))];
-
-	$delete_button = new CButtonDelete(_('Delete item prototype?'),
-		url_params(['form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'])
-	);
-
-	if ($data['limited']) {
-		$delete_button->setAttribute('disabled', 'disabled');
-	}
-
-	$buttons[] = $delete_button;
-	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
-
-	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$itemTab->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')), [
+			new CSubmit('clone', _('Clone')),
+			(new CButtonDelete(_('Delete item prototype?'),
+				url_params(['form', 'itemid', 'parent_discoveryid', 'hostid'])
+			))->setEnabled(!$data['limited']),
+			new CButtonCancel(url_params(['parent_discoveryid', 'hostid']))
+		]
+	));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))]
+		[new CButtonCancel(url_params(['parent_discoveryid', 'hostid']))]
 	));
 }
 

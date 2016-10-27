@@ -268,12 +268,8 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$delete_button = new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid']));
-	if ($data['templated']) {
-		$delete_button->setAttribute('disabled', 'disabled');
-	}
-
-	$buttons[] = $delete_button;
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid'])))
+		->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel();
 
 	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

@@ -30,9 +30,7 @@ $itemForm = (new CForm())
 	->setName('itemForm')
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid']);
-if (!empty($this->data['parent_discoveryid'])) {
-	$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-}
+
 if (!empty($this->data['itemid'])) {
 	$itemForm->addVar('itemid', $this->data['itemid']);
 }
@@ -351,25 +349,19 @@ if (!hasRequest('form_refresh')) {
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$buttons = [new CSubmit('clone', _('Clone'))];
-
-	$delete_button = new CButtonDelete(_('Delete discovery rule?'),
-		url_params(['form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'])
-	);
-
-	if ($data['limited']) {
-		$delete_button->setAttribute('disabled', 'disabled');
-	}
-
-	$buttons[] = $delete_button;
-	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
-
-	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$itemTab->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')), [
+			new CSubmit('clone', _('Clone')),
+			(new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
+				->setEnabled(!$data['limited']),
+			new CButtonCancel(url_param('hostid'))
+		]
+	));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))]
+		[new CButtonCancel(url_param('hostid'))]
 	));
 }
 
