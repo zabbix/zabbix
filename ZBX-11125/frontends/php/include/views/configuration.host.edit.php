@@ -573,9 +573,16 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			$templateLink,
 			(new CCol(
 				new CHorList([
-					(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+					(new CSimpleButton(_('Unlink')))
+						->onClick('javascript: submitFormWithParam('.
+							'"'.$frmHost->getName().'", "unlink['.$template['templateid'].']", "1"'.
+						');')
+						->addClass(ZBX_STYLE_BTN_LINK),
 					array_key_exists($template['templateid'], $data['original_templates'])
-						? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+						? (new CSimpleButton(_('Unlink and clear')))
+							->onClick('javascript: submitFormWithParam('.
+								'"'.$frmHost->getName().'", "unlink_and_clear['.$template['templateid'].']", "1"'.
+							');')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
@@ -604,7 +611,11 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		])
-		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+		->addRow([
+			(new CSimpleButton(_('Add')))
+				->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "add_template", "1");')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		]);
 
 	$tmplList->addRow(_('Link new templates'),
 		(new CDiv($newTemplateTable))
@@ -711,18 +722,8 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	else {
 		$field_length = $hostInventoryTable['fields'][$field_name]['length'];
 
-		if ($field_length < 39) {
-			$width = ZBX_TEXTAREA_SMALL_WIDTH;
-		}
-		elseif ($field_length < 64) {
-			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
-		}
-		else {
-			$width = ZBX_TEXTAREA_BIG_WIDTH;
-		}
-
 		$input = (new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
-			->setWidth($width)
+			->setWidth(($field_length < 39) ? ZBX_TEXTAREA_SMALL_WIDTH : ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('maxlength', $field_length);
 	}
 
@@ -781,19 +782,19 @@ $encryption_form_list = (new CFormList('encryption'))
 	])
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('PSK'),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
 		(new CTextBox('tls_subject', $data['tls_subject'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);

@@ -151,21 +151,26 @@ class CScreenActions extends CScreenBase {
 					->addClass(ZBX_STYLE_YELLOW);
 			}
 			else {
-				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
+				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 			}
 
-			$recipient = $alert['userid'] != 0
+			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
+			$info_icons = [];
+			if ($alert['error'] !== '') {
+				$info_icons[] = makeErrorIcon($alert['error']);
+			}
+
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-				$actions[$alert['actionid']]['name'],
+				array_key_exists($alert['actionid'], $actions) ? $actions[$alert['actionid']]['name'] : '',
 				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
 				$recipient,
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
 				$status,
-				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+				makeInformationList($info_icons)
 			]);
 		}
 

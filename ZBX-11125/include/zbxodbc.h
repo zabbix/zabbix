@@ -35,7 +35,6 @@ typedef struct
 	SQLHSTMT	hstmt;
 	SQLSMALLINT     col_num;
 	ZBX_ODBC_ROW	row_data;
-	SQLLEN		*data_len;
 }
 ZBX_ODBC_DBH;
 

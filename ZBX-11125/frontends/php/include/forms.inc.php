@@ -468,7 +468,7 @@ function getItemFilterForm(&$items) {
 		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn2->addRow(_('SNMP OID'),
-		(new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CTextBox('filter_snmp_oid', $filter_snmp_oid, '', 512))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
 	$filterColumn3->addRow(_('Trends (in days)'),
@@ -1256,6 +1256,8 @@ function getTriggerMassupdateFormData() {
 		'visible' => getRequest('visible', []),
 		'priority' => getRequest('priority', ''),
 		'dependencies' => getRequest('dependencies', []),
+		'tags' => getRequest('tags', []),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
@@ -1292,6 +1294,10 @@ function getTriggerMassupdateFormData() {
 	unset($dependency);
 
 	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }
@@ -1476,6 +1482,9 @@ function getTriggerFormData(array $data) {
 		}
 		else {
 			show_messages(false, '', _('Expression syntax error.'));
+			$data['expression_field_name'] = 'expression';
+			$data['expression_field_value'] = $data['expression'];
+			$data['expression_field_readonly'] = $readonly;
 			$data['expression_constructor'] = IM_ESTABLISHED;
 		}
 	}
@@ -1516,6 +1525,9 @@ function getTriggerFormData(array $data) {
 		}
 		else {
 			show_messages(false, '', _('Recovery expression syntax error.'));
+			$data['recovery_expression_field_name'] = 'recovery_expression';
+			$data['recovery_expression_field_value'] = $data['recovery_expression'];
+			$data['recovery_expression_field_readonly'] = $readonly;
 			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
 		}
 	}

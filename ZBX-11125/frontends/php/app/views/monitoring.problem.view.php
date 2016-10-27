@@ -41,7 +41,8 @@ $options = [
 			'inventory' => $data['filter']['inventory'],
 			'tags' => $data['filter']['tags'],
 			'maintenance' => $data['filter']['maintenance'],
-			'unacknowledged' => $data['filter']['unacknowledged']
+			'unacknowledged' => $data['filter']['unacknowledged'],
+			'details' => $data['filter']['details']
 		]
 	]
 ];
@@ -135,7 +136,7 @@ if ($data['action'] == 'problem.view') {
 					'parameters' => 'srctbl=triggers&srcfld1=triggerid&dstfrm=zbx_filter&dstfld1=filter_triggerids_'.
 						'&monitored_hosts=1&with_monitored_triggers=1&multiselect=1&noempty=1'
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 		->addRow(_('Problem'),
 			(new CTextBox('filter_problem', $data['filter']['problem']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -234,6 +235,9 @@ if ($data['action'] == 'problem.view') {
 			(new CCheckBox('filter_unacknowledged'))->setChecked($data['filter']['unacknowledged'] == 1)
 		);
 	}
+
+	$filter_column2
+		->addRow(_('Show details'), (new CCheckBox('filter_details'))->setChecked($data['filter']['details'] == 1));
 
 	$filter = (new CFilter('web.problem.filter.state'))
 		->addVar('action', 'problem.view')

@@ -122,7 +122,6 @@ class testFormGraphPrototype extends CWebTest {
 	 */
 	public function testFormGraphPrototype_Setup() {
 		DBsave_tables('graphs');
-		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
 	}
 
 	// Returns layout data
@@ -597,6 +596,7 @@ class testFormGraphPrototype extends CWebTest {
 		if (!isset($data['form'])) {
 			$this->zbxTestLaunchPopup('add_item');
 			if (isset($data['host'])) {
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -1236,7 +1236,6 @@ class testFormGraphPrototype extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormGraphPrototype_Teardown() {
-		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 		DBrestore_tables('graphs');
 	}
 }

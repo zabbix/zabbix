@@ -357,8 +357,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem(getHostAvailabilityTable($db_host));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$lifetime_indicator = getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']);
-			$list->addItem((new CDiv($lifetime_indicator))->addClass(ZBX_STYLE_STATUS_CONTAINER));
+			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
+			$list->addItem(makeInformationList($info_icons));
 		}
 	}
 
@@ -594,10 +594,14 @@ function getHostAvailabilityTable($host) {
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($type))
-					->addClass(ZBX_STYLE_STATUS_RED)
-					->addClass(ZBX_STYLE_CURSOR_POINTER)
-					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_RED);
+
+				if ($host[$prefix.'error'] !== '') {
+					$ai
+						->addClass(ZBX_STYLE_CURSOR_POINTER)
+						->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
+				}
+
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);
@@ -842,7 +846,34 @@ function makeAdministrationGeneralMenu($selected)
 }
 
 /**
- * Renders an error icon like [x] with error message
+ * Renders an icon list
+ *
+ * @param array $info_icons  The list of information icons
+ *
+ * @return CSpan
+ */
+function makeInformationList($info_icons)
+{
+	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
+}
+
+/**
+ * Renders an information icon like green [i] with message
+ *
+ * @param string $message
+ *
+ * @return CSpan
+ */
+function makeInformationIcon($message)
+{
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INFO)
+		->addClass(ZBX_STYLE_STATUS_GREEN)
+		->setHint($message);
+}
+
+/**
+ * Renders an error icon like red [i] with error message
  *
  * @param string $error
  *
@@ -850,14 +881,14 @@ function makeAdministrationGeneralMenu($selected)
  */
 function makeErrorIcon($error)
 {
-	return (new CSpan(bold('&times;')))
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
 /**
- * Renders an unknown icon like [?] with error message
+ * Renders an unknown icon like grey [i] with error message
  *
  * @param string $error
  *
@@ -865,14 +896,14 @@ function makeErrorIcon($error)
  */
 function makeUnknownIcon($error)
 {
-	return (new CSpan(bold('?')))
-		->addClass(ZBX_STYLE_STATUS_GREY)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INFO)
+		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
 /**
- * Renders a warning icon like [!] with error message
+ * Renders a warning icon like yellow [i] with error message
  *
  * @param string $error
  *
@@ -880,9 +911,9 @@ function makeUnknownIcon($error)
  */
 function makeWarningIcon($error)
 {
-	return (new CSpan(bold('!')))
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error);
 }
 

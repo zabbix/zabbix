@@ -30,10 +30,12 @@ void	zbx_script_clean(zbx_script_t *script)
 	ZBX_UNUSED(script);
 }
 
-int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len)
+int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, char **result, char *error,
+		size_t max_error_len)
 {
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(script);
+	ZBX_UNUSED(user);
 	ZBX_UNUSED(result);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(max_error_len);

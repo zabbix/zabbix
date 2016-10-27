@@ -42,7 +42,7 @@ $triggersTable = (new CTableInfo())
 		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 		_('Expression'),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
 $this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
@@ -121,9 +121,9 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	// status
 	$status = (new CLink(
-		triggerIndicator($trigger['status']),
+		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		'trigger_prototypes.php?'.
-			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+			'action='.(($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'triggerprototype.massenable'
 				: 'triggerprototype.massdisable'
 			).
@@ -164,10 +164,10 @@ $triggersForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'triggerprototype.massenable' => ['name' => _('Enable'),
+			'triggerprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Enable selected trigger prototypes?')
 			],
-			'triggerprototype.massdisable' => ['name' => _('Disable'),
+			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Disable selected trigger prototypes?')
 			],
 			'triggerprototype.massupdateform' => ['name' => _('Mass update')],

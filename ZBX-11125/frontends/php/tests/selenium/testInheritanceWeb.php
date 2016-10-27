@@ -100,7 +100,8 @@ class testInheritanceWeb extends CWebTest {
 	public function testInheritanceWeb_SimpleCreate($data) {
 		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
+		$this->zbxTestAssertElementValue('name', $data['name']);
 
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
@@ -108,18 +109,18 @@ class testInheritanceWeb extends CWebTest {
 			$this->zbxTestInputTypeWait('name', $step['name']);
 			$this->zbxTestInputType('url', $step['url']);
 			$this->zbxTestClick('add');
-			$this->webDriver->switchTo()->window('');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add'));
-			$this->zbxTestTextPresent($data['name']);
+			$this->zbxTestTextNotPresent('Page received incorrect data');
+			$this->zbxTestWaitWindowClose();
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name_0'));
+			$this->zbxTestTextPresent($step['name']);
 		}
 
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				$this->zbxTestCheckHeader('Web monitoring');
-				$this->zbxTestTextPresent('Web scenario added');
+				$this->zbxTestTextNotPresent('Cannot add web scenario');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				break;
 
 			case TEST_BAD:

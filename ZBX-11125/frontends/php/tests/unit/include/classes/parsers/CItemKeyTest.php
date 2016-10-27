@@ -814,4 +814,32 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 			$this->assertEquals($unquoted_params[$n], $item_key_parser->getParam($n));
 		}
 	}
+
+	public static function providerQuoteParam() {
+		return [
+			['', false, ''],
+			['', true, '""'],
+			['param', false, 'param'],
+			['param', true, '"param"'],
+			['"param', false, '"\"param"'],
+			['"param', true, '"\"param"'],
+			[' param', false, '" param"'],
+			[' param', true, '" param"'],
+			['a,b', false, '"a,b"'],
+			['a,b', true, '"a,b"'],
+			['a]b', false, '"a]b"'],
+			['a]b', true, '"a]b"'],
+			['ab\\', true, false]
+		];
+	}
+
+	/**
+	* @dataProvider providerQuoteParam
+	*/
+	public function test_QuoteParam($param, $force, $expected) {
+		$rc = CItemKey::quoteParam($param, $force);
+
+		$this->assertEquals($expected, $rc);
+	}
+
 }

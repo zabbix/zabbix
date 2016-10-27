@@ -182,11 +182,20 @@ class CIconMap extends CApiService {
 		}
 
 		$iconMapids = DB::insert('icon_map', $iconMaps);
-
 		$mappings = [];
+
 		foreach ($iconMaps as $imnum => $iconMap) {
+			$sort_order = 0;
+
 			foreach ($iconMap['mappings'] as $mapping) {
 				$mapping['iconmapid'] = $iconMapids[$imnum];
+
+				if (!array_key_exists('sortorder', $mapping)) {
+					$mapping['sortorder'] = $sort_order;
+				}
+
+				$sort_order++;
+
 				$mappings[] = $mapping;
 			}
 		}
@@ -262,11 +271,21 @@ class CIconMap extends CApiService {
 
 			if (isset($iconMap['mappings'])) {
 				$mappingsDb = $iconMapsUpd[$iconMap['iconmapid']]['mappings'];
+				$sort_order = 0;
+
 				foreach ($mappingsDb as $mapping) {
 					$oldIconMappings[] = $mapping;
 				}
+
 				foreach ($iconMap['mappings'] as $mapping) {
 					$mapping['iconmapid'] = $iconMap['iconmapid'];
+
+					if (!array_key_exists('sortorder', $mapping)) {
+						$mapping['sortorder'] = $sort_order;
+					}
+
+					$sort_order++;
+
 					$newIconMappings[] = $mapping;
 				}
 			}
