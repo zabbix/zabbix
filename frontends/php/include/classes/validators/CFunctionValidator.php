@@ -188,7 +188,7 @@ class CFunctionValidator extends CValidator {
 			],
 			'nodata'=> [
 				'args' => [
-					['type' => 'sec_zero', 'mandat' => true]
+					['type' => 'sec', 'mandat' => true]
 				],
 				'value_types' => $valueTypesAll
 			],
@@ -342,6 +342,9 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateParameter($param, $type) {
 		switch ($type) {
+			case 'sec':
+				return $this->validateSec($param);
+
 			case 'sec_zero':
 				return $this->validateSecZero($param);
 
@@ -385,6 +388,18 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateSecValue($param) {
 		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain only seconds.
+	 * Examples: 1, 5w
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSec($param) {
+		return ($this->validateSecValue($param) && $param > 0);
 	}
 
 	/**
