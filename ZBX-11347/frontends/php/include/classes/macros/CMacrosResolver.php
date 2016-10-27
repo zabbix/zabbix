@@ -1401,7 +1401,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 						if (array_key_exists($itemid, $db_items)) {
 							$hostids[$db_items[$itemid]['hostid']] = true;
-							break;
 						}
 					}
 				}
