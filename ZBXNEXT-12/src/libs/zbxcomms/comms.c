@@ -1834,7 +1834,7 @@ static int	validate_cidr(const char *ip, const char *cidr, void * value)
 static int	zbx_validate_hostname(const char *hostname, int len)
 {
 	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
-	int	i;
+	int		i;
 
 	/* Single character names or nicknames are not allowed */
 	if (1 >= len)
