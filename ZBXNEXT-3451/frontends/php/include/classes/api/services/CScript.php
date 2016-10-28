@@ -320,48 +320,96 @@ class CScript extends CApiService {
 			$scriptsByHost[$hostId] = [];
 		}
 
-		$scripts = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
-			'hostids' => $hostIds,
-			'sortfield' => 'name',
-			'preservekeys' => true
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'selectGroups' => ['groupid', 'name'],
+			'hostids' => $hostIds
 		]);
 
-		if ($scripts) {
-			// resolve macros
-			$macrosData = [];
-			foreach ($scripts as $scriptId => $script) {
-				if (!empty($script['confirmation'])) {
-					foreach ($script['hosts'] as $host) {
-						if (isset($scriptsByHost[$host['hostid']])) {
-							$macrosData[$host['hostid']][$scriptId] = $script['confirmation'];
+		$groupids = [];
+		$host_groups = [];
+		$parents = [];
+		$parent_name = '';
+		foreach ($hosts as $host) {
+			foreach ($host['groups'] as $group) {
+				$groupids[$group['groupid']] = true;
+				$host_groups[$host['hostid']][$group['groupid']] = $group['name'];
+				$parent = explode('/', $group['name']);
+				if (count($parent) > 1) {
+					array_pop($parent);
+					foreach ($parent as $sub_parent) {
+						if ($parent_name === '') {
+							$parent_name = $sub_parent;
+						}
+						else {
+							$parent_name .= '/'.$sub_parent;
+						}
+
+						$parents[] = $parent_name;
+					}
+				}
+			}
+		}
+
+		if ($parents) {
+			$parent_groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => $parents],
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+
+			$tmp_host_groups = $host_groups;
+			foreach ($tmp_host_groups as $key => $host_group) {
+				foreach ($parent_groups as $parent_group) {
+					foreach ($host_group as $group) {
+						if (strpos($parent_group['name'], $group.'/') === 0) {
+							$host_groups[$key][$parent_group['groupid']] = $parent_group['name'];
 						}
 					}
 				}
 			}
-			if ($macrosData) {
-				$macrosData = CMacrosResolverHelper::resolve([
+
+			$groupids = array_replace($groupids, $parent_groups);
+		}
+
+		$scripts = API::getApiService()->select('scripts', [
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
+				'confirmation', 'type', 'execute_on'
+			],
+			'groupids' => array_keys($groupids),
+			'sortfield' => 'name',
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		if ($scripts) {
+			$macros_data = [];
+			foreach ($scripts as $scriptId => $script) {
+				// resolve macros
+				if ($script['confirmation'] !== '') {
+					foreach ($host_groups as $key => $host_group) {
+						if ($script['groupid'] === null || in_array($script['groupid'], $host_group)) {
+							$macros_data[$key][$scriptId] = $script['confirmation'];
+						}
+					}
+				}
+			}
+
+			if ($macros_data) {
+				$macros_data = CMacrosResolverHelper::resolve([
 					'config' => 'scriptConfirmation',
-					'data' => $macrosData
+					'data' => $macros_data
 				]);
 			}
 
 			foreach ($scripts as $scriptId => $script) {
-				$hosts = $script['hosts'];
-				unset($script['hosts']);
-				// set script to host
-				foreach ($hosts as $host) {
-					$hostId = $host['hostid'];
+				foreach ($host_groups as $key => $host_group) {
+					$scriptsByHost[$key][$scriptId] = $script;
 
-					if (isset($scriptsByHost[$hostId])) {
-						$size = count($scriptsByHost[$hostId]);
-						$scriptsByHost[$hostId][$size] = $script;
-
-						// set confirmation text with resolved macros
-						if (isset($macrosData[$hostId][$scriptId]) && $script['confirmation']) {
-							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$scriptId];
-						}
+					// set confirmation text with resolved macros
+					if (isset($macrosData[$hostId][$scriptId]) && $script['confirmation']) {
+						$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$scriptId];
 					}
 				}
 			}
