@@ -536,11 +536,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
-	const char		*__function_name = "substitute_formula_macros";
+	const char	*__function_name = "substitute_formula_macros";
 
 	char		*exp, *tmp, *e, *p, *param = NULL;
 	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, off, len, sep_pos;
-	int		ret = SUCCEED;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -586,8 +586,8 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 				if (SUCCEED == parse_host_key(param, &host, &key))
 				{
-					if (SUCCEED != (ret = substitute_key_macros(&key, NULL, NULL, jp_row,
-							MACRO_TYPE_ITEM_KEY, error, max_error_len)))
+					if (SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+							MACRO_TYPE_ITEM_KEY, error, max_error_len))
 					{
 						zbx_free(host);
 						zbx_free(key);
@@ -608,7 +608,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 			else
 				substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
-			if (SUCCEED != (ret = zbx_function_param_quote(&param, quoted)))
+			if (SUCCEED != zbx_function_param_quote(&param, quoted))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\")", param);
 				goto out;
@@ -630,6 +630,8 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
 	substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+
+	ret = SUCCEED;
 out:
 	zbx_free(param);
 	zbx_free(tmp);
@@ -693,7 +695,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 
 		if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
 				err, sizeof(err)))
+		{
 			goto out;
+		}
 
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
@@ -714,7 +718,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 		{
 			if (FAIL == substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
 					err, sizeof(err)))
+			{
 				goto out;
+			}
 
 			zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 		}
@@ -748,7 +754,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 			item->key = zbx_strdup(NULL, key_proto);
 			if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
 					err, sizeof(err)))
+			{
 				goto out;
+			}
 
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
@@ -777,7 +785,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 			buffer = zbx_strdup(buffer, snmp_oid_proto);
 			if (FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
 					err, sizeof(err)))
+			{
 				goto out;
+			}
 
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 			if (0 != strcmp(item->snmp_oid, buffer))
