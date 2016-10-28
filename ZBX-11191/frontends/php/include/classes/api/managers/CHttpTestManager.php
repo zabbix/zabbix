@@ -246,6 +246,34 @@ class CHttpTestManager {
 					$this->createStepsReal($httpTest, $steps_create[$key]);
 				}
 			}
+			else {
+				if (isset($httpTest['applicationid'])) {
+					$dbStepIds = DBfetchColumn(DBselect(
+						'SELECT i.itemid'.
+						' FROM items i'.
+							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
+						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid')))
+						, 'itemid'
+					);
+					$this->updateItemsApplications($dbStepIds, $httpTest['applicationid']);
+				}
+
+				if (isset($httpTest['status'])) {
+					$status = ($httpTest['status'] == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+					$itemIds = DBfetchColumn(DBselect(
+						'SELECT hsi.itemid'.
+							' FROM httpstep hs,httpstepitem hsi'.
+							' WHERE hs.httpstepid=hsi.httpstepid'.
+								' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
+					), 'itemid');
+
+					DB::update('items', [
+						'values' => ['status' => $status],
+						'where' => ['itemid' => $itemIds]
+					]);
+				}
+			}
 		}
 
 		// TODO: REMOVE info
@@ -892,10 +920,10 @@ class CHttpTestManager {
 
 			if ($stepitemsUpdate) {
 				DB::update('items', $stepitemsUpdate);
+			}
 
-				if (array_key_exists('applicationid', $httpTest)) {
-					$this->updateItemsApplications($itemids, $httpTest['applicationid']);
-				}
+			if (array_key_exists('applicationid', $httpTest)) {
+				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 		}
 	}
