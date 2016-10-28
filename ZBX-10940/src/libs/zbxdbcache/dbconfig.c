@@ -7537,7 +7537,7 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *macro, const char *value, char **error)
 {
-	if (SUCCEED == is_double_suffix(value))
+	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
 		return SUCCEED;
 
 	if (NULL != error)
@@ -7823,10 +7823,9 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
  * Parameters: queue - [OUT] the vector of delayed items (optional)           *
- *             from  - [IN] the minimum delay time in seconds or -1 if there  *
- *                          is no minimum limit                               *
- *             to    - [IN] the maximum delay time in seconds or -1 if there  *
- *                          is no maximum limit                               *
+ *             from  - [IN] the minimum delay time in seconds (non-negative)  *
+ *             to    - [IN] the maximum delay time in seconds or              *
+ *                          ZBX_QUEUE_TO_INFINITY if there is no limit        *
  *                                                                            *
  * Return value: the number of delayed items                                  *
  *                                                                            *
@@ -7891,7 +7890,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				break;
 		}
 
-		if ((-1 != from && from > now - dc_item->nextcheck) || (-1 != to && now - dc_item->nextcheck >= to))
+		if (now - dc_item->nextcheck < from || (ZBX_QUEUE_TO_INFINITY != to && now - dc_item->nextcheck >= to))
 			continue;
 
 		if (NULL != queue)

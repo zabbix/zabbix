@@ -599,7 +599,9 @@
 				error: function() {
 					overlayDialogue({
 						'title': '<?= _('Discovery check error') ?>',
-						'content': jQuery('<span>').text('<?= _('Cannot validate discovery check: invalid request or connection to Zabbix server failed.') ?>'),
+						'content': jQuery('<span>').text(<?= CJs::encodeJson(
+							_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')
+						) ?>),
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',
