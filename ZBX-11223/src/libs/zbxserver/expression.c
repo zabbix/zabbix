@@ -4327,6 +4327,10 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           echo.sh[{$MACRO}]       | a]\    | undefined         | FAIL      *
  *           echo.sh["{$MACRO}"]     | a]     | echo.sh["a]"]     | SUCCEED   *
  *           echo.sh["{$MACRO}"]     | a]\    | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | [a     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | [a\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | [a     | echo.sh["[a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | [a\    | undefined         | FAIL      *
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/

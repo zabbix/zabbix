@@ -1112,7 +1112,9 @@ int	quote_key_param(char **param, int forced)
 	{
 		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
 				NULL == strchr(*param, ']'))
+		{
 			return SUCCEED;
+		}
 	}
 
 	sz_src = strlen(*param);
