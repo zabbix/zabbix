@@ -189,8 +189,8 @@ if (!$data['screen']['templateid']) {
 	$sharing_tab = (new CFormList('sharing_form'))
 		->addRow(_('Type'),
 		(new CRadioButtonList('private', (int) $data['screen']['private']))
-			->addValue(_('Private'), PRIVATE_SHARING)
-			->addValue(_('Public'), PUBLIC_SHARING)
+			->addValue(_('Private'), PRIVATE_SHARING, 'private_' . PRIVATE_SHARING)
+			->addValue(_('Public'), PUBLIC_SHARING, 'private_' . PUBLIC_SHARING)
 			->setModern(true)
 		)
 		->addRow(_('List of user group shares'),
@@ -208,12 +208,12 @@ if (!$data['screen']['templateid']) {
 	$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 }
 
-// append buttons to form
-if ($data['screen']['screenid']) {
+if ($data['form'] == 'update') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CSubmit('clone', _('Clone')),
+			new CButton('clone', _('Clone')),
+			new CButton('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete screen?'), url_params(['form', 'screenid', 'templateid'])),
 			new CButtonCancel(url_param('templateid'))
 		]
