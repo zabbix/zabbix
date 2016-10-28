@@ -66,32 +66,40 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		// clone button
 		$('#clone').click(function() {
-			// Remove buttons, sharing options and inaccessible user message.
-			$('#screenid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
-			$('#update')
-				.text(<?= CJs::encodeJson(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
-			$('#name').focus();
+			$('#screenid, [id^=user_group_shares_], [id^=user_shares_]').remove();
+			$('#private_' + <?= PRIVATE_SHARING ?>).prop('checked', true);
 
 			$('#form').val('clone');
 
-			// Set screen to private.
-			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
-
-			// Switch to first tab so multiselect is visible and only then add data and resize.
-			$('#tab_screen_tab').trigger('click');
-
-			$('#multiselect_userid_wrapper').show();
-
-			// Set current user as owner.
-			$('#userid').multiSelect('addData', {
-				'id': $('#current_user_userid').val(),
-				'name': $('#current_user_fullname').val()
-			});
+			changeToCloneForm();
 		});
+
+		$('#full_clone').click(function() {
+			$('#form').val('full_clone');
+
+			changeToCloneForm();
+		});
+
 	});
+
+	function changeToCloneForm() {
+		jQuery('#delete, #clone, #full_clone, #inaccessible_user').remove();
+
+		jQuery('#update')
+			.text(<?= CJs::encodeJson(_('Add')) ?>)
+			.attr({id: 'add', name: 'add'});
+
+		jQuery('#tab_screen_tab').click();
+		jQuery('#multiselect_userid_wrapper').show();
+
+		jQuery('#userid').multiSelect('addData', {
+			'id': jQuery('#current_user_userid').val(),
+			'name': jQuery('#current_user_fullname').val()
+		});
+
+		jQuery('#name').focus();
+	};
 
 	/**
 	 * @see init.js add.popup event
