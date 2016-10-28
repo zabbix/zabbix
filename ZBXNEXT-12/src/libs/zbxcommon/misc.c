@@ -1853,13 +1853,13 @@ int	is_ip6(const char *ip)
 		p++;
 	}
 
-	if (2 <= colons && colons <= 7 && 4 >= digits && 1 == only_digits)
+	if (2 <= colons && colons <= 7 && 4 >= digits && 1 == only_digits && 2 > dcolons)
 		res = SUCCEED;
 	else
 	{
 		last_colon = strrchr(ip, ':');
 
-		if (2 <= colons && colons <= 6 && last_colon < p)
+		if (2 <= colons && colons <= 6 &&  2 > dcolons && last_colon < p)
 			res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
 	}
 

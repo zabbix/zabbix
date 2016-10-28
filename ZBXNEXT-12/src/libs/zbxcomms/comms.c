@@ -1831,6 +1831,36 @@ static int	validate_cidr(const char *ip, const char *cidr, void * value)
 	return FAIL;
 }
 
+static int	zbx_validate_hostname(const char *hostname, int len)
+{
+	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
+	int	i;
+
+	/* Single character names or nicknames are not allowed */
+	if (1 >= len)
+		return FAIL;
+
+	/* the first character must be an alpha character */
+	if (0 == isalnum(hostname[0]))
+		return FAIL;
+
+	/* the last character must not be a minus sign or period */
+	if ('-' == hostname[len - 1] || '.' == hostname[len - 1])
+		return FAIL;
+
+	for (i = 0; i < len; i++)
+	{
+		if (0 != isalnum(hostname[i]) || '-'== hostname[i])
+			component = 1;
+		else if ('.' == hostname[i] && 1 == component)
+			component = 0;
+		else
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	zbx_validate_ip_list(const char *ip_list, char **error)
 {
 	char	*pch, *cidr_sep;
@@ -1854,9 +1884,18 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 					*cidr_sep = '/';
 					*error = zbx_dsprintf(NULL, "invalid CIDR notation \"%s\"", pch);
 				}
+
 				return FAIL;
 			}
 		}
+		else if (FAIL == is_ip(pch) && FAIL == zbx_validate_hostname(pch, strlen(pch)))
+		{
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "\"%s\"", pch);
+
+			return FAIL;
+		}
+
 		pch = strtok (NULL, ",");
 	}
 
