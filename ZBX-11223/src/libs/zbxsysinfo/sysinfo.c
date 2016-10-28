@@ -1095,8 +1095,8 @@ void	unquote_key_param(char *param)
  * Parameters: param   - [IN/OUT] item key parameter                          *
  *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
  *                                contain any special characters              *
- *                            0 - do nothing if the paramter does not contain *
- *                                any special characters                      *
+ *                            0 - do nothing if the parameter does not        *
+ *                                contain any special characters              *
  *                                                                            *
  * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
  *                         was not necessary                                  *
