@@ -1834,7 +1834,11 @@ int	is_ip6(const char *ip)
 		else if (':' == *p)
 		{
 			if (0 == digits && 0 < colons)
+			{
+				/* Consecutive sections of zeroes are replaced with a double colon */
+				only_digits = 1;
 				dcolons++;
+			}
 			if (4 < digits || 1 < dcolons)
 				break;
 			digits = 0;
