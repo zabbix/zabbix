@@ -1110,8 +1110,8 @@ int	quote_key_param(char **param, int forced)
 
 	if (0 == forced)
 	{
-		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']') && NULL == strchr(*param, '['))
+		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
+				NULL == strchr(*param, ']'))
 			return SUCCEED;
 	}
 
