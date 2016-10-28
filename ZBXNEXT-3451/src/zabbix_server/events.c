@@ -56,9 +56,6 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	if ('\0' == *tag->tag)
 		return FAIL;
 
-	if (NULL != strchr(tag->tag, '/'))
-		return FAIL;
-
 	/* check for duplicated tags */
 	for (i = 0; i < event->tags.values_num; i++)
 	{
@@ -129,6 +126,9 @@ int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		events[events_num].trigger.type = trigger_type;
 		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
 		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
+
+		substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+				&events[events_num].trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
 

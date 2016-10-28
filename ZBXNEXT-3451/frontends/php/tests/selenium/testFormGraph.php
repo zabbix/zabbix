@@ -450,6 +450,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -843,7 +844,7 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
-			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");

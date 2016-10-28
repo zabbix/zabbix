@@ -40,9 +40,16 @@
  ******************************************************************************/
 static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *condition)
 {
-	int	i, ret = FAIL;
+	int	i, ret, ret_continue;
 
-	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		ret_continue = SUCCEED;
+	else
+		ret_continue = FAIL;
+
+	ret = ret_continue;
+
+	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
@@ -66,9 +73,16 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
  ******************************************************************************/
 static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	int	i, ret = FAIL;
+	int	i, ret, ret_continue;
 
-	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		ret_continue = SUCCEED;
+	else
+		ret_continue = FAIL;
+
+	ret = ret_continue;
+
+	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 

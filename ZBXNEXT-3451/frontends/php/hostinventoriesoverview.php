@@ -85,8 +85,16 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $controls = (new CList())
-	->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()])
-	->addItem([_('Grouping by').SPACE, $inventoryFieldsComboBox]);
+	->addItem([
+		new CLabel(_('Group'), 'groupid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$pageFilter->getGroupsCB()
+	])
+	->addItem([
+		new CLabel(_('Grouping by'), 'groupby'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$inventoryFieldsComboBox
+	]);
 
 $hostinvent_wdgt->setControls(
 	(new CForm('get'))->addItem($controls)

@@ -44,8 +44,6 @@ else {
 		(new CSpan($this->data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
 	]);
 
-	$controls = new CList();
-
 	// host screen list
 	if (!empty($this->data['screens'])) {
 		$screenComboBox = new CComboBox(
@@ -57,10 +55,10 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$controls
+		$screenWidget->setControls((new CList())
 			->addItem($screenComboBox)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-		$screenWidget->setControls($controls);
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+		);
 	}
 
 	// append screens to widget

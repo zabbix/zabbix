@@ -476,11 +476,14 @@ if (isset($onlyHostid)) {
 	]);
 	$host = reset($only_hosts);
 
-	$cmbHosts = new CComboBox('hostid', $hostid);
-	$cmbHosts->addItem($hostid, $host['name']);
-	$cmbHosts->setEnabled(false);
-	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
-	$controls[] = [SPACE, _('Host'), SPACE, $cmbHosts];
+	$controls[] = [
+		new CLabel(_('Host'), 'hostid'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CComboBox('hostid', $hostid))
+			->addItem($hostid, $host['name'])
+			->setEnabled(false)
+			->setAttribute('title', _('You can not switch hosts for current selection.'))
+	];
 }
 else {
 	// show Group dropdown in header for these specified sources
@@ -488,7 +491,11 @@ else {
 		'templates', 'hosts', 'host_templates'
 	];
 	if (str_in_array($srctbl, $showGroupCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$controls[] = [_('Group'), SPACE, $pageFilter->getGroupsCB()];
+		$controls[] = [
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getGroupsCB()
+		];
 	}
 
 	// show Type dropdown in header for help items
@@ -500,13 +507,17 @@ else {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
 
-		$controls[] = [_('Type'), SPACE, $cmbTypes];
+		$controls[] = [new CLabel(_('Type'), 'itemtype'), (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $cmbTypes];
 	}
 
 	// show Host dropdown in header for these specified sources
 	$showHostCmbBox = ['triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes'];
 	if (str_in_array($srctbl, $showHostCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$controls[] = [SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()];
+		$controls[] = [
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getHostsCB()
+		];
 	}
 }
 
@@ -521,7 +532,7 @@ if (str_in_array($srctbl, ['applications', 'triggers'])) {
 		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
 		$epmtyScript .= ' close_window(); return false;';
 
-		$controls[] = [SPACE, (new CButton('empty', _('Empty')))->onClick($epmtyScript)];
+		$controls[] = [(new CButton('empty', _('Empty')))->onClick($epmtyScript)];
 	}
 }
 

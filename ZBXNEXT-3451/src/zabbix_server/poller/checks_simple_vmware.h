@@ -77,6 +77,8 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 		AGENT_RESULT *result);
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,

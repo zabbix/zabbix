@@ -518,6 +518,8 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timesp
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
 
+#define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
+#define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
