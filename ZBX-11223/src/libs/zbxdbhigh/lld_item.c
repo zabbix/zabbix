@@ -538,89 +538,100 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 {
 	const char		*__function_name = "substitute_formula_macros";
 
-	char		*exp, *tmp, *e, *func, *key, *host = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
-	zbx_function_t	funcdata;
-	int		ret = SUCCEED, i;
+	char		*exp, *tmp, *e, *p, *param = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, off, len, sep_pos;
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = *data; '\0' != *e; e += len)
+	for (e = *data; SUCCEED == zbx_function_params_find(e, &off, &len); e += off + len)
 	{
-		/* get function data or jump over part of the string that is not a function */
-		if (FAIL == zbx_function_parse(&funcdata, e, &len))
+		/* substitute LLD macros in the preceding part of the string */
+
+		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, off);
+		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		tmp_offset = strlen(tmp);
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
+
+		if (++tmp_offset > tmp_alloc)
+			tmp_alloc = tmp_offset;
+
+		tmp_offset = 0;
+
+		/* substitute LLD macros in function parameters */
+
+		e[off + len] = '\0';
+
+		for (p = e; '\0' != *p; p += sep_pos)
 		{
-			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
-			continue;
-		}
+			size_t	param_pos, param_len;
+			int	quoted;
 
-		/* substitute LLD macros in the part of the string that was jumped over */
-		if (0 != tmp_offset)
-		{
-			size_t	tmp_len;
+			zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
-			substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
-			tmp_len = strlen(tmp);
+			/* copy what was before the parameter */
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p, param_pos);
 
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
+			/* prepare the parameter (macro substitutions and quoting) */
 
-			if (++tmp_len > tmp_alloc)
-				tmp_alloc = tmp_len;
+			zbx_free(param);
+			param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
-			tmp_offset = 0;
-		}
-
-		/* substitute LLD macros in function parameters (if any) */
-		if (0 < funcdata.nparam)
-		{
-			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
-			if (SUCCEED == parse_host_key(funcdata.params[0].name, &host, &key))
+			if (p == e)
 			{
-				zbx_free(funcdata.params[0].name);
-				funcdata.params[0].quoted = 0;
-				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				char	*key, *host = NULL;
 
-				if (NULL != host)
+				if (SUCCEED == parse_host_key(param, &host, &key))
 				{
-					funcdata.params[0].name = zbx_dsprintf(NULL, "%s:%s", host, key);
-					zbx_free(host);
-					zbx_free(key);
-				}
-				else
-				{
-					funcdata.params[0].name = key;
-					key = NULL;
+					if (SUCCEED != (ret = substitute_key_macros(&key, NULL, NULL, jp_row,
+							MACRO_TYPE_ITEM_KEY, error, max_error_len)))
+					{
+						zbx_free(host);
+						zbx_free(key);
+						goto out;
+					}
+
+					zbx_free(param);
+					if (NULL != host)
+					{
+						param = zbx_dsprintf(NULL, "%s:%s", host, key);
+						zbx_free(host);
+						zbx_free(key);
+					}
+					else
+						param = key;
 				}
 			}
+			else
+				substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
-			/* substitute LLD macros in the rest of the parameters (simple replacement) */
-			for (i = 1; i < funcdata.nparam; i++)
-				substitute_discovery_macros(&funcdata.params[i].name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			if (SUCCEED != (ret = zbx_function_param_quote(&param, quoted)))
+			{
+				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\")", param);
+				goto out;
+			}
+
+			/* copy the parameter */
+			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, param);
+
+			/* copy what was after the parameter */
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p + param_pos + param_len,
+					sep_pos - param_pos - param_len);
 		}
 
-		/* substitute the original function in the string with the new one (with substituted LLD macros) */
-		ret = zbx_function_tostr(&funcdata, &func);
-		if (SUCCEED == ret)
-			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
-		else if (NULL != error)
-			zbx_snprintf(error, max_error_len, "Invalid formula syntax \"%s\")", e);
-
-		/* cleanup */
-		zbx_free(func);
-		zbx_function_clean(&funcdata);
-
-		if (FAIL == ret)
-			break;
+		e[off + len] = ')';
 	}
 
-	/* substitute the LLD macros in the remainder of the string that was jumped over */
-	if (SUCCEED == ret && 0 != tmp_offset)
-	{
-		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
-	}
+	/* substitute LLD macros in the remaining part */
 
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
+	substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+out:
+	zbx_free(param);
 	zbx_free(tmp);
 
 	if (SUCCEED == ret)

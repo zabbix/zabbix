@@ -1080,23 +1080,10 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
-typedef struct
-{
-	char	*name;
-	short	quoted;
-}
-zbx_func_param_t;
-
-typedef struct
-{
-	char			*name;
-	int			nparam;
-	zbx_func_param_t	*params;
-}
-zbx_function_t;
-
-void	zbx_function_clean(zbx_function_t *func);
-int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
-int	zbx_function_tostr(const zbx_function_t *func, char **out);
+size_t	zbx_no_function(const char *expr);
+void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
+int	zbx_function_param_quote(char **param, int forced);
+int	zbx_function_params_find(const char *expr, size_t *offset, size_t *length);
 
 #endif
