@@ -1719,48 +1719,41 @@ function get_timeperiod_form() {
 		]);
 
 		$tabDays = (new CTable())
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')],
-					'new_timeperiod[dayofweek_mo]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')],
-					'new_timeperiod[dayofweek_tu]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')],
-					'new_timeperiod[dayofweek_we]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')],
-					'new_timeperiod[dayofweek_th]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')],
-					'new_timeperiod[dayofweek_fr]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')],
-					'new_timeperiod[dayofweek_sa]'
-				)
-			])
-			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')],
-					'new_timeperiod[dayofweek_su]'
-				)
-			]);
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_mo]'))
+					->setLabel(_('Monday'))
+					->setChecked($dayofweek[0] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_tu]'))
+					->setLabel(_('Tuesday'))
+					->setChecked($dayofweek[1] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_we]'))
+					->setLabel(_('Wednesday'))
+					->setChecked($dayofweek[2] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_th]'))
+					->setLabel(_('Thursday'))
+					->setChecked($dayofweek[3] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_fr]'))
+					->setLabel(_('Friday'))
+					->setChecked($dayofweek[4] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_sa]'))
+					->setLabel(_('Saturday'))
+					->setChecked($dayofweek[5] == 1)
+			)
+			->addRow(
+				(new CCheckBox('new_timeperiod[dayofweek_su]'))
+					->setLabel(_('Sunday'))
+					->setChecked($dayofweek[6] == 1)
+			);
 		$tblPeriod->addRow([_('Day of week'), $tabDays]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
@@ -1768,64 +1761,52 @@ function get_timeperiod_form() {
 
 		$tabMonths = (new CTable())
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_jan]'))->setChecked($month[0] == 1), _('January')],
-					'new_timeperiod[month_jan]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_jul]'))->setChecked($month[6] == 1), _('July')],
-					'new_timeperiod[month_jul]'
-				)
+				(new CCheckBox('new_timeperiod[month_jan]'))
+					->setLabel(_('January'))
+					->setChecked($month[0] == 1),
+				(new CCheckBox('new_timeperiod[month_jul]'))
+					->setLabel(_('July'))
+					->setChecked($month[6] == 1)
 			])
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_feb]'))->setChecked($month[1] == 1), _('February')],
-					'new_timeperiod[month_feb]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_aug]'))->setChecked($month[7] == 1), _('August')],
-					'new_timeperiod[month_aug]'
-				)
+				(new CCheckBox('new_timeperiod[month_feb]'))
+					->setLabel(_('February'))
+					->setChecked($month[1] == 1),
+				(new CCheckBox('new_timeperiod[month_aug]'))
+					->setLabel(_('August'))
+					->setChecked($month[7] == 1)
 			])
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_mar]'))->setChecked($month[2] == 1), _('March')],
-					'new_timeperiod[month_mar]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_sep]'))->setChecked($month[8] == 1), _('September')],
-					'new_timeperiod[month_sep]'
-				)
+				(new CCheckBox('new_timeperiod[month_mar]'))
+					->setLabel(_('March'))
+					->setChecked($month[2] == 1),
+				(new CCheckBox('new_timeperiod[month_sep]'))
+					->setLabel(_('September'))
+					->setChecked($month[8] == 1)
 			])
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_apr]'))->setChecked($month[3] == 1), _('April')],
-					'new_timeperiod[month_apr]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_oct]'))->setChecked($month[9] == 1), _('October')],
-					'new_timeperiod[month_oct]'
-				)
+				(new CCheckBox('new_timeperiod[month_apr]'))
+					->setLabel(_('April'))
+					->setChecked($month[3] == 1),
+				(new CCheckBox('new_timeperiod[month_oct]'))
+					->setLabel(_('October'))
+					->setChecked($month[9] == 1)
 			])
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_may]'))->setChecked($month[4] == 1), _('May')],
-					'new_timeperiod[month_may]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_nov]'))->setChecked($month[10] == 1), _('November')],
-					'new_timeperiod[month_nov]'
-				)
+				(new CCheckBox('new_timeperiod[month_may]'))
+					->setLabel(_('May'))
+					->setChecked($month[4] == 1),
+				(new CCheckBox('new_timeperiod[month_nov]'))
+					->setLabel(_('November'))
+					->setChecked($month[10] == 1)
 			])
 			->addRow([
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_jun]'))->setChecked($month[5] == 1), _('June')],
-					'new_timeperiod[month_jun]'
-				),
-				new CLabel(
-					[(new CCheckBox('new_timeperiod[month_dec]'))->setChecked($month[11] == 1), _('December')],
-					'new_timeperiod[month_dec]'
-				)
+				(new CCheckBox('new_timeperiod[month_jun]'))
+					->setLabel(_('June'))
+					->setChecked($month[5] == 1),
+				(new CCheckBox('new_timeperiod[month_dec]'))
+					->setLabel(_('December'))
+					->setChecked($month[11] == 1)
 			]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
@@ -1850,48 +1831,41 @@ function get_timeperiod_form() {
 
 			$tabDays = (new CTable())
 				->addRow($td)
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')],
-						'new_timeperiod[dayofweek_mo]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')],
-						'new_timeperiod[dayofweek_tu]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')],
-						'new_timeperiod[dayofweek_we]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')],
-						'new_timeperiod[dayofweek_th]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')],
-						'new_timeperiod[dayofweek_fr]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')],
-						'new_timeperiod[dayofweek_sa]'
-					)
-				])
-				->addRow([
-					new CLabel(
-						[(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')],
-						'new_timeperiod[dayofweek_su]'
-					)
-				]);
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_mo]'))
+						->setLabel(_('Monday'))
+						->setChecked($dayofweek[0] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_tu]'))
+						->setLabel(_('Tuesday'))
+						->setChecked($dayofweek[1] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_we]'))
+						->setLabel(_('Wednesday'))
+						->setChecked($dayofweek[2] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_th]'))
+						->setLabel(_('Thursday'))
+						->setChecked($dayofweek[3] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_fr]'))
+						->setLabel(_('Friday'))
+						->setChecked($dayofweek[4] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_sa]'))
+						->setLabel(_('Saturday'))
+						->setChecked($dayofweek[5] == 1)
+				)
+				->addRow(
+					(new CCheckBox('new_timeperiod[dayofweek_su]'))
+						->setLabel(_('Sunday'))
+						->setChecked($dayofweek[6] == 1)
+				);
 			$tblPeriod->addRow([_('Day of week'), $tabDays]);
 		}
 		else {
