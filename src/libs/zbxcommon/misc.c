@@ -1793,7 +1793,7 @@ int	is_ip4(const char *ip)
 
 		p++;
 	}
-	if (dots == 3 && 1 <= digits && digits <= 3 && 255 >= octet)
+	if (3 == dots && 1 <= digits && 3 >= digits && 255 >= octet)
 		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -1835,12 +1835,14 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == digits && 0 < colons)
 			{
-				/* Consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeroes are replaced with a double colon */
 				only_digits = 1;
 				dcolons++;
 			}
+
 			if (4 < digits || 1 < dcolons)
 				break;
+
 			digits = 0;
 			colons++;
 		}
@@ -1853,15 +1855,17 @@ int	is_ip6(const char *ip)
 		p++;
 	}
 
-	if (2 <= colons && colons <= 7 && 4 >= digits && 1 == only_digits && 2 > dcolons)
-		res = SUCCEED;
-	else
+	if (2 > colons || 7 < colons || 4 < digits || 0 == only_digits || 2 <= dcolons)
 	{
+		/* check if it's IPv4-mapped or IPv4-compatible IPv6 address */
+
 		last_colon = strrchr(ip, ':');
 
-		if (2 <= colons && colons <= 6 &&  2 > dcolons && last_colon < p)
+		if (2 <= colons && colons <= 6 && 2 > dcolons && last_colon < p)
 			res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
 	}
+	else
+		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
