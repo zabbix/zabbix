@@ -60,11 +60,9 @@ static zbx_history_table_t dht = {
 		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"druleid",		ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
 		{"dcheckid",		ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"type",		ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
 		{"ip",			ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"dns",			ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
-		{"key_",		ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
 		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
@@ -2512,13 +2510,12 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_DRULE		drule;
-	DB_DCHECK		dcheck;
 	DB_DHOST		dhost;
-	zbx_uint64_t		last_druleid = 0;
+	zbx_uint64_t		last_druleid = 0, dcheckid;
 	struct zbx_json_parse	jp_data, jp_row;
 	int			port, status, ret;
 	const char		*p = NULL;
-	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
+	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
 	size_t			value_alloc = 128;
@@ -2551,13 +2548,10 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
-		memset(&dcheck, 0, sizeof(dcheck));
-		*key_ = '\0';
 		*value = '\0';
 		*dns = '\0';
 		port = 0;
 		status = 0;
-		dcheck.key_ = key_;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
@@ -2569,24 +2563,13 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 
 		ZBX_STR2UINT64(drule.druleid, tmp);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
-			goto json_parse_error;
-
-		dcheck.type = atoi(tmp);
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
 		if ('\0' != *tmp)
-		{
-			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
-		}
-		else if (-1 != dcheck.type)
-		{
-			*error = zbx_strdup(*error, "null service check ID");
-			ret = FAIL;
-			break;
-		}
+			ZBX_STR2UINT64(dcheckid, tmp);
+		else
+			dcheckid = 0;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
@@ -2594,7 +2577,6 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
 
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_));
 		zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc);
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
 
@@ -2625,13 +2607,13 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
-				ZBX_FS_UI64 " type:%d time:'%s %s' ip:'%s' dns:'%s' port:%d key:'%s' value:'%s'",
-				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
-				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
+				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%d value:'%s'",
+				__function_name, drule.druleid, dcheckid, drule.unique_dcheckid, zbx_date2str(itemtime),
+				zbx_time2str(itemtime), ip, dns, port, value);
 
 		DBbegin();
 
-		if (-1 == dcheck.type)
+		if (0 == dcheckid)
 		{
 			if (SUCCEED != DBlock_druleid(drule.druleid))
 			{
@@ -2646,17 +2628,17 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		}
 		else
 		{
-			if (SUCCEED != DBlock_dcheckid(dcheck.dcheckid, drule.druleid))
+			if (SUCCEED != DBlock_dcheckid(dcheckid, drule.druleid))
 			{
 				DBrollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
-						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
+						" belong to druleid:" ZBX_FS_UI64, dcheckid, drule.druleid);
 
 				continue;
 			}
 
-			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
+			discovery_update_service(&drule, dcheckid, &dhost, ip, dns, port, status, value, itemtime);
 		}
 
 		DBcommit();
@@ -2697,6 +2679,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	zbx_vector_ptr_t	autoreg_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2710,6 +2693,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 
 	hosttime = atoi(tmp);
 
+	zbx_vector_ptr_create(&autoreg_hosts);
 	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
@@ -2743,12 +2727,19 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 		if (FAIL == is_ushort(tmp, &port))
 			port = ZBX_DEFAULT_AGENT_PORT;
 
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, itemtime);
+	}
+
+	if (0 != autoreg_hosts.values_num)
+	{
 		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
+		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 		DBcommit();
 	}
 
 	zbx_free(host_metadata);
+	DBregister_host_clean(&autoreg_hosts);
+	zbx_vector_ptr_destroy(&autoreg_hosts);
 out:
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());

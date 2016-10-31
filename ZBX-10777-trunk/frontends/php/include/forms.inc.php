@@ -468,7 +468,7 @@ function getItemFilterForm(&$items) {
 		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn2->addRow(_('SNMP OID'),
-		(new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CTextBox('filter_snmp_oid', $filter_snmp_oid, '', 512))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
 	$filterColumn3->addRow(_('Trends (in days)'),
