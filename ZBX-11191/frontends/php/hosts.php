@@ -118,6 +118,11 @@ $fields = [
 ];
 check_fields($fields);
 
+API::HttpTest()->update([
+	'httptestid' => '81',
+	'applicationid' => '540'
+
+]);
 /*
  * Permissions
  */

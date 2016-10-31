@@ -1,11 +1,21 @@
 Changes for 3.0.6rc1
 
 New features:
+........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
+A......... [ZBX-11125] prohibited zero in first parameter of nodata() trigger function (Sasha, vso)
+........S. [ZBX-11349] removed possibility to create items, triggers and graphs with empty names after low level discovery macro substitution (Sergejs)
+A......... [ZBX-11244] fixed parsing of JSON text when PHP is compiled without JSON library (Cemeris)
+..F....... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
+..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
+..F....... [ZBX-11367] fixed xml import when non-snmp interfaces have incorrect parameter "bulk" (Gunars)
+..F....... [ZBX-10388] removed duplicated data and reduced traffic for hint popups (Gunars)
+..F....... [ZBX-11331] fixed JS error in Configuration->Discovery edit page (Oleg)
 ...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
 ....I..... [ZBX-11038] removed compression for the generated CSS files, added "sass" folder to the distribution archive (asaveljevs)
 ....I..... [ZBX-11335] added MariaDB database support when compiling with --with-mysql configuration option; thanks to Dmitry Smirnov for patch (viktors)
@@ -1519,9 +1529,14 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.16rc1
 
 New features:
+........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
+...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
+..F....... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
+..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
 ...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
 A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
 A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
@@ -3003,6 +3018,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.19
