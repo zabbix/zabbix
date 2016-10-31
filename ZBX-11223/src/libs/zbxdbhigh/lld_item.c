@@ -547,7 +547,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = *data; SUCCEED == zbx_function_params_find(e, &off, &len); e += off + len)
+	for (e = *data; SUCCEED == zbx_function_params_find(e, &off, &len); e += off + len + 1)
 	{
 		/* substitute LLD macros in the preceding part of the string */
 
@@ -565,10 +565,13 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		e[off + len] = '\0';
 
-		for (p = e; '\0' != *p; p += sep_pos)
+		for (p = e + off; '\0' != *p; p += sep_pos)
 		{
 			size_t	param_pos, param_len;
 			int	quoted;
+
+			if (',' == *p)
+				p++;
 
 			zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
@@ -580,7 +583,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 			zbx_free(param);
 			param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
-			if (p == e)
+			if (p - e == off)
 			{
 				char	*key, *host = NULL;
 
@@ -619,9 +622,10 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 			/* copy what was after the parameter */
 			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p + param_pos + param_len,
-					sep_pos - param_pos - param_len);
+					sep_pos - param_pos - param_len + 1);
 		}
 
+		zbx_chrcpy_alloc(&exp, &exp_alloc, &exp_offset, ')');
 		e[off + len] = ')';
 	}
 
