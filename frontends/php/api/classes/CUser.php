@@ -335,7 +335,9 @@ class CUser extends CZBXAPI {
 
 			if (isset($user['usrgrps'])) {
 				if (empty($user['usrgrps'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%s" cannot be without user group.', $dbUser['alias']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('User "%1$s" cannot be without user group.', $dbUser['alias'])
+					);
 				}
 
 				// checking if user tries to disable himself (not allowed). No need to check this on creating a user.

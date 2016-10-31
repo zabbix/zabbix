@@ -673,14 +673,16 @@ class CHost extends CHostGeneral {
 				}
 
 				if (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".',
-						$dbHosts[$hostId]['host'])
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $dbHosts[$hostId]['host'])
 					);
 				}
 			}
 			else {
 				if (!isset($host['groups']) || !is_array($host['groups']) || !$host['groups']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $host['host'])
+					);
 				}
 
 				foreach ($host['groups'] as $group) {
@@ -1078,6 +1080,10 @@ class CHost extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
+		if (!array_key_exists('hosts', $data) || !is_array($data['hosts'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'hosts'));
+		}
+
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
@@ -1096,9 +1102,12 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// check if hosts have at least 1 group
-		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
+		if (array_key_exists('groups', $data) && !$data['groups'] && $updHosts) {
+			$host = reset($updHosts);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host "%1$s" cannot be without host group.', $host['name'])
+			);
 		}
 
 		/*

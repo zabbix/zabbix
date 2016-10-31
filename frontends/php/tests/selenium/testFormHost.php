@@ -108,7 +108,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('ERROR: Cannot add host');
-		$this->zbxTestTextPresent('No groups for host "'.$host.'".');
+		$this->zbxTestTextPresent('Host "'.$host.'" cannot be without host group.');
 
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
