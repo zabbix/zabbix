@@ -100,14 +100,14 @@ class CTable extends CTag {
 		return $this->rownum;
 	}
 
-	public function startToString() {
+	protected function startToString() {
 		$ret = parent::startToString();
 		$ret .= $this->header;
 		$ret .= '<tbody>';
 		return $ret;
 	}
 
-	public function endToString() {
+	protected function endToString() {
 		$ret = $this->footer;
 		$ret .= '</tbody>';
 		$ret .= parent::endToString();
