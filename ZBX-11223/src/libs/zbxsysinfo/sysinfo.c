@@ -1117,9 +1117,7 @@ int	quote_key_param(char **param, int forced)
 		}
 	}
 
-	sz_src = strlen(*param);
-
-	if ('\\' == (*param)[sz_src - 1])
+	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
 		return FAIL;
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;

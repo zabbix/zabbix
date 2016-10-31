@@ -3751,25 +3751,23 @@ int	zbx_function_param_quote(char **param, int forced)
 		return SUCCEED;
 	}
 
-	sz_src = strlen(*param);
-
-	if ('\\' == *param[sz_src - 1])
+	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
 		return FAIL;
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
 
 	*param = zbx_realloc(*param, sz_dst);
 
-	*param[--sz_dst] = '\0';
-	*param[--sz_dst] = '"';
+	(*param)[--sz_dst] = '\0';
+	(*param)[--sz_dst] = '"';
 
 	while (0 < sz_src)
 	{
-		*param[--sz_dst] = *param[--sz_src];
-		if ('"' == *param[sz_src])
-			*param[--sz_dst] = '\\';
+		(*param)[--sz_dst] = (*param)[--sz_src];
+		if ('"' == (*param)[sz_src])
+			(*param)[--sz_dst] = '\\';
 	}
-	*param[--sz_dst] = '"';
+	(*param)[--sz_dst] = '"';
 
 	return SUCCEED;
 }
