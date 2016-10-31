@@ -44,8 +44,6 @@ sub new($$) {
     $REQUEST_TIMEOUT = (defined($options->{request_timeout}) ? $options->{request_timeout} : _DEFAULT_REQUEST_TIMEOUT);
     $REQUEST_ATTEMPTS = (defined($options->{request_attempts}) ? $options->{request_attempts} : _DEFAULT_REQUEST_ATTEMPTS);
 
-    $ua->timeout(_LOGIN_TIMEOUT);
-
     $ua->agent("Net::Zabbix");
 
     my $req = HTTP::Request->new(POST => $options->{'url'}."/api_jsonrpc.php");
@@ -58,6 +56,9 @@ sub new($$) {
     $domain =~ s/^https*\:\/\/(.+)\/*$/$1/;
 
     if (my $authid = get_authid($domain)) {
+
+    $ua->timeout($REQUEST_TIMEOUT);
+
 	my $self = {
             UserAgent => $ua,
             request   => $req,
@@ -81,7 +82,11 @@ sub new($$) {
         id => 1,
     }));
 
+    $ua->timeout(_LOGIN_TIMEOUT);
+
     my $res = $ua->request($req);
+
+    $ua->timeout($REQUEST_TIMEOUT);
 
     croak "cannot connect to Zabbix: " . $res->status_line unless ($res->is_success);
 
@@ -90,8 +95,6 @@ sub new($$) {
     croak "Zabbix API returned invalid JSON: " . $@ if $@;
 
     set_authid($domain, $auth);
-
-    $ua->timeout($REQUEST_TIMEOUT);
 
     return bless {
         UserAgent => $ua,
