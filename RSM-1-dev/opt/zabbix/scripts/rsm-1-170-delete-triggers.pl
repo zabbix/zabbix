@@ -19,27 +19,8 @@ use RSMSLV;
 use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
 use TLDs;
 
-my %OPTS;
-
-my $usage_str = "usage: $0 [--no-create-ns-triggers --no-rename-triggers --debug --dry-run --help]";
-
-if (!GetOptions(\%OPTS, 'no-create-ns-triggers!', 'no-rename-triggers!', 'debug!', 'dry-run!', 'help!'))
-{
-	print("$usage_str\n");
-	exit(1);
-}
-
-if ($OPTS{'help'})
-{
-	print("$usage_str\n");
-	exit(0);
-}
-
 # auto-flush stdout
 $| = 1;
-
-setopt('debug') if ($OPTS{'debug'});
-setopt('dry-run') if ($OPTS{'dry-run'});
 
 sub __get_host_macro($$$)
 {
@@ -82,313 +63,54 @@ if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 set_slv_config($config);
 db_connect();
 
-print("\nFixing TLD macros RDDS.ENABLED");
 my $tlds_ref = get_tlds(ENABLED_DNS);
-foreach (@{$tlds_ref})
+
+
 {
-	$tld = $_;	# set globally
-
-	print(".");
-
-	my $templateid = get_hostid("Template $tld");
-
-	my $rdds = __get_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}', 1);	# optional
-
-	next unless (defined($rdds));
-
-	if ($rdds)
-	{
-		__create_macro('{$RSM.TLD.RDDS43.ENABLED}', 1, $templateid, undef);	# templated, do not force update
-		__create_macro('{$RSM.TLD.RDDS80.ENABLED}', 1, $templateid, undef);	# templated, do not force update
-	}
-	else
-	{
-		__create_macro('{$RSM.TLD.RDDS43.ENABLED}', 0, $templateid, undef);	# templated, do not force update
-		__create_macro('{$RSM.TLD.RDDS80.ENABLED}', 0, $templateid, undef);	# templated, do not force update
-	}
-
-	__create_macro('{$RSM.TLD.RDAP.ENABLED}', 0, $templateid, undef);		# templated, do not force update
-
-	__delete_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}');
-}
-undef($tld);
-
-print("\nFixing probe macros RDDS.ENABLED");
-my $probes_ref = get_probes(ENABLED_DNS);
-foreach my $host (keys(%{$probes_ref}))
-{
-	print(".");
-
-	my $templateid = get_hostid("Template $host");
-
-	my $rdds = __get_host_macro($templateid, '{$RSM.RDDS.ENABLED}', 1);	# optional
-
-	next unless (defined($rdds));
-
-	if ($rdds)
-	{
-		__create_macro('{$RSM.RDDS43.ENABLED}', 1, $templateid, undef);	# templated, do not force update
-		__create_macro('{$RSM.RDDS80.ENABLED}', 1, $templateid, undef);	# templated, do not force update
-	}
-	else
-	{
-		__create_macro('{$RSM.RDDS43.ENABLED}', 0, $templateid, undef);	# templated, do not force update
-		__create_macro('{$RSM.RDDS80.ENABLED}', 0, $templateid, undef);	# templated, do not force update
-	}
-
-	__create_macro('{$RSM.RDAP.ENABLED}', 0, $templateid, undef);		# templated, do not force update
-
-	__delete_host_macro($templateid, '{$RSM.RDDS.ENABLED}');
-}
-
-if (0)
-{
-	print("\nDeleting triggers");
-	my $triggerids;
-
-	my $rows_ref = db_select("select triggerid from triggers where description like '% under 99%'");
-
-	foreach my $row_ref (@{$rows_ref})
-	{
-		print(".");
-		push(@{$triggerids}, $row_ref->[0]);
-	}
-	__delete_triggers($triggerids);
-}
-
-if (!$OPTS{'no-create-ns-triggers'})
-{
-	print("\nCreating NS downtime triggers");
+	print("\nDeleting obsoleted triggers");
 	foreach (@{$tlds_ref})
 	{
 		$tld = $_;	# set globally
 
-		print(".");
-		my $hostid = get_hostid($tld);
+		my $host = "Template $tld";
 
-		my $rows_ref = db_select("select key_ from items where hostid=$hostid and key_ like 'rsm.slv.dns.ns.downtime[%]'");
+		print("\n$host");
+		my @triggerids;
+		my $result = $zabbix->get('trigger', {'filter' => {'host' => $host}, 'output' => ['triggerid', 'description']});
 
-		foreach my $row_ref (@{$rows_ref})
+		if (ref($result) eq 'ARRAY')
 		{
-			my $key = $row_ref->[0];
-
-			my ($ns, $ip) = split(',', get_nsip_from_key($key));
-
-			#print("    $ns ($ip) [$key]\n");
-
-			my $options =
+			foreach my $r (@{$result})
 			{
-				'description' => "Name Server $ns ($ip)".' has been down for over {$RSM.SLV.NS.AVAIL} minutes',
-				'expression' => '{'.$tld.':'.$key.'.last(0)}>{$RSM.SLV.NS.AVAIL}',
-				'priority' => '4'
-			};
+				push(@triggerids, $r->{'triggerid'});
+				#print("," . $r->{'triggerid'});
+				#printf("%30s | %10s | %s\n", $host, $r->{'triggerid'}, $r->{'description'});
+			}
+		}
 
-			__create_trigger($options);
+		if (scalar(@triggerids) != 0)
+		{
+			my $part_limit = 20;
+			while (scalar(@triggerids) > 0)
+			{
+				my @part;
+
+				while (scalar(@part) < $part_limit && scalar(@triggerids) > 0)
+				{
+					push(@part, shift(@triggerids));
+				}
+
+				#my $result = $zabbix->remove('trigger', \@triggerids);
+				#pfail("cannot delete triggers by ID ", join(',', @triggerids), ": ", Dumper($zabbix->last_error())) unless ($result);
+				print("\n  feeding ", scalar(@part), " of ", (scalar(@triggerids) + scalar(@part)), ": ", join(',', @part));
+				__delete_triggers(\@part);
+			}
 		}
 	}
 	undef($tld);
 }
 
-print("\nFixing value mappings");
-db_exec("update valuemaps set name='RSM Service Availability' where valuemapid=16");
-my $rows_ref = db_select("select mappingid from mappings where mappingid=113");
-if (scalar(@{$rows_ref}) == 0)
-{
-	print(".");
-	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (113,16,'2','Up (inconclusive)')");
-}
-db_exec("update valuemaps set name='RSM RDDS probe result' where valuemapid=18");
-db_exec("update valuemaps set name='RSM EPP result' where valuemapid=19");
-db_exec("update items set valuemapid=null where key_='" . 'rsm.dns.udp[{$RSM.TLD}]' . "'");
-db_exec("update items set valuemapid=null where key_='" . 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]' . "'");
 
-my $slv_items_to_remove_like =
-[
-	'rsm.slv.dns.ns.results[%',
-	'rsm.slv.dns.ns.positive[%',
-	'rsm.slv.dns.ns.sla[%',
-	'rsm.slv.%.month%'
-];
-
-my $trigger_names_to_rename =
-{
-	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
-};
-
-my $item_keys_to_remove =
-[
-	'rsm.slv.dns.upd'
-];
-
-my $item_names_to_rename =
-{
-	'EPP service availability at $1 ($2)' => 'EPP test',
-	'Number of working DNS Name Servers of $1 (UDP)' => 'DNS UDP test',
-	'Number of working DNS Name Servers of $1 (TCP)' => 'DNS TCP test',
-	'RDDS availability of $1' => 'RDDS test',
-	'RDDS43 IP of $1' => 'RDDS43 IP',
-	'RDDS43 RTT of $1' => 'RDDS43 RTT',
-	'RDDS43 update time of $1' => 'RDDS43 update time',
-	'RDDS80 IP of $1' => 'RDDS80 IP',
-	'RDDS80 RTT of $1' => 'RDDS80 RTT',
-	'EPP IP of $1' => 'EPP IP',
-	'EPP $2 command RTT of $1' => 'EPP $2 command RTT',
-};
-
-if (!$OPTS{'no-rename-triggers'})
-{
-	print("\nRenaming triggers");
-	foreach my $from (keys(%{$trigger_names_to_rename}))
-	{
-		print(".");
-		my $to = $trigger_names_to_rename->{$from};
-
-		db_exec("update triggers set description='$to' where description='$from'");
-	}
-}
-
-print("\nRenaming item keys");
-foreach my $key (@{$item_keys_to_remove})
-{
-	print(".");
-	db_exec("delete from items where key_='$key'");
-}
-
-print("\nRenaming item names");
-foreach my $from (keys(%{$item_names_to_rename}))
-{
-	print(".");
-	my $to = $item_names_to_rename->{$from};
-
-	db_exec("update items set name='$to' where name='$from'");
-}
-
-print("\nDeleting obsoleted items");
-foreach my $key (@{$slv_items_to_remove_like})
-{
-	print(".");
-	db_exec("delete from items where key_ like '$key'");
-}
-foreach my $key (@{$item_keys_to_remove})
-{
-	print(".");
-	db_exec("delete from items where key_='$key'");
-}
-
-{
-	my $host = 'Template Proxy Health';
-	my $item = 'rsm.probe.online';
-	my $name = 'Probe main status';
-	my $application = 'Probe Availability';
-
-	my $result = $zabbix->get('template', {'filter' => {'host' => $host}});
-	pfail("cannot find template \"$host\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
-	my $templateid = $result->{'templateid'};
-
-	unless ($zabbix->exist('item', {'hostid' => $templateid, 'key_' => $item}))
-	{
-		print("\nCreating probe mon items");
-
-		my $applicationid = __get_applicationid($templateid, $application);
-
-		my $options = {'name' => $name,
-			       'key_'=> $item,
-			       'hostid' => $templateid,
-			       'applications' => [$applicationid],
-			       'type' => 2, 'value_type' => 3,
-			       'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
-		$zabbix->create('item', $options);
-		pfail("cannot create item for probe main status: ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
-	}
-}
-
-print("\nCreating SLV monthly items and triggers");
-__create_missing_slv_montly_items_and_triggers();
-
-print("\nFixing applications");
-my $name_from = 'SLV current month';
-my $name_to = 'SLV monthly';
-foreach (@{$tlds_ref})
-{
-	$tld = $_;	# set globally
-
-	print(".");
-
-	my $rows_ref = db_select(
-		"select a.applicationid".
-		" from applications a,hosts h".
-		" where a.hostid=h.hostid".
-			" and h.host='$tld'".
-			" and a.name='$name_from'");
-
-	next if (scalar(@{$rows_ref}) == 0);
-
-	my $applicationid_from = $rows_ref->[0]->[0];
-
-	$rows_ref = db_select(
-		"select a.applicationid".
-		" from applications a,hosts h".
-		" where a.hostid=h.hostid".
-			" and h.host='$tld'".
-			" and a.name='$name_to'");
-
-	my $applicationid_to = $rows_ref->[0]->[0];
-
-	db_exec("update items_applications".
-		" set applicationid=$applicationid_to".
-		" where applicationid=$applicationid_from");
-
-	db_exec("delete from applications".
-		" where applicationid=$applicationid_from");
-}
-undef($tld);
-
-print("\nCreating macros");
-my $global_macros = {
-	'{$RSM.SLV.DNS.AVAIL}' => 0,
-	'{$RSM.SLV.NS.AVAIL}' => 432,
-	'{$RSM.SLV.RDDS.AVAIL}' => 864,
-	'{$RSM.SLV.EPP.AVAIL}' => 864
-};
-foreach my $m (keys(%{$global_macros}))
-{
-	print(".");
-	__create_macro($m, $global_macros->{$m}, undef, 1);	# global, force update
-}
-print("\nDone!\n");
-
-sub __create_item
-{
-	my $options = shift;
-
-	my $result;
-
-	if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}}))
-	{
-		$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
-
-		if ('ARRAY' eq ref($result))
-		{
-			pfail("Request: ", Dumper($options),
-				"returned more than one item with key ", $options->{'key_'}, ":\n",
-				Dumper($result));
-		}
-
-		$options->{'itemid'} = $result->{'itemid'};
-
-		$result = $zabbix->update('item', $options);
-	}
-	else
-	{
-		$result = $zabbix->create('item', $options);
-	}
-
-	pfail($zabbix->last_error) if (defined($zabbix->last_error));
-
-	$result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
-
-	return $result;
-}
 
 sub __create_trigger
 {
