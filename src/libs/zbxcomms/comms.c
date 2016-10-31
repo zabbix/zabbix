@@ -1768,15 +1768,15 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 		switch (current_ai->ai_family)
 		{
 			case AF_INET:
-				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
-						&name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr))
+				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr,
+						&ai_addr4->sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
 				break;
 			case AF_INET6:
-				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
-						name6->sin6_addr.s6_addr, ai_addr6->sin6_addr.s6_addr))
+				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size, name6->sin6_addr.s6_addr,
+						ai_addr6->sin6_addr.s6_addr))
 				{
 					return SUCCEED;
 				}
@@ -1798,13 +1798,13 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				}
 				break;
 			case AF_INET6:
+				/* incoming AF_INET, must see whether the given is compatible or mapped */
 				memcpy(ipv6_compat_address, ipv4_compat_mask, sizeof(ipv4_compat_mask));
 				memcpy(&ipv6_compat_address[sizeof(ipv4_compat_mask)], &name4->sin_addr.s_addr, 4);
 
 				memcpy(ipv6_mapped_address, ipv4_mapped_mask, sizeof(ipv4_mapped_mask));
 				memcpy(&ipv6_mapped_address[sizeof(ipv4_mapped_mask)], &name4->sin_addr.s_addr, 4);
 
-				/* incoming AF_INET, must see whether the given is compatible or mapped */
 				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
 						&ai_addr6->sin6_addr.s6_addr, ipv6_compat_address) ||
 						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
@@ -1820,7 +1820,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 }
 #endif
 
-static int	validate_cidr(const char *ip, const char *cidr, void * value)
+static int	validate_cidr(const char *ip, const char *cidr, void *value)
 {
 	if (SUCCEED == is_ip4(ip))
 		return is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);
@@ -1836,7 +1836,7 @@ static int	zbx_validate_hostname(const char *hostname, int len)
 	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
 	int		i;
 
-	/* Single character names or nicknames are not allowed */
+	/* single character names or nicknames are not allowed */
 	if (1 >= len)
 		return FAIL;
 
@@ -1871,12 +1871,14 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 
 	strscpy(tmp, ip_list);
 
-	pch = strtok (tmp, ",");
-	while (pch != NULL)
+	pch = strtok(tmp, ",");
+
+	while (NULL != pch)
 	{
 		if (NULL != (cidr_sep = strchr(pch, '/')))
 		{
 			*cidr_sep = '\0';
+
 			if (FAIL == validate_cidr(pch, cidr_sep + 1, NULL))
 			{
 				if (NULL != error)
@@ -1896,7 +1898,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 			return FAIL;
 		}
 
-		pch = strtok (NULL, ",");
+		pch = strtok(NULL, ",");
 	}
 
 	return SUCCEED;
@@ -1925,7 +1927,6 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
-	int		prefix_size_ipv6, prefix_tmp;
 #else
 	struct hostent	*hp;
 	int		i;
@@ -1952,10 +1953,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 	for (start = tmp; '\0' != *start;)
 	{
-		prefix_size = IPV4_MAX_CIDR_PREFIX;
-#if defined(HAVE_IPV6)
-		prefix_size_ipv6 = IPV6_MAX_CIDR_PREFIX;
-#endif
+		prefix_size = -1;
 
 		if (NULL != (end = strchr(start, ',')))
 			*end = '\0';
@@ -1964,13 +1962,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			*cidr_sep = '\0';
 
-			if (SUCCEED == validate_cidr(start, cidr_sep + 1, &prefix_size))
-			{
-#if defined(HAVE_IPV6)
-				prefix_size_ipv6 = prefix_size;
-#endif
-			}
-			else
+			if (SUCCEED != validate_cidr(start, cidr_sep + 1, &prefix_size))
 				*cidr_sep = '/';	/* CIDR is only supported for IP */
 		}
 
@@ -1987,8 +1979,15 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
-				prefix_tmp = current_ai->ai_family == AF_INET ? prefix_size : prefix_size_ipv6;
-				if (SUCCEED == zbx_ip_cmp(prefix_tmp, current_ai, name))
+				int	prefix_size_current = prefix_size;
+
+				if (-1 == prefix_size_current)
+				{
+					prefix_size_current = (current_ai->ai_family == AF_INET ?
+							IPV4_MAX_CIDR_PREFIX : IPV6_MAX_CIDR_PREFIX);
+				}
+
+				if (SUCCEED == zbx_ip_cmp(prefix_size_current, current_ai, name))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -2001,6 +2000,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		{
 			for (i = 0; NULL != hp->h_addr_list[i]; i++)
 			{
+				if (-1 == prefix_size)
+					prefix_size = IPV4_MAX_CIDR_PREFIX;
+
 				if (SUCCEED == subnet_match(AF_INET, prefix_size,
 						&((struct in_addr *)hp->h_addr_list[i])->s_addr, &name.sin_addr.s_addr))
 					return SUCCEED;
