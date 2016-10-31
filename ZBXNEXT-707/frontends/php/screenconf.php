@@ -207,24 +207,18 @@ if (hasRequest('add') || hasRequest('update')) {
 		$messageSuccess = _('Screen added');
 		$messageFailed = _('Cannot add screen');
 
-		$output = ['resourcetype', 'resourceid', 'width', 'height', 'x', 'y', 'colspan', 'rowspan', 'elements',
-			'valign', 'haligh', 'style', 'url', 'max_columns'
-		];
+		if (getRequest('form') === 'full_clone') {
+			$output = ['resourcetype', 'resourceid', 'width', 'height', 'x', 'y', 'colspan', 'rowspan', 'elements',
+				'valign', 'haligh', 'style', 'url', 'max_columns'
+			];
 
-		if (hasRequest('templateid')) {
-			if (getRequest('form') === 'full_clone') {
+			if (hasRequest('templateid')) {
 				$screen['screenitems'] = API::TemplateScreenItem()->get([
 					'output' => $output,
 					'screenids' => [getRequest('screenid')]
 				]);
 			}
-
-			$screen['templateid'] = getRequest('templateid');
-
-			$screenids = API::TemplateScreen()->create($screen);
-		}
-		else {
-			if (getRequest('form') === 'full_clone') {
+			else {
 				array_push($output, 'dynamic', 'sort_triggers', 'application');
 
 				$screen['screenitems'] = API::ScreenItem()->get([
@@ -233,6 +227,22 @@ if (hasRequest('add') || hasRequest('update')) {
 				]);
 			}
 
+			$max_x = $screen['hsize'] - 1;
+			$max_y = $screen['vsize'] - 1;
+
+			foreach ($screen['screenitems'] as $key => $screen_item) {
+				if($screen_item['x'] > $max_x || $screen_item['y'] > $max_y) {
+					unset($screen['screenitems'][$key]);
+				}
+			}
+		}
+
+		if (hasRequest('templateid')) {
+			$screen['templateid'] = getRequest('templateid');
+
+			$screenids = API::TemplateScreen()->create($screen);
+		}
+		else {
 			$screen['userid'] = getRequest('userid', '');
 			$screen['private'] = getRequest('private', PRIVATE_SHARING);
 			$screen['users'] = getRequest('users', []);
