@@ -1850,7 +1850,7 @@ static int	zbx_validate_hostname(const char *hostname, int len)
 
 	for (i = 0; i < len; i++)
 	{
-		if (0 != isalnum(hostname[i]) || '-'== hostname[i])
+		if (0 != isalnum(hostname[i]) || '-' == hostname[i])
 			component = 1;
 		else if ('.' == hostname[i] && 1 == component)
 			component = 0;
