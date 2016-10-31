@@ -18,6 +18,9 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11191] fixed web scenarios not updating step items when giving only "applicationid" and steps with "httpstepid" properties (Ivo)
+A......... [ZBX-11191] fixed updating templated web scenario steps by prohibiting to directly change the step name or giving different amount of steps than in template (Ivo)
+A......... [ZBX-11191] improved web scenario step validation by adding required fields (Ivo)
 ...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
 A......... [ZBX-11125] prohibited zero in first parameter of nodata() trigger function (Sasha, vso)
 ........S. [ZBX-11349] removed possibility to create items, triggers and graphs with empty names after low level discovery macro substitution (Sergejs)
@@ -240,6 +243,9 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11191] fixed web scenarios not updating step items when giving only "applicationid" and steps with "httpstepid" properties (Ivo)
+A......... [ZBX-11191] fixed updating templated web scenario steps by prohibiting to directly change the step name or giving different amount of steps than in template (Ivo)
+A......... [ZBX-11191] improved web scenario step validation by adding required fields (Ivo)
 ...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
 A......... [ZBX-11125] prohibited zero in first parameter of nodata() trigger function (Sasha, vso)
 ........S. [ZBX-11349] removed possibility to create items, triggers and graphs with empty names after low level discovery macro substitution (Sergejs)
