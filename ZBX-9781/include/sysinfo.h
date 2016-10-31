@@ -300,7 +300,7 @@ typedef struct
 }
 MODE_FUNCTION;
 
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param,
-		unsigned flags, AGENT_RESULT *result);
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param, unsigned flags,
+		AGENT_RESULT *result);
 
 #endif

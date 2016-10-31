@@ -948,8 +948,8 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param,
-		unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param, unsigned flags,
+		AGENT_RESULT *result)
 {
 	const char	*__function_name = "zbx_execute_threaded_metric";
 
@@ -961,7 +961,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	zbx_timespec_t	ts, ts_start;
 	zbx_uint64_t	timediff;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cmd:%s", __function_name, cmd);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cmd:'%s'", __function_name, cmd);
 
 	if (-1 == pipe(fds))
 	{
@@ -1007,7 +1007,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	alarm(CONFIG_TIMEOUT);
 	zbx_timespec(&ts_start);
-	data_offset = 0;
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
@@ -1024,7 +1023,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 		if (-1 == n)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error while reading data: %s.",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error while reading data: %s",
 					zbx_strerror(errno)));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
@@ -1062,8 +1061,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	zbx_free(data);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d %s", __function_name, ret,
-			ISSET_MSG(result) ? result->msg : "");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d '%s'", __function_name, ret, ISSET_MSG(result) ? result->msg : "");
 
 	return ret;
 }
@@ -1108,16 +1106,17 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param,
-		unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, const char *param, unsigned flags,
+		AGENT_RESULT *result)
 {
 	const char			*__function_name = "zbx_execute_threaded_metric";
+
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
 	zbx_metric_thread_args_t	metric_args = {metric_func, cmd, param, flags, result};
 	DWORD				rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cmd:%s", __function_name, cmd);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cmd:'%s'", __function_name, cmd);
 
 	args.args = (void *)&metric_args;
 
@@ -1146,7 +1145,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	CloseHandle(thread);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d %s", __function_name, metric_args.agent_ret,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d '%s'", __function_name, metric_args.agent_ret,
 			ISSET_MSG(result) ? result->msg : "");
 
 	return metric_args.agent_ret;
