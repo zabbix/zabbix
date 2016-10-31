@@ -145,7 +145,8 @@ class CHttpTestManager {
 		]);
 
 		$deleteStepItemIds = [];
-		$steps = [];
+		$steps_create = [];
+		$steps_update = [];
 
 		foreach ($httpTests as $key => $httpTest) {
 			DB::update('httptest', [
@@ -153,7 +154,8 @@ class CHttpTestManager {
 				'where' => ['httptestid' => $httpTest['httptestid']]
 			]);
 
-			$checkItemsUpdate = $updateFields = [];
+			$checkItemsUpdate = [];
+			$updateFields = [];
 			$itemids = [];
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
@@ -188,23 +190,23 @@ class CHttpTestManager {
 			}
 
 			if (array_key_exists('steps', $httpTest)) {
-				// update steps
-
-				$stepsCreate = $stepsUpdate = [];
 				$db_http_test = $dbHttpTest[$httpTest['httptestid']];
 				$dbSteps = zbx_toHash($db_http_test['steps'], 'httpstepid');
+
 				foreach ($httpTest['steps'] as $webstep) {
 					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
-						$stepsUpdate[] = $webstep;
+						$steps_update[$key][] = $webstep;
 						unset($dbSteps[$webstep['httpstepid']]);
 					}
 					elseif (!isset($webstep['httpstepid'])) {
-						$stepsCreate[] = $webstep;
+						$steps_create[$key][] = $webstep;
 					}
 
-					$steps[$key]['create'] = $stepsCreate;
-					$steps[$key]['update'] = $stepsUpdate;
+					if ($db_http_test['templateid'] != 0) {
+						unset($dbSteps[$webstep['httpstepid']]);
+					}
 				}
+
 				$stepidsDelete = array_keys($dbSteps);
 
 				if (!empty($stepidsDelete)) {
@@ -219,6 +221,7 @@ class CHttpTestManager {
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
 
+				// IF application ID was not set, use the ID from DB so new items can be linked.
 				if (!array_key_exists('applicationid', $httpTest)) {
 					$httpTest['applicationid'] = $db_http_test['applicationid'];
 				}
@@ -228,17 +231,19 @@ class CHttpTestManager {
 			}
 		}
 
+		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
 		if ($deleteStepItemIds) {
 			API::Item()->delete($deleteStepItemIds, true);
 		}
 
 		foreach ($httpTests as $key => $httpTest) {
 			if (array_key_exists('steps', $httpTest)) {
-				if ($steps[$key]['update']) {
-					$this->updateStepsReal($httpTest, $steps[$key]['update']);
+				if (array_key_exists($key, $steps_update)) {
+					$this->updateStepsReal($httpTest, $steps_update[$key]);
 				}
-				if ($steps[$key]['create']) {
-					$this->createStepsReal($httpTest, $steps[$key]['create']);
+
+				if (array_key_exists($key, $steps_create)) {
+					$this->createStepsReal($httpTest, $steps_create[$key]);
 				}
 			}
 			else {
@@ -612,7 +617,7 @@ class CHttpTestManager {
 		}
 
 		if (!empty($httpTestsCreate)) {
-			$newHttpTests = $this->create($httpTestsCreate, true);
+			$newHttpTests = $this->create($httpTestsCreate);
 			foreach ($newHttpTests as $num => $newHttpTest) {
 				$httpTests[$num]['httptestid'] = $newHttpTest['httptestid'];
 			}
@@ -706,7 +711,7 @@ class CHttpTestManager {
 		}
 
 		$insertItems = [];
-		$testItemIds = [];
+
 		foreach ($checkitems as $item) {
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $httpTest['hostid'];
@@ -725,20 +730,17 @@ class CHttpTestManager {
 			$insertItems[] = $item;
 		}
 
-		if ($insertItems) {
-			$newTestItemIds = DB::insert('items', $insertItems);
-			$testItemIds = array_merge($testItemIds, $newTestItemIds);
+		$newTestItemIds = DB::insert('items', $insertItems);
 
-			if (array_key_exists('applicationid', $httpTest)) {
-				$this->createItemsApplications($newTestItemIds, $httpTest['applicationid']);
-			}
+		if (array_key_exists('applicationid', $httpTest)) {
+			$this->createItemsApplications($newTestItemIds, $httpTest['applicationid']);
 		}
 
 		$httpTestItems = [];
 		foreach ($checkitems as $inum => $item) {
 			$httpTestItems[] = [
 				'httptestid' => $httpTest['httptestid'],
-				'itemid' => $testItemIds[$inum],
+				'itemid' => $newTestItemIds[$inum],
 				'type' => $item['httptestitemtype']
 			];
 		}
@@ -810,6 +812,7 @@ class CHttpTestManager {
 
 			$insertItems = [];
 			$stepItemids = [];
+
 			foreach ($stepitems as $item) {
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $delay;
@@ -914,12 +917,13 @@ class CHttpTestManager {
 					];
 				}
 			}
+
 			if ($stepitemsUpdate) {
 				DB::update('items', $stepitemsUpdate);
+			}
 
-				if (array_key_exists('applicationid', $httpTest)) {
-					$this->updateItemsApplications($itemids, $httpTest['applicationid']);
-				}
+			if (array_key_exists('applicationid', $httpTest)) {
+				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 		}
 	}
@@ -927,27 +931,27 @@ class CHttpTestManager {
 	/**
 	 * Update web item application linkage.
 	 *
-	 * @param array  $itemIds
-	 * @param string $appId
+	 * @param array  $itemids
+	 * @param string $applicationid
 	 */
-	protected function updateItemsApplications(array $itemIds, $appId) {
-		if ($appId == 0) {
-			DB::delete('items_applications', ['itemid' => $itemIds]);
+	protected function updateItemsApplications(array $itemids, $applicationid) {
+		if ($applicationid == 0) {
+			DB::delete('items_applications', ['itemid' => $itemids]);
 		}
 		else {
-			$linkedItemIds = DBfetchColumn(
-				DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.dbConditionInt('ia.itemid', $itemIds)),
+			$linked_itemids = DBfetchColumn(
+				DBselect('SELECT ia.itemid FROM items_applications ia WHERE '.dbConditionInt('ia.itemid', $itemids)),
 				'itemid'
 			);
 
-			if (linkedItemIds) {
+			if ($linked_itemids) {
 				DB::update('items_applications', [
-					'values' => ['applicationid' => $appId],
-					'where' => ['itemid' => $linkedItemIds]
+					'values' => ['applicationid' => $applicationid],
+					'where' => ['itemid' => $linked_itemids]
 				]);
 			}
 
-			$this->createItemsApplications(array_diff($itemIds, $linkedItemIds), $appId);
+			$this->createItemsApplications(array_diff($itemids, $linked_itemids), $applicationid);
 		}
 	}
 
