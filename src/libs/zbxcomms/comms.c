@@ -1840,8 +1840,8 @@ static int	zbx_validate_hostname(const char *hostname, int len)
 	if (1 >= len)
 		return FAIL;
 
-	/* the first character must be an alpha character */
-	if (0 == isalnum(hostname[0]))
+	/* the first character must be an alphanumeric character */
+	if (0 == isalnum(*hostname))
 		return FAIL;
 
 	/* the last character must not be a minus sign or period */
