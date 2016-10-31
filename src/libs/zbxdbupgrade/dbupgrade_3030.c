@@ -132,6 +132,13 @@ static int	DBpatch_3030011(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_3030012(void)
+{
+	const ZBX_FIELD field = {"value_str", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("profiles", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -150,5 +157,6 @@ DBPATCH_ADD(3030008, 0, 1)
 DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
+DBPATCH_ADD(3030012, 0, 1)
 
 DBPATCH_END()
