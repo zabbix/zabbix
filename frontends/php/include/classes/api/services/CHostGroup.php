@@ -676,6 +676,8 @@ class CHostGroup extends CApiService {
 
 		$host_group_name_validator = new CHostGroupNameValidator();
 
+		$required_fields = ['name'];
+
 		foreach ($groups as $group) {
 			// Validate required fields and check if "name" is not empty.
 			if (!is_array($group)) {
@@ -683,7 +685,8 @@ class CHostGroup extends CApiService {
 			}
 
 			// Check required parameters.
-			$missing_keys = checkRequiredKeys($group, ['name']);
+			$missing_keys = array_diff($required_fields, array_keys($group));
+
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group is missing parameters: %1$s', implode(', ', $missing_keys))
