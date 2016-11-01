@@ -3851,12 +3851,17 @@ static const char	*match_parenthesis(const char *ptr)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_function_params_find                                         *
+ * Function: zbx_function_find                                                *
  *                                                                            *
  * Purpose: find location of function parameters in calculated item formula   *
  *                                                                            *
+ * Parameters: expr     - [IN] string to parse                                *
+ *             func_pos - [OUT] function position in the string               *
+ *             par_l    - [OUT] position of the opening parenthesis           *
+ *             par_r    - [OUT] position of the closing parenthesis           *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_function_params_find(const char *expr, size_t *offset, size_t *length)
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r)
 {
 	const char	*ptr, *par;
 	size_t		len;
@@ -3874,9 +3879,10 @@ int	zbx_function_params_find(const char *expr, size_t *offset, size_t *length)
 		if (NULL == (par = match_parenthesis(ptr + len + 1)))
 			continue;
 
+		*func_pos = ptr - expr;
 		ptr += len + 1;
-		*offset = ptr - expr;
-		*length = par - ptr;
+		*par_l = ptr - expr;
+		*par_r = par - expr;
 		return SUCCEED;
 	}
 

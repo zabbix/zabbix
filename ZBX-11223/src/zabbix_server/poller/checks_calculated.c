@@ -87,8 +87,8 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_parse_expression";
-	char		*e, *f, *func = NULL, *params = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0;
+	char		*e, *func = NULL, *params = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
 	int		functionid, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
@@ -98,21 +98,18 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params; '\0' != *e; e++)
+	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
-		if (NULL != strchr(" \t\r\n", *e))
-			continue;
+		/* copy the part of the string preceding function */
+		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
 
-		f = e;
-		if (FAIL == parse_function(&e, &func, &params))
-		{
-			e = f;
-			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *f);
+		e[par_l] = '\0';
+		func = zbx_strdup(NULL, e[f_pos]);
+		e[par_l] = '(';
 
-			continue;
-		}
-		else
-			e--;
+		e[par_r] = '\0';
+		params = zbx_strdup(NULL, e[par_l + 1]);
+		e[par_r] = ')';
 
 		functionid = calcitem_add_function(exp, func, params);
 
@@ -122,14 +119,20 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		func = NULL;
 		params = NULL;
 
+		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
 	}
+
+	/* copy the remaining part */
+	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
 	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
+	{
 		ret = NOTSUPPORTED;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

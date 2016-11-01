@@ -1084,6 +1084,6 @@ size_t	zbx_no_function(const char *expr);
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
-int	zbx_function_params_find(const char *expr, size_t *offset, size_t *length);
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
 #endif
