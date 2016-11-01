@@ -1819,8 +1819,8 @@ int	is_ip4(const char *ip)
 int	is_ip6(const char *ip)
 {
 	const char	*__function_name = "is_ip6";
-	const char	*p = ip, *last_colon;
-	int		digits = 0, only_digits = 0, colons = 0, dcolons = 0, res = FAIL, allowed_colons = 7;
+	const char	*p = ip;
+	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, allowed_colons = 7, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1828,43 +1828,44 @@ int	is_ip6(const char *ip)
 	{
 		if (0 != isxdigit(*p))
 		{
-			digits++;
-			only_digits = 1;
+			xdigits++;
+			only_xdigits = 1;
 		}
 		else if (':' == *p)
 		{
-			if (0 == digits && 0 < colons)
+			if (0 == xdigits && 0 < colons)
 			{
 				/* consecutive sections of zeroes are replaced with a double colon */
-				only_digits = 1;
-				dcolons++;
+				only_xdigits = 1;
+				dbl_colons++;
 
 				if (*(p + 1) == '\0')	/* extra colon is allowed when trailing */
 					allowed_colons++;
 			}
 
-			if (4 < digits || 1 < dcolons)
+			if (4 < xdigits || 1 < dbl_colons)
 				break;
 
-			digits = 0;
+			xdigits = 0;
 			colons++;
 		}
 		else
 		{
-			only_digits = 0;
+			only_xdigits = 0;
 			break;
 		}
 
 		p++;
 	}
 
-	if (2 > colons || allowed_colons < colons || 4 < digits || 0 == only_digits || 2 <= dcolons)
+	if (2 > colons || allowed_colons < colons || 4 < xdigits || 0 == only_xdigits || 1 < dbl_colons)
 	{
 		/* check if it's IPv4-mapped or IPv4-compatible IPv6 address */
+		const char	*last_colon;
 
 		last_colon = strrchr(ip, ':');
 
-		if (2 <= colons && colons <= 6 && 2 > dcolons && last_colon < p)
+		if (2 <= colons && colons <= 6 && 2 > dbl_colons && last_colon < p)
 			res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
 	}
 	else
