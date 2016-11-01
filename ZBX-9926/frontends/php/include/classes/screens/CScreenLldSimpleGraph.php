@@ -138,13 +138,32 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 				? $this->screenitem['real_resourceid']
 				: $this->screenitem['resourceid'];
 
-			$selectedItemPrototype = API::ItemPrototype()->get([
+			$options = [
 				'output' => ['itemid', 'name'],
-				'itemids' => [$resourceid],
 				'selectHosts' => ['name'],
 				'selectDiscoveryRule' => ['hostid']
-			]);
+			];
 
+			/*
+			 * If screen item is dynamic or is templated screen, real item prototype is looked up by "key"
+			 * used as resource ID for this screen item and by current host.
+			 */
+			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+				$currentItemPrototype = API::ItemPrototype()->get([
+					'output' => ['key_'],
+					'itemids' => [$resourceid]
+				]);
+				$currentItemPrototype = reset($currentItemPrototype);
+
+				$options['hostids'] = [$this->hostid];
+				$options['filter'] = ['key_' => $currentItemPrototype['key_']];
+			}
+			// otherwise just use resource ID given to to this screen item.
+			else {
+				$options['itemids'] = [$resourceid];
+			}
+
+			$selectedItemPrototype = API::ItemPrototype()->get($options);
 			$this->itemPrototype = reset($selectedItemPrototype);
 		}
 

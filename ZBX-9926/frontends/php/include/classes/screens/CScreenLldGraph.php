@@ -113,12 +113,31 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				? $this->screenitem['real_resourceid']
 				: $this->screenitem['resourceid'];
 
-			$selectedGraphPrototype = API::GraphPrototype()->get([
+			$options = [
 				'output' => ['graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'],
-				'graphids' => [$resourceid],
 				'selectDiscoveryRule' => ['hostid']
-			]);
+			];
 
+			/*
+			 * If screen item is dynamic or is templated screen, real graph prototype is looked up by "name"
+			 * used as resource ID for this screen item and by current host.
+			 */
+			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+				$currentGraphPrototype = API::GraphPrototype()->get([
+					'output' => ['name'],
+					'graphids' => [$resourceid]
+				]);
+				$currentGraphPrototype = reset($currentGraphPrototype);
+
+				$options['hostids'] = [$this->hostid];
+				$options['filter'] = ['name' => $currentGraphPrototype['name']];
+			}
+			// otherwise just use resource ID given to this screen item.
+			else {
+				$options['graphids'] = [$resourceid];
+			}
+
+			$selectedGraphPrototype = API::GraphPrototype()->get($options);
 			$this->graphPrototype = reset($selectedGraphPrototype);
 		}
 
