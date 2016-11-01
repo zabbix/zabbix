@@ -104,11 +104,11 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
 
 		e[par_l] = '\0';
-		func = zbx_strdup(NULL, e[f_pos]);
+		func = zbx_strdup(NULL, e + f_pos);
 		e[par_l] = '(';
 
 		e[par_r] = '\0';
-		params = zbx_strdup(NULL, e[par_l + 1]);
+		params = zbx_strdup(NULL, e + par_l + 1);
 		e[par_r] = ')';
 
 		functionid = calcitem_add_function(exp, func, params);
