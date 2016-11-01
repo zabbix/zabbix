@@ -184,7 +184,7 @@ class CHostPrototype extends CHostBase {
 				]),
 				'groupLinks' => new CCollectionValidator([
 					'uniqueField' => 'groupid',
-					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageEmpty' => _('Host prototype "%1$s" cannot be without host group.'),
 					'messageInvalid' => _('Incorrect host groups for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
 				]),
