@@ -1733,7 +1733,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	for (i = prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
 		netmask[j] = i >= 8 ? 0xFF : ~((1 << (8 - i)) - 1);
 
-	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix */
+	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix. */
 	/* All hosts on a subnetwork have the same network prefix. */
 	for (i = 0; i < bytes; i++)
 	{
@@ -1831,7 +1831,7 @@ static int	validate_cidr(const char *ip, const char *cidr, void *value)
 	return FAIL;
 }
 
-static int	zbx_validate_hostname(const char *hostname, int len)
+static int	validate_hostname(const char *hostname, int len)
 {
 	unsigned char	component = 0;	/* periods are only allowed when they serve to delimit components */
 	int		i;
@@ -1890,7 +1890,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_ip(pch) && FAIL == zbx_validate_hostname(pch, strlen(pch)))
+		else if (FAIL == is_ip(pch) && FAIL == validate_hostname(pch, strlen(pch)))
 		{
 			if (NULL != error)
 				*error = zbx_dsprintf(NULL, "\"%s\"", pch);
