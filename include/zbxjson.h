@@ -65,6 +65,7 @@
 #define ZBX_PROTO_TAG_USERNAME		"username"
 #define ZBX_PROTO_TAG_PASSWORD		"password"
 #define ZBX_PROTO_TAG_SID		"sid"
+#define ZBX_PROTO_TAG_VERSION		"version"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

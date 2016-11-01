@@ -77,27 +77,36 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "recv_proxyhistory";
-	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 	int		ret;
+	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
+	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse history data from active proxy at \"%s\": %s",
 				sock->peer, error);
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_hist_data(sock, jp, proxy_hostid, ts, &error)))
+	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto out;
+	}
+
+	zbx_proxy_update_version(&proxy, jp);
+
+	if (SUCCEED != (ret = process_hist_data(sock, jp, proxy.hostid, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);
 		goto out;
 	}
 
-	update_proxy_lastaccess(proxy_hostid);
+	update_proxy_lastaccess(proxy.hostid);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
@@ -180,20 +189,29 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxy_heartbeat";
 
-	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	int		ret;
+	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse heartbeat from active proxy at \"%s\": %s",
 				sock->peer, error);
 		goto out;
 	}
 
-	update_proxy_lastaccess(proxy_hostid);
+	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto out;
+	}
+
+	zbx_proxy_update_version(&proxy, jp);
+
+	update_proxy_lastaccess(proxy.hostid);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 

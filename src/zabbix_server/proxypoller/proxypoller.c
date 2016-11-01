@@ -38,12 +38,33 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
 	int		ret;
+	char		*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
 			proxy->port, timeout, (unsigned int)proxy->tls_connect);
 
+	switch (proxy->tls_connect)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = proxy->tls_issuer;
+			tls_arg2 = proxy->tls_subject;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = proxy->tls_psk_identity;
+			tls_arg2 = proxy->tls_psk;
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
-			proxy->tls_connect, proxy->tls_arg1, proxy->tls_arg2)))
+			proxy->tls_connect, tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
