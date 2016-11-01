@@ -958,8 +958,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	int		fds[2], n, status;
 	char		buffer[MAX_STRING_LEN], *data;
 	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
-	zbx_timespec_t	ts, ts_start;
-	zbx_uint64_t	timediff;
+	double		time_start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cmd:'%s'", __function_name, cmd);
 
@@ -1006,14 +1005,11 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	close(fds[1]);
 
 	alarm(CONFIG_TIMEOUT);
-	zbx_timespec(&ts_start);
+	time_start = zbx_time();
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
-		zbx_timespec(&ts);
-		timediff = (zbx_uint64_t)(ts.sec - ts_start.sec) * 1000000000 + ts.ns - ts_start.ns;
-
-		if ((zbx_uint64_t)CONFIG_TIMEOUT * 1000000000 < timediff)
+		if (CONFIG_TIMEOUT < zbx_time() - time_start)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for data."));
 			kill(pid, SIGKILL);
