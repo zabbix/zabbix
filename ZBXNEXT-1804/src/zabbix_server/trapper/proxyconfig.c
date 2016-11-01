@@ -110,7 +110,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());
-		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
+		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -118,7 +118,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 
 	process_proxyconfig(&jp_data);
-	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
