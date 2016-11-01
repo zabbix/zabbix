@@ -970,7 +970,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		goto out;
 	}
 
-	if (-1 == (pid = fork()))
+	if (-1 == (pid = zbx_fork()))
 	{
 		close(fds[0]);
 		close(fds[1]);
