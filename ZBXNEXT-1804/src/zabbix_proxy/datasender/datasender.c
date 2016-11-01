@@ -55,6 +55,8 @@ static void	host_availability_sender(struct zbx_json *j)
 	{
 		char	*error = NULL;
 
+		zbx_json_addstring(j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
 		if (SUCCEED != put_data_to_server(&sock, j, &error))
@@ -98,6 +100,8 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 	*records = f_get_data(j, &lastid);
 
 	zbx_json_close(j);
+
+	zbx_json_addstring(j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	if (*records > 0)
 	{
