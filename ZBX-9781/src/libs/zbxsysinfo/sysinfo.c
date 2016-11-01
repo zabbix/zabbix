@@ -937,7 +937,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *                                                                            *
  * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
- * Purpose: execute agent metric in a separate process/thread so it can be    *
+ * Purpose: execute metric in a separate process/thread so it can be          *
  *          killed/terminated when timeout is detected                        *
  *                                                                            *
  * Parameters: metric_func - [IN] the metric function to execute              *
@@ -965,7 +965,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (-1 == pipe(fds))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create pipe: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create data pipe: %s", strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -974,7 +974,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	{
 		close(fds[0]);
 		close(fds[1]);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork process: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork data process: %s", strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1095,7 +1095,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  *                                                                            *
  * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
- * Purpose: execute agent metric in a separate process/thread so it can be    *
+ * Purpose: execute metric in a separate process/thread so it can be          *
  *          killed/terminated when timeout is detected                        *
  *                                                                            *
  * Parameters: metric_func - [IN] the metric function to execute              *
@@ -1122,14 +1122,14 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (ZBX_THREAD_ERROR == (thread = zbx_thread_start(agent_metric_thread, &args)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start agent metric thread: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
 				strerror_from_system(GetLastError())));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot wait for agent metric thread: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot wait for data: %s",
 				strerror_from_system(GetLastError())));
 		TerminateThread(thread, 0);
 		CloseHandle(thread);
@@ -1137,7 +1137,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	}
 	else if (WAIT_TIMEOUT == rc)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while executing agent check."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for data."));
 		TerminateThread(thread, 0);
 		CloseHandle(thread);
 		return SYSINFO_RET_FAIL;
