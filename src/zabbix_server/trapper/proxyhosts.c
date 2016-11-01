@@ -105,6 +105,8 @@ void	send_host_availability(zbx_socket_t *sock)
 		zbx_json_close(&j);
 	}
 
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))

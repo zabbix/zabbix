@@ -250,7 +250,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
 
 		zbx_free(msg);
 		return FAIL;
@@ -262,7 +262,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
 
 		zbx_free(msg);
 		return FAIL;

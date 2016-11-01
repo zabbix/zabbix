@@ -105,6 +105,7 @@ void	send_areg_data(zbx_socket_t *sock)
 	zbx_json_close(&j);
 
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
