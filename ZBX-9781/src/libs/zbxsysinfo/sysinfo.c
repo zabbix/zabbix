@@ -982,6 +982,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (0 == pid)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "executing in data process for cmd:'%s'", cmd);
+
 		signal(SIGILL, SIG_DFL);
 		signal(SIGFPE, SIG_DFL);
 		signal(SIGSEGV, SIG_DFL);
@@ -1019,8 +1021,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 		if (-1 == n)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error while reading data: %s",
-					zbx_strerror(errno)));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error while reading data: %s", zbx_strerror(errno)));
 			kill(pid, SIGKILL);
 			ret = SYSINFO_RET_FAIL;
 			break;
@@ -1077,6 +1078,8 @@ zbx_metric_thread_args_t;
 ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for cmd:'%s'", args->cmd);
 
 	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->cmd, args->param, args->flags, args->result)))
 	{
