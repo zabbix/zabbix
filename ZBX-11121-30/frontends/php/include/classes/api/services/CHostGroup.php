@@ -927,8 +927,6 @@ class CHostGroup extends CApiService {
 
 		$dbGroups = $this->get([
 			'output' => ['groupid'],
-			'selectHosts' => ['hostid'],
-			'selectTemplates' => ['templateid'],
 			'groupids' => $groupIds,
 			'selectHosts' => ['hostid', 'host'],
 			'selectTemplates' => ['templateid', 'host']
