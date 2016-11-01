@@ -354,6 +354,7 @@ typedef struct
 	int		proxy_data_nextcheck;
 	int		timediff;
 	int		lastaccess;
+	int		version;
 	unsigned char	location;
 }
 ZBX_DC_PROXY;
@@ -7865,25 +7866,24 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
-		dst_proxy->tls_connect = host->tls_connect;
 
+		dst_proxy->tls_connect = host->tls_connect;
+		dst_proxy->tls_accept = host->tls_accept;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (ZBX_TCP_SEC_TLS_CERT == host->tls_connect)
+		strscpy(dst_proxy->tls_issuer, host->tls_issuer);
+		strscpy(dst_proxy->tls_subject, host->tls_subject);
+
+		if (NULL == host->tls_dc_psk)
 		{
-			strscpy(dst_proxy->tls_arg1, host->tls_issuer);
-			strscpy(dst_proxy->tls_arg2, host->tls_subject);
+			*dst_proxy->tls_psk_identity = '\0';
+			*dst_proxy->tls_psk = '\0';
 		}
-		else if (ZBX_TCP_SEC_TLS_PSK == host->tls_connect && NULL != host->tls_dc_psk)
+		else
 		{
-			strscpy(dst_proxy->tls_arg1, host->tls_dc_psk->tls_psk_identity);
-			strscpy(dst_proxy->tls_arg2, host->tls_dc_psk->tls_psk);
+			strscpy(dst_proxy->tls_psk_identity, host->tls_dc_psk->tls_psk_identity);
+			strscpy(dst_proxy->tls_psk, host->tls_dc_psk->tls_psk);
 		}
-		else	/* ZBX_TCP_SEC_UNENCRYPTED */
 #endif
-		{
-			*dst_proxy->tls_arg1 = '\0';
-			*dst_proxy->tls_arg2 = '\0';
-		}
 	}
 	else
 	{
@@ -7892,8 +7892,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		*dst_proxy->host = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		*dst_proxy->tls_arg1 = '\0';
-		*dst_proxy->tls_arg2 = '\0';
+		*dst_proxy->tls_psk_identity = '\0';
+		*dst_proxy->tls_psk = '\0';
 #endif
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -9764,4 +9764,77 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(&rules->correlations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_active_proxy_by_name                                  *
+ *                                                                            *
+ * Purpose: gets active proxy data by its name from configuration cache       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     name  - [IN] the proxy name                                            *
+ *     proxy - [OUT] the proxy data                                           *
+ *     error - [OUT] error message                                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - proxy data were retrieved successfully                       *
+ *     FAIL    - failed to retriev proxy data, error message is set           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error)
+{
+	int		ret = FAIL;
+	ZBX_DC_HOST	*dc_host;
+	ZBX_DC_PROXY	*dc_proxy;
+
+	LOCK_CACHE;
+
+	if (NULL == (dc_host = DCfind_proxy(name)))
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
+		goto out;
+	}
+
+	if (HOST_STATUS_PROXY_ACTIVE != dc_host->status)
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured for passive mode", name);
+		goto out;
+	}
+
+	if (NULL == (dc_proxy = zbx_hashset_search(&config->proxies, &dc_host->hostid)))
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
+		goto out;
+	}
+
+	DCget_proxy(proxy, dc_proxy);
+	ret = SUCCEED;
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_update_proxy_version                                      *
+ *                                                                            *
+ * Purpose: updates proxy version in configuration cache                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     hostid  - [IN] the proxy identifier                                    *
+ *     version - [IN] the new proxy version                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
+		dc_proxy->version = version;
+
+	UNLOCK_CACHE;
 }

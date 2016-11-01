@@ -89,10 +89,93 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
 					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
 					ZBX_PROTO_TAG_JMX_ERROR};
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_proxy_check_permissions                                      *
+ *                                                                            *
+ * Purpose: checks proxy connection permissions (encryption configuration)    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     proxy   - [IN] the proxy data                                          *
+ *     sock    - [IN] connection socket context                               *
+ *     error   - [OUT] error message                                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - connection permission check was successful                   *
+ *     FAIL    - otherwise                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error)
+{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
+
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
+	if (0 == ((unsigned int)proxy->tls_accept & sock->connection_type))
+	{
+		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
+				zbx_tls_connection_type_name(sock->connection_type), proxy->host);
+		return FAIL;
+	}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *proxy->tls_issuer && 0 != strcmp(proxy->tls_issuer, attr.issuer))
+		{
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", proxy->host);
+			return FAIL;
+		}
+
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *proxy->tls_subject && 0 != strcmp(proxy->tls_subject, attr.subject))
+		{
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", proxy->host);
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (strlen(proxy->tls_psk_identity) != attr.psk_identity_len ||
+				0 != memcmp(proxy->tls_psk_identity, attr.psk_identity, attr.psk_identity_len))
+		{
+			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", proxy->host);
+			return FAIL;
+		}
+	}
+#endif
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: get_active_proxy_id                                              *
+ * Function: get_active_proxy_from_request                                              *
  *                                                                            *
  * Purpose:                                                                   *
  *     Extract a proxy name from JSON and find the proxy ID in configuration  *
@@ -101,10 +184,8 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
  *                                                                            *
  * Parameters:                                                                *
  *     jp      - [IN] JSON with the proxy name                                *
- *     hostid  - [OUT] proxy host ID found in database                        *
- *     host    - [OUT] buffer provided by caller with minimum size            *
- *                     'HOST_HOST_LEN_MAX' for writing proxy name             *
  *     sock    - [IN] connection socket context                               *
+ *     proxy   - [OUT] the proxy data                                         *
  *     error   - [OUT] error message                                          *
  *                                                                            *
  * Return value:                                                              *
@@ -113,10 +194,10 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
+int	get_active_proxy_from_request(struct zbx_json_parse *jp, const zbx_socket_t *sock, DC_PROXY *proxy,
 		char **error)
 {
-	char	*ch_error;
+	char	*ch_error, host[HOST_HOST_LEN_MAX];
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
@@ -131,7 +212,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != DCcheck_proxy_permissions(host, sock, hostid, error))
+	if (SUCCEED != zbx_dc_get_active_proxy_by_name(host, proxy, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -2779,4 +2860,49 @@ int	proxy_get_history_count(void)
 	DBfree_result(result);
 
 	return count;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_proxy_update_version                                         *
+ *                                                                            *
+ * Purpose: updates proxy version based on the received version field         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     jp      - [IN] JSON with the proxy version                             *
+ *     version - [OUT] proxy version                                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - proxy version was successfully extracted                     *
+ *     FAIL    - otherwise                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
+{
+	char	value[MAX_STRING_LEN], *pminor, *ptr;
+	int	version;
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)))
+		return FAIL;
+
+	if (NULL == (pminor = strchr(value, '.')))
+		return FAIL;
+
+	*pminor++ = '\0';
+
+	if (NULL != (ptr = strchr(pminor, '.')))
+		*ptr = '\0';
+
+	version = ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+
+	if (proxy->version != version)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" version updated from %d.%d to %d.%d", proxy->host,
+				ZBX_COMPONENT_VERSION_MAJOR(proxy->version), ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+				ZBX_COMPONENT_VERSION_MAJOR(version), ZBX_COMPONENT_VERSION_MINOR(version));
+
+		zbx_dc_update_proxy_version(proxy->hostid, version);
+	}
+
+	return SUCCEED;
 }

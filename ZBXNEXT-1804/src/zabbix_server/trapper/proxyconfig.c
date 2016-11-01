@@ -38,25 +38,33 @@
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_proxyconfig";
-	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 	struct zbx_json	j;
+	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, sock, &error))
+	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
 	{
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
 				" \"%s\": %s", sock->peer, error);
 		goto out;
 	}
 
-	update_proxy_lastaccess(proxy_hostid);
+	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto out;
+	}
+
+	zbx_proxy_update_version(&proxy, jp);
+
+	update_proxy_lastaccess(proxy.hostid);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != get_proxyconfig_data(proxy_hostid, &j, &error))
+	if (SUCCEED != get_proxyconfig_data(proxy.hostid, &j, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
