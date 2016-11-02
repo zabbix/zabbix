@@ -1256,8 +1256,6 @@ error:
 	zbx_vector_ptr_append(&results, result);
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
 
-
-
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
 	/* Prefetching when working with Oracle is needed because otherwise it fetches only 1 row at a time when doing */
