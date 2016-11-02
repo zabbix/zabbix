@@ -304,7 +304,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestCheckboxSelect('event_ack_enable', false);
+		$this->zbxTestCheckboxSelectXpath('event_ack_enable', false);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Enable event acknowledgement']);
@@ -426,7 +426,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestCheckboxSelect('server_check_interval', false);
+		$this->zbxTestCheckboxSelectXpath('server_check_interval', false);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Show warning if Zabbix server is down']);
