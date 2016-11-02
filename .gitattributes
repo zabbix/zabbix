@@ -311,6 +311,8 @@ src/zabbix_java/tests/junit-4.8.2.jar -text svneol=unset#application/java-archiv
 src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
+src/zabbix_server/trapper/proxydata.c -text
+src/zabbix_server/trapper/proxydata.h -text
 tests/images/image.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png

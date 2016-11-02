@@ -175,7 +175,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 
 /******************************************************************************
  *                                                                            *
- * Function: get_active_proxy_from_request                                              *
+ * Function: get_active_proxy_from_request                                    *
  *                                                                            *
  * Purpose:                                                                   *
  *     Extract a proxy name from JSON and find the proxy ID in configuration  *
@@ -1490,8 +1490,6 @@ int	get_host_availability_data(struct zbx_json *json, int *ts)
 	if (SUCCEED != DCget_hosts_availability(&hosts, ts))
 		goto out;
 
-	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
-
 	for (i = 0; i < hosts.values_num; i++)
 	{
 		ha = (zbx_host_availability_t *)hosts.values[i];
@@ -1507,8 +1505,6 @@ int	get_host_availability_data(struct zbx_json *json, int *ts)
 
 		zbx_json_close(json);
 	}
-
-	zbx_json_close(json);
 
 	ret = SUCCEED;
 out:
@@ -2882,18 +2878,19 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
 	char	value[MAX_STRING_LEN], *pminor, *ptr;
 	int	version;
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)))
-		return FAIL;
+	if (NULL != jp &&
+			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)) &&
+			NULL != (pminor = strchr(value, '.')))
+	{
+		*pminor++ = '\0';
 
-	if (NULL == (pminor = strchr(value, '.')))
-		return FAIL;
+		if (NULL != (ptr = strchr(pminor, '.')))
+			*ptr = '\0';
 
-	*pminor++ = '\0';
-
-	if (NULL != (ptr = strchr(pminor, '.')))
-		*ptr = '\0';
-
-	version = ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+		version = ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+	}
+	else
+		version = ZBX_COMPONENT_VERSION(3, 2);
 
 	if (proxy->version != version)
 	{
