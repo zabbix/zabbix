@@ -24,6 +24,8 @@
 #include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"
+#elif defined(HAVE_ORACLE)
+#	include "zbxalgo.h"
 #endif
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
@@ -37,6 +39,7 @@ static zbx_ibm_db2_handle_t	ibm_db2;
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
 static zbx_oracle_db_handle_t	oracle;
+static zbx_vector_ptr_t	results;
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
@@ -320,6 +323,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 	memset(&oracle, 0, sizeof(oracle));
 
+	zbx_vector_ptr_create(&results);
+
 	/* connection string format: [//]host[:port][/service name] */
 
 	if ('\0' != *host)
@@ -581,10 +586,20 @@ void	zbx_db_close()
 		oracle.errhp = NULL;
 	}
 
-	if (NULL != oracle.envhp)
+	if (0 != results.values_num)
 	{
-		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-		oracle.envhp = NULL;
+		int	i;
+
+		zabbix_log(LOG_LEVEL_WARNING, "database closed with queries in progress");
+
+		for (i = 0; i < results.values_num; i++)
+		{
+			/* deallocate all handles before environment is deallocated */
+			DB_RESULT	result = results.values[i];
+
+			OCIHandleFree(result->stmthp, OCI_HTYPE_STMT);
+			result->stmthp = NULL;
+		}
 	}
 
 	if (NULL != oracle.srvhp)
@@ -592,6 +607,15 @@ void	zbx_db_close()
 		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
 		oracle.srvhp = NULL;
 	}
+
+	if (NULL != oracle.envhp)
+	{
+		/* delete the environment handle, which deallocates all other handles associated with it */
+		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+		oracle.envhp = NULL;
+	}
+
+	zbx_vector_ptr_destroy(&results);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != conn)
 	{
@@ -1229,7 +1253,10 @@ error:
 	}
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
+	zbx_vector_ptr_append(&results, result);
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
+
+
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
@@ -1609,6 +1636,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 #elif defined(HAVE_MYSQL)
 	return mysql_fetch_row(result);
 #elif defined(HAVE_ORACLE)
+	if (NULL == result->stmthp)
+		return NULL;
+
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
 
@@ -1771,6 +1801,8 @@ void	IBM_DB2free_result(DB_RESULT result)
 /* in zbxdb.h - #define DBfree_result   OCI_DBfree_result */
 void	OCI_DBfree_result(DB_RESULT result)
 {
+	int	i;
+
 	if (NULL == result)
 		return;
 
@@ -1785,7 +1817,10 @@ void	OCI_DBfree_result(DB_RESULT result)
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
-				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
+				/* OCI will deallocate a descriptor if the environment handle is deallocated. */
+				if (NULL != result->stmthp)
+					OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
+
 				result->clobs[i] = NULL;
 			}
 		}
@@ -1797,6 +1832,15 @@ void	OCI_DBfree_result(DB_RESULT result)
 
 	if (result->stmthp)
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
+
+	for (i = 0; i < results.values_num; i++)
+	{
+		if (results.values[i] == result)
+		{
+			zbx_vector_ptr_remove(&results, i);
+			break;
+		}
+	}
 
 	zbx_free(result);
 }
