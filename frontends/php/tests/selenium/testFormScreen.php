@@ -229,14 +229,14 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickWait('edit');
 		$this->zbxTestClickLinkTextWait('Change');
 		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
-		$this->zbxTestCheckboxSelect('dynamic');
+		$this->zbxTestCheckboxSelectXpath('dynamic');
 		$this->zbxTestInputTypeOverwrite('colspan', '1');
 		$this->zbxTestInputTypeOverwrite('rowspan', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen updated');
 		$this->zbxTestClickLinkTextWait('Change');
 		$this->assertTrue($this->zbxTestCheckboxSelected('dynamic'));
-		$this->zbxTestCheckboxSelect('dynamic', false);
+		$this->zbxTestCheckboxSelectXpath('dynamic', false);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen updated');
 		$this->zbxTestClickLinkTextWait('Change');
