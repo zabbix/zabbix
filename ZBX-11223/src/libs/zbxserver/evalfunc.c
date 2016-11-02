@@ -1341,7 +1341,6 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
-			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (values.values[0].value.ui64 == values.values[1].value.ui64)
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
