@@ -38,6 +38,45 @@
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
+	const char	*__function_name = "zbx_recv_proxy_data";
+
+	int		ret;
+	char		*error = NULL;
+	DC_PROXY	proxy;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy data from active proxy at \"%s\": %s",
+				sock->peer, error);
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto out;
+	}
+
+	zbx_proxy_update_version(&proxy, jp);
+
+	/*
+	if (SUCCEED != (ret = process_areg_data(jp, proxy.hostid, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\": %s",
+				host, sock->peer, error);
+	}
+	*/
+
+	ret = SUCCEED;
+out:
+	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+
+	zbx_free(error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
 /******************************************************************************
@@ -110,13 +149,15 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_dhis_data(&j, &areg_lastid);
 	zbx_json_close(&j);
 
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == send_data_to_server(sock, j.buffer, &error))
 	{
 		zbx_set_availability_diff_ts(availability_ts);
+
+		DBbegin();
 
 		if (0 != history_lastid)
 			proxy_set_hist_lastid(history_lastid);
@@ -126,6 +167,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		if (0 != areg_lastid)
 			proxy_set_areg_lastid(areg_lastid);
+
+		DBcommit();
 	}
 	else
 	{
