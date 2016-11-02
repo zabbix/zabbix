@@ -126,7 +126,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	/* copy the remaining part */
 	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
 
-	zbx_remove_whitespace(dc_item->params);
+	zbx_remove_whitespace(exp->exp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
