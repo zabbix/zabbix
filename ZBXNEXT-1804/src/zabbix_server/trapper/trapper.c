@@ -34,6 +34,7 @@
 #include "proxydiscovery.h"
 #include "proxyautoreg.h"
 #include "proxyhosts.h"
+#include "proxydata.h"
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
@@ -556,6 +557,13 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 			{
 				recv_agenthistory(sock, &jp, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					zbx_recv_proxy_data(sock, &jp, ts);
+				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+					zbx_send_proxy_data(sock, ts);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
 			{

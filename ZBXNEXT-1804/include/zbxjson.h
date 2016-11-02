@@ -66,6 +66,10 @@
 #define ZBX_PROTO_TAG_PASSWORD		"password"
 #define ZBX_PROTO_TAG_SID		"sid"
 #define ZBX_PROTO_TAG_VERSION		"version"
+#define ZBX_PROTO_TAG_HOST_AVAILABILITY	"host availability"
+#define ZBX_PROTO_TAG_HISTORY_DATA	"history data"
+#define ZBX_PROTO_TAG_DISCOVERY_DATA	"discovery data"
+#define ZBX_PROTO_TAG_AUTO_REGISTRATION	"auto registration"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -83,6 +87,7 @@
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 #define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+#define ZBX_PROTO_VALUE_PROXY_DATA		"proxy data"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
