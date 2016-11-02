@@ -641,7 +641,7 @@ class CUserGroup extends CApiService {
 		]);
 
 		foreach ($dbUsers as $dbUser) {
-			$db_usrgrpids = array();
+			$db_usrgrpids = [];
 
 			foreach ($dbUser['usrgrps'] as $usrgrp) {
 				$db_usrgrpids[] = $usrgrp['usrgrpid'];

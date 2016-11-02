@@ -533,8 +533,8 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		$hosts_to_unlink = array();
-		$templates_to_unlink = array();
+		$hosts_to_unlink = [];
+		$templates_to_unlink = [];
 
 		foreach ($delGroups as $group) {
 			foreach ($group['hosts'] as $host) {
