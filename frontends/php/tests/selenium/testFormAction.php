@@ -1001,7 +1001,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['new_operation_opmessage_default_msg'])) {
 			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
-			$this->zbxTestCheckboxSelect('new_operation_opmessage_default_msg', false);
+			$this->zbxTestCheckboxSelectXpath('new_operation_opmessage_default_msg', false);
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
 			$new_operation_opmessage_default_msg = 'checked';
@@ -1190,8 +1190,8 @@ class testFormAction extends CWebTest {
 			]);
 
 			$this->zbxTestTextPresent('Default message');
-			$this->zbxTestAssertVisibleId('new_operation_opmessage_default_msg');
-			$this->zbxTestAssertVisibleXpath('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
+			$this->zbxTestAssertElementPresentId('new_operation_opmessage_default_msg');
+			$this->zbxTestAssertElementPresentXpath('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
 			if ($new_operation_opmessage_default_msg == 'checked') {
 				$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opmessage_default_msg'));
 			}
@@ -1345,9 +1345,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTextPresent ([
 				'Execute on', 'Zabbix agent', 'Zabbix server']
 			);
-			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
+			$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
 			$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opcommand_execute_on_0'));
-			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
+			$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 		}
 		elseif ($new_operation_opcommand_type != null) {
 			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
