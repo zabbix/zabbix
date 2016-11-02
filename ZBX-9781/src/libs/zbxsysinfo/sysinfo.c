@@ -840,20 +840,40 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 	char	**pvalue, result_type;
 	size_t	value_len;
 
-	if (ISSET_TEXT(result))
-		result_type = 't';
-	else if (ISSET_STR(result))
-		result_type = 's';
-	else if (ISSET_UI64(result))
-		result_type = 'u';
-	else if (ISSET_DBL(result))
-		result_type = 'd';
-	else if (ISSET_MSG(result))
-		result_type = 'm';
+	if (SYSINFO_RET_OK == agent_ret)
+	{
+		if (ISSET_TEXT(result))
+			result_type = 't';
+		else if (ISSET_STR(result))
+			result_type = 's';
+		else if (ISSET_UI64(result))
+			result_type = 'u';
+		else if (ISSET_DBL(result))
+			result_type = 'd';
+		else if (ISSET_MSG(result))
+			result_type = 'm';
+		else
+			result_type = '-';
+	}
 	else
-		result_type = '-';
+		result_type = 'm';
 
-	if ('-' != result_type && NULL != (pvalue = GET_TEXT_RESULT(result)))
+	switch (result_type)
+	{
+		case 't':
+		case 's':
+		case 'u':
+		case 'd':
+			pvalue = GET_TEXT_RESULT(result);
+			break;
+		case 'm':
+			pvalue = GET_MSG_RESULT(result);
+			break;
+		default:
+			pvalue = NULL;
+	}
+
+	if (NULL != pvalue)
 	{
 		value_len = strlen(*pvalue) + 1;
 	}
