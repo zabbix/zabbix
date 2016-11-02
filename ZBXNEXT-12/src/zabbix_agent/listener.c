@@ -100,25 +100,6 @@ static void	process_listener(zbx_socket_t *s)
 		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_socket_strerror());
 }
 
-static void	get_in_addr(const struct sockaddr *sa, char *ip, size_t ip_size)
-{
-	void	*addr;
-
-	if (sa->sa_family == AF_INET)
-	{
-		struct sockaddr_in *ipv4 = (struct sockaddr_in *)sa;
-		addr = &(ipv4->sin_addr);
-	}
-	else
-	{
-		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)sa;
-		addr = &(ipv6->sin6_addr);
-	}
-
-	if (NULL == inet_ntop(sa->sa_family, addr, ip, ip_size))
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR ERROR! cannot inet_ntop(): %s", zbx_strerror(errno));
-}
-
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -165,36 +146,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 				}
 			}
 
-			{
-#ifdef HAVE_IPV6
-#	define ZBX_SOCKADDR struct sockaddr_storage
-#else
-#	define ZBX_SOCKADDR struct sockaddr_in
-#endif
-#if !defined(ZBX_SOCKLEN_T)
-#	define ZBX_SOCKLEN_T socklen_t
-#endif
-
-				ZBX_SOCKADDR	name;
-				char    	ipstr[INET6_ADDRSTRLEN];
-				ZBX_SOCKLEN_T	nlen;
-
-				nlen = sizeof(name);
-
-				if (ZBX_PROTO_ERROR == getpeername(s.socket, (struct sockaddr *)&name, &nlen))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "DIMIR: getpeername() ERROR!!!!!!");
-					exit(EXIT_SUCCESS);
-				}
-
-				get_in_addr((struct sockaddr *)&name, ipstr, sizeof(ipstr));
-
-				zbx_tcp_unaccept(&s);
-
-				zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s %55s %20s", ipstr, CONFIG_HOSTS_ALLOWED, (ret == SUCCEED ? "PASSED" : "REJECTED"));
-
-				exit(EXIT_SUCCESS);
-			}
+			zbx_tcp_unaccept(&s);
 		}
 
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
