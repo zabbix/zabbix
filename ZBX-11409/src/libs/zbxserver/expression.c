@@ -3765,28 +3765,27 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 		}
 
-		if (NULL != replace_to)
+		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
-			if (ZBX_TOKEN_FUNC_MACRO == token.type && 0 != func_macro)
+			if (0 != func_macro)
 			{
 				ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
 						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
 						&replace_to);
 			}
-
-			if (1 == require_numeric)
-			{
-				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
-					wrap_negative_double_suffix(&replace_to, NULL);
-				else if (NULL != error)
-					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
-			}
-
-			if (ZBX_TOKEN_FUNC_MACRO == token.type && 0 == func_macro)
+			else
 			{
 				/* ignore functions with macros not supporting them */
 				zbx_free(replace_to);
 			}
+		}
+
+		if (1 == require_numeric && NULL != replace_to)
+		{
+			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+				wrap_negative_double_suffix(&replace_to, NULL);
+			else if (NULL != error)
+				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
 
 		if (FAIL == ret)
