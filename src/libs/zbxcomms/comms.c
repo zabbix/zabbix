@@ -1752,8 +1752,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 	const unsigned char	ipv4_compat_mask[12] = {0};
 	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
-	unsigned char		ipv6_compat_address[16];
-	unsigned char		ipv6_mapped_address[16];
+
 	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
 	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
@@ -1791,7 +1790,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				/* incoming AF_INET6, must see whether it is compatible or mapped */
 				if ((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
 						0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
+						SUCCEED == subnet_match(AF_INET, prefix_size,
 						&name6->sin6_addr.s6_addr[12], &ai_addr4->sin_addr.s_addr))
 				{
 					return SUCCEED;
@@ -1799,16 +1798,16 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				break;
 			case AF_INET6:
 				/* incoming AF_INET, must see whether the given is compatible or mapped */
-				memcpy(ipv6_compat_address, ipv4_compat_mask, sizeof(ipv4_compat_mask));
-				memcpy(&ipv6_compat_address[sizeof(ipv4_compat_mask)], &name4->sin_addr.s_addr, 4);
+				/* adjust prefix size to IPv4-compatible */
+				prefix_size = IPV4_MAX_CIDR_PREFIX - (IPV6_MAX_CIDR_PREFIX - prefix_size);
 
-				memcpy(ipv6_mapped_address, ipv4_mapped_mask, sizeof(ipv4_mapped_mask));
-				memcpy(&ipv6_mapped_address[sizeof(ipv4_mapped_mask)], &name4->sin_addr.s_addr, 4);
+				if (0 > prefix_size)
+					prefix_size = 0;
 
-				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
-						&ai_addr6->sin6_addr.s6_addr, ipv6_compat_address) ||
-						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
-						&ai_addr6->sin6_addr.s6_addr, ipv6_mapped_address))
+				if ((0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_compat_mask, 12) ||
+						0 == memcmp(ai_addr6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
+						SUCCEED == subnet_match(AF_INET, prefix_size,
+						&ai_addr6->sin6_addr.s6_addr[12], &name4->sin_addr.s_addr))
 				{
 					return SUCCEED;
 				}
