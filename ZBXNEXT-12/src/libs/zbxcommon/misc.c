@@ -1820,7 +1820,7 @@ int	is_ip6(const char *ip)
 {
 	const char	*__function_name = "is_ip6";
 	const char	*p = ip;
-	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, allowed_colons = 7, res = FAIL;
+	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
@@ -1838,9 +1838,6 @@ int	is_ip6(const char *ip)
 				/* consecutive sections of zeroes are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
-
-				if (*(p + 1) == '\0')	/* extra colon is allowed when trailing */
-					allowed_colons++;
 			}
 
 			if (4 < xdigits || 1 < dbl_colons)
@@ -1858,7 +1855,7 @@ int	is_ip6(const char *ip)
 		p++;
 	}
 
-	if (2 > colons || allowed_colons < colons || 4 < xdigits || 0 == only_xdigits || 1 < dbl_colons)
+	if (2 > colons || 7 < colons || 4 < xdigits || 0 == only_xdigits || 1 < dbl_colons)
 	{
 		/* check if it's IPv4-mapped or IPv4-compatible IPv6 address */
 		const char	*last_colon;
