@@ -1237,19 +1237,18 @@ select {
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #4f4f4f !important; }
   .checkbox-radio + label span {
+    position: relative;
     display: inline-block;
     width: 14px;
     height: 14px;
-    margin: 0 4px -3px 0;
+    margin: -4px 4px 0 0;
+    bottom: -3px;
     border: 1px solid #4f4f4f;
     background-color: #383838; }
     .checkbox-radio + label span:active {
       border-color: #4f4f4f; }
   .checkbox-radio:focus + label span {
     border-color: #768d99; }
-  .checkbox-radio:checked + label span {
-    position: relative;
-    z-index: 1; }
   .checkbox-radio:checked:focus + label span {
     border-color: #768d99; }
   .checkbox-radio:checked[disabled] + label span {
