@@ -681,7 +681,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
-	/* get hosts by assigned maintenance groups */
+	/* get hosts operation's hosts */
 
 	zbx_vector_uint64_create(&groupids);
 	get_operation_groupids(operationid, &groupids);
