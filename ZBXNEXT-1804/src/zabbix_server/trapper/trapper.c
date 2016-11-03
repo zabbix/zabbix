@@ -575,14 +575,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_discovery_data(sock, &jp);
+					recv_discovery_data(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_discovery_data(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_areg_data(sock, &jp);
+					recv_areg_data(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_areg_data(sock);
 			}
