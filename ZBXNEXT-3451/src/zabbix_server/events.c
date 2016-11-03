@@ -739,6 +739,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
  * Function: correlation_match_event_hostgroup                                *
  *                                                                            *
  * Purpose: checks if the event matches the specified host group              *
+ *          (including nested groups)                                         *
  *                                                                            *
  * Parameters: event   - [IN] the new event to check                          *
  *             groupid - [IN] the group id to match                           *

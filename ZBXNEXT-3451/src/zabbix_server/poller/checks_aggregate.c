@@ -230,6 +230,7 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
  * Function: aggregate_get_items                                              *
  *                                                                            *
  * Purpose: get array of items specified by key for selected groups           *
+ *          (including nested groups)                                         *
  *                                                                            *
  * Parameters: itemids - [OUT] list of item ids                               *
  *             groups  - [IN] list of comma-separated host groups             *

@@ -643,7 +643,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
  *                                                                            *
  * Purpose: get groups (including nested groups) used by an operation         *
  *                                                                            *
- * Parameters: operationid - [IN] the maintenance period id                   *
+ * Parameters: operationid - [IN] the operation id                            *
  *             groupids    - [OUT] the group ids                              *
  *                                                                            *
  ******************************************************************************/
