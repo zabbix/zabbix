@@ -96,7 +96,7 @@ $event = reset($events);
 
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
-		'output' => [],
+		'output' => ['correlationid', 'userid'],
 		'select_alerts' => ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error',
 			'esc_step', 'clock', 'subject', 'message'
 		],
@@ -106,12 +106,17 @@ if ($event['r_eventid'] != 0) {
 		'objectids' => getRequest('triggerid')
 	]);
 
-	$r_event = reset($r_events);
+	if ($r_events) {
+		$r_event = reset($r_events);
 
-	if ($r_event['alerts']) {
-		$event['alerts'] = array_merge($event['alerts'], $r_event['alerts']);
+		$event['correlationid'] = $r_event['correlationid'];
+		$event['userid'] = $r_event['userid'];
 
-		CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+		if ($r_event['alerts']) {
+			$event['alerts'] = array_merge($event['alerts'], $r_event['alerts']);
+
+			CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+		}
 	}
 }
 
