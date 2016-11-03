@@ -33,8 +33,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-define('PAGE_SIZE', 100);
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
@@ -75,31 +73,42 @@ if (!$triggers) {
 
 $trigger = reset($triggers);
 
-// events
-$events = API::Event()->get([
-	'output' => API_OUTPUT_EXTEND,
-	'select_alerts' => API_OUTPUT_EXTEND,
-	'select_acknowledges' => API_OUTPUT_EXTEND,
-	'selectHosts' => API_OUTPUT_EXTEND,
+$alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
+	'clock', 'subject', 'message'
+];
+$options = [
+	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'acknowledged', 'value'],
+	'select_alerts' => $alert_options,
+	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'],
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
-]);
+];
 
+$events = API::Event()->get($options);
 if (!$events) {
 	access_deny();
 }
-
 $event = reset($events);
+
+$real_event = DBfetch(DBselect('SELECT eventid FROM event_recovery WHERE r_eventid='.zbx_dbstr($event['eventid'])));
+
+if ($real_event) {
+	$options['eventids'] = [$real_event['eventid']];
+
+	$events = API::Event()->get($options);
+	if (!$events) {
+		access_deny();
+	}
+	$event = reset($events);
+}
 
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
-		'select_alerts' => ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error',
-			'esc_step', 'clock', 'subject', 'message'
-		],
+		'select_alerts' => $alert_options,
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
