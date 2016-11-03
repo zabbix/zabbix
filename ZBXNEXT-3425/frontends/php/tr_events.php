@@ -94,6 +94,27 @@ if (!$events) {
 
 $event = reset($events);
 
+if ($event['r_eventid'] != 0) {
+	$r_events = API::Event()->get([
+		'output' => [],
+		'select_alerts' => ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error',
+			'esc_step', 'clock', 'subject', 'message'
+		],
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
+		'eventids' => [$event['r_eventid']],
+		'objectids' => getRequest('triggerid')
+	]);
+
+	$r_event = reset($r_events);
+
+	if ($r_event['alerts']) {
+		$event['alerts'] = array_merge($event['alerts'], $r_event['alerts']);
+
+		CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+	}
+}
+
 /*
  * Display
  */
