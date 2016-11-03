@@ -160,7 +160,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=0';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
-		$this->zbxTestCheckboxSelect('dropdown_first_remember', false);
+		$this->zbxTestCheckboxSelectXpath('dropdown_first_remember', false);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'remember selected']);
 		$this->assertFalse($this->zbxTestCheckboxSelected('dropdown_first_remember'));

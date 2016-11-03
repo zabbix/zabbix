@@ -79,7 +79,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_services'][@disabled]");
 
-		$this->zbxTestCheckboxSelect('hk_services_mode', false);
+		$this->zbxTestCheckboxSelectXpath('hk_services_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_services'][@disabled]");
 
 		// audit
@@ -314,7 +314,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// IT services
 
 			if (isset($data['hk_services_mode'])) {
-				$this->zbxTestCheckboxSelect('hk_services_mode', $data['hk_services_mode']);
+				$this->zbxTestCheckboxSelectXpath('hk_services_mode', $data['hk_services_mode']);
 			}
 
 			if (isset($data['hk_services'])) {
@@ -348,7 +348,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_history_global'])) {
-				$this->zbxTestCheckboxSelect('hk_history_global', $data['hk_history_global']);
+				$this->zbxTestCheckboxSelectXpath('hk_history_global', $data['hk_history_global']);
 			}
 
 			if (isset($data['hk_history'])) {
