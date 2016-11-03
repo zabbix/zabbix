@@ -979,6 +979,19 @@ define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
+// API validation
+// data types
+define('API_STRING_UTF8',	1);
+define('API_ID',			2);
+define('API_OBJECT',		3);
+define('API_IDS',			4);
+define('API_OBJECTS',		5);
+// flags
+define('API_REQUIRED',		0x01);
+define('API_NOT_EMPTY',		0x02);
+define('API_ALLOW_NULL',	0x04);
+define('API_UNIQ',			0x08);
+
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
 	define('JSON_ERROR_NONE', 0);
