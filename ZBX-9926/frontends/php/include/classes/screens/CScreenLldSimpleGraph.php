@@ -148,7 +148,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 			 * If screen item is dynamic or is templated screen, real item prototype is looked up by "key"
 			 * used as resource ID for this screen item and by current host.
 			 */
-			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+			if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 				$currentItemPrototype = API::ItemPrototype()->get([
 					'output' => ['key_'],
 					'itemids' => [$resourceid]

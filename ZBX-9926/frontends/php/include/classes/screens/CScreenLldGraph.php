@@ -122,7 +122,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 			 * If screen item is dynamic or is templated screen, real graph prototype is looked up by "name"
 			 * used as resource ID for this screen item and by current host.
 			 */
-			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+			if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 				$currentGraphPrototype = API::GraphPrototype()->get([
 					'output' => ['name'],
 					'graphids' => [$resourceid]
