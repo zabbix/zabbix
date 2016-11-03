@@ -590,7 +590,7 @@ void	zbx_db_close()
 	{
 		int	i;
 
-		zabbix_log(LOG_LEVEL_WARNING, "database closed with queries in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
 
 		for (i = 0; i < results.values_num; i++)
 		{
