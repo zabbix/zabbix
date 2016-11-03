@@ -95,7 +95,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_audit'][@disabled]");
 
-		$this->zbxTestCheckboxSelect('hk_audit_mode', false);
+		$this->zbxTestCheckboxSelectXpath('hk_audit_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_audit'][@disabled]");
 
 		//	user sessions
@@ -324,7 +324,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// audit
 
 			if (isset($data['hk_audit_mode'])) {
-				$this->zbxTestCheckboxSelect('hk_audit_mode', $data['hk_audit_mode']);
+				$this->zbxTestCheckboxSelectXpath('hk_audit_mode', $data['hk_audit_mode']);
 			}
 
 			if (isset($data['hk_audit'])) {

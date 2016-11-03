@@ -269,10 +269,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelectXpath('show_legend', false);
-		$this->zbxTestCheckboxSelect('show_work_period', false);
-		$this->zbxTestCheckboxSelect('show_triggers', false);
-		$this->zbxTestCheckboxSelect('visible_percent_left');
-		$this->zbxTestCheckboxSelect('visible_percent_right');
+		$this->zbxTestCheckboxSelectXpath('show_work_period', false);
+		$this->zbxTestCheckboxSelectXpath('show_triggers', false);
+		$this->zbxTestCheckboxSelectXpath('visible_percent_left');
+		$this->zbxTestCheckboxSelectXpath('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
 		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
@@ -501,10 +501,10 @@ class testTemplateInheritance extends CWebTest {
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelectXpath('show_legend', false);
-		$this->zbxTestCheckboxSelect('show_work_period', false);
-		$this->zbxTestCheckboxSelect('show_triggers', false);
-		$this->zbxTestCheckboxSelect('visible_percent_left');
-		$this->zbxTestCheckboxSelect('visible_percent_right');
+		$this->zbxTestCheckboxSelectXpath('show_work_period', false);
+		$this->zbxTestCheckboxSelectXpath('show_triggers', false);
+		$this->zbxTestCheckboxSelectXpath('visible_percent_left');
+		$this->zbxTestCheckboxSelectXpath('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
 		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
