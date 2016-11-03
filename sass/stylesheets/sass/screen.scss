@@ -1834,10 +1834,12 @@ select {
 	@include opacity(0);
 
 	+ label span {
+		position: relative;
 		display: inline-block;
 		width: 14px;
 		height: 14px;
-		margin: 0 4px -3px 0;
+		margin: -4px 4px 0 0;
+		bottom: -3px;
 		border: 1px solid $form-border-color;
 		background-color: $form-bg-color;
 
@@ -1848,11 +1850,6 @@ select {
 
 	&:focus + label span {
 		border-color: $form-border-focus-color;
-	}
-
-	&:checked + label span {
-		position: relative;
-		z-index: 1;
 	}
 
 	&:checked:focus + label span {
