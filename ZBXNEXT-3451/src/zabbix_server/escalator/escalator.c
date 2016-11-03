@@ -681,36 +681,39 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
-	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			/* the 1st 'select' works if remote command target is "Host group" */
-			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
-#ifdef HAVE_OPENIPMI
-			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
-			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
-#endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
-#endif
-			);
-
 	/* get hosts by assigned maintenance groups */
 
 	zbx_vector_uint64_create(&groupids);
 	get_operation_groupids(operationid, &groupids);
 
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,hosts_groups hg,hosts h"
-			" where o.operationid=" ZBX_FS_UI64
-				" and hg.hostid=h.hostid"
-				" and h.status=%d"
-				" and",
-			operationid, HOST_STATUS_MONITORED);
+	if (0 != groupids.values_num)
+	{
+		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				/* the 1st 'select' works if remote command target is "Host group" */
+				"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+					",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+#ifdef HAVE_OPENIPMI
+				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
+				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+#endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
+#endif
+				);
 
-	DBadd_condition_alloc(&buffer, &buffer_alloc, &buffer_offset, "hg.groupid", groupids.values,
-			groupids.values_num);
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,hosts_groups hg,hosts h"
+				" where o.operationid=" ZBX_FS_UI64
+					" and hg.hostid=h.hostid"
+					" and h.status=%d"
+					" and",
+				operationid, HOST_STATUS_MONITORED);
 
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " union ");
+		DBadd_condition_alloc(&buffer, &buffer_alloc, &buffer_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " union ");
+	}
 
 	zbx_vector_uint64_destroy(&groupids);
 
