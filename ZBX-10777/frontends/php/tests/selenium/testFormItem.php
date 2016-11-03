@@ -957,7 +957,7 @@ class testFormItem extends CWebTest {
 
 			$this->zbxTestTextPresent('Use custom multiplier');
 			$this->zbxTestAssertElementPresentId('multiplier');
-			$this->zbxTestAssertVisibleXpath("//input[@type='checkbox' and @id='multiplier']");
+			$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier']");
 			if (isset($templateid)) {
 				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
 			}
@@ -1212,7 +1212,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestAssertVisibleId('cancel');
@@ -2226,7 +2226,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelect('multiplier');
+			$this->zbxTestCheckboxSelectXpath('multiplier');
 			$this->zbxTestInputType('formula', $data['formula']);
 		}
 
@@ -2394,8 +2394,8 @@ class testFormItem extends CWebTest {
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
-		$this->zbxTestCheckboxSelect('hk_history_global', false);
-		$this->zbxTestCheckboxSelect('hk_trends_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_history_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
 
@@ -2432,10 +2432,10 @@ class testFormItem extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);
-		$this->zbxTestCheckboxSelect('hk_history_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_history_global', false);
 
 		$this->zbxTestInputType('hk_trends', 365);
-		$this->zbxTestCheckboxSelect('hk_trends_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
 

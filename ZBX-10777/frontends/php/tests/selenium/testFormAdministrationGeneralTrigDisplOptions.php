@@ -109,10 +109,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestInputType('problem_ack_color', 'BB0000');
 		$this->zbxTestInputType('ok_unack_color', '66FF66');
 		$this->zbxTestInputType('ok_ack_color', '66FF66');
-		$this->zbxTestCheckboxSelect('problem_unack_style', false);
-		$this->zbxTestCheckboxSelect('problem_ack_style', false);
-		$this->zbxTestCheckboxSelect('ok_unack_style', false);
-		$this->zbxTestCheckboxSelect('ok_ack_style', false);
+		$this->zbxTestCheckboxSelectXpath('problem_unack_style', false);
+		$this->zbxTestCheckboxSelectXpath('problem_ack_style', false);
+		$this->zbxTestCheckboxSelectXpath('ok_unack_style', false);
+		$this->zbxTestCheckboxSelectXpath('ok_ack_style', false);
 		$this->zbxTestInputType('ok_period', '120');
 		$this->zbxTestInputType('blink_period', '120');
 
