@@ -122,56 +122,19 @@ out:
  *                                                                            *
  * Purpose: send history data to a Zabbix server                              *
  *                                                                            *
+ * Comments: 'history data' request is deprecated starting with Zabbix v3.4   *
+ *                                                                            *
  ******************************************************************************/
 static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "send_proxyhistory";
 
-	struct zbx_json	j;
-	zbx_uint64_t	lastid;
-	int		ret = FAIL;
-	char		*error = NULL;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "history data request"))
-	{
-		/* do not send any reply to server in this case as the server expects history data */
-		goto out1;
-	}
+	/* do not send any reply to server in this case as the server expects history data */
+	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "history data request"))
+		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-
-	proxy_get_hist_data(&j, &lastid);
-
-	zbx_json_close(&j);
-
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-
-	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
-	{
-		error = zbx_strdup(error, zbx_socket_strerror());
-		goto out;
-	}
-
-	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
-		goto out;
-
-	if (0 != lastid)
-		proxy_set_hist_lastid(lastid);
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send history data to server at \"%s\": %s", sock->peer, error);
-
-	zbx_json_free(&j);
-	zbx_free(error);
-out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
