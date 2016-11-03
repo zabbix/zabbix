@@ -253,10 +253,6 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __function_name, groups, itemkey);
 
 	zbx_vector_uint64_create(&groupids);
-	sql = zbx_malloc(sql, sql_alloc);
-
-	esc = DBdyn_escape_string(itemkey);
-
 	zbx_vector_str_create(&group_names);
 
 	num = num_param(groups);
@@ -268,42 +264,47 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 		zbx_vector_str_append(&group_names, group);
 	}
 
-	/* TODO: make item notsupported when zbx_dc_get_nested_hostgroupids_by_names() fails */
 	zbx_dc_get_nested_hostgroupids_by_names(group_names.values, group_names.values_num, &groupids);
 	zbx_vector_str_clear_ext(&group_names, zbx_ptr_free);
 	zbx_vector_str_destroy(&group_names);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct i.itemid"
-			" from items i,hosts h,hosts_groups hg"
-			" where i.hostid=h.hostid"
-				" and h.hostid=hg.hostid"
-				" and i.key_='%s'"
-				" and i.status=%d"
-				" and i.state=%d"
-				" and h.status=%d"
-				" and",
-			esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);
+	if (0 != groupids.values_num)
+	{
+		sql = zbx_malloc(sql, sql_alloc);
+		esc = DBdyn_escape_string(itemkey);
 
-	zbx_free(esc);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct i.itemid"
+				" from items i,hosts h,hosts_groups hg"
+				" where i.hostid=h.hostid"
+					" and h.hostid=hg.hostid"
+					" and i.key_='%s'"
+					" and i.status=%d"
+					" and i.state=%d"
+					" and h.status=%d"
+					" and",
+				esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
-			groupids.values_num);
+		zbx_free(esc);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselect("%s", sql);
+
+		zbx_free(sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			zbx_vector_uint64_append(itemids, itemid);
+		}
+		DBfree_result(result);
+
+		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
 
 	zbx_vector_uint64_destroy(&groupids);
-
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(itemids, itemid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
