@@ -2432,10 +2432,10 @@ class testFormItem extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);
-		$this->zbxTestCheckboxSelect('hk_history_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_history_global', false);
 
 		$this->zbxTestInputType('hk_trends', 365);
-		$this->zbxTestCheckboxSelect('hk_trends_global', false);
+		$this->zbxTestCheckboxSelectXpath('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
 
