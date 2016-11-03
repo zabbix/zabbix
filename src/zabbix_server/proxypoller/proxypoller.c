@@ -366,8 +366,9 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
+	zbx_timespec_t		ts;
 
-	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, NULL))
+	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, &ts))
 	{
 		if ('\0' == *answer)
 		{
@@ -385,7 +386,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_dhis_data(&jp, &error))
+		if (SUCCEED != process_dhis_data(&jp, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" discovery data: %s", proxy->host, proxy->addr, error);
@@ -426,8 +427,9 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 	char			*answer = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
+	zbx_timespec_t		ts;
 
-	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, NULL))
+	while (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, &ts))
 	{
 		if ('\0' == *answer)
 		{
@@ -445,7 +447,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_areg_data(&jp, proxy->hostid, &error))
+		if (SUCCEED != process_areg_data(&jp, proxy->hostid, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" auto registration data: %s", proxy->host, proxy->addr, error);
@@ -480,27 +482,36 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer)
+static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts)
 {
 	struct zbx_json_parse	jp;
+	char			*error = NULL;
+	int			ret = FAIL;
 
 	if ('\0' == *answer)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no proxy data:"
 				" check allowed connection types and access rights", proxy->host, proxy->addr);
-		return FAIL;
+		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(answer, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, zbx_json_strerror());
-		return FAIL;
+		goto out;
 	}
 
 	zbx_proxy_update_version(proxy, &jp);
 
-	return SUCCEED;
+	if (SUCCEED != (ret = process_proxy_data(&jp, proxy->hostid, ts, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
+				proxy->host, proxy->addr, error);
+	}
+out:
+	zbx_free(error);
+	return ret;
 }
 
 /******************************************************************************
@@ -520,12 +531,13 @@ static int	proxy_get_data(DC_PROXY *proxy)
 	const char	*__function_name = "proxy_get_data";
 	char		*answer = NULL;
 	int		ret = FAIL, version;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == (version = proxy->version))
 	{
-		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, NULL) ||
+		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts) ||
 				'\0' == *answer)
 		{
 			zbx_proxy_update_version(proxy, NULL);
@@ -550,15 +562,15 @@ static int	proxy_get_data(DC_PROXY *proxy)
 		goto out;
 	}
 
-	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, NULL))
+	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
 		return FAIL;
 
-	ret = proxy_parse_proxy_data(proxy, answer);
+	ret = proxy_parse_proxy_data(proxy, answer, &ts);
 
 	zbx_free(answer);
 out:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	return ret;
 }
 

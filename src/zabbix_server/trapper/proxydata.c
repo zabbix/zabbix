@@ -62,13 +62,11 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	/*
-	if (SUCCEED != (ret = process_areg_data(jp, proxy.hostid, &error)))
+	if (SUCCEED != process_proxy_data(jp, proxy.hostid, ts, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
 	}
-	*/
 
 	ret = SUCCEED;
 out:

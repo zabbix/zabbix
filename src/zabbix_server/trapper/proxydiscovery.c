@@ -31,7 +31,7 @@
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
+void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "recv_discovery_data";
 
@@ -57,7 +57,7 @@ void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != (ret = process_dhis_data(jp, &error)))
+	if (SUCCEED != (ret = process_dhis_data(jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid discovery data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);

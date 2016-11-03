@@ -1518,19 +1518,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_host_availability                                        *
+ * Function: process_host_availability_array                                  *
  *                                                                            *
- * Purpose: update proxy hosts availability                                   *
+ * Purpose: parses host availability data array and processes the data        *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_host_availability(struct zbx_json_parse *jp, char **error)
+static int	process_host_availability_array(struct zbx_json_parse *jp_data, char **error)
 {
-	const char		*__function_name = "process_host_availability";
 	zbx_uint64_t		hostid;
-	struct zbx_json_parse	jp_data, jp_row;
+	struct zbx_json_parse	jp_row;
 	const char		*p = NULL;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 129;
@@ -1538,39 +1537,28 @@ int	process_host_availability(struct zbx_json_parse *jp, char **error)
 	zbx_vector_ptr_t	hosts;
 	int			i, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
-		goto out;
-
 	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
 	zbx_vector_ptr_create(&hosts);
 
-	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
+	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the host entries */
 	{
 		if (SUCCEED != (ret = zbx_json_brackets_open(p, &jp_row)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
-			goto clean;
+			goto out;
 		}
 
 		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
-			goto clean;
+			goto out;
 		}
 
 		if (SUCCEED != (ret = is_uint64(tmp, &hostid)))
 		{
 			*error = zbx_strdup(*error, "hostid is not a valid numeric");
-			goto clean;
+			goto out;
 		}
 
 		ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
@@ -1598,7 +1586,7 @@ int	process_host_availability(struct zbx_json_parse *jp, char **error)
 		{
 			zbx_free(ha);
 			*error = zbx_dsprintf(*error, "no availability data for \"hostid\":" ZBX_FS_UI64, hostid);
-			goto clean;
+			goto out;
 		}
 
 		zbx_vector_ptr_append(&hosts, ha);
@@ -1632,11 +1620,46 @@ int	process_host_availability(struct zbx_json_parse *jp, char **error)
 
 		zbx_free(sql);
 	}
-clean:
+
+	ret = SUCCEED;
+out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);
 
 	zbx_free(tmp);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_host_availability                                        *
+ *                                                                            *
+ * Purpose: update proxy hosts availability                                   *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	process_host_availability(struct zbx_json_parse *jp, char **error)
+{
+	const char		*__function_name = "process_host_availability";
+	struct zbx_json_parse	jp_data;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
+		goto out;
+
+	ret = process_host_availability_array(&jp_data, error);
+
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2385,14 +2408,52 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_hist_data                                                *
+ * Function: get_proxy_timediff                                               *
  *                                                                            *
- * Purpose: process values sent by proxies, active agents and senders         *
+ * Purpose: calculates difference between server and proxy time               *
+ *                                                                            *
+ * Parameters: jp           - [IN] JSON with clock, [ns] fields               *
+ *             ts_recv      - [IN] the connection timestamp                   *
+ *             ts_diff      - [OUT] proxy - server timestamp difference       *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - the JSON does not have timestamp data                *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_proxy_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv, zbx_timespec_t *ts_diff)
+{
+	char	tmp[32];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+	{
+		ts_diff->sec = ts_recv->sec - atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+		{
+			ts_diff->ns = ts_recv->ns - atoi(tmp);
+
+			if (ts_diff->ns < 0)
+			{
+				ts_diff->sec--;
+				ts_diff->ns += 1000000000;
+			}
+		}
+		return SUCCEED;
+	}
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_hist_data_array                                          *
+ *                                                                            *
+ * Purpose: parses history data array and process the data                    *
  *                                                                            *
  * Parameters: sock         - [IN] descriptor of agent-server socket          *
  *                                 connection. NULL for proxy connection      *
- *             jp           - [IN] JSON with historical data                  *
- *             proxy_hostid - [IN] proxy identificator from database          *
+ *             jp_data      - [IN] JSON with history data array               *
+ *             proxy_hostid - [IN] proxy identifier from database             *
+ *             ts_diff      - [IN] proxy - server timestamp difference        *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
  *                                                                            *
@@ -2400,56 +2461,27 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
-		zbx_timespec_t *ts, char **info)
+static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp_data,
+		const zbx_uint64_t proxy_hostid, zbx_timespec_t *ts_diff, char **info)
 {
 #define VALUES_MAX	256
-	const char		*__function_name = "process_hist_data";
-	struct zbx_json_parse	jp_data, jp_row;
+	struct zbx_json_parse	jp_row;
 	const char		*p = NULL;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, values_num = 0;
 	int			ret, processed = 0, total_num = 0;
 	double			sec;
-	zbx_timespec_t		proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	sec = zbx_time();
-
-	proxy_timediff.sec = 0;
-	proxy_timediff.ns = 0;
 
 	if (NULL == values)
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
-	{
-		proxy_timediff.sec = ts->sec - atoi(tmp);
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
-		{
-			proxy_timediff.ns = ts->ns - atoi(tmp);
-
-			if (proxy_timediff.ns < 0)
-			{
-				proxy_timediff.sec--;
-				proxy_timediff.ns += 1000000000;
-			}
-		}
-	}
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
-		goto out;
-	}
-
 	if (0 != proxy_hostid)
-		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+		DCconfig_set_proxy_timediff(proxy_hostid, ts_diff);
 
-	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
+	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the item key entries */
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 		{
@@ -2468,7 +2500,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 			if (FAIL == is_uint31(tmp, &av->ts.sec))
 				continue;
 
-			av->ts.sec += proxy_timediff.sec;
+			av->ts.sec += ts_diff->sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
@@ -2478,7 +2510,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 					continue;
 				}
 
-				av->ts.ns += proxy_timediff.ns;
+				av->ts.ns += ts_diff->ns;
 
 				if (av->ts.ns > 999999999)
 				{
@@ -2487,7 +2519,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 				}
 			}
 			else
-				av->ts.ns = proxy_timediff.ns;
+				av->ts.ns = ts_diff->ns;
 		}
 		else
 			zbx_timespec(&av->ts);
@@ -2563,9 +2595,56 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
-out:
+
 	zbx_free(tmp);
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_hist_data                                                *
+ *                                                                            *
+ * Purpose: process values sent by proxies, active agents and senders         *
+ *                                                                            *
+ * Parameters: sock         - [IN] descriptor of agent-server socket          *
+ *                                 connection. NULL for proxy connection      *
+ *             jp           - [IN] JSON with historical data                  *
+ *             proxy_hostid - [IN] proxy identificator from database          *
+ *             ts           - [IN] timestamp when the proxy connection was    *
+ *                                 established                                *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
+		zbx_timespec_t *ts, char **info)
+{
+#define VALUES_MAX	256
+	const char		*__function_name = "process_hist_data";
+	int			ret;
+	struct zbx_json_parse	jp_data;
+	zbx_timespec_t		ts_diff;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != get_proxy_timediff(jp, ts, &ts_diff))
+	{
+		ts_diff.sec = 0;
+		ts_diff.ns = 0;
+	}
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*info = zbx_strdup(*info, zbx_json_strerror());
+		goto out;
+	}
+
+	ret = process_hist_data_array(sock, &jp_data, proxy_hostid, &ts_diff, info);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -2573,15 +2652,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_dhis_data                                                *
+ * Function: process_dhis_data_array                                          *
  *                                                                            *
- * Purpose: update discovery data, received from proxy                        *
+ * Purpose: parse discovery data array and process the data                   *
+ *                                                                            *
+ * Parameters: jp_data      - [IN] JSON with discovery data array             *
+ *             ts_diff      - [IN] proxy - server timestamp difference        *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_dhis_data(struct zbx_json_parse *jp, char **error)
+static int	process_dhis_data_array(struct zbx_json_parse *jp_data, zbx_timespec_t *ts_diff, char **error)
 {
 	const char		*__function_name = "process_dhis_data";
 	DB_RESULT		result;
@@ -2589,38 +2673,22 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 	DB_DRULE		drule;
 	DB_DHOST		dhost;
 	zbx_uint64_t		last_druleid = 0, dcheckid;
-	struct zbx_json_parse	jp_data, jp_row;
-	int			port, status, ret;
+	struct zbx_json_parse	jp_row;
+	int			port, status, ret = SUCCEED;
 	const char		*p = NULL;
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
-	time_t			now, hosttime, itemtime;
+	time_t			itemtime;
 	size_t			value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	now = time(NULL);
-
-	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	hosttime = atoi(tmp);
 
 	memset(&drule, 0, sizeof(drule));
 	*last_ip = '\0';
 
 	value = zbx_malloc(value, value_alloc);
 
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
@@ -2633,7 +2701,7 @@ int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
-		itemtime = now - (hosttime - atoi(tmp));
+		itemtime = atoi(tmp) + ts_diff->sec;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
 			goto json_parse_error;
@@ -2728,6 +2796,48 @@ json_parse_error:
 	}
 
 	zbx_free(value);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_dhis_data                                                *
+ *                                                                            *
+ * Purpose: update discovery data, received from proxy                        *
+ *                                                                            *
+ * Parameters: jp           - [IN] JSON with historical data                  *
+ *             ts           - [IN] timestamp when the proxy connection was    *
+ *                                 established                                *
+ *             error        - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	process_dhis_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error)
+{
+	const char		*__function_name = "process_dhis_data";
+	int			ret;
+	struct zbx_json_parse	jp_data;
+	zbx_timespec_t		ts_diff;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	ret = process_dhis_data(&jp_data, &ts_diff, error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2736,44 +2846,37 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_areg_data                                                *
+ * Function: process_areg_data_array                                          *
  *                                                                            *
- * Purpose: update auto registration data, received from proxy                *
+ * Purpose: parse auto registration data array and process the data           *
+ *                                                                            *
+ * Parameters: jp_data      - [IN] JSON with auto registration data array     *
+ *             proxy_hostid - [IN] proxy identifier from database             *
+ *             ts_diff      - [IN] proxy - server timestamp difference        *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char **error)
+static int	process_areg_data_array(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts_diff,
+		char **error)
 {
-	const char		*__function_name = "process_areg_data";
-
-	struct zbx_json_parse	jp_data, jp_row;
-	int			ret;
+	struct zbx_json_parse	jp_row;
+	int			ret = SUCCEED;
 	const char		*p = NULL;
-	time_t			now, hosttime, itemtime;
+	time_t			itemtime;
 	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	autoreg_hosts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	now = time(NULL);
-
-	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-		goto out;
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto out;
-
-	hosttime = atoi(tmp);
-
 	zbx_vector_ptr_create(&autoreg_hosts);
 	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
 
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
@@ -2781,7 +2884,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
 			break;
 
-		itemtime = now - (hosttime - atoi(tmp));
+		itemtime = atoi(tmp) + ts_diff->sec;
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host))))
 			break;
@@ -2817,10 +2920,54 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char
 	zbx_free(host_metadata);
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
-out:
+
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_areg_data                                                *
+ *                                                                            *
+ * Purpose: update auto registration data, received from proxy                *
+ *                                                                            *
+ * Parameters: jp           - [IN] JSON with historical data                  *
+ *             proxy_hostid - [IN] proxy identifier from database             *
+ *             ts           - [IN] timestamp when the proxy connection was    *
+ *                                 established                                *
+ *             error        - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error)
+{
+	const char		*__function_name = "process_areg_data";
+
+	struct zbx_json_parse	jp_data;
+	int			ret;
+	zbx_timespec_t		ts_diff;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	ret = process_areg_data_array(&jp_data, proxy_hostid, &ts_diff, error);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -2902,4 +3049,79 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_proxy_data                                               *
+ *                                                                            *
+ * Purpose: process 'proxy data' packet received from proxy                   *
+ *                                                                            *
+ * Parameters: jp           - [IN] JSON with proxy data                       *
+ *             proxy_hostid - [IN] proxy identifier from database             *
+ *             ts           - [IN] timestamp when the proxy connection was    *
+ *                                 established                                *
+ *             error        - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error)
+{
+	const char		*__function_name = "process_proxy_data";
+
+	struct zbx_json_parse	jp_data;
+	int			ret = FAIL;
+	zbx_timespec_t		ts_diff;
+	char			*error_step = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
+	{
+		if (SUCCEED != process_host_availability_array(&jp_data, &error_step))
+			*error = zbx_strdcatf(*error, "%s\n", error_step);
+	}
+	else
+		*error = zbx_strdcatf(*error, "cannot open host availability data array\n");
+
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
+	{
+		if (SUCCEED != process_hist_data_array(NULL, &jp_data, proxy_hostid, &ts_diff, &error_step))
+			*error = zbx_strdcatf(*error, "%s\n", error_step);
+	}
+	else
+		*error = zbx_strdcatf(*error, "cannot open history data array\n");
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
+	{
+		if (SUCCEED != process_dhis_data_array(&jp_data, &ts_diff, &error_step))
+			*error = zbx_strdcatf(*error, "%s\n", error_step);
+	}
+	else
+		*error = zbx_strdcatf(*error, "cannot open discovery data array\n");
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
+	{
+		if (SUCCEED != process_areg_data_array(&jp_data, proxy_hostid, &ts_diff, &error_step))
+			*error = zbx_strdcatf(*error, "%s\n", error_step);
+	}
+	else
+		*error = zbx_strdcatf(*error, "cannot open auto registration data array\n");
+
+	if (NULL == *error)
+		ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
