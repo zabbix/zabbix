@@ -177,7 +177,7 @@ class CApiInputValidator {
 	 * Array of ids validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -190,6 +190,11 @@ class CApiInputValidator {
 		if (($flags & API_ALLOW_NULL) && $data === null) {
 			return true;
 		}
+
+		if (($flags & API_NORMALIZE) && self::validateId([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
 
 		if (!is_array($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
@@ -205,7 +210,7 @@ class CApiInputValidator {
 		$uniq = [];
 
 		foreach ($data as $key => &$value) {
-			if (!ctype_digit(strval($key)) || strval($key) !== strval($index)) {
+			if (!is_int($key) || $key !== $index) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $key));
 				return false;
 			}
@@ -233,7 +238,7 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -257,10 +262,18 @@ class CApiInputValidator {
 			return false;
 		}
 
+		if (($flags & API_NORMALIZE) && $data) {
+			reset($data);
+
+			if (!is_int(key($data))) {
+				$data = [$data];
+			}
+		}
+
 		$index = 0;
 
 		foreach ($data as $key => &$value) {
-			if (!ctype_digit(strval($key)) || strval($key) !== strval($index)) {
+			if (!is_int($key) || $key !== $index) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $key));
 				return false;
 			}

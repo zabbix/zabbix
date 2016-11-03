@@ -991,6 +991,7 @@ define('API_REQUIRED',		0x01);
 define('API_NOT_EMPTY',		0x02);
 define('API_ALLOW_NULL',	0x04);
 define('API_UNIQ',			0x08);
+define('API_NORMALIZE',		0x10);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

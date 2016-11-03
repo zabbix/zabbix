@@ -230,6 +230,30 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/": an array is expected.'
 			],
 			[
+				['type' => API_IDS, 'flags' => API_NORMALIZE],
+				null,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_IDS],
+				46342,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_IDS, 'flags' => API_NORMALIZE],
+				46342,
+				'/',
+				[46342]
+			],
+			[
+				['type' => API_IDS, 'flags' => API_NORMALIZE],
+				'0000046342',
+				'/',
+				['46342']
+			],
+			[
 				['type' => API_IDS, 'flags' => API_ALLOW_NULL],
 				null,
 				'/',
@@ -441,6 +465,43 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				],
 				'/',
 				'Invalid parameter "/1/mappings/7/value": value is not unique.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64]
+				]],
+				[
+					'valuemapid' => 5,
+					'name' => 'APC Battery Status'
+				],
+				'/',
+				'Invalid parameter "/": unexpected parameter "valuemapid".'
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
+					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+						'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
+					]]
+				]],
+				[
+					'valuemapid' => 5,
+					'name' => 'APC Battery Status',
+					'mappings' => ['value' => '1', 'newvalue' => 'unknown']
+				],
+				'/',
+				[
+					[
+						'valuemapid' => 5,
+						'name' => 'APC Battery Status',
+						'mappings' => [
+							['value' => '1', 'newvalue' => 'unknown']
+						]
+					]
+				]
 			]
 		];
 	}
