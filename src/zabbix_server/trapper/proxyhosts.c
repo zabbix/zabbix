@@ -84,52 +84,11 @@ void	send_host_availability(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_host_availability";
 
-	struct zbx_json	j;
-	int		ret = FAIL, ts;
-	char		*error = NULL;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "host availability data request"))
-	{
-		/* do not send any reply to server in this case as the server expects host availability data */
-		goto out1;
-	}
+	/* do not send any reply to server in this case as the server expects host availability data */
+	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "host availability data request"))
+		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	/* if there are no host availability changes we still have to send empty data in response */
-	if (SUCCEED != get_host_availability_data(&j, &ts))
-	{
-		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-		zbx_json_close(&j);
-	}
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
-
-	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
-	{
-		error = zbx_strdup(error, zbx_socket_strerror());
-		goto out;
-	}
-
-	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
-		goto out;
-
-	zbx_set_availability_diff_ts(ts);
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-				sock->peer, error);
-	}
-
-	zbx_json_free(&j);
-	zbx_free(error);
-out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
