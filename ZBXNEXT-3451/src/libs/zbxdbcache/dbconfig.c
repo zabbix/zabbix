@@ -4103,11 +4103,12 @@ static void	DCsync_hostgroups(DB_RESULT result)
 
 		group = DCfind_id(&config->hostgroups, groupid, sizeof(zbx_dc_hostgroup_t), &found);
 
-		if (0 == found)
-			zbx_vector_uint64_create_ext(&group->nested_groupids, __config_mem_malloc_func,
+		/* recreate the nested groupid cache to free memory if nested groups were removed */
+		if (0 != found)
+			zbx_vector_uint64_destroy(&group->nested_groupids);
+
+		zbx_vector_uint64_create_ext(&group->nested_groupids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
-		else
-			zbx_vector_uint64_clear(&group->nested_groupids);
 
 		DCstrpool_replace(found, &group->name, row[1]);
 
@@ -4129,6 +4130,7 @@ static void	DCsync_hostgroups(DB_RESULT result)
 		if (FAIL != zbx_vector_uint64_bsearch(&syncids, group->groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
+		zbx_vector_uint64_destroy(&group->nested_groupids);
 		zbx_strpool_release(group->name);
 		zbx_hashset_iter_remove(&iter);
 	}
