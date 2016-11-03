@@ -228,7 +228,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelect('status', false);
+		$this->zbxTestCheckboxSelectXpath('status', false);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
@@ -268,7 +268,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('width', '950');
 		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelectXpath('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
@@ -384,7 +384,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 		$this->zbxTestDropdownSelect('valuemapid', 'APC Battery Status');
-		$this->zbxTestCheckboxSelect('status', false);
+		$this->zbxTestCheckboxSelectXpath('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
@@ -444,7 +444,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelect('status', false);
+		$this->zbxTestCheckboxSelectXpath('status', false);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger prototype added');
@@ -500,7 +500,7 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestInputTypeOverwrite('height', '250');
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelectXpath('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
