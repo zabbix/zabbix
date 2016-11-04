@@ -547,8 +547,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FULL_STRING);
-			e += par_r + 1)
+	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
 		/* substitute LLD macros in the part of the string preceding function parameters */
 
@@ -587,35 +586,34 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 			if (p - e == par_l + 1)
 			{
-				char	*key, *host = NULL;
+				char	*key = NULL, *host = NULL;
 
-				if (SUCCEED == parse_host_key(param, &host, &key))
+				if (SUCCEED != parse_host_key(param, &host, &key) ||
+						SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+								MACRO_TYPE_ITEM_KEY, NULL, 0))
 				{
-					if (SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
-							MACRO_TYPE_ITEM_KEY, error, max_error_len))
-					{
-						zbx_free(host);
-						zbx_free(key);
-						goto out;
-					}
-
-					zbx_free(param);
-					if (NULL != host)
-					{
-						param = zbx_dsprintf(NULL, "%s:%s", host, key);
-						zbx_free(host);
-						zbx_free(key);
-					}
-					else
-						param = key;
+					zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
+					zbx_free(host);
+					zbx_free(key);
+					goto out;
 				}
+
+				zbx_free(param);
+				if (NULL != host)
+				{
+					param = zbx_dsprintf(NULL, "%s:%s", host, key);
+					zbx_free(host);
+					zbx_free(key);
+				}
+				else
+					param = key;
 			}
 			else
 				substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 			if (SUCCEED != zbx_function_param_quote(&param, quoted))
 			{
-				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\")", param);
+				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 				goto out;
 			}
 

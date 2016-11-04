@@ -98,9 +98,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params;
-			SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FULL_STRING);
-			e += par_r + 1)
+	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
 		/* copy the part of the string preceding function */
 		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);

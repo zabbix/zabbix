@@ -3641,8 +3641,8 @@ int	zbx_function_param_quote(char **param, int forced)
  *                                                                            *
  * Function: zbx_no_function                                                  *
  *                                                                            *
- * Purpose: count calculated item formula characters that can be skipped      *
- *          without the risk of missing function                              *
+ * Purpose: count calculated item (prototype) formula characters that can be  *
+ *          skipped without the risk of missing a function                    *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_no_function(const char *expr)
@@ -3657,25 +3657,37 @@ size_t	zbx_no_function(const char *expr)
 
 /******************************************************************************
  *                                                                            *
- * Function: match_parenthesis                                                *
+ * Function: function_match_parenthesis                                       *
  *                                                                            *
  * Purpose: given the position of opening function parenthesis find the       *
  *          position of a closing one                                         *
  *                                                                            *
+ * Parameters: expr     - [IN] string to parse                                *
+ *             par_l    - [IN] position of the opening parenthesis            *
+ *             par_r    - [OUT] position of the closing parenthesis           *
+ *                                                                            *
+ * Return value: SUCCEED - closing parenthesis was found                      *
+ *               FAIL    - string after par_l does not look like a valid      *
+ *                         function parameter list                            *
+ *                                                                            *
  ******************************************************************************/
-static const char	*match_parenthesis(const char *ptr)
+static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
 #define ZBX_FUNC_PARAM_UNQUOTED		2
 #define ZBX_FUNC_PARAM_POSTQUOTED	3
 
+	const char	*ptr;
 	int		state = ZBX_FUNC_PARAM_NEXT;
 
-	while ('\0' != *ptr)
+	for (ptr = expr + par_l + 1; '\0' != *ptr; ptr++)
 	{
 		if (')' == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
-			return ptr;
+		{
+			*par_r = ptr - expr;
+			return SUCCEED;
+		}
 
 		switch (state)
 		{
@@ -3697,16 +3709,14 @@ static const char	*match_parenthesis(const char *ptr)
 				if (',' == *ptr)
 					state = ZBX_FUNC_PARAM_NEXT;
 				else if (' ' != *ptr)
-					return NULL;
+					return FAIL;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-
-		ptr++;
 	}
 
-	return NULL;
+	return FAIL;
 
 #undef ZBX_FUNC_PARAM_NEXT
 #undef ZBX_FUNC_PARAM_QUOTED
@@ -3716,63 +3726,62 @@ static const char	*match_parenthesis(const char *ptr)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_function_validate                                            *
+ *                                                                            *
+ * Purpose: check whether expression starts with a valid function             *
+ *                                                                            *
+ * Parameters: expr     - [IN] string to parse                                *
+ *             par_l    - [OUT] position of the opening parenthesis or the    *
+ *                              amount of characters to skip                  *
+ *             par_r    - [OUT] position of the closing parenthesis           *
+ *                                                                            *
+ * Return value: SUCCEED - string starts with a valid function                *
+ *               FAIL    - string does not start with a function and par_l    *
+ *                         characters can be safely skipped                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
+{
+	/* try to validate function name */
+	if (SUCCEED != function_parse_name(expr, par_l))
+		return FAIL;
+
+	/* now we know the position of '(', try to find ')' */
+	return function_match_parenthesis(expr, *par_l, par_r);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_function_find                                                *
  *                                                                            *
- * Purpose: find location of function parameters in calculated item formula   *
+ * Purpose: find the location of the next function and its parameters in      *
+ *          calculated item (prototype) formula                               *
  *                                                                            *
  * Parameters: expr     - [IN] string to parse                                *
  *             func_pos - [OUT] function position in the string               *
  *             par_l    - [OUT] position of the opening parenthesis           *
  *             par_r    - [OUT] position of the closing parenthesis           *
  *                                                                            *
+ * Return value: SUCCEED - function was found at func_pos                     *
+ *               FAIL    - there are no functions in the expression           *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, int search_type)
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r)
 {
-	const char	*ptr, *par;
-	size_t		len;
+	const char	*ptr;
 
-	for (ptr = expr; '\0' != *ptr; ptr += len)
+	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
 	{
-		if (FUNCTION_FIND_TYPE_FIRST_CHAR == search_type && SUCCEED != is_function_char(*ptr))
-			return FAIL;
-
 		/* skip the part of expression that is definitely not a function */
 		ptr += zbx_no_function(ptr);
 
-		/* try to validate function name */
-		if (SUCCEED != function_parse_name(ptr, &len))
-		{
-			switch (search_type)
-			{
-				case FUNCTION_FIND_TYPE_FULL_STRING:
-					continue;
-				case FUNCTION_FIND_TYPE_FIRST_CHAR:
-					return FAIL;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					break;
-			}
-		}
-
-
-		/* now ptr + len points to '(', try to find ')' */
-		if (NULL == (par = match_parenthesis(ptr + len + 1)))
-		{
-			switch (search_type)
-			{
-				case FUNCTION_FIND_TYPE_FULL_STRING:
-					continue;
-				case FUNCTION_FIND_TYPE_FIRST_CHAR:
-					return FAIL;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					break;
-			}
-		}
+		/* try to validate function candidate */
+		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r))
+			continue;
 
 		*func_pos = ptr - expr;
-		*par_l = ptr + len - expr;
-		*par_r = par - expr;
+		*par_l += *func_pos;
+		*par_r += *func_pos;
 		return SUCCEED;
 	}
 

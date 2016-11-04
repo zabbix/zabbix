@@ -2400,7 +2400,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 {
 	char	*p, *host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
-	size_t	sz, f_pos, par_l, par_r;
+	size_t	sz, par_l, par_r;
 
 	p = bl + 1;
 
@@ -2436,11 +2436,8 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
 
-	if (SUCCEED != zbx_function_find(p, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FIRST_CHAR) ||
-			'}' != p[par_r + 1])
-	{
+	if (SUCCEED != zbx_function_validate(p, &par_l, &par_r) || '}' != p[par_r + 1])
 		goto fail;
-	}
 
 	p[par_l] = '\0';
 	p[par_r] = '\0';
@@ -4103,7 +4100,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 {
 	char	*pl, *pr;
 	char	*key = NULL;
-	size_t	sz, replace_to_offset = 0, f_pos, par_l, par_r;
+	size_t	sz, replace_to_offset = 0, par_l, par_r;
 
 	pl = pr = data + *pos;
 	if ('{' != *pr++)
@@ -4145,7 +4142,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 		return FAIL;
 
 	/* a trigger function with parameters */
-	if (SUCCEED != zbx_function_find(pr, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FIRST_CHAR))
+	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
 		return FAIL;
 
 	pr += par_r + 1;
