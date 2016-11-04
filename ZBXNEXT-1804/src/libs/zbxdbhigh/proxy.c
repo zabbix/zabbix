@@ -29,6 +29,13 @@
 #include "zbxalgo.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
+/* the space reserved in json buffer to hold at least one record plus service data */
+#define ZBX_DATA_JSON_RESERVED  	(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+
+#define ZBX_DATA_JSON_RECORD_LIMIT 	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
+#define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
+
+
 extern unsigned int	configured_tls_accept_modes;
 
 typedef struct
@@ -1745,22 +1752,21 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Purpose: Get history data from the database.                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid)
+static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid,
+		zbx_uint64_t *id, int *more)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
-	int		f, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
+	int		f, records = 0, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id;
 	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
+	*more = ZBX_PROXY_DATA_DONE;
 	*lastid = 0;
-
-	proxy_get_lastid(ht->table, ht->lastidfield, &id);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
@@ -1768,15 +1774,15 @@ static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_t
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", ht->fields[f].field);
 try_again:
 	zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where id>" ZBX_FS_UI64 " order by id",
-			ht->table, id);
+			ht->table, *id);
 
-	result = DBselectN(sql, records_lim);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(*lastid, row[0]);
 
-		if (1 < *lastid - id)
+		if (1 < *lastid - *id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
 			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
@@ -1785,7 +1791,7 @@ try_again:
 				DBfree_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__function_name, *lastid - id - 1,
+						__function_name, *lastid - *id - 1,
 						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
@@ -1793,7 +1799,7 @@ try_again:
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
-						__function_name, *lastid - id - 1);
+						__function_name, *lastid - *id - 1);
 			}
 		}
 
@@ -1811,12 +1817,22 @@ try_again:
 
 		zbx_json_close(j);
 
-		id = *lastid;
-		records_lim--;
+		/* stop gathering data to avoid exceeding the maximum packet size */
+		if (ZBX_DATA_JSON_RECORD_LIMIT < j->buffer_offset)
+		{
+			*more = ZBX_PROXY_DATA_MORE;
+			break;
+		}
+
+		*id = *lastid;
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
+	if (ZBX_MAX_HRECORDS == records)
+		*more = ZBX_PROXY_DATA_MORE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64 " more:%d size:" ZBX_FS_SIZE_T,
+			__function_name, records, *lastid, *more, j->buffer_offset);
 
 	return records;
 }
@@ -1829,12 +1845,13 @@ try_again:
  *          cache to speed things up.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t * id, int *records_processed)
+static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t *id, int *more)
 {
 	const char			*__function_name = "proxy_get_history_data";
 
 	typedef struct
 	{
+		zbx_uint64_t	itemid;
 		zbx_uint64_t	lastlogsize;
 		size_t		psource;
 		size_t		pvalue;
@@ -1861,7 +1878,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_
 	static size_t			data_alloc = 0;
 	size_t				data_num = 0, i;
 	DC_ITEM				*dc_items;
-	int				*errcodes, records = 0, records_lim = ZBX_MAX_HRECORDS, retries = 1;
+	int				*errcodes, records = 0, retries = 1;
 	zbx_history_data_t		*hd;
 	struct timespec			t_sleep = { 0, 100000000L }, t_rem;
 
@@ -1870,6 +1887,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_
 	if (NULL == string_buffer)
 		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
 
+	*more = ZBX_PROXY_DATA_DONE;
 	*lastid = 0;
 
 try_again:
@@ -1881,7 +1899,7 @@ try_again:
 			" order by id",
 			*id);
 
-	result = DBselectN(sql, records_lim);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	zbx_free(sql);
 
@@ -1921,6 +1939,7 @@ try_again:
 
 		hd = &data[data_num++];
 
+		hd->itemid = *lastid;
 		hd->clock = atoi(row[2]);
 		hd->ns = atoi(row[3]);
 		hd->timestamp = atoi(row[4]);
@@ -1950,7 +1969,6 @@ try_again:
 		string_buffer_offset += len2;
 
 		*id = *lastid;
-		records_lim--;
 	}
 	DBfree_result(result);
 
@@ -2009,42 +2027,94 @@ try_again:
 		zbx_json_close(j);
 
 		records++;
+
+		/* stop gathering data to avoid exceeding the maximum packet size */
+		if (ZBX_DATA_JSON_RECORD_LIMIT < j->buffer_offset)
+		{
+			/* rollback lastid and id to the last added itemid */
+			*lastid = hd->itemid;
+			*id = hd->itemid;
+
+			*more = ZBX_PROXY_DATA_MORE;
+			break;
+		}
 	}
 	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
-	*records_processed = data_num;
+	if (ZBX_MAX_HRECORDS == data_num)
+		*more = ZBX_PROXY_DATA_MORE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d records_processed:%d lastid:" ZBX_FS_UI64,
-			__function_name, records, *records_processed, *lastid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d records selected:%d lastid:" ZBX_FS_UI64 " more:%d size:"
+			ZBX_FS_SIZE_T, __function_name, records, data_num, *lastid, *more, (int)j->buffer_offset);
 
 	return records;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	int		records = 0, records_processed;
+	int		records = 0;
 	zbx_uint64_t	id;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
-	do
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		records += proxy_get_history_data(j, lastid, &id, &records_processed);
+		records += proxy_get_history_data(j, lastid, &id, more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+			break;
 	}
-	while (ZBX_MAX_HRECORDS > records && ZBX_MAX_HRECORDS == records_processed);
 
 	return records;
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	return proxy_get_history_data_simple(j, &dht, lastid);
+	int		records = 0;
+	zbx_uint64_t	id;
+
+	proxy_get_lastid(dht.table, dht.lastidfield, &id);
+
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
+	{
+		records += proxy_get_history_data_simple(j, &dht, lastid, &id, more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+			break;
+	}
+
+	return records;
 }
 
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	return proxy_get_history_data_simple(j, &areg, lastid);
+	int		records = 0;
+	zbx_uint64_t	id;
+
+	proxy_get_lastid(areg.table, areg.lastidfield, &id);
+
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
+	{
+		records += proxy_get_history_data_simple(j, &areg, lastid, &id, more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+			break;
+	}
+
+	return records;
 }
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
@@ -2465,6 +2535,8 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 		const zbx_uint64_t proxy_hostid, zbx_timespec_t *ts_diff, char **info)
 {
 #define VALUES_MAX	256
+	const char		*__function_name = "process_hist_data_array";
+
 	struct zbx_json_parse	jp_row;
 	const char		*p = NULL;
 	char			*tmp = NULL;
@@ -2472,6 +2544,8 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 	int			ret, processed = 0, total_num = 0;
 	double			sec;
 	static AGENT_VALUE	*values = NULL, *av;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
 
@@ -2598,6 +2672,8 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 
 	zbx_free(tmp);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -2667,7 +2743,7 @@ out:
  ******************************************************************************/
 static int	process_dhis_data_array(struct zbx_json_parse *jp_data, zbx_timespec_t *ts_diff, char **error)
 {
-	const char		*__function_name = "process_dhis_data";
+	const char		*__function_name = "process_dhis_data_array";
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_DRULE		drule;
@@ -2837,7 +2913,7 @@ int	process_dhis_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **erro
 		goto out;
 	}
 
-	ret = process_dhis_data(&jp_data, &ts_diff, error);
+	ret = process_dhis_data_array(&jp_data, &ts_diff, error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2863,6 +2939,8 @@ out:
 static int	process_areg_data_array(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts_diff,
 		char **error)
 {
+	const char		*__function_name = "process_areg_data_array";
+
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
 	const char		*p = NULL;
@@ -2872,6 +2950,8 @@ static int	process_areg_data_array(struct zbx_json_parse *jp_data, zbx_uint64_t 
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	autoreg_hosts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
@@ -2923,6 +3003,8 @@ static int	process_areg_data_array(struct zbx_json_parse *jp_data, zbx_uint64_t 
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

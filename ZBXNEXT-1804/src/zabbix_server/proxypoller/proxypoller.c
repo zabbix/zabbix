@@ -482,11 +482,13 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts)
+static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
 	int			ret = FAIL;
+
+	*more = ZBX_PROXY_DATA_DONE;
 
 	if ('\0' == *answer)
 	{
@@ -509,6 +511,13 @@ static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_times
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, error);
 	}
+	else
+	{
+		char	value[MAX_STRING_LEN];
+
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value)))
+			*more = atoi(value);
+	}
 out:
 	zbx_free(error);
 	return ret;
@@ -526,7 +535,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_data(DC_PROXY *proxy)
+static int	proxy_get_data(DC_PROXY *proxy, int *more)
 {
 	const char	*__function_name = "proxy_get_data";
 	char		*answer = NULL;
@@ -537,11 +546,11 @@ static int	proxy_get_data(DC_PROXY *proxy)
 
 	if (0 == (version = proxy->version))
 	{
-		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts) ||
-				'\0' == *answer)
-		{
+		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
+			return FAIL;
+
+		if ('\0' == *answer)
 			zbx_proxy_update_version(proxy, NULL);
-		}
 	}
 
 	if (ZBX_COMPONENT_VERSION(3, 2) == version)
@@ -558,6 +567,8 @@ static int	proxy_get_data(DC_PROXY *proxy)
 		if (SUCCEED != proxy_get_auto_registration(proxy))
 			goto out;
 
+		/* the above functions will retrieve all available data for 3.2 and older proxies */
+		*more = ZBX_PROXY_DATA_DONE;
 		ret = SUCCEED;
 		goto out;
 	}
@@ -565,11 +576,11 @@ static int	proxy_get_data(DC_PROXY *proxy)
 	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
 		return FAIL;
 
-	ret = proxy_parse_proxy_data(proxy, answer, &ts);
+	ret = proxy_parse_proxy_data(proxy, answer, &ts, more);
 
 	zbx_free(answer);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
 
 	return ret;
 }
@@ -593,7 +604,7 @@ static int	process_proxy(void)
 {
 	const char		*__function_name = "process_proxy";
 	DC_PROXY		proxy;
-	int			num, i;
+	int			num, i, more;
 	char			*port = NULL;
 	time_t			now;
 	unsigned char		update_nextcheck;
@@ -633,8 +644,12 @@ static int	process_proxy(void)
 
 		if (proxy.proxy_data_nextcheck <= now)
 		{
-			if (SUCCEED != proxy_get_data(&proxy))
-				goto network_error;
+			do
+			{
+				if (SUCCEED != proxy_get_data(&proxy, &more))
+					goto network_error;
+			}
+			while (ZBX_PROXY_DATA_MORE == more);
 		}
 
 		DBbegin();
