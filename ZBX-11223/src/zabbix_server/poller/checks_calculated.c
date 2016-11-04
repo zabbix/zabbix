@@ -62,7 +62,7 @@ static void	free_expression(expression_t *exp)
 	exp->functions_num = 0;
 }
 
-static int	calcitem_add_function(expression_t *exp, char *func, char *params)
+static int	calcitem_add_function(expression_t *exp, char *host, char *key, char *func, char *params)
 {
 	function_t	*f;
 
@@ -75,8 +75,8 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 
 	f = &exp->functions[exp->functions_num++];
 	f->functionid = exp->functions_num;
-	f->host = NULL;
-	f->key = NULL;
+	f->host = host;
+	f->key = key;
 	f->func = func;
 	f->params = params;
 	f->value = NULL;
@@ -87,9 +87,9 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_parse_expression";
-	char		*e, *func = NULL, *params = NULL;
+	char		*e, *func = NULL, *params = NULL, *host = NULL, *key = NULL, *buf;
 	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		functionid, ret;
+	int		functionid, ret = SUCCEED, nparam = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
@@ -113,13 +113,38 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		params = zbx_strdup(NULL, e + par_l + 1);
 		e[par_r] = ')';
 
-		functionid = calcitem_add_function(exp, func, params);
+		buf = get_param_dyn(params, 1);	/* for first parameter result is not NULL */
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s(%s)'",
-				__function_name, functionid, func, params);
+		if (SUCCEED != parse_host_key(buf, &host, &key))
+		{
+			zbx_snprintf(error, max_error_len,
+					"Invalid first parameter in function [%s(%s)].",
+					func, params);
+			ret = NOTSUPPORTED;
+		}
 
+		zbx_free(buf);
+
+		if (SUCCEED == ret)
+		{
+			if (NULL == host)
+				host = strdup(dc_item->host.host);
+
+			remove_param(params, 1);
+
+			functionid = calcitem_add_function(exp, host, key, func, params);
+
+			zabbix_log(LOG_LEVEL_ERR, "%s() functionid:%d function:'%s:%s.%s(%s)'",
+					__function_name, functionid, host, key, func, params);
+		}
+
+		host = NULL;
+		key = NULL;
 		func = NULL;
 		params = NULL;
+
+		if (SUCCEED != ret)
+			goto out;
 
 		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
@@ -137,7 +162,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	{
 		ret = NOTSUPPORTED;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -165,33 +190,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
-		f = &exp->functions[i];
-
-		buf = get_param_dyn(f->params, 1);	/* for first parameter result is not NULL */
-
-		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
-		{
-			zbx_snprintf(error, max_error_len,
-					"Invalid first parameter in function [%s(%s)].",
-					f->func, f->params);
-			ret = NOTSUPPORTED;
-		}
-
-		zbx_free(buf);
-
-		if (SUCCEED != ret)
-			goto out;
-
-		if (NULL == f->host)
-			f->host = strdup(dc_item->host.host);
-
-		keys[i].host = f->host;
-		keys[i].key = f->key;
-
-		remove_param(f->params, 1);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() function:'%s:%s.%s(%s)'",
-				__function_name, f->host, f->key, f->func, f->params);
+		keys[i].host = exp->functions[i].host;
+		keys[i].key = exp->functions[i].key;
 	}
 
 	DCconfig_get_items_by_keys(items, keys, errcodes, exp->functions_num);
