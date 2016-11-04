@@ -66,40 +66,34 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#clone').click(function() {
-			$('#screenid, [id^=user_group_shares_], [id^=user_shares_]').remove();
-			$('#private_' + <?= PRIVATE_SHARING ?>).prop('checked', true);
+		$('#clone, #full_clone').click(function() {
+			var form = $(this).attr('id');
 
-			$('#form').val('clone');
+			$('#form').val(form);
 
-			changeToCloneForm();
-		});
+			if (form === 'clone') {
+				$('#screenid, [id^=user_group_shares_], [id^=user_shares_]').remove();
+				$('#private_' + <?= PRIVATE_SHARING ?>).prop('checked', true);
+			}
 
-		$('#full_clone').click(function() {
-			$('#form').val('full_clone');
+			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
 
-			changeToCloneForm();
+			$('#update')
+				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.attr({id: 'add', name: 'add'});
+
+			$('#tab_screen_tab').trigger('click');
+			$('#multiselect_userid_wrapper').show();
+
+			$('#userid').multiSelect('addData', {
+				'id': $('#current_user_userid').val(),
+				'name': $('#current_user_fullname').val()
+			});
+
+			$('#name').focus();
 		});
 
 	});
-
-	function changeToCloneForm() {
-		jQuery('#delete, #clone, #full_clone, #inaccessible_user').remove();
-
-		jQuery('#update')
-			.text(<?= CJs::encodeJson(_('Add')) ?>)
-			.attr({id: 'add', name: 'add'});
-
-		jQuery('#tab_screen_tab').click();
-		jQuery('#multiselect_userid_wrapper').show();
-
-		jQuery('#userid').multiSelect('addData', {
-			'id': jQuery('#current_user_userid').val(),
-			'name': jQuery('#current_user_fullname').val()
-		});
-
-		jQuery('#name').focus();
-	};
 
 	/**
 	 * @see init.js add.popup event

@@ -46,7 +46,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'screenid' =>		[T_ZBX_INT, O_NO,  P_SYS,	DB_ID,
-		'isset({form}) && ({form} == "update" || {form} == "full_clone")'
+		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
 	],
 	'templateid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
@@ -231,7 +231,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			$max_y = $screen['vsize'] - 1;
 
 			foreach ($screen['screenitems'] as $key => $screen_item) {
-				if($screen_item['x'] > $max_x || $screen_item['y'] > $max_y) {
+				if ($screen_item['x'] > $max_x || $screen_item['y'] > $max_y) {
 					unset($screen['screenitems'][$key]);
 				}
 			}
