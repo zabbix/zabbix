@@ -472,8 +472,8 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 	];
 
 	if ($config['event_ack_enable']) {
-		$options['select_acknowledges'] = API_OUTPUT_COUNT;
 		$options['output'][] = 'acknowledged';
+		$options['select_acknowledges'] = API_OUTPUT_COUNT;
 	}
 
 	$events = API::Event()->get($options);
@@ -496,17 +496,14 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 			])
 			: [];
 
-		foreach ($events as &$event) {
+		foreach ($events as $event) {
 			if (array_key_exists($event['r_eventid'], $r_events)) {
 				$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
 			}
 			else {
 				$event['r_clock'] = 0;
 			}
-		}
-		unset($event);
 
-		foreach ($events as $event) {
 			$triggers[$event['objectid']]['events'][] = $event;
 		}
 	}
@@ -702,10 +699,8 @@ foreach ($triggers as $trigger) {
 		$next_event_clock = time();
 
 		foreach (array_slice($trigger['events'], 0, $config['event_show_max']) as $enum => $event) {
-			if ($showEvents == EVENTS_OPTION_NOT_ACK) {
-				if ($event['acknowledged'] || $event['value'] != TRIGGER_VALUE_TRUE) {
-					continue;
-				}
+			if ($showEvents == EVENTS_OPTION_NOT_ACK && $event['acknowledged']) {
+				continue;
 			}
 
 			$value = ($event['r_eventid'] == 0) ? TRIGGER_VALUE_TRUE : TRIGGER_VALUE_FALSE;
