@@ -922,7 +922,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
-		'parent_discoveryid' => getRequest('parent_discoveryid', !empty($options['is_discovery_rule']) ? getRequest('itemid') : null),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
@@ -975,14 +975,13 @@ function getItemFormData(array $item = [], array $options = []) {
 	if (!empty($data['parent_discoveryid'])) {
 		$discoveryRule = API::DiscoveryRule()->get([
 			'itemids' => $data['parent_discoveryid'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['hostid'],
 			'editable' => true
 		]);
-		$discoveryRule = reset($discoveryRule);
-		$data['hostid'] = $discoveryRule['hostid'];
+		$data['hostid'] = reset($discoveryRule)['hostid'];
 
 		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
-		$data['application_prototypes'] = getRequest('application_prototypes', array());
+		$data['application_prototypes'] = getRequest('application_prototypes', []);
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);

@@ -21,8 +21,8 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->addItem(get_header_host_table('discoveries', $this->data['hostid'],
-		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : 0
+	->addItem(get_header_host_table('discoveries', $data['hostid'],
+		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
 
 // create form
