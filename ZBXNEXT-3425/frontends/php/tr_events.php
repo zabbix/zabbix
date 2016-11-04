@@ -77,15 +77,19 @@ $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'us
 	'clock', 'subject', 'message'
 ];
 $options = [
-	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'acknowledged', 'value'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'value'],
 	'select_alerts' => $alert_options,
-	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'],
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
 ];
+
+if ($config['event_ack_enable']) {
+	$options['output'][] = 'acknowledged';
+	$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
+}
 
 $events = API::Event()->get($options);
 if (!$events) {
