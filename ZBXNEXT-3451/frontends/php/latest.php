@@ -108,12 +108,43 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-$applications = $items = $hostScripts = [];
+$applications = [];
+$items = [];
+$hostScripts = [];
+$child_groups = [];
+
+// multiselect host groups
+$multiSelectHostGroupData = [];
+if ($filter['groupids'] !== null) {
+	$filterGroups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groupids'],
+		'preservekeys' => true
+	]);
+
+	foreach ($filterGroups as $group) {
+		$multiSelectHostGroupData[] = [
+			'id' => $group['groupid'],
+			'name' => $group['name']
+		];
+
+		$child_groups[] = $group['name'].'/';
+	}
+}
 
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
-	$groupids = $filter['groupids'];
+	if ($child_groups) {
+		$child_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'search' => ['name' => $child_groups],
+			'startSearch' => true,
+			'preservekeys' => true
+		]);
+
+		$groupids = array_keys(array_replace($filterGroups, $child_groups));
+	}
 
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
@@ -276,23 +307,6 @@ if ($filter['hostids']) {
 		$multiSelectHostData[] = [
 			'id' => $host['hostid'],
 			'name' => $host['name']
-		];
-	}
-}
-
-// multiselect host groups
-$multiSelectHostGroupData = [];
-if ($filter['groupids'] !== null) {
-	$filterGroups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids'],
-		'preservekeys' => true
-	]);
-
-	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
 		];
 	}
 }
