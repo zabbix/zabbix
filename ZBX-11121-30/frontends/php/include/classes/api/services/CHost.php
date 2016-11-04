@@ -793,9 +793,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
-			],
+			'output' => ['hostid', 'host'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
@@ -835,11 +833,9 @@ class CHost extends CHostGeneral {
 			$data['tls_subject'] = '';
 		}
 
-		if (array_key_exists('groups', $data) && !$data['groups'] && $updHosts) {
-			$host = reset($updHosts);
-
+		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" cannot be without host group.', $host['name'])
+				_s('Host "%1$s" cannot be without host group.', reset($db_hosts)['host'])
 			);
 		}
 

@@ -929,7 +929,7 @@ class CTemplate extends CHostGeneral {
 		$templates = zbx_toArray($data['templates']);
 
 		$dbTemplates = $this->get([
-			'output' => ['templateid'],
+			'output' => ['templateid', 'host'],
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -942,11 +942,9 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		if (array_key_exists('groups', $data) && !$data['groups'] && $updTemplates) {
-			$template = reset($updTemplates);
-
+		if (array_key_exists('groups', $data) && !$data['groups'] && $dbTemplates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Template "%1$s" cannot be without host group.', $template['name'])
+				_s('Template "%1$s" cannot be without host group.', reset($dbTemplates)['host'])
 			);
 		}
 
