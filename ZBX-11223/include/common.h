@@ -1080,10 +1080,17 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
+typedef enum
+{
+	FUNCTION_FIND_TYPE_FULL_STRING = 0,	/* function searching in whole string */
+	FUNCTION_FIND_TYPE_FIRST_CHAR,		/* string should begin with first function char */
+}
+zbx_function_find_type_t;
+
 size_t	zbx_no_function(const char *expr);
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, int search_type);
 
 #endif

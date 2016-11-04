@@ -547,7 +547,8 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
+	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FULL_STRING);
+			e += par_r + 1)
 	{
 		/* substitute LLD macros in the part of the string preceding function parameters */
 

@@ -2436,8 +2436,11 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
 
-	if (SUCCEED != zbx_function_find(p, &f_pos, &par_l, &par_r) || 0 != f_pos || '}' != p[par_r + 1])
+	if (SUCCEED != zbx_function_find(p, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FIRST_CHAR) ||
+			'}' != p[par_r + 1])
+	{
 		goto fail;
+	}
 
 	p[par_l] = '\0';
 	p[par_r] = '\0';
@@ -4142,7 +4145,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 		return FAIL;
 
 	/* a trigger function with parameters */
-	if (SUCCEED != zbx_function_find(pr, &f_pos, &par_l, &par_r) || 0 != f_pos)
+	if (SUCCEED != zbx_function_find(pr, &f_pos, &par_l, &par_r, FUNCTION_FIND_TYPE_FIRST_CHAR))
 		return FAIL;
 
 	pr += par_r + 1;

@@ -3726,23 +3726,49 @@ static const char	*match_parenthesis(const char *ptr)
  *             par_r    - [OUT] position of the closing parenthesis           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r)
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, int search_type)
 {
 	const char	*ptr, *par;
 	size_t		len;
 
 	for (ptr = expr; '\0' != *ptr; ptr += len)
 	{
+		if (FUNCTION_FIND_TYPE_FIRST_CHAR == search_type && SUCCEED != is_function_char(*ptr))
+			return FAIL;
+
 		/* skip the part of expression that is definitely not a function */
 		ptr += zbx_no_function(ptr);
 
 		/* try to validate function name */
 		if (SUCCEED != function_parse_name(ptr, &len))
-			continue;
+		{
+			switch (search_type)
+			{
+				case FUNCTION_FIND_TYPE_FULL_STRING:
+					continue;
+				case FUNCTION_FIND_TYPE_FIRST_CHAR:
+					return FAIL;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					break;
+			}
+		}
+
 
 		/* now ptr + len points to '(', try to find ')' */
 		if (NULL == (par = match_parenthesis(ptr + len + 1)))
-			continue;
+		{
+			switch (search_type)
+			{
+				case FUNCTION_FIND_TYPE_FULL_STRING:
+					continue;
+				case FUNCTION_FIND_TYPE_FIRST_CHAR:
+					return FAIL;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					break;
+			}
+		}
 
 		*func_pos = ptr - expr;
 		*par_l = ptr + len - expr;
