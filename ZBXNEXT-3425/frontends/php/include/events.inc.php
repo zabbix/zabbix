@@ -271,7 +271,7 @@ function make_small_eventlist($startEvent, $backurl) {
 	$clock = $startEvent['clock'];
 
 	$options = [
-		'output' => ['eventid', 'r_eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'acknowledged'],
+		'output' => ['eventid', 'r_eventid', 'source', 'object', 'objectid', 'clock', 'ns'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
@@ -284,6 +284,7 @@ function make_small_eventlist($startEvent, $backurl) {
 	];
 
 	if ($config['event_ack_enable']) {
+		$options['output'][] = 'acknowledged';
 		$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
 	}
 
