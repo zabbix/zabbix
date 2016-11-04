@@ -85,7 +85,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 			$profileLinksComboBox,
 			$expressionTextBox,
 			$iconsComboBox,
-			(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;'),
+			$iconPreviewImage,
 			(new CCol(
 				(new CButton('remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -118,11 +118,7 @@ $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['def
 	->addClass('preview')
 	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
-$iconMapTable->addRow([
-	(new CCol(_('Default')))->setColSpan(4),
-	$iconsComboBox,
-	(new CCol($iconPreviewImage))->setAttribute('style', 'vertical-align: middle;')
-]);
+$iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
 $iconMapTab->addRow(_('Mappings'),
