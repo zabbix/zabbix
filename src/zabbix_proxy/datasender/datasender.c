@@ -42,14 +42,18 @@ extern int		server_num, process_num;
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender()
+static int	proxy_data_sender(int *more)
 {
+	const char	*__function_name = "proxy_data_sender";
 	zbx_socket_t	sock;
 	struct zbx_json	j;
-	int		ret = FAIL, availability_ts, history_records, discovery_records, areg_records;
+	int		ret = FAIL, availability_ts, history_records, discovery_records, areg_records, more_history,
+			more_discovery, more_areg;
 	zbx_uint64_t	history_lastid, discovery_lastid, areg_lastid;
 	zbx_timespec_t	ts;
 	char		*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
@@ -62,22 +66,28 @@ static int	proxy_data_sender()
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_HISTORY_DATA);
-	if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid)))
+	if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid, &more_history)))
 		ret = SUCCEED;
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DISCOVERY_DATA);
-	if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid)))
+	if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery)))
 		ret = SUCCEED;
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_AUTO_REGISTRATION);
-	if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid)))
+	if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
 		ret = SUCCEED;
 	zbx_json_close(&j);
 
 	if (SUCCEED == ret)
 	{
+		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
+				ZBX_PROXY_DATA_MORE == more_areg)
+		{
+			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
+		}
+
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
@@ -98,6 +108,8 @@ static int	proxy_data_sender()
 
 	if (SUCCEED == ret)
 	{
+		*more = more_history | more_discovery | more_areg;
+
 		zbx_set_availability_diff_ts(availability_ts);
 
 		if (0 != history_lastid || 0 != discovery_lastid || 0 != areg_lastid)
@@ -116,6 +128,10 @@ static int	proxy_data_sender()
 			DBcommit();
 		}
 	}
+	else
+		*more = ZBX_PROXY_DATA_DONE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
 
 	return history_records + discovery_records + areg_records;
 }
@@ -129,8 +145,8 @@ static int	proxy_data_sender()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
-	int		records = 0;
-	double		sec = 0.0;
+	int		records = 0, more;
+	double		time_start, time_diff = 0.0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -151,15 +167,22 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		zbx_handle_log();
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
-				get_process_type_string(process_type), records, sec);
+				get_process_type_string(process_type), records, time_diff);
 
-		sec = zbx_time();
-		records = proxy_data_sender();
-		sec = zbx_time() - sec;
+		records = 0;
+		time_start = zbx_time();
+
+		do
+		{
+			records += proxy_data_sender(&more);
+			time_diff = zbx_time() - time_start;
+		}
+		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);
+				get_process_type_string(process_type), records, time_diff, CONFIG_PROXYDATA_FREQUENCY);
 
-		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
+		if (ZBX_PROXY_DATA_MORE != more)
+			zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
 	}
 }

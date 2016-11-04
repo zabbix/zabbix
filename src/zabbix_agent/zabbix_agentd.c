@@ -725,7 +725,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
-			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
+			PARM_OPT,	1,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,

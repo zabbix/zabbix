@@ -28,6 +28,10 @@
 #define ZBX_PROXYMODE_PASSIVE	1
 
 #define ZBX_MAX_HRECORDS	1000
+#define ZBX_MAX_HRECORDS_TOTAL	10000
+
+#define ZBX_PROXY_DATA_DONE	0
+#define ZBX_PROXY_DATA_MORE	1
 
 typedef struct
 {
@@ -59,9 +63,9 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data);
 int	get_host_availability_data(struct zbx_json *j, int *ts);
 int	process_host_availability(struct zbx_json_parse *jp_data, char **error);
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid);
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid);
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid);
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 void	proxy_set_hist_lastid(const zbx_uint64_t lastid);
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid);
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid);

@@ -119,7 +119,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	struct zbx_json	j;
 	zbx_uint64_t	areg_lastid, history_lastid, discovery_lastid;
 	char		*error = NULL;
-	int		availability_ts;
+	int		availability_ts, more_history, more_discovery, more_areg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -136,16 +136,22 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_HISTORY_DATA);
-	proxy_get_hist_data(&j, &history_lastid);
+	proxy_get_hist_data(&j, &history_lastid, &more_history);
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DISCOVERY_DATA);
-	proxy_get_dhis_data(&j, &discovery_lastid);
+	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_AUTO_REGISTRATION);
-	proxy_get_dhis_data(&j, &areg_lastid);
+	proxy_get_dhis_data(&j, &areg_lastid, &more_areg);
 	zbx_json_close(&j);
+
+	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
+			ZBX_PROXY_DATA_MORE == more_areg)
+	{
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
+	}
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
