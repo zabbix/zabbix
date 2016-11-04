@@ -1526,7 +1526,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = new CLink(_('First'), $url->getUrl());
+			$tags[] = new CLink(_x('First', 'page navigation'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
@@ -1553,7 +1553,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = new CLink(_('Last'), $url->getUrl());
+			$tags[] = new CLink(_x('Last', 'page navigation'), $url->getUrl());
 		}
 	}
 
@@ -2195,19 +2195,6 @@ function hasErrorMesssages() {
 	}
 
 	return false;
-}
-
-/**
- * Check if all keys from $keys exist in $array.
- * If some keys are missing return array of missing keys, true otherwise.
- *
- * @param array $array
- * @param array $keys
- *
- * @return array|bool
- */
-function checkRequiredKeys(array $array, array $keys) {
-	return array_diff($keys, array_keys($array));
 }
 
 /**

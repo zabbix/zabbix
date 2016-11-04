@@ -606,7 +606,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
 			'eventids' => $eventids,
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => ['clock', 'message', 'alias', 'name', 'surname'],
 			'preservekeys' => true
 		]);
 	}

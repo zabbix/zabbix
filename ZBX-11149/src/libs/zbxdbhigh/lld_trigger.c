@@ -216,7 +216,7 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_prototoypes_get                                      *
+ * Function: lld_trigger_prototypes_get                                       *
  *                                                                            *
  * Purpose: retrieve trigger prototypes which are inherited from the          *
  *          discovery rule                                                    *
@@ -225,7 +225,7 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
  *             trigger_prototypes - [OUT] sorted list of trigger prototypes   *
  *                                                                            *
  ******************************************************************************/
-static void	lld_trigger_prototoypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes)
+static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes)
 {
 	DB_RESULT			result;
 	DB_ROW				row;
@@ -1360,6 +1360,11 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: value \"%s\" is too long.\n",
 				(0 != trigger->triggerid ? "update" : "create"), *field);
+	}
+	else if (ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION == flag && '\0' == **field)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s trigger: name is empty.\n",
+				(0 != trigger->triggerid ? "update" : "create"));
 	}
 	else
 		return;
@@ -2699,7 +2704,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 
 	zbx_vector_ptr_create(&trigger_prototypes);
 
-	lld_trigger_prototoypes_get(lld_ruleid, &trigger_prototypes);
+	lld_trigger_prototypes_get(lld_ruleid, &trigger_prototypes);
 
 	if (0 == trigger_prototypes.values_num)
 		goto out;

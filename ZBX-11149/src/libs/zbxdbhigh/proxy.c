@@ -1721,7 +1721,7 @@ try_again:
  *          cache to speed things up.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
+static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t * id, int *records_processed)
 {
 	const char			*__function_name = "proxy_get_history_data";
 
@@ -1748,7 +1748,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	static char			*string_buffer = NULL;
 	static size_t			string_buffer_alloc = ZBX_KIBIBYTE;
 	size_t				string_buffer_offset = 0, len1, len2;
-	static zbx_uint64_t		*itemids = NULL, id;
+	static zbx_uint64_t		*itemids = NULL;
 	static zbx_history_data_t	*data = NULL;
 	static size_t			data_alloc = 0;
 	size_t				data_num = 0, i;
@@ -1764,7 +1764,6 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 
 	*lastid = 0;
 
-	proxy_get_lastid("proxy_history", "history_lastid", &id);
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
@@ -1772,7 +1771,7 @@ try_again:
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
-			id);
+			*id);
 
 	result = DBselectN(sql, records_lim);
 
@@ -1782,7 +1781,7 @@ try_again:
 	{
 		ZBX_STR2UINT64(*lastid, row[0]);
 
-		if (1 < *lastid - id)
+		if (1 < *lastid - *id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
 			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
@@ -1791,7 +1790,7 @@ try_again:
 				DBfree_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__function_name, *lastid - id - 1,
+						__function_name, *lastid - *id - 1,
 						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
@@ -1799,7 +1798,7 @@ try_again:
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
-						__function_name, *lastid - id - 1);
+						__function_name, *lastid - *id - 1);
 			}
 		}
 
@@ -1842,7 +1841,7 @@ try_again:
 		memcpy(&string_buffer[string_buffer_offset], row[7], len2);
 		string_buffer_offset += len2;
 
-		id = *lastid;
+		*id = *lastid;
 		records_lim--;
 	}
 	DBfree_result(result);
@@ -1903,18 +1902,31 @@ try_again:
 
 		records++;
 	}
-
 	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
+	*records_processed = data_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d records_processed:%d lastid:" ZBX_FS_UI64,
+			__function_name, records, *records_processed, *lastid);
 
 	return records;
 }
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid)
 {
-	return proxy_get_history_data(j, lastid);
+	int		records = 0, records_processed;
+	zbx_uint64_t	id;
+
+	proxy_get_lastid("proxy_history", "history_lastid", &id);
+
+	do
+	{
+		records += proxy_get_history_data(j, lastid, &id, &records_processed);
+	}
+	while (ZBX_MAX_HRECORDS > records && ZBX_MAX_HRECORDS == records_processed);
+
+	return records;
 }
 
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid)
@@ -2652,8 +2664,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	zbx_vector_ptr_t	autoreg_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&autoreg_hosts);
 
 	now = time(NULL);
 
@@ -2697,19 +2712,26 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == is_ushort(tmp, &port))
 			port = ZBX_DEFAULT_AGENT_PORT;
 
-		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
-		DBcommit();
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, itemtime);
 
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
+	}
+
+	if (0 != autoreg_hosts.values_num)
+	{
+		DBbegin();
+		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
+		DBcommit();
 	}
 exit:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
 	zbx_free(host_metadata);
+	DBregister_host_clean(&autoreg_hosts);
+	zbx_vector_ptr_destroy(&autoreg_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
