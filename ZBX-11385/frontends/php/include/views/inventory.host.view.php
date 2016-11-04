@@ -98,7 +98,7 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 				(new CDiv($interface['main'] ? bold($interface['ip']) : $interface['ip']))
 					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
 				(new CDiv($interface['main'] ? bold($interface['dns']) : $interface['dns']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_INTERFACE_DNS_WIDTH.'px;'),
 				(new CDiv($interface['main'] ? bold($connect_to) : $connect_to))
 					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH),
 				(new CDiv($interface['main'] ? bold($interface['port']) : $interface['port']))
