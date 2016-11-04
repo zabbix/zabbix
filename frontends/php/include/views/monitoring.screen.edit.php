@@ -208,7 +208,7 @@ if (!$data['screen']['templateid']) {
 	$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 }
 
-if ($data['form'] == 'update') {
+if ($data['form'] === 'update') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
