@@ -262,8 +262,8 @@ function make_small_eventlist($startEvent, $backurl) {
 			_('Time'),
 			_('Recovery time'),
 			_('Status'),
-			_('Duration'),
 			_('Age'),
+			_('Duration'),
 			$config['event_ack_enable'] ? _('Ack') : null,
 			_('Actions')
 		]);
@@ -386,8 +386,8 @@ function make_small_eventlist($startEvent, $backurl) {
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				))->addClass('action'),
 			$cell_status,
-			$duration,
 			zbx_date2age($event['clock']),
+			$duration,
 			$config['event_ack_enable'] ? $acknowledges[$event['eventid']] : null,
 			array_key_exists($index, $actions)
 				? (new CCol($actions[$index]))->addClass(ZBX_STYLE_NOWRAP)
