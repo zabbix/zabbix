@@ -3526,7 +3526,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
 			;
 
-		*length = ++ptr - expr;
+		*length = ++ptr - expr - *param_pos;
 
 		/* skip trailing whitespace to find the next parameter */
 		while (' ' == *ptr)
@@ -3537,7 +3537,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 		for (ptr = expr; '\0' != *ptr && ',' != *ptr; ptr++)
 			;
 
-		*length = ptr - expr;
+		*length = ptr - expr - *param_pos;
 	}
 
 	*sep_pos = ptr - expr;
