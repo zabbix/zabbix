@@ -1718,6 +1718,11 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
 				goto unlock;
 			}
+			if (0 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is zero."));
+				goto unlock;
+			}
 			SET_DBL_RESULT(result, (double)datastore->free_space / datastore->capacity * 100);
 			break;
 	}
