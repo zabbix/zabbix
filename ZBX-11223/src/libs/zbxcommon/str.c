@@ -3647,7 +3647,7 @@ int	zbx_function_param_quote(char **param, int forced)
  *          skipped without the risk of missing a function                    *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_no_function(const char *expr)
+static size_t	zbx_no_function(const char *expr)
 {
 	const char	*ptr = expr;
 
