@@ -711,16 +711,8 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 
 		item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
 		item->snmp_oid_orig = NULL;
-		if (ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type)
-		{
-			if (FAIL == substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
-					err, sizeof(err)))
-			{
-				goto out;
-			}
-
-			zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
-		}
+		substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+		zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
 		item->description = zbx_strdup(NULL, description_proto);
 		item->description_orig = NULL;
@@ -777,23 +769,15 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
 		}
 
-		if (ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type)
+		buffer = zbx_strdup(buffer, snmp_oid_proto);
+		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+		zbx_lrtrim(buffer, ZBX_WHITESPACE);
+		if (0 != strcmp(item->snmp_oid, buffer))
 		{
-			buffer = zbx_strdup(buffer, snmp_oid_proto);
-			if (FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID,
-					err, sizeof(err)))
-			{
-				goto out;
-			}
-
-			zbx_lrtrim(buffer, ZBX_WHITESPACE);
-			if (0 != strcmp(item->snmp_oid, buffer))
-			{
-				item->snmp_oid_orig = item->snmp_oid;
-				item->snmp_oid = buffer;
-				buffer = NULL;
-				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
-			}
+			item->snmp_oid_orig = item->snmp_oid;
+			item->snmp_oid = buffer;
+			buffer = NULL;
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
 		}
 
 		buffer = zbx_strdup(buffer, description_proto);
