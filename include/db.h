@@ -343,6 +343,7 @@ typedef struct
 	char		*value2;
 	unsigned char	conditiontype;
 	unsigned char	operator;
+	int		condition_result;
 }
 DB_CONDITION;
 
