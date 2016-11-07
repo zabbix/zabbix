@@ -89,7 +89,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	const char	*__function_name = "calcitem_parse_expression";
 	char		*e, *func = NULL, *params = NULL, *host = NULL, *key = NULL, *buf;
 	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		functionid, ret = SUCCEED, nparam = 0, quoted;
+	int		functionid, ret = SUCCEED, quoted;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
@@ -259,7 +259,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 	}
 
 	DCconfig_clean_items(items, errcodes, exp->functions_num);
-out:
+
 	zbx_free(errcodes);
 	zbx_free(items);
 	zbx_free(keys);
