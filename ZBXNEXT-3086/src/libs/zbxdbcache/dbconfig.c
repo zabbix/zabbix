@@ -9323,7 +9323,16 @@ static void	zbx_db_condition_free(DB_CONDITION *condition)
 {
 	zbx_free(condition->value2);
 	zbx_free(condition->value);
-	zbx_free(condition);
+}
+void	zbx_condition_eval_free(zbx_hashset_t *uniq_conditions)
+{
+	zbx_hashset_iter_t	iter;
+	DB_CONDITION		*condition;
+
+	zbx_hashset_iter_reset(uniq_conditions, &iter);
+
+	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
+		zbx_db_condition_free(condition);
 }
 
 /******************************************************************************
@@ -9339,7 +9348,6 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
 {
 	zbx_free(action->formula);
 
-	zbx_vector_ptr_clear_ext(&action->conditions, (zbx_clean_func_t)zbx_db_condition_free);
 	zbx_vector_ptr_destroy(&action->conditions);
 
 	zbx_free(action);
@@ -9356,10 +9364,10 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
  *             conditions - [OUT] the conditions vector                       *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions, zbx_hashset_t *uniq_conditions)
 {
 	int				i;
-	DB_CONDITION			*condition;
+	DB_CONDITION			condition, *hashed_condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
 	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
@@ -9368,16 +9376,19 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 	{
 		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
 
-		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+		condition.conditionid = dc_condition->conditionid;
+		condition.actionid = dc_action->actionid;
+		condition.conditiontype = dc_condition->conditiontype;
+		condition.operator = dc_condition->op;
+		condition.value = zbx_strdup(NULL, dc_condition->value);
+		condition.value2 = zbx_strdup(NULL, dc_condition->value2);
 
-		condition->conditionid = dc_condition->conditionid;
-		condition->actionid = dc_action->actionid;
-		condition->conditiontype = dc_condition->conditiontype;
-		condition->operator = dc_condition->op;
-		condition->value = zbx_strdup(NULL, dc_condition->value);
-		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
+		if (NULL == (hashed_condition = zbx_hashset_search(uniq_conditions, &condition)))
+			hashed_condition = zbx_hashset_insert(uniq_conditions, &condition, sizeof(DB_CONDITION));
+		else
+			zbx_db_condition_free(&condition);
 
-		zbx_vector_ptr_append(conditions, condition);
+		zbx_vector_ptr_append(conditions, hashed_condition);
 	}
 }
 
@@ -9395,7 +9406,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
  *           function later.                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action)
+static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action, zbx_hashset_t *uniq_conditions)
 {
 	zbx_action_eval_t		*action;
 
@@ -9407,7 +9418,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->formula = zbx_strdup(NULL, dc_action->formula);
 	zbx_vector_ptr_create(&action->conditions);
 
-	dc_action_copy_conditions(dc_action, &action->conditions);
+	dc_action_copy_conditions(dc_action, &action->conditions, uniq_conditions);
 
 	return action;
 }
@@ -9424,7 +9435,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
  *           function later.                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions)
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
 {
 	const char			*__function_name = "zbx_dc_get_actions_eval";
 	zbx_dc_action_t			*dc_action;
@@ -9438,7 +9449,7 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions)
 
 	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
+		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action, uniq_conditions));
 	}
 
 	UNLOCK_CACHE;
