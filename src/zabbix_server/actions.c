@@ -1706,8 +1706,6 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 		event = &events[i];
 
-		process_event_conditions(event, &uniq_conditions);
-
 		/* OK events can't start escalations - skip them */
 		if (SUCCEED == is_recovery_event(event))
 			continue;
@@ -1717,6 +1715,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		{
 			continue;
 		}
+
+		process_event_conditions(event, &uniq_conditions);
 
 		for (j = 0; j < actions.values_num; j++)
 		{
