@@ -974,8 +974,8 @@ function getItemFormData(array $item = [], array $options = []) {
 	// hostid
 	if (!empty($data['parent_discoveryid'])) {
 		$discoveryRule = API::DiscoveryRule()->get([
-			'itemids' => $data['parent_discoveryid'],
 			'output' => ['hostid'],
+			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
 		$data['hostid'] = reset($discoveryRule)['hostid'];

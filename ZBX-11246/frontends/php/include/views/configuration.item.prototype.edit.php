@@ -29,7 +29,6 @@ if (!empty($this->data['hostid'])) {
 $itemForm = (new CForm())
 	->setName('itemForm')
 	->addVar('form', $this->data['form'])
-	->addVar('hostid', $this->data['hostid'])
 	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 if (!empty($this->data['itemid'])) {
@@ -415,16 +414,16 @@ if ($this->data['itemid'] != 0) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(_('Delete item prototype?'),
-				url_params(['form', 'itemid', 'parent_discoveryid', 'hostid'])
+				url_params(['form', 'itemid', 'parent_discoveryid'])
 			))->setEnabled(!$data['limited']),
-			new CButtonCancel(url_params(['parent_discoveryid', 'hostid']))
+			new CButtonCancel(url_params(['parent_discoveryid']))
 		]
 	));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['parent_discoveryid', 'hostid']))]
+		[new CButtonCancel(url_params(['parent_discoveryid']))]
 	));
 }
 
