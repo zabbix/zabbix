@@ -69,8 +69,7 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 	if (exp->functions_alloc == exp->functions_num)
 	{
 		exp->functions_alloc += 8;
-		exp->functions = zbx_realloc(exp->functions,
-				exp->functions_alloc * sizeof(function_t));
+		exp->functions = zbx_realloc(exp->functions, exp->functions_alloc * sizeof(function_t));
 	}
 
 	f = &exp->functions[exp->functions_num++];
@@ -87,63 +86,61 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_parse_expression";
-	char		*e, *func = NULL, *params = NULL, *host = NULL, *key = NULL, *buf;
+	char		*e, *buf = NULL;
 	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		functionid, ret = SUCCEED, quoted;
+	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
-
-	assert(dc_item);
-	assert(exp);
 
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
 	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
-		size_t param_pos, param_len, sep_pos;
+		char	*func, *params, *host = NULL, *key = NULL;
+		size_t	param_pos, param_len, sep_pos;
+		int	functionid, quoted;
 
 		/* copy the part of the string preceding function */
 		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
+
+		/* extract the first function parameter and <host:>key reference from it */
+
+		e[par_r] = '\0';
+		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
+		e[par_r] = ')';
+
+		zbx_free(buf);
+		buf = zbx_function_param_unquote_dyn(e + par_l + 1 + param_pos, param_len, &quoted);
+
+		if (SUCCEED != parse_host_key(buf, &host, &key))
+		{
+			zbx_snprintf(error, max_error_len, "Invalid first parameter in function [%.*s].",
+					par_r - f_pos + 1, e + f_pos);
+			goto out;
+		}
+
+		if (NULL == host)
+			host = zbx_strdup(NULL, dc_item->host.host);
+
+		/* extract function name and remaining parameters */
 
 		e[par_l] = '\0';
 		func = zbx_strdup(NULL, e + f_pos);
 		e[par_l] = '(';
 
-		e[par_r] = '\0';
-		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
-		buf = zbx_function_param_unquote_dyn(e + par_l + 1 + param_pos, param_len, &quoted);
-
-		params = zbx_strdup(NULL, e + par_l + 1 + sep_pos + 1);
-		e[par_r] = ')';
-
-		if (SUCCEED != parse_host_key(buf, &host, &key))
+		if (')' != e[par_l + 1 + sep_pos]) /* first parameter is not the only one */
 		{
-			zbx_snprintf(error, max_error_len,
-					"Invalid first parameter in function [%s(%s)].",
-					func, params);
-			ret = NOTSUPPORTED;
+			e[par_r] = '\0';
+			params = zbx_strdup(NULL, e + par_l + 1 + sep_pos + 1);
+			e[par_r] = ')';
 		}
+		else	/* the only parameter of the function was <host:>key reference */
+			params = zbx_strdup(NULL, "");
 
-		zbx_free(buf);
+		functionid = calcitem_add_function(exp, host, key, func, params);
 
-		if (SUCCEED == ret)
-		{
-			if (NULL == host)
-				host = strdup(dc_item->host.host);
-
-			functionid = calcitem_add_function(exp, host, key, func, params);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s:%s.%s(%s)'",
-					__function_name, functionid, host, key, func, params);
-		}
-
-		host = NULL;
-		key = NULL;
-		func = NULL;
-		params = NULL;
-
-		if (SUCCEED != ret)
-			goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s:%s.%s(%s)'",
+				__function_name, functionid, host, key, func, params);
 
 		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
@@ -156,12 +153,14 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL,
-				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, &exp->exp,
+			MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len))
 	{
-		ret = NOTSUPPORTED;
+		ret = SUCCEED;
 	}
 out:
+	zbx_free(buf);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
