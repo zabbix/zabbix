@@ -1059,7 +1059,6 @@ int	is_snmp_type(unsigned char type);
 
 int	parse_host(char **exp, char **host);
 int	parse_key(char **exp, char **key);
-int	parse_function(char **exp, char **func, char **params);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
