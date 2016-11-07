@@ -3549,8 +3549,10 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
  *                                                                            *
  * Purpose: unquotes function parameter                                       *
  *                                                                            *
- * Parameters: param - [IN] the parameter to unquote                          *
- *             len   - [IN] the parameter length                              *
+ * Parameters: param -  [IN] the parameter to unquote                         *
+ *             len   -  [IN] the parameter length                             *
+ *             quoted - [OUT] the flag that specifies whether parameter was   *
+ *                            quoted before extraction                        *
  *                                                                            *
  * Return value: The unquoted parameter. This value must be freed by the      *
  *               caller.                                                      *

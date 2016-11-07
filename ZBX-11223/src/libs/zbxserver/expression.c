@@ -2377,7 +2377,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
  *                                                                            *
- * Parameters: triggerid  - [IN] the trigger identificator from a database    *
+ * Parameters: expression - [IN] string to parse                              *
  *             replace_to - [IN] the pointer to a result buffer               *
  *             bl         - [IN] the pointer to a left curly bracket          *
  *             br         - [OUT] the pointer to a next char, after a right   *
