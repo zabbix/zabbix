@@ -139,12 +139,13 @@ class CJson {
 	 *
 	 */
 	public function encode($valueToEncode, $deQuote = [], $forceObject = false) {
-		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')
+				&& defined('JSON_UNESCAPED_SLASHES')) {
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
 
-			$encoded = json_encode($valueToEncode, $forceObject ? JSON_FORCE_OBJECT : null);
+			$encoded = json_encode($valueToEncode, JSON_UNESCAPED_SLASHES | ($forceObject ? JSON_FORCE_OBJECT : 0));
 
 			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
@@ -320,9 +321,8 @@ class CJson {
 							$ascii .= '\r';
 							break;
 						case $ord_var_c == 0x22:
-						case $ord_var_c == 0x2F:
 						case $ord_var_c == 0x5C:
-							// double quote, slash, slosh
+							// double quote, slosh
 							$ascii .= '\\'.$var{$c};
 							break;
 						case ($ord_var_c >= 0x20 && $ord_var_c <= 0x7F):
