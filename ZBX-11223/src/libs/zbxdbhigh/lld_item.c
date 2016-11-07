@@ -563,18 +563,14 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		/* substitute LLD macros in function parameters */
 
-		e[par_r] = '\0';
-
 		for (p = e + par_l + 1; p - e < par_r ; p += sep_pos + 1)
 		{
 			size_t	param_pos, param_len;
 			int	quoted;
 
+			e[par_r] = '\0';
 			zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
-
-			/* restore original formula if the last parameter was parsed */
-			if ('\0' == p[sep_pos])
-				e[par_r] = ')';
+			e[par_r] = ')';
 
 			/* copy what was before the parameter */
 			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p, param_pos);
