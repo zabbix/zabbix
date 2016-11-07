@@ -321,12 +321,6 @@ function make_small_eventlist($startEvent, $backurl) {
 	}
 	unset($event);
 
-	$sortFields = [
-		['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-		['field' => 'eventid', 'order' => ZBX_SORT_DOWN]
-	];
-	CArrayHelper::sort($events, $sortFields);
-
 	$actions = makeEventsActions($events, true);
 
 	foreach ($events as $index => $event) {
