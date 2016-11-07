@@ -32,13 +32,11 @@
 #define PCI_TERMINAL_SERVICES		2176
 #define PCI_TOTAL_SESSIONS		2178
 
-typedef enum
-{
-	PERF_COUNTER_NOTSUPPORTED = 0,
-	PERF_COUNTER_INITIALIZED,
-	PERF_COUNTER_GET_SECOND_VALUE,	/* waiting for the second raw value (needed for some, e.g. rate, counters) */
-	PERF_COUNTER_ACTIVE,
-};
+#define	PERF_COUNTER_NOTSUPPORTED	0
+#define	PERF_COUNTER_INITIALIZED	1
+#define	PERF_COUNTER_GET_SECOND_VALUE	2	/* waiting for the second raw value */
+						/* (needed for some, e.g. rate, counters) */
+#define	PERF_COUNTER_ACTIVE		3
 
 typedef struct perf_counter_id
 {
