@@ -89,7 +89,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	const char	*__function_name = "calcitem_parse_expression";
 	char		*e, *func = NULL, *params = NULL, *host = NULL, *key = NULL, *buf;
 	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		functionid, ret = SUCCEED, nparam = 0;
+	int		functionid, ret = SUCCEED, nparam = 0, quoted;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
@@ -100,6 +100,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
+		size_t param_pos, param_len, sep_pos;
+
 		/* copy the part of the string preceding function */
 		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
 
@@ -108,10 +110,11 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		e[par_l] = '(';
 
 		e[par_r] = '\0';
-		params = zbx_strdup(NULL, e + par_l + 1);
-		e[par_r] = ')';
+		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
+		buf = zbx_function_param_unquote_dyn(e + par_l + 1 + param_pos, param_len, &quoted);
 
-		buf = get_param_dyn(params, 1);	/* for first parameter result is not NULL */
+		params = zbx_strdup(NULL, e + par_l + 1 + sep_pos + 1);
+		e[par_r] = ')';
 
 		if (SUCCEED != parse_host_key(buf, &host, &key))
 		{
@@ -128,11 +131,9 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 			if (NULL == host)
 				host = strdup(dc_item->host.host);
 
-			remove_param(params, 1);
-
 			functionid = calcitem_add_function(exp, host, key, func, params);
 
-			zabbix_log(LOG_LEVEL_ERR, "%s() functionid:%d function:'%s:%s.%s(%s)'",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s:%s.%s(%s)'",
 					__function_name, functionid, host, key, func, params);
 		}
 
