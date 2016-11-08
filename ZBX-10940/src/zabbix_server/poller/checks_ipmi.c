@@ -406,9 +406,9 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	return c;
 }
 
-static void	delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
+static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
-	const char	*__function_name = "delete_ipmi_control";
+	const char	*__function_name = "zbx_delete_ipmi_control";
 	int	i;
 	size_t	sz;
 
@@ -439,10 +439,10 @@ static void	delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 }
 
 /* callback function invoked from OpenIPMI */
-static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
+static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
-	const char		*__function_name = "got_thresh_reading";
+	const char		*__function_name = "zbx_got_thresh_reading_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	const char		*e_string, *s_type_string, *s_reading_type_string;
 	ipmi_entity_t		*ent;
@@ -525,9 +525,9 @@ out:
 }
 
 /* callback function invoked from OpenIPMI */
-static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
+static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
 {
-	const char		*__function_name = "got_discrete_states";
+	const char		*__function_name = "zbx_got_discrete_states_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int			id, i, val, ret, is_state_set;
 	ipmi_entity_t		*ent;
@@ -609,7 +609,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 	switch (s->reading_type)
 	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
-			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
+			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, zbx_got_thresh_reading_cb, h)))
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_reading() return error: 0x%x",
@@ -647,7 +647,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 		case 0x7d:
 		case 0x7e:
 		case 0x7f:
-			if (0 != (ret = ipmi_sensor_get_states(s->sensor, got_discrete_states, h)))
+			if (0 != (ret = ipmi_sensor_get_states(s->sensor, zbx_got_discrete_states_cb, h)))
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_states() return error: 0x%x",
@@ -895,7 +895,7 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 				zbx_allocate_ipmi_control(h, control);
 			break;
 		case IPMI_DELETED:
-			delete_ipmi_control(h, control);
+			zbx_delete_ipmi_control(h, control);
 			break;
 		case IPMI_CHANGED:
 			break;
