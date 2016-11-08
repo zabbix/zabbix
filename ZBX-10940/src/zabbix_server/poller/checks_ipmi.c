@@ -1056,9 +1056,9 @@ static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
 	zbx_free(h);
 }
 
-void	free_ipmi_handler(void)
+void	zbx_free_ipmi_handler(void)
 {
-	const char	*__function_name = "free_ipmi_handler";
+	const char	*__function_name = "zbx_free_ipmi_handler";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1077,10 +1077,10 @@ void	free_ipmi_handler(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username,
+static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username,
 		const char *password)
 {
-	const char		*__function_name = "init_ipmi_host";
+	const char		*__function_name = "zbx_init_ipmi_host";
 	zbx_ipmi_host_t		*h;
 	ipmi_open_option_t	options[4];
 	struct timeval		tv;
@@ -1164,7 +1164,7 @@ ipmi_domain_id_t	domain_id_ptr;
 int			domain_close_ok;
 
 /* callback function invoked from OpenIPMI */
-static void	domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
+static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = cb_data;
 
@@ -1198,7 +1198,7 @@ static int	close_inactive_host(zbx_ipmi_host_t *h)
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%d", h->domain_id);
 
-	ipmi_domain_iterate_domains(domains_iterate_cb, domain_name);
+	ipmi_domain_iterate_domains(zbx_domains_iterate_cb, domain_name);
 
 	h->done = 0;
 	domain_close_ok = 0;
@@ -1271,7 +1271,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 		return CONFIG_ERROR;
 	}
 
-	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
+	h = zbx_init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	h->lastaccess = time(NULL);
@@ -1391,7 +1391,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_err
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
+	h = zbx_init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up)

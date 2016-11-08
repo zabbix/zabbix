@@ -1069,7 +1069,7 @@ void	zbx_on_exit(void)
 	zbx_destroy_itservices_lock();
 
 #ifdef HAVE_OPENIPMI
-	free_ipmi_handler();
+	zbx_free_ipmi_handler();
 #endif
 
 #ifdef HAVE_SQLITE3
