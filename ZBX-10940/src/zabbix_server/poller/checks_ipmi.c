@@ -97,7 +97,7 @@ static unsigned int	domain_id = 0;
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
 
-static char	*sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
+static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
 {
 	/* minimum size of 'str' buffer, str_sz, is 35 bytes to avoid truncation */
 	int	i;
@@ -263,7 +263,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	id_type = ipmi_sensor_get_id_type(sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
-			sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz), h->ip, h->port);
+			zbx_sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz), h->ip, h->port);
 
 	h->sensor_count++;
 	sz = h->sensor_count * sizeof(zbx_ipmi_sensor_t);
@@ -285,7 +285,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
 	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s'"
 			" reading_type:0x%x ('%s') type:0x%x ('%s') full_name:'%s'", h->ip, h->port,
-			s->id_type, s->id_sz, sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+			s->id_type, s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 			s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor), s->type,
 			ipmi_sensor_get_sensor_type_string(s->sensor), full_name);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, s);
@@ -311,7 +311,7 @@ static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 		sz = sizeof(zbx_ipmi_sensor_t);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sensor '%s@[%s]:%d' deleted",
-				sensor_id_to_str(id_str, sizeof(id_str), h->sensors[i].id, h->sensors[i].id_type,
+				zbx_sensor_id_to_str(id_str, sizeof(id_str), h->sensors[i].id, h->sensors[i].id_type,
 				h->sensors[i].id_sz), h->ip, h->port);
 
 		h->sensor_count--;
@@ -513,7 +513,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 			rate = ipmi_sensor_get_rate_unit_string(sensor);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL "%s %s%s%s%s]",
-					sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 					e_string, s_type_string, s_reading_type_string, val, percent, base,
 					mod_use, modifier, rate);
 			break;
@@ -556,7 +556,8 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	if (0 != err)
 	{
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading a discrete sensor %s@[%s]:%d", err,
-				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
+				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip,
+				h->port);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -577,7 +578,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		is_state_set = ipmi_is_state_set(states, i);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 				ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
 				ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
 
@@ -600,7 +601,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 	struct timeval	tv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
-			sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
+			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
 
 	h->ret = SUCCEED;
 	h->done = 0;
@@ -612,8 +613,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_reading() return error: 0x%x",
-						sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-						ret);
+						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
+						s->id_sz), ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -650,8 +651,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			{
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_get_states() return error: 0x%x",
-						sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-						ret);
+						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
+						s->id_sz), ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -661,7 +662,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 
 			h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 					" IPMI reading type \"%s\" is not supported",
-					sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 					s_reading_type_string);
 			h->ret = NOTSUPPORTED;
 			goto out;
