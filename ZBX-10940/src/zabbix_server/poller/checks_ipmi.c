@@ -144,7 +144,7 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 	return str;
 }
 
-static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
+static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
 	const char	*__function_name = "get_ipmi_host";
@@ -1089,7 +1089,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
 
-	h = get_ipmi_host(ip, port, authtype, privilege, username, password);
+	h = zbx_get_ipmi_host(ip, port, authtype, privilege, username, password);
 
 	if (NULL != h)
 	{
