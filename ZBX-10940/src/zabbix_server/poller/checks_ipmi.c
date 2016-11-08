@@ -881,9 +881,9 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 }
 
 /* callback function invoked from OpenIPMI */
-static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_control_t *control, void *cb_data)
+static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_control_t *control, void *cb_data)
 {
-	const char	*__function_name = "control_change";
+	const char	*__function_name = "zbx_control_change_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
@@ -905,9 +905,9 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 }
 
 /* callback function invoked from OpenIPMI */
-static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_entity_t *entity, void *cb_data)
+static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_entity_t *entity, void *cb_data)
 {
-	const char	*__function_name = "entity_change";
+	const char	*__function_name = "zbx_entity_change_cb";
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
 
@@ -918,7 +918,7 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 		if (0 != (ret = ipmi_entity_add_sensor_update_handler(entity, zbx_sensor_change_cb, h)))
 			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_set_sensor_update_handler() return error: 0x%x", ret);
 
-		if (0 != (ret = ipmi_entity_add_control_update_handler(entity, control_change, h)))
+		if (0 != (ret = ipmi_entity_add_control_update_handler(entity, zbx_control_change_cb, h)))
 			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_add_control_update_handler() return error: 0x%x", ret);
 	}
 
@@ -926,9 +926,9 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 }
 
 /* callback function invoked from OpenIPMI */
-static void	domain_closed(void *cb_data)
+static void	zbx_domain_closed_cb(void *cb_data)
 {
-	const char	*__function_name = "domain_closed";
+	const char	*__function_name = "zbx_domain_closed_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
@@ -956,13 +956,13 @@ static void	setup_done(ipmi_domain_t *domain, int err, unsigned int conn_num, un
 		h->err = zbx_dsprintf(h->err, "cannot connect to IPMI host: %s", zbx_strerror(err));
 		h->ret = NETWORK_ERROR;
 
-		if (0 != (ret = ipmi_domain_close(domain, domain_closed, h)))
+		if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, h)))
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", ret);
 
 		goto out;
 	}
 
-	if (0 != (ret = ipmi_domain_add_entity_update_handler(domain, entity_change, h)))
+	if (0 != (ret = ipmi_domain_add_entity_update_handler(domain, zbx_entity_change_cb, h)))
 		zabbix_log(LOG_LEVEL_DEBUG, "ipmi_domain_add_entity_update_handler() return error: [0x%x]", ret);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
@@ -1180,7 +1180,7 @@ static void	domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 	zbx_ipmi_host_t	*h = cb_data;
 	int		ret;
 
-	if (0 != (ret = ipmi_domain_close(domain, domain_closed, h)))
+	if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, h)))
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", ret);
 	else
 		domain_close_ok = 1;
