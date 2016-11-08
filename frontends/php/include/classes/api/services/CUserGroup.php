@@ -398,8 +398,10 @@ class CUserGroup extends CApiService {
 
 			// check whether user tries to add himself to a disabled user group
 			$usrgrps = $this->get([
+				'output' => ['usrgrpid', 'gui_access', 'users_status'],
 				'usrgrpids' => $usrgrpids,
-				'output' => API_OUTPUT_EXTEND,
+				'selectUsers' => ['userid'],
+				'preservekeys' => true
 			]);
 			if (uint_in_array(self::$userData['userid'], $userids)) {
 				foreach ($usrgrps as $usrgrp) {
@@ -410,34 +412,32 @@ class CUserGroup extends CApiService {
 				}
 			}
 
-			// get already linked users
-			$linkedUsers = [];
-			$sql = 'SELECT usrgrpid,userid'.
-				' FROM users_groups'.
-				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids);
-			$linkedUsersDb = DBselect($sql);
-			while ($link = DBfetch($linkedUsersDb)) {
-				if (!isset($linkedUsers[$link['usrgrpid']])) {
-					$linkedUsers[$link['usrgrpid']] = [];
-				}
-				$linkedUsers[$link['usrgrpid']][$link['userid']] = 1;
-			}
-
-			// get user-userGroup links to insert and get user ids to unlink
 			$userUsergroupLinksToInsert = [];
-			$userIdsToUnlink = [];
-			foreach ($usrgrpids as $usrgrpid) {
+			$amount_of_usrgrps_to_unlink = [];
+
+			foreach ($usrgrps as $usrgrpid => $usrgrp) {
+				$usrgrp_userids = [];
+
+				foreach ($usrgrp['users'] as $user) {
+					$usrgrp_userids[$user['userid']] = true;
+				}
+
 				foreach ($userids as $userid) {
-					if (!isset($linkedUsers[$usrgrpid][$userid])) {
+					if (!array_key_exists($userid, $usrgrp_userids)) {
 						$userUsergroupLinksToInsert[] = [
 							'usrgrpid' => $usrgrpid,
-							'userid' => $userid,
+							'userid' => $userid
 						];
 					}
-					unset($linkedUsers[$usrgrpid][$userid]);
+					else {
+						unset($usrgrp_userids[$userid]);
+					}
 				}
-				if (isset($linkedUsers[$usrgrpid]) && !empty($linkedUsers[$usrgrpid])) {
-					$userIdsToUnlink = array_merge($userIdsToUnlink, array_keys($linkedUsers[$usrgrpid]));
+
+				foreach ($usrgrp_userids as $userid => $value) {
+					$amount_of_usrgrps_to_unlink[$userid] = array_key_exists($userid, $amount_of_usrgrps_to_unlink)
+						? $amount_of_usrgrps_to_unlink[$userid] + 1
+						: 1;
 				}
 			}
 
@@ -446,11 +446,28 @@ class CUserGroup extends CApiService {
 				DB::insert('users_groups', $userUsergroupLinksToInsert);
 			}
 
-			// unlink users from user groups
-			if (!empty($userIdsToUnlink)) {
+			if ($amount_of_usrgrps_to_unlink) {
+				// Unlink users from user groups.
+
+				$userids_to_unlink = array_keys($amount_of_usrgrps_to_unlink);
+
+				$db_users = API::User()->get([
+					'output' => ['userid', 'alias'],
+					'userids' => $userids_to_unlink,
+					'selectUsrgrps' => ['usrgrps']
+				]);
+
+				foreach ($db_users as $user) {
+					if (count($user['usrgrps']) <= $amount_of_usrgrps_to_unlink[$user['userid']]) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('User "%1$s" cannot be without user group.', $user['alias'])
+						);
+					}
+				}
+
 				DB::delete('users_groups', [
-					'userid' => $userIdsToUnlink,
-					'usrgrpid' => $usrgrpids,
+					'userid' => $userids_to_unlink,
+					'usrgrpid' => $usrgrpids
 				]);
 			}
 		}
@@ -624,14 +641,16 @@ class CUserGroup extends CApiService {
 		]);
 
 		foreach ($dbUsers as $dbUser) {
-			if (count($dbUser['usrgrps']) == 1) {
-				$dbGroup = reset($dbUser['usrgrps']);
+			$db_usrgrpids = [];
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'User group "%1$s" is the only group that user "%2$s" belongs to.',
-					$dbUserGroups[$dbGroup['usrgrpid']]['name'],
-					$dbUser['alias']
-				));
+			foreach ($dbUser['usrgrps'] as $usrgrp) {
+				$db_usrgrpids[] = $usrgrp['usrgrpid'];
+			}
+
+			if (!array_diff($db_usrgrpids, $userGroupIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" cannot be without user group.', $dbUser['alias'])
+				);
 			}
 		}
 	}
