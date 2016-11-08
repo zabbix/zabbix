@@ -1,3 +1,30 @@
+Changes for 2.2.16rc1
+
+New features:
+........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
+........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
+
+Bug fixes:
+........S. [ZBX_11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
+A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
+...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
+..F....... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
+..F....... [ZBX-8457] fixed user macro resolving for templated host and templates (Oleg)
+...G...... [ZBX-10906] fixed agent active checks being delayed if system time was pushed back (wiper)
+A......... [ZBX-10842] fixed sql error when updating httptest with applicationid and without httpstepid parameters (Cemeris)
+A......... [ZBX-10842] prevented disappearing of step items when updating httptest without applicationid, httpstepid parameters (Cemeris)
+A......... [ZBX-10842] fixed connecting web scenario applicationid to created steps when updating with API httptest.update mehtod (Cemeris)
+..F....... [ZBX-9656] prevented updating comments for discovered triggers (Ivo)
+..F....PS. [ZBX-11221] fixed MySQL connection issue by overriding user defined auto commit setting (Oleg, vso)
+........S. [ZBX-10694] reverted hypervisor health status to HostSystem.overallStatus property (wiper)
+.......PS. [ZBX-11213] fixed database monitoring keys (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.15
+
+2.2.15rc1 was released as 2.2.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.15rc1
 
 New features:
@@ -1459,9 +1486,20 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.19rc1
+Changes for 2.0.20rc1
 
 New features:
+
+Bug fixes:
+....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19
+
+2.0.19rc1 was released as 2.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
 
 Bug fixes:
 ....I..... [ZBX-7108] fixed error when upgrading graph_theme table in proxy database from 1.8 to 2.0 (vso)

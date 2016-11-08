@@ -404,36 +404,33 @@ class CMacrosResolverGeneral {
 		$hostMacros = array();
 
 		do {
-			$dbHosts = API::Host()->get(array(
-				'hostids' => $hostIds,
-				'templated_hosts' => true,
-				'output' => array('hostid'),
-				'selectParentTemplates' => array('templateid'),
-				'selectMacros' => array('macro', 'value')
-			));
+			$db_host_macros = DBselect(
+				'SELECT hm.hostid,hm.macro,hm.value FROM hostmacro hm WHERE '.dbConditionInt('hm.hostid', $hostIds)
+			);
+			while ($db_host_macro = DBfetch($db_host_macros)) {
+				$hostMacros[$db_host_macro['hostid']][$db_host_macro['macro']] = $db_host_macro['value'];
+			}
 
-			$hostIds = array();
+			$templateids = array();
+			$host_templates = DBselect(
+				'SELECT ht.hostid,ht.templateid FROM hosts_templates ht WHERE '.dbConditionInt('ht.hostid', $hostIds)
+			);
+			while ($host_template = DBfetch($host_templates)) {
+				$hostTemplates[$host_template['hostid']][] = $host_template['templateid'];
+				$templateids[$host_template['templateid']] = $host_template['templateid'];
+			}
 
-			if ($dbHosts) {
-				foreach ($dbHosts as $dbHost) {
-					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
-
-					foreach ($dbHost['macros'] as $dbMacro) {
-						if (!isset($hostMacros[$dbHost['hostid']])) {
-							$hostMacros[$dbHost['hostid']] = array();
-						}
-
-						$hostMacros[$dbHost['hostid']][$dbMacro['macro']] = $dbMacro['value'];
-					}
+			foreach ($hostIds as $hostid) {
+				if (!array_key_exists($hostid, $hostTemplates)) {
+					$hostTemplates[$hostid] = array();
 				}
+			}
 
-				foreach ($dbHosts as $dbHost) {
-					// only unprocessed templates will be populated
-					foreach ($hostTemplates[$dbHost['hostid']] as $templateId) {
-						if (!isset($hostTemplates[$templateId])) {
-							$hostIds[$templateId] = $templateId;
-						}
-					}
+			// only unprocessed templates will be populated
+			$hostIds = array();
+			foreach ($templateids as $templateid) {
+				if (!array_key_exists($templateid, $hostTemplates)) {
+					$hostIds[$templateid] = $templateid;
 				}
 			}
 		} while ($hostIds);

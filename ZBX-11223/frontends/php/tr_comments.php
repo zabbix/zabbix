@@ -61,20 +61,16 @@ $trigger = reset($trigger);
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	$result = DBexecute(
-		'UPDATE triggers'.
-		' SET comments='.zbx_dbstr($_REQUEST['comments']).
-		' WHERE triggerid='.zbx_dbstr($_REQUEST['triggerid'])
-	);
+	$comments = getRequest('comments');
+
+	$result = API::Trigger()->update(array(
+		'triggerid' => getRequest('triggerid'),
+		'comments' => $comments
+	));
+
 	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 
-	$trigger['comments'] = $_REQUEST['comments'];
-
-	if ($result) {
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
-			_('Trigger').' ['.$_REQUEST['triggerid'].'] ['.$trigger['description'].'] '.
-			_('Comments').' ['.$_REQUEST['comments'].']');
-	}
+	$trigger['comments'] = $comments;
 }
 elseif (isset($_REQUEST['cancel'])) {
 	jsRedirect('tr_status.php');
@@ -87,6 +83,7 @@ elseif (isset($_REQUEST['cancel'])) {
 $triggerEditable = API::Trigger()->get(array(
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => array('triggerid'),
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 	'editable' => true
 ));
 

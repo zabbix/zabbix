@@ -1298,11 +1298,34 @@ ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: update_schedule                                                  *
+ *                                                                            *
+ * Purpose: update active check and send buffer schedule by the specified     *
+ *          time delta                                                        *
+ *                                                                            *
+ * Parameters: delta - [IN] the time delta in seconds                         *
+ *                                                                            *
+ * Comments: This function is used to update checking and sending schedules   *
+ *           if the system time was rolled back.                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_schedule(int delta)
+{
+	int	i;
+
+	for (i = 0; NULL != active_metrics[i].key; i++)
+		active_metrics[i].nextcheck += delta;
+
+	buffer.lastsent += delta;
+}
+
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2, now, delta, lastcheck = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1321,13 +1344,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		if (time(NULL) >= nextsend)
+		now = time(NULL);
+
+		if (now >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);
 			nextsend = (int)time(NULL) + 1;
 		}
 
-		if (time(NULL) >= nextrefresh)
+		if (now >= nextrefresh)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", thread_num2);
 
@@ -1341,7 +1366,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			}
 		}
 
-		if (time(NULL) >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
+		if (now >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
 			zbx_setproctitle("active checks #%d [processing active checks]", thread_num2);
 
@@ -1355,9 +1380,21 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
+			if (0 > (delta = now - lastcheck))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "the system time has been pushed back,"
+						" adjusting active check schedule");
+				update_schedule(delta);
+				nextcheck += delta;
+				nextsend += delta;
+				nextrefresh += delta;
+			}
+
 			zbx_setproctitle("active checks #%d [idle 1 sec]", thread_num2);
 			zbx_sleep(1);
 		}
+
+		lastcheck = now;
 	}
 
 #ifdef _WINDOWS

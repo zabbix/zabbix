@@ -64,6 +64,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.hw.vendor", VMCHECK_FUNC(check_vcenter_hv_hw_vendor)},
 	{"hv.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_hv_memory_size_ballooned)},
 	{"hv.memory.used", VMCHECK_FUNC(check_vcenter_hv_memory_used)},
+	{"hv.sensor.health.state", VMCHECK_FUNC(check_vcenter_hv_sensor_health_state)},
 	{"hv.status", VMCHECK_FUNC(check_vcenter_hv_status)},
 	{"hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
 	{"hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},

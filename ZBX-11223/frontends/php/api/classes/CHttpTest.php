@@ -275,19 +275,20 @@ class CHttpTest extends CZBXAPI {
 		$httpTests = zbx_toArray($httpTests);
 
 		// find hostid by applicationid
-		foreach ($httpTests as $hnum => $httpTest) {
-			unset($httpTests[$hnum]['templateid']);
+		foreach ($httpTests as &$httpTest) {
+			unset($httpTest['httptestid'], $httpTest['templateid']);
 
 			// convert deprecated params
-			$httpTests[$hnum] = $this->convertDeprecatedParam($httpTest, 'macros', 'variables');
+			$httpTest = $this->convertDeprecatedParam($httpTest, 'macros', 'variables');
 
 			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
 				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
 						' FROM applications a'.
 						' WHERE a.applicationid='.zbx_dbstr($httpTest['applicationid'])));
-				$httpTests[$hnum]['hostid'] = $dbHostId['hostid'];
+				$httpTest['hostid'] = $dbHostId['hostid'];
 			}
 		}
+		unset($httpTest);
 
 		$this->validateCreate($httpTests);
 
