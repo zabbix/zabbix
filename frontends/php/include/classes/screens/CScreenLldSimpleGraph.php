@@ -134,22 +134,24 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	 */
 	protected function getItemPrototype() {
 		if ($this->itemPrototype === null) {
-			$defaultOptions = [
+			$resourceid = array_key_exists('real_resourceid', $this->screenitem)
+				? $this->screenitem['real_resourceid']
+				: $this->screenitem['resourceid'];
+
+			$options = [
 				'output' => ['itemid', 'name'],
 				'selectHosts' => ['name'],
 				'selectDiscoveryRule' => ['hostid']
 			];
 
-			$options = [];
-
 			/*
 			 * If screen item is dynamic or is templated screen, real item prototype is looked up by "key"
 			 * used as resource ID for this screen item and by current host.
 			 */
-			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+			if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 				$currentItemPrototype = API::ItemPrototype()->get([
 					'output' => ['key_'],
-					'itemids' => [$this->screenitem['resourceid']]
+					'itemids' => [$resourceid]
 				]);
 				$currentItemPrototype = reset($currentItemPrototype);
 
@@ -158,10 +160,8 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 			}
 			// otherwise just use resource ID given to to this screen item.
 			else {
-				$options['itemids'] = [$this->screenitem['resourceid']];
+				$options['itemids'] = [$resourceid];
 			}
-
-			$options = zbx_array_merge($defaultOptions, $options);
 
 			$selectedItemPrototype = API::ItemPrototype()->get($options);
 			$this->itemPrototype = reset($selectedItemPrototype);
