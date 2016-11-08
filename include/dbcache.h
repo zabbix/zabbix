@@ -555,7 +555,7 @@ void	DCupdate_hosts_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions);
 void	zbx_action_eval_free(zbx_action_eval_t *action);
-void	zbx_condition_eval_free(zbx_hashset_t *uniq_conditions);
+void	zbx_conditions_eval_free(zbx_hashset_t *uniq_conditions);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 
