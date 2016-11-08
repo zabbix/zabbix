@@ -978,7 +978,8 @@ function getItemFormData(array $item = [], array $options = []) {
 			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
-		$data['hostid'] = reset($discoveryRule)['hostid'];
+		$discoveryRule = reset($discoveryRule);
+		$data['hostid'] = $discoveryRule['hostid'];
 
 		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
 		$data['application_prototypes'] = getRequest('application_prototypes', []);
