@@ -62,7 +62,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != process_proxy_data(jp, proxy.hostid, ts, &error))
+	if (SUCCEED != process_proxy_data(&proxy, jp, ts, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
@@ -144,7 +144,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_close(&j);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_AUTO_REGISTRATION);
-	proxy_get_dhis_data(&j, &areg_lastid, &more_areg);
+	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 	zbx_json_close(&j);
 
 	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||

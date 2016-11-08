@@ -232,7 +232,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	disconnect_proxy(&s);
 out:
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 
 	return ret;
 }
@@ -506,7 +506,7 @@ static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_times
 
 	zbx_proxy_update_version(proxy, &jp);
 
-	if (SUCCEED != (ret = process_proxy_data(&jp, proxy->hostid, ts, &error)))
+	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, error);

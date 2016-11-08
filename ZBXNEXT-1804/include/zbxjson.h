@@ -71,6 +71,7 @@
 #define ZBX_PROTO_TAG_DISCOVERY_DATA	"discovery data"
 #define ZBX_PROTO_TAG_AUTO_REGISTRATION	"auto registration"
 #define ZBX_PROTO_TAG_MORE		"more"
+#define ZBX_PROTO_TAG_ITEMID		"itemid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
