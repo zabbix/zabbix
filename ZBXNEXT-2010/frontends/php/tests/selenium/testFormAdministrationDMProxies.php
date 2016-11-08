@@ -263,6 +263,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestClickButton('proxy.create');
 		switch ($expected) {
 			case PROXY_GOOD:
+				$this->zbxTestTextNotPresent('Cannot add proxy');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy added');
 				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestCheckHeader('Proxies');
