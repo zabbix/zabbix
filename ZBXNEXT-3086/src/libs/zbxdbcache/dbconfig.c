@@ -9364,7 +9364,7 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
  *             conditions - [OUT] the conditions vector                       *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions, zbx_hashset_t *uniq_conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions, char **formula, zbx_hashset_t *uniq_conditions)
 {
 	int				i;
 	DB_CONDITION			condition, *hashed_condition;
@@ -9384,9 +9384,24 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition.value2 = zbx_strdup(NULL, dc_condition->value2);
 
 		if (NULL == (hashed_condition = zbx_hashset_search(uniq_conditions, &condition)))
+		{
 			hashed_condition = zbx_hashset_insert(uniq_conditions, &condition, sizeof(DB_CONDITION));
+		}
 		else
+		{
+			char	search[ZBX_MAX_UINT64_LEN + 2];
+			char	replace[ZBX_MAX_UINT64_LEN + 2];
+			char	*old_formula;
+
+			zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}", condition.conditionid);
+			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", hashed_condition->conditionid);
+
+			old_formula = *formula;
+			*formula = string_replace(*formula, search, replace);
+			zbx_free(old_formula);
+
 			zbx_db_condition_free(&condition);
+		}
 
 		zbx_vector_ptr_append(conditions, hashed_condition);
 	}
@@ -9418,7 +9433,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->formula = zbx_strdup(NULL, dc_action->formula);
 	zbx_vector_ptr_create(&action->conditions);
 
-	dc_action_copy_conditions(dc_action, &action->conditions, uniq_conditions);
+	dc_action_copy_conditions(dc_action, &action->conditions, &action->formula, uniq_conditions);
 
 	return action;
 }
