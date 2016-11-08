@@ -170,7 +170,7 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int au
 	return h;
 }
 
-static zbx_ipmi_host_t	*allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
+static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
 	const char	*__function_name = "allocate_ipmi_host";
@@ -198,7 +198,7 @@ static zbx_ipmi_host_t	*allocate_ipmi_host(const char *ip, int port, int authtyp
 	return h;
 }
 
-static zbx_ipmi_sensor_t	*get_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char		*__function_name = "get_ipmi_sensor";
 	int			i;
@@ -468,7 +468,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		goto out;
 	}
 
-	s = get_ipmi_sensor(h, sensor);
+	s = zbx_get_ipmi_sensor(h, sensor);
 
 	if (NULL == s)
 	{
@@ -543,7 +543,7 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		goto out;
 	}
 
-	s = get_ipmi_sensor(h, sensor);
+	s = zbx_get_ipmi_sensor(h, sensor);
 
 	if (NULL == s)
 	{
@@ -866,7 +866,7 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 		switch (op)
 		{
 			case IPMI_ADDED:
-				if (NULL == get_ipmi_sensor(h, sensor))
+				if (NULL == zbx_get_ipmi_sensor(h, sensor))
 					allocate_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_DELETED:
@@ -1097,7 +1097,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 			goto out;
 	}
 	else
-		h = allocate_ipmi_host(ip, port, authtype, privilege, username, password);
+		h = zbx_allocate_ipmi_host(ip, port, authtype, privilege, username, password);
 
 	h->ret = SUCCEED;
 	h->done = 0;
