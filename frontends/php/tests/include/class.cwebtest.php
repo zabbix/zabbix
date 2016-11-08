@@ -273,7 +273,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
 		$checkbox = $this->webDriver->findElement(WebDriverBy::id($id));
 		if ($select != $checkbox->isSelected()) {
-			$checkbox->click();
+			$this->webDriver->findElement(WebDriverBy::xpath("//label[@for='$id']"))->click();
 		}
 	}
 

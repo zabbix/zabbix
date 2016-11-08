@@ -1981,8 +1981,8 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestClickWait('usrgrps_7');
-		$this->zbxTestClickWait('usrgrps_11');
+		$this->zbxTestCheckboxSelectXpath('usrgrps_7');
+		$this->zbxTestCheckboxSelectXpath('usrgrps_11');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
