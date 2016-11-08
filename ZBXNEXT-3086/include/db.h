@@ -339,11 +339,12 @@ typedef struct
 {
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
+	int		condition_result;
 	char		*value;
 	char		*value2;
 	unsigned char	conditiontype;
 	unsigned char	operator;
-	int		condition_result;
+	unsigned char	eventsource;
 }
 DB_CONDITION;
 

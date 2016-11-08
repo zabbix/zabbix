@@ -9382,6 +9382,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition.operator = dc_condition->op;
 		condition.value = zbx_strdup(NULL, dc_condition->value);
 		condition.value2 = zbx_strdup(NULL, dc_condition->value2);
+		condition.eventsource = dc_action->eventsource;
 
 		if (NULL == (hashed_condition = zbx_hashset_search(uniq_conditions, &condition)))
 		{

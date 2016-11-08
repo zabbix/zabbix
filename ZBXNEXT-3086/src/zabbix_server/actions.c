@@ -1633,6 +1633,7 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 
 	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
 	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->eventsource, condition2->eventsource);
 
 	return 0;
 }
@@ -1646,6 +1647,7 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value2, strlen(condition->value2), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->conditiontype, 1, hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->operator, 1, hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->eventsource, 1, hash);
 
 	return hash;
 }
@@ -1659,7 +1661,10 @@ static void	process_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_
 	zbx_hashset_iter_reset(uniq_conditions, &iter);
 
 	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-		condition->condition_result = check_action_condition(event, condition);
+	{
+		if (condition->eventsource == event->source)
+			condition->condition_result = check_action_condition(event, condition);
+	}
 }
 
 /******************************************************************************
