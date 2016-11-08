@@ -834,8 +834,10 @@ class CHost extends CHostGeneral {
 		}
 
 		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
+			$host = reset($db_hosts);
+
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host "%1$s" cannot be without host group.', reset($db_hosts)['host'])
+				_s('Host "%1$s" cannot be without host group.', $host['host'])
 			);
 		}
 
