@@ -394,7 +394,7 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<span>', {
+			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn'}
 				)
 				.click(function() {
@@ -628,18 +628,19 @@ function rm4favorites(object, objectid) {
 	});
 }
 
-
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {idx} 	idx					User profile index
- * @param {int} 	value_int			Integer value
+ * @param {string} 	idx					User profile index
+ * @param {string} 	value_int			Integer value
+ * @param {object} 	idx2				An array of IDs
  */
-function updateUserProfile(idx, value_int) {
+function updateUserProfile(idx, value_int, idx2) {
 	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
-			value_int: value_int
+			value_int: value_int,
+			idx2: idx2
 		}
 	});
 }

@@ -90,10 +90,13 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 
 // filter set
 if (hasRequest('filter_set')) {
+	CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
-	CProfile::update('web.tr_status.filter.show_severity',
-		getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
+	CProfile::update('web.tr_status.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		PROFILE_TYPE_INT
 	);
 	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
@@ -101,13 +104,6 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
-
-	// show triggers
-	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
-	// whole page inaccessible on large installations.
-	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
-	}
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
@@ -151,18 +147,13 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
-	$showTriggers = TRIGGERS_OPTION_ALL;
-}
-else {
-	$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-}
+$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
 $showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
 $showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 $txtSelect = CProfile::get('web.tr_status.filter.txt_select', '');
 $showChange = CProfile::get('web.tr_status.filter.status_change', 0);
-$statusChangeBydays = CProfile::get('web.tr_status.filter.status_change_days', 14);
+$statusChangeDays = CProfile::get('web.tr_status.filter.status_change_days', 14);
 $ackStatus = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
 	? ZBX_ACK_STS_ANY : CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
 $showEvents = CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
@@ -199,17 +190,22 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  */
 $triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
-$rightForm = (new CForm('get'))
-	->addVar('fullscreen', $_REQUEST['fullscreen']);
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-
-$rightForm->addItem($controls);
-
-$triggerWidget->setControls($rightForm);
+$triggerWidget->setControls((new CForm('get'))
+	->addVar('fullscreen', $_REQUEST['fullscreen'])
+	->addItem((new CList())
+		->addItem([
+			new CLabel(_('Group'), 'groupid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getGroupsCB()
+		])
+		->addItem([
+			new CLabel(_('Host'), 'hostid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$pageFilter->getHostsCB()
+		])
+		->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+	)
+);
 
 // filter
 $filterFormView = new CView('common.filter.trigger', [
@@ -221,7 +217,7 @@ $filterFormView = new CView('common.filter.trigger', [
 		'showEvents' => $showEvents,
 		'showSeverity' => $showSeverity,
 		'statusChange' => $showChange,
-		'statusChangeDays' => $statusChangeBydays,
+		'statusChangeDays' => $statusChangeDays,
 		'showDetails' => $showDetails,
 		'txtSelect' => $txtSelect,
 		'application' => $filter['application'],
@@ -251,15 +247,15 @@ $triggerForm = (new CForm('get', 'zabbix.php'))
 $switcherName = 'trigger_switchers';
 
 if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
-	$showHideAllDiv = (new CColHeader(
-		(new CDiv())
+	$showHideAllButton = (new CColHeader(
+		(new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->setId($switcherName)
 			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 else {
-	$showHideAllDiv = null;
+	$showHideAllButton = null;
 }
 
 if ($config['event_ack_enable']) {
@@ -274,7 +270,7 @@ else {
 
 $triggerTable = (new CTableInfo())
 	->setHeader([
-		$showHideAllDiv,
+		$showHideAllButton,
 		$headerCheckBox,
 		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 		_('Status'),
@@ -353,7 +349,7 @@ if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
 if ($showChange) {
-	$options['lastChangeSince'] = time() - $statusChangeBydays * SEC_PER_DAY;
+	$options['lastChangeSince'] = time() - $statusChangeDays * SEC_PER_DAY;
 }
 if (!$showMaintenance) {
 	$options['maintenance'] = false;
@@ -365,9 +361,7 @@ order_result($triggers, $sortField, $sortOrder);
 $url = (new CUrl('tr_status.php'))
 	->setArgument('fullscreen', getRequest('fullscreen'))
 	->setArgument('groupid', $pageFilter->groupid)
-	->setArgument('hostid', $pageFilter->hostid)
-	->setArgument('show_triggers', getRequest('show_triggers'))
-	->setArgument('filter_set', getRequest('filter_set'));
+	->setArgument('hostid', $pageFilter->hostid);
 
 $paging = getPagingLine($triggers, $sortOrder, $url);
 
@@ -418,6 +412,7 @@ $triggerIds = zbx_objectValues($triggers, 'triggerid');
 $triggerEditable = API::Trigger()->get([
 	'triggerids' => $triggerIds,
 	'output' => ['triggerid'],
+	'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 	'editable' => true,
 	'preservekeys' => true
 ]);
@@ -713,15 +708,15 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
-		$openOrCloseDiv = $trigger['events']
-			? (new CDiv())
+		$openOrCloseButton = $trigger['events']
+			? (new CSimpleButton())
 				->addClass(ZBX_STYLE_TREEVIEW)
 				->setAttribute('data-switcherid', $trigger['triggerid'])
 				->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
 			: '';
 	}
 	else {
-		$openOrCloseDiv = null;
+		$openOrCloseButton = null;
 	}
 
 	// comments
@@ -735,7 +730,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	$triggerTable->addRow([
-		$openOrCloseDiv,
+		$openOrCloseButton,
 		$ack_checkbox,
 		getSeverityCell($trigger['priority'], $config, null, !$trigger['value']),
 		$statusSpan,

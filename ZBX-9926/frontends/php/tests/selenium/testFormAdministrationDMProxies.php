@@ -42,25 +42,11 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Mode');
-		$this->zbxTestTextPresent('Encryption');
-		$this->zbxTestTextPresent('Last seen (age)');
-		$this->zbxTestTextPresent('Host count');
-		$this->zbxTestTextPresent('Item count');
-		$this->zbxTestTextPresent('Required performance (vps)');
-		$this->zbxTestTextPresent('Hosts');
 
 		$this->zbxTestClickButtonText('Create proxy');
-		$this->zbxTestTextPresent('Proxy name');
-		$this->zbxTestTextPresent('Proxy mode');
-		$this->zbxTestTextPresent('Hosts');
-		$this->zbxTestTextPresent('Proxy hosts');
-		$this->zbxTestTextPresent('Other hosts');
-		$this->zbxTestTextPresent('Description');
+		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Hosts', 'Proxy hosts', 'Other hosts', 'Description']);
 
 		$this->zbxTestAssertElementPresentId('host');
-		// this check will fail in case of incorrect maxlength value for this "host" element!!!
 		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
 		$this->zbxTestAssertElementPresentId('status');
 		$this->zbxTestDropdownHasOptions('status', ['Active', 'Passive']);
@@ -73,17 +59,12 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		// Switch to passive mode
 		$this->zbxTestDropdownSelectWait('status', 'Passive');
-		$this->zbxTestTextPresent('Proxy name');
-		$this->zbxTestTextPresent('Proxy mode');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ip'));
+		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Hosts', 'Proxy hosts', 'Other hosts', 'Description']);
 		$this->zbxTestTextPresent('Interface');
 		$this->zbxTestTextPresent(['IP address', 'DNS name', 'Connect to', 'Port']);
-		$this->zbxTestTextPresent('Hosts');
-		$this->zbxTestTextPresent('Proxy hosts');
-		$this->zbxTestTextPresent('Other hosts');
-		$this->zbxTestTextPresent('Description');
 
 		$this->zbxTestAssertElementPresentId('host');
-		// this check will fail in case of incorrect maxlength value for this "host" element!!!
 		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
 		$this->zbxTestAssertElementPresentId('status');
 		$this->zbxTestAssertElementPresentId('ip');
@@ -98,25 +79,27 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 	}
 
-
 	// Returns all possible proxy data
 	public static function dataCreate() {
 		// Ok/bad, name, mode, hosts, ip, dns, connect_to, port, error
 		return [
 			[PROXY_GOOD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
-				['ЗАББИКС Сервер'], 0, 0, 0, 0, ''
+				['ЗАББИКС Сервер'], 0, 0, 'No encryption', 0, ''
 			],
 			[PROXY_GOOD, 'New active proxy 2', HOST_STATUS_PROXY_ACTIVE,
-				[], 0, 0, 0, 0, ''
+				[], 0, 0, 'PSK', 0, ''
+			],
+			[PROXY_GOOD, 'New active proxy 3', HOST_STATUS_PROXY_ACTIVE,
+				[], 0, 0, 'Certificate', 0, ''
 			],
 			[PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
-				[], '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''
+				[], '192.168.1.1', 'proxy123.zabbix.com', 'No encryption', 11051, ''
 			],
 			[PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
-				[], '{$PROXY_IP}', 'proxy123.zabbix.com', 0, 11051, ''
+				[], '{$PROXY_IP}', 'proxy123.zabbix.com', 'PSK', 11051, ''
 			],
 			[PROXY_GOOD, 'New passive proxy with port macro', HOST_STATUS_PROXY_PASSIVE,
-				[], '192.168.1.1', 'proxy123.zabbix.com', 0, '{$PROXY_PORT}', ''
+				[], '192.168.1.1', 'proxy123.zabbix.com', 'Certificate', '{$PROXY_PORT}', ''
 			],
 			[
 				PROXY_BAD,
@@ -163,14 +146,14 @@ class testFormAdministrationDMProxies extends CWebTest {
 				['Cannot add proxy', 'Incorrect interface port "port" provided.']
 			],
 			[PROXY_BAD,
-				'New active proxy 1',
+				'Active proxy 1',
 				HOST_STATUS_PROXY_ACTIVE,
 				[],
 				0,
 				0,
 				0,
 				0,
-				['Cannot add proxy', 'Proxy "New active proxy 1" already exists.']
+				['Cannot add proxy', 'Proxy "Active proxy 1" already exists.']
 			],
 			[PROXY_BAD,
 				'New passive proxy with wrong port macro',
@@ -204,38 +187,87 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 
-		// create proxy
 		$this->zbxTestClickButtonText('Create proxy');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 
-		$this->zbxTestInputType('host', $name);
-		switch ($mode) {
-			case HOST_STATUS_PROXY_ACTIVE:
-				$this->zbxTestDropdownSelectWait('status', 'Active');
-				break;
-
-			case HOST_STATUS_PROXY_PASSIVE:
-				$this->zbxTestDropdownSelectWait('status', 'Passive');
-				$this->zbxTestInputType('ip', $ip);
-				$this->zbxTestInputType('dns', $dns);
-// TODO connect_to is not supported yet
-				$this->zbxTestInputType('port', $port);
-				break;
-		}
-
+		$this->zbxTestInputTypeWait('host', $name);
 		// adding host that will be monitored by this proxy
 		foreach ($hosts as $host) {
 			$this->zbxTestDropdownSelect('proxy_hostids_right', $host);
 			$this->zbxTestClick('add');
 		}
+
+		switch ($mode) {
+			case HOST_STATUS_PROXY_ACTIVE:
+				$this->zbxTestDropdownSelectWait('status', 'Active');
+				$this->zbxTestClickWait('tab_encryptionTab');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('encryption'));
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_0'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_1'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_2'][@disabled]");
+
+				switch ($connect_to) {
+					case 'No encryption':
+						$this->zbxTestAssertNotVisibleId('tls_psk_identity');
+						$this->zbxTestAssertNotVisibleId('tls_psk');
+						$this->zbxTestAssertNotVisibleId('tls_issuer');
+						$this->zbxTestAssertNotVisibleId('tls_subject');
+				break;
+
+					case 'PSK':
+						$this->zbxTestClickWait('tls_in_psk');
+						$this->zbxTestInputTypeWait('tls_psk_identity', 'test identity');
+						$this->zbxTestInputTypeWait('tls_psk', '12345678901234567890123456789012');
+						break;
+
+					case 'Certificate':
+						$this->zbxTestClickWait('tls_in_cert');
+						$this->zbxTestAssertElementPresentId('tls_issuer');
+						$this->zbxTestAssertElementPresentId('tls_subject');
+						break;
+				}
+				break;
+
+			case HOST_STATUS_PROXY_PASSIVE:
+				$this->zbxTestDropdownSelectWait('status', 'Passive');
+				$this->zbxTestInputTypeOverwrite('ip', $ip);
+				$this->zbxTestInputTypeOverwrite('dns', $dns);
+				$this->zbxTestInputTypeOverwrite('port', $port);
+				$this->zbxTestClickWait('tab_encryptionTab');
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('encryption'));
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_in_none'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_psk_identity'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_psk'][@disabled]");
+
+				switch ($connect_to) {
+					case 'No encryption':
+						$this->assertTrue($this->zbxTestCheckboxSelected('tls_connect_0'));
+				break;
+
+					case 'PSK':
+						$this->zbxTestClickXpathWait("//ul[@id='tls_connect']//label[@for='tls_connect_1']");
+						$this->zbxTestInputTypeWait('tls_psk_identity', 'test identity');
+						$this->zbxTestInputTypeWait('tls_psk', '12345678901234567890123456789012');
+						break;
+
+					case 'Certificate':
+						$this->zbxTestClickXpathWait("//ul[@id='tls_connect']//label[@for='tls_connect_2']");
+						$this->zbxTestAssertElementPresentId('tls_issuer');
+						$this->zbxTestAssertElementPresentId('tls_subject');
+						break;
+		}
+				break;
+		}
+
 		$this->zbxTestClickButton('proxy.create');
 		switch ($expected) {
 			case PROXY_GOOD:
-				$this->zbxTestTextPresent('Proxy added');
+				$this->zbxTestTextNotPresent('Cannot add proxy');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy added');
 				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestCheckHeader('Proxies');
-				$this->zbxTestTextPresent(['Mode', 'Name', 'Encryption','Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
+				$this->zbxTestTextPresent(['Mode', 'Name', 'Encryption', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
 				$this->zbxTestTextPresent($name);
 
 				switch ($mode) {
@@ -268,9 +300,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public static function dataUpdateProxyName() {
 		// Name, newname
 		return [
-			['New active proxy 1', 'New active proxy 1 updated'],
-			['New active proxy 2', 'New active proxy 2 updated'],
-			['New passive proxy 1', 'New passive proxy 1 updated']
+			['Active proxy 3', 'New active proxy 3 updated'],
+			['Passive proxy 3', 'New passive proxy 3 updated'],
 		];
 	}
 
@@ -285,7 +316,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestCheckHeader('Proxies');
 
-		// check presence of buttons
 		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
 		$this->zbxTestAssertElementPresentId('clone');
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
@@ -301,8 +331,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		$oldHash = DBhash($sql);
 
-		// update proxy name
-		$this->zbxTestInputType('host', $newname);
+		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.update');
 		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
@@ -311,7 +340,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		$this->assertEquals($oldHash, DBhash($sql));
 
-		// check that proxy name has been updated in the DB
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy name has not been updated');
 	}
@@ -320,7 +348,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// Name, clone name
 		return [
 			['Active proxy 1', 'Active proxy 1 cloned'],
-			['Active proxy 2', 'Active proxy 2 cloned'],
 			['Passive proxy 1', 'Passive proxy 1 cloned']
 		];
 	}
@@ -337,23 +364,20 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestCheckHeader('Proxies');
 
-		// check presence of buttons
 		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
 		$this->zbxTestAssertElementPresentId('clone');
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
-		// update proxy name
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestTextPresent('Proxy');
-		$this->zbxTestInputType('host', $newname);
+		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.create');
 		$this->zbxTestTextPresent('Proxy added');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
 
-		// checking that proxy name has been updated in the DB
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy has not been created');
 	}
@@ -374,6 +398,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
 
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent(['Update', 'Clone', 'Delete', 'Cancel']);
 
 		$this->zbxTestClickButtonText('Delete');

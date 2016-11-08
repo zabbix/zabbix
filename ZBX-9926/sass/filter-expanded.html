@@ -19,7 +19,7 @@
 <body>
 <header role="banner">
 		<div class="nav" role="navigation">
-			<div class="top-nav-container"><div class="logo"></div><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -28,10 +28,9 @@
 		</div>
 	</header>
 	<div class="article">
-	<div class="header-title">
-	<h1>Dashboard</h1>
-	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid" class="red"><option>All</option><option>Zabbix</option><option selected class="red">Zabbix2</option><option>Zabbix3</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
-	</div>
+	<div class="header-title table">
+	<div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid" class="red"><option>All</option><option>MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</option><option selected class="red">Zabbix2</option><option>Zabbix3</option></select></li><li><label for="groupid">Group</label>&nbsp;<select id="groupid" class="red"><option>All</option><option>MMMMMMMMMMMM</option><option selected class="red">Zabbix2</option><option>Zabbix3</option></select></li><li><button type="button">Create web scenario</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div></div>
 		<ul class="object-group"><li><span><a href="">All hosts</a></span>/<span class="selected"><a href="">Zabbix server</a>:</span></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span class="selected"><a href="">Discovery</a></span>/<span><a href="">Discovery</a></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
 	<div class="filter-btn-container">
 	<button type="button" class="filter-trigger filter-active">Filter<span class="arrow-up"></span></button>
@@ -100,6 +99,7 @@
 	<li><div class="table-forms-td-left"><label for="Groups">Status</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
 	<li><div class="table-forms-td-left"><label for="Groups">Triggers</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
 	<li><div class="table-forms-td-left"><label for="Groups">Template</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label>Filter by host inventory</label></div><div class="table-forms-td-right"><table><tbody><tr><td><select id="" name=""><option value="software_full">Software (Full details)</option><option value="software_app_a">Software application A</option><option value="software_app_b">Software application B</option></select></td><td><input type="text" id="" name="" style="width: 150px" maxlength="255"></td><td class="nowrap"><button type="button" class="btn-link" id="" name="">Remove</button></td></tr><tr><td colspan="2"><button type="button" id="" name="" class="btn-link">Add</button></td></tr></tbody></table></div></li>
 	</ul>
 	</div>
 	</div>
@@ -177,7 +177,7 @@
 	<table class="list-table">
 		<thead>
 			<tr>
-				<th><div class="treeview"><span class="arrow-down"></span></div><div class="treeview"><span class="arrow-right"></span></div></th>
+				<th><button type="button" class="treeview"><span class="arrow-down"></span></button><button type="button" class="treeview"><span class="arrow-right"></span></button></th>
 				<th class="cell-width"><input type="checkbox"></th>
 				<th><a href="">Hosts<span class="arrow-down"></span></a></th>
 				<th><a href="">Applications<span class="arrow-up"></span></a></th>
@@ -233,7 +233,7 @@
 				<td><!--<span class="rel-container cursor-pointer"><span class="icon-depend-up"></span></span>--><span class="icon-depend-up cursor-pointer"></span></td>
 			</tr>
 			<tr>
-			    <td><div class="treeview"><span class="arrow-right"></span></div><a href="">Public Cloud Service</a></td>
+			    <td><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">Public Cloud Service</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Main server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
@@ -251,7 +251,7 @@
 				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
-			    <td><div class="treeview"><span class="arrow-down"></span></div><a href="">Business System</a></td>
+			    <td><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">Business System</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Backup server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
@@ -269,7 +269,7 @@
 				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
-			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-right"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
+			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-right"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">HQ server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
@@ -287,7 +287,7 @@
 				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
-			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-down"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
+			    <td style="padding-left: 2em;"><button type="button" class="treeview"><span class="arrow-down"></span></button><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
 				<td><input type="checkbox"></td>
 				<td><a href="">Riga server</a></td>
 				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>

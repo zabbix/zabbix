@@ -149,7 +149,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($oldVmName);
-		$this->zbxTestInputType("name", $newVmName);
+		$this->zbxTestInputTypeOverwrite('name', $newVmName);
 		$this->zbxTestClickWait('update');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
@@ -181,8 +181,8 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
-		$this->zbxTestClickLinkText($newVmName);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickLinkTextWait($newVmName);
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
@@ -194,8 +194,8 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_CancelDeleteValueMap() {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);
-		$this->zbxTestClick('cancel');
+		$this->zbxTestClickLinkTextWait($this->valuemapWithMultipleMappings);
+		$this->zbxTestClickWait('cancel');
 
 		// checking that valuemap was not deleted after clicking on the "Cancel" button in the confirm dialog box
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';
@@ -209,7 +209,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 

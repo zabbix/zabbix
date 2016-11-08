@@ -57,6 +57,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestHrefClickWait('?form=update&slideshowid='.$slideshow['slideshowid']);
+		$this->zbxTestCheckHeader('Slide shows');
 		$this->zbxTestTextPresent(['Slide','Sharing']);
 		$this->zbxTestTextPresent(['Owner', 'Name', 'Default delay (in seconds)', 'Slides']);
 

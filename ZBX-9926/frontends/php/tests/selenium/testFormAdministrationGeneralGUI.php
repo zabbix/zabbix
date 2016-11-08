@@ -108,12 +108,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
+		$this->zbxTestAssertElementValue('default_theme', 'dark-theme');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('dark-theme');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->zbxTestDropdownSelect('default_theme', 'Blue');
+		$this->zbxTestAssertElementValue('default_theme', 'blue-theme');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');
@@ -184,7 +186,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('search_limit', '1');
+		$this->zbxTestInputTypeOverwrite('search_limit', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
 
@@ -205,11 +207,12 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestInputType('search_limit', '0');
+		$this->zbxTestInputTypeOverwrite('search_limit', '0');
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+		$this->zbxTestTextPresent('Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value

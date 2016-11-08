@@ -282,7 +282,9 @@ class CLineGraphDraw extends CGraphDraw {
 					' GROUP BY itemid,'.$calc_field
 				);
 
-				$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+				if (!$this->hasSchedulingIntervals($this->items[$i]['intervals']) || $this->items[$i]['delay'] != 0) {
+					$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+				}
 			}
 
 			if (!isset($this->data[$this->items[$i]['itemid']])) {
@@ -1314,8 +1316,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$intervals = [
 			['main' => SEC_PER_MIN / 2, 'sub' => SEC_PER_MIN / 60],		// 30 seconds and 1 second
 			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// 60 seconds and 5 seconds
-			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minuts and 10 seconds
-			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minuts and 30 seconds
+			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minutes and 10 seconds
+			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minutes and 30 seconds
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],				// 1 hour and 1 minute
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],			// 1 hour and 2 minutes
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],			// 1 hour and 5 minutes
@@ -2655,15 +2657,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$delay = $this->items[$item]['delay'];
 
-				$has_scheduling = false;
-				foreach ($this->items[$item]['intervals'] as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
-						$has_scheduling = true;
-						break;
-					}
-				}
-
-				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER || ($has_scheduling && $delay == 0)) {
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| ($this->hasSchedulingIntervals($this->items[$item]['intervals']) && $delay == 0)) {
 					$draw = true;
 				}
 				else {
@@ -2728,5 +2723,22 @@ class CLineGraphDraw extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
+	}
+
+	/**
+	 * Checks if item intervals has at least one scheduling interval.
+	 *
+	 * @param array $intervals
+	 *
+	 * @return bool
+	 */
+	private function hasSchedulingIntervals($intervals) {
+		foreach ($intervals as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -274,23 +274,9 @@ class testFormItem extends CWebTest {
 			[
 				[
 					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
-					'key' => 'test-inheritance-item1'
-				]
-			],
-			[
-				[
-					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal',
 					'host' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
-					'key' => 'test-inheritance-item1'
 				]
 			],
 			[
@@ -1793,28 +1779,6 @@ class testFormItem extends CWebTest {
 					'formCheck' => true
 				]
 			],
-			// Flexfields with negative number in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-negative flexdelay',
-					'key' => 'item-flex-negative-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
-			// Flexfields with symbols in flexdelay
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item flex-symbols in flexdelay',
-					'key' => 'item-flex-symbols-flexdelay',
-					'flexPeriod' => [
-						['flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00']
-					]
-				]
-			],
 			// History
 			[
 				[
@@ -1848,15 +1812,6 @@ class testFormItem extends CWebTest {
 					'errors' => [
 							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
 					]
-				]
-			],
-			// History
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item history',
-					'key' => 'item-history-test',
-					'history' => 'days'
 				]
 			],
 			// Trends
@@ -1894,17 +1849,6 @@ class testFormItem extends CWebTest {
 					'errors' => [
 							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
 					]
-				]
-			],
-			// Trends
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item trends Check',
-					'key' => 'item-trends-test',
-					'trends' => 'trends',
-					'dbCheck' => true,
-					'formCheck' => true
 				]
 			],
 			[

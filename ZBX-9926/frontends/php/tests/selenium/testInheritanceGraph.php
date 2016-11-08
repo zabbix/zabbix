@@ -59,9 +59,9 @@ class testInheritanceGraph extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
-		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestClickWait('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -88,8 +88,8 @@ class testInheritanceGraph extends CWebTest {
 					'addItems' => [
 						['itemName' => 'testInheritanceItem1']
 					],
+					'error_msg' => 'Cannot add graph',
 					'errors'=> [
-						'Cannot add graph',
 						'Graph with name "testInheritanceGraph4" already exists in graphs or graph prototypes.'
 					]
 				]
@@ -107,18 +107,19 @@ class testInheritanceGraph extends CWebTest {
 
 		foreach ($data['addItems'] as $item) {
 			$this->zbxTestLaunchPopup('add_item');
-			$this->zbxTestClickLinkText($item['itemName']);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestClickLinkTextWait($item['itemName']);
+			$this->zbxTestWaitWindowClose();
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'groupid');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
-				$this->zbxTestTextPresent('Graph added');
+				$this->zbxTestTextNotPresent('Cannot add graph');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
 				$this->zbxTestTextPresent($data['name']);
 				break;
 
@@ -126,6 +127,7 @@ class testInheritanceGraph extends CWebTest {
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Graph added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

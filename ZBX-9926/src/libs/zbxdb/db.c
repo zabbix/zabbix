@@ -254,6 +254,7 @@ static int	is_recoverable_mysql_error(void)
 		case CR_CONNECTION_ERROR:
 		case CR_SERVER_LOST:
 		case CR_UNKNOWN_HOST:
+		case CR_COMMANDS_OUT_OF_SYNC:
 		case ER_SERVER_SHUTDOWN:
 		case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
 		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
@@ -405,6 +406,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
 	if (0 != mysql_set_character_set(conn, "utf8"))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8\"");
+
+	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
+	{
+		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		ret = ZBX_DB_FAIL;
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
@@ -978,7 +985,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 			if (oci_ids_num >= oci_ids_alloc)
 			{
 				old_alloc = oci_ids_alloc;
-				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
+				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 3 / 2);
 				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber *));
 
 				for (i = old_alloc; i < oci_ids_alloc; i++)
@@ -2156,12 +2163,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; '\0' != *s;)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */

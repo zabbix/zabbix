@@ -75,7 +75,6 @@ class testFormTriggerPrototype extends CWebTest {
 	 */
 	protected $itemKey = 'item-prototype-reuse';
 
-
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
@@ -294,7 +293,7 @@ class testFormTriggerPrototype extends CWebTest {
 				$this->zbxTestAssertAttribute("//button[@id='insert']", 'disabled');
 			}
 
-			$this->zbxTestAssertElementNotPresentId('add_expression');
+			$this->zbxTestAssertElementNotPresentXpath("//ul[@id='triggersFormList']//button[contains(@onclick, 'add_expression')]");
 			$this->zbxTestAssertElementNotPresentId('insert_macro');
 			$this->zbxTestAssertElementNotPresentId('exp_list');
 			}
@@ -307,11 +306,10 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
-				$this->zbxTestAssertVisibleId('add_expression');
-				$this->zbxTestAssertElementValue('add_expression', 'Add');
+				$this->zbxTestAssertVisibleXpath("//ul[@id='triggersFormList']//button[contains(@onclick, 'add_expression') and text()='Add']");
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentId('add_expression');
+				$this->zbxTestAssertElementNotPresentXpath("//ul[@id='triggersFormList']//button[contains(@onclick, 'add_expression')]");
 			}
 
 			$this->zbxTestAssertVisibleId('insert');
@@ -826,8 +824,8 @@ class testFormTriggerPrototype extends CWebTest {
 				else {
 					$this->zbxTestAssertElementPresentId('test_expression');
 
-					$this->zbxTestAssertElementValue('and_expression', 'And');
-					$this->zbxTestAssertElementValue('or_expression', 'Or');
+					$this->zbxTestAssertVisibleXpath("//ul[@id='triggersFormList']//button[contains(@onclick, 'and_expression') and text()='And']");
+					$this->zbxTestAssertVisibleXpath("//ul[@id='triggersFormList']//button[contains(@onclick, 'or_expression') and text()='Or']");
 					$this->zbxTestAssertElementPresentXpath("//button[text()='Remove']");
 					if (isset($constructor['elements'])) {
 						foreach($constructor['elements'] as $elem) {

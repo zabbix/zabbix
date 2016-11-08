@@ -132,7 +132,7 @@ var timeControl = {
 						obj.objDims.width = 0;
 					}
 
-					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
+					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 23);
 				}
 
 				// url

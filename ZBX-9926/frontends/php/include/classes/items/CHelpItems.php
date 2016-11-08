@@ -81,11 +81,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[
@@ -249,6 +249,10 @@ class CHelpItems {
 					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
 					'key' => 'system.uname',
 					'description' => _('Detailed host information. Returns string')
 				],
@@ -363,11 +367,11 @@ class CHelpItems {
 					'description' => _('Log file monitoring with log rotation support. Returns log')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[
@@ -669,6 +673,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
 					'description' => _('VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency')
+				],
+				[
+					'key' => 'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
+					'description' => _('VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
 					'key' => 'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',

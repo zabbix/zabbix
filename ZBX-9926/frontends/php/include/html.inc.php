@@ -569,7 +569,7 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 	}
 
 	return (new CList())
-		->addClass('table-forms')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addItem([
 			(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 			(new CDiv($other_buttons))
@@ -594,10 +594,14 @@ function getHostAvailabilityTable($host) {
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($type))
-					->addClass(ZBX_STYLE_STATUS_RED)
-					->addClass(ZBX_STYLE_CURSOR_POINTER)
-					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_RED);
+
+				if ($host[$prefix.'error'] !== '') {
+					$ai
+						->addClass(ZBX_STYLE_CURSOR_POINTER)
+						->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
+				}
+
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);

@@ -596,6 +596,7 @@ class testFormGraphPrototype extends CWebTest {
 		if (!isset($data['form'])) {
 			$this->zbxTestLaunchPopup('add_item');
 			if (isset($data['host'])) {
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -1023,8 +1024,8 @@ class testFormGraphPrototype extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'graphName' => 'graphStackedMore',
-					'width' => 'name',
-					'height' => 'name',
+					'width' => '0',
+					'height' => '0',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'yaxismin' => 'name',
@@ -1083,32 +1084,39 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['noItem'])) {
+			$this->zbxTestLaunchPopup('add_protoitem');
+
+			$this->zbxTestClickLinkTextWait($this->item);
+			$this->zbxTestWaitWindowClose();
+
 			$this->zbxTestLaunchPopup('add_item');
 
+			$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
-			$this->webDriver->switchTo()->window('');
-
-			$this->zbxTestLaunchPopup('add_protoitem');
-			$this->zbxTestClickLinkTextWait($this->item);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->item);
 
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->itemSimple);
 
-				$this->zbxTestLaunchPopup('add_item');
+				$this->zbxTestClickWait('add_item');
+				$this->zbxTestSwitchToNewWindow();
 
+				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 				$this->zbxTestClickLinkTextWait($this->itemSimple);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 
-				$this->zbxTestLaunchPopup('add_protoitem');
+				$this->zbxTestClickWait('add_protoitem');
+				$this->zbxTestSwitchToNewWindow();
 				$this->zbxTestClickLinkTextWait($this->item);
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
 			}
 		}
 		if (isset($data['width'])) {
@@ -1140,7 +1148,7 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_min_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
@@ -1155,14 +1163,13 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_max_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
 					break;
 			}
 		}
-
 
 		$this->zbxTestClickWait('add');
 

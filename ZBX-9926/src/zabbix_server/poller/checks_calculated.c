@@ -93,13 +93,27 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
-	assert(dc_item);
-	assert(exp);
-
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
 	for (e = dc_item->params; '\0' != *e; e++)
 	{
+		if ('{' == *e && '$' == *(e + 1))	/* user macro ? */
+		{
+			int	macro_r, context_l, context_r;
+
+			/* find length of user macro and copy the user macro verbatim */
+
+			if (SUCCEED == zbx_user_macro_parse(e, &macro_r, &context_l, &context_r))
+			{
+				zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, (size_t)macro_r + 1);
+				e += macro_r;	/* skip to position after user macro */
+			}
+			else
+				zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *e);
+
+			continue;
+		}
+
 		if (SUCCEED != is_function_char(*e))
 		{
 			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *e);
@@ -264,7 +278,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			break;
 		}
 
-		if (SUCCEED != is_double_suffix(f->value) || '-' == *f->value)
+		if (SUCCEED != is_double_suffix(f->value, ZBX_FLAG_DOUBLE_SUFFIX) || '-' == *f->value)
 		{
 			char	*wrapped;
 

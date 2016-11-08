@@ -429,10 +429,15 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function validateCreate(array $httpTests) {
+		$required_fields = ['name', 'hostid', 'steps'];
+
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, ['name', 'hostid', 'steps']);
-			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
+			$missing_keys = array_diff($required_fields, array_keys($httpTest));
+
+			if ($missing_keys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Web scenario missing parameters: %1$s', implode(', ', $missing_keys))
+				);
 			}
 		}
 
@@ -491,6 +496,9 @@ class CHttpTest extends CApiService {
 			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
 		]);
 
+		// Required fields for steps.
+		$required_fields = ['httpstepid'];
+
 		foreach ($httpTests as &$httpTest) {
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
 
@@ -504,12 +512,33 @@ class CHttpTest extends CApiService {
 
 			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as &$httpTestStep) {
+					if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
+						/*
+						 * Handle templated webscenario steps first by checking the keys and then check name before
+						 * populating the name field from parent.
+						 */
+
+						$missing_keys = array_diff($required_fields, array_keys($httpTestStep));
+
+						if ($missing_keys) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Web scenario step is missing parameters: %1$s', implode(', ', $missing_keys))
+							);
+						}
+
+						if (array_key_exists('name', $httpTestStep)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Cannot update step name for a templated web scenario "%1$s".', $httpTest['name'])
+							);
+						}
+					}
+
 					if (isset($httpTestStep['httpstepid'])
 							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
 						$httpTestStep['name'] = $dbHttpTest['steps'][$httpTestStep['httpstepid']]['name'];
 					}
 
-					if ($dbHttpTest['templateid']) {
+					if ($dbHttpTest['templateid'] != 0) {
 						unset($httpTestStep['no']);
 					}
 
@@ -650,6 +679,20 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 		}
 
+		// Check if step still exists on update.
+		if ($dbHttpTest) {
+			foreach ($httpTest['steps'] as $step) {
+				$dbHttpTest['steps'] = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
+
+				if (array_key_exists('httpstepid', $step)
+						&& !array_key_exists($step['httpstepid'], $dbHttpTest['steps'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+			}
+		}
+
 		$followRedirectsValidator = new CLimitedSetValidator([
 				'values' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]
 			]
@@ -659,6 +702,14 @@ class CHttpTest extends CApiService {
 				'values' => [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]
 			]
 		);
+
+		if ($dbHttpTest && $dbHttpTest['templateid'] != 0) {
+			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
+
+			if (count($httpTest['steps']) != count($dbHttpTest['steps'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
+			}
+		}
 
 		foreach ($httpTest['steps'] as $step) {
 			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
@@ -698,17 +749,6 @@ class CHttpTest extends CApiService {
 				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
 			}
 		}
-
-		// check if step still exists on update
-		if ($dbHttpTest) {
-			foreach ($httpTest['steps'] as $step) {
-				if (isset($step['httpstepid']) && !isset($dbHttpTest['steps'][$step['httpstepid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-		}
 	}
 
 	/**
@@ -720,8 +760,15 @@ class CHttpTest extends CApiService {
 	 * @param array $dbHttpTest
 	 */
 	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = []) {
+		if ($dbHttpTest) {
+			$httpTest['steps'] = zbx_toHash($httpTest['steps'], 'httpstepid');
+			$httpTest['steps'] = $this->extendFromObjects($httpTest['steps'], $dbHttpTest['steps'], ['name']);
+		}
+
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Web scenario step "%1$s" already exists.', $duplicate['name'])
+			);
 		}
 	}
 

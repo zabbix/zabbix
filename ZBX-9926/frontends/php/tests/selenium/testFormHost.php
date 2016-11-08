@@ -263,10 +263,11 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='add_templates_']/input", 'Template OS Linux');
-
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClick('update');
@@ -298,7 +299,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink" next to a template by name
-		$this->zbxTestClickWait('unlink_'.$hostid2);
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink[".$hostid2."]') and text()='Unlink']");
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('update');
@@ -325,10 +326,11 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestAssertElementPresentXpath("//div[@id='add_templates_']/input");
-		$this->zbxTestInputTypeByXpath("//div[@id='add_templates_']/input", 'Template OS Linux');
-;
-		$this->zbxTestClickXpathWait("//span[@class='suggest-found']");
-		$this->zbxTestClickWait('add_template');
+		$this->zbxTestClickButtonText('Select');
+		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestWaitWindowClose();
+		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClickWait('update');
@@ -360,7 +362,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink and clear" next to a template by name
-		$this->zbxTestClickWait('unlink_and_clear_'.$hostid2);
+		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink_and_clear[".$hostid2."]') and text()='Unlink and clear']");
 
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('update');

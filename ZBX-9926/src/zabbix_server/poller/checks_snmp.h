@@ -25,16 +25,13 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-#ifdef HAVE_NETSNMP
-#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
-#	include <net-snmp/net-snmp-config.h>
-#	include <net-snmp/net-snmp-includes.h>
-#endif
-
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
 
+#ifdef HAVE_NETSNMP
+void	zbx_init_snmp(void);
 int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result);
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
+#endif
 
 #endif

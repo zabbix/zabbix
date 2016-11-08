@@ -192,18 +192,21 @@ class testZBX6663 extends CWebTest {
 
 		if (isset($zbx_data['discoveryRule'])) {
 			$this->zbxTestClickLinkTextWait('Discovery rules');
-			$this->zbxTestClickLinkText($this->discoveryRule);
-			$this->zbxTestClickLinkText($zbx_data['discoveryRule']);
+			$this->zbxTestCheckHeader('Discovery rules');
+			$this->zbxTestClickLinkTextWait($this->discoveryRule);
+			$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
 		}
 		else {
 			$link = $zbx_data['link'];
 			$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='$link']");
 		}
 
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestCheckboxSelect("all_$checkbox");
 
 		$this->zbxTestClickLinkText($this->templated);
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('selected_count'));
 		$this->zbxTestTextPresent('0 selected');
 	}
 }

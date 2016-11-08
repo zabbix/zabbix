@@ -512,10 +512,10 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementNotPresentId('update');
 		}
 
-		$this->zbxTestTabSwitch('Authentication');
+		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestAssertVisibleId('authentication');
 		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM']);
 
 		if (isset($data['authentication'])) {
@@ -543,7 +543,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}
 
-		$this->zbxTestTabSwitch('Steps');
+		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes', 'Action']);
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
@@ -580,9 +580,9 @@ class testFormWeb extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkText($this->host);
-		$this->zbxTestClickLinkText('Web scenarios');
-		$this->zbxTestClickLinkText($name);
+		$this->zbxTestClickLinkTextWait($this->host);
+		$this->zbxTestClickLinkTextWait('Web scenarios');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent('Web scenario updated');
@@ -1459,7 +1459,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestInputType('variables', $data['variables']);
 		}
 
-		$this->zbxTestTabSwitch('Authentication');
+		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
 		}
@@ -1475,7 +1475,7 @@ class testFormWeb extends CWebTest {
 
 		$check = false;
 		if (isset($data['add_step'])) {
-			$this->zbxTestTabSwitch('Steps');
+			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 			foreach($data['add_step'] as $item) {
 				$this->zbxTestClickWait('add_step');
 				$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
@@ -1537,7 +1537,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestDropdownAssertSelected('agent', $data['agent']);
 			if (isset($data['add_step'])) {
-				$this->zbxTestTabSwitch('Steps');
+				$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
 				foreach($data['add_step'] as $item) {
 					$step = $item['step']." step";
 					$this->zbxTestTextPresent($step);
@@ -1545,6 +1545,7 @@ class testFormWeb extends CWebTest {
 			}
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Web scenarios');
+			$this->zbxTestCheckHeader('Web monitoring');
 			$this->zbxTestTextPresent($name);
 		}
 

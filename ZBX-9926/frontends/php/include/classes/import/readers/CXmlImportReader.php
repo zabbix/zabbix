@@ -95,23 +95,28 @@ class CXmlImportReader extends CImportReader {
 							$data[$node_name][$xml->name] = $xml->value;
 						}
 
+						// it make $this->isEmptyElement valid after processing attributes
+						$xml->moveToElement();
+
 						/*
 						 * We assume that an element with attributes always contains child elements, not a text node
 						 * works for 1.8 XML.
 						 */
-						$child_data = $this->xml_to_array($xml, $sub_path);
-						if (is_array($child_data)) {
-							foreach ($child_data as $child_node_name => $child_node_value) {
-								if (array_key_exists($child_node_name, $data[$node_name])) {
-									$child_node_name .= count($data[$node_name]);
+						if (!$xml->isEmptyElement) {
+							$child_data = $this->xml_to_array($xml, $sub_path);
+							if (is_array($child_data)) {
+								foreach ($child_data as $child_node_name => $child_node_value) {
+									if (array_key_exists($child_node_name, $data[$node_name])) {
+										$child_node_name .= count($data[$node_name]);
+									}
+									$data[$node_name][$child_node_name] = $child_node_value;
 								}
-								$data[$node_name][$child_node_name] = $child_node_value;
 							}
-						}
-						elseif ($child_data !== '') {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
-								_s('unexpected text "%1$s"', trim($child_data))
-							));
+							elseif ($child_data !== '') {
+								throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
+									_s('unexpected text "%1$s"', trim($child_data))
+								));
+							}
 						}
 					}
 					else {
