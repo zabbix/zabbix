@@ -969,6 +969,145 @@ static int	DBpatch_2030094(void)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_function                                                   *
+ *                                                                            *
+ * Purpose: return function and function parameters                           *
+ *          func(param,...)                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *         exp - pointer to the first char of function                        *
+ *                last("host:key[key params]",#1)                             *
+ *                ^                                                           *
+ *         func - optional pointer to resulted function                       *
+ *         params - optional pointer to resulted function parameters          *
+ *                                                                            *
+ * Return value: return SUCCEED and move exp to the next char after right ')' *
+ *               or FAIL and move exp to incorrect character                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: This function is outdated and should be used in this upgrade     *
+ *           only. For other applications consider zbx_function_find() or     *
+ *           zbx_function_validate().                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_function(char **exp, char **func, char **params)
+{
+	char		*p, *s;
+	int		state;		/* 0 - init
+					 * 1 - function name/params
+					 */
+	unsigned char	flags = 0x00;	/* 0x01 - function OK
+					 * 0x02 - params OK
+					 */
+
+	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
+	{
+		if (SUCCEED == is_function_char(*p))
+		{
+			state = 1;
+			continue;
+		}
+
+		if (0 == state)
+			goto error;
+
+		if ('(' == *p)	/* key parameters
+				 * last("hostname:vfs.fs.size[\"/\",\"total\"]",0)}
+				 * ----^
+				 */
+		{
+			int	state;	/* 0 - init
+					 * 1 - inside quoted param
+					 * 2 - inside unquoted param
+					 * 3 - end of params
+					 */
+
+			if (NULL != func)
+			{
+				*p = '\0';
+				*func = zbx_strdup(NULL, s);
+				*p++ = '(';
+			}
+			flags |= 0x01;
+
+			for (s = p, state = 0; '\0' != *p; p++)
+			{
+				switch (state) {
+				/* init state */
+				case 0:
+					if (',' == *p)
+						;
+					else if ('"' == *p)
+						state = 1;
+					else if (')' == *p)
+						state = 3;
+					else if (' ' != *p)
+						state = 2;
+					break;
+				/* quoted */
+				case 1:
+					if ('"' == *p)
+					{
+						if ('"' != p[1])
+							state = 0;
+						else
+							goto error;
+					}
+					else if ('\\' == *p && '"' == p[1])
+						p++;
+					break;
+				/* unquoted */
+				case 2:
+					if (',' == *p)
+						state = 0;
+					else if (')' == *p)
+						state = 3;
+					break;
+				}
+
+				if (3 == state)
+					break;
+			}
+
+			if (3 == state)
+			{
+				if (NULL != params)
+				{
+					*p = '\0';
+					*params = zbx_strdup(NULL, s);
+					*p = ')';
+				}
+				flags |= 0x02;
+			}
+			else
+				goto error;
+		}
+		else
+			goto error;
+
+		break;
+	}
+
+	if (0x03 != flags)
+		goto error;
+
+	*exp = p + 1;
+
+	return SUCCEED;
+error:
+	if (NULL != func)
+		zbx_free(*func);
+	if (NULL != params)
+		zbx_free(*params);
+
+	*exp = p;
+
+	return FAIL;
+}
+
 static int	DBpatch_2030095(void)
 {
 	DB_RESULT	result;
