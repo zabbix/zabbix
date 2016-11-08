@@ -782,6 +782,10 @@ class CHost extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
+		if (!array_key_exists('hosts', $data) || !is_array($data['hosts'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'hosts'));
+		}
+
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
@@ -789,9 +793,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
-			],
+			'output' => ['hostid', 'host'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
@@ -831,9 +833,12 @@ class CHost extends CHostGeneral {
 			$data['tls_subject'] = '';
 		}
 
-		// check if hosts have at least 1 group
-		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
+		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
+			$host = reset($db_hosts);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host "%1$s" cannot be without host group.', $host['host'])
+			);
 		}
 
 		/*
@@ -1619,7 +1624,9 @@ class CHost extends CHostGeneral {
 
 			// Validate "groups" field.
 			if (!array_key_exists('groups', $host) || !is_array($host['groups']) || !$host['groups']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host "%1$s" cannot be without host group.', $host['host'])
+				);
 			}
 
 			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
@@ -1777,8 +1784,8 @@ class CHost extends CHostGeneral {
 
 			// Validate "groups" field.
 			if (array_key_exists('groups', $host) && (!is_array($host['groups']) || !$host['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".',
-					$db_hosts[$host['hostid']]['host'])
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host "%1$s" cannot be without host group.', $db_hosts[$host['hostid']]['host'])
 				);
 			}
 
