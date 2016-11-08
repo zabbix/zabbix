@@ -20,6 +20,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
 A.F....... [ZBX-9926] fixed displaying of LLD graphs in host screens if user has no rights to Templates group (Gunars)
 ...G...PS. [ZBX-11149] added support of OpenSSL 1.1.0 (Andris, gleb)
 A......... [ZBX-11191] fixed web scenarios not updating step items when giving only "applicationid" and steps with "httpstepid" properties (Ivo)
