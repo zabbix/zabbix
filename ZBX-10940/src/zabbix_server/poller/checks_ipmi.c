@@ -982,7 +982,7 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_type_e log_type, va_list ap)
+static void	zbx_vlog(os_handler_t *handler, const char *format, enum ipmi_log_type_e log_type, va_list ap)
 {
 	char	type[8], str[MAX_STRING_LEN];
 
@@ -1004,9 +1004,9 @@ static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_typ
 	zabbix_log(LOG_LEVEL_DEBUG, "%s%s", type, str);
 }
 
-int	init_ipmi_handler(void)
+int	zbx_init_ipmi_handler(void)
 {
-	const char	*__function_name = "init_ipmi_handler";
+	const char	*__function_name = "zbx_init_ipmi_handler";
 
 	int		res, ret = FAIL;
 
@@ -1018,7 +1018,7 @@ int	init_ipmi_handler(void)
 		goto out;
 	}
 
-	os_hnd->set_log_handler(os_hnd, my_vlog);
+	os_hnd->set_log_handler(os_hnd, zbx_vlog);
 
 	if (0 != (res = ipmi_init(os_hnd)))
 	{
@@ -1034,7 +1034,7 @@ out:
 	return ret;
 }
 
-static void	free_ipmi_connection(zbx_ipmi_host_t *h)
+static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
 {
 	int	i;
 
@@ -1069,7 +1069,7 @@ void	free_ipmi_handler(void)
 		h = hosts;
 		hosts = hosts->next;
 
-		free_ipmi_connection(h);
+		zbx_free_ipmi_connection(h);
 	}
 
 	os_hnd->free_os_handler(os_hnd);
@@ -1212,7 +1212,7 @@ static int	close_inactive_host(zbx_ipmi_host_t *h)
 		while (0 == h->done)
 			os_hnd->perform_one_op(os_hnd, &tv);
 
-		free_ipmi_connection(h);
+		zbx_free_ipmi_connection(h);
 
 		ret = SUCCEED;
 	}

@@ -799,7 +799,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
+	zbx_init_ipmi_handler();
 #endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
