@@ -1175,7 +1175,7 @@ static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
 }
 
 /* callback function invoked from OpenIPMI */
-static void	domain_close_cb(ipmi_domain_t *domain, void *cb_data)
+static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	zbx_ipmi_host_t	*h = cb_data;
 	int		ret;
@@ -1186,9 +1186,9 @@ static void	domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 		domain_close_ok = 1;
 }
 
-static int	close_inactive_host(zbx_ipmi_host_t *h)
+static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 {
-	const char	*__function_name = "close_inactive_host";
+	const char	*__function_name = "zbx_close_inactive_host";
 
 	char		domain_name[11];	/* max int length */
 	struct timeval	tv;
@@ -1202,7 +1202,7 @@ static int	close_inactive_host(zbx_ipmi_host_t *h)
 
 	h->done = 0;
 	domain_close_ok = 0;
-	ipmi_domain_pointer_cb(domain_id_ptr, domain_close_cb, h);
+	ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h);
 
 	if (1 == domain_close_ok)
 	{
@@ -1222,9 +1222,9 @@ static int	close_inactive_host(zbx_ipmi_host_t *h)
 	return ret;
 }
 
-void	delete_inactive_ipmi_hosts(time_t last_check)
+void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 {
-	const char	*__function_name = "delete_inactive_ipmi_hosts";
+	const char	*__function_name = "zbx_delete_inactive_ipmi_hosts";
 
 	zbx_ipmi_host_t	*h = hosts, *prev = NULL, *next;
 
@@ -1236,7 +1236,7 @@ void	delete_inactive_ipmi_hosts(time_t last_check)
 		{
 			next = h->next;
 
-			if (SUCCEED == close_inactive_host(h))
+			if (SUCCEED == zbx_close_inactive_host(h))
 			{
 				if (NULL == prev)
 					hosts = next;
