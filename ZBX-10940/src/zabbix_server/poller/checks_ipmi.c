@@ -220,7 +220,7 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t 
 	return s;
 }
 
-static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *id)
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *id)
 {
 	const char		*__function_name = "get_ipmi_sensor_by_id";
 	int			i;
@@ -247,7 +247,7 @@ static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *
 	return s;
 }
 
-static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
+static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char		*__function_name = "allocate_ipmi_sensor";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
@@ -293,7 +293,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	return s;
 }
 
-static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
+static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	const char	*__function_name = "delete_ipmi_sensor";
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
@@ -867,10 +867,10 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 		{
 			case IPMI_ADDED:
 				if (NULL == zbx_get_ipmi_sensor(h, sensor))
-					allocate_ipmi_sensor(h, sensor);
+					zbx_allocate_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_DELETED:
-				delete_ipmi_sensor(h, sensor);
+				zbx_delete_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_CHANGED:
 				break;
@@ -1285,7 +1285,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 		return h->ret;
 	}
 
-	s = get_ipmi_sensor_by_id(h, item->ipmi_sensor);
+	s = zbx_get_ipmi_sensor_by_id(h, item->ipmi_sensor);
 	if (NULL == s)
 		c = get_ipmi_control_by_name(h, item->ipmi_sensor);
 
