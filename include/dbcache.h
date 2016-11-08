@@ -587,4 +587,20 @@ void	zbx_free_tag(zbx_tag_t *tag);
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
 
+typedef struct
+{
+	zbx_timespec_t	ts;
+	char		*value;	/* NULL in case of meta record (see "meta" field below) */
+	char		*source;
+	zbx_uint64_t	lastlogsize;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	unsigned char	state;
+	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
+}
+zbx_agent_value_t;
+
+void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 #endif

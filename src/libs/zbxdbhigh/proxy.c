@@ -35,6 +35,8 @@
 #define ZBX_DATA_JSON_RECORD_LIMIT 	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 #define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
 
+/* the maximum number of values processed in one batch */
+#define ZBX_HISTORY_VALUES_MAX		256
 
 extern unsigned int	configured_tls_accept_modes;
 
@@ -1992,8 +1994,7 @@ try_again:
 
 		hd = &data[i];
 
-		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, dc_items[i].host.host, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, dc_items[i].itemid);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
 
@@ -2465,7 +2466,158 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: process_mass_history_data_value                                  *
+ *                                                                            *
+ * Purpose: process single value from incoming history data                   *
+ *                                                                            *
+ * Parameters: item    - [IN] the item to process                             *
+ *             value   - [IN] the value to process                            *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_mass_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
+{
+	if (ITEM_STATUS_ACTIVE != item->status)
+		return FAIL;
+
+	if (HOST_STATUS_MONITORED != item->host.status)
+		return FAIL;
+
+	if (SUCCEED == in_maintenance_without_data_collection(item->host.maintenance_status,
+			item->host.maintenance_type, item->type) &&
+			item->host.maintenance_from <= value->ts.sec)
+		return FAIL;
+
+	/* empty values are only allowed for meta information update packets */
+	if (NULL == value->value && 0 == value->meta)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", item->key_orig);
+		return FAIL;
+	}
+
+	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
+		return FAIL;
+
+	if (ITEM_STATE_NOTSUPPORTED == value->state ||
+			(NULL != value->value && 0 == strcmp(value->value, ZBX_NOTSUPPORTED)))
+	{
+		item->state = ITEM_STATE_NOTSUPPORTED;
+		dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts,
+				item->state, value->value);
+	}
+	else
+	{
+		int		res = SUCCEED;
+		AGENT_RESULT	result;
+
+		init_result(&result);
+
+		if (NULL != value->value)
+			res = set_result_type(&result, item->value_type, item->data_type, value->value);
+
+		if (SUCCEED == res)
+		{
+			if (ITEM_VALUE_TYPE_LOG == item->value_type && NULL != value->value)
+			{
+				result.log->timestamp = value->timestamp;
+				if (NULL != value->source)
+				{
+					zbx_replace_invalid_utf8(value->source);
+					result.log->source = zbx_strdup(result.log->source, value->source);
+				}
+				result.log->severity = value->severity;
+				result.log->logeventid = value->logeventid;
+
+				calc_timestamp(result.log->value, &result.log->timestamp, item->logtimefmt);
+			}
+
+			if (0 != value->meta)
+				set_result_meta(&result, value->lastlogsize, value->mtime);
+
+			item->state = ITEM_STATE_NORMAL;
+			dc_add_history(item->itemid, item->value_type, item->flags, &result,
+					&value->ts, item->state, NULL);
+		}
+		else if (ISSET_MSG(&result))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig,
+					result.msg);
+
+			item->state = ITEM_STATE_NOTSUPPORTED;
+			dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
+					result.msg);
+		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
+
+		free_result(&result);
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_mass_history_data                                        *
+ *                                                                            *
+ * Purpose: process new item values                                           *
+ *                                                                            *
+ * Parameters: items     - [IN] the items to process                          *
+ *             values    - [IN] the item values value to process              *
+ *             errcodes  - [IN/OUT] in - item configuration error code        *
+ *                                      (FAIL - item/host was not found)      *
+ *                                 out - value processing result              *
+ *                                      (SUCCEED - processed, FAIL - error)   *
+ *             values_num - [IN] the number of items/values to process        *
+ *             *processed - [OUT] the number of values processed              *
+ *                                                                            *
+ ******************************************************************************/
+void	process_mass_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num, int *processed)
+{
+	const char		*__function_name = "process_mass_history_data";
+	size_t			i;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (i = 0; i < values_num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (SUCCEED != process_mass_history_data_value(&items[i], &values[i]))
+		{
+			/* clean failed items to avoid updating their runtime data */
+			DCconfig_clean_items(&items[i], &errcodes[i], 1);
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		(*processed)++;
+	}
+
+	zbx_dc_items_update_runtime_data(items, values, errcodes, values_num);
+
+	dc_flush_history();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
 static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
+{
+	size_t	i;
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_free(values[i].value);
+		zbx_free(values[i].source);
+	}
+}
+
+static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
 {
 	size_t	i;
 
@@ -2534,7 +2686,6 @@ static int	get_proxy_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *t
 static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp_data,
 		const zbx_uint64_t proxy_hostid, zbx_timespec_t *ts_diff, char **info)
 {
-#define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data_array";
 
 	struct zbx_json_parse	jp_row;
@@ -2550,7 +2701,7 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 	sec = zbx_time();
 
 	if (NULL == values)
-		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
+		values = zbx_malloc(values, ZBX_HISTORY_VALUES_MAX * sizeof(AGENT_VALUE));
 
 	if (0 != proxy_hostid)
 		DCconfig_set_proxy_timediff(proxy_hostid, ts_diff);
@@ -2650,7 +2801,7 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 
 		values_num++;
 
-		if (VALUES_MAX == values_num)
+		if (ZBX_HISTORY_VALUES_MAX == values_num)
 		{
 			process_mass_data(sock, proxy_hostid, values, values_num, &processed);
 
@@ -2699,7 +2850,6 @@ static int	process_hist_data_array(zbx_socket_t *sock, struct zbx_json_parse *jp
 int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
 		zbx_timespec_t *ts, char **info)
 {
-#define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
 	int			ret;
 	struct zbx_json_parse	jp_data;
@@ -3135,11 +3285,213 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_proxy_history_data                                       *
+ *                                                                            *
+ * Purpose: parses history data array and process the data                    *
+ *                                                                            *
+ * Parameters: proxy      - [IN] the proxy the data was received from         *
+ *             itemids    - [IN] the items identifiers                        *
+ *             values     - [IN] the item values value to process             *
+ *             values_num - [IN] the number of items/values to process        *
+ *             processed  - [OUT] the number of values processed              *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_proxy_history_data(const DC_PROXY *proxy, zbx_uint64_t *itemids, zbx_agent_value_t *values,
+		int values_num, int *processed)
+{
+	DC_ITEM	*items;
+	int	*errcodes, i;
+
+	items = zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	errcodes = zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		/* don't process item if its host was assigned to another proxy */
+		if (items[i].host.proxy_hostid != proxy->hostid)
+		{
+			DCconfig_clean_items(&items[i], &errcodes[i], 1);
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		/* item has been already converted to decimal format by proxy - */
+		/* reset its data type to decimal to prevent double conversion  */
+		if (ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+			items[i].data_type = ITEM_DATA_TYPE_DECIMAL;
+	}
+
+	process_mass_history_data(items, values, errcodes, values_num, processed);
+	DCconfig_clean_items(items, errcodes, values_num);
+
+	zbx_free(errcodes);
+	zbx_free(items);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_proxy_history_data                                         *
+ *                                                                            *
+ * Purpose: parses history data array and process the data                    *
+ *                                                                            *
+ * Parameters: jp_data      - [IN] JSON with history data array               *
+ *             ts_diff      - [IN] proxy - server timestamp difference        *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
+		zbx_timespec_t *ts_diff, char **info)
+{
+	const char		*__function_name = "parse_proxy_history_data";
+
+	struct zbx_json_parse		jp_row;
+	const char			*p = NULL;
+	char				*tmp = NULL, itemid_s[ZBX_MAX_UINT64_LEN + 1];
+	size_t				tmp_alloc = 0, values_num = 0;
+	int				ret = SUCCEED, processed = 0, total_num = 0;
+	double				sec;
+	zbx_agent_value_t		values[ZBX_HISTORY_VALUES_MAX], *av;
+	zbx_uint64_t			itemids[ZBX_HISTORY_VALUES_MAX];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sec = zbx_time();
+
+	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the item key entries */
+	{
+		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+		{
+			*info = zbx_strdup(*info, zbx_json_strerror());
+			break;
+		}
+
+		total_num++;
+
+		av = &values[values_num];
+
+		memset(av, 0, sizeof(zbx_agent_value_t));
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
+		{
+			if (FAIL == is_uint31(tmp, &av->ts.sec))
+				continue;
+
+			av->ts.sec += ts_diff->sec;
+
+			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
+			{
+				if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
+					0LL, 999999999LL))
+				{
+					continue;
+				}
+
+				av->ts.ns += ts_diff->ns;
+
+				if (av->ts.ns > 999999999)
+				{
+					av->ts.sec++;
+					av->ts.ns -= 1000000000;
+				}
+			}
+			else
+				av->ts.ns = ts_diff->ns;
+		}
+		else
+			zbx_timespec(&av->ts);
+
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ITEMID, itemid_s, sizeof(itemid_s)))
+			continue;
+
+		if (SUCCEED != is_uint64(itemid_s, &itemids[values_num]))
+			continue;
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
+			av->state = (unsigned char)atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		{
+			av->meta = 1;	/* contains meta information */
+			is_uint64(tmp, &av->lastlogsize);
+		}
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
+		{
+			av->value = zbx_strdup(av->value, tmp);
+		}
+		else
+		{
+			if (ITEM_STATE_NOTSUPPORTED == av->state)
+			{
+				/* unsupported items cannot have empty error message */
+				continue;
+			}
+
+			if (0 == av->meta)
+			{
+				/* only meta information update packets can have empty value*/
+				continue;
+			}
+		}
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
+			av->mtime = atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc))
+			av->timestamp = atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGSOURCE, &tmp, &tmp_alloc))
+			av->source = strdup(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, &tmp, &tmp_alloc))
+			av->severity = atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
+			av->logeventid = atoi(tmp);
+
+		values_num++;
+
+		if (ZBX_HISTORY_VALUES_MAX == values_num)
+		{
+			process_proxy_history_data(proxy, itemids, values, values_num, &processed);
+			zbx_agent_values_clean(values, values_num);
+			values_num = 0;
+		}
+	}
+
+	if (0 < values_num)
+	{
+		process_proxy_history_data(proxy, itemids, values, values_num, &processed);
+		zbx_agent_values_clean(values, values_num);
+	}
+
+	if (SUCCEED == ret)
+	{
+		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
+				processed, total_num - processed, total_num, zbx_time() - sec);
+	}
+
+	zbx_free(tmp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_proxy_data                                               *
  *                                                                            *
  * Purpose: process 'proxy data' packet received from proxy                   *
  *                                                                            *
- * Parameters: jp           - [IN] JSON with proxy data                       *
+ * Parameters: proxy        - [IN] the source proxy                           *
+ *             jp           - [IN] JSON with proxy data                       *
  *             proxy_hostid - [IN] proxy identifier from database             *
  *             ts           - [IN] timestamp when the proxy connection was    *
  *                                 established                                *
@@ -3150,7 +3502,7 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error)
+int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error)
 {
 	const char		*__function_name = "process_proxy_data";
 
@@ -3167,6 +3519,8 @@ int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx
 		goto out;
 	}
 
+	DCconfig_set_proxy_timediff(proxy->hostid, &ts_diff);
+
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
 		if (SUCCEED != process_host_availability_array(&jp_data, &error_step))
@@ -3178,7 +3532,7 @@ int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
-		if (SUCCEED != process_hist_data_array(NULL, &jp_data, proxy_hostid, &ts_diff, &error_step))
+		if (SUCCEED != parse_proxy_history_data(proxy, &jp_data, &ts_diff, &error_step))
 			*error = zbx_strdcatf(*error, "%s\n", error_step);
 	}
 	else
@@ -3194,7 +3548,7 @@ int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
 	{
-		if (SUCCEED != process_areg_data_array(&jp_data, proxy_hostid, &ts_diff, &error_step))
+		if (SUCCEED != process_areg_data_array(&jp_data, proxy->hostid, &ts_diff, &error_step))
 			*error = zbx_strdcatf(*error, "%s\n", error_step);
 	}
 	else
@@ -3203,6 +3557,8 @@ int	process_proxy_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx
 	if (NULL == *error)
 		ret = SUCCEED;
 out:
+	zbx_free(error_step);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

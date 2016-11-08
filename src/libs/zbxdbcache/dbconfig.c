@@ -9840,3 +9840,54 @@ void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version)
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_items_update_runtime_data                                 *
+ *                                                                            *
+ * Purpose: updates item runtime properties in configuration cache            *
+ *                                                                            *
+ * Parameters: items      - [IN] the items to update                          *
+ *             values     - [IN] the items values containing new properties   *
+ *             errcodes   - [IN] item error codes. Update only items with     *
+ *                               SUCCEED code                                 *
+ *             values_num - [IN] the number of elements in items,values and   *
+ *                               errcodes arrays                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num)
+{
+	size_t		i;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < values_num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &items[i].itemid)))
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
+		dc_item->state = values[i].state;
+		dc_item->lastclock = values[i].ts.sec;
+		dc_item->lastlogsize = values[i].lastlogsize;
+		dc_item->mtime = values[i].mtime;
+	}
+
+	UNLOCK_CACHE;
+}
+
+
+
