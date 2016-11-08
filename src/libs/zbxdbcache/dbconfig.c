@@ -9324,6 +9324,7 @@ static void	zbx_db_condition_free(DB_CONDITION *condition)
 	zbx_free(condition->value2);
 	zbx_free(condition->value);
 }
+
 void	zbx_conditions_eval_free(zbx_hashset_t *uniq_conditions)
 {
 	zbx_hashset_iter_t	iter;
