@@ -1325,10 +1325,10 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	return h->ret;
 }
 
-/* function 'parse_ipmi_command' requires 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
-int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len)
+/* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
+int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len)
 {
-	const char	*__function_name = "parse_ipmi_command";
+	const char	*__function_name = "zbx_parse_ipmi_command";
 
 	const char	*p;
 	size_t		sz_c_name;
@@ -1377,12 +1377,12 @@ fail:
 	return ret;
 }
 
-int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len)
+int	zbx_set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len)
 {
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In set_ipmi_control_value(control:%s, value:%d)", item->ipmi_sensor, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_set_ipmi_control_value(control:%s, value:%d)", item->ipmi_sensor, value);
 
 	if (NULL == os_hnd)
 	{
