@@ -1059,7 +1059,6 @@ int	is_snmp_type(unsigned char type);
 
 int	parse_host(char **exp, char **host);
 int	parse_key(char **exp, char **key);
-int	parse_function(char **exp, char **func, char **params);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
@@ -1080,16 +1079,10 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
-typedef struct
-{
-	char	*name;
-	char	**params;
-	int	nparam;
-}
-zbx_function_t;
-
-void	zbx_function_clean(zbx_function_t *func);
-int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
-int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
+int	zbx_function_param_quote(char **param, int forced);
+int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
 #endif
