@@ -771,9 +771,9 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
-static void	read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
+static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 {
-	const char		*__function_name = "read_ipmi_control";
+	const char		*__function_name = "zbx_read_ipmi_control";
 	int			ret;
 	struct timeval		tv;
 
@@ -806,9 +806,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
-static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int value)
+static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int value)
 {
-	const char		*__function_name = "set_ipmi_control";
+	const char		*__function_name = "zbx_set_ipmi_control";
 	int			ret;
 	struct timeval		tv;
 
@@ -853,9 +853,9 @@ out:
 }
 
 /* callback function invoked from OpenIPMI */
-static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
+static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
 {
-	const char	*__function_name = "sensor_change";
+	const char	*__function_name = "zbx_sensor_change_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
@@ -915,7 +915,7 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 
 	if (op == IPMI_ADDED)
 	{
-		if (0 != (ret = ipmi_entity_add_sensor_update_handler(entity, sensor_change, h)))
+		if (0 != (ret = ipmi_entity_add_sensor_update_handler(entity, zbx_sensor_change_cb, h)))
 			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_set_sensor_update_handler() return error: 0x%x", ret);
 
 		if (0 != (ret = ipmi_entity_add_control_update_handler(entity, control_change, h)))
@@ -1299,7 +1299,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	if (NULL != s)
 		zbx_read_ipmi_sensor(h, s);
 	else
-		read_ipmi_control(h, c);
+		zbx_read_ipmi_control(h, c);
 
 	if (h->ret != SUCCEED)
 	{
@@ -1414,7 +1414,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_err
 		return NOTSUPPORTED;
 	}
 
-	set_ipmi_control(h, c, value);
+	zbx_set_ipmi_control(h, c, value);
 
 	if (h->ret != SUCCEED)
 	{
