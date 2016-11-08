@@ -592,9 +592,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
-static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
+static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
-	const char	*__function_name = "read_ipmi_sensor";
+	const char	*__function_name = "zbx_read_ipmi_sensor";
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int		ret;
 	const char	*s_reading_type_string;
@@ -678,9 +678,9 @@ out:
 }
 
 /* callback function invoked from OpenIPMI */
-static void	got_control_reading(ipmi_control_t *control, int err, int *val, void *cb_data)
+static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *val, void *cb_data)
 {
-	const char		*__function_name = "got_control_reading";
+	const char		*__function_name = "zbx_got_control_reading_cb";
 	zbx_ipmi_host_t		*h = cb_data;
 	int			n;
 	zbx_ipmi_control_t	*c;
@@ -735,9 +735,9 @@ out:
 }
 
 /* callback function invoked from OpenIPMI */
-static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
+static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *cb_data)
 {
-	const char		*__function_name = "got_control_setting";
+	const char		*__function_name = "zbx_got_control_setting_cb";
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_control_t	*c;
 
@@ -789,7 +789,7 @@ static void	read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	if (0 != (ret = ipmi_control_get_val(c->control, got_control_reading, h)))
+	if (0 != (ret = ipmi_control_get_val(c->control, zbx_got_control_reading_cb, h)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_get_val() return error: 0x%x",
 				c->c_name, ret);
@@ -835,7 +835,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	if (0 != (ret = ipmi_control_set_val(c->control, c->val, got_control_setting, h)))
+	if (0 != (ret = ipmi_control_set_val(c->control, c->val, zbx_got_control_setting_cb, h)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_set_val() return error: 0x%x",
 				c->c_name, ret);
@@ -1297,7 +1297,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	}
 
 	if (NULL != s)
-		read_ipmi_sensor(h, s);
+		zbx_read_ipmi_sensor(h, s);
 	else
 		read_ipmi_control(h, c);
 
