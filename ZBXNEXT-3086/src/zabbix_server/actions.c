@@ -1367,7 +1367,6 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
 
-
 		condition_result = condition->condition_result;
 
 		switch (action->evaltype)
@@ -1619,7 +1618,6 @@ int	is_recovery_event(const DB_EVENT *event)
 	return FAIL;
 }
 
-
 static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 {
 	const DB_CONDITION	*condition1 = d1, *condition2 = d2;
@@ -1651,7 +1649,6 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 
 	return hash;
 }
-
 
 static void	process_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
 {
