@@ -1341,7 +1341,6 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
-			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (values.values[0].value.ui64 == values.values[1].value.ui64)
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -2171,10 +2170,12 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *                                                                            *
  * Purpose: evaluate function used as a macro (e.g., in notifications)        *
  *                                                                            *
- * Parameters: host - host the key belongs to                                 *
- *             key - item's key (for example, 'system.cpu.load[,avg1]')       *
- *             function - function (for example, 'max')                       *
- *             parameter - parameter of the function                          *
+ * Parameters: value     - [OUT] evaluation result (if it's successful)       *
+ *             host      - [IN] host the key belongs to                       *
+ *             key       - [IN] item's key                                    *
+ *                              (for example, 'system.cpu.load[,avg1]')       *
+ *             function  - [IN] function name (for example, 'max')            *
+ *             parameter - [IN] function parameter list                       *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *

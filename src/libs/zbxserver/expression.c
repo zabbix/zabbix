@@ -2377,7 +2377,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
  *                                                                            *
- * Parameters: triggerid  - [IN] the trigger identificator from a database    *
+ * Parameters: expression - [IN] string to parse                              *
  *             replace_to - [IN] the pointer to a result buffer               *
  *             bl         - [IN] the pointer to a left curly bracket          *
  *             br         - [OUT] the pointer to a next char, after a right   *
@@ -2398,9 +2398,9 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  ******************************************************************************/
 static void	get_trigger_function_value(const char *expression, char **replace_to, char *bl, char **br)
 {
-	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
+	char	*p, *host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
-	size_t	sz;
+	size_t	sz, par_l, par_r;
 
 	p = bl + 1;
 
@@ -2436,22 +2436,28 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
 
-	if (SUCCEED != parse_function(&p, &function, &parameter) || '}' != *p++)
+	if (SUCCEED != zbx_function_validate(p, &par_l, &par_r) || '}' != p[par_r + 1])
 		goto fail;
+
+	p[par_l] = '\0';
+	p[par_r] = '\0';
 
 	/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
 	*replace_to = zbx_realloc(*replace_to, MAX_BUFFER_LEN);
 
 	if (NULL == host || NULL == key ||
-			SUCCEED != evaluate_macro_function(*replace_to, host, key, function, parameter))
+			SUCCEED != evaluate_macro_function(*replace_to, host, key, p, p + par_l + 1))
+	{
 		zbx_strlcpy(*replace_to, STR_UNKNOWN_VARIABLE, MAX_BUFFER_LEN);
+	}
 
-	*br = p;
+	p[par_l] = '(';
+	p[par_r] = ')';
+
+	*br = p + par_r + 2;	/* point to the character after '}' */
 fail:
 	zbx_free(host);
 	zbx_free(key);
-	zbx_free(function);
-	zbx_free(parameter);
 }
 
 /******************************************************************************
@@ -4094,7 +4100,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 {
 	char	*pl, *pr;
 	char	*key = NULL;
-	size_t	sz, replace_to_offset = 0;
+	size_t	sz, replace_to_offset = 0, par_l, par_r;
 
 	pl = pr = data + *pos;
 	if ('{' != *pr++)
@@ -4132,8 +4138,16 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 
 	pl = pr;
 
+	if ('.' != *pr++)
+		return FAIL;
+
 	/* a trigger function with parameters */
-	if ('.' != *pr++ || SUCCEED != parse_function(&pr, NULL, NULL) || '}' != *pr++)
+	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
+		return FAIL;
+
+	pr += par_r + 1;
+
+	if ('}' != *pr++)
 		return FAIL;
 
 	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
@@ -4305,17 +4319,33 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key and OID    *
  *                                                                            *
- * Example:  key                     | macro       | result                   *
- *          -------------------------+-------------+-----------------         *
- *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
- *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
- *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
- *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}]        *
- *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
- *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
- *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
- *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
- *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
+ * Example:  key                     | macro  | result            | return    *
+ *          -------------------------+--------+-------------------+---------  *
+ *           echo.sh[{$MACRO}]       | a      | echo.sh[a]        | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a\     | echo.sh[a\]       | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a      | echo.sh["a"]      | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a\     | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       |  a     | echo.sh[" a"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     |  a     | echo.sh[" a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     |  a\    | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | "a"\   | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | "a"\   | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a,b\   | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a,b\   | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | a]     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a]\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | a]     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a]\    | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | [a     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | [a\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | [a     | echo.sh["[a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | [a\    | undefined         | FAIL      *
+ *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
