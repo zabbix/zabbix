@@ -9364,7 +9364,8 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
  *             conditions - [OUT] the conditions vector                       *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions, char **formula, zbx_hashset_t *uniq_conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions,
+		char **formula, zbx_hashset_t *uniq_conditions)
 {
 	int				i;
 	DB_CONDITION			condition, *uniq_condition;
@@ -9422,7 +9423,8 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
  *           function later.                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action, zbx_hashset_t *uniq_conditions)
+static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action,
+		zbx_hashset_t *uniq_conditions)
 {
 	zbx_action_eval_t		*action;
 
