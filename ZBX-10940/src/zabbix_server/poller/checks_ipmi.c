@@ -147,7 +147,7 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
-	const char	*__function_name = "get_ipmi_host";
+	const char	*__function_name = "zbx_get_ipmi_host";
 	zbx_ipmi_host_t	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
@@ -173,7 +173,7 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int au
 static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
-	const char	*__function_name = "allocate_ipmi_host";
+	const char	*__function_name = "zbx_allocate_ipmi_host";
 	zbx_ipmi_host_t	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
@@ -200,7 +200,7 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 
 static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
-	const char		*__function_name = "get_ipmi_sensor";
+	const char		*__function_name = "zbx_get_ipmi_sensor";
 	int			i;
 	zbx_ipmi_sensor_t	*s = NULL;
 
@@ -222,7 +222,7 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t 
 
 static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *id)
 {
-	const char		*__function_name = "get_ipmi_sensor_by_id";
+	const char		*__function_name = "zbx_get_ipmi_sensor_by_id";
 	int			i;
 	zbx_ipmi_sensor_t	*s = NULL;
 
@@ -249,7 +249,7 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const ch
 
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
-	const char		*__function_name = "allocate_ipmi_sensor";
+	const char		*__function_name = "zbx_allocate_ipmi_sensor";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_sensor_t	*s;
 	char			id[IPMI_SENSOR_ID_SZ];
@@ -295,7 +295,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 
 static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
-	const char	*__function_name = "delete_ipmi_sensor";
+	const char	*__function_name = "zbx_delete_ipmi_sensor";
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int		i;
 	size_t		sz;
@@ -327,7 +327,7 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 
 static zbx_ipmi_control_t	*zbx_get_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
-	const char		*__function_name = "get_ipmi_control";
+	const char		*__function_name = "zbx_get_ipmi_control";
 	int			i;
 	zbx_ipmi_control_t	*c = NULL;
 
@@ -349,7 +349,7 @@ static zbx_ipmi_control_t	*zbx_get_ipmi_control(zbx_ipmi_host_t *h, ipmi_control
 
 static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_name(zbx_ipmi_host_t *h, const char *c_name)
 {
-	const char		*__function_name = "get_ipmi_control_by_name";
+	const char		*__function_name = "zbx_get_ipmi_control_by_name";
 	int			i;
 	zbx_ipmi_control_t	*c = NULL;
 
@@ -371,7 +371,7 @@ static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_name(zbx_ipmi_host_t *h, cons
 
 static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
-	const char		*__function_name = "allocate_ipmi_control";
+	const char		*__function_name = "zbx_allocate_ipmi_control";
 	size_t			sz;
 	zbx_ipmi_control_t	*c;
 	char			*c_name = NULL;
