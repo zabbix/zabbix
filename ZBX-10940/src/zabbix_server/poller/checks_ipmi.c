@@ -325,7 +325,7 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static zbx_ipmi_control_t	*get_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
+static zbx_ipmi_control_t	*zbx_get_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
 	const char		*__function_name = "get_ipmi_control";
 	int			i;
@@ -347,7 +347,7 @@ static zbx_ipmi_control_t	*get_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *
 	return c;
 }
 
-static zbx_ipmi_control_t	*get_ipmi_control_by_name(zbx_ipmi_host_t *h, const char *c_name)
+static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_name(zbx_ipmi_host_t *h, const char *c_name)
 {
 	const char		*__function_name = "get_ipmi_control_by_name";
 	int			i;
@@ -369,7 +369,7 @@ static zbx_ipmi_control_t	*get_ipmi_control_by_name(zbx_ipmi_host_t *h, const ch
 	return c;
 }
 
-static zbx_ipmi_control_t	*allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
+static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
 	const char		*__function_name = "allocate_ipmi_control";
 	size_t			sz;
@@ -699,7 +699,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 		goto out;
 	}
 
-	c = get_ipmi_control(h, control);
+	c = zbx_get_ipmi_control(h, control);
 
 	if (NULL == c)
 	{
@@ -753,7 +753,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 		return;
 	}
 
-	c = get_ipmi_control(h, control);
+	c = zbx_get_ipmi_control(h, control);
 
 	if (NULL == c)
 	{
@@ -891,8 +891,8 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 	switch (op)
 	{
 		case IPMI_ADDED:
-			if (NULL == get_ipmi_control(h, control))
-				allocate_ipmi_control(h, control);
+			if (NULL == zbx_get_ipmi_control(h, control))
+				zbx_allocate_ipmi_control(h, control);
 			break;
 		case IPMI_DELETED:
 			delete_ipmi_control(h, control);
@@ -1287,7 +1287,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 
 	s = zbx_get_ipmi_sensor_by_id(h, item->ipmi_sensor);
 	if (NULL == s)
-		c = get_ipmi_control_by_name(h, item->ipmi_sensor);
+		c = zbx_get_ipmi_control_by_name(h, item->ipmi_sensor);
 
 	if (NULL == s && NULL == c)
 	{
@@ -1404,7 +1404,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_err
 		return h->ret;
 	}
 
-	c = get_ipmi_control_by_name(h, item->ipmi_sensor);
+	c = zbx_get_ipmi_control_by_name(h, item->ipmi_sensor);
 
 	if (NULL == c)
 	{
