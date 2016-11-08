@@ -70,11 +70,11 @@ jQuery(function($) {
 			var ms = this.first().data('multiSelect');
 
 			var data = [];
-			for (var id in ms.values.selected) {
-				var item = ms.values.selected[id];
+			for (var key in ms.values.selected) {
+				var item = ms.values.selected[key];
 
 				data[data.length] = {
-					id: id,
+					id: item.id,
 					name: item.name,
 					prefix: item.prefix === 'undefined' ? '' : item.prefix
 				};
@@ -909,12 +909,20 @@ jQuery(function($) {
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
 			var li = $(this),
-				id = li.data('id'),
 				span = $('span.subfilter-enabled', li),
 				text = $('span:first-child', span),
-				t = empty(values.selected[id].prefix)
-					? values.selected[id].name
-					: values.selected[id].prefix + values.selected[id].name;
+				key = '';
+
+				$.each(values.selected, function(i, item) {
+					if (item.id == li.data('id')) {
+						key = item.name;
+						return false;
+					}
+				});
+
+				var t = empty(values.selected[key].prefix)
+					? values.selected[key].name
+					: values.selected[key].prefix + values.selected[name].key;
 
 			// rewrite previous text to original
 			text.text(t);
