@@ -12,6 +12,7 @@ Bug fixes:
 Changes for 3.2.2rc1
 
 New features:
+.......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
 A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped forward slash restriction in "Tag name" and "Tag for matching" (Sasha, vso)
@@ -239,6 +240,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.6rc1
 
 New features:
+.......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
