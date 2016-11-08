@@ -915,7 +915,7 @@ class CConfigurationExport {
 
 		foreach ($triggers as $idx => &$trigger) {
 			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);
 					continue 2;
 				}
