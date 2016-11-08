@@ -9324,7 +9324,7 @@ static void	zbx_db_condition_free(DB_CONDITION *condition)
 	zbx_free(condition->value2);
 	zbx_free(condition->value);
 }
-void	zbx_condition_eval_free(zbx_hashset_t *uniq_conditions)
+void	zbx_conditions_eval_free(zbx_hashset_t *uniq_conditions)
 {
 	zbx_hashset_iter_t	iter;
 	DB_CONDITION		*condition;
@@ -9367,7 +9367,7 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
 static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions, char **formula, zbx_hashset_t *uniq_conditions)
 {
 	int				i;
-	DB_CONDITION			condition, *hashed_condition;
+	DB_CONDITION			condition, *uniq_condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
 	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
@@ -9384,9 +9384,9 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition.value2 = zbx_strdup(NULL, dc_condition->value2);
 		condition.eventsource = dc_action->eventsource;
 
-		if (NULL == (hashed_condition = zbx_hashset_search(uniq_conditions, &condition)))
+		if (NULL == (uniq_condition = zbx_hashset_search(uniq_conditions, &condition)))
 		{
-			hashed_condition = zbx_hashset_insert(uniq_conditions, &condition, sizeof(DB_CONDITION));
+			uniq_condition = zbx_hashset_insert(uniq_conditions, &condition, sizeof(DB_CONDITION));
 		}
 		else
 		{
@@ -9395,7 +9395,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 			char	*old_formula;
 
 			zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}", condition.conditionid);
-			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", hashed_condition->conditionid);
+			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", uniq_condition->conditionid);
 
 			old_formula = *formula;
 			*formula = string_replace(*formula, search, replace);
@@ -9404,7 +9404,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 			zbx_db_condition_free(&condition);
 		}
 
-		zbx_vector_ptr_append(conditions, hashed_condition);
+		zbx_vector_ptr_append(conditions, uniq_condition);
 	}
 }
 

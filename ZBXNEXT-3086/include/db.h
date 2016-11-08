@@ -339,9 +339,9 @@ typedef struct
 {
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
-	int		condition_result;
 	char		*value;
 	char		*value2;
+	int		condition_result;
 	unsigned char	conditiontype;
 	unsigned char	operator;
 	unsigned char	eventsource;

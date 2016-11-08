@@ -1750,7 +1750,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		}
 	}
 
-	zbx_condition_eval_free(&uniq_conditions);
+	zbx_conditions_eval_free(&uniq_conditions);
 	zbx_hashset_destroy(&uniq_conditions);
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
