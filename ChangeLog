@@ -9,6 +9,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
 A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
 A.F....... [ZBX-9926] fixed displaying of LLD graphs in host screens if user has no rights to Templates group (Gunars)
@@ -239,6 +240,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
 A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
 A.F....... [ZBX-9926] fixed displaying of LLD graphs in host screens if user has no rights to Templates group (Gunars)

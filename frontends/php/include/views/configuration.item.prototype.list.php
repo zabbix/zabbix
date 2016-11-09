@@ -31,7 +31,6 @@ $widget = (new CWidget())
 // create form
 $itemForm = (new CForm())
 	->setName('items')
-	->addVar('hostid', $this->data['hostid'])
 	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
