@@ -913,16 +913,16 @@ jQuery(function($) {
 				text = $('span:first-child', span),
 				key = '';
 
-				$.each(values.selected, function(i, item) {
-					if (item.id == li.data('id')) {
-						key = item.name;
-						return false;
-					}
-				});
+			$.each(values.selected, function(i, item) {
+				if (item.id == li.data('id')) {
+					key = item.name;
+					return false;
+				}
+			});
 
-				var t = empty(values.selected[key].prefix)
-					? values.selected[key].name
-					: values.selected[key].prefix + values.selected[name].key;
+			var t = empty(values.selected[key].prefix)
+				? values.selected[key].name
+				: values.selected[key].prefix + values.selected[key].name;
 
 			// rewrite previous text to original
 			text.text(t);
