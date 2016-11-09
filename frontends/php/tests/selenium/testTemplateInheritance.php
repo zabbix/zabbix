@@ -224,11 +224,11 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger1');
 		$this->zbxTestInputType('expression', '{Inheritance test template:key-item-inheritance-test.last(0)}=0');
-		$this->zbxTestCheckboxSelect('type');
+		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelectXpath('status', false);
+		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
@@ -268,11 +268,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('width', '950');
 		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxSelectXpath('show_legend', false);
-		$this->zbxTestCheckboxSelectXpath('show_work_period', false);
-		$this->zbxTestCheckboxSelectXpath('show_triggers', false);
-		$this->zbxTestCheckboxSelectXpath('visible_percent_left');
-		$this->zbxTestCheckboxSelectXpath('visible_percent_right');
+		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->zbxTestCheckboxSelect('show_triggers', false);
+		$this->zbxTestCheckboxSelect('visible_percent_left');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
 		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
@@ -384,7 +384,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 		$this->zbxTestDropdownSelect('valuemapid', 'APC Battery Status');
-		$this->zbxTestCheckboxSelectXpath('status', false);
+		$this->zbxTestCheckboxSelect('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
@@ -440,11 +440,11 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger');
 		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
-		$this->zbxTestCheckboxSelect('type');
+		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelectXpath('status', false);
+		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger prototype added');
@@ -500,11 +500,11 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestInputTypeOverwrite('height', '250');
 		}
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxSelectXpath('show_legend', false);
-		$this->zbxTestCheckboxSelectXpath('show_work_period', false);
-		$this->zbxTestCheckboxSelectXpath('show_triggers', false);
-		$this->zbxTestCheckboxSelectXpath('visible_percent_left');
-		$this->zbxTestCheckboxSelectXpath('visible_percent_right');
+		$this->zbxTestCheckboxSelect('show_legend', false);
+		$this->zbxTestCheckboxSelect('show_work_period', false);
+		$this->zbxTestCheckboxSelect('show_triggers', false);
+		$this->zbxTestCheckboxSelect('visible_percent_left');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestInputType('percent_left', '4');
 		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');

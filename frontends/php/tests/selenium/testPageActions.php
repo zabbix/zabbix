@@ -261,7 +261,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
-		$this->zbxTestClickXpath("//input[@id='g_actionid_".$action['actionid']."']");
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdisable');
 
 		$this->webDriver->switchTo()->alert()->accept();
@@ -291,7 +291,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
-		$this->zbxTestClickXpath("//input[@id='g_actionid_".$action['actionid']."']");
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massenable');
 
 		$this->webDriver->switchTo()->alert()->accept();
@@ -325,7 +325,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
-		$this->zbxTestClickWait('g_actionid_'.$action['actionid']);
+		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdelete');
 
 		$this->webDriver->switchTo()->alert()->accept();
