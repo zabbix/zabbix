@@ -209,12 +209,7 @@ class CApiInputValidator {
 		$index = 0;
 		$uniq = [];
 
-		foreach ($data as $key => &$value) {
-			if (!is_int($key) || $key !== $index) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $key));
-				return false;
-			}
-
+		foreach ($data as &$value) {
 			$index++;
 			$subpath = ($path === '/' ? $path : $path.'/').$index;
 			if (!self::validateId([], $value, $subpath, $error)) {
@@ -230,6 +225,8 @@ class CApiInputValidator {
 			}
 		}
 		unset($value);
+
+		$data = array_values($data);
 
 		return true;
 	}
@@ -272,12 +269,7 @@ class CApiInputValidator {
 
 		$index = 0;
 
-		foreach ($data as $key => &$value) {
-			if (!is_int($key) || $key !== $index) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $key));
-				return false;
-			}
-
+		foreach ($data as &$value) {
 			$index++;
 			$subpath = ($path === '/' ? $path : $path.'/').$index;
 			if (!self::validateObject(['fields' => $rule['fields']], $value, $subpath, $error)) {
@@ -285,6 +277,8 @@ class CApiInputValidator {
 			}
 		}
 		unset($value);
+
+		$data = array_values($data);
 
 		// Uniqueness check.
 
