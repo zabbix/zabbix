@@ -161,8 +161,8 @@ struct zbx_tls_context
 };
 #endif
 
-extern unsigned int				configured_tls_connect_mode;
-extern unsigned int				configured_tls_accept_modes;
+extern unsigned int			configured_tls_connect_mode;
+extern unsigned int			configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;

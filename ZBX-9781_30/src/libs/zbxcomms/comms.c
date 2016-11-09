@@ -679,14 +679,13 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			zbx_set_socket_strerror("ZBX_TCP_WRITE() timed out");
+			return ZBX_PROTO_ERROR;
+		}
 	}
-	while (FAIL == zbx_alarm_timed_out() && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
-
-	if (SUCCEED == zbx_alarm_timed_out())
-	{
-		zbx_set_socket_strerror("ZBX_TCP_WRITE() timed out");
-		return ZBX_PROTO_ERROR;
-	}
+	while (ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
 
 	if (ZBX_PROTO_ERROR == res)
 		zbx_set_socket_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(err));
@@ -1487,14 +1486,13 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			zbx_set_socket_strerror("ZBX_TCP_READ() timed out");
+			return ZBX_PROTO_ERROR;
+		}
 	}
-	while (FAIL == zbx_alarm_timed_out() && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
-
-	if (SUCCEED == zbx_alarm_timed_out())
-	{
-		zbx_set_socket_strerror("ZBX_TCP_READ() timed out");
-		return ZBX_PROTO_ERROR;
-	}
+	while (ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
 
 	if (ZBX_PROTO_ERROR == res)
 		zbx_set_socket_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(err));
