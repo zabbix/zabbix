@@ -1051,13 +1051,13 @@ void	unquote_key_param(char *param)
  * Parameters: param   - [IN/OUT] item key parameter                          *
  *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
  *                                contain any special characters              *
- *                            0 - do nothing if the paramter does not contain *
- *                                any special characters                      *
+ *                            0 - do nothing if the parameter does not        *
+ *                                contain any special characters              *
  *                                                                            *
- * Return value: SUCEED - if parameter doesn't contain special characters and *
- *                        is not forced to be quoted or when parameter is     *
- *                        enclosed in quotes                                  *
- *               FAIL   - if parameter ends with backslash                    *
+ * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
+ *                         was not necessary                                  *
+ *               FAIL    - if parameter needs to but cannot be quoted due to  *
+ *                         backslash in the end                               *
  *                                                                            *
  ******************************************************************************/
 int	quote_key_param(char **param, int forced)
@@ -1066,13 +1066,14 @@ int	quote_key_param(char **param, int forced)
 
 	if (0 == forced)
 	{
-		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
+				NULL == strchr(*param, ']'))
+		{
 			return SUCCEED;
+		}
 	}
 
-	sz_src = strlen(*param);
-
-	if ('\\' == (*param)[sz_src - 1])
+	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
 		return FAIL;
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
