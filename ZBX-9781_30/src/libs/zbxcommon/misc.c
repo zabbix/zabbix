@@ -3105,5 +3105,3 @@ int	zbx_alarm_timed_out(void)
 {
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
 }
-
-
