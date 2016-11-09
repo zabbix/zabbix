@@ -268,6 +268,8 @@ static void    free_result_ptr(AGENT_RESULT *result)
 	zbx_free(result);
 }
 
+
+
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value";
