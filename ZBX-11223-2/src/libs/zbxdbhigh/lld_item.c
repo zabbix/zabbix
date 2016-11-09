@@ -991,8 +991,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	if (SUCCEED != substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
-		ret = FAIL;
+	ret = (substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err)));
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
 	item->units_orig = NULL;
@@ -1004,8 +1003,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED != substitute_formula_macros(&item->params, jp_row, err, sizeof(err)))
-			ret = FAIL;
+		if (FAIL != ret)
+			ret = substitute_formula_macros(&item->params, jp_row, err, sizeof(err));
 	}
 	else
 		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1053,13 +1052,14 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
  *             item           - [IN] an existing item or NULL                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
+static int	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
 		zbx_lld_item_t *item, char **error)
 {
 	const char		*__function_name = "lld_item_update";
 
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
+	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1078,8 +1078,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	{
 		item->key_orig = item->key;
 		item->key = zbx_strdup(NULL, item_prototype->key);
-		if (SUCCEED != substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
-				err, sizeof(err)))
+		if (SUCCEED != (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
+				err, sizeof(err))))
 		{
 			goto out;
 		}
@@ -1101,7 +1101,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED != substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
+		if (SUCCEED != (ret = substitute_formula_macros(&buffer, jp_row, err, sizeof(err))))
 			goto out;
 	}
 	else
@@ -1155,7 +1155,12 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 out:
 	zbx_free(buffer);
 
+	if (FAIL == ret)
+		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
