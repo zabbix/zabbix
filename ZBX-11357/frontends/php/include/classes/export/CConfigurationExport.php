@@ -792,7 +792,7 @@ class CConfigurationExport {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
 
 				// unset lld and web graphs
-				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
 				}
@@ -817,7 +817,7 @@ class CConfigurationExport {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
 
 				// unset lld and web graphs
-				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
 				}
@@ -842,7 +842,7 @@ class CConfigurationExport {
 				$item = $graphItems[$gItem['itemid']];
 
 				// unset lld and web graphs
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue 2;
 				}
