@@ -32,11 +32,12 @@ class SocketProcessor implements Runnable
 
 	private Socket socket;
 
-	public SocketProcessor(Socket socket)
+	SocketProcessor(Socket socket)
 	{
 		this.socket = socket;
 	}
 
+	@Override
 	public void run()
 	{
 		logger.debug("starting to process incoming connection");
