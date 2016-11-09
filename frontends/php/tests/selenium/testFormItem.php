@@ -957,7 +957,7 @@ class testFormItem extends CWebTest {
 
 			$this->zbxTestTextPresent('Use custom multiplier');
 			$this->zbxTestAssertElementPresentId('multiplier');
-			$this->zbxTestAssertVisibleXpath("//input[@type='checkbox' and @id='multiplier']");
+			$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier']");
 			if (isset($templateid)) {
 				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
 			}
@@ -1212,7 +1212,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestAssertVisibleId('cancel');

@@ -40,9 +40,6 @@
 #	include <openssl/ssl.h>
 #	include <openssl/err.h>
 #	include <openssl/rand.h>
-#ifdef _WINDOWS
-#	include "mutexs.h"
-#endif
 #endif
 
 /* Currently use only TLS 1.2, which has number 3.3. In 2015 a new standard for TLS 1.3 is expected. */
@@ -55,6 +52,98 @@
 #	define ZBX_TLS_CIPHERSUITE_CERT	0			/* select only certificate ciphersuites */
 #	define ZBX_TLS_CIPHERSUITE_PSK	1			/* select only pre-shared key ciphersuites */
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
+#endif
+
+#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL	/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
+
+/* mutexes for multi-threaded OpenSSL (see "man 3ssl threads" and example in crypto/threads/mttest.c) */
+
+#ifdef _WINDOWS
+#include "mutexs.h"
+
+static ZBX_MUTEX	*crypto_mutexes = NULL;
+
+static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
+{
+	if (0 != (mode & CRYPTO_LOCK))
+		__zbx_mutex_lock(file, line, crypto_mutexes + n);
+	else
+		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
+}
+
+static void	zbx_openssl_thread_setup(void)
+{
+	const char	*__function_name = "zbx_openssl_thread_setup";
+
+	int	i, num_locks;
+
+	num_locks = CRYPTO_num_locks();
+
+	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(ZBX_MUTEX))))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
+		exit(EXIT_FAILURE);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __function_name, num_locks);
+
+	for (i = 0; i < num_locks; i++)
+	{
+		if (SUCCEED != zbx_mutex_create(crypto_mutexes + i, NULL))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex #%d for OpenSSL library", i);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	CRYPTO_set_locking_callback((void (*)(int, int, const char *, int))zbx_openssl_locking_cb);
+
+	/* do not register our own threadid_func() callback, use OpenSSL default one */
+}
+
+static void	zbx_openssl_thread_cleanup(void)
+{
+	int	i, num_locks;
+
+	CRYPTO_set_locking_callback(NULL);
+
+	num_locks = CRYPTO_num_locks();
+
+	for (i = 0; i < num_locks; i++)
+		zbx_mutex_destroy(crypto_mutexes + i);
+
+	zbx_free(crypto_mutexes);
+}
+#endif	/* _WINDOWS */
+
+#define OPENSSL_INIT_LOAD_SSL_STRINGS			0
+#define OPENSSL_INIT_LOAD_CRYPTO_STRINGS		0
+#define OPENSSL_VERSION					SSLEAY_VERSION
+#define OpenSSL_version					SSLeay_version
+#define TLS_method					TLSv1_2_method
+#define TLS_client_method				TLSv1_2_client_method
+#define SSL_CTX_get_ciphers(ciphers)			((ciphers)->cipher_list)
+#define SSL_CTX_set_min_proto_version(ctx, TLSv)	1
+
+static int	OPENSSL_init_ssl(int opts, void *settings)
+{
+	SSL_load_error_strings();
+	ERR_load_BIO_strings();
+	SSL_library_init();
+#ifdef _WINDOWS
+	zbx_openssl_thread_setup();
+#endif
+	return 1;
+}
+
+static void	OPENSSL_cleanup(void)
+{
+	RAND_cleanup();
+	ERR_free_strings();
+#ifdef _WINDOWS
+	zbx_openssl_thread_cleanup();
+#endif
+}
 #endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -133,10 +222,6 @@ ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
-#ifdef _WINDOWS
-/* array of mutexes for OpenSSL on multi-threaded systems (see "man 3ssl threads") */
-ZBX_MUTEX					*crypto_mutexes		= NULL;
-#endif
 static int					init_done 		= 0;
 /* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
@@ -1606,18 +1691,20 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
 {
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		char	*msg = NULL;
-		size_t	msg_alloc = 0, msg_offset = 0;
-		int	i, num;
+		char			*msg = NULL;
+		size_t			msg_alloc = 0, msg_offset = 0;
+		int			i, num;
+		STACK_OF(SSL_CIPHER)	*cipher_list;
 
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() %s ciphersuites:", title1, title2);
 
-		num = sk_SSL_CIPHER_num(ciphers->cipher_list);
+		cipher_list = SSL_CTX_get_ciphers(ciphers);
+		num = sk_SSL_CIPHER_num(cipher_list);
 
 		for (i = 0; i < num; i++)
 		{
 			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s",
-					sk_SSL_CIPHER_value(ciphers->cipher_list, i)->name);
+					SSL_CIPHER_get_name(sk_SSL_CIPHER_value(cipher_list, i)));
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
@@ -2450,62 +2537,6 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 }
 #endif
 
-#if defined(HAVE_OPENSSL) && defined(_WINDOWS)
-/* see "man 3ssl threads" and example in OpenSSL crypto/threads/mttest.c */
-
-static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
-{
-	if (0 != (mode & CRYPTO_LOCK))
-		__zbx_mutex_lock(file, line, crypto_mutexes + n);
-	else
-		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
-}
-
-static void	zbx_openssl_thread_setup(void)
-{
-	const char	*__function_name = "zbx_openssl_thread_setup";
-
-	int	i, num_locks;
-
-	num_locks = CRYPTO_num_locks();
-
-	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(ZBX_MUTEX))))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
-		exit(EXIT_FAILURE);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __function_name, num_locks);
-
-	for (i = 0; i < num_locks; i++)
-	{
-		if (SUCCEED != zbx_mutex_create(crypto_mutexes + i, NULL))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex #%d for OpenSSL library", i);
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	CRYPTO_set_locking_callback((void (*)(int, int, const char *, int))zbx_openssl_locking_cb);
-
-	/* do not register our own threadid_func() callback, use OpenSSL default one */
-}
-
-static void	zbx_openssl_thread_cleanup(void)
-{
-	int	i, num_locks;
-
-	CRYPTO_set_locking_callback(NULL);
-
-	num_locks = CRYPTO_num_locks();
-
-	for (i = 0; i < num_locks; i++)
-		zbx_mutex_destroy(crypto_mutexes + i);
-
-	zbx_free(crypto_mutexes);
-}
-#endif
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
@@ -2538,15 +2569,15 @@ static void	zbx_tls_library_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
-	SSL_load_error_strings();
-	ERR_load_BIO_strings();
-	SSL_library_init();             /* always returns "1" */
-#if defined(_WINDOWS)
-	zbx_openssl_thread_setup();
-#endif
+	if (1 != OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
+		exit(EXIT_FAILURE);
+	}
+
 	init_done = 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", SSLeay_version(SSLEAY_VERSION));
+	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
 #endif
 }
 #endif
@@ -2571,11 +2602,7 @@ void	zbx_tls_library_deinit(void)
 	if (1 == init_done)
 	{
 		init_done = 0;
-		RAND_cleanup();         /* erase PRNG state */
-		ERR_free_strings();
-#if defined(_WINDOWS)
-		zbx_openssl_thread_cleanup();
-#endif
+		OPENSSL_cleanup();
 	}
 #endif
 }
@@ -3071,6 +3098,17 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 
 void	zbx_tls_init_child(void)
 {
+#define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
+#define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+#	define ZBX_CIPHERS_PSK_ECDHE	"kECDHEPSK+AES128:"
+#	define ZBX_CIPHERS_PSK		"kPSK+AES128"
+#else
+#	define ZBX_CIPHERS_PSK_ECDHE	""
+#	define ZBX_CIPHERS_PSK		"PSK-AES128-CBC-SHA"
+#endif
+
 	const char	*__function_name = "zbx_tls_init_child";
 	char		*error = NULL;
 	size_t		error_alloc = 0, error_offset = 0;
@@ -3099,27 +3137,41 @@ void	zbx_tls_init_child(void)
 	/* set protocol version to TLS 1.2 */
 
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
-		method = TLSv1_2_client_method();
+		method = TLS_client_method();
 	else	/* ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD */
-		method = TLSv1_2_method();
+		method = TLS_method();
 
 	/* create context for certificate-only authentication if certificate is configured */
-	if (NULL != CONFIG_TLS_CERT_FILE && NULL == (ctx_cert = SSL_CTX_new(method)))
-		goto out_method;
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		if (NULL == (ctx_cert = SSL_CTX_new(method)))
+			goto out_method;
+
+		if (1 != SSL_CTX_set_min_proto_version(ctx_cert, TLS1_2_VERSION))
+			goto out_method;
+	}
 
 	/* Create context for PSK-only authentication. PSK can come from configuration file (in proxy, agentd) */
 	/* and later from database (in server, proxy). */
-	if ((NULL != CONFIG_TLS_PSK_FILE ||
-			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))) &&
-			NULL == (ctx_psk = SSL_CTX_new(method)))
+	if (NULL != CONFIG_TLS_PSK_FILE || 0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		goto out_method;
+		if (NULL == (ctx_psk = SSL_CTX_new(method)))
+			goto out_method;
+
+		if (1 != SSL_CTX_set_min_proto_version(ctx_psk, TLS1_2_VERSION))
+			goto out_method;
 	}
 
 	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a universal context */
 	/* for certificate and PSK authentication to prepare for both. */
-	if (NULL != ctx_cert && NULL != ctx_psk && NULL == (ctx_all = SSL_CTX_new(method)))
-		goto out_method;
+	if (NULL != ctx_cert && NULL != ctx_psk)
+	{
+		if (NULL == (ctx_all = SSL_CTX_new(method)))
+			goto out_method;
+
+		if (1 != SSL_CTX_set_min_proto_version(ctx_all, TLS1_2_VERSION))
+			goto out_method;
+	}
 
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != CONFIG_TLS_CA_FILE)
@@ -3309,9 +3361,9 @@ void	zbx_tls_init_child(void)
 
 		/* try to enable ECDH ciphersuites */
 		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_cert))
-			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128";
+			ciphers = ZBX_CIPHERS_CERT_ECDHE ZBX_CIPHERS_CERT;
 		else
-			ciphers = "RSA+aRSA+AES128";
+			ciphers = ZBX_CIPHERS_CERT;
 
 		/* set up ciphersuites */
 		if (1 != SSL_CTX_set_cipher_list(ctx_cert, ciphers))
@@ -3326,6 +3378,8 @@ void	zbx_tls_init_child(void)
 
 	if (NULL != ctx_psk)
 	{
+		const char	*ciphers;
+
 		SSL_CTX_set_info_callback(ctx_psk, zbx_openssl_info_cb);
 
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
@@ -3342,9 +3396,12 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
 
-		/* OpenSSL does not support ECDHE-PSK ciphersuites before version 1.1.0 */
+		if ('\0' != *ZBX_CIPHERS_PSK_ECDHE && SUCCEED == zbx_set_ecdhe_parameters(ctx_psk))
+			ciphers = ZBX_CIPHERS_PSK_ECDHE ZBX_CIPHERS_PSK;
+		else
+			ciphers = ZBX_CIPHERS_PSK;
 
-		if (1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
+		if (1 != SSL_CTX_set_cipher_list(ctx_psk, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
 			goto out;
@@ -3368,9 +3425,9 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
 
 		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_all))
-			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
+			ciphers = ZBX_CIPHERS_CERT_ECDHE ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK_ECDHE ZBX_CIPHERS_PSK;
 		else
-			ciphers = "RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
+			ciphers = ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK;
 
 		if (1 != SSL_CTX_set_cipher_list(ctx_all, ciphers))
 		{
@@ -3397,6 +3454,11 @@ out1:
 	zbx_free(error);
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
+
+#undef ZBX_CIPHERS_CERT_ECDHE
+#undef ZBX_CIPHERS_CERT
+#undef ZBX_CIPHERS_PSK_ECDHE
+#undef ZBX_CIPHERS_PSK
 }
 #endif
 
@@ -5043,11 +5105,16 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	cipher_name = SSL_get_cipher(s->tls_ctx->ctx);
 
-	if (0 == strncmp("PSK-", cipher_name, 4))
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
+	if (0 == strncmp("ECDHE-PSK-", cipher_name, ZBX_CONST_STRLEN("ECDHE-PSK-")) ||
+			0 == strncmp("PSK-", cipher_name, ZBX_CONST_STRLEN("PSK-")))
+#else
+	if (0 == strncmp("PSK-", cipher_name, ZBX_CONST_STRLEN("PSK-")))
+#endif
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
-	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type? */
+	else if (0 != strncmp("(NONE)", cipher_name, ZBX_CONST_STRLEN("(NONE)")))
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
@@ -5625,10 +5692,6 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
  ******************************************************************************/
 int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
-#if defined(HAVE_OPENSSL)
-	SSL_SESSION	*sess;
-#endif
-
 #if defined(HAVE_POLARSSL)
 	attr->psk_identity = (char *)s->tls_ctx->ctx->psk_identity;
 	attr->psk_identity_len = s->tls_ctx->ctx->psk_identity_len;
@@ -5638,13 +5701,8 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	else
 		return FAIL;
 #elif defined(HAVE_OPENSSL)
-	if (NULL != (sess = SSL_get_session(s->tls_ctx->ctx)))
-	{
-		if (NULL != (attr->psk_identity = sess->psk_identity))
-			attr->psk_identity_len = strlen(attr->psk_identity);
-		else
-			return FAIL;
-	}
+	if (NULL != (attr->psk_identity = SSL_get_psk_identity(s->tls_ctx->ctx)))
+		attr->psk_identity_len = strlen(attr->psk_identity);
 	else
 		return FAIL;
 #endif

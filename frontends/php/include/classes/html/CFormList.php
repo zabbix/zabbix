@@ -22,7 +22,7 @@
 class CFormList extends CList {
 
 	protected $editable = true;
-	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
+	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox'];
 
 	public function __construct($id = null) {
 		parent::__construct();
@@ -46,7 +46,9 @@ class CFormList extends CList {
 			$input_class = strtolower(get_class($input));
 
 			if (in_array($input_class, $this->formInputs)) {
-				$input_id = $input->getAttribute('id');
+				if ($input_class !== 'ccheckbox' || $input->getLabel() === '') {
+					$input_id = $input->getAttribute('id');
+				}
 			}
 		}
 
