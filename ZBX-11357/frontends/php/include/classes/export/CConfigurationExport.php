@@ -791,7 +791,6 @@ class CConfigurationExport {
 			if ($graph['ymin_itemid'] && isset($graphItems[$graph['ymin_itemid']])) {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
 
-				// unset lld and web graphs
 				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -816,7 +815,6 @@ class CConfigurationExport {
 			if ($graph['ymax_itemid'] && isset($graphItems[$graph['ymax_itemid']])) {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
 
-				// unset lld and web graphs
 				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -841,7 +839,6 @@ class CConfigurationExport {
 			foreach ($graph['gitems'] as $ginum => $gItem) {
 				$item = $graphItems[$gItem['itemid']];
 
-				// unset lld and web graphs
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue 2;
