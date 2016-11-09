@@ -3073,19 +3073,14 @@ fail:
 	return res;
 }
 
-void	zbx_alarm_flag_set()
+void	zbx_alarm_flag_set(void)
 {
 	zbx_timed_out = 1;
 }
 
-void	zbx_alarm_flag_clear()
+void	zbx_alarm_flag_clear(void)
 {
 	zbx_timed_out = 0;
-}
-
-int	zbx_alarm_timed_out()
-{
-	return (0 == zbx_timed_out ? FAIL : SUCCEED);
 }
 
 #if !defined(_WINDOWS)
@@ -3104,4 +3099,10 @@ unsigned int	zbx_alarm_off(void)
 	zbx_alarm_flag_clear();
 	return ret;
 }
+
+int	zbx_alarm_timed_out(void)
+{
+	return (0 == zbx_timed_out ? FAIL : SUCCEED);
+}
+
 #endif

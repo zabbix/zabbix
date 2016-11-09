@@ -1161,14 +1161,15 @@ int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
-int	zbx_alarm_timed_out();
-void	zbx_alarm_flag_set();
-void	zbx_alarm_flag_clear();
+void	zbx_alarm_flag_set(void);
+void	zbx_alarm_flag_clear(void);
 
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
 #endif
+
+int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
