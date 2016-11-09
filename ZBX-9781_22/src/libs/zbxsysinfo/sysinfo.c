@@ -1440,7 +1440,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for cmd:'%s'", args->cmd);
+	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for key:'%s'", args->request->key);
 
 	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->request, args->result)))
 	{
@@ -1472,7 +1472,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
-	zbx_metric_thread_args_t	metric_args = {metric_func, cmd, param, flags, result};
+	zbx_metric_thread_args_t	metric_args = {metric_func, request, result};
 	DWORD				rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
