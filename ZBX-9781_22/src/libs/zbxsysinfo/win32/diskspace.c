@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*path, *mode;
 	LPTSTR		wpath;
@@ -59,6 +59,11 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
