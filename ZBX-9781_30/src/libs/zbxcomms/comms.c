@@ -42,8 +42,6 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 
 extern int	CONFIG_TIMEOUT;
 
-extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_socket_strerror                                              *
@@ -671,7 +669,7 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 	}
 #endif
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -679,12 +677,12 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 		res = ZBX_TCP_WRITE(s->socket, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while (0 == zbx_timed_out && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
+	while (FAIL == zbx_alarm_timed_out() && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		zbx_set_socket_strerror("ZBX_TCP_WRITE() timed out");
 		return ZBX_PROTO_ERROR;
@@ -1479,7 +1477,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 	}
 #endif
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -1487,12 +1485,12 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 		res = ZBX_TCP_READ(s->socket, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while (0 == zbx_timed_out && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
+	while (FAIL == zbx_alarm_timed_out() && ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		zbx_set_socket_strerror("ZBX_TCP_READ() timed out");
 		return ZBX_PROTO_ERROR;
