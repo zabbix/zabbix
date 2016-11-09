@@ -230,7 +230,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 	}
 
@@ -270,14 +270,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestCheckboxSelect($id, $select = true) {
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
-		$checkbox = $this->webDriver->findElement(WebDriverBy::id($id));
-		if ($select != $checkbox->isSelected()) {
-			$this->webDriver->findElement(WebDriverBy::xpath("//label[@for='$id']"))->click();
-		}
-	}
-
-	public function zbxTestCheckboxSelectXpath($id, $select = true) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
 		$checkbox = $this->webDriver->findElement(WebDriverBy::id($id));
 		if ($select != $checkbox->isSelected()) {

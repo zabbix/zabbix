@@ -2384,7 +2384,7 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelectXpath('multiplier');
+			$this->zbxTestCheckboxSelect('multiplier');
 			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
 		}
 

@@ -2226,7 +2226,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelectXpath('multiplier');
+			$this->zbxTestCheckboxSelect('multiplier');
 			$this->zbxTestInputType('formula', $data['formula']);
 		}
 
@@ -2394,8 +2394,8 @@ class testFormItem extends CWebTest {
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
-		$this->zbxTestCheckboxSelectXpath('hk_history_global', false);
-		$this->zbxTestCheckboxSelectXpath('hk_trends_global', false);
+		$this->zbxTestCheckboxSelect('hk_history_global', false);
+		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
 
@@ -2432,10 +2432,10 @@ class testFormItem extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);
-		$this->zbxTestCheckboxSelectXpath('hk_history_global', false);
+		$this->zbxTestCheckboxSelect('hk_history_global', false);
 
 		$this->zbxTestInputType('hk_trends', 365);
-		$this->zbxTestCheckboxSelectXpath('hk_trends_global', false);
+		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
 
