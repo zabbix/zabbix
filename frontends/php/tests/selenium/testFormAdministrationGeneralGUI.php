@@ -160,7 +160,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=0';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
-		$this->zbxTestCheckboxSelectXpath('dropdown_first_remember', false);
+		$this->zbxTestCheckboxSelect('dropdown_first_remember', false);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'remember selected']);
 		$this->assertFalse($this->zbxTestCheckboxSelected('dropdown_first_remember'));
@@ -304,7 +304,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestCheckboxSelectXpath('event_ack_enable', false);
+		$this->zbxTestCheckboxSelect('event_ack_enable', false);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Enable event acknowledgement']);
@@ -426,7 +426,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestCheckboxSelectXpath('server_check_interval', false);
+		$this->zbxTestCheckboxSelect('server_check_interval', false);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Show warning if Zabbix server is down']);

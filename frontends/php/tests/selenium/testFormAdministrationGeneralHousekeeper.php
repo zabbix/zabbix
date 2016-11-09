@@ -60,7 +60,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_autoreg'][@disabled]");
 
-		$this->zbxTestCheckboxSelectXpath('hk_events_mode', false);
+		$this->zbxTestCheckboxSelect('hk_events_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_events_trigger'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_events_internal'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
@@ -79,7 +79,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_services'][@disabled]");
 
-		$this->zbxTestCheckboxSelectXpath('hk_services_mode', false);
+		$this->zbxTestCheckboxSelect('hk_services_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_services'][@disabled]");
 
 		// audit
@@ -95,7 +95,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_audit'][@disabled]");
 
-		$this->zbxTestCheckboxSelectXpath('hk_audit_mode', false);
+		$this->zbxTestCheckboxSelect('hk_audit_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_audit'][@disabled]");
 
 		//	user sessions
@@ -111,7 +111,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "value", 365);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_sessions'][@disabled]");
 
-		$this->zbxTestCheckboxSelectXpath('hk_sessions_mode', false);
+		$this->zbxTestCheckboxSelect('hk_sessions_mode', false);
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_sessions'][@disabled]");
 
 		// history
@@ -292,7 +292,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// events and alerts
 
 			if (isset($data['hk_events_mode'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_events_mode', $data['hk_events_mode']);
+				$this->zbxTestCheckboxSelect('hk_events_mode', $data['hk_events_mode']);
 			}
 
 			if (isset($data['hk_events_trigger'])) {
@@ -314,7 +314,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// IT services
 
 			if (isset($data['hk_services_mode'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_services_mode', $data['hk_services_mode']);
+				$this->zbxTestCheckboxSelect('hk_services_mode', $data['hk_services_mode']);
 			}
 
 			if (isset($data['hk_services'])) {
@@ -324,7 +324,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// audit
 
 			if (isset($data['hk_audit_mode'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_audit_mode', $data['hk_audit_mode']);
+				$this->zbxTestCheckboxSelect('hk_audit_mode', $data['hk_audit_mode']);
 			}
 
 			if (isset($data['hk_audit'])) {
@@ -334,7 +334,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// user sessions
 
 			if (isset($data['hk_sessions_mode'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_sessions_mode', $data['hk_sessions_mode']);
+				$this->zbxTestCheckboxSelect('hk_sessions_mode', $data['hk_sessions_mode']);
 			}
 
 			if (isset($data['hk_sessions'])) {
@@ -348,7 +348,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_history_global'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_history_global', $data['hk_history_global']);
+				$this->zbxTestCheckboxSelect('hk_history_global', $data['hk_history_global']);
 			}
 
 			if (isset($data['hk_history'])) {
@@ -358,11 +358,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// trends
 
 			if (isset($data['hk_trends_mode'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_trends_mode', $data['hk_trends_mode']);
+				$this->zbxTestCheckboxSelect('hk_trends_mode', $data['hk_trends_mode']);
 			}
 
 			if (isset($data['hk_trends_global'])) {
-				$this->zbxTestCheckboxSelectXpath('hk_trends_global', $data['hk_trends_global']);
+				$this->zbxTestCheckboxSelect('hk_trends_global', $data['hk_trends_global']);
 			}
 
 			if (isset($data['hk_trends'])) {

@@ -1001,7 +1001,7 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['new_operation_opmessage_default_msg'])) {
 			$new_operation_opmessage_default_msg = $data['new_operation_opmessage_default_msg'];
-			$this->zbxTestCheckboxSelectXpath('new_operation_opmessage_default_msg', false);
+			$this->zbxTestCheckboxSelect('new_operation_opmessage_default_msg', false);
 		}
 		elseif ($new_operation_operationtype == 'Send message') {
 			$new_operation_opmessage_default_msg = 'checked';
@@ -1901,13 +1901,13 @@ class testFormAction extends CWebTest {
 					case 'Send message':
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-						$this->zbxTestClickWait('all_usrgrps');
+						$this->zbxTestCheckboxSelect('all_usrgrps');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
 						$this->zbxTestSwitchToNewWindow();
-						$this->zbxTestClickWait('all_users');
+						$this->zbxTestCheckboxSelect('all_users');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
 
@@ -1981,14 +1981,14 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestCheckboxSelectXpath('usrgrps_7');
-		$this->zbxTestCheckboxSelectXpath('usrgrps_11');
+		$this->zbxTestCheckboxSelect('usrgrps_7');
+		$this->zbxTestCheckboxSelect('usrgrps_11');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
 		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestClickWait('users_1');
+		$this->zbxTestCheckboxSelect('users_1');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
