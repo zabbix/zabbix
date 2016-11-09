@@ -19,65 +19,52 @@
 
 package com.zabbix.gateway;
 
-import java.util.ArrayList;
-
 class HelperFunctionChest
 {
-	public static <T> boolean arrayContains(T[] array, T key)
+	static <T> boolean arrayContains(T[] array, T key)
 	{
 		for (T element : array)
+		{
 			if (key.equals(element))
 				return true;
+		}
 
 		return false;
 	}
 
-	public static int separatorIndex(String input)
+	static int separatorIndex(String input)
 	{
-		byte[] inputByteArray = input.getBytes();
-		int i, inputLength = inputByteArray.length;
-
-		for (i = 0; i < inputLength; i++)
+		for (int i = 0; i < input.length(); i++)
 		{
-			if ('\\' == inputByteArray[i])
+			if ('\\' == input.charAt(i))
 			{
-				if (i + 1 < inputLength &&
-						('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+				if (i + 1 < input.length() && ('\\' == input.charAt(i + 1) || '.' == input.charAt(i + 1)))
 					i++;
 			}
-			else if ('.' == inputByteArray[i])
+			else if ('.' == input.charAt(i))
+			{
 				return i;
+			}
 		}
 
 		return -1;
 	}
 
-	public static String unescapeUserInput(String input)
+	static String unescapeUserInput(String input)
 	{
-		byte[] inputByteArray = input.getBytes(), outputByteArray;
-		ArrayList<Byte> outputByteList = new ArrayList<Byte>();
-		int i, inputLength = inputByteArray.length;
+		StringBuilder builder = new StringBuilder(input.length());
 
-		for (i = 0; i < inputLength; i++)
+		for (int i = 0; i < input.length(); i++)
 		{
-			if ('\\' == inputByteArray[i] && i + 1 < inputLength &&
-					('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+			if ('\\' == input.charAt(i) && i + 1 < input.length() &&
+					('\\' == input.charAt(i + 1) || '.' == input.charAt(i + 1)))
 			{
 				i++;
 			}
 
-			outputByteList.add(inputByteArray[i]);
+			builder.append(input.charAt(i));
 		}
 
-		outputByteArray = new byte[outputByteList.size()];
-
-		i = 0;
-		for (Byte b : outputByteList)
-		{
-			outputByteArray[i] = b;
-			i++;
-		}
-
-		return new String(outputByteArray);
+		return builder.toString();
 	}
 }
