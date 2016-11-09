@@ -3089,4 +3089,10 @@ unsigned int	zbx_alarm_off(void)
 	zbx_timed_out = 0;
 	return ret;
 }
+
+unsigned int	zbx_alarm_timed_out()
+{
+	return (0 == zbx_timed_out ? FAIL : SUCCEED);
+}
+
 #endif
