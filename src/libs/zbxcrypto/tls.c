@@ -3396,7 +3396,7 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
 
-		if (0 != strcmp("", ZBX_CIPHERS_PSK_ECDHE) && SUCCEED == zbx_set_ecdhe_parameters(ctx_psk))
+		if ('\0' != *ZBX_CIPHERS_PSK_ECDHE && SUCCEED == zbx_set_ecdhe_parameters(ctx_psk))
 			ciphers = ZBX_CIPHERS_PSK_ECDHE ZBX_CIPHERS_PSK;
 		else
 			ciphers = ZBX_CIPHERS_PSK;
