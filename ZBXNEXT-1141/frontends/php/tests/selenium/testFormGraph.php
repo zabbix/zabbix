@@ -310,14 +310,14 @@ class testFormGraph extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Show legend');
-		$this->zbxTestAssertVisibleId('show_legend');
+		$this->zbxTestAssertElementPresentId('show_legend');
 		if (!isset($data['form'])) {
 			$this->assertTrue($this->zbxTestCheckboxSelected('show_legend'));
 		}
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show working time');
-			$this->zbxTestAssertVisibleId('show_work_period');
+			$this->zbxTestAssertElementPresentId('show_work_period');
 
 			if (!isset($data['form'])) {
 				$this->assertTrue($this->zbxTestCheckboxSelected('show_work_period'));
@@ -337,7 +337,7 @@ class testFormGraph extends CWebTest {
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show triggers');
-			$this->zbxTestAssertVisibleId('show_triggers');
+			$this->zbxTestAssertElementPresentId('show_triggers');
 			if (!isset($data['form'])) {
 				$this->assertTrue($this->zbxTestCheckboxSelected('show_triggers'));
 			}
@@ -355,9 +355,9 @@ class testFormGraph extends CWebTest {
 
 		if ($graphtype == 'Normal') {
 			$this->zbxTestTextPresent('Percentile line (left)');
-			$this->zbxTestAssertVisibleId('visible_percent_left');
+			$this->zbxTestAssertElementPresentId('visible_percent_left');
 			$this->zbxTestTextPresent('Percentile line (right)');
-			$this->zbxTestAssertVisibleId('visible_percent_right');
+			$this->zbxTestAssertElementPresentId('visible_percent_right');
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertAttribute("//input[@id='visible_percent_left']", 'disabled');
 				$this->zbxTestAssertAttribute("//input[@id='visible_percent_right']", 'disabled');
@@ -373,7 +373,7 @@ class testFormGraph extends CWebTest {
 
 		if ($graphtype == 'Pie' || $graphtype == 'Exploded') {
 			$this->zbxTestTextPresent('3D view');
-			$this->zbxTestAssertVisibleId('show_3d');
+			$this->zbxTestAssertElementPresentId('show_3d');
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertAttribute("//input[@id='show_3d']/@disabled", 'disabled');
 			}
@@ -388,7 +388,7 @@ class testFormGraph extends CWebTest {
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Y axis MIN value');
-			$this->zbxTestAssertVisibleId('ymin_type');
+			$this->zbxTestAssertElementPresentId('ymin_type');
 			$this->zbxTestDropdownHasOptions('ymin_type', [
 				'Calculated',
 				'Fixed',
@@ -413,7 +413,7 @@ class testFormGraph extends CWebTest {
 			}
 
 			$this->zbxTestTextPresent('Y axis MAX value');
-			$this->zbxTestAssertVisibleId('ymax_type');
+			$this->zbxTestAssertElementPresentId('ymax_type');
 			$this->zbxTestDropdownHasOptions('ymax_type', [
 				'Calculated',
 				'Fixed',
@@ -450,6 +450,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -843,7 +844,7 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
-			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");

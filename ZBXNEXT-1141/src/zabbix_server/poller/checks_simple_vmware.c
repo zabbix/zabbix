@@ -27,6 +27,11 @@
 #include "checks_simple_vmware.h"
 #include"../vmware/vmware.h"
 
+#define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
+#define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
+#define ZBX_VMWARE_DATASTORE_SIZE_PFREE		2
+#define ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED	3
+
 static const char	*sysinfo_ret_string(int ret)
 {
 	switch (ret)
@@ -1638,6 +1643,131 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 					"datastore/totalWriteLatency[average]", datastore->uuid, 1, result);
 			goto unlock;
 		}
+	}
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vcenter_hv_datastore_size";
+
+	char			*url, *param, *uuid, *name;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	int			i, ret = SYSINFO_RET_FAIL, mode;
+	zbx_vmware_datastore_t	*datastore;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+	param = get_rparam(request, 3);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "total"))
+	{
+		mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
+	}
+	else if (0 == strcmp(param, "free"))
+	{
+		mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
+	}
+	else if (0 == strcmp(param, "pfree"))
+	{
+		mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
+	}
+	else if (0 == strcmp(param, "uncommitted"))
+	{
+		mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	for (i = 0; i < hv->datastores.values_num; i++)
+	{
+		datastore = hv->datastores.values[i];
+		if (0 == strcmp(name, datastore->name))
+			break;
+	}
+
+	if (NULL == datastore)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	switch (mode)
+	{
+		case ZBX_VMWARE_DATASTORE_SIZE_TOTAL:
+			if (ZBX_MAX_UINT64 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
+				goto unlock;
+			}
+			SET_UI64_RESULT(result, datastore->capacity);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_FREE:
+			if (ZBX_MAX_UINT64 == datastore->free_space)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
+				goto unlock;
+			}
+			SET_UI64_RESULT(result, datastore->free_space);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED:
+			if (ZBX_MAX_UINT64 == datastore->uncommitted)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"uncommitted\" is not available."));
+				goto unlock;
+			}
+			SET_UI64_RESULT(result, datastore->uncommitted);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
+			if (ZBX_MAX_UINT64 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
+				goto unlock;
+			}
+			if (ZBX_MAX_UINT64 == datastore->free_space)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
+				goto unlock;
+			}
+			if (0 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is zero."));
+				goto unlock;
+			}
+			SET_DBL_RESULT(result, (double)datastore->free_space / datastore->capacity * 100);
+			break;
 	}
 
 	ret = SYSINFO_RET_OK;

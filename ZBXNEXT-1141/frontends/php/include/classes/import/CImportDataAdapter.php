@@ -111,6 +111,10 @@ class CImportDataAdapter {
 
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $inum => $interface) {
+						if ($interface['type'] != INTERFACE_TYPE_SNMP) {
+							unset($interface['bulk']);
+						}
+
 						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}

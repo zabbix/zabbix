@@ -134,7 +134,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter-space');
 
 		switch ($result) {
 			case TEST_GOOD:
@@ -224,7 +224,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger1');
 		$this->zbxTestInputType('expression', '{Inheritance test template:key-item-inheritance-test.last(0)}=0');
-		$this->zbxTestCheckboxSelect('type');
+		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
@@ -278,8 +278,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_item');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow('add_item');
 		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClickWait('add');
@@ -441,7 +440,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger');
 		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
-		$this->zbxTestCheckboxSelect('type');
+		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");

@@ -81,11 +81,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[
@@ -375,11 +375,11 @@ class CHelpItems {
 					'description' => _('Number of matching lines since the last check of the item with log rotation support. Returns integer')
 				],
 				[
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
 				[
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				],
 				[
@@ -681,6 +681,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
 					'description' => _('VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency')
+				],
+				[
+					'key' => 'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
+					'description' => _('VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
 					'key' => 'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
