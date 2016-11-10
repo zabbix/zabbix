@@ -1944,16 +1944,19 @@ int	flush_correlated_events(void)
 	correlate_events_by_global_rules(&trigger_diff, &triggerids_lock);
 
 	if (0 != events_num)
-	{
+
+		DBbegin();
+{
 		flush_events();
 		update_trigger_changes(&trigger_diff);
 		DBupdate_itservices(&trigger_diff);
-		clean_events();
 
-		DBbegin();
 		DCconfig_triggers_apply_changes(&trigger_diff);
 		zbx_save_trigger_changes(&trigger_diff);
+
 		DBcommit();
+
+		clean_events();
 	}
 
 	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
