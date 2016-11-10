@@ -503,7 +503,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertVisibleId('clone');
 			$this->zbxTestAssertElementValue('clone', 'Clone');
 
-			$this->zbxTestAssertElementNotPresentId('delete');
+			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
 		}
 		else {
 			$this->zbxTestAssertElementPresentId('add');
