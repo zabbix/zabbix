@@ -72,8 +72,7 @@
 			$('#form').val(form);
 
 			if (form === 'clone') {
-				$('#screenid, [id^=user_group_shares_], [id^=user_shares_]').remove();
-				$('#private_' + <?= PRIVATE_SHARING ?>).prop('checked', true);
+				$('#screenid').remove();
 			}
 
 			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
