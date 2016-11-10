@@ -434,10 +434,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
-	if (NULL == getenv("NLS_LANG"))
-		putenv("NLS_LANG=.UTF8");
-#endif
 	memset(&oracle, 0, sizeof(oracle));
 
 	/* connection string format: [//]host[:port][/service name] */
@@ -456,10 +452,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret)
 	{
 		/* initialize environment */
-		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
+		err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
 				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
 				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0,
+				OCI_UTF8, OCI_UTF8);
 
 		if (OCI_SUCCESS != err)
 		{
