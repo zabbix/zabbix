@@ -401,6 +401,8 @@ static void	save_event_recovery(void)
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where eventid=" ZBX_FS_UI64 ";\n",
 				recovery->eventid);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_db_insert_execute(&db_insert);
