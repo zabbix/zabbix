@@ -9,6 +9,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
 ..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
@@ -241,6 +242,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
 ..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
