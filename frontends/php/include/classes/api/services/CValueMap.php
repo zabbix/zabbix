@@ -46,7 +46,7 @@ class CValueMap extends CApiService {
 	/**
 	 * Get value maps.
 	 *
-	 * @param array $options
+	 * @param array  $options
 	 *
 	 * @return array
 	 */
@@ -93,17 +93,15 @@ class CValueMap extends CApiService {
 	/**
 	 * Add value maps.
 	 *
-	 * @param array		$valuemaps								An array of value maps.
-	 * @param string	$valuemaps[]['name']					Name of the value map.
-	 * @param array		$valuemaps[]['mappings']				Value mappings for value map.
-	 * @param string	$valuemaps[]['mappings'][]['value']		Value mapping original value.
-	 * @param string	$valuemaps[]['mappings'][]['newvalue']	Value to which the original value is mapped to.
+	 * @param array  $valuemaps                              An array of value maps.
+	 * @param string $valuemaps[]['name']                    Name of the value map.
+	 * @param array  $valuemaps[]['mappings']                Value mappings for value map.
+	 * @param string $valuemaps[]['mappings'][]['value']     Value mapping original value.
+	 * @param string $valuemaps[]['mappings'][]['newvalue']  Value to which the original value is mapped to.
 	 *
 	 * @return array
 	 */
 	public function create($valuemaps) {
-		$valuemaps = zbx_toArray($valuemaps);
-
 		$this->validateCreate($valuemaps);
 
 		$valuemapids = DB::insertBatch('valuemaps', $valuemaps);
@@ -144,8 +142,6 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function update($valuemaps) {
-		$valuemaps = zbx_toArray($valuemaps);
-
 		$this->validateUpdate($valuemaps);
 
 		$upd_valuemaps = [];
@@ -262,16 +258,16 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $valuemapids) {
-		// Check permissions.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete value maps.'));
 		}
 
-		if (!$valuemapids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY];
+
+		if (!CApiInputValidator::validate($api_input_rules, $valuemapids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check if value map exists.
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
@@ -279,21 +275,18 @@ class CValueMap extends CApiService {
 		]);
 
 		foreach ($valuemapids as $valuemapid) {
-			if (!is_int($valuemapid) && !is_string($valuemapid)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif (!array_key_exists($valuemapid, $db_valuemaps)) {
+			if (!array_key_exists($valuemapid, $db_valuemaps)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 		}
 
-		// Mappings are handled with cascade delete, but items.valuemapid reference should be removed first.
 		$result = DB::update('items', [[
 			'values' => ['valuemapid' => 0],
 			'where' => ['valuemapid' => $valuemapids]
 		]]);
+
 		if ($result) {
 			$this->deleteByIds($valuemapids);
 		}
@@ -314,47 +307,21 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $valuemaps) {
-		// Check permissions.
+	protected function validateCreate(array &$valuemaps) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create value maps.'));
 		}
 
-		if (!$valuemaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
+			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
+			]]
+		]];
 
-		$required_fields = ['name', 'mappings'];
-
-		foreach ($valuemaps as $valuemap) {
-			if (!is_array($valuemap)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// Check required parameters.
-			$missing_keys = array_diff($required_fields, array_keys($valuemap));
-
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Value map is missing parameters: %1$s', implode(', ', $missing_keys))
-				);
-			}
-
-			// Validate "name" field.
-			if (is_array($valuemap['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif ($valuemap['name'] === '' || $valuemap['name'] === null || $valuemap['name'] === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Value map name cannot be empty.'));
-			}
-		}
-
-		// Check for duplicate names.
-		$duplicate = CArrayHelper::findDuplicate($valuemaps, 'name');
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
-			);
+		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// Check if value map already exists.
@@ -365,13 +332,8 @@ class CValueMap extends CApiService {
 		]);
 
 		if ($db_valuemaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Value map "%1$s" already exists.', $db_valuemaps[0]['name'])
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value map "%1$s" already exists.', $db_valuemaps[0]['name']));
 		}
-
-		// Validate "mappings" field and its properties.
-		$this->checkMappings($valuemaps);
 	}
 
 	/**
@@ -381,22 +343,23 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $valuemaps) {
-		// Check permissions.
+	protected function validateUpdate(array &$valuemaps) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update value maps.'));
 		}
 
-		if (!$valuemaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_UNIQ, 'length' => 64],
+			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
+			]]
+		]];
 
-		// Validate given IDs.
-		$this->checkObjectIds($valuemaps, 'valuemapid',
-			_('No "%1$s" given for value map.'),
-			_('Empty value map ID.'),
-			_('Incorrect value map ID.')
-		);
+		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// Check value map names.
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
@@ -415,30 +378,16 @@ class CValueMap extends CApiService {
 				);
 			}
 
-			// Validate "name" field.
-			if (array_key_exists('name', $valuemap)) {
-				if (is_array($valuemap['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif ($valuemap['name'] === '' || $valuemap['name'] === null || $valuemap['name'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Value map name cannot be empty.'));
-				}
+			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
 
-				if ($db_valuemaps[$valuemap['valuemapid']]['name'] !== $valuemap['name']) {
+			if (array_key_exists('name', $valuemap)) {
+				if ($db_valuemap['name'] !== $valuemap['name']) {
 					$check_names[] = $valuemap;
 				}
 			}
 		}
 
 		if ($check_names) {
-			// Check for duplicate names.
-			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
-			if ($duplicate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
-				);
-			}
-
 			// Check if value map already exists.
 			$db_valuemap_names = API::getApiService()->select('valuemaps', [
 				'output' => ['valuemapid', 'name'],
@@ -453,77 +402,6 @@ class CValueMap extends CApiService {
 						_s('Value map "%1$s" already exists.', $valuemap['name'])
 					);
 				}
-			}
-		}
-
-		// Populate "name" field, if not set.
-		$valuemaps = $this->extendFromObjects(zbx_toHash($valuemaps, 'valuemapid'), $db_valuemaps, ['name']);
-
-		// Validate "mappings" field and its properties.
-		$this->checkMappings($valuemaps);
-	}
-
-	/**
-	 * Check "mappings" field properties.
-	 *
-	 * @param array $valuemaps									An array of value maps.
-	 * @param array $valuemaps[]['mappings']					An array of "mappings" data.
-	 * @param string $valuemaps[]['mappings'][]['value']		Original mapping value.
-	 * @param string $valuemaps[]['mappings'][]['newvalue']		Value to which the original value is mapped to.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkMappings(array $valuemaps) {
-		$required_fields = ['value', 'newvalue'];
-
-		foreach ($valuemaps as $valuemap) {
-			if (!array_key_exists('mappings', $valuemap)) {
-				continue;
-			}
-
-			if (!is_array($valuemap['mappings'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif (!$valuemap['mappings']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('At least one mapping should be given for value map "%1$s".', $valuemap['name'])
-				);
-			}
-
-			foreach ($valuemap['mappings'] as $mapping) {
-				if (!is_array($mapping)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-
-				$missing_keys = array_diff($required_fields, array_keys($mapping));
-
-				if ($missing_keys) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Mapping is missing parameters: %1$s for value map "%2$s".',
-						implode(', ', $missing_keys),
-						$valuemap['name']
-					));
-				}
-				else {
-					foreach (['value', 'newvalue'] as $field) {
-						if (is_array($mapping[$field])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-					}
-				}
-
-				if ($mapping['newvalue'] === '' || $mapping['newvalue'] === null || $mapping['newvalue'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Empty new value in value map "%1$s".', $valuemap['name'])
-					);
-				}
-			}
-
-			$duplicate = CArrayHelper::findDuplicate($valuemap['mappings'], 'value');
-			if ($duplicate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate mapping value "%1$s" for value map "%2$s".', $duplicate['value'], $valuemap['name'])
-				);
 			}
 		}
 	}
