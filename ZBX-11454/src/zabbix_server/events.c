@@ -1211,7 +1211,7 @@ out:
 static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EVENT *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
-	int			i;
+	int			i, index;
 	zbx_corr_operation_t	*operation;
 	zbx_event_recovery_t	queue_local;
 	zbx_timespec_t		ts;
@@ -1232,13 +1232,14 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 				ts.sec = event->clock;
 				ts.ns = event->ns;
 
-				close_event(event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+				index = close_event(event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
 						event->objectid, &ts, 0, correlation->correlationid, event->eventid,
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
 						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
 
 				event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
+				events[index].flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
 
 				break;
 			case ZBX_CORR_OPERATION_CLOSE_OLD:
