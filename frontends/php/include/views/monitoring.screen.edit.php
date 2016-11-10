@@ -189,8 +189,8 @@ if (!$data['screen']['templateid']) {
 	$sharing_tab = (new CFormList('sharing_form'))
 		->addRow(_('Type'),
 		(new CRadioButtonList('private', (int) $data['screen']['private']))
-			->addValue(_('Private'), PRIVATE_SHARING, 'private_' . PRIVATE_SHARING)
-			->addValue(_('Public'), PUBLIC_SHARING, 'private_' . PUBLIC_SHARING)
+			->addValue(_('Private'), PRIVATE_SHARING)
+			->addValue(_('Public'), PUBLIC_SHARING)
 			->setModern(true)
 		)
 		->addRow(_('List of user group shares'),
