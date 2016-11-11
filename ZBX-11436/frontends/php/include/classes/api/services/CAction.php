@@ -1460,6 +1460,12 @@ class CAction extends CApiService {
 
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
+					if (!array_key_exists('opmessage', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No message specified for action operation.')
+						);
+					}
+
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
 						: [];
@@ -1663,6 +1669,13 @@ class CAction extends CApiService {
 					if ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
 							&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
+					}
+					break;
+				case OPERATION_TYPE_RECOVERY_MESSAGE:
+					if (!array_key_exists('opmessage', $operation)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No message specified for action operation.')
+						);
 					}
 					break;
 			}
