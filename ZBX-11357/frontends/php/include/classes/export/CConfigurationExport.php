@@ -754,14 +754,14 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Unset graphs that have LLD created items or web items, or items containing LLD applications.
+	 * Unset graphs that have LLD created items or items containing LLD applications
+	 * and replace graph itemids with array of host and key.
 	 *
 	 * @param array $graphs
 	 *
 	 * @return array
 	 */
 	protected function prepareGraphs(array $graphs) {
-		// get item axis items info
 		$graphItemIds = [];
 
 		foreach ($graphs as $graph) {
