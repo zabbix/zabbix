@@ -117,6 +117,7 @@ class CConfigurationImport {
 		$this->processApplications();
 		$this->processValueMaps();
 		$this->processItems();
+		$this->processHttpTests();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
 		$this->processGraphs();
@@ -124,7 +125,6 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
-		$this->processHttpTests();
 
 		return true;
 	}
