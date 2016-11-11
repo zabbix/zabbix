@@ -2573,13 +2573,16 @@ static int	process_mass_history_data_value(DC_ITEM *item, zbx_agent_value_t *val
  *                                 out - value processing result              *
  *                                      (SUCCEED - processed, FAIL - error)   *
  *             values_num - [IN] the number of items/values to process        *
- *             *processed - [OUT] the number of values processed              *
+ *                                                                            *
+ * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num, int *processed)
+static int	process_mass_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num)
 {
-	const char		*__function_name = "process_mass_history_data";
-	size_t			i;
+	const char	*__function_name = "process_mass_history_data";
+	size_t		i;
+	int		processed = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < values_num; i++)
@@ -2595,7 +2598,7 @@ void	process_mass_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *e
 			continue;
 		}
 
-		(*processed)++;
+		processed++;
 	}
 
 	zbx_dc_items_update_runtime_data(items, values, errcodes, values_num);
@@ -2603,6 +2606,8 @@ void	process_mass_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *e
 	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return processed;
 }
 
 
@@ -3293,14 +3298,15 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
  *             itemids    - [IN] the items identifiers                        *
  *             values     - [IN] the item values value to process             *
  *             values_num - [IN] the number of items/values to process        *
- *             processed  - [OUT] the number of values processed              *
+ *                                                                            *
+ * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-static void	process_proxy_history_data(const DC_PROXY *proxy, zbx_uint64_t *itemids, zbx_agent_value_t *values,
-		int values_num, int *processed)
+static int	process_proxy_history_data(const DC_PROXY *proxy, zbx_uint64_t *itemids, zbx_agent_value_t *values,
+		int values_num)
 {
 	DC_ITEM	*items;
-	int	*errcodes, i;
+	int	*errcodes, i, processed;
 
 	items = zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	errcodes = zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
@@ -3323,11 +3329,13 @@ static void	process_proxy_history_data(const DC_PROXY *proxy, zbx_uint64_t *item
 			items[i].data_type = ITEM_DATA_TYPE_DECIMAL;
 	}
 
-	process_mass_history_data(items, values, errcodes, values_num, processed);
+	processed = process_mass_history_data(items, values, errcodes, values_num);
 	DCconfig_clean_items(items, errcodes, values_num);
 
 	zbx_free(errcodes);
 	zbx_free(items);
+
+	return processed;
 }
 
 /******************************************************************************
@@ -3459,7 +3467,7 @@ static int	parse_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse
 
 		if (ZBX_HISTORY_VALUES_MAX == values_num)
 		{
-			process_proxy_history_data(proxy, itemids, values, values_num, &processed);
+			processed = process_proxy_history_data(proxy, itemids, values, values_num);
 			zbx_agent_values_clean(values, values_num);
 			values_num = 0;
 		}
@@ -3467,7 +3475,7 @@ static int	parse_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse
 
 	if (0 < values_num)
 	{
-		process_proxy_history_data(proxy, itemids, values, values_num, &processed);
+		processed = process_proxy_history_data(proxy, itemids, values, values_num);
 		zbx_agent_values_clean(values, values_num);
 	}
 
