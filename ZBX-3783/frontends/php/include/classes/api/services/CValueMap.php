@@ -313,10 +313,10 @@ class CValueMap extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => DB::getFieldLength('valuemaps', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
-				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => DB::getFieldLength('mappings', 'value')],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('mappings', 'newvalue')]
 			]]
 		]];
 
@@ -350,10 +350,10 @@ class CValueMap extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_UNIQ, 'length' => 64],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_UNIQ, 'length' => DB::getFieldLength('valuemaps', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
-				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => DB::getFieldLength('mappings', 'value')],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('mappings', 'newvalue')]
 			]]
 		]];
 

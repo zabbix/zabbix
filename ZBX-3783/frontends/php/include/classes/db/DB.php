@@ -248,6 +248,26 @@ class DB {
 		return isset($schema['fields'][$fieldName]);
 	}
 
+	/**
+	 * Returns length of the field.
+	 *
+	 * @static
+	 *
+	 * @param string $table_name
+	 * @param string $field_name
+	 *
+	 * @return bool
+	 */
+	public static function getFieldLength($table_name, $field_name) {
+		$schema = self::getSchema($table_name);
+
+		if (!array_key_exists($field_name, $schema['fields'])) {
+			exit;
+		}
+
+		return $schema['fields'][$field_name]['length'];
+	}
+
 	private static function addMissingFields($tableSchema, $values) {
 		global $DB;
 
