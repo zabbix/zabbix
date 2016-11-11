@@ -161,9 +161,8 @@ struct zbx_tls_context
 };
 #endif
 
-extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
-extern unsigned int				configured_tls_connect_mode;
-extern unsigned int				configured_tls_accept_modes;
+extern unsigned int			configured_tls_connect_mode;
+extern unsigned int			configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
@@ -3759,16 +3758,16 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	}
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	while (0 != (res = ssl_handshake(s->tls_ctx->ctx)))
 	{
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "ssl_handshake() timed out");
 			goto out;
@@ -4013,16 +4012,16 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	/* TLS handshake */
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 			goto out;
@@ -4261,7 +4260,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
@@ -4270,9 +4269,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "SSL_connect() timed out");
 			goto out;
@@ -4553,16 +4552,16 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	/* TLS handshake */
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	while (0 != (res = ssl_handshake(s->tls_ctx->ctx)))
 	{
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "ssl_handshake() timed out");
 			goto out;
@@ -4794,16 +4793,16 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	/* TLS handshake */
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 			goto out;
@@ -5056,7 +5055,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	if (1 != (res = SSL_accept(s->tls_ctx->ctx)))
@@ -5065,9 +5064,9 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "SSL_accept() timed out");
 			goto out;
@@ -5199,7 +5198,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	int	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -5207,12 +5206,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 		res = ssl_write(s->tls_ctx->ctx, (const unsigned char *)buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while (POLARSSL_ERR_NET_WANT_WRITE == res && 0 == zbx_timed_out);
+	while (POLARSSL_ERR_NET_WANT_WRITE == res && FAIL == zbx_alarm_timed_out());
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		*error = zbx_strdup(*error, "ssl_write() timed out");
 		return ZBX_PROTO_ERROR;
@@ -5233,7 +5232,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	ssize_t	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -5241,12 +5240,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 		res = gnutls_record_send(s->tls_ctx->ctx, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && 0 == zbx_timed_out);
+	while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && FAIL == zbx_alarm_timed_out());
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		*error = zbx_strdup(*error, "gnutls_record_send() timed out");
 		return ZBX_PROTO_ERROR;
@@ -5265,7 +5264,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	int	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	if (0 >= (res = SSL_write(s->tls_ctx->ctx, buf, (int)len)))
@@ -5277,9 +5276,9 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "SSL_write() timed out");
 			return ZBX_PROTO_ERROR;
@@ -5320,7 +5319,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	int	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -5328,12 +5327,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		res = ssl_read(s->tls_ctx->ctx, (unsigned char *)buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while (POLARSSL_ERR_NET_WANT_READ == res && 0 == zbx_timed_out);
+	while (POLARSSL_ERR_NET_WANT_READ == res && FAIL == zbx_alarm_timed_out());
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		*error = zbx_strdup(*error, "ssl_read() timed out");
 		return ZBX_PROTO_ERROR;
@@ -5354,7 +5353,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	ssize_t	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
@@ -5362,12 +5361,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		res = gnutls_record_recv(s->tls_ctx->ctx, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
 	}
-	while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && 0 == zbx_timed_out);
+	while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && FAIL == zbx_alarm_timed_out());
 
-	if (1 == zbx_timed_out)
+	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		*error = zbx_strdup(*error, "gnutls_record_recv() timed out");
 		return ZBX_PROTO_ERROR;
@@ -5387,7 +5386,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	int	res;
 
 #if defined(_WINDOWS)
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	if (0 >= (res = SSL_read(s->tls_ctx->ctx, buf, (int)len)))
@@ -5398,9 +5397,9 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		int	error_code;
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
-			zbx_timed_out = 1;
+			zbx_alarm_flag_set();
 #endif
-		if (1 == zbx_timed_out)
+		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, "SSL_read() timed out");
 			return ZBX_PROTO_ERROR;
@@ -5453,16 +5452,16 @@ void	zbx_tls_close(zbx_socket_t *s)
 #if defined(_WINDOWS)
 		double	sec;
 
-		zbx_timed_out = 0;
+		zbx_alarm_flag_clear();
 		sec = zbx_time();
 #endif
 		while (0 > (res = ssl_close_notify(s->tls_ctx->ctx)))
 		{
 #if defined(_WINDOWS)
 			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
+				zbx_alarm_flag_set();
 #endif
-			if (1 == zbx_timed_out)
+			if (SUCCEED == zbx_alarm_timed_out())
 				break;
 
 			if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
@@ -5482,7 +5481,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 #if defined(_WINDOWS)
 		double	sec;
 
-		zbx_timed_out = 0;
+		zbx_alarm_flag_clear();
 		sec = zbx_time();
 #endif
 		/* shutdown TLS connection */
@@ -5490,9 +5489,9 @@ void	zbx_tls_close(zbx_socket_t *s)
 		{
 #if defined(_WINDOWS)
 			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
+				zbx_alarm_flag_set();
 #endif
-			if (1 == zbx_timed_out)
+			if (SUCCEED == zbx_alarm_timed_out())
 				break;
 
 			if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
