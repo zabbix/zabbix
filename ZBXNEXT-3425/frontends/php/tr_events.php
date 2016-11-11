@@ -97,6 +97,9 @@ if (!$events) {
 }
 $event = reset($events);
 
+$alerts = [];
+$r_alerts = [];
+
 $real_event = DBfetch(DBselect('SELECT eventid FROM event_recovery WHERE r_eventid='.zbx_dbstr($event['eventid'])));
 
 if ($real_event) {
@@ -107,6 +110,11 @@ if ($real_event) {
 		access_deny();
 	}
 	$event = reset($events);
+}
+
+if ($event['alerts']) {
+	$alerts = $event['alerts'];
+	CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
 }
 
 if ($event['r_eventid'] != 0) {
@@ -126,9 +134,8 @@ if ($event['r_eventid'] != 0) {
 		$event['userid'] = $r_event['userid'];
 
 		if ($r_event['alerts']) {
-			$event['alerts'] = array_merge($event['alerts'], $r_event['alerts']);
-
-			CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+			$r_alerts = $r_event['alerts'];
+			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => SORT_DESC]]);
 		}
 	}
 }
@@ -155,10 +162,10 @@ $eventTab = (new CTable())
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
 				: null,
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($event['alerts'])))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
 				->setHeader(_('Message actions'), [], false, 'tr_events.php'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($event['alerts'])))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
 				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
