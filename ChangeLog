@@ -23,6 +23,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 A......... [ZBX-11357] implemented exporting and importing of triggers and graphs when they use web items (Cemeris)
 ..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
@@ -257,6 +258,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
 ..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
@@ -1793,6 +1795,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
 A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
 ...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
@@ -3279,6 +3282,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
 --------------------------------------------------------------------------------
