@@ -62,7 +62,7 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*fsname, *mode;
 	zbx_uint64_t	total, free, used;
@@ -91,6 +91,11 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
