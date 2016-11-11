@@ -14,7 +14,7 @@
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
         <meta name="msapplication-TileColor" content="#d40000">
    </head>
 <body>
@@ -239,7 +239,7 @@
       </li>
       <li>
       <div class="table-forms-td-left"><label for="HostName">Label location</label></div>
-      <div class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></div>
+      <div class="table-forms-td-right"><input type="checkbox" id="1" class="checkbox-radio"><label for="1"><span></span></label><div class="form-input-margin"></div><select><option>Bottom</option></select></div>
       </li>
       <li>
       <div class="table-forms-td-left"><label for="HostName">Host</label></div>
@@ -251,7 +251,7 @@
       </li>
       <li>
       <div class="table-forms-td-left">Icons</div>
-      <div class="table-forms-td-right"><label for="UseIconmap"><input type="checkbox" id="UseIconmap">Automatic icon selection</label><table><tr><td><label>Default</label>
+      <div class="table-forms-td-right"><input type="checkbox" id="UseIconmap" class="checkbox-radio"><label for="UseIconmap"><span></span>Automatic icon selection</label><table><tr><td><label>Default</label>
       <select>
           <option value="2">Cloud_(24)</option>
           <option value="3">Cloud_(48)</option>
@@ -429,31 +429,31 @@
       </td>
       </tr>
       <tr>
-      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
+      <td class="table-forms-td-left"><input type="checkbox" id="Label" class="checkbox-radio"><label for="Label"><span></span>Label</label></td>
       <td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
       </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label location</label></td>
-            <td class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></td>
+            <td class="table-forms-td-left"><input type="checkbox" id="LabelLoc" class="checkbox-radio"><label for="LabelLoc"><span></span>Label location</label></td>
+            <td class="table-forms-td-right"><input type="checkbox" id="Smth" class="checkbox-radio"><label for="Smth"><span></span></label><div class="form-input-margin"></div><select><option>Bottom</option></select></td>
             </tr>
       <tr>
-      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
-      <td class="table-forms-td-right"><input type="checkbox"></td>
+      <td class="table-forms-td-left"><input type="checkbox" id="AutoIconSel" class="checkbox-radio"><label for="AutoIconSel"><span></span>Automatic icon selection</label></td>
+      <td class="table-forms-td-right"><input type="checkbox" id="Smth2" class="checkbox-radio"><label for="Smth2"><span></span></label></td>
       </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (default)</label></td>
+            <td class="table-forms-td-left"><input type="checkbox" id="IconDef" class="checkbox-radio"><label for="IconDef"><span></span>Icon (default)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (problem)</label></td>
+            <td class="table-forms-td-left"><input type="checkbox" id="IconProbl" class="checkbox-radio"><label for="IconProbl"><span></span>Icon (problem)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (maintenance)</label></td>
+            <td class="table-forms-td-left"><input type="checkbox" id="IconMaint" class="checkbox-radio"><label for="IconMaint"><span></span>Icon (maintenance)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (disabled)</label></td>
+            <td class="table-forms-td-left"><input type="checkbox" id="IconDis" class="checkbox-radio"><label for="IconDis"><span></span>Icon (disabled)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
       </tbody>
@@ -503,7 +503,7 @@
             <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
             </td>
             </tr>
-            
+
             </tbody>
       </table>
    </div>

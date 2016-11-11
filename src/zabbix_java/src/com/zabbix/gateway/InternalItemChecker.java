@@ -28,7 +28,7 @@ class InternalItemChecker extends ItemChecker
 {
 	private static final Logger logger = LoggerFactory.getLogger(InternalItemChecker.class);
 
-	public InternalItemChecker(JSONObject request) throws ZabbixException
+	InternalItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
 	}

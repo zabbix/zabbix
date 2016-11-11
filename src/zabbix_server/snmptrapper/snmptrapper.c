@@ -28,7 +28,7 @@
 #include "zbxregexp.h"
 
 static int	trap_fd = -1;
-static int	trap_lastsize;
+static off_t	trap_lastsize;
 static ino_t	trap_ino = 0;
 static char	*buffer = NULL;
 static int	offset = 0;
@@ -62,7 +62,7 @@ static void	DBget_lastsize()
 static void	DBupdate_lastsize()
 {
 	DBbegin();
-	DBexecute("update globalvars set snmp_lastsize=%d", trap_lastsize);
+	DBexecute("update globalvars set snmp_lastsize=" ZBX_FS_UI64, trap_lastsize);
 	DBcommit();
 }
 
@@ -426,9 +426,9 @@ static int	read_traps()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
-	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
+	if (-1 == lseek(trap_fd, trap_lastsize, SEEK_SET))
 	{
-		error = zbx_dsprintf(error, "cannot set position to %d for \"%s\": %s", trap_lastsize,
+		error = zbx_dsprintf(error, "cannot set position to " ZBX_FS_I64 " for \"%s\": %s", trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_WARNING);
 		goto out;
@@ -444,12 +444,6 @@ static int	read_traps()
 
 	if (0 < nbytes)
 	{
-		if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)trap_lastsize + nbytes)
-		{
-			nbytes = 0;
-			goto out;
-		}
-
 		buffer[nbytes + offset] = '\0';
 		trap_lastsize += nbytes;
 		DBupdate_lastsize();
@@ -508,14 +502,6 @@ static int	open_trap_file()
 		goto out;
 	}
 
-	if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
-	{
-		error = zbx_dsprintf(error, "cannot process SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				"file size exceeds the maximum supported size of 2 GB");
-		delay_trap_logs(error, LOG_LEVEL_CRIT);
-		goto out;
-	}
-
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
@@ -569,10 +555,6 @@ static int	get_latest_data()
 			if (0 != offset)
 				parse_traps(1);
 
-			close_trap_file();
-		}
-		else if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
-		{
 			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)

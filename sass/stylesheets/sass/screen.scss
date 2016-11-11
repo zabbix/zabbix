@@ -1525,9 +1525,9 @@ footer {
 	}
 
 	label {
-		padding: 0 0 0 16px;
+		padding: 0 0 0 18px;
 		display: inline-block;
-		text-indent: -13px;
+		text-indent: -18px;
 		max-width: 600px;
 
 		input[type="checkbox"] {
@@ -1554,7 +1554,6 @@ footer {
 			margin-right: 0;
 		}
 	}
-
 }
 
 .radio-segmented {
@@ -1585,8 +1584,11 @@ footer {
 	}
 
 	input[type="radio"] {
-		position: absolute;
-		clip: rect(1px, 1px, 1px, 1px);
+		position: absolute !important;
+		top: auto !important;
+		width: 1px !important;
+		height: 1px !important;
+		@include opacity(0);
 
 		+ label {
 			color: $font-color;
@@ -1769,6 +1771,102 @@ select {
 .form-input-margin {
 	display: inline-block;
 	margin: 0 3px 0 0;
+}
+
+.checkbox-radio {
+	&[type="checkbox"] {
+		+ label span {
+			@include border-radius(2px);
+		}
+
+		&:checked + label span {
+			&::after {
+				content:'';
+				position: absolute;
+				display: block;
+				width: 7px;
+				height: 4px;
+				top: 6px;
+				left: 7px;
+				border-left: 2px solid $btn-bg-color;
+				border-bottom: 2px solid $btn-bg-color;
+				@include transform(translate(-50%, -50%) rotate(-45deg));
+			}
+		}
+
+		&:checked[disabled] + label span {
+			&::after {
+				border-color: $form-border-color !important;
+			}
+		}
+	}
+
+	&[type="radio"] {
+		+ label span {
+			@include border-radius(50%);
+		}
+
+		&:checked + label span {
+			&::after {
+				content: '';
+				position: absolute;
+				display: block;
+				width: 8px;
+				height: 8px;
+				top: 3px;
+				left: 3px;
+				background-color: $btn-bg-color;
+				@include border-radius(50%);
+			}
+		}
+
+		&:checked[disabled] + label span {
+			&::after {
+				background-color: $form-border-color !important;
+			}
+		}
+	}
+
+	position: absolute !important;
+	top: auto !important;
+	width: 1px !important;
+	height: 1px !important;
+	@include opacity(0);
+
+	+ label span {
+		position: relative;
+		display: inline-block;
+		width: 14px;
+		height: 14px;
+		margin: -4px 4px 0 0;
+		bottom: -3px;
+		border: 1px solid $form-border-color;
+		background-color: $form-bg-color;
+
+		&:active {
+			border-color: $form-border-color;
+		}
+	}
+
+	&:focus + label span {
+		border-color: $form-border-focus-color;
+	}
+
+	&:checked:focus + label span {
+		border-color: $form-border-focus-color;
+	}
+
+	&:checked[disabled] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
+
+	&[disabled] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
 }
 
 %form-check-radio-style {
