@@ -9884,6 +9884,10 @@ void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values,
 		dc_item->lastclock = values[i].ts.sec;
 		dc_item->lastlogsize = values[i].lastlogsize;
 		dc_item->mtime = values[i].mtime;
+
+		/* update nextcheck for items that are counted in queue for monitoring purposes */
+		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
+			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, dc_item->lastclock);
 	}
 
 	UNLOCK_CACHE;
