@@ -9897,6 +9897,11 @@ static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t
 
 	zbx_vector_uint64_append(nested_groupids, groupid);
 
+	/* The target group id will not be found in the configuration cache if target group was removed */
+	/* between call to this function and the configuration cache look-up below. The target group id */
+	/* is nevertheless returned so that the SELECT statements of the callers work even if no group  */
+	/* was found.                                                                                   */
+
 	if (NULL != (parent_group = zbx_hashset_search(&config->hostgroups, &groupid)))
 	{
 		if (0 == (parent_group->flags & ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS))
