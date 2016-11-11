@@ -106,7 +106,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	if (-1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
 	{
 		if (-1 == (smbios_len = lseek(fd, 0, SEEK_END)))
-			return ret;
+			goto close;
 
 		lseek(fd, 0, SEEK_SET);
 		smbuf = zbx_malloc(NULL, smbios_len);
