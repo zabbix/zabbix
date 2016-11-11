@@ -2647,7 +2647,7 @@ static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
  *                FAIL - the JSON does not have timestamp data                *
  *                                                                            *
  ******************************************************************************/
-static int	get_proxy_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv, zbx_timespec_t *ts_diff)
+static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv, zbx_timespec_t *ts_diff)
 {
 	char	tmp[32];
 
@@ -2862,7 +2862,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_proxy_timediff(jp, ts, &ts_diff))
+	if (SUCCEED != get_client_timediff(jp, ts, &ts_diff))
 	{
 		ts_diff.sec = 0;
 		ts_diff.ns = 0;
@@ -3056,7 +3056,7 @@ int	process_dhis_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **erro
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	if (SUCCEED != (ret = get_client_timediff(jp, ts, &ts_diff)))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
@@ -3191,7 +3191,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	if (SUCCEED != (ret = get_client_timediff(jp, ts, &ts_diff)))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
@@ -3521,7 +3521,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_proxy_timediff(jp, ts, &ts_diff)))
+	if (SUCCEED != (ret = get_client_timediff(jp, ts, &ts_diff)))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
