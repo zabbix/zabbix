@@ -302,6 +302,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	}
 
 	tcsetattr(f, TCSANOW, &old_options);
+	tcflush(f, TCIOFLUSH);
 	close(f);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
