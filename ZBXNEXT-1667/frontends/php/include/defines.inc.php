@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.3.0');
 define('ZABBIX_API_VERSION',	'3.3.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3030011);
+define('ZABBIX_DB_VERSION',		3030012);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -1151,6 +1151,7 @@ define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
+define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');

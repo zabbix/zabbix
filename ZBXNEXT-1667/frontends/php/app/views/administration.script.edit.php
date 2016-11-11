@@ -89,7 +89,7 @@ $scriptFormList
 			->addValue(_('Write'), PERM_READ_WRITE)
 			->setModern(true)
 	)
-	->addRow(new CLabel(_('Enable confirmation'), 'enable_confirmation'),
+	->addRow(_('Enable confirmation'),
 		(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'] == 1)
 	);
 

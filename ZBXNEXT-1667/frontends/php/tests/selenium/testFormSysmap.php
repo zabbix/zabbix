@@ -85,7 +85,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestAssertElementPresentId('cancel');
 	}
 
-		public static function create() {
+	public static function create() {
 		return [
 			[
 				[
@@ -233,23 +233,28 @@ class testFormSysmap extends CWebTest {
 	public function testFormSysmapCreate($data) {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestInputTypeWait('name', $data['name']);
+		$this->zbxTestAssertElementValue('name', $data['name']);
 
 		if (isset($data['width'])) {
 			$this->zbxTestInputTypeOverwrite('width', $data['width']);
+			$this->zbxTestAssertElementValue('width', $data['width']);
 		}
 		$width = $this->zbxTestGetValue("//input[@id='width']");
 
 		if (isset($data['height'])) {
 			$this->zbxTestInputTypeOverwrite('height', $data['height']);
+			$this->zbxTestAssertElementValue('height', $data['height']);
 		}
 		$height = $this->zbxTestGetValue("//input[@id='height']");
 
 		if (isset($data['url_name'])) {
 			$this->zbxTestInputType('urls_0_name', $data['url_name']);
+			$this->zbxTestAssertElementValue('urls_0_name', $data['url_name']);
 		}
 
 		if (isset($data['url'])) {
 			$this->zbxTestInputType('urls_0_url', $data['url']);
+			$this->zbxTestAssertElementValue('urls_0_url', $data['url']);
 		}
 
 		if (isset($data['selects'])) {
@@ -268,15 +273,17 @@ class testFormSysmap extends CWebTest {
 			$user_id = $this->zbxTestGetAttributeValue("//div[@id='userid']//li[@data-id]", 'data-id');
 		}
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestTextNotPresent('Page received incorrect data', 'Cannot add network map');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
 				$this->assertEquals(1, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$data['name']."'"));
 				break;
 
 		case TEST_BAD:
+				$this->zbxTestTextNotPresent('Network map added');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);

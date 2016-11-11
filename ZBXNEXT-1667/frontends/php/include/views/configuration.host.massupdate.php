@@ -66,12 +66,9 @@ $replaceGroups = (new CDiv(
 ))->setId('replaceGroups');
 
 $hostFormList->addRow(
-	[
-		_('Replace host groups'),
-		SPACE,
-		(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
-			->setChecked(isset($data['visible']['groups']))
-	],
+	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
+		->setLabel(_('Replace host groups'))
+		->setChecked(isset($data['visible']['groups'])),
 	$replaceGroups
 );
 
@@ -106,12 +103,9 @@ if (isset($_REQUEST['new_groups'])) {
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$hostFormList->addRow(
-		[
-			_('Add new or existing host groups'),
-			SPACE,
-			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-				->setChecked(isset($data['visible']['new_groups']))
-		],
+		(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
+			->setLabel(_('Add new or existing host groups'))
+			->setChecked(isset($data['visible']['new_groups'])),
 		(new CDiv(
 			(new CMultiSelect([
 				'name' => 'new_groups[]',
@@ -129,12 +123,9 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 }
 else {
 	$hostFormList->addRow(
-		[
-			_('New host group'),
-			SPACE,
-			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-				->setChecked(isset($data['visible']['new_groups']))
-		],
+		(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
+			->setLabel(_('New host group'))
+			->setChecked(isset($data['visible']['new_groups'])),
 		(new CDiv(
 			(new CMultiSelect([
 				'name' => 'new_groups[]',
@@ -152,12 +143,9 @@ else {
 
 // append description to form list
 $hostFormList->addRow(
-	[
-		_('Description'),
-		SPACE,
-		(new CVisibilityBox('visible[description]', 'description', _('Original')))
-			->setChecked(isset($data['visible']['description']))
-	],
+	(new CVisibilityBox('visible[description]', 'description', _('Original')))
+		->setLabel(_('Description'))
+		->setChecked(isset($data['visible']['description'])),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -168,23 +156,17 @@ foreach ($data['proxies'] as $proxie) {
 	$proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
 }
 $hostFormList->addRow(
-	[
-		_('Monitored by proxy'),
-		SPACE,
-		(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
-			->setChecked(isset($data['visible']['proxy_hostid']))
-	],
+	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
+		->setLabel(_('Monitored by proxy'))
+		->setChecked(isset($data['visible']['proxy_hostid'])),
 	$proxyComboBox
 );
 
 // append status to form list
 $hostFormList->addRow(
-	[
-		_('Status'),
-		SPACE,
-		(new CVisibilityBox('visible[status]', 'status', _('Original')))
-			->setChecked(isset($data['visible']['status']))
-	],
+	(new CVisibilityBox('visible[status]', 'status', _('Original')))
+		->setLabel(_('Status'))
+		->setChecked(isset($data['visible']['status'])),
 	new CComboBox('status', $data['status'], null, [
 		HOST_STATUS_MONITORED => _('Enabled'),
 		HOST_STATUS_NOT_MONITORED => _('Disabled')
@@ -207,26 +189,22 @@ $newTemplateTable = (new CTable())
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addRow([
-		(new CDiv([
-			new CLabel(
-				[(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1), _('Replace')],
-				'mass_replace_tpls'
-			),
-			BR(),
-			new CLabel(
-				[(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1), _('Clear when unlinking')],
-				'mass_clear_tpls'
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('mass_replace_tpls'))
+				->setLabel(_('Replace'))
+				->setChecked($data['mass_replace_tpls'] == 1)
 			)
-		]))->addClass('floatleft')
+			->addItem((new CCheckBox('mass_clear_tpls'))
+				->setLabel(_('Clear when unlinking'))
+				->setChecked($data['mass_clear_tpls'] == 1)
+			)
 	]);
 
 $templatesFormList->addRow(
-	[
-		_('Link templates'),
-		SPACE,
-		(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
-			->setChecked(isset($data['visible']['templates']))
-	],
+	(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
+		->setLabel(_('Link templates'))
+		->setChecked(isset($data['visible']['templates'])),
 	(new CDiv($newTemplateTable))
 		->setId('templateDiv')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -237,42 +215,30 @@ $ipmiFormList = new CFormList('ipmiFormList');
 
 // append ipmi to form list
 $ipmiFormList->addRow(
-	[
-		_('IPMI authentication algorithm'),
-		SPACE,
-		(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
-			->setChecked(isset($data['visible']['ipmi_authtype']))
-	],
+	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
+		->setLabel(_('IPMI authentication algorithm'))
+		->setChecked(isset($data['visible']['ipmi_authtype'])),
 	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
 $ipmiFormList->addRow(
-	[
-		_('IPMI privilege level'),
-		SPACE,
-		(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
-			->setChecked(isset($data['visible']['ipmi_privilege']))
-	],
+	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
+		->setLabel(_('IPMI privilege level'))
+		->setChecked(isset($data['visible']['ipmi_privilege'])),
 	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
-	[
-		_('IPMI username'),
-		SPACE,
-		(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
-			->setChecked(isset($data['visible']['ipmi_username']))
-	],
+	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
+		->setLabel(_('IPMI username'))
+		->setChecked(isset($data['visible']['ipmi_username'])),
 	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
-	[
-		_('IPMI password'),
-		SPACE,
-		(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
-			->setChecked(isset($data['visible']['ipmi_password']))
-	],
+	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
+		->setLabel(_('IPMI password'))
+		->setChecked(isset($data['visible']['ipmi_password'])),
 	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
@@ -280,12 +246,9 @@ $inventoryFormList = new CFormList('inventoryFormList');
 
 // append inventories to form list
 $inventoryFormList->addRow(
-	[
-		_('Inventory mode'),
-		SPACE,
-		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
-			->setChecked(isset($data['visible']['inventory_mode']))
-	],
+	(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
+		->setLabel(_('Inventory mode'))
+		->setChecked(isset($data['visible']['inventory_mode'])),
 	(new CDiv(
 		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
@@ -324,15 +287,9 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	}
 
 	$inventoryFormList->addRow(
-		[
-			$fieldInfo['title'],
-			SPACE,
-			(new CVisibilityBox(
-				'visible['.$field.']',
-				'host_inventory['.$field.']',
-				_('Original')
-			))->setChecked(isset($data['visible'][$field]))
-		],
+		(new CVisibilityBox('visible['.$field.']', 'host_inventory['.$field.']', _('Original')))
+			->setLabel($fieldInfo['title'])
+			->setChecked(isset($data['visible'][$field])),
 		$fieldInput, null, 'formrow-inventory'
 	);
 }
@@ -348,13 +305,13 @@ $encryption_table = (new CTable())
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 			->setModern(true)
 	])
-	->addRow([_('Connections from host'), [
-		new CLabel([new CCheckBox('tls_in_none'), _('No encryption')]),
-		BR(),
-		new CLabel([new CCheckBox('tls_in_psk'), _('PSK')]),
-		BR(),
-		new CLabel([new CCheckBox('tls_in_cert'), _('Certificate')])
-	]])
+	->addRow([_('Connections from host'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('tls_in_none'))->setLabel(_('No encryption')))
+			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
+			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
+	])
 	->addRow([_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	])
@@ -368,12 +325,10 @@ $encryption_table = (new CTable())
 		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	]);
 
-$encryption_form_list->addRow([
-	_('Connections'),
-	SPACE,
+$encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
-		->setChecked(isset($data['visible']['encryption']))
-	],
+		->setLabel(_('Connections'))
+		->setChecked(isset($data['visible']['encryption'])),
 	(new CDiv($encryption_table))
 		->setId('encryption_div')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

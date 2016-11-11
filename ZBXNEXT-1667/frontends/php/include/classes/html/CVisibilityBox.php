@@ -40,6 +40,20 @@ class CVisibilityBox extends CCheckBox {
 		insert_javascript_for_visibilitybox();
 	}
 
+	/**
+	 * Set the label for the checkbox and put it on the left.
+	 *
+	 * @param string $label
+	 *
+	 * @return CVisibilityBox
+	 */
+	public function setLabel($label) {
+		parent::setLabel($label.SPACE);
+		$this->setLabelPosition(self::LABEL_POSITION_LEFT);
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
 		if (!isset($this->attributes['checked'])) {
 			foreach ($this->object_name as $obj_name) {

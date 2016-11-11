@@ -66,7 +66,7 @@ class CJsonRpc {
 			return $this->json->encode($this->_response[0]);
 		}
 
-		if ($this->_jsonDecoded === null || $this->_jsonDecoded == []) {
+		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded == []) {
 			$this->jsonError(null, '-32600', null, null, true);
 			return $this->json->encode($this->_response[0]);
 		}

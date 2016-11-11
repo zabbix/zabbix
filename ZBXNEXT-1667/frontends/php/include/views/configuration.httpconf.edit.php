@@ -258,13 +258,6 @@ if (!$this->data['form_refresh']) {
 if (!empty($this->data['httptestid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
-	if ($this->data['templated'] == 0) {
-		$buttons[] = new CButtonDelete(
-			_('Delete web scenario?'),
-			url_param('form').url_param('httptestid').url_param('hostid')
-		);
-	}
-
 	if ($this->data['host']['status'] == HOST_STATUS_MONITORED
 			|| $this->data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 
@@ -275,6 +268,8 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid'])))
+		->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel();
 
 	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

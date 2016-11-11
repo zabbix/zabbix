@@ -118,16 +118,15 @@ foreach ($mediatypes as &$mediatype) {
 }
 unset($mediatype);
 
-$frm_row = [];
+$frm_row = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$frm_row[] = new CLabel([
-		(new CCheckBox('severity['.$severity.']', $severity))->setChecked(str_in_array($severity, $severities)),
-		getSeverityName($severity, $config)
-	], 'severity['.$severity.']');
-	$frm_row[] = BR();
+	$frm_row->addItem(
+		(new CCheckBox('severity['.$severity.']', $severity))
+			->setLabel(getSeverityName($severity, $config))
+			->setChecked(str_in_array($severity, $severities))
+	);
 }
-array_pop($frm_row);
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
