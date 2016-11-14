@@ -1,7 +1,7 @@
 Changes for 3.3.0
 
 New features:
-..F....... [ZBXNEXT-707] implemented full clone functionality for all types of screens; fixed screen clone with fields under sharing tab (Cemeris)
+..F....... [ZBXNEXT-707] implemented full clone functionality for all types of screens (Cemeris)
 ..F....PS. [ZBXNEXT-2970] increased maximum supported SNMP trapper file size (vso)
 .....J.... [ZBXNEXT-1141] added support for AtomicBoolean, AtomicInteger, and AtomicLong to Java gateway (asaveljevs)
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
@@ -23,6 +23,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11475] fixed copying sharing properties while cloning screen or network maps (Cemeris)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 A......... [ZBX-11357] implemented exporting and importing of triggers and graphs when they use web items (Cemeris)
 ..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
@@ -258,6 +259,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11475] fixed copying sharing properties while cloning screen or network maps (Cemeris)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
