@@ -450,56 +450,32 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	else
 		ret = ZBX_DB_FAIL;
 
-	if (0 == csid)
+	while (ZBX_DB_OK == ret)
 	{
-		if (ZBX_DB_OK == ret)
+		/* initialize environment */
+		if (OCI_SUCCESS == (err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT, (dvoid *)0,
+				(dvoid * (*)(dvoid *,size_t))0, (dvoid * (*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0, csid, csid)))
 		{
-			/* initialize environment */
-			err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-					(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-					(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-					(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+			if (0 != csid)
+				break;	/* environment with UTF8 character set successfully created */
 
-			if (OCI_SUCCESS != err)
-			{
-				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
-				ret = ZBX_DB_FAIL;
-			}
-		}
-
-		if (ZBX_DB_OK == ret)
-		{
-			/* find out the id of UTF8 character set */
-			if (0 != (csid = OCINlsCharSetNameToId(oracle.envhp, (const oratext *)"UTF8")))
-			{
-				/* get rid of this environment to create a better one with OCIEnvNlsCreate() */
-				OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-				oracle.envhp = NULL;
-			}
-			else
+			/* try to find out the id of UTF8 character set */
+			if (0 == (csid = OCINlsCharSetNameToId(oracle.envhp, (const oratext *)"UTF8")))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Cannot find out the ID of \"UTF8\" character set."
 						" Relying on current \"NLS_LANG\" settings.");
+				break;	/* use default environment with character set derived from NLS_LANG */
 			}
+
+			/* get rid of this environment to create a better one on the next iteration */
+			OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+			oracle.envhp = NULL;
 		}
-	}
-
-	if (0 != csid)
-	{
-		if (ZBX_DB_OK == ret)
+		else
 		{
-			/* initialize environment with UTF-8 support */
-			err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-					(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-					(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-					(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0,
-					csid, csid);
-
-			if (OCI_SUCCESS != err)
-			{
-				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
-				ret = ZBX_DB_FAIL;
-			}
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
+			ret = ZBX_DB_FAIL;
 		}
 	}
 
