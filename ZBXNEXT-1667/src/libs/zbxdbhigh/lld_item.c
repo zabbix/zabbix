@@ -855,7 +855,6 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
-		char	*proto_parameter;
 		/* substitute LLD macros in the part of the string preceding function parameters */
 
 		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
@@ -871,17 +870,14 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 		/* substitute LLD macros in function parameters */
 
 		e[par_r] = '\0';
-		proto_parameter = zbx_strdup(NULL, e + par_l + 1);
-		e[par_r] = ')';
-
-		ret = substitute_function_parameters(proto_parameter, 1, &exp, &exp_alloc, &exp_offset,
+		ret = substitute_function_parameters(e + par_l + 1, 1, &exp, &exp_alloc, &exp_offset,
 				jp_row, error, max_error_len);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
-
-		zbx_free(proto_parameter);
+		e[par_r] = ')';
 
 		if (SUCCEED != ret)
 			goto out;
+
 	}
 
 	/* substitute LLD macros in the remaining part */
