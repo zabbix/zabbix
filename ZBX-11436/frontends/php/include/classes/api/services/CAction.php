@@ -850,10 +850,9 @@ class CAction extends CApiService {
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
-						$operation['opmessage']['operationid'] = $operationId;
-						$opMessagesToInsert[] = $operation['opmessage'];
-					}
+					$operation['opmessage']['operationid'] = $operationId;
+					$opMessagesToInsert[] = $operation['opmessage'];
+
 					if (isset($operation['opmessage_usr'])) {
 						foreach ($operation['opmessage_usr'] as $user) {
 							$opMessageUsrsToInsert[] = [
@@ -923,10 +922,8 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
-						$operation['opmessage']['operationid'] = $operationId;
-						$opMessagesToInsert[] = $operation['opmessage'];
-					}
+					$operation['opmessage']['operationid'] = $operationId;
+					$opMessagesToInsert[] = $operation['opmessage'];
 					break;
 			}
 			if (isset($operation['opconditions'])) {
@@ -1460,7 +1457,7 @@ class CAction extends CApiService {
 
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
-					if (!array_key_exists('opmessage', $operation)) {
+					if (!array_key_exists('opmessage', $operation) || !is_array($operation['opmessage'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('No message specified for action operation.')
 						);
@@ -1672,7 +1669,7 @@ class CAction extends CApiService {
 					}
 					break;
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (!array_key_exists('opmessage', $operation)) {
+					if (!array_key_exists('opmessage', $operation) || !is_array($operation['opmessage'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('No message specified for action operation.')
 						);
