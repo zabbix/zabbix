@@ -180,7 +180,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($agentInterfaceAvailable) {
 			foreach ($data as $hostId => $texts) {
 				if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $texts)) {
-					$dbInterface = DBfetch(DBselect(
+					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT i.hostid,i.ip,i.dns,i.useip'.
 						' FROM interface i'.
 						' WHERE i.main='.INTERFACE_PRIMARY.
@@ -188,22 +188,32 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							' AND i.hostid='.zbx_dbstr($hostId)
 					));
 
-					$dbInterfaceTexts = array($dbInterface['ip'], $dbInterface['dns']);
+					if ($dbInterfaces) {
+						$dbInterface = $dbInterfaces[0];
+						$dbInterfaceTexts = array($dbInterface['ip'], $dbInterface['dns']);
 
-					if ($this->findMacros(self::PATTERN_HOST, $dbInterfaceTexts)
-							|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $dbInterfaceTexts)) {
-						$saveCurrentConfig = $this->config;
+						if ($this->findMacros(self::PATTERN_HOST, $dbInterfaceTexts)
+								|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $dbInterfaceTexts)) {
+							$saveCurrentConfig = $this->config;
 
-						$dbInterfaceMacros = $this->resolve(array(
-							'config' => 'hostInterfaceIpDnsAgentPrimary',
-							'data' => array($hostId => $dbInterfaceTexts)
-						));
+							$dbInterfaceMacros = $this->resolve(array(
+								'config' => 'hostInterfaceIpDnsAgentPrimary',
+								'data' => array($hostId => $dbInterfaceTexts)
+							));
 
-						$dbInterfaceMacros = reset($dbInterfaceMacros);
-						$dbInterface['ip'] = $dbInterfaceMacros[0];
-						$dbInterface['dns'] = $dbInterfaceMacros[1];
+							$dbInterfaceMacros = reset($dbInterfaceMacros);
+							$dbInterface['ip'] = $dbInterfaceMacros[0];
+							$dbInterface['dns'] = $dbInterfaceMacros[1];
 
-						$this->config = $saveCurrentConfig;
+							$this->config = $saveCurrentConfig;
+						}
+					}
+					else {
+						$dbInterface = array(
+							'ip' => UNRESOLVED_MACRO_STRING,
+							'dns' => UNRESOLVED_MACRO_STRING,
+							'useip' => false
+						);
 					}
 
 					foreach ($interfaceMacros as $interfaceMacro) {
@@ -216,7 +226,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								$macros[$hostId][$interfaceMacro] = $dbInterface['dns'];
 								break;
 							case '{HOST.CONN}':
-								$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
+								$macros[$hostId][$interfaceMacro] = $dbInterface['useip']
+									? $dbInterface['ip']
+									: $dbInterface['dns'];
 								break;
 						}
 					}
@@ -226,62 +238,44 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// interface macros, macro should be resolved to interface with highest priority
 		if ($interfaceWithoutPortMacrosAvailable) {
-			$interfaces = array();
+			$interfaces_by_priority = array();
 
-			$dbInterfaces = DBselect(
-				'SELECT i.hostid,i.ip,i.dns,i.useip,i.type'.
+			$interfaces = DBfetchArray(DBselect(
+				'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
 				' FROM interface i'.
 				' WHERE i.main='.INTERFACE_PRIMARY.
 					' AND '.dbConditionInt('i.hostid', $hostIds).
 					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
-			);
+			));
 
-			while ($dbInterface = DBfetch($dbInterfaces)) {
-				$hostId = $dbInterface['hostid'];
+			$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 
-				if (isset($interfaces[$hostId])) {
-					$dbPriority = $this->interfacePriorities[$dbInterface['type']];
-					$existPriority = $this->interfacePriorities[$interfaces[$hostId]['type']];
+			// Items with no interfaces must collect interface data from host.
+			foreach ($interfaces as $interface) {
+				$hostid = $interface['hostid'];
+				$priority = $this->interfacePriorities[$interface['type']];
 
-					if ($dbPriority > $existPriority) {
-						$interfaces[$hostId] = $dbInterface;
-					}
-				}
-				else {
-					$interfaces[$hostId] = $dbInterface;
+				if (!array_key_exists($hostid, $interfaces_by_priority)
+						|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
+					$interfaces_by_priority[$hostid] = $interface;
 				}
 			}
 
-			if ($interfaces) {
-				foreach ($interfaces as $hostId => $interface) {
-					if ($interfaceMacros = $this->findMacros(self::PATTERN_INTERFACE, $data[$hostId])) {
-						foreach ($interfaceMacros as $interfaceMacro) {
-							switch ($interfaceMacro) {
-								case '{IPADDRESS}':
-								case '{HOST.IP}':
-									$macros[$hostId][$interfaceMacro] = $interface['ip'];
-									break;
-								case '{HOST.DNS}':
-									$macros[$hostId][$interfaceMacro] = $interface['dns'];
-									break;
-								case '{HOST.CONN}':
-									$macros[$hostId][$interfaceMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-									break;
-							}
-
-							// Resolving macros to AGENT main interface. If interface is AGENT macros stay unresolved.
-							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
-								if ($this->findMacros(self::PATTERN_HOST, array($macros[$hostId][$interfaceMacro]))
-										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, array($macros[$hostId][$interfaceMacro]))) {
-									// attention recursion!
-									$macrosInMacros = $this->resolveTexts(array($hostId => array($macros[$hostId][$interfaceMacro])));
-									$macros[$hostId][$interfaceMacro] = $macrosInMacros[$hostId][0];
-								}
-								elseif ($this->findMacros(self::PATTERN_INTERFACE, array($macros[$hostId][$interfaceMacro]))) {
-									$macros[$hostId][$interfaceMacro] = UNRESOLVED_MACRO_STRING;
-								}
-							}
-						}
+			foreach ($interfaces_by_priority as $hostid => $interface) {
+				foreach ($this->findMacros(self::PATTERN_INTERFACE, $data[$hostid]) as $interfaceMacro) {
+					switch ($interfaceMacro) {
+						case '{IPADDRESS}':
+						case '{HOST.IP}':
+							$macros[$hostid][$interfaceMacro] = $interface['ip'];
+							break;
+						case '{HOST.DNS}':
+							$macros[$hostid][$interfaceMacro] = $interface['dns'];
+							break;
+						case '{HOST.CONN}':
+							$macros[$hostid][$interfaceMacro] = $interface['useip']
+								? $interface['ip']
+								: $interface['dns'];
+							break;
 					}
 				}
 			}
@@ -906,21 +900,72 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($macros) {
 			$dbItems = API::Item()->get(array(
 				'itemids' => $itemIds,
-				'selectInterfaces' => array('ip', 'dns', 'useip'),
-				'selectHosts' => array('host', 'name'),
+				'selectHosts' => array('hostid', 'host', 'name'),
 				'webitems' => true,
-				'output' => array('itemid'),
+				'output' => array('itemid', 'interfaceid'),
 				'filter' => array('flags' => null),
 				'preservekeys' => true
 			));
 
-			foreach ($macros as $key => $macroData) {
-				if (isset($dbItems[$macroData['itemid']])) {
-					$host = reset($dbItems[$macroData['itemid']]['hosts']);
-					$interface = reset($dbItems[$macroData['itemid']]['interfaces']);
+			$hostids = array();
 
-					// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-					if (!$interface) {
+			foreach ($macros as $key => $macroData) {
+				$itemid = $macroData['itemid'];
+
+				if (array_key_exists($itemid, $dbItems)) {
+					foreach ($macroData['macros'] as $macro => $value) {
+						switch ($macro) {
+							case '{HOST.IP}':
+							case '{IPADDRESS}': // deprecated
+							case '{HOST.DNS}':
+							case '{HOST.CONN}':
+								$hostids[$dbItems[$itemid]['hosts'][0]['hostid']] = true;
+								break 2;
+						}
+					}
+				}
+			}
+
+			$interfaces = array();
+			$interfaces_by_priority = array();
+
+			if ($hostids) {
+				$interfaces = DBfetchArray(DBselect(
+					'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
+					' FROM interface i'.
+					' WHERE '.dbConditionInt('i.hostid', array_keys($hostids)).
+						' AND '.dbConditionInt('i.type', $this->interfacePriorities)
+				));
+
+				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
+				$interfaces = zbx_toHash($interfaces, 'interfaceid');
+
+				// Items with no interfaces must collect interface data from host.
+				foreach ($interfaces as $interface) {
+					$hostid = $interface['hostid'];
+					$priority = $this->interfacePriorities[$interface['type']];
+
+					if ($interface['main'] == INTERFACE_PRIMARY && (!array_key_exists($hostid, $interfaces_by_priority)
+							|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']])) {
+						$interfaces_by_priority[$hostid] = $interface;
+					}
+				}
+			}
+
+			foreach ($macros as $key => $macroData) {
+				$itemid = $macroData['itemid'];
+
+				if (array_key_exists($itemid, $dbItems)) {
+					$host = $dbItems[$itemid]['hosts'][0];
+					$interfaceid = $dbItems[$itemid]['interfaceid'];
+
+					if ($interfaceid != 0 && array_key_exists($interfaceid, $interfaces)) {
+						$interface = $interfaces[$interfaceid];
+					}
+					elseif (array_key_exists($host['hostid'], $interfaces_by_priority)) {
+						$interface = $interfaces_by_priority[$host['hostid']];
+					}
+					else {
 						$interface = array(
 							'ip' => UNRESOLVED_MACRO_STRING,
 							'dns' => UNRESOLVED_MACRO_STRING,
@@ -954,8 +999,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						}
 					}
 				}
-
-				unset($macros[$key]['itemid']);
 			}
 		}
 
