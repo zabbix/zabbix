@@ -479,7 +479,6 @@ ZBX_DC_CONFIG_TABLE;
 typedef struct
 {
 	zbx_uint64_t	conditionid;
-
 	unsigned char	conditiontype;
 	unsigned char	op;
 	const char	*value;
