@@ -8,6 +8,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11475] fixed copying sharing properties while cloning screen or network maps (Cemeris)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
 ..F....... [ZBX-11390] fixed error hint displaying (Oleg)
