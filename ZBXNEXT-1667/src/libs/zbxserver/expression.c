@@ -4896,3 +4896,90 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 	return ret;
 }
+
+int	substitute_function_parameters(char *e, size_t par_l, size_t par_r, unsigned char key_in_param,
+		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	const char	*__function_name = "substitute_function_parameters";
+	int		ret = SUCCEED;
+	size_t		sep_pos;
+	char		*param = NULL, *p;
+	unsigned char	in_parenthesis = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if ('(' == e[par_l] && ')' == e[par_r])
+	{
+		in_parenthesis = 1;
+		par_l++;
+	}
+
+	for (p = e + par_l; p - e < par_r ; p += sep_pos + 1)
+	{
+		size_t	param_pos, param_len;
+		int	quoted;
+
+		e[par_r] = '\0';
+		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+
+		if (1 == in_parenthesis)
+			e[par_r] = ')';
+
+		/* copy what was before the parameter */
+		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
+
+		/* prepare the parameter (macro substitutions and quoting) */
+
+		zbx_free(param);
+		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
+
+		if (1 == key_in_param && p - e == par_l)
+		{
+			char	*key = NULL, *host = NULL;
+
+			if (SUCCEED != parse_host_key(param, &host, &key) ||
+					SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+							MACRO_TYPE_ITEM_KEY, NULL, 0))
+			{
+				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
+				zbx_free(host);
+				zbx_free(key);
+				ret = FAIL;
+				goto out;
+			}
+
+			zbx_free(param);
+			if (NULL != host)
+			{
+				param = zbx_dsprintf(NULL, "%s:%s", host, key);
+				zbx_free(host);
+				zbx_free(key);
+			}
+			else
+				param = key;
+		}
+		else
+			substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+
+		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		{
+			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
+			ret = FAIL;
+			goto out;
+		}
+
+		/* copy the parameter */
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, param);
+
+		/* copy what was after the parameter (including separator) */
+		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
+				sep_pos - param_pos - param_len + 1);
+	}
+out:
+	zbx_free(param);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
