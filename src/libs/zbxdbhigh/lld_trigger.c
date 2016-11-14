@@ -1024,7 +1024,7 @@ static int	lld_parameter_make(char **proto_parameter, struct zbx_json_parse *jp_
 	size_t		exp_alloc = 0, exp_offset = 0;
 	char		*exp = NULL, err[MAX_STRING_LEN];
 
-	if (SUCCEED == (ret = substitute_function_parameters(*proto_parameter, 0, strlen(*proto_parameter), 0,
+	if (SUCCEED == (ret = substitute_function_parameters(*proto_parameter, 0,
 			&exp, &exp_alloc, &exp_offset, jp_row,
 			err, sizeof(err))))
 	{

@@ -4897,34 +4897,26 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	return ret;
 }
 
-int	substitute_function_parameters(char *e, size_t par_l, size_t par_r, unsigned char key_in_param,
+int	substitute_function_parameters(char *e, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_function_parameters";
 	int		ret = SUCCEED;
-	size_t		sep_pos;
+	size_t		sep_pos, len;
 	char		*param = NULL, *p;
 	unsigned char	in_parenthesis = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if ('(' == e[par_l] && ')' == e[par_r])
-	{
-		in_parenthesis = 1;
-		par_l++;
-	}
+	len = strlen(e);
 
-	for (p = e + par_l; p - e < par_r ; p += sep_pos + 1)
+	for (p = e; p - e < len ; p += sep_pos + 1)
 	{
 		size_t	param_pos, param_len;
 		int	quoted;
 
-		e[par_r] = '\0';
 		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
-
-		if (1 == in_parenthesis)
-			e[par_r] = ')';
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
@@ -4934,7 +4926,7 @@ int	substitute_function_parameters(char *e, size_t par_l, size_t par_r, unsigned
 		zbx_free(param);
 		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
-		if (1 == key_in_param && p - e == par_l)
+		if (1 == key_in_param && p - e == 0)
 		{
 			char	*key = NULL, *host = NULL;
 
