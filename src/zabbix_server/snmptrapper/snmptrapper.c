@@ -52,7 +52,7 @@ static void	DBget_lastsize()
 		trap_lastsize = 0;
 	}
 	else
-		trap_lastsize = atoi(row[0]);
+		ZBX_STR2UINT64(trap_lastsize, row[0]);
 
 	DBfree_result(result);
 
@@ -424,7 +424,7 @@ static int	read_traps()
 	int		nbytes = 0;
 	char		*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:" ZBX_FS_I64, __function_name, trap_lastsize);
 
 	if (-1 == lseek(trap_fd, trap_lastsize, SEEK_SET))
 	{
