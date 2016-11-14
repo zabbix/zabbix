@@ -3606,23 +3606,38 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_IP, 0);
+				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.dns_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_DNS, 0);
+				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.addr);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_CONN, 0);
+				}
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
