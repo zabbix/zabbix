@@ -134,7 +134,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter-space');
 
 		switch ($result) {
 			case TEST_GOOD:
@@ -277,8 +277,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClick('add_item');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
 		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClickWait('add');

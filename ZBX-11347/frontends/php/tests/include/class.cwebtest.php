@@ -213,6 +213,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
 	}
 
+	public function zbxTestDoubleClickLinkText($link_text, $id) {
+		$this->zbxTestClickLinkTextWait($link_text);
+		if (!$this->zbxTestElementPresentId($id)){
+			$this->zbxTestClickLinkTextWait($link_text);
+		}
+	}
+
 	public function zbxTestClickButtonText($button_text) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"));
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"))->click();
@@ -227,6 +234,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 	}
 
+	public function zbxTestDoubleClick($click_id, $id) {
+		$this->zbxTestClickWait($click_id);
+		if (!$this->zbxTestElementPresentId($id)){
+			$this->zbxTestClickWait($click_id);
+		}
+	}
+
+	public function zbxTestDoubleClickBeforeMessage($click_id, $id) {
+		$this->zbxTestClickWait($click_id);
+		$msg = count($this->webDriver->findElements(WebDriverBy::className('msg-bad')));
+		if (!$this->zbxTestElementPresentId($id) and $msg === 0){
+			$this->zbxTestClickWait($click_id);
+		}
+	}
+
 	public function zbxTestClickXpath($xpath) {
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
 	}
@@ -234,6 +256,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	public function zbxTestClickXpathWait($xpath) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	public function zbxTestDoubleClickXpath($click_xpath, $id) {
+		$this->zbxTestClickXpathWait($click_xpath);
+		if (!$this->zbxTestElementPresentId($id)){
+			$this->zbxTestClickXpathWait($click_xpath);
+		}
 	}
 
 	public function zbxTestHrefClickWait($href) {
@@ -317,6 +346,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestGetSelectedLabel ($id) {
 		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']//option[@selected='selected']"))->getText();
+	}
+
+	public function zbxTestElementPresentId($id) {
+		$elements = $this->webDriver->findElements(WebDriverBy::id($id));
+
+		if (count($elements) === 0) {
+			return false;
+		}
+
+		return true;
 	}
 
 		public function zbxTestAssertElementPresentId($id) {
@@ -440,6 +479,24 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		});
 	}
 
+	public function zbxTestClickAndSwitchToNewWindow($xpath) {
+		$this->zbxTestClickXpathWait($xpath);
+			try {
+				$this->webDriver->wait(30)->until(function () {
+				$handles = count($this->webDriver->getWindowHandles());
+				if ($handles > 1) {
+					$all = $this->webDriver->getWindowHandles();
+					return $this->webDriver->switchTo()->window(end($all));
+				}
+				}
+				);
+			}
+			catch (TimeoutException $ex) {
+				$this->zbxTestClickXpathWait($xpath);
+				$this->webDriver->switchTo()->window('zbx_popup');
+			}
+	}
+
 	public function zbxTestWaitWindowClose() {
 		$this->webDriver->wait(10)->until(function () {
 			try {
@@ -456,6 +513,37 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestCheckFatalErrors();
 	}
 
+	public function zbxTestClickLinkAndWaitWindowClose($link) {
+		$this->zbxTestClickLinkTextWait($link);
+		try {
+			$this->webDriver->wait(10)->until(function () {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles == 1) {
+						return $this->webDriver->switchTo()->window('');
+					}
+				}
+			);
+		}
+		catch (TimeoutException $ex) {
+			$this->zbxTestClickLinkTextWait($link);
+			return $this->webDriver->switchTo()->window('');
+		}
+
+		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function zbxTestClickAndAcceptAlert($id) {
+		$this->zbxTestClickWait($id);
+			try {
+				$this->webDriver->wait(10)->until(WebDriverExpectedCondition::alertIsPresent());
+				$this->webDriver->switchTo()->alert()->accept();
+			}
+			catch (TimeoutException $ex) {
+				$this->zbxTestClickWait($id);
+				$this->webDriver->switchTo()->alert()->accept();
+			}
+	}
+
 	public function zbxTestGetDropDownElements($dropdownId) {
 		$optionCount = count($this->webDriver->findElements(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option')));
 		$optionList = [];
@@ -470,8 +558,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestAssertElementValue($id, $value) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
-		$element = $this->webDriver->findElement(WebDriverBy::id($id));
-		$this->assertEquals($value, $element->getAttribute('value'));
+		$element = $this->webDriver->findElement(WebDriverBy::id($id))->getAttribute('value');
+		$this->assertEquals($value, $element);
 	}
 
 	public function zbxTestGetValue($xpath) {

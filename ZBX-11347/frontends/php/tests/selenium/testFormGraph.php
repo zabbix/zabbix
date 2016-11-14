@@ -450,6 +450,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -843,7 +844,7 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {
-			$this->zbxTestInputTypeWait('name', $data['name']);
+			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
@@ -863,9 +864,8 @@ class testFormGraph extends CWebTest {
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$link."']");
-				$this->zbxTestClickLinkTextWait($link);
+				$this->zbxTestClickLinkAndWaitWindowClose($link);
 
-				$this->zbxTestWaitWindowClose();
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
 				$this->zbxTestTextPresent($this->host . ': ' . $link);
 
@@ -950,9 +950,8 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
 			$this->zbxTestAssertElementPresentXpath("//a[text()='".$this->itemSimple."']");
-			$this->zbxTestClickLinkTextWait($this->itemSimple);
+			$this->zbxTestClickLinkAndWaitWindowClose($this->itemSimple);
 
-			$this->zbxTestWaitWindowClose();
 			$ymax_name = $data['ymax_name'];
 			$ymax_nameValue = $this->zbxTestGetValue("//input[@id='ymax_name']");
 			$this->assertEquals($this->host.": $ymax_name", $ymax_nameValue);

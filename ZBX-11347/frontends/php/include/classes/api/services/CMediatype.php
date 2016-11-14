@@ -184,7 +184,8 @@ class CMediatype extends CApiService {
 			}
 
 			// Check required parameters.
-			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
+			$missing_keys = array_diff($required_fields, array_keys($mediatype));
+
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Media type is missing parameters: %1$s', implode(', ', $missing_keys))

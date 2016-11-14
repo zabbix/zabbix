@@ -225,6 +225,10 @@ class CTemplateScreen extends CScreen {
 		}
 
 		$screenIds = array_keys($result);
+		$graphids = [];
+		$itemids = [];
+		$graph_prototypeids = [];
+		$item_prototypeids = [];
 
 		// adding screenitems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
@@ -246,6 +250,12 @@ class CTemplateScreen extends CScreen {
 					case SCREEN_RESOURCE_PLAIN_TEXT:
 						$itemids[$screenItem['resourceid']] = $screenItem['resourceid'];
 						break;
+					case SCREEN_RESOURCE_LLD_GRAPH:
+						$graph_prototypeids[$screenItem['resourceid']] = $screenItem['resourceid'];
+						break;
+					case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+						$item_prototypeids[$screenItem['resourceid']] = $screenItem['resourceid'];
+						break;
 				}
 			}
 
@@ -256,10 +266,15 @@ class CTemplateScreen extends CScreen {
 			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
 		}
 
+		$realGraphs = [];
+		$realItems = [];
+		$real_graph_prototypes = [];
+		$real_item_prototypes = [];
+
 		// creating linkage of template -> real objects
 		if (!is_null($options['selectScreenItems']) && !is_null($options['hostids'])) {
 			// prepare graphs
-			if (!empty($graphids)) {
+			if ($graphids) {
 				$tplGraphs = API::Graph()->get([
 					'output' => ['graphid', 'name'],
 					'graphids' => $graphids,
@@ -275,7 +290,7 @@ class CTemplateScreen extends CScreen {
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
-				$realGraphs = [];
+
 				foreach ($dbGraphs as $graph) {
 					$host = reset($graph['hosts']);
 					unset($graph['hosts']);
@@ -287,8 +302,37 @@ class CTemplateScreen extends CScreen {
 				}
 			}
 
+			// prepare graphprototypes
+			if ($graph_prototypeids) {
+				$tpl_graph_prototypes = API::GraphPrototype()->get([
+					'output' => ['graphid', 'name'],
+					'graphids' => $graph_prototypeids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$db_graph_prototypes = API::GraphPrototype()->get([
+					'output' => ['graphid', 'name'],
+					'selectHosts' => ['hostid'],
+					'hostids' => $options['hostids'],
+					'filter' => ['name' => zbx_objectValues($tpl_graph_prototypes, 'name')],
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($db_graph_prototypes as $graph) {
+					$host = reset($graph['hosts']);
+					unset($graph['hosts']);
+
+					if (!array_key_exists($host['hostid'], $real_graph_prototypes)) {
+						$real_graph_prototypes[$host['hostid']] = [];
+					}
+					$real_graph_prototypes[$host['hostid']][$graph['name']] = $graph;
+				}
+			}
+
 			// prepare items
-			if (!empty($itemids)) {
+			if ($itemids) {
 				$tplItems = API::Item()->get([
 					'output' => ['itemid', 'key_', 'hostid'],
 					'itemids' => $itemids,
@@ -304,7 +348,6 @@ class CTemplateScreen extends CScreen {
 					'preservekeys' => true
 				]);
 
-				$realItems = [];
 				foreach ($dbItems as $item) {
 					unset($item['hosts']);
 
@@ -312,6 +355,33 @@ class CTemplateScreen extends CScreen {
 						$realItems[$item['hostid']] = [];
 					}
 					$realItems[$item['hostid']][$item['key_']] = $item;
+				}
+			}
+
+			// prepare itemprototypes
+			if ($item_prototypeids) {
+				$tpl_item_prototypes = API::ItemPrototype()->get([
+					'output' => ['itemid', 'key_', 'hostid'],
+					'itemids' => $item_prototypeids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				$db_item_prototypes = API::ItemPrototype()->get([
+					'output' => ['itemid', 'key_', 'hostid'],
+					'hostids' => $options['hostids'],
+					'filter' => ['key_' => zbx_objectValues($tpl_item_prototypes, 'key_')],
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($db_item_prototypes as $item) {
+					unset($item['hosts']);
+
+					if (!array_key_exists($item['hostid'], $real_item_prototypes)) {
+						$real_item_prototypes[$item['hostid']] = [];
+					}
+					$real_item_prototypes[$item['hostid']][$item['key_']] = $item;
 				}
 			}
 		}
@@ -358,6 +428,14 @@ class CTemplateScreen extends CScreen {
 							case SCREEN_RESOURCE_PLAIN_TEXT:
 								$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
 								$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
+								break;
+							case SCREEN_RESOURCE_LLD_GRAPH:
+								$name = $tpl_graph_prototypes[$screenitem['resourceid']]['name'];
+								$screenitem['real_resourceid'] = $real_graph_prototypes[$hostid][$name]['graphid'];
+								break;
+							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+								$item_key = $tpl_item_prototypes[$screenitem['resourceid']]['key_'];
+								$screenitem['real_resourceid'] = $real_item_prototypes[$hostid][$item_key]['itemid'];
 								break;
 						}
 					}

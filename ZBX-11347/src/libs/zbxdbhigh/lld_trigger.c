@@ -1361,6 +1361,11 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: value \"%s\" is too long.\n",
 				(0 != trigger->triggerid ? "update" : "create"), *field);
 	}
+	else if (ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION == flag && '\0' == **field)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s trigger: name is empty.\n",
+				(0 != trigger->triggerid ? "update" : "create"));
+	}
 	else
 		return;
 
