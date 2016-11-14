@@ -277,7 +277,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
-		$this->zbxTestClickAndSwitchToNewWindow('add_item');
+		$this->zbxTestClickAndSwitchToNewWindow("//button[@id='add_item']");
 		$this->zbxTestClickLinkTextWait('testInheritanceItem1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClickWait('add');
