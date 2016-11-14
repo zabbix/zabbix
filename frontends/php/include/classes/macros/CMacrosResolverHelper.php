@@ -76,6 +76,7 @@ class CMacrosResolverHelper {
 	 * @param string $interfaces[n]['main']
 	 * @param string $interfaces[n]['ip']
 	 * @param string $interfaces[n]['dns']
+	 * @param string $interfaces[n]['port']
 	 *
 	 * @return array
 	 */
