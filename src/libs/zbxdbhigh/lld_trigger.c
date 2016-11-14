@@ -1018,23 +1018,20 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 	return buffer;
 }
 
-static int	lld_parameter_make(char **proto_parameter, struct zbx_json_parse *jp_row, char **error)
+static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *jp_row, char **error)
 {
 	int		ret;
 	size_t		exp_alloc = 0, exp_offset = 0;
-	char		*exp = NULL, err[MAX_STRING_LEN];
+	char		err[MAX_STRING_LEN];
 
-	if (SUCCEED == (ret = substitute_function_parameters(*proto_parameter, 0,
-			&exp, &exp_alloc, &exp_offset, jp_row,
+	*exp = NULL;
+
+	if (FAIL == (ret = substitute_function_parameters(e, 0,
+			exp, &exp_alloc, &exp_offset, jp_row,
 			err, sizeof(err))))
 	{
-		zbx_free(*proto_parameter);
-		*proto_parameter = exp;
-	}
-	else
-	{
 		*error = zbx_strdup(*error, err);
-		zbx_free(exp);
+		zbx_free(*exp);
 	}
 
 	return ret;
@@ -1058,8 +1055,7 @@ static int	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_
 			break;
 	}
 
-	proto_parameter = zbx_strdup(NULL, function_proto->parameter);
-	if (FAIL == (ret = lld_parameter_make(&proto_parameter, jp_row, error)))
+	if (FAIL == (ret = lld_parameter_make(function_proto->parameter, &proto_parameter, jp_row, error)))
 		goto clean;
 
 	if (i == functions->values_num)
