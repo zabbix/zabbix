@@ -81,11 +81,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS.')
 				),
 				array(
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
 				),
 				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>]',
 					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
@@ -343,11 +343,11 @@ class CHelpItems {
 					'description' => _('Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression')
 				),
 				array(
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
 				),
 				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns.record[<ip>,name,<type>,<timeout>,<count>]',
 					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(

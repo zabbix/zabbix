@@ -253,11 +253,15 @@ int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
+typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
+
 typedef struct
 {
 	const char	*mode;
 	int		(*function)();
 }
 MODE_FUNCTION;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif
