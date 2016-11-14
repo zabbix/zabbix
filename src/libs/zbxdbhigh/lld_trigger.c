@@ -1018,12 +1018,34 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 	return buffer;
 }
 
-static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions,
-		zbx_uint64_t itemid, struct zbx_json_parse *jp_row)
+static int	lld_parameter_make(char **proto_parameter, struct zbx_json_parse *jp_row, char **error)
 {
-	int			i;
+	int		ret;
+	size_t		exp_alloc = 0, exp_offset = 0;
+	char		*exp = NULL, err[MAX_STRING_LEN];
+
+	if (SUCCEED == (ret = substitute_function_parameters(*proto_parameter, 0, strlen(*proto_parameter), 0,
+			&exp, &exp_alloc, &exp_offset, jp_row,
+			err, sizeof(err))))
+	{
+		zbx_free(*proto_parameter);
+		*proto_parameter = exp;
+	}
+	else
+	{
+		*error = zbx_strdup(*error, err);
+		zbx_free(exp);
+	}
+
+	return ret;
+}
+
+static int	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions,
+		zbx_uint64_t itemid, struct zbx_json_parse *jp_row, char **error)
+{
+	int			i, ret;
 	zbx_lld_function_t	*function = NULL;
-	char			*proto_parameter = NULL;
+	char			*proto_parameter;
 
 	for (i = 0; i < functions->values_num; i++)
 	{
@@ -1037,7 +1059,8 @@ static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr
 	}
 
 	proto_parameter = zbx_strdup(NULL, function_proto->parameter);
-	substitute_lld_macros(&proto_parameter, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	if (FAIL == (ret = lld_parameter_make(&proto_parameter, jp_row, error)))
+		goto clean;
 
 	if (i == functions->values_num)
 	{
@@ -1082,8 +1105,10 @@ static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr
 
 		function->flags |= ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
 	}
-
+clean:
 	zbx_free(proto_parameter);
+
+	return ret;
 }
 
 static void	lld_functions_delete(zbx_vector_ptr_t *functions)
@@ -1102,7 +1127,7 @@ static void	lld_functions_delete(zbx_vector_ptr_t *functions)
 }
 
 static int	lld_functions_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *functions,
-		zbx_vector_ptr_t *items, zbx_vector_ptr_t *item_links, struct zbx_json_parse *jp_row)
+		zbx_vector_ptr_t *items, zbx_vector_ptr_t *item_links, struct zbx_json_parse *jp_row, char **error)
 {
 	const char		*__function_name = "lld_functions_make";
 
@@ -1140,7 +1165,8 @@ static int	lld_functions_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 		else
 			itemid = item_proto->itemid;
 
-		lld_function_make(function_proto, functions, itemid, jp_row);
+		if ( FAIL == lld_function_make(function_proto, functions, itemid, jp_row, error))
+			goto out;
 	}
 
 	lld_functions_delete(functions);
@@ -1294,7 +1320,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 	zbx_free(buffer);
 
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
-			&lld_row->item_links, jp_row))
+			&lld_row->item_links, jp_row, error))
 		goto out;
 
 	trigger->flags |= ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
