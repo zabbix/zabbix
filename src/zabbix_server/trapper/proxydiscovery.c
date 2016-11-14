@@ -57,7 +57,7 @@ void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != (ret = process_dhis_data(jp, ts, &error)))
+	if (SUCCEED != (ret = process_discovery_data(jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid discovery data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);

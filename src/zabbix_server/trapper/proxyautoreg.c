@@ -59,7 +59,7 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != (ret = process_areg_data(jp, proxy.hostid, ts, &error)))
+	if (SUCCEED != (ret = process_auto_registration(jp, proxy.hostid, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);

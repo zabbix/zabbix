@@ -325,7 +325,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_hist_data(NULL, &jp, proxy->hostid, &ts, &error))
+		if (SUCCEED != process_proxy_history_data(&jp, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" history data: %s", proxy->host, proxy->addr, error);
@@ -386,7 +386,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_dhis_data(&jp, &ts, &error))
+		if (SUCCEED != process_discovery_data(&jp, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" discovery data: %s", proxy->host, proxy->addr, error);
@@ -447,7 +447,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_areg_data(&jp, proxy->hostid, &ts, &error))
+		if (SUCCEED != process_auto_registration(&jp, proxy->hostid, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" auto registration data: %s", proxy->host, proxy->addr, error);
@@ -472,9 +472,9 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_parse_proxy_data                                           *
+ * Function: proxy_process_proxy_data                                         *
  *                                                                            *
- * Purpose: parses proxy data request                                         *
+ * Purpose: processes proxy data request                                      *
  *                                                                            *
  * Parameters: proxy - [IN]                                                   *
  *                                                                            *
@@ -482,11 +482,15 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
+static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
 {
+	const char		*__function_name = "proxy_process_proxy_data";
+
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
 	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	*more = ZBX_PROXY_DATA_DONE;
 
@@ -520,6 +524,9 @@ static int	proxy_parse_proxy_data(DC_PROXY *proxy, const char *answer, zbx_times
 	}
 out:
 	zbx_free(error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -576,7 +583,7 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
 		return FAIL;
 
-	ret = proxy_parse_proxy_data(proxy, answer, &ts, more);
+	ret = proxy_process_proxy_data(proxy, answer, &ts, more);
 
 	zbx_free(answer);
 out:

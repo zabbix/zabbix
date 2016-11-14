@@ -33,23 +33,6 @@
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
 
-typedef struct
-{
-	zbx_timespec_t	ts;
-	char		host_name[HOST_HOST_LEN_MAX];
-	char		key[ITEM_KEY_LEN * 4 + 1];
-	char		*value;	/* NULL in case of meta record (see "meta" field below) */
-	char		*source;
-	zbx_uint64_t	lastlogsize;
-	int		mtime;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
-	unsigned char	state;
-	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
-}
-AGENT_VALUE;
-
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, const zbx_socket_t *sock, DC_PROXY *proxy,
 		char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
@@ -72,12 +55,9 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
-void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
-		AGENT_VALUE *values, size_t value_num, int *processed);
-int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
-		zbx_timespec_t *ts, char **info);
-int	process_dhis_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error);
-int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error);
+int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
+int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error);
+int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts, char **error);
 
 void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts);
 
@@ -85,5 +65,9 @@ int	proxy_get_history_count(void);
 
 int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp);
 
+int	process_proxy_history_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
+int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
+int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error);
+
 #endif

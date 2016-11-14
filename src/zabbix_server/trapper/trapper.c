@@ -47,7 +47,7 @@ extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size
  *                                                                            *
  * Function: recv_agenthistory                                                *
  *                                                                            *
- * Purpose: processes the received values from active agents and senders      *
+ * Purpose: processes the received values from active agents                  *
  *                                                                            *
  ******************************************************************************/
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
@@ -58,8 +58,33 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = process_hist_data(sock, jp, 0, ts, &info)))
+	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
+
+	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+
+	zbx_free(info);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_senderhistory                                               *
+ *                                                                            *
+ * Purpose: processes the received values from senders                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
+{
+	const char	*__function_name = "recv_senderhistory";
+	char		*info = NULL;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -100,7 +125,7 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != (ret = process_hist_data(sock, jp, proxy.hostid, ts, &error)))
+	if (SUCCEED != (ret = process_proxy_history_data(jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);
@@ -516,10 +541,13 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					active_passive_misconfig(sock);
 				}
 			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 			{
 				recv_agenthistory(sock, &jp, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			{
+				recv_senderhistory(sock, &jp, ts);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 			{
@@ -584,15 +612,19 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 	}
 	else
 	{
-		char		value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
-				source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
-		AGENT_VALUE	av;
+		char			value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
+					source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11],
+					host[HOST_HOST_LEN * 4 + 1], key[ITEM_KEY_LEN * 4 + 1];
+		zbx_agent_value_t	av;
+		zbx_host_key_t		hk = {host, key};
+		DC_ITEM			item;
+		int			errcode;
 
-		memset(&av, 0, sizeof(AGENT_VALUE));
+		memset(&av, 0, sizeof(zbx_agent_value_t));
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
+			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
@@ -612,7 +644,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				return FAIL;
 
 			*pr = '\0';
-			zbx_strlcpy(av.host_name, pl, sizeof(av.host_name));
+			zbx_strlcpy(host, pl, sizeof(host));
 			*pr = ':';
 
 			pl = pr + 1;
@@ -620,7 +652,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				return FAIL;
 
 			*pr = '\0';
-			zbx_strlcpy(av.key, pl, sizeof(av.key));
+			zbx_strlcpy(key, pl, sizeof(key));
 			*pr = ':';
 
 			av.value = pr + 1;
@@ -632,7 +664,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
-		process_mass_data(sock, 0, &av, 1, NULL);
+		DCconfig_get_items_by_keys(&item, &hk, &errcode, 1);
+		process_history_data(&item, &av, &errcode, 1);
+		DCconfig_clean_items(&item, &errcode, 1);
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))

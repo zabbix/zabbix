@@ -255,8 +255,8 @@ zbx_action_eval_t;
 
 typedef struct
 {
-	const char	*host;
-	const char	*key;
+	char	*host;
+	char	*key;
 }
 zbx_host_key_t;
 
