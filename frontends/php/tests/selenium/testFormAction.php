@@ -2031,8 +2031,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait('Simple form test host');
 		$this->zbxTestWaitWindowClose();
