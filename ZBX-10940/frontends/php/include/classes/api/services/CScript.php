@@ -276,15 +276,27 @@ class CScript extends CApiService {
 		$scriptId = $data['scriptid'];
 		$hostId = $data['hostid'];
 
-		$scripts = $this->get([
+		if (!zbx_is_int($scriptId) || !zbx_is_int($hostId)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostId,
-			'scriptids' => $scriptId,
-			'output' => ['scriptid'],
 			'preservekeys' => true
 		]);
+		if (!array_key_exists($hostId, $db_hosts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		if (!isset($scripts[$scriptId])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		$db_scripts = $this->get([
+			'output' => ['scriptid'],
+			'hostids' => $hostId,
+			'scriptids' => $scriptId,
+			'preservekeys' => true
+		]);
+		if (!array_key_exists($scriptId, $db_scripts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// execute script

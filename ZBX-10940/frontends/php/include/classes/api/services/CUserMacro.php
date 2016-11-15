@@ -303,7 +303,7 @@ class CUserMacro extends CApiService {
 		$required_fields = ['globalmacroid'];
 
 		foreach ($globalmacros as $globalmacro) {
-			$missing_keys = checkRequiredKeys($globalmacro, $required_fields);
+			$missing_keys = array_diff($required_fields, array_keys($globalmacro));
 
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -450,7 +450,7 @@ class CUserMacro extends CApiService {
 		$required_fields = ['hostmacroid'];
 
 		foreach ($hostmacros as $hostmacro) {
-			$missing_keys = checkRequiredKeys($hostmacro, $required_fields);
+			$missing_keys = array_diff($required_fields, array_keys($hostmacro));
 
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -634,9 +634,8 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the field is not valid.
 	 */
 	protected function checkMacro(array $macro) {
-		$required_fields = ['macro'];
+		$missing_keys = array_diff(['macro'], array_keys($macro));
 
-		$missing_keys = checkRequiredKeys($macro, $required_fields);
 		if ($missing_keys) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User macro missing parameters: %1$s', implode(', ', $missing_keys))
