@@ -125,7 +125,7 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_proxy_update_version(&proxy, jp);
 
-	if (SUCCEED != (ret = process_proxy_history_data(jp, ts, &error)))
+	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);

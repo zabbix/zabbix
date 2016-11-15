@@ -325,7 +325,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 			break;
 		}
 
-		if (SUCCEED != process_proxy_history_data(&jp, &ts, &error))
+		if (SUCCEED != process_proxy_history_data(proxy, &jp, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" history data: %s", proxy->host, proxy->addr, error);
