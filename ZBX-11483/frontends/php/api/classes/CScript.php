@@ -412,7 +412,7 @@ class CScript extends CZBXAPI {
 		}
 
 		$db_hosts = API::Host()->get(array(
-			'output' => ['hostid'],
+			'output' => array('hostid'),
 			'hostids' => $hostid,
 			'preservekeys' => true
 		));
