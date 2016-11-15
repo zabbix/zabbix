@@ -102,15 +102,17 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	static long	pagesize = 0;
 	static int	smbios_status = SMBIOS_STATUS_UNKNOWN;
 	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
+	zbx_stat_t	file_buf;
 
-	if (-1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
+
+	if (-1 != zbx_stat(SYS_TABLE_FILE, &file_buf) && -1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
 	{
-		if (-1 == (smbios_len = lseek(fd, 0, SEEK_END)))
-			goto close;
+		smbuf = zbx_malloc(NULL, file_buf.st_size);
+		smbios_len = read(fd, smbuf, file_buf.st_size);
 
-		lseek(fd, 0, SEEK_SET);
-		smbuf = zbx_malloc(NULL, smbios_len);
-		smbios_len = read(fd, smbuf, smbios_len);
+		if (-1 == (ssize_t)smbios_len)
+			goto clean;
+
 	}
 	else if (-1 != (fd = open(DEV_MEM, O_RDONLY)))
 	{
