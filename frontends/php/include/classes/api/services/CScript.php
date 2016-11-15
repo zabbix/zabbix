@@ -273,6 +273,9 @@ class CScript extends CApiService {
 	public function execute(array $data) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+		$scriptId = $data['scriptid'];
+		$hostId = $data['hostid'];
+
 		if (!zbx_is_int($scriptId) || !zbx_is_int($hostId)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
