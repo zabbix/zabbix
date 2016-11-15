@@ -2606,7 +2606,7 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
 {
 	char	buffer[MAX_ID_LEN + 1];
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_CLOCK, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_ITEMID, buffer, sizeof(buffer)))
 		return FAIL;
 
 	if (SUCCEED != is_uint64(buffer, itemid))
@@ -2859,6 +2859,13 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 {
 	zbx_host_rights_t	*rights = (zbx_host_rights_t *)args;
 
+	if (0 != item->host.proxy_hostid)
+	{
+		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": host is monitored by proxy",
+				item->host.host, item->key_orig);
+		return FAIL;
+	}
+
 	if (ITEM_TYPE_ZABBIX_ACTIVE != item->type)
 	{
 		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": unsupported item type",
@@ -2895,6 +2902,13 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	char			*allowed_hosts;
 	int			ret;
 	zbx_host_rights_t	*rights;
+
+	if (0 != item->host.proxy_hostid)
+	{
+		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": host is monitored by proxy",
+				item->host.host, item->key_orig);
+		return FAIL;
+	}
 
 	if (ITEM_TYPE_TRAPPER != item->type)
 	{
@@ -3059,7 +3073,7 @@ out:
  ******************************************************************************/
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
-	return process_client_history_data(NULL, jp, ts, proxy_item_validator, (void *)proxy->hostid, info);
+	return process_client_history_data(NULL, jp, ts, proxy_item_validator, (void *)&proxy->hostid, info);
 }
 
 /******************************************************************************
@@ -3610,6 +3624,21 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strcatnl_alloc                                               *
+ *                                                                            *
+ * Purpose: appends text to the string on a new line                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_offset, const char *text)
+{
+	if (0 != *info_offset)
+		zbx_chrcpy_alloc(info, info_alloc, info_offset, '\n');
+
+	zbx_strcpy_alloc(info, info_alloc, info_offset, text);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_proxy_data                                               *
  *                                                                            *
  * Purpose: process 'proxy data' request                                      *
@@ -3631,9 +3660,10 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	const char		*__function_name = "process_proxy_data";
 
 	struct zbx_json_parse	jp_data;
-	int			ret = FAIL;
+	int			ret = SUCCEED;
 	zbx_timespec_t		ts_diff;
 	char			*error_step = NULL;
+	size_t			error_alloc = 0, error_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3647,42 +3677,40 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
-		if (SUCCEED != process_host_availability(&jp_data, &error_step))
-			*error = zbx_strdcatf(*error, "%s\n", error_step);
+		if (SUCCEED != process_host_availability_contents(&jp_data, &error_step))
+			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 	else
-		*error = zbx_strdcatf(*error, "cannot open host availability data array\n");
-
+		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find host availability tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
-		if (SUCCEED != process_proxy_history_data_33(proxy, &jp_data, &ts_diff, &error_step))
-			*error = zbx_strdcatf(*error, "%s\n", error_step);
+		process_proxy_history_data_33(proxy, &jp_data, &ts_diff, &error_step);
+		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 	else
-		*error = zbx_strdcatf(*error, "cannot open history data array\n");
+		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find history data tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != process_discovery_data(&jp_data, &ts_diff, &error_step))
-			*error = zbx_strdcatf(*error, "%s\n", error_step);
+		if (SUCCEED != process_discovery_data_contents(&jp_data, &ts_diff, &error_step))
+			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 	else
-		*error = zbx_strdcatf(*error, "cannot open discovery data array\n");
+		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find discovery data tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
 	{
-		if (SUCCEED != process_auto_registration(&jp_data, proxy->hostid, &ts_diff, &error_step))
-			*error = zbx_strdcatf(*error, "%s\n", error_step);
+		if (SUCCEED != process_auto_registration_contents(&jp_data, proxy->hostid, &ts_diff, &error_step))
+			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+
 	}
 	else
-		*error = zbx_strdcatf(*error, "cannot open auto registration data array\n");
+		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find auto registration tag");
 
-	if (NULL == *error)
-		ret = SUCCEED;
-out:
 	zbx_free(error_step);
-
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
