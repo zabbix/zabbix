@@ -3047,7 +3047,8 @@ out:
  *                                                                            *
  * Purpose: process history data received form Zabbix proxy                   *
  *                                                                            *
- * Parameters: jp           - [IN] the JSON with history data                 *
+ * Parameters: proxy        - [IN] the source proxy                           *
+ *             jp           - [IN] the JSON with history data                 *
  *             ts           - [IN] the connection timestamp                   *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
@@ -3056,9 +3057,9 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_proxy_history_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
+int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
-	return process_client_history_data(NULL, jp, ts, proxy_item_validator, NULL, info);
+	return process_client_history_data(NULL, jp, ts, proxy_item_validator, (void *)proxy->hostid, info);
 }
 
 /******************************************************************************
