@@ -1020,17 +1020,16 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 
 static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *jp_row, char **error)
 {
-	int		ret;
-	size_t		exp_alloc = 0, exp_offset = 0;
-	char		err[MAX_STRING_LEN];
+	int	ret;
+	size_t	exp_alloc = 0, exp_offset = 0;
+	char	err[64];
 
 	*exp = NULL;
 
-	if (FAIL == (ret = substitute_function_parameters(e, 0,
-			exp, &exp_alloc, &exp_offset, jp_row,
+	if (FAIL == (ret = substitute_function_parameters(e, 0, exp, &exp_alloc, &exp_offset, jp_row,
 			err, sizeof(err))))
 	{
-		*error = zbx_strdup(*error, err);
+		*error = zbx_strdcat(*error, err);
 		zbx_free(*exp);
 	}
 
