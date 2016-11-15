@@ -135,15 +135,19 @@ if ($filter['groupids'] !== null) {
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
+	$groupids = null;
 	if ($child_groups) {
-		$child_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'search' => ['name' => $child_groups],
-			'startSearch' => true,
-			'preservekeys' => true
-		]);
-
-		$groupids = array_keys(array_replace($filterGroups, $child_groups));
+		$groups = $filterGroups;
+		foreach ($child_groups as $child_group) {
+			$child_groups = API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $child_group],
+				'startSearch' => true,
+				'preservekeys' => true
+			]);
+			$groups = array_replace($groups, $child_groups);
+		}
+		$groupids = array_keys($groups);
 	}
 
 	$hosts = API::Host()->get([
