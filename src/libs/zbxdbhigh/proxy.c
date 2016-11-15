@@ -3590,7 +3590,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 			}
 		}
 
-		processed_num = process_history_data(items, values, errcodes, values_num);
+		processed_num += process_history_data(items, values, errcodes, values_num);
 		DCconfig_clean_items(items, errcodes, values_num);
 
 		total_num += read_num;
