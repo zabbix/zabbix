@@ -407,15 +407,29 @@ class CScript extends CZBXAPI {
 		$scriptid = $data['scriptid'];
 		$hostid = $data['hostid'];
 
+		if (!zbx_is_int($scriptid) || !zbx_is_int($hostid)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+
+		$db_hosts = API::Host()->get(array(
+			'output' => ['hostid'],
+			'hostids' => $hostid,
+			'preservekeys' => true
+		));
+		if (!array_key_exists($hostid, $db_hosts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$alowedScripts = $this->get(array(
 			'hostids' => $hostid,
 			'scriptids' => $scriptid,
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
 		));
-		if (!isset($alowedScripts[$scriptid])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		if (!array_key_exists($scriptid, $alowedScripts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
 		if (!$socket = @fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
 			switch ($errorMsg) {
 				case 'Connection refused':
