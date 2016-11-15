@@ -277,21 +277,21 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
-		$db_hosts = API::Host()->get(array(
-			'output' => array('hostid'),
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostId,
 			'preservekeys' => true
-		));
+		]);
 		if (!array_key_exists($hostId, $db_hosts)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_scripts = $this->get(array(
-			'output' => array('scriptid'),
+		$db_scripts = $this->get([
+			'output' => ['scriptid'],
 			'hostids' => $hostId,
 			'scriptids' => $scriptId,
 			'preservekeys' => true
-		));
+		]);
 		if (!array_key_exists($scriptId, $db_scripts)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
