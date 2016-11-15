@@ -1,6 +1,7 @@
 Changes for 3.0.6rc1
 
 New features:
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 .......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
@@ -1547,6 +1548,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 A.F.....S. [ZBX-11347] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters for items without interface (asaveljevs, Ivo, Sasha)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
@@ -3035,6 +3037,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
