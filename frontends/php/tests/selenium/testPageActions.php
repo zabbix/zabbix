@@ -297,7 +297,7 @@ class testPageActions extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Action enabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
 		$this->zbxTestTextPresent('Enabled');
 
 		$this->assertEquals(1, DBcount(
