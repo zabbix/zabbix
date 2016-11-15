@@ -4904,7 +4904,8 @@ int	substitute_function_parameters(const char *e, unsigned char key_in_param,
 	const char	*__function_name = "substitute_function_parameters";
 	int		ret = SUCCEED;
 	size_t		sep_pos, len;
-	char		*param = NULL, *p;
+	char		*param = NULL;
+	const char	*p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
