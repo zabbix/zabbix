@@ -3,6 +3,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
