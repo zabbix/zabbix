@@ -331,7 +331,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hostGroupsComboBox = new CComboBox('hostgroupid', getRequest('hostgroupid', 0), 'javascript: submit()');
 		$hostGroupsComboBox->addItem(0, _('all'));
 
-		$hostGroups = API::HostGroup()->get([
+		$groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'hostids' => $triggerOptions['hostids'],
 			'monitored_hosts' => true,
@@ -340,7 +340,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 		$parents = [];
 		$parent_name = '';
-		foreach ($hostGroups as $group) {
+		foreach ($groups as $group) {
 			$parent = explode('/', $group['name']);
 			if (count($parent) > 1) {
 				array_pop($parent);
@@ -363,16 +363,16 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 				'preservekeys' => true
 			]);
 
-			$hostGroups = array_replace($hostGroups, $parent_groups);
+			$groups = array_replace($groups, $parent_groups);
 		}
 
-		order_result($hostGroups, 'name');
+		order_result($groups, 'name');
 
 		if (hasRequest('hostgroupid') && getRequest('hostgroupid')) {
 			$triggerOptions['groupids'] = [getRequest('hostgroupid')];
 			if (array_key_exists(getRequest('hostgroupid'), $groups)) {
 				$parent = $groups[getRequest('hostgroupid')]['name'].'/';
-				foreach ($hostGroups as $group) {
+				foreach ($groups as $group) {
 					if (strpos($group['name'], $parent) === 0) {
 						$triggerOptions['groupids'][] = $group['groupid'];
 					}
@@ -383,11 +383,11 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			$triggerOptions['groupids'] = null;
 		}
 
-		foreach ($hostGroups as $hostGroup) {
-			$hostGroupsComboBox->addItem($hostGroup['groupid'], $hostGroup['name']);
+		foreach ($groups as $group) {
+			$hostGroupsComboBox->addItem($group['groupid'], $group['name']);
 		}
 
-		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
+		if (isset($_REQUEST['hostgroupid']) && !isset($groups[$_REQUEST['hostgroupid']])) {
 			unset($triggerOptions['groupids']);
 		}
 
@@ -446,7 +446,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		// filter host
 		$hostsComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
 		$hostsComboBox->addItem(0, _('all'));
-
 		if (getRequest('filter_groupid')) {
 			$filter_groupids = [getRequest('filter_groupid')];
 			$parent = $groups[getRequest('filter_groupid')]['name'].'/';
