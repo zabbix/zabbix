@@ -1160,8 +1160,8 @@ out:
 	return h;
 }
 
-ipmi_domain_id_t	domain_id_ptr;
-int			domain_close_ok;
+static ipmi_domain_id_t	domain_id_ptr;
+static int		domain_close_ok;
 
 /* callback function invoked from OpenIPMI */
 static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
