@@ -1135,7 +1135,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	options[3].option = IPMI_OPEN_OPTION_LOCAL_ONLY;	/* scan only local resources */
 	options[3].ival = 1;
 
-	zbx_snprintf(domain_name, sizeof(domain_name), "%d", h->domain_id);
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_id);
 
 	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_setup_done_cb, h, zbx_domain_up_cb, h, options,
 			ARRSIZE(options), NULL)))
@@ -1196,7 +1196,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
 
-	zbx_snprintf(domain_name, sizeof(domain_name), "%d", h->domain_id);
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_id);
 
 	ipmi_domain_iterate_domains(zbx_domains_iterate_cb, domain_name);
 
