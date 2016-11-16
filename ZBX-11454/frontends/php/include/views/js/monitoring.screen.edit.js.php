@@ -66,19 +66,13 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		// clone button
 		$('#clone').click(function() {
-			// Remove buttons, sharing options and inaccessible user message.
-			$('#screenid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
+			$('#screenid, #delete, #clone, #inaccessible_user').remove();
 			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
-			$('#name').focus();
 
 			$('#form').val('clone');
-
-			// Set screen to private.
-			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
 			$('#tab_screen_tab').trigger('click');
@@ -90,6 +84,8 @@
 				'id': $('#current_user_userid').val(),
 				'name': $('#current_user_fullname').val()
 			});
+
+			$('#name').focus();
 		});
 	});
 

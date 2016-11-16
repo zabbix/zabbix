@@ -120,7 +120,7 @@ int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression, par_l);
 
 	if (0 == strcmp(buf, "regsub"))
-		macro_func = MACRO_FUNC_IREGSUB;
+		macro_func = MACRO_FUNC_REGSUB;
 	else if (0 == strcmp(buf, "iregsub"))
 		macro_func = MACRO_FUNC_IREGSUB;
 

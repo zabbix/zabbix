@@ -754,14 +754,14 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Unset graphs that have LLD created items or web items, or items containing LLD applications.
+	 * Unset graphs that have LLD created items or items containing LLD applications
+	 * and replace graph itemids with array of host and key.
 	 *
 	 * @param array $graphs
 	 *
 	 * @return array
 	 */
 	protected function prepareGraphs(array $graphs) {
-		// get item axis items info
 		$graphItemIds = [];
 
 		foreach ($graphs as $graph) {
@@ -791,8 +791,7 @@ class CConfigurationExport {
 			if ($graph['ymin_itemid'] && isset($graphItems[$graph['ymin_itemid']])) {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
 
-				// unset lld and web graphs
-				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
 				}
@@ -816,8 +815,7 @@ class CConfigurationExport {
 			if ($graph['ymax_itemid'] && isset($graphItems[$graph['ymax_itemid']])) {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
 
-				// unset lld and web graphs
-				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
 				}
@@ -841,8 +839,7 @@ class CConfigurationExport {
 			foreach ($graph['gitems'] as $ginum => $gItem) {
 				$item = $graphItems[$gItem['itemid']];
 
-				// unset lld and web graphs
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue 2;
 				}
@@ -915,7 +912,7 @@ class CConfigurationExport {
 
 		foreach ($triggers as $idx => &$trigger) {
 			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);
 					continue 2;
 				}
