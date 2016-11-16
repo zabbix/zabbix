@@ -60,25 +60,17 @@ static int	proxy_data_sender(int *more)
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_HOST_AVAILABILITY);
 	if (SUCCEED == get_host_availability_data(&j, &availability_ts))
 		ret = SUCCEED;
-	zbx_json_close(&j);
 
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_HISTORY_DATA);
 	if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid, &more_history)))
 		ret = SUCCEED;
-	zbx_json_close(&j);
 
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DISCOVERY_DATA);
 	if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery)))
 		ret = SUCCEED;
-	zbx_json_close(&j);
 
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_AUTO_REGISTRATION);
 	if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
 		ret = SUCCEED;
-	zbx_json_close(&j);
 
 	if (SUCCEED == ret)
 	{

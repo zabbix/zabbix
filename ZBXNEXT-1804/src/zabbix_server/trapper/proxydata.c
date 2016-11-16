@@ -131,21 +131,10 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_HOST_AVAILABILITY);
 	get_host_availability_data(&j, &availability_ts);
-	zbx_json_close(&j);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_HISTORY_DATA);
 	proxy_get_hist_data(&j, &history_lastid, &more_history);
-	zbx_json_close(&j);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DISCOVERY_DATA);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
-	zbx_json_close(&j);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_AUTO_REGISTRATION);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
-	zbx_json_close(&j);
 
 	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 			ZBX_PROXY_DATA_MORE == more_areg)
