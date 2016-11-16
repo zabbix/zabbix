@@ -552,7 +552,9 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 		/* substitute LLD macros in the part of the string preceding function parameters */
 
 		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
-		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		if (SUCCEED != substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
+			goto out;
+
 		tmp_offset = strlen(tmp);
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
 
@@ -625,7 +627,9 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	/* substitute LLD macros in the remaining part */
 
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
-	substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	if (SUCCEED != substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
+		goto out;
+
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
 
 	ret = SUCCEED;
