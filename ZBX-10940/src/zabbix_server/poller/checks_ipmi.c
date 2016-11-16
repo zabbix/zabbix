@@ -96,7 +96,7 @@ typedef struct zbx_ipmi_host
 zbx_ipmi_host_t;
 
 static unsigned int	domain_nr = 0;		/* for making a sequence of domain names "0", "1", "2", ... */
-static zbx_ipmi_host_t	*hosts = NULL;
+static zbx_ipmi_host_t	*hosts = NULL;		/* head of single-linked list of monitored hosts */
 static os_handler_t	*os_hnd;
 
 static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
@@ -146,6 +146,17 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_ipmi_host                                                *
+ *                                                                            *
+ * Purpose: Find element in the global list 'hosts' using parameters as       *
+ *          search criteria                                                   *
+ *                                                                            *
+ * Return value: pointer to list element with host data                       *
+ *               NULL if not found                                            *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
@@ -172,6 +183,15 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int au
 	return h;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_allocate_ipmi_host                                           *
+ *                                                                            *
+ * Purpose: create a new element in the global list 'hosts'                   *
+ *                                                                            *
+ * Return value: pointer to the new list element with host data               *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
@@ -1091,9 +1111,9 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
 
-	h = zbx_get_ipmi_host(ip, port, authtype, privilege, username, password);
+	/* Host already in the list? */
 
-	if (NULL != h)
+	if (NULL != (h = zbx_get_ipmi_host(ip, port, authtype, privilege, username, password)))
 	{
 		if (1 == h->domain_up)
 			goto out;
