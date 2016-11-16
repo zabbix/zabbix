@@ -1591,6 +1591,8 @@ int	get_host_availability_data(struct zbx_json *json, int *ts)
 	if (SUCCEED != DCget_hosts_availability(&hosts, ts))
 		goto out;
 
+	zbx_json_addarray(json, ZBX_PROTO_TAG_HOST_AVAILABILITY);
+
 	for (i = 0; i < hosts.values_num; i++)
 	{
 		ha = (zbx_host_availability_t *)hosts.values[i];
@@ -1606,6 +1608,8 @@ int	get_host_availability_data(struct zbx_json *json, int *ts)
 
 		zbx_json_close(json);
 	}
+
+	zbx_json_close(json);
 
 	ret = SUCCEED;
 out:
@@ -1849,12 +1853,12 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Purpose: Get history data from the database.                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid,
-		zbx_uint64_t *id, int *more)
+static void	proxy_get_history_data_simple(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more)
 {
 	const char	*__function_name = "proxy_get_history_data_simple";
 	size_t		offset = 0;
-	int		f, records = 0, retries = 1;
+	int		f, records_num_last = *records_num, retries = 1;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1900,6 +1904,9 @@ try_again:
 			}
 		}
 
+		if (0 == *records_num)
+			zbx_json_addarray(j, proto_tag);
+
 		zbx_json_addobject(j, NULL);
 
 		for (f = 0; NULL != ht->fields[f].field; f++)
@@ -1910,7 +1917,7 @@ try_again:
 			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], ht->fields[f].jt);
 		}
 
-		records++;
+		(*records_num)++;
 
 		zbx_json_close(j);
 
@@ -1925,13 +1932,11 @@ try_again:
 	}
 	DBfree_result(result);
 
-	if (ZBX_MAX_HRECORDS == records)
+	if (ZBX_MAX_HRECORDS == *records_num)
 		*more = ZBX_PROXY_DATA_MORE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64 " more:%d size:" ZBX_FS_SIZE_T,
-			__function_name, records, *lastid, *more, j->buffer_offset);
-
-	return records;
+			__function_name, *records_num - records_num_last, *lastid, *more, j->buffer_offset);
 }
 
 /******************************************************************************
@@ -1942,7 +1947,8 @@ try_again:
  *          cache to speed things up.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t *id, int *more)
+static void	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num,
+		int *more)
 {
 	const char			*__function_name = "proxy_get_history_data";
 
@@ -1975,7 +1981,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_
 	static size_t			data_alloc = 0;
 	size_t				data_num = 0, i;
 	DC_ITEM				*dc_items;
-	int				*errcodes, records = 0, retries = 1;
+	int				*errcodes, retries = 1, records_num_last = *records_num;
 	zbx_history_data_t		*hd;
 	struct timespec			t_sleep = { 0, 100000000L }, t_rem;
 
@@ -2085,10 +2091,12 @@ try_again:
 		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
-		zbx_json_addobject(j, NULL);
-
 		hd = &data[i];
 
+		if (0 == *records_num)
+			zbx_json_addarray(j, ZBX_PROTO_TAG_HISTORY_DATA);
+
+		zbx_json_addobject(j, NULL);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, dc_items[i].itemid);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
@@ -2122,7 +2130,7 @@ try_again:
 
 		zbx_json_close(j);
 
-		records++;
+		(*records_num)++;
 
 		/* stop gathering data to avoid exceeding the maximum packet size */
 		if (ZBX_DATA_JSON_RECORD_LIMIT < j->buffer_offset)
@@ -2141,15 +2149,14 @@ try_again:
 	if (ZBX_MAX_HRECORDS == data_num)
 		*more = ZBX_PROXY_DATA_MORE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d records selected:%d lastid:" ZBX_FS_UI64 " more:%d size:"
-			ZBX_FS_SIZE_T, __function_name, records, data_num, *lastid, *more, (int)j->buffer_offset);
-
-	return records;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d selected:%d lastid:" ZBX_FS_UI64 " more:%d size:"
+			ZBX_FS_SIZE_T, __function_name, *records_num - records_num_last, data_num, *lastid, *more,
+			(int)j->buffer_offset);
 }
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	int		records = 0;
+	int		records_num = 0;
 	zbx_uint64_t	id;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
@@ -2160,18 +2167,21 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		records += proxy_get_history_data(j, lastid, &id, more);
+		proxy_get_history_data(j, lastid, &id, &records_num, more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
 			break;
 	}
 
-	return records;
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
 }
 
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	int		records = 0;
+	int		records_num = 0;
 	zbx_uint64_t	id;
 
 	proxy_get_lastid(dht.table, dht.lastidfield, &id);
@@ -2182,18 +2192,21 @@ int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		records += proxy_get_history_data_simple(j, &dht, lastid, &id, more);
+		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
 			break;
 	}
 
-	return records;
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
 }
 
 int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	int		records = 0;
+	int		records_num = 0;
 	zbx_uint64_t	id;
 
 	proxy_get_lastid(areg.table, areg.lastidfield, &id);
@@ -2204,13 +2217,17 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		records += proxy_get_history_data_simple(j, &areg, lastid, &id, more);
+		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTO_REGISTRATION, &areg, lastid, &id, &records_num,
+				more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
 			break;
 	}
 
-	return records;
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
 }
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
@@ -3245,6 +3262,8 @@ json_parse_error:
 
 	zbx_free(value);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -3659,33 +3678,24 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		if (SUCCEED != process_host_availability_contents(&jp_data, &error_step))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
-	else
-		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find host availability tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
 		process_proxy_history_data_33(proxy, &jp_data, &ts_diff, &error_step);
 		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
-	else
-		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find history data tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
 		if (SUCCEED != process_discovery_data_contents(&jp_data, &ts_diff, &error_step))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
-	else
-		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find discovery data tag");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTO_REGISTRATION, &jp_data))
 	{
 		if (SUCCEED != process_auto_registration_contents(&jp_data, proxy->hostid, &ts_diff, &error_step))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-
 	}
-	else
-		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, "cannot find auto registration tag");
 
 	zbx_free(error_step);
 	ret = SUCCEED;
