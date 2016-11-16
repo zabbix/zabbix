@@ -4686,6 +4686,31 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
 	return FAIL;
 }
 
+static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	int	ret;
+	char	*exp = NULL;
+	size_t	exp_alloc = 0, exp_offset = 0;
+	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
+
+	(*data)[par_r] = '\0';
+	ret = substitute_function_parameters(*data + par_l + 1, 0, &exp, &exp_alloc, &exp_offset, jp_row,
+			error, max_error_len);
+	(*data)[par_r] = ')';
+
+	if (SUCCEED == ret)
+	{
+		/* copy what is left including closing parenthesis and replace function parameters */
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + par_r, token->token.r - (par_r - 1));
+		zbx_replace_string(data, par_l + 1, &token->token.r, exp);
+	}
+
+	zbx_free(exp);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: substitute_lld_macros                                            *
@@ -4762,7 +4787,10 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					/* it is not a valid function macro and is processed as a plain text, */
 					/* expanding lld macros inside it.                                    */
 					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
+					{
+						ret = substitute_func_macro(data, &token, jp_row, error, max_error_len);
 						pos = token.token.r;
+					}
 					break;
 			}
 		}
