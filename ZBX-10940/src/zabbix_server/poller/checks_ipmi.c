@@ -86,7 +86,8 @@ typedef struct zbx_ipmi_host
 	ipmi_con_t		*con;
 	int			domain_up;
 	int			done;
-	time_t			lastaccess;
+	time_t			lastaccess;	/* Time of last access attempt. Used to detect and delete inactive */
+						/* (disabled) IPMI hosts from OpenIPMI to stop polling them. */
 	unsigned int		domain_id;
 	char			*err;
 	struct zbx_ipmi_host	*next;
