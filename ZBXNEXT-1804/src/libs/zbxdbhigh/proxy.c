@@ -2818,19 +2818,11 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 
 	/* don't process item if its host was assigned to another proxy */
 	if (item->host.proxy_hostid != *proxyid)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": host proxy has been changed",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	/* don't process aggregate/calculated items coming from proxy */
 	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": unsupported item type",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	/* item has been already converted to decimal format by proxy - */
 	/* reset its data type to decimal to prevent double conversion  */
@@ -2860,18 +2852,10 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 	zbx_host_rights_t	*rights = (zbx_host_rights_t *)args;
 
 	if (0 != item->host.proxy_hostid)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": host is monitored by proxy",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	if (ITEM_TYPE_ZABBIX_ACTIVE != item->type)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": unsupported item type",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	if (rights->hostid != item->host.hostid)
 	{
@@ -2904,18 +2888,10 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	zbx_host_rights_t	*rights;
 
 	if (0 != item->host.proxy_hostid)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": host is monitored by proxy",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	if (ITEM_TYPE_TRAPPER != item->type)
-	{
-		*error = zbx_dsprintf(*error, "cannot process host \"%s\" item \"%s\": unsupported item type",
-				item->host.host, item->key_orig);
 		return FAIL;
-	}
 
 	allowed_hosts = zbx_strdup(NULL, item->trapper_hosts);
 	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, &allowed_hosts,
@@ -3582,8 +3558,11 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 
 			if (SUCCEED != proxy_item_validator(&items[i], NULL, (void *)&proxy->hostid, &error))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-				zbx_free(error);
+				if (NULL != error)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					zbx_free(error);
+				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
