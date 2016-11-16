@@ -734,6 +734,30 @@ class CApiService {
 	}
 
 	/**
+	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
+	 * object from from the source object.
+	 *
+	 * @param array  $objects
+	 * @param array  $source
+	 * @param string $field_name
+	 * @param array  $fields
+	 *
+	 * @return array
+	 */
+	protected function extendObjectsByKey(array $objects, array $source, $field_name, array $fields) {
+		$fields = array_flip($fields);
+
+		foreach ($objects as &$object) {
+			if (array_key_exists($object[$field_name], $source)) {
+				$object += array_intersect_key($source[$object[$field_name]], $fields);
+			}
+		}
+		unset($object);
+
+		return $objects;
+	}
+
+	/**
 	 * Checks that each object has a valid ID.
 	 *
 	 * @param array $objects

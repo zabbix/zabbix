@@ -35,6 +35,39 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	public static function validate(array $rule, &$data, $path, &$error) {
+		$error = '';
+
+		return self::validateData($rule, $data, $path, $error)
+			&& self::validateDataUniqueness($rule, $data, $path, $error);
+	}
+
+	/**
+	 * Base uniqueness validation function.
+	 *
+	 * @param array  $rule  validation rule
+	 * @param mixed  $data  import data
+	 * @param string $path  data path (for error reporting)
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	public static function validateUniqueness(array $rule, $data, $path, &$error) {
+		$error = '';
+
+		return self::validateDataUniqueness($rule, $data, $path, $error);
+	}
+
+	/**
+	 * Base data validation function.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateData($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
@@ -51,6 +84,39 @@ class CApiInputValidator {
 			case API_OBJECTS:
 				return self::validateObjects($rule, $data, $path, $error);
 		}
+
+		// This message can be untranslated because warn about incorrect validation rules at a development stage.
+		$error = 'Incorrect validation rules.';
+
+		return false;
+	}
+
+	/**
+	 * Base data uniqueness validation function.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
+		switch ($rule['type']) {
+			case API_STRING_UTF8:
+			case API_ID:
+			case API_OBJECT:
+				return true;
+
+			case API_IDS:
+				return self::validateIdsUniqueness($rule, $data, $path, $error);
+
+			case API_OBJECTS:
+				return self::validateObjectsUniqueness($rule, $data, $path, $error);
+		}
+
+		// This message can be untranslated because warn about incorrect validation rules at a development stage.
+		$error = 'Incorrect validation rules.';
 
 		return false;
 	}
@@ -158,7 +224,7 @@ class CApiInputValidator {
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-				if (!self::validate($field_rule, $data[$field_name], $subpath, $error)) {
+				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
 				}
 			}
@@ -177,7 +243,7 @@ class CApiInputValidator {
 	 * Array of ids validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ, API_NORMALIZE
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -206,27 +272,15 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$index = 0;
-		$uniq = [];
+		$data = array_values($data);
 
-		foreach ($data as &$value) {
-			$index++;
-			$subpath = ($path === '/' ? $path : $path.'/').$index;
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 			if (!self::validateId([], $value, $subpath, $error)) {
 				return false;
 			}
-
-			if ($flags & API_UNIQ) {
-				if (array_key_exists($value, $uniq)) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _('value is not unique'));
-					return false;
-				}
-				$uniq[$value] = true;
-			}
 		}
 		unset($value);
-
-		$data = array_values($data);
 
 		return true;
 	}
@@ -235,7 +289,7 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_UNIQ, API_NORMALIZE
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -267,42 +321,125 @@ class CApiInputValidator {
 			}
 		}
 
-		$index = 0;
+		$data = array_values($data);
 
-		foreach ($data as &$value) {
-			$index++;
-			$subpath = ($path === '/' ? $path : $path.'/').$index;
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 			if (!self::validateObject(['fields' => $rule['fields']], $value, $subpath, $error)) {
 				return false;
 			}
 		}
 		unset($value);
 
-		$data = array_values($data);
+		return true;
+	}
 
-		// Uniqueness check.
+	/**
+	 * Array of ids uniqueness validator.
+	 *
+	 * @param array  $rule
+	 * @param bool   $rule['uniq']    (optional)
+	 * @param array  $rule['fields']
+	 * @param array  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIdsUniqueness($rule, array $data = null, $path, &$error) {
+		// $data can be NULL when API_ALLOW_NULL is set
+		if ($data === null) {
+			return true;
+		}
 
-		$uniq_fields = [];
-		foreach ($rule['fields'] as $field_name => $field_rule) {
-			if (array_key_exists('flags', $field_rule) && ($field_rule['flags'] & API_UNIQ)) {
-				$uniq_fields[] = $field_name;
+		if (!array_key_exists('uniq', $rule) || $rule['uniq'] === false) {
+			return true;
+		}
+
+		$uniq = [];
+
+		foreach ($data as $index => $value) {
+			if (array_key_exists($value, $uniq)) {
+				$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+				$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
+					_s('value %1$s already exists', '('.$value.')')
+				);
+				return false;
+			}
+			$uniq[$value] = true;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Array of objects uniqueness validator.
+	 *
+	 * @param array  $rule
+	 * @param array  $rule['uniq']    (optional) subsets of unique fields ([['hostid', 'name'], [...]])
+	 * @param array  $rule['fields']  (optional)
+	 * @param array  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateObjectsUniqueness($rule, array $data = null, $path, &$error) {
+		// $data can be NULL when API_ALLOW_NULL is set
+		if ($data === null) {
+			return true;
+		}
+
+		if (array_key_exists('uniq', $rule)) {
+			foreach ($rule['uniq'] as $field_names) {
+				$uniq = [];
+
+				foreach ($data as $index => $object) {
+					$_uniq = &$uniq;
+					$values = [];
+					$level = 1;
+
+					foreach ($field_names as $field_name) {
+						if (!array_key_exists($field_name, $object)) {
+							break;
+						}
+
+						$values[] = $object[$field_name];
+
+						if ($level < count($field_names)) {
+							if (!array_key_exists($object[$field_name], $_uniq)) {
+								$_uniq[$object[$field_name]] = [];
+							}
+
+							$_uniq = &$_uniq[$object[$field_name]];
+						}
+						else {
+							if (array_key_exists($object[$field_name], $_uniq)) {
+								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+								$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _s('value %1$s already exists',
+									'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
+								));
+								return false;
+							}
+
+							$_uniq[$object[$field_name]] = true;
+						}
+
+						$level++;
+					}
+				}
 			}
 		}
 
-		foreach ($uniq_fields as $field_name) {
-			$uniq = [];
-			$index = 0;
-
-			foreach ($data as $object) {
-				$index++;
-
-				if (array_key_exists($field_name, $object)) {
-					if (array_key_exists($object[$field_name], $uniq)) {
-						$subpath = ($path === '/' ? $path : $path.'/').$index.'/'.$field_name;
-						$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _('value is not unique'));
-						return false;
+		if (array_key_exists('fields', $rule)) {
+			foreach ($data as $index => $object) {
+				foreach ($rule['fields'] as $field_name => $field_rule) {
+					if (array_key_exists($field_name, $object)) {
+						$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
+						if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
+							return false;
+						}
 					}
-					$uniq[$object[$field_name]] = true;
 				}
 			}
 		}
