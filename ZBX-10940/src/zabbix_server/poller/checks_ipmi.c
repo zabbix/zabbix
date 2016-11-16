@@ -88,13 +88,14 @@ typedef struct zbx_ipmi_host
 	int			done;
 	time_t			lastaccess;	/* Time of last access attempt. Used to detect and delete inactive */
 						/* (disabled) IPMI hosts from OpenIPMI to stop polling them. */
-	unsigned int		domain_id;
+	unsigned int		domain_nr;	/* Domain number. It is converted to text string and used as */
+						/* domain name. */
 	char			*err;
 	struct zbx_ipmi_host	*next;
 }
 zbx_ipmi_host_t;
 
-static unsigned int	domain_id = 0;
+static unsigned int	domain_nr = 0;		/* for making a sequence of domain names "0", "1", "2", ... */
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
 
@@ -189,7 +190,7 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 	h->privilege = privilege;
 	h->username = strdup(username);
 	h->password = strdup(password);
-	h->domain_id = domain_id++;
+	h->domain_nr = domain_nr++;
 
 	h->next = hosts;
 	hosts = h;
@@ -1136,7 +1137,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	options[3].option = IPMI_OPEN_OPTION_LOCAL_ONLY;	/* scan only local resources */
 	options[3].ival = 1;
 
-	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_id);
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
 	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_setup_done_cb, h, zbx_domain_up_cb, h, options,
 			ARRSIZE(options), NULL)))
@@ -1156,7 +1157,7 @@ out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p domain_id:%u", __function_name, h, h->domain_id);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p domain_nr:%u", __function_name, h, h->domain_nr);
 
 	return h;
 }
@@ -1197,7 +1198,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
 
-	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_id);
+	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
 	ipmi_domain_iterate_domains(zbx_domains_iterate_cb, domain_name);
 
