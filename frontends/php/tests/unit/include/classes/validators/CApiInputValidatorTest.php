@@ -21,7 +21,7 @@
 
 class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 
-	public function dataProvider() {
+	public function dataProviderInput() {
 		return [
 			[
 				['type' => API_STRING_UTF8, 'length' => 16],
@@ -278,22 +278,22 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/7": a number is too large.'
 			],
 			[
-				['type' => API_IDS, 'flags' => API_UNIQ],
+				['type' => API_IDS, 'uniq' => true],
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7],
 				'/',
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7]
 			],
 			[
-				['type' => API_IDS, 'flags' => API_UNIQ],
+				['type' => API_IDS, 'uniq' => true],
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '3'],
 				'/',
-				'Invalid parameter "/10": value is not unique.'
+				'Invalid parameter "/10": value (3) already exists.'
 			],
 			[
-				['type' => API_IDS, 'flags' => API_UNIQ],
+				['type' => API_IDS, 'uniq' => true],
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '03'],
 				'/',
-				'Invalid parameter "/10": value is not unique.'
+				'Invalid parameter "/10": value (3) already exists.'
 			],
 			[
 				['type' => API_OBJECTS],
@@ -323,7 +323,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_OBJECTS, 'fields' => []],
 				['000' => []],
 				'/',
-				'Invalid parameter "/": unexpected parameter "000".'
+				[[]]
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => []],
@@ -359,11 +359,11 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/2": the parameter "name" is missing.'
 			],
 			[
-				['type' => API_OBJECTS, 'fields' => [
-					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
-					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+				['type' => API_OBJECTS, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64],
+					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64],
 						'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
 					]]
 				]],
@@ -418,9 +418,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				['type' => API_OBJECTS, 'fields' => [
-					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64]
+				['type' => API_OBJECTS, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64]
 				]],
 				[
 					[
@@ -437,14 +437,14 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					]
 				],
 				'/',
-				'Invalid parameter "/3/valuemapid": value is not unique.'
+				'Invalid parameter "/3": value (valuemapid)=(4) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'fields' => [
-					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
-					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+				['type' => API_OBJECTS, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64],
+					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64],
 						'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
 					]]
 				]],
@@ -464,26 +464,26 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					]
 				],
 				'/',
-				'Invalid parameter "/1/mappings/7/value": value is not unique.'
+				'Invalid parameter "/1/mappings/7": value (value)=(1) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'fields' => [
-					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64]
+				['type' => API_OBJECTS, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64]
 				]],
 				[
 					'valuemapid' => 5,
 					'name' => 'APC Battery Status'
 				],
 				'/',
-				'Invalid parameter "/": unexpected parameter "valuemapid".'
+				'Invalid parameter "/1": an array is expected.'
 			],
 			[
-				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_UNIQ],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_UNIQ, 'length' => 64],
-					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_UNIQ, 'length' => 64],
+				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64],
+					'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['value']], 'fields' => [
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64],
 						'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 64]
 					]]
 				]],
@@ -507,7 +507,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider dataProvider
+	 * @dataProvider dataProviderInput
 	 *
 	 * @param array  $rule
 	 * @param mixed  $data
@@ -521,7 +521,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 
 		if ($rc === true) {
 			$this->assertEquals(gettype($expected), gettype($data));
+			$this->assertEquals('string', gettype($error));
 			$this->assertEquals($expected, $data);
+			$this->assertEquals('', $error);
 		}
 		else {
 			$this->assertEquals(gettype($expected), gettype($error));
@@ -529,4 +531,185 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function dataProviderUniqueness() {
+		return [
+			[
+				['type' => API_IDS, 'uniq' => true],
+				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_IDS, 'uniq' => true],
+				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '3'],
+				'/',
+				false,
+				'Invalid parameter "/10": value (3) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				[
+					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
+					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
+					['applicationid' => 3, 'hostid' => 1, 'name' => 'app3'],
+					['applicationid' => 4, 'hostid' => 1, 'name' => 'app4'],
+					['applicationid' => 5, 'hostid' => 1, 'name' => 'app5'],
+					['applicationid' => 6, 'hostid' => 1, 'name' => 'app6'],
+					['applicationid' => 7, 'hostid' => 1, 'name' => 'app7'],
+					['applicationid' => 8, 'hostid' => 1, 'name' => 'app8'],
+					['applicationid' => 9, 'hostid' => 1, 'name' => 'app9'],
+					['applicationid' => 10, 'hostid' => 1, 'name' => 'app10'],
+					['applicationid' => 11, 'hostid' => 2, 'name' => 'app1'],
+					['applicationid' => 12, 'hostid' => 2, 'name' => 'app2'],
+					['applicationid' => 13, 'hostid' => 2, 'name' => 'app3'],
+					['applicationid' => 14, 'hostid' => 2, 'name' => 'app4'],
+					['applicationid' => 15, 'hostid' => 2, 'name' => 'app5'],
+					['applicationid' => 16, 'hostid' => 3, 'name' => 'app1'],
+					['applicationid' => 17, 'hostid' => 3, 'name' => 'app2'],
+					['applicationid' => 18, 'hostid' => 3, 'name' => 'app3'],
+					['applicationid' => 19, 'hostid' => 3, 'name' => 'app4'],
+					['applicationid' => 20, 'hostid' => 3, 'name' => 'app5']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				[
+					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
+					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
+					['applicationid' => 3, 'hostid' => 1, 'name' => 'app3'],
+					['applicationid' => 4, 'hostid' => 1, 'name' => 'app4'],
+					['applicationid' => 5, 'hostid' => 1, 'name' => 'app5'],
+					['applicationid' => 6, 'hostid' => 1, 'name' => 'app6'],
+					['applicationid' => 7, 'hostid' => 1, 'name' => 'app7'],
+					['applicationid' => 8, 'hostid' => 1, 'name' => 'app8'],
+					['applicationid' => 9, 'hostid' => 1, 'name' => 'app9'],
+					['applicationid' => 10, 'hostid' => 1, 'name' => 'app10'],
+					['applicationid' => 11, 'hostid' => 2, 'name' => 'app1'],
+					['applicationid' => 12, 'hostid' => 2, 'name' => 'app2'],
+					['applicationid' => 13, 'hostid' => 2, 'name' => 'app3'],
+					['applicationid' => 14, 'hostid' => 2, 'name' => 'app4'],
+					['applicationid' => 15, 'hostid' => 2, 'name' => 'app5'],
+					['applicationid' => 16, 'hostid' => 3, 'name' => 'app1'],
+					['applicationid' => 17, 'hostid' => 3, 'name' => 'app2'],
+					['applicationid' => 18, 'hostid' => 3, 'name' => 'app3'],
+					['applicationid' => 19, 'hostid' => 3, 'name' => 'app4'],
+					['applicationid' => 20, 'hostid' => 3, 'name' => 'app5'],
+					['applicationid' => 21, 'hostid' => 1, 'name' => 'app1']
+				],
+				'/',
+				false,
+				'Invalid parameter "/21": value (hostid, name)=(1, app1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				[
+					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
+					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
+					['applicationid' => 3, 'hostid' => 1, 'name' => 'app3'],
+					['applicationid' => 4, 'hostid' => 1, 'name' => 'app4'],
+					['applicationid' => 5, 'hostid' => 1, 'name' => 'app5'],
+					['applicationid' => 6, 'hostid' => 1, 'name' => 'app6'],
+					['applicationid' => 7, 'hostid' => 1, 'name' => 'app7'],
+					['applicationid' => 8, 'hostid' => 1, 'name' => 'app8'],
+					['applicationid' => 9, 'hostid' => 1, 'name' => 'app9'],
+					['applicationid' => 10, 'hostid' => 1, 'name' => 'app10'],
+					['applicationid' => 11, 'hostid' => 2, 'name' => 'app1'],
+					['applicationid' => 12, 'hostid' => 2, 'name' => 'app2'],
+					['applicationid' => 13, 'hostid' => 2, 'name' => 'app3'],
+					['applicationid' => 14, 'hostid' => 2, 'name' => 'app4'],
+					['applicationid' => 15, 'hostid' => 2, 'name' => 'app5'],
+					['applicationid' => 16, 'hostid' => 3, 'name' => 'app1'],
+					['applicationid' => 17, 'hostid' => 3, 'name' => 'app2'],
+					['applicationid' => 18, 'hostid' => 3, 'name' => 'app3'],
+					['applicationid' => 19, 'hostid' => 3, 'name' => 'app4'],
+					['applicationid' => 1, 'hostid' => 3, 'name' => 'app5']
+				],
+				'/',
+				false,
+				'Invalid parameter "/20": value (applicationid)=(1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['name']]],
+				[
+					['name' => 'app1'],
+					['name' => 'app2'],
+					['name' => 'app3'],
+					['name' => 'app4'],
+					['name' => 'app5'],
+					['name' => 'app6'],
+					['name' => 'app7'],
+					['name' => 'app8'],
+					['name' => 'app9'],
+					[],
+					['name' => 'app10'],
+					['name' => 'app11'],
+					['name' => 'app12'],
+					[],
+					[],
+					[],
+					['name' => 'app13'],
+					['name' => 'app14'],
+					['name' => 'app15'],
+					['name' => 'app16'],
+					['name' => 'app17'],
+					['name' => 'app18'],
+					['name' => 'app19'],
+					['name' => 'app1']
+				],
+				'/',
+				false,
+				'Invalid parameter "/24": value (name)=(app1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']]],
+				[
+					['hostid' => 1, 'name' => 'app1'],
+					['hostid' => 1, 'name' => 'app2'],
+					['hostid' => 1],
+					['hostid' => 1],
+					['hostid' => 1],
+					['hostid' => 1, 'name' => 'app6'],
+					['hostid' => 1, 'name' => 'app7'],
+					['name' => 'app8'],
+					['name' => 'app9'],
+					['name' => 'app10'],
+					['name' => 'app1'],
+					['name' => 'app2'],
+					['name' => 'app3'],
+					['name' => 'app4'],
+					['name' => 'app5'],
+					['hostid' => 3],
+					['hostid' => 3],
+					['hostid' => 3],
+					['hostid' => 3],
+					['hostid' => 1, 'name' => 'app1']
+				],
+				'/',
+				false,
+				'Invalid parameter "/20": value (hostid, name)=(1, app1) already exists.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderUniqueness
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param bool   $rc_exprected
+	 * @param mixed  $error_exprected
+	 */
+	public function testApiUniqueness(array $rule, $data, $path, $rc_expected, $error_expected) {
+		$rc = CApiInputValidator::validateUniqueness($rule, $data, $path, $error);
+
+		$this->assertEquals(gettype($rc_expected), gettype($rc));
+		$this->assertEquals(gettype($error_expected), gettype($error));
+		$this->assertEquals($rc_expected, $rc);
+		$this->assertEquals($error_expected, $error);
+	}
 }
