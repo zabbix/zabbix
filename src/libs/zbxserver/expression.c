@@ -4726,7 +4726,7 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
  *                            if a function macro is supported.               *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
- *             max_erro_len - [IN] the size of error buffer                   *
+ *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
