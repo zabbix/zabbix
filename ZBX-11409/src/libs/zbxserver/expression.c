@@ -3769,9 +3769,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (0 != func_macro)
 			{
-				ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
+				if (SUCCEED != (ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
 						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
-						&replace_to);
+						&replace_to)))
+				{
+					zbx_free(replace_to);
+				}
 			}
 			else
 			{
