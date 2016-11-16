@@ -4151,7 +4151,8 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
  *               FAIL    - func does not point at valid function              *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_token_parse_function(const char *expression, const char *func, zbx_strloc_t *func_loc)
+static int	zbx_token_parse_function(const char *expression, const char *func,
+		zbx_strloc_t *func_loc, zbx_strloc_t *func_param)
 {
 	size_t	par_l, par_r;
 
@@ -4160,6 +4161,9 @@ static int	zbx_token_parse_function(const char *expression, const char *func, zb
 
 	func_loc->l = func - expression;
 	func_loc->r = func_loc->l + par_r;
+
+	func_param->l = func_loc->l + par_l;
+	func_param->r = func_loc->l + par_r;
 
 	return SUCCEED;
 }
@@ -4188,7 +4192,7 @@ static int	zbx_token_parse_function(const char *expression, const char *func, zb
 static int	zbx_token_parse_func_macro(const char *expression, const char *macro, const char *func,
 		zbx_token_t *token)
 {
-	zbx_strloc_t		func_loc;
+	zbx_strloc_t		func_loc, func_param;
 	zbx_token_func_macro_t	*data;
 	const char		*ptr;
 	int			offset;
@@ -4196,7 +4200,7 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 	if ('\0' == *func)
 		return FAIL;
 
-	if (SUCCEED != zbx_token_parse_function(expression, func, &func_loc))
+	if (SUCCEED != zbx_token_parse_function(expression, func, &func_loc, &func_param))
 		return FAIL;
 
 	ptr = expression + func_loc.r + 1;
@@ -4222,6 +4226,7 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 	data->macro.r = func_loc.l - 2;
 
 	data->func = func_loc;
+	data->func_param = func_param;
 
 	return SUCCEED;
 }
@@ -4256,7 +4261,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 	int				offset;
 	zbx_token_simple_macro_t	*data;
 	const char			*ptr;
-	zbx_strloc_t			key_loc, func_loc;
+	zbx_strloc_t			key_loc, func_loc, func_param;
 
 	ptr = key;
 
@@ -4282,7 +4287,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 	if (0 == ptr - key)
 		return FAIL;
 
-	if (SUCCEED != zbx_token_parse_function(expression, ptr + 1, &func_loc))
+	if (SUCCEED != zbx_token_parse_function(expression, ptr + 1, &func_loc, &func_param))
 		return FAIL;
 
 	key_loc.l = key - expression;

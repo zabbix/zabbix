@@ -1278,6 +1278,8 @@ typedef struct
 	zbx_strloc_t	macro;
 	/* function + parameters, for example: regsub("([0-9]+)", \1) */
 	zbx_strloc_t	func;
+	/* parameters, for example: ("([0-9]+)", \1) */
+	zbx_strloc_t	func_param;
 }
 zbx_token_func_macro_t;
 
