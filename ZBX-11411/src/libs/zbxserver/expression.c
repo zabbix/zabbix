@@ -4174,7 +4174,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
  *                            macros.                                         *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
- *             max_erro_len - [IN] the size of error buffer                   *
+ *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
