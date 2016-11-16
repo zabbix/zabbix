@@ -104,15 +104,12 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
 	zbx_stat_t	file_buf;
 
-
 	if (-1 != zbx_stat(SYS_TABLE_FILE, &file_buf) && -1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
 	{
 		smbuf = zbx_malloc(NULL, file_buf.st_size);
-		smbios_len = read(fd, smbuf, file_buf.st_size);
 
-		if (-1 == (ssize_t)smbios_len)
+		if (-1 == (ssize_t)(smbios_len = read(fd, smbuf, file_buf.st_size)))
 			goto clean;
-
 	}
 	else if (-1 != (fd = open(DEV_MEM, O_RDONLY)))
 	{
@@ -126,8 +123,11 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 				memset(membuf, 0, sizeof(membuf));
 
 				len = fp % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
-				if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED, fd, fp - len)))
+				if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED,
+						fd, fp - len)))
+				{
 					goto close;
+				}
 
 				memcpy(membuf, (char *)mmp + len, sizeof(membuf));
 				munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
@@ -135,7 +135,8 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 				if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
 				{
 					smbios_len = membuf[7] << 8 | membuf[6];
-					smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 | (size_t)membuf[9] << 8 | membuf[8];
+					smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 |
+							(size_t)membuf[9] << 8 | membuf[8];
 					smbios_status = SMBIOS_STATUS_OK;
 					break;
 				}
