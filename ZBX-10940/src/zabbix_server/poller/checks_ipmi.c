@@ -541,6 +541,8 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 					mod_use = "*";
 					modifier = ipmi_sensor_get_modifier_unit_string(sensor);
 					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
 			}
 			rate = ipmi_sensor_get_rate_unit_string(sensor);
 
@@ -549,6 +551,8 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 					e_string, s_type_string, s_reading_type_string, val, percent, base,
 					mod_use, modifier, rate);
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 out:
 	h->done = 1;
@@ -938,6 +942,8 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 				break;
 			case IPMI_CHANGED:
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
 
@@ -965,6 +971,8 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 			break;
 		case IPMI_CHANGED:
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1071,6 +1079,7 @@ static void	zbx_vlog(os_handler_t *handler, const char *format, enum ipmi_log_ty
 		case IPMI_LOG_DEBUG		: zbx_strlcpy(type, "DEBG: ", sizeof(type)); break;
 		case IPMI_LOG_DEBUG_CONT	:
 		case IPMI_LOG_DEBUG_END		: *type = '\0'; break;
+		default				: THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	zbx_vsnprintf(str, sizeof(str), format, ap);
