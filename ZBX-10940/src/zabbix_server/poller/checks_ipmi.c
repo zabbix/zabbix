@@ -625,13 +625,48 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_perform_openipmi_ops                                         *
+ *                                                                            *
+ * Purpose: Pass control to OpenIPMI library to process events                *
+ *                                                                            *
+ * Return value: SUCCEED - no errors                                          *
+ *               FAIL - an error occurred while processing events             *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *function_name)
+{
+	struct timeval	tv;
+
+	tv.tv_sec = 10;		/* set timeout for one operation */
+	tv.tv_usec = 0;
+
+	while (0 == h->done)
+	{
+		int	res;
+
+		if (0 == (res = os_hnd->perform_one_op(os_hnd, &tv)))
+			continue;
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perform_one_op() error: %s", function_name,
+					zbx_strerror(res));
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
 	const char	*__function_name = "zbx_read_ipmi_sensor";
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int		ret;
 	const char	*s_reading_type_string;
-	struct timeval	tv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
 			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
@@ -701,11 +736,7 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			goto out;
 	}
 
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-
-	while (0 == h->done)
-		os_hnd->perform_one_op(os_hnd, &tv);
+	zbx_perform_openipmi_ops(h, __function_name);	/* ignore returned result */
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
@@ -812,7 +843,6 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 {
 	const char		*__function_name = "zbx_read_ipmi_control";
 	int			ret;
-	struct timeval		tv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c->c_name, h->ip, h->port);
 
@@ -834,11 +864,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 		goto out;
 	}
 
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-
-	while (0 == h->done)
-		os_hnd->perform_one_op(os_hnd, &tv);
+	zbx_perform_openipmi_ops(h, __function_name);	/* ignore returned result */
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
@@ -847,7 +873,6 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 {
 	const char		*__function_name = "zbx_set_ipmi_control";
 	int			ret;
-	struct timeval		tv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d' value:%d",
 			__function_name, c->c_name, h->ip, h->port, value);
@@ -880,11 +905,7 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 		goto out;
 	}
 
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-
-	while (0 == h->done)
-		os_hnd->perform_one_op(os_hnd, &tv);
+	zbx_perform_openipmi_ops(h, __function_name);	/* ignore returned result */
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
@@ -1132,7 +1153,6 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	const char		*__function_name = "zbx_init_ipmi_host";
 	zbx_ipmi_host_t		*h;
 	ipmi_open_option_t	options[4];
-	struct timeval		tv;
 	char			*addrs[1] = {NULL}, *ports[1] = {NULL}, domain_name[11];	/* max int length */
 	int			ret;
 
@@ -1195,11 +1215,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-
-	while (0 == h->done)
-		os_hnd->perform_one_op(os_hnd, &tv);
+	zbx_perform_openipmi_ops(h, __function_name);	/* ignore returned result */
 out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
@@ -1244,7 +1260,6 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	const char	*__function_name = "zbx_close_inactive_host";
 
 	char		domain_name[11];	/* max int length */
-	struct timeval	tv;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
@@ -1257,16 +1272,9 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	domain_close_ok = 0;
 	ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h);
 
-	if (1 == domain_close_ok)
+	if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
 	{
-		tv.tv_sec = 10;
-		tv.tv_usec = 0;
-
-		while (0 == h->done)
-			os_hnd->perform_one_op(os_hnd, &tv);
-
 		zbx_free_ipmi_connection(h);
-
 		ret = SUCCEED;
 	}
 
