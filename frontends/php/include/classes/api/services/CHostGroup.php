@@ -346,64 +346,84 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
+	 * Inherit rights from parent host groups.
+	 *
+	 * @param array  $groups
+	 * @param string $groups[]['groupid']
+	 * @param string $groups[]['name']
+	 *
+	 * @return array
+	 */
+	private function inheritRights(array $groups) {
+		$parent_names = [];
+
+		foreach ($groups as $group) {
+			if (($pos = strrpos($group['name'], '/')) === false) {
+				continue;
+			}
+
+			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+		}
+
+		if ($parent_names) {
+			$db_parent_groups = API::getApiService()->select('groups', [
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => array_keys($parent_names)]
+			]);
+
+			$parent_groupids = [];
+
+			foreach ($db_parent_groups as $db_parent_group) {
+				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			}
+
+			if ($parent_groupids) {
+				$db_rights = API::getApiService()->select('rights', [
+					'output' => ['groupid', 'id', 'permission'],
+					'filter' => ['id' => array_keys($parent_groupids)]
+				]);
+
+				$rights = [];
+
+				foreach ($db_rights as $db_right) {
+					foreach ($parent_groupids[$db_right['id']] as $groupid) {
+						$rights[] = [
+							'groupid' => $db_right['groupid'],
+							'permission' => $db_right['permission'],
+							'id' => $groupid
+						];
+					}
+				}
+
+				DB::insertBatch('rights', $rights);
+			}
+		}
+	}
+
+	/**
 	 * Create host groups.
 	 *
-	 * @param array $groups array with host group names
-	 * @param array $groups['name']
+	 * @param array  $groups
+	 * @param string $groups[]['name']
 	 *
 	 * @return array
 	 */
 	public function create(array $groups) {
-		$groups = zbx_toArray($groups);
-
 		$this->validateCreate($groups);
 
-		$groupids = [];
-		$groupids_with_rights = [];
-		$parent_children = [];
+		$groupids = DB::insertBatch('groups', $groups);
+
+		foreach ($groups as $index => &$group) {
+			$group['groupid'] = $groupids[$index];
+		}
+		unset($group);
+
+		$this->inheritRights($groups);
 
 		foreach ($groups as $group) {
-			$new_groupids = DB::insert('groups', [$group]);
-			$groupid = reset($new_groupids);
-			$groupids[] = $groupid;
-
-			$name_parts = explode('/', $group['name']);
-			if (count($name_parts) > 1) {
-				array_pop($name_parts);
-				$parents = $this->get([
-					'output' => ['groupid'],
-					'filter' => ['name' => implode('/', $name_parts)],
-					'limit' => 1
-				]);
-
-				if ($parents) {
-					$parent = reset($parents);
-					$groupids_with_rights[$groupid] = $parent['groupid'];
-					$parent_children[$parent['groupid']][] = $groupid;
-				}
-			}
-		}
-
-		if ($groupids_with_rights) {
-			$rights = DBSelect(
-				'SELECT r.groupid, r.permission, r.id'.
-				' FROM rights r'.
-				' WHERE '.dbConditionInt('r.id', $groupids_with_rights)
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], 'groups',
+				null, null
 			);
-
-			$rights_to_insert = [];
-
-			while ($right = DBfetch($rights)) {
-				foreach ($parent_children[$right['id']] as $parent_child) {
-					$rights_to_insert[] = [
-						'groupid' => $right['groupid'],
-						'permission' => $right['permission'],
-						'id' => $parent_child
-					];
-				}
-			}
-
-			DB::insert('rights', $rights_to_insert);
 		}
 
 		return ['groupids' => $groupids];
@@ -659,61 +679,16 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
+	 * Check for duplicated host groups.
 	 *
-	 * @param array $groups
+	 * @param array  $names
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException  if host group already exists.
 	 */
-	protected function validateCreate(array $groups) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
-		}
-
-		if (!$groups) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$host_group_name_validator = new CHostGroupNameValidator();
-
-		foreach ($groups as $group) {
-			// Validate required fields and check if "name" is not empty.
-			if (!is_array($group)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// Check required parameters.
-			$missing_keys = checkRequiredKeys($group, ['name']);
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group is missing parameters: %1$s', implode(', ', $missing_keys))
-				);
-			}
-
-			// Check if host group name is valid.
-			if (!$host_group_name_validator->validate($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError())
-				);
-			}
-
-			$this->checkNoParameters($group, ['internal'], _('Cannot set "%1$s" for host group "%2$s".'),
-				$group['name']
-			);
-		}
-
-		// Check for duplicate names.
-		$duplicate = CArrayHelper::findDuplicate($groups, 'name');
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "%1$s" value "%2$s" for host group.', 'name', $duplicate['name'])
-			);
-		}
-
-		// Check if host group already exists.
+	private function checkDuplicates($names) {
 		$db_groups = API::getApiService()->select('groups', [
 			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($groups, 'name')],
+			'filter' => ['name' => $names],
 			'limit' => 1
 		]);
 
@@ -722,6 +697,28 @@ class CHostGroup extends CApiService {
 				_s('Host group "%1$s" already exists.', $db_groups[0]['name'])
 			);
 		}
+	}
+
+	/**
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @param array $groups
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateCreate(array &$groups) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('groups', 'name')]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$this->checkDuplicates(zbx_objectValues($groups, 'name'));
 	}
 
 	/**

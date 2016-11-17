@@ -502,7 +502,56 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 						]
 					]
 				]
-			]
+			],
+			[
+				['type' => API_HG_NAME, 'length' => 16],
+				'Zabbix servers',
+				'/1/name',
+				'Zabbix servers'
+			],
+			[
+				['type' => API_HG_NAME, 'length' => 16],
+				'Zabbix Servers+++',
+				'/1/name',
+				'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				['type' => API_HG_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				['type' => API_HG_NAME],
+				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_HG_NAME],
+				null,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_HG_NAME],
+				// broken UTF-8 byte sequence
+				'Заббикс '."\xd1".'сервера',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_HG_NAME],
+				'Latvia/Riga',
+				'/1/name',
+				'Latvia/Riga'
+			],
+			[
+				['type' => API_HG_NAME],
+				'/Latvia/Riga',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
+			],
 		];
 	}
 

@@ -986,6 +986,7 @@ define('API_ID',			2);
 define('API_OBJECT',		3);
 define('API_IDS',			4);
 define('API_OBJECTS',		5);
+define('API_HG_NAME',		6);
 // flags
 define('API_REQUIRED',		0x01);
 define('API_NOT_EMPTY',		0x02);
