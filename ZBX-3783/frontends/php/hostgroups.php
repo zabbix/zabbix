@@ -173,12 +173,6 @@ if (hasRequest('form')) {
 
 					$result &= (bool) API::HostGroup()->massRemove($massRemove);
 				}
-
-				if ($result) {
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupId, $name, 'groups',
-						['name' => $oldGroup['name']], ['name' => $name]
-					);
-				}
 			}
 		}
 		else {
