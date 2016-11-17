@@ -283,7 +283,8 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	zbx_ipmi_sensor_t	*s;
 	char			id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e	id_type;
-	int			id_sz, sz;
+	int			id_sz;
+	size_t			sz;
 	char			full_name[MAX_STRING_LEN];
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
@@ -295,7 +296,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 			zbx_sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz), h->ip, h->port);
 
 	h->sensor_count++;
-	sz = h->sensor_count * sizeof(zbx_ipmi_sensor_t);
+	sz = (size_t)h->sensor_count * sizeof(zbx_ipmi_sensor_t);
 
 	if (NULL == h->sensors)
 		h->sensors = zbx_malloc(h->sensors, sz);
@@ -345,8 +346,8 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 
 		h->sensor_count--;
 		if (h->sensor_count != i)
-			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (h->sensor_count - i));
-		h->sensors = zbx_realloc(h->sensors, sz * h->sensor_count);
+			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (size_t)(h->sensor_count - i));
+		h->sensors = zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
 
 		break;
 	}
@@ -412,7 +413,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c_name, h->ip, h->port);
 
 	h->control_count++;
-	sz = h->control_count * sizeof(zbx_ipmi_control_t);
+	sz = (size_t)h->control_count * sizeof(zbx_ipmi_control_t);
 
 	if (NULL == h->controls)
 		h->controls = zbx_malloc(h->controls, sz);
@@ -426,7 +427,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	c->control = control;
 	c->c_name = c_name;
 	c->num_values = ipmi_control_get_num_vals(control);
-	sz = sizeof(int) * c->num_values;
+	sz = sizeof(int) * (size_t)c->num_values;
 	c->val = zbx_malloc(c->val, sz);
 	memset(c->val, 0, sz);
 
@@ -458,8 +459,8 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 
 		h->control_count--;
 		if (h->control_count != i)
-			memmove(&h->controls[i], &h->controls[i + 1], sz * (h->control_count - i));
-		h->controls = zbx_realloc(h->controls, sz * h->control_count);
+			memmove(&h->controls[i], &h->controls[i + 1], sz * (size_t)(h->control_count - i));
+		h->controls = zbx_realloc(h->controls, sz * (size_t)h->control_count);
 
 		break;
 	}
