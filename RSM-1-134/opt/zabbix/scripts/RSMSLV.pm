@@ -5021,7 +5021,7 @@ sub __get_macro
 
 	if ($search_tld)
 	{
-		fail("cannot get TLD macro \"$m\": TLD not specified") if (!$templateid && !$tld);
+		fail("internal error: macro \"$m\" can be set per TLD but function to get it is called with TLD unspecified") if (!$templateid && !$tld);
 
 		$templateid = get_hostid("Template $tld") unless ($templateid);
 

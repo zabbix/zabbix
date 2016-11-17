@@ -957,13 +957,225 @@ ROW   |3        |2         |0    |Up                                            
 ROW   |4        |2         |2    |Unreachable                                                   |
 ROW   |68       |10        |1    |Up                                                            |
 ROW   |74       |13        |-1   |Internal error                                                |
-ROW   |75       |13        |-205 |No reply from resolver                                        |
-ROW   |76       |13        |-206 |No AD bit in the answer from resolver                         |
-ROW   |78       |13        |-200 |No reply from Name Server                                     |
-ROW   |79       |13        |-201 |Invalid reply from Name Server                                |
-ROW   |80       |13        |-202 |No UNIX timestamp                                             |
-ROW   |81       |13        |-203 |Invalid UNIX timestamp                                        |
-ROW   |82       |13        |-204 |DNSSEC error                                                  |
+ROW   |75       |13        |-205 |No reply from resolver (obsolete)                             |
+ROW   |76       |13        |-206 |Keyset is not valid (obsolete)                                |
+ROW   |78       |13        |-200 |DNS UDP - No reply from name server                           |
+ROW   |79       |13        |-201 |Invalid reply from Name Server (obsolete)                     |
+ROW   |80       |13        |-202 |No UNIX timestamp (obsolete)                                  |
+ROW   |81       |13        |-203 |Invalid UNIX timestamp (obsolete)                             |
+ROW   |82       |13        |-204 |DNSSEC error (obsolete)                                       |
+ROW   |284      |13        |-207 |DNS UDP - Expecting DNS class IN but got CHAOS                |
+ROW   |285      |13        |-208 |DNS UDP - Expecting DNS Class IN but got HESIOD               |
+ROW   |286      |13        |-209 |DNS UDP - Expecting DNS Class IN but got something different than IN, CHAOS or HESIOD|
+ROW   |287      |13        |-210 |DNS UDP - Header section incomplete                           |
+ROW   |288      |13        |-211 |DNS UDP - Question section incomplete                         |
+ROW   |289      |13        |-212 |DNS UDP - Answer section incomplete                           |
+ROW   |290      |13        |-213 |DNS UDP - Authority section incomplete                        |
+ROW   |291      |13        |-214 |DNS UDP - Additional section incomplete                       |
+ROW   |292      |13        |-215 |DNS UDP - Malformed DNS response                              |
+ROW   |293      |13        |-250 |DNS UDP - Querying for a non existent domain - AA flag not present in response|
+ROW   |294      |13        |-251 |DNS UDP - Querying for a non existent domain - Domain name being queried not present in question section|
+ROW   |295      |13        |-252 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOERROR|
+ROW   |296      |13        |-253 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got FORMERR|
+ROW   |297      |13        |-254 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got SERVFAIL|
+ROW   |298      |13        |-255 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTIMP|
+ROW   |299      |13        |-256 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got REFUSED|
+ROW   |300      |13        |-257 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got YXDOMAIN|
+ROW   |301      |13        |-258 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got YXRRSET|
+ROW   |302      |13        |-259 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NXRRSET|
+ROW   |303      |13        |-260 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTAUTH|
+ROW   |304      |13        |-261 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTZONE|
+ROW   |305      |13        |-262 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADVERS or BADSIG|
+ROW   |306      |13        |-263 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADKEY|
+ROW   |307      |13        |-264 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADTIME|
+ROW   |308      |13        |-265 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADMODE|
+ROW   |309      |13        |-266 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADNAME|
+ROW   |310      |13        |-267 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADALG|
+ROW   |311      |13        |-268 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADTRUNC|
+ROW   |312      |13        |-269 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADCOOKIE|
+ROW   |313      |13        |-270 |DNS UDP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got unexpected|
+ROW   |314      |13        |-300 |DNS UDP - Querying for an existent domain - AA flag present in response|
+ROW   |315      |13        |-301 |DNS UDP - Querying for an existent domain - Domain name being queried not present in question section|
+ROW   |316      |13        |-302 |DNS UDP - Querying for an existent domain - Expecting referral but answer section is not empty|
+ROW   |317      |13        |-303 |DNS UDP - Querying for an existent domain - Expecting referral but authority section does not contain a referral|
+ROW   |318      |13        |-304 |DNS UDP - Querying for an existent domain - No Unix timestamp |
+ROW   |319      |13        |-305 |DNS UDP - Querying for an existent domain - Invalid timestamp |
+ROW   |320      |13        |-306 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got FORMERR|
+ROW   |321      |13        |-307 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got SERVFAIL|
+ROW   |322      |13        |-308 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got NXDOMAIN|
+ROW   |323      |13        |-309 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTIMP|
+ROW   |324      |13        |-310 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got REFUSED|
+ROW   |325      |13        |-311 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got YXDOMAIN|
+ROW   |326      |13        |-312 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got YXRRSET|
+ROW   |327      |13        |-313 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got NXRRSET|
+ROW   |328      |13        |-314 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTAUTH|
+ROW   |329      |13        |-315 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTZONE|
+ROW   |330      |13        |-316 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADVERS or BADSIG|
+ROW   |331      |13        |-317 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADKEY|
+ROW   |332      |13        |-318 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADTIME|
+ROW   |333      |13        |-319 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADMODE|
+ROW   |334      |13        |-320 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADNAME|
+ROW   |335      |13        |-321 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADALG|
+ROW   |336      |13        |-322 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADTRUNC|
+ROW   |337      |13        |-323 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got BADCOOKIE|
+ROW   |338      |13        |-324 |DNS UDP - Querying for an existent domain - Expecting NOERROR RCODE but got unexpected|
+ROW   |339      |13        |-350 |DNS UDP - Querying for a DNAME TLD - AA flag present in response|
+ROW   |340      |13        |-351 |DNS UDP - Querying for a DNAME TLD - DNAME RR not found or malformed in answer section|
+ROW   |341      |13        |-352 |DNS UDP - Querying for a DNAME TLD - CNAME RR not found in answer section|
+ROW   |342      |13        |-353 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got FORMERR|
+ROW   |343      |13        |-354 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got SERVFAIL|
+ROW   |344      |13        |-355 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NXDOMAIN|
+ROW   |345      |13        |-356 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTIMP|
+ROW   |346      |13        |-357 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got REFUSED|
+ROW   |347      |13        |-358 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got YXDOMAIN|
+ROW   |348      |13        |-359 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got YXRRSET|
+ROW   |349      |13        |-360 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NXRRSET|
+ROW   |350      |13        |-361 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTAUTH|
+ROW   |351      |13        |-362 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTZONE|
+ROW   |352      |13        |-363 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADVERS or BADSIG|
+ROW   |353      |13        |-364 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADKEY|
+ROW   |354      |13        |-365 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADTIME|
+ROW   |355      |13        |-366 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADMODE|
+ROW   |356      |13        |-367 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADNAME|
+ROW   |357      |13        |-368 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADALG|
+ROW   |358      |13        |-369 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADTRUNC|
+ROW   |359      |13        |-370 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADCOOKIE|
+ROW   |360      |13        |-371 |DNS UDP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got unexpected|
+ROW   |361      |13        |-400 |DNS UDP - No reply from local resolver                        |
+ROW   |362      |13        |-401 |DNS UDP - No AD bit from local resolver                       |
+ROW   |363      |13        |-402 |DNS UDP - Expecting NOERROR RCODE but got SERVFAIL from local resolver|
+ROW   |364      |13        |-403 |DNS UDP - Expecting NOERROR RCODE but got NXDOMAIN from local resolver|
+ROW   |365      |13        |-404 |DNS UDP - Expecting NOERROR RCODE but got unexpecting from local resolver|
+ROW   |366      |13        |-405 |DNS UDP - Unknown cryptographic algorithm                     |
+ROW   |367      |13        |-406 |DNS UDP - Cryptographic algorithm not implemented             |
+ROW   |368      |13        |-407 |DNS UDP - No RRSIGs where found in any section, and the TLD has the DNSSEC flag enabled|
+ROW   |369      |13        |-408 |DNS UDP - LDNS - No RRSIG found                               |
+ROW   |370      |13        |-409 |DNS UDP - No DNSSEC public key(s)                             |
+ROW   |371      |13        |-410 |DNS UDP - The signature does not cover this RRset             |
+ROW   |372      |13        |-411 |DNS UDP - No signatures found for trusted DNSSEC public key(s)|
+ROW   |373      |13        |-412 |DNS UDP - No DS record(s)                                     |
+ROW   |374      |13        |-413 |DNS UDP - Could not validate DS record(s)                     |
+ROW   |375      |13        |-414 |DNS UDP - No keys with the KEYTAG and algorithm from the RRSIG found|
+ROW   |376      |13        |-415 |DNS UDP - Bogus DNSSEC signature                              |
+ROW   |377      |13        |-416 |DNS UDP - DNSSEC signature has expired                        |
+ROW   |378      |13        |-417 |DNS UDP - DNSSEC signature not incepted yet                   |
+ROW   |379      |13        |-418 |DNS UDP - DNSSEC signature has expiration date earlier than inception date|
+ROW   |380      |13        |-419 |DNS UDP - Error in NSEC3 denial of existence proof            |
+ROW   |381      |13        |-420 |DNS UDP - Syntax error, algorithm unknown or non parseable    |
+ROW   |382      |13        |-421 |DNS UDP - Iterations count for NSEC3 record higher than maximum|
+ROW   |383      |13        |-422 |DNS UDP - RR not covered by the given NSEC RRs                |
+ROW   |384      |13        |-423 |DNS UDP - Wildcard not covered by the given NSEC RRs          |
+ROW   |385      |13        |-424 |DNS UDP - Original of NSEC3 hashed name could not be found    |
+ROW   |386      |13        |-425 |DNS UDP - The RRSIG has too few RDATA fields                  |
+ROW   |387      |13        |-426 |DNS UDP - The DNSKEY has too few RDATA fields                 |
+ROW   |388      |13        |-427 |DNS UDP - Malformed DNSSEC response                           |
+ROW   |389      |13        |-600 |DNS TCP - Timeout reply from name server                      |
+ROW   |390      |13        |-601 |DNS TCP - Error opening connection to name server             |
+ROW   |391      |13        |-607 |DNS TCP - Expecting DNS class IN but got CHAOS                |
+ROW   |392      |13        |-608 |DNS TCP - Expecting DNS Class IN but got HESIOD               |
+ROW   |393      |13        |-609 |DNS TCP - Expecting DNS Class IN but got something different than IN, CHAOS or HESIOD|
+ROW   |394      |13        |-610 |DNS TCP - Header section incomplete                           |
+ROW   |395      |13        |-611 |DNS TCP - Question section incomplete                         |
+ROW   |396      |13        |-612 |DNS TCP - Answer section incomplete                           |
+ROW   |497      |13        |-613 |DNS TCP - Authority section incomplete                        |
+ROW   |498      |13        |-614 |DNS TCP - Additional section incomplete                       |
+ROW   |499      |13        |-615 |DNS TCP - Malformed DNS response                              |
+ROW   |400      |13        |-650 |DNS TCP - Querying for a non existent domain - AA flag not present in response|
+ROW   |401      |13        |-651 |DNS TCP - Querying for a non existent domain - Domain name being queried not present in question section|
+ROW   |402      |13        |-652 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOERROR|
+ROW   |403      |13        |-653 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got FORMERR|
+ROW   |404      |13        |-654 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got SERVFAIL|
+ROW   |405      |13        |-655 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTIMP|
+ROW   |406      |13        |-656 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got REFUSED|
+ROW   |407      |13        |-657 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got YXDOMAIN|
+ROW   |408      |13        |-658 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got YXRRSET|
+ROW   |409      |13        |-659 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NXRRSET|
+ROW   |410      |13        |-660 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTAUTH|
+ROW   |411      |13        |-661 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got NOTZONE|
+ROW   |412      |13        |-662 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADVERS or BADSIG|
+ROW   |413      |13        |-663 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADKEY|
+ROW   |414      |13        |-664 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADTIME|
+ROW   |415      |13        |-665 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADMODE|
+ROW   |416      |13        |-666 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADNAME|
+ROW   |417      |13        |-667 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADALG|
+ROW   |418      |13        |-668 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADTRUNC|
+ROW   |419      |13        |-669 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got BADCOOKIE|
+ROW   |420      |13        |-670 |DNS TCP - Querying for a non existent domain - Expecting NXDOMAIN RCODE but got unexpected|
+ROW   |421      |13        |-700 |DNS TCP - Querying for an existent domain - AA flag present in response|
+ROW   |422      |13        |-701 |DNS TCP - Querying for an existent domain - Domain name being queried not present in question section|
+ROW   |423      |13        |-702 |DNS TCP - Querying for an existent domain - Expecting referral but answer section is not empty|
+ROW   |424      |13        |-703 |DNS TCP - Querying for an existent domain - Expecting referral but authority section does not contain a referral|
+ROW   |425      |13        |-704 |DNS TCP - Querying for an existent domain - No Unix timestamp |
+ROW   |426      |13        |-705 |DNS TCP - Querying for an existent domain - Invalid timestamp |
+ROW   |427      |13        |-706 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got FORMERR|
+ROW   |428      |13        |-707 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got SERVFAIL|
+ROW   |429      |13        |-708 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got NXDOMAIN|
+ROW   |430      |13        |-709 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTIMP|
+ROW   |431      |13        |-710 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got REFUSED|
+ROW   |432      |13        |-711 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got YXDOMAIN|
+ROW   |433      |13        |-712 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got YXRRSET|
+ROW   |434      |13        |-713 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got NXRRSET|
+ROW   |435      |13        |-714 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTAUTH|
+ROW   |436      |13        |-715 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got NOTZONE|
+ROW   |437      |13        |-716 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADVERS or BADSIG|
+ROW   |438      |13        |-717 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADKEY|
+ROW   |439      |13        |-718 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADTIME|
+ROW   |440      |13        |-719 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADMODE|
+ROW   |441      |13        |-720 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADNAME|
+ROW   |442      |13        |-721 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADALG|
+ROW   |443      |13        |-722 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADTRUNC|
+ROW   |444      |13        |-723 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got BADCOOKIE|
+ROW   |445      |13        |-724 |DNS TCP - Querying for an existent domain - Expecting NOERROR RCODE but got unexpected|
+ROW   |446      |13        |-750 |DNS TCP - Querying for a DNAME TLD - AA flag present in response|
+ROW   |447      |13        |-751 |DNS TCP - Querying for a DNAME TLD - DNAME RR not found or malformed in answer section|
+ROW   |448      |13        |-752 |DNS TCP - Querying for a DNAME TLD - CNAME RR not found in answer section|
+ROW   |449      |13        |-753 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got FORMERR|
+ROW   |450      |13        |-754 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got SERVFAIL|
+ROW   |451      |13        |-755 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NXDOMAIN|
+ROW   |452      |13        |-756 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTIMP|
+ROW   |453      |13        |-757 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got REFUSED|
+ROW   |454      |13        |-758 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got YXDOMAIN|
+ROW   |455      |13        |-759 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got YXRRSET|
+ROW   |456      |13        |-760 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NXRRSET|
+ROW   |457      |13        |-761 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTAUTH|
+ROW   |458      |13        |-762 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got NOTZONE|
+ROW   |459      |13        |-763 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADVERS or BADSIG|
+ROW   |460      |13        |-764 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADKEY|
+ROW   |461      |13        |-765 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADTIME|
+ROW   |462      |13        |-766 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADMODE|
+ROW   |463      |13        |-767 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADNAME|
+ROW   |464      |13        |-768 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADALG|
+ROW   |465      |13        |-769 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADTRUNC|
+ROW   |466      |13        |-770 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got BADCOOKIE|
+ROW   |467      |13        |-771 |DNS TCP - Querying for a DNAME TLD - Expecting NOERROR RCODE but got unexpected|
+ROW   |468      |13        |-800 |DNS TCP - No reply from local resolver                        |
+ROW   |469      |13        |-801 |DNS TCP - No AD bit from local resolver                       |
+ROW   |470      |13        |-802 |DNS TCP - Expecting NOERROR RCODE but got SERVFAIL from local resolver|
+ROW   |471      |13        |-803 |DNS TCP - Expecting NOERROR RCODE but got NXDOMAIN from local resolver|
+ROW   |472      |13        |-804 |DNS TCP - Expecting NOERROR RCODE but got unexpecting from local resolver|
+ROW   |473      |13        |-805 |DNS TCP - Unknown cryptographic algorithm                     |
+ROW   |474      |13        |-806 |DNS TCP - Cryptographic algorithm not implemented             |
+ROW   |475      |13        |-807 |DNS TCP - No RRSIGs where found in any section, and the TLD has the DNSSEC flag enabled|
+ROW   |476      |13        |-808 |DNS TCP - LDNS - No RRSIG found                               |
+ROW   |477      |13        |-809 |DNS TCP - No DNSSEC public key(s)                             |
+ROW   |478      |13        |-810 |DNS TCP - The signature does not cover this RRset             |
+ROW   |479      |13        |-811 |DNS TCP - No signatures found for trusted DNSSEC public key(s)|
+ROW   |480      |13        |-812 |DNS TCP - No DS record(s)                                     |
+ROW   |481      |13        |-813 |DNS TCP - Could not validate DS record(s)                     |
+ROW   |482      |13        |-814 |DNS TCP - No keys with the KEYTAG and algorithm from the RRSIG found|
+ROW   |483      |13        |-815 |DNS TCP - Bogus DNSSEC signature                              |
+ROW   |484      |13        |-816 |DNS TCP - DNSSEC signature has expired                        |
+ROW   |485      |13        |-817 |DNS TCP - DNSSEC signature not incepted yet                   |
+ROW   |486      |13        |-818 |DNS TCP - DNSSEC signature has expiration date earlier than inception date|
+ROW   |487      |13        |-819 |DNS TCP - Error in NSEC3 denial of existence proof            |
+ROW   |488      |13        |-820 |DNS TCP - Syntax error, algorithm unknown or non parseable    |
+ROW   |489      |13        |-821 |DNS TCP - Iterations count for NSEC3 record higher than maximum|
+ROW   |490      |13        |-822 |DNS TCP - RR not covered by the given NSEC RRs                |
+ROW   |491      |13        |-823 |DNS TCP - Wildcard not covered by the given NSEC RRs          |
+ROW   |492      |13        |-824 |DNS TCP - Original of NSEC3 hashed name could not be found    |
+ROW   |493      |13        |-825 |DNS TCP - The RRSIG has too few RDATA fields                  |
+ROW   |494      |13        |-826 |DNS TCP - The DNSKEY has too few RDATA fields                 |
+ROW   |495      |13        |-827 |DNS TCP - Malformed DNSSEC response                           |
 ROW   |83       |14        |1    |Online                                                        |
 ROW   |84       |14        |0    |Offline                                                       |
 ROW   |85       |15        |-1   |Internal error                                                |

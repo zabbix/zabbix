@@ -25,8 +25,8 @@
 #define ZBX_EC_NOERROR	0
 
 /* item values indicating an error code: NB! KEEP THIS IN SYNC WITH checks_simple_rsm.c and RSMSLV.pm */
-/* -1   .. -199, -208, -250, -500	internal monitoring software errors                           */
-/* -200 .. -999				service errors (registry operator fault)                      */
+/* -1   .. -199, (RDDS: -208, -250, -500)	internal monitoring software errors                   */
+/* -200 .. -999					service errors (registry operator fault)              */
 
 /* internal */
 #define ZBX_EC_INTERNAL			-1	/* general internal error */
@@ -42,14 +42,45 @@
 #define ZBX_EC_HTTP_EHTTP		-9
 #define ZBX_EC_HTTP_EHTTPS		-10
 #define ZBX_EC_HTTP_BASE		-11
-/* DNS */
-#define ZBX_EC_DNS_NS_NOREPLY		-200	/* no reply from Name Server */
-#define ZBX_EC_DNS_NS_EREPLY		-201	/* invalid reply from Name Server */
-#define ZBX_EC_DNS_NS_NOTS		-202	/* no UNIX timestamp */
-#define ZBX_EC_DNS_NS_ETS		-203	/* invalid UNIX timestamp */
-#define ZBX_EC_DNS_NS_EDNSSEC		-204	/* DNSSEC error */
-#define ZBX_EC_DNS_RES_NOREPLY		-205	/* no reply from resolver */
-#define ZBX_EC_DNS_RES_NOADBIT		-206	/* no AD bit in the answer from resolver */
+/* DNS UDP specific */
+#define ZBX_EC_DNS_UDP_NS_NOREPLY	-200	/* DNS UDP - No reply from Name Server */
+/* The following set of DNS errors apply to both UDP and TCP, ZBX_EC_OFFSET_DNS_TCP is applied in case of TCP. */
+#define ZBX_EC_DNS_IN_GOT_CHAOS		-207	/* DNS UDP/TCP - Expecting DNS class IN but got CHAOS */
+#define ZBX_EC_DNS_IN_GOT_HESIOD	-208	/* DNS UDP/TCP - Expecting DNS class IN but got HESIOD */
+#define ZBX_EC_DNS_IN_GOT_OTHER		-209	/* DNS UDP/TCP - Expecting DNS class IN but got something different than IN, CHAOS or HESIOD */
+#define ZBX_EC_DNS_LDNS_BASE		-210	/* DNS UDP/TCP - LDNS errors: -210..-215 */
+/* DNS UDP/TCP non-existent */
+#define ZBX_EC_DNS_NXD_NO_AA		-250	/* DNS UDP/TCP - Querying for a non existent domain - AA flag not present in response */
+#define ZBX_EC_DNS_NXD_NOT_IN_QUESTION	-251	/* DNS UDP/TCP - Querying for a non existent domain - Domain name being queried not present in question section */
+#define ZBX_EC_DNS_NXD_RCODE_BASE	-252	/* DNS UDP/TCP - RCODE errors -252 .. -270 */
+/* DNS UDP/TCP existent */
+#define ZBX_EC_DNS_EXD_AA		-300	/* DNS UDP/TCP - Querying for an existent domain - AA flag present in response */
+#define ZBX_EC_DNS_EXD_NOT_IN_QUESTION	-301	/* DNS UDP/TCP - Querying for an existent domain - Domain name being queried not present in question section */
+#define ZBX_EC_DNS_EXD_ANSWER		-302	/* DNS UDP/TCP - Querying for an existent domain - Expecting referral but answer section is not empty */
+#define ZBX_EC_DNS_EXD_NO_REFERRAL	-303	/* DNS UDP/TCP - Querying for an existent domain - Expecting referral but authority section does not contain a referral */
+#define ZBX_EC_DNS_EXD_NO_UNIX_TS	-304	/* DNS UDP/TCP - Querying for an existent domain - No Unix timestamp */
+#define ZBX_EC_DNS_EXD_INV_UNIX_TS	-305	/* DNS UDP/TCP - Querying for an existent domain - Invalid timestamp */
+#define ZBX_EC_DNS_EXD_RCODE_BASE	-306	/* DNS UDP/TCP - RCODE errors -306 .. -324 */
+/* DNS UDP/TCP DNAME */
+#define ZBX_EC_DNS_DNAME_AA		-350	/* DNS UDP/TCP - Querying for a DNAME TLD - AA flag present in response */
+#define ZBX_EC_DNS_DNAME_NO_RR		-351	/* DNS UDP/TCP - Querying for a DNAME TLD - DNAME RR not found or malformed in answer section */
+#define ZBX_EC_DNS_DNAME_NO_CN_RR	-352	/* DNS UDP/TCP - Querying for a DNAME TLD - CNAME RR not found in answer section */
+#define ZBX_EC_DNS_DNAME_RCODE_BASE	-353	/* DNS UDP/TCP - RCODE errors -353 .. -371 */
+/* DNS UDP/TCP DNSSEC */
+#define ZBX_EC_DNS_DNSSEC_NO_RESOLV	-400	/* DNS UDP/TCP - No reply from local resolver */
+#define ZBX_EC_DNS_DNSSEC_NO_AD		-401	/* DNS UDP/TCP - No AD bit from local resolver */
+#define ZBX_EC_DNS_DNSSEC_SERVFAIL	-402	/* DNS UDP/TCP - Expecting NOERROR RCODE but got SERVFAIL from local resolver  */
+#define ZBX_EC_DNS_DNSSEC_NXDOMAIN	-403	/* DNS UDP/TCP - Expecting NOERROR RCODE but got NXDOMAIN from local resolver */
+#define ZBX_EC_DNS_DNSSEC_UNEXP		-404	/* DNS UDP/TCP - Expecting NOERROR RCODE but got unexpecting from local resolver */
+#define ZBX_EC_DNS_DNSSEC_NO_RRSIGS	-407	/* DNS UDP/TCP - No RRSIGs where found in any section, and the TLD has the DNSSEC flag enabled */
+#define ZBX_EC_DNS_DNSSEC_LDNS_BASE	-405	/* DNS UDP/TCP - LDNS errors: -405, -406, -408 .. -427 */
+/* DNS TCP specific */
+#define ZBX_EC_DNS_TCP_NS_TO		-600	/* DNS TCP - Timeout reply from name server */
+#define ZBX_EC_DNS_TCP_NS_CONN		-601	/* DNS TCP - Error opening connection to name server */
+/* generic DNS TCP error codes have the following offset */
+#define ZBX_EC_OFFSET_DNS_TCP		-400
+/* last DNS error code:			-827 (ZBX_EC_OFFSET_DNS_TCP + last of ZBX_EC_DNS_DNSSEC_LDNS_BASE */
+
 /* RDDS */
 #define ZBX_EC_RDDS43_NONS		-201	/* RDDS43 - The output of the response does not match specification */
 #define ZBX_EC_RDDS43_RES_NOREPLY	-208	/* RDDS43 - No reply from local resolver */
@@ -111,6 +142,16 @@
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
 
 #define ZBX_NOT_PERFORMED		-100000	/* NB! Must not conflict with any of the error codes above! */
+
+/* RCODES that are missing in LDNS library */
+#define ZBX_LDNS_BADVERS_OR_BADSIG	16
+#define ZBX_LDNS_BADKEY			17
+#define ZBX_LDNS_BADTIME		18
+#define ZBX_LDNS_BADMODE		19
+#define ZBX_LDNS_BADNAME		20
+#define ZBX_LDNS_BADALG			21
+#define ZBX_LDNS_BADTRUNC		22
+#define ZBX_LDNS_BADCOOKIE		23
 
 #define ZBX_RSM_UDP	0
 #define ZBX_RSM_TCP	1

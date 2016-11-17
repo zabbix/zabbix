@@ -1624,6 +1624,9 @@ sub create_global_macros() {
         '{$RSM.DNS.PROBE.ONLINE}' => 2,
         '{$RSM.DNS.AVAIL.MINNS}' => 2,
         '{$RSM.DNS.ROLLWEEK.SLA}' => 60,
+        '{$RSM.DNS.TEST.PROTO.RATIO}' => 10,
+        '{$RSM.DNS.TEST.CRIT.RECOVER}' => 3,
+        '{$RSM.DNS.TEST.UPD.RATIO}' => 2,
 
         '{$RSM.RDDS.RTT.LOW}' => 2000,
         '{$RSM.RDDS43.RTT.HIGH}' => 10000,

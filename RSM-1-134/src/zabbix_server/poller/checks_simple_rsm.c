@@ -53,6 +53,9 @@
 extern const char	*CONFIG_LOG_FILE;
 extern const char	epp_passphrase[128];
 
+char	proto;	/* for DNS test error codes */
+#define DNS_EC_PROTO_OFFSET(EC)	(EC) + (proto == ZBX_RSM_UDP ? 0 : ZBX_EC_OFFSET_DNS_TCP)
+
 typedef struct
 {
 	char	*name;
@@ -368,7 +371,7 @@ static int	zbx_get_last_label(const char *name, char **last_label, char *err, si
 
 	if (name == last_label_start)
 	{
-		zbx_snprintf(err, err_size, "cannot get last label from \"%s\"", name);
+		zbx_snprintf(err, err_size, "cannot get last label from \"%s\" (does it contain any dots?)", name);
 		return FAIL;
 	}
 
@@ -377,7 +380,7 @@ static int	zbx_get_last_label(const char *name, char **last_label, char *err, si
 
 	if (name == last_label_start)
 	{
-		zbx_snprintf(err, err_size, "cannot get last label from \"%s\"", name);
+		zbx_snprintf(err, err_size, "cannot get last label from \"%s\" (does it start with the dot?)", name);
 		return FAIL;
 	}
 
@@ -598,7 +601,7 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 	{
 		zbx_snprintf(err, err_size, "no %s RRSIG records found at nameserver \"%s\" (%s)",
 				zbx_covered_to_str(covered), ns, ip);
-		*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+		*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_RRSIGS);
 		goto out;
 	}
 
@@ -636,7 +639,7 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 		{
 			zbx_snprintf(err, err_size, "no %s records of \"%s\" found at nameserver \"%s\" (%s)",
 					zbx_covered_to_str(covered), owner_buf, ns, ip);
-			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_RRSIGS);
 			goto out;
 		}
 
@@ -665,7 +668,7 @@ static int	zbx_verify_rrsigs(const ldns_pkt *pkt, ldns_pkt_section section, int 
 					zbx_covered_to_str(covered),
 					ldns_rr_list_rr_count(rrsigs),
 					ldns_rr_list_rr_count(keys));
-			*rtt = ZBX_EC_DNS_NS_EDNSSEC;
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_RRSIGS);
 			goto out;
 		}
 	}
@@ -683,9 +686,353 @@ out:
 	return ret;
 }
 
+static int	dns_query_ec_ldns(ldns_status error_status)
+{
+	switch (error_status)
+	{
+		case LDNS_STATUS_MEM_ERR:
+			return ZBX_EC_INTERNAL;
+		case LDNS_STATUS_ERR:
+			if (ZBX_RSM_TCP == proto)
+			{
+				return ZBX_EC_DNS_TCP_NS_CONN;		/* TCP specific */
+			}
+			break;
+		case LDNS_STATUS_SOCKET_ERROR:
+		case LDNS_STATUS_NETWORK_ERR:
+			if (ZBX_RSM_UDP == proto)
+			{
+				return ZBX_EC_DNS_UDP_NS_NOREPLY;	/* UDP specific */
+			}
+			else if (LDNS_STATUS_NETWORK_ERR == error_status)
+			{
+				return ZBX_EC_DNS_TCP_NS_TO;		/* TCP specific */
+			}
+			break;
+		case LDNS_STATUS_WIRE_INCOMPLETE_HEADER:
+			return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE);
+		case LDNS_STATUS_WIRE_INCOMPLETE_QUESTION:
+			return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE - 1);
+		case LDNS_STATUS_WIRE_INCOMPLETE_ANSWER:
+			return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE - 2);
+		case LDNS_STATUS_WIRE_INCOMPLETE_AUTHORITY:
+			return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE - 3);
+		case LDNS_STATUS_WIRE_INCOMPLETE_ADDITIONAL:
+			return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE - 4);
+	}
+
+	/* catch ALL */
+	return DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_LDNS_BASE - 5);
+}
+
+/* query for non-existent domain */
+static int	dns_ec_nxd_rcode(ldns_pkt_rcode rcode, int *rtt)
+{
+	int	ec_add;
+
+	if (LDNS_RCODE_NXDOMAIN == rcode)
+		return SUCCEED;
+
+	switch (rcode)
+	{
+		case LDNS_RCODE_NOERROR:
+			ec_add = 0;
+			break;
+		case LDNS_RCODE_FORMERR:
+			ec_add = 1;
+			break;
+		case LDNS_RCODE_SERVFAIL:
+			ec_add = 2;
+			break;
+		case LDNS_RCODE_NOTIMPL:
+			ec_add = 3;
+			break;
+		case LDNS_RCODE_REFUSED:
+			ec_add = 4;
+			break;
+		case LDNS_RCODE_YXDOMAIN:
+			ec_add = 5;
+			break;
+		case LDNS_RCODE_YXRRSET:
+			ec_add = 6;
+			break;
+		case LDNS_RCODE_NXRRSET:
+			ec_add = 7;
+			break;
+		case LDNS_RCODE_NOTAUTH:
+			ec_add = 8;
+			break;
+		case LDNS_RCODE_NOTZONE:
+			ec_add = 9;
+			break;
+		case ZBX_LDNS_BADVERS_OR_BADSIG:
+			ec_add = 10;
+			break;
+		case ZBX_LDNS_BADKEY:
+			ec_add = 11;
+			break;
+		case ZBX_LDNS_BADTIME:
+			ec_add = 12;
+			break;
+		case ZBX_LDNS_BADMODE:
+			ec_add = 13;
+			break;
+		case ZBX_LDNS_BADNAME:
+			ec_add = 14;
+			break;
+		case ZBX_LDNS_BADALG:
+			ec_add = 15;
+			break;
+		case ZBX_LDNS_BADTRUNC:
+			ec_add = 16;
+			break;
+		case ZBX_LDNS_BADCOOKIE:
+			ec_add = 17;
+			break;
+		default:
+			ec_add = 18;
+			break;
+	}
+
+	*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_NXD_RCODE_BASE - ec_add);
+
+	return FAIL;
+}
+
+/* generic query */
+static int	dns_ec_generic_rcode(ldns_pkt_rcode rcode, int *rtt)
+{
+	int	ec_add;
+
+	if (LDNS_RCODE_NOERROR == rcode)
+		return SUCCEED;
+
+	switch (rcode)
+	{
+		case LDNS_RCODE_FORMERR:
+			ec_add = 0;
+			break;
+		case LDNS_RCODE_SERVFAIL:
+			ec_add = 1;
+			break;
+		case LDNS_RCODE_NXDOMAIN:
+			ec_add = 2;
+			break;
+		case LDNS_RCODE_NOTIMPL:
+			ec_add = 3;
+			break;
+		case LDNS_RCODE_REFUSED:
+			ec_add = 4;
+			break;
+		case LDNS_RCODE_YXDOMAIN:
+			ec_add = 5;
+			break;
+		case LDNS_RCODE_YXRRSET:
+			ec_add = 6;
+			break;
+		case LDNS_RCODE_NXRRSET:
+			ec_add = 7;
+			break;
+		case LDNS_RCODE_NOTAUTH:
+			ec_add = 8;
+			break;
+		case LDNS_RCODE_NOTZONE:
+			ec_add = 9;
+			break;
+		case ZBX_LDNS_BADVERS_OR_BADSIG:
+			ec_add = 10;
+			break;
+		case ZBX_LDNS_BADKEY:
+			ec_add = 11;
+			break;
+		case ZBX_LDNS_BADTIME:
+			ec_add = 12;
+			break;
+		case ZBX_LDNS_BADMODE:
+			ec_add = 13;
+			break;
+		case ZBX_LDNS_BADNAME:
+			ec_add = 14;
+			break;
+		case ZBX_LDNS_BADALG:
+			ec_add = 15;
+			break;
+		case ZBX_LDNS_BADTRUNC:
+			ec_add = 16;
+			break;
+		case ZBX_LDNS_BADCOOKIE:
+			ec_add = 17;
+			break;
+		default:
+			ec_add = 18;
+			break;
+	}
+
+	*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_RCODE_BASE - ec_add);
+
+	return FAIL;
+}
+
+/* DNSKEY query (DNSSEC) RCODE error */
+static int	dnskey_ec_rcode(ldns_pkt_rcode rcode, int *ec)
+{
+	if (LDNS_RCODE_NOERROR == rcode)
+		return SUCCEED;
+
+	if (LDNS_RCODE_SERVFAIL == rcode)
+		*ec = ZBX_EC_DNS_DNSSEC_SERVFAIL;
+	else if (LDNS_RCODE_NXDOMAIN == rcode)
+		*ec = ZBX_EC_DNS_DNSSEC_NXDOMAIN;
+	else
+		*ec = ZBX_EC_DNS_DNSSEC_UNEXP;
+
+	return FAIL;
+}
+
+/* DNSKEY query (DNSSEC) LDNS error */
+static int	dnskey_ec_ldns(ldns_status status, int *ec)
+{
+	int	ec_add;
+
+	if (LDNS_STATUS_OK == status)
+		return SUCCEED;
+
+	switch (status)
+	{
+		case LDNS_STATUS_CRYPTO_UNKNOWN_ALGO:
+			ec_add = 0;
+			break;
+		case LDNS_STATUS_CRYPTO_ALGO_NOT_IMPL:
+			ec_add = 1;
+			break;
+		case LDNS_STATUS_CRYPTO_NO_RRSIG:
+			ec_add = 3;	/* -2 belongs to ZBX_EC_DNS_DNSSEC_NO_RRSIGS */
+			break;
+		case LDNS_STATUS_CRYPTO_NO_DNSKEY:
+			ec_add = 4;
+			break;
+		case LDNS_STATUS_CRYPTO_TYPE_COVERED_ERR:
+			ec_add = 5;
+			break;
+		case LDNS_STATUS_CRYPTO_NO_TRUSTED_DNSKEY:
+			ec_add = 6;
+			break;
+		case LDNS_STATUS_CRYPTO_NO_DS:
+			ec_add = 7;
+			break;
+		case LDNS_STATUS_CRYPTO_NO_TRUSTED_DS:
+			ec_add = 8;
+			break;
+		case LDNS_STATUS_CRYPTO_NO_MATCHING_KEYTAG_DNSKEY:
+			ec_add = 9;
+			break;
+		case LDNS_STATUS_CRYPTO_BOGUS:
+			ec_add = 10;
+			break;
+		case LDNS_STATUS_CRYPTO_SIG_EXPIRED:
+			ec_add = 11;
+			break;
+		case LDNS_STATUS_CRYPTO_SIG_NOT_INCEPTED:
+			ec_add = 12;
+			break;
+		case LDNS_STATUS_CRYPTO_EXPIRATION_BEFORE_INCEPTION:
+			ec_add = 13;
+			break;
+		case LDNS_STATUS_NSEC3_ERR:
+			ec_add = 14;
+			break;
+		case LDNS_STATUS_SYNTAX_ALG_ERR:
+			ec_add = 15;
+			break;
+		case LDNS_STATUS_SYNTAX_ITERATIONS_OVERFLOW:
+			ec_add = 16;
+			break;
+		case LDNS_STATUS_DNSSEC_NSEC_RR_NOT_COVERED:
+			ec_add = 17;
+			break;
+		case LDNS_STATUS_DNSSEC_NSEC_WILDCARD_NOT_COVERED:
+			ec_add = 18;
+			break;
+		case LDNS_STATUS_DNSSEC_NSEC3_ORIGINAL_NOT_FOUND:
+			ec_add = 19;
+			break;
+		case LDNS_STATUS_MISSING_RDATA_FIELDS_RRSIG:
+			ec_add = 20;
+			break;
+		case LDNS_STATUS_MISSING_RDATA_FIELDS_KEY:
+			ec_add = 21;
+			break;
+		default:
+			ec_add = 22;
+	}
+
+	*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_LDNS_BASE - ec_add);
+
+	return FAIL;
+}
+
+static int	dns_ec_rr_class(int class, int *ec)
+{
+	if (LDNS_RR_CLASS_IN == class)
+		return SUCCEED;
+
+	if (NULL != ec)
+	{
+		if (LDNS_RR_CLASS_CH == class)
+			*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_IN_GOT_CHAOS);
+		else if (LDNS_RR_CLASS_HS == class)
+			*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_IN_GOT_HESIOD);
+		else
+			*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_IN_GOT_OTHER);
+	}
+
+	return FAIL;
+}
+
+static int	dns_query(ldns_resolver *res, const ldns_rdf *testname_rdf, ldns_pkt **pkt, ldns_status *status_ref,
+		int type, int class, int flags, int *ec)
+{
+	ldns_status	status;
+	ldns_rr_list	*rr_list = NULL;
+	int		rr_count, i, ret = FAIL;
+
+	status = ldns_resolver_query_status(pkt, res, testname_rdf, type, class, flags);
+
+	if (LDNS_STATUS_OK != status)
+	{
+		if (NULL != ec)
+			*ec = dns_query_ec_ldns(status);
+		goto out;
+	}
+
+	/* query successful, check CLASS */
+	rr_list = ldns_pkt_all(*pkt);
+
+	rr_count = ldns_rr_list_rr_count(rr_list);
+
+	for (i = 0; i < rr_count; i++)
+	{
+		const	ldns_rr	*rr;
+
+		rr = ldns_rr_list_rr(rr_list, i);
+
+		if (SUCCEED != dns_ec_rr_class(ldns_rr_get_class(rr), ec))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != rr_list)
+		ldns_rr_list_deep_free(rr_list);
+	if (NULL != status_ref)
+		*status_ref = status;
+
+	return ret;
+}
+
 static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
 		const char *testprefix, const char *domain, FILE *log_fd, int *rtt, int *upd_ptr, char ipv4_enabled,
-		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
+		char ipv6_enabled, char *err, size_t err_size)
 {
 	char		testname[ZBX_HOST_BUF_SIZE], *host, *last_label = NULL;
 	ldns_rdf	*testname_rdf = NULL, *last_label_rdf = NULL;
@@ -717,46 +1064,98 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 	}
 
 	/* IN A query */
-	if (NULL == (pkt = ldns_resolver_query(res, testname_rdf, LDNS_RR_TYPE_A, LDNS_RR_CLASS_IN, 0)))
+	if (SUCCEED != dns_query(res, testname_rdf, &pkt, NULL, LDNS_RR_TYPE_A, LDNS_RR_CLASS_IN, 0, rtt))
 	{
-		zbx_snprintf(err, err_size, "cannot connect to nameserver \"%s\" (%s)", ns, ip);
-		*rtt = ZBX_EC_DNS_NS_NOREPLY;
+		zbx_snprintf(err, err_size, "cannot connect to nameserver \"%s\" (%s): %d", ns, ip, *rtt);
 		goto out;
 	}
 
-	/* verify RCODE */
-	if (LDNS_RCODE_NOERROR != (rcode = ldns_pkt_get_rcode(pkt)) && LDNS_RCODE_NXDOMAIN != rcode)
+	/* get RCODE */
+	rcode = ldns_pkt_get_rcode(pkt);
+
+	if (NULL == upd_ptr)
 	{
-		char	*rcode_str;
+		ldns_rr_list	*rr_tmp;
 
-		rcode_str = ldns_pkt_rcode2str(rcode);
-		zbx_snprintf(err, err_size, "IN A query of %s from nameserver \"%s\" (%s) failed (rcode:%s)",
-				testname, ns, ip, rcode_str);
-		zbx_free(rcode_str);
-		*rtt = ZBX_EC_DNS_NS_EREPLY;
-		goto out;
-	}
-
-	ldns_pkt_print(log_fd, pkt);
-
-	if (0 != epp_enabled)
-	{
-		/* start referral validation */
-
-		/* no AA flag */
-		if (0 != ldns_pkt_aa(pkt))
+		/* non-existent domain: no AA flag (non-authoritative answer) */
+		if (0 == ldns_pkt_aa(pkt))
 		{
-			zbx_snprintf(err, err_size, "AA flag is set in the answer of \"%s\" from nameserver \"%s\" (%s)",
-					testname, ns, ip);
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
+			zbx_snprintf(err, err_size, "AA flag not present in the answer of non-existent domain \"%s\""
+					" from nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_NXD_NO_AA);
 			goto out;
 		}
+
+		/* non-existent domain: domain not in QUESTION */
+		if (NULL == (rr_tmp = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_A,
+				LDNS_SECTION_QUESTION)))
+		{
+			zbx_snprintf(err, err_size, "domain name queried \"%s\" not found in QUESTION section"
+					" from nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_NXD_NOT_IN_QUESTION);
+			goto out;
+		}
+
+		ldns_rr_list_deep_free(rr_tmp);
+
+		/* non-existent domain: RCODE != NXDOMAIN */
+		if (SUCCEED != dns_ec_nxd_rcode(rcode, rtt))
+		{
+			zbx_snprintf(err, err_size, "invalid RCODE (%d) when queried \"%s\" from nameserver \"%s\" (%s)"
+					", expected NXDOMAIN", rcode, testname, ns, ip);
+			goto out;
+		}
+
+		/* non-existent domain: if DNSSEC enabled, verify RRSIGs */
+		if (NULL != keys && SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_NSEC,
+				keys, ns, ip, rtt, err, err_size))
+		{
+			goto out;
+		}
+	}
+	else
+	{
+		ldns_rr_list	*rr_tmp;
+
+		/* existent domain: AA flag is set (authoritative answer) */
+		if (0 != ldns_pkt_aa(pkt))
+		{
+			zbx_snprintf(err, err_size, "AA flag is present in the answer of existent domain \"%s\""
+					" from nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_AA);
+			goto out;
+		}
+
+		/* existent domain: domain not in QUESTION */
+		if (NULL == (rr_tmp = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_A,
+				LDNS_SECTION_QUESTION)))
+		{
+			zbx_snprintf(err, err_size, "domain name queried \"%s\" not found in QUESTION section"
+					" from nameserver \"%s\" (%s)", testname, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_NOT_IN_QUESTION);
+			goto out;
+		}
+
+		ldns_rr_list_deep_free(rr_tmp);
+
+		/* existent domain: ANSWER section is not empty, expected referral in AUTHORITY section */
+		if (NULL != (rr_tmp = ldns_pkt_rr_list_by_name_and_type(pkt, testname_rdf, LDNS_RR_TYPE_NS,
+				LDNS_SECTION_ANSWER)))
+		{
+			ldns_rr_list_deep_free(rr_tmp);
+			zbx_snprintf(err, err_size, "ANSWER section is not empty when queried domain \"%s\""
+					" from nameserver \"%s\" (%s), expected referral (AUTHORITY)", testname, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_ANSWER);
+			goto out;
+		}
+
+		/* start referral validation */
 
 		/* the AUTHORITY section should contain at least one NS RR for the last label in  */
 		/* PREFIX, e.g. "icann-test" when querying for "blahblah.icann-test.example." */
 		if (SUCCEED != zbx_get_last_label(testname, &last_label, err, err_size))
 		{
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
+			*rtt = ZBX_EC_INTERNAL;
 			goto out;
 		}
 
@@ -764,67 +1163,63 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 		{
 			zbx_snprintf(err, err_size, "invalid last label \"%s\" generated from testname \"%s\"",
 					last_label, testname);
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
+			*rtt = ZBX_EC_INTERNAL;
 			goto out;
 		}
 
+		/* existent domain: AUTHORITY section is empty, expected referral */
 		if (NULL == (nsset = ldns_pkt_rr_list_by_name_and_type(pkt, last_label_rdf, LDNS_RR_TYPE_NS,
 				LDNS_SECTION_AUTHORITY)))
 		{
-			zbx_snprintf(err, err_size, "no NS records of \"%s\" at nameserver \"%s\" (%s)", last_label,
-					ns, ip);
-			*rtt = ZBX_EC_DNS_NS_EREPLY;
+			zbx_snprintf(err, err_size, "queried \"%s\" but no referral in AUTHORITY section on nameserver"
+					" \"%s\" (%s)", last_label, ns, ip);
+			*rtt = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_NO_REFERRAL);
 			goto out;
 		}
 
 		/* end referral validation */
 
-		if (NULL != upd_ptr)
+		/* existent domain: RCODE != NOERROR */
+		if (SUCCEED != dns_ec_generic_rcode(rcode, rtt))
 		{
-			/* extract UNIX timestamp of random NS record */
+			zbx_snprintf(err, err_size, "invalid RCODE (%d) when queried \"%s\" from nameserver \"%s\" (%s)"
+					", expected NOERROR", rcode, testname, ns, ip);
+			goto out;
+		}
 
-			rr = ldns_rr_list_rr(nsset, zbx_random(ldns_rr_list_rr_count(nsset)));
-			host = ldns_rdf2str(ldns_rr_rdf(rr, 0));
+		/* extract UNIX timestamp of random NS record */
 
-			zbx_rsm_infof(log_fd, "randomly chose ns %s", host);
-			if (SUCCEED != zbx_get_ts_from_host(host, &ts))
-			{
-				zbx_snprintf(err, err_size, "cannot extract Unix timestamp from %s", host);
-				zbx_free(host);
-				*upd_ptr = ZBX_EC_DNS_NS_NOTS;
-				goto out;
-			}
+		rr = ldns_rr_list_rr(nsset, zbx_random(ldns_rr_list_rr_count(nsset)));
+		host = ldns_rdf2str(ldns_rr_rdf(rr, 0));
 
-			now = time(NULL);
-
-			if (0 > now - ts)
-			{
-				zbx_snprintf(err, err_size, "Unix timestamp of %s is in the future (current: %lu)",
-						host, now);
-				zbx_free(host);
-				*upd_ptr = ZBX_EC_DNS_NS_ETS;
-				goto out;
-			}
-
+		zbx_rsm_infof(log_fd, "randomly chose ns %s", host);
+		if (SUCCEED != zbx_get_ts_from_host(host, &ts))
+		{
+			zbx_snprintf(err, err_size, "cannot extract Unix timestamp from \"%s\"", host);
 			zbx_free(host);
-
-			/* successful update time */
-			*upd_ptr = now - ts;
+			*upd_ptr = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_NO_UNIX_TS);
+			goto out;
 		}
 
-		if (NULL != keys)	/* DNSSEC enabled */
+		now = time(NULL);
+
+		if (0 > now - ts)
 		{
-			if (SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_DS, keys,
-					ns, ip, rtt, err, err_size))
-			{
-				goto out;
-			}
+			zbx_snprintf(err, err_size, "Unix timestamp of %s is in the future (current: %lu)",
+					host, now);
+			zbx_free(host);
+			*upd_ptr = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_EXD_INV_UNIX_TS);
+			goto out;
 		}
-	}
-	else if (NULL != keys)	/* EPP disabled, DNSSEC enabled */
-	{
-		if (SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_NSEC, keys, ns, ip, rtt,
-				err, err_size))
+
+		zbx_free(host);
+
+		/* successful update time */
+		*upd_ptr = now - ts;
+
+		/* existent domain: if DNSSEC enabled, verify RRSIGs */
+		if (NULL != keys && SUCCEED != zbx_verify_rrsigs(pkt, LDNS_SECTION_AUTHORITY, ZBX_COVERED_TYPE_DS, keys,
+				ns, ip, rtt, err, err_size))
 		{
 			goto out;
 		}
@@ -961,11 +1356,12 @@ static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt
 	}
 }
 
-static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const char *resolver,
+static int	zbx_get_dnskeys(ldns_resolver *res, const char *domain, const char *resolver,
 		ldns_rr_list **keys, FILE *pkt_file, int *ec, char *err, size_t err_size)
 {
 	ldns_pkt	*pkt = NULL;
 	ldns_rdf	*domain_rdf = NULL;
+	ldns_status	status;
 	int		ret = FAIL;
 
 	if (NULL == (domain_rdf = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, domain)))
@@ -975,11 +1371,19 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 		goto out;
 	}
 
-	/* query domain records */
-	if (NULL == (pkt = ldns_resolver_query(res, domain_rdf, LDNS_RR_TYPE_DNSKEY, LDNS_RR_CLASS_IN, LDNS_RD)))
+	/* get the keys */
+	if (SUCCEED != dns_query(res, domain_rdf, &pkt, &status, LDNS_RR_TYPE_DNSKEY, LDNS_RR_CLASS_IN, LDNS_RD, NULL))
 	{
-		zbx_snprintf(err, err_size, "cannot connect to resolver \"%s\"", resolver);
-		*ec = ZBX_EC_DNS_RES_NOREPLY;
+		zbx_snprintf(err, err_size, "cannot request DNSKEY records from resolver \"%s\"", resolver);
+		*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_RESOLV);
+		goto out;
+	}
+
+	/* check for additional LDNS errors */
+	if (SUCCEED != dnskey_ec_ldns(status, ec))
+	{
+		zbx_snprintf(err, err_size, "invalid LDNS status from resolver \"%s\": %s", resolver,
+				ldns_get_errorstr_by_id(status));
 		goto out;
 	}
 
@@ -991,7 +1395,15 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 	{
 		zbx_snprintf(err, err_size, "AD flag not set in the answer of \"%s\" from resolver \"%s\"",
 				domain, resolver);
-		*ec = ZBX_EC_DNS_RES_NOADBIT;
+		*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_AD);
+		goto out;
+	}
+
+	/* rcode must be NOERROR */
+	if (SUCCEED != dnskey_ec_rcode(ldns_pkt_get_rcode(pkt), ec))
+	{
+		zbx_snprintf(err, err_size, "invalid RCODE when requesting DNSKEY records from resolver \"%s\": %d",
+				resolver, ldns_pkt_get_rcode(pkt));
 		goto out;
 	}
 
@@ -1001,7 +1413,7 @@ static int	zbx_get_dnskeys(const ldns_resolver *res, const char *domain, const c
 	{
 		zbx_snprintf(err, err_size, "no DNSKEY records of domain \"%s\" from resolver \"%s\"", domain,
 				resolver);
-		*ec = ZBX_EC_DNS_NS_EDNSSEC;
+		*ec = DNS_EC_PROTO_OFFSET(ZBX_EC_DNS_DNSSEC_NO_RRSIGS);
 		goto out;
 	}
 
@@ -1727,8 +2139,10 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	for (idx = UDP_PROTO_IDX; idx <= TCP_PROTO_IDX; idx++)
 	{
-		char	proto = protos[idx].proto, keybuf[12];	/* rsm.dns.(udp|tcp) */
+		char	keybuf[12];	/* rsm.dns.(udp|tcp) */
 		int	res_ec = ZBX_EC_NOERROR, rtt, rtt_limit;
+
+		proto = protos[idx].proto;
 
 		if (0 != dns_test_step)
 		{
@@ -1749,7 +2163,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
 				err, sizeof(err)))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver \"%s\": %s", res_ip, err));
 			goto out;
 		}
 
@@ -1768,7 +2182,6 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 				(ZBX_RSM_UDP == proto ? ZBX_MACRO_DNS_UDP_RTT : ZBX_MACRO_DNS_TCP_RTT),
 				&rtt_limit, 1, err, sizeof(err)))
 		{
-			free_items(items, items_num);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 			goto out;
 		}
@@ -1792,7 +2205,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 				{
 					if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys,
 							testprefix_ptr, domain, log_fd, &rtt, upd_ptr, ipv4_enabled,
-							ipv6_enabled, epp_enabled, err, sizeof(err)))
+							ipv6_enabled, err, sizeof(err)))
 					{
 						zbx_rsm_err(log_fd, err);
 					}
@@ -1824,6 +2237,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 		free_items(items, items_num);
 		items = NULL;
+		items_num = 0;
 
 		if (NULL != keys)
 		{
@@ -1891,6 +2305,8 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	/* set the value of our simple check item itself */
 	zbx_add_value_uint(item, item->nextcheck, test_result);
 out:
+	free_items(items, items_num);
+
 	if (NULL != res)
 	{
 		if (0 != ldns_resolver_nameserver_count(res))

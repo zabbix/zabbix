@@ -50,7 +50,7 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $cfg_max_value = get_macro_dns_udp_rtt_low();
+my $cfg_max_value;	# can be per-tld
 my $delay = get_macro_dns_delay($now);
 
 my ($month_from, $month_till, $value_ts) = get_month_bounds($now, $delay);
@@ -64,6 +64,12 @@ my $left_ipv6_cycles = $left_cycles * $probes_ipv6;
 
 my $probes_ref = get_probes(ENABLED_DNS);
 my $probe_times_ref = get_probe_times($month_from, $cycle_till, $probes_ref);
+
+if (scalar(keys(%{$probe_times_ref})) == 0)
+{
+	wrn("no probes were online at the period: ", ts_full($month_from, $cycle_till));
+	exit;
+}
 
 my $tlds_ref;
 if (opt('tld'))
@@ -108,6 +114,8 @@ while ($tld_index < $tld_count)
 	{
 		# child
 		$tld = $tlds_ref->[$tld_index];
+
+		$cfg_max_value = get_macro_dns_udp_rtt_low();
 
 		db_connect();
 
