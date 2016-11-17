@@ -432,32 +432,36 @@ class CHostGroup extends CApiService {
 	/**
 	 * Update host groups.
 	 *
-	 * @param array $groups
-	 * @param array $groups[0]['name'], ...
-	 * @param array $groups[0]['groupid'], ...
+	 * @param array  $groups
+	 * @param string $groups[]['groupid']
+	 * @param string $groups[]['name']
 	 *
 	 * @return boolean
 	 */
 	public function update(array $groups) {
-		$groups = zbx_toArray($groups);
-
-		$db_groups = [];
 		$this->validateUpdate($groups, $db_groups);
 
-		$update = [];
+		$upd_groups = [];
 
 		foreach ($groups as $group) {
-			// Skip update if name has not changed.
-			if (array_key_exists('name', $group) && $group['name'] !== $db_groups[$group['groupid']]['name']) {
-				$update[] = [
+			$db_group = $db_groups[$group['groupid']];
+
+			if (array_key_exists('name', $group) && $group['name'] !== $db_group['name']) {
+				$upd_groups[] = [
 					'values' => ['name' => $group['name']],
 					'where' => ['groupid' => $group['groupid']]
 				];
 			}
 		}
 
-		if ($update) {
-			DB::update('groups', $update);
+		DB::update('groups', $upd_groups);
+
+		foreach ($groups as $group) {
+			$db_group = $db_groups[$group['groupid']];
+
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $db_group['name'],
+				'groups', $db_group, $group
+			);
 		}
 
 		return ['groupids' => zbx_objectValues($groups, 'groupid')];
@@ -472,27 +476,29 @@ class CHostGroup extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $groupids, $nopermissions = false) {
-		if (empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-		sort($groupids);
 
-		$delGroups = $this->get([
+		$db_groups = $this->get([
+			'output' => ['groupid', 'name', 'internal'],
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => ['groupid', 'name', 'internal'],
 			'preservekeys' => true,
 			'nopermissions' => $nopermissions
 		]);
+
 		foreach ($groupids as $groupid) {
-			if (!isset($delGroups[$groupid])) {
+			if (!array_key_exists($groupid, $db_groups)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
-			if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
+			if ($db_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
+					_s('Host group "%1$s" is internal and can not be deleted.', $db_groups[$groupid]['name'])
+				);
 			}
 		}
 
@@ -506,7 +512,7 @@ class CHostGroup extends CApiService {
 		if ($groupPrototype) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
-					$delGroups[$groupPrototype['groupid']]['name']
+					$db_groups[$groupPrototype['groupid']]['name']
 				)
 			);
 		}
@@ -519,7 +525,7 @@ class CHostGroup extends CApiService {
 				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" cannot be deleted, because some hosts depend on it.',
-						$delGroups[$groupid]['name']
+						$db_groups[$groupid]['name']
 					)
 				);
 			}
@@ -538,7 +544,7 @@ class CHostGroup extends CApiService {
 				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
-						$delGroups[$script['groupid']]['name']
+						$db_groups[$script['groupid']]['name']
 					)
 				);
 			}
@@ -554,7 +560,7 @@ class CHostGroup extends CApiService {
 		if ($corr_condition_group) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
-					$delGroups[$corr_condition_group['groupid']]['name']
+					$db_groups[$corr_condition_group['groupid']]['name']
 				)
 			);
 		}
@@ -670,9 +676,10 @@ class CHostGroup extends CApiService {
 			'value_id' => $groupids
 		]);
 
-		// TODO: remove audit
 		foreach ($groupids as $groupid) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $db_groups[$groupid]['name'],
+				'groups', null, null
+			);
 		}
 
 		return ['groupids' => $groupids];
@@ -729,28 +736,28 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $groups, array &$db_groups) {
-		if (!$groups) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	protected function validateUpdate(array &$groups, array &$db_groups = null) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
+			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('groups', 'name')]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		// Validate given IDs.
-		$this->checkObjectIds($groups, 'groupid',
-			_('No "%1$s" given for group.'),
-			_('Empty group ID.'),
-			_('Incorrect group ID.')
-		);
 
 		// permissions
 		$db_groups = $this->get([
-			'output' => ['groupid', 'flags', 'name'],
+			'output' => ['groupid', 'name', 'flags'],
 			'groupids' => zbx_objectValues($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$check_names = [];
-		$host_group_name_validator = new CHostGroupNameValidator();
+		$update_discovered_validator = new CUpdateDiscoveredValidator([
+			'messageAllowed' => _('Cannot update a discovered host group.')
+		]);
+
+		$names = [];
 
 		foreach ($groups as $group) {
 			if (!array_key_exists($group['groupid'], $db_groups)) {
@@ -759,55 +766,17 @@ class CHostGroup extends CApiService {
 				);
 			}
 
-			// Check if host group name is valid.
-			if (array_key_exists('name', $group)) {
-				if (!$host_group_name_validator->validate($group['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError())
-					);
-				}
+			$db_group = $db_groups[$group['groupid']];
 
-				if ($db_groups[$group['groupid']]['name'] !== $group['name']) {
-					$check_names[] = $group;
-				}
+			$this->checkPartialValidator($group, $update_discovered_validator, $db_group);
+
+			if (array_key_exists('name', $group) && $group['name'] !== $db_group['name']) {
+				$names[] = $group['name'];
 			}
 		}
 
-		if ($check_names) {
-			// Check for duplicate names.
-			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
-			if ($duplicate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate "%1$s" value "%2$s" for host group.', 'name', $duplicate['name'])
-				);
-			}
-
-			// Check if group already exists.
-			$db_group_names = API::getApiService()->select('groups', [
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => zbx_objectValues($check_names, 'name')]
-			]);
-			$db_group_names = zbx_toHash($db_group_names, 'name');
-
-			foreach ($check_names as $group) {
-				if (array_key_exists($group['name'], $db_group_names)
-						&& bccomp($db_group_names[$group['name']]['groupid'], $group['groupid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
-				}
-			}
-		}
-
-		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'messageAllowed' => _('Cannot update a discovered host group.')
-		]);
-
-		foreach ($groups as $group) {
-			$this->checkNoParameters($group, ['internal'], _('Cannot update "%1$s" for host group "%2$s".'),
-				array_key_exists('name', $group) ? $group['name'] : $db_groups[$group['groupid']]['name']
-			);
-
-			// Cannot update discovered host groups.
-			$this->checkPartialValidator($group, $update_discovered_validator, $db_groups[$group['groupid']]);
+		if ($names) {
+			$this->checkDuplicates($names);
 		}
 	}
 

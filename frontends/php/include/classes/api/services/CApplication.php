@@ -305,7 +305,9 @@ class CApplication extends CApiService {
 		foreach ($applications as $application) {
 			// check permissions by hostid
 			if (!array_key_exists($application['hostid'], $dbHosts)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 
 			$names_by_hostid[$application['hostid']][] = $application['name'];
@@ -341,7 +343,9 @@ class CApplication extends CApiService {
 
 		foreach ($applications as $application) {
 			if (!array_key_exists($application['applicationid'], $db_applications)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
@@ -428,10 +432,9 @@ class CApplication extends CApiService {
 			}
 		}
 
-		if ($upd_applications) {
-			DB::update('applications', $upd_applications);
-			(new CApplicationManager())->inherit($applications);
-		}
+		DB::update('applications', $upd_applications);
+
+		(new CApplicationManager())->inherit($applications);
 
 		foreach ($applications as $application) {
 			$db_application = $db_applications[$application['applicationid']];
@@ -470,7 +473,9 @@ class CApplication extends CApiService {
 		if (!$nopermissions) {
 			foreach ($applicationids as $applicationid) {
 				if (!array_key_exists($applicationid, $db_applications)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 
 				$db_application = $db_applications[$applicationid];
