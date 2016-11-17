@@ -324,7 +324,7 @@ class CApplication extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	public function validateUpdate(array &$applications, array &$db_applications = null) {
+	private function validateUpdate(array &$applications, array &$db_applications = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['applicationid']], 'fields' => [
 			'applicationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('applications', 'name')]
@@ -353,7 +353,7 @@ class CApplication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
 		}
 
-		$applications = $this->extendObjectsByKey($applications, $db_applications, 'applicationid', ['hostid', 'name']);
+		$applications = $this->extendObjectsByKey($applications, $db_applications, 'applicationid', ['hostid']);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']]];
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $applications, '/', $error)) {
@@ -371,7 +371,7 @@ class CApplication extends CApiService {
 				);
 			}
 
-			if ($db_application['name'] !== $application['name']) {
+			if (array_key_exists('name', $application) && $application['name'] !== $db_application['name']) {
 				$names_by_hostid[$db_application['hostid']][] = $application['name'];
 			}
 		}
@@ -424,7 +424,7 @@ class CApplication extends CApiService {
 		foreach ($applications as $application) {
 			$db_application = $db_applications[$application['applicationid']];
 
-			if ($application['name'] !== $db_application['name']) {
+			if (array_key_exists('name', $application) && $application['name'] !== $db_application['name']) {
 				$upd_applications[] = [
 					'values' => ['name' => $application['name']],
 					'where' => ['applicationid' => $application['applicationid']]
