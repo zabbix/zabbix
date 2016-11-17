@@ -184,7 +184,7 @@ class CValueMap extends CApiService {
 					];
 
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'],
-						$upd_valuemap['name'], 'valuemaps', $db_valuemap, $upd_valuemap
+						$db_valuemap['name'], 'valuemaps', $db_valuemap, $upd_valuemap
 					);
 				}
 			}
