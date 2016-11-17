@@ -278,7 +278,7 @@ class CApplication extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateCreate(&$applications) {
+	private function validateCreate(array &$applications) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('applications', 'name')]
@@ -324,7 +324,7 @@ class CApplication extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	public function validateUpdate(&$applications, &$db_applications) {
+	public function validateUpdate(array &$applications, array &$db_applications = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['applicationid']], 'fields' => [
 			'applicationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('applications', 'name')]
