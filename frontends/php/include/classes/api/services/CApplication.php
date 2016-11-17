@@ -396,7 +396,7 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		foreach ($applications as $num => $application) {
+		foreach ($applications as $application) {
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $application['applicationid'],
 				$application['name'], 'applications', null, null
 			);
