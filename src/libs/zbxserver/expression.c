@@ -4477,10 +4477,12 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *           structure host, key, func fields.                                *
  *                                                                            *
  ******************************************************************************/
-static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
+static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
 {
 	char	*pl, *pr, *key = NULL, *replace_to = NULL;
 	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0, par_l, par_r;
+	int	ret = FAIL;
 
 	pl = pr = *data + token->token.l;
 	if ('{' != *pr++)
@@ -4506,7 +4508,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	/* an item key */
 	if (SUCCEED != get_item_key(&pr, &key))
-		return FAIL;
+		goto clean;
 
 	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
@@ -4516,25 +4518,34 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 	pl = pr;
 
 	if ('.' != *pr++)
-		return FAIL;
+		goto clean;
 
 	/* a trigger function with parameters */
 	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
-		return FAIL;
+		goto clean;
 
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
+
+	pr[par_r] = '\0';
+	ret = substitute_function_parameters(pr + par_l + 1, 0, &replace_to, &replace_to_alloc, &replace_to_offset,
+			jp_row, error, max_error_len);
+	pr[par_r] = ')';
+
+	pl = pr + par_r;
 	pr += par_r + 1;
 
-	if ('}' != *pr++)
-		return FAIL;
+	if (FAIL == ret || '}' != *pr++)
+		goto clean;
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	token->token.r = pr - *data - 1;
 	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
-
+	ret = SUCCEED;
+clean:
 	zbx_free(replace_to);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -4771,7 +4782,7 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
-					process_simple_macro_token(data, &token, jp_row);
+					process_simple_macro_token(data, &token, jp_row, error, max_error_len);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
