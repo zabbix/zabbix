@@ -611,10 +611,13 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 
 		is_state_set = ipmi_is_state_set(states, i);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-				ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
-				ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
+					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+					ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
+					ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
+		}
 
 		if (0 != is_state_set)
 			s->value.discrete |= 1 << i;
