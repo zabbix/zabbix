@@ -302,17 +302,14 @@ class CApplication extends CApiService {
 
 		$names_by_hostid = [];
 
-		foreach ($applications as &$application) {
+		foreach ($applications as $application) {
 			// check permissions by hostid
 			if (!array_key_exists($application['hostid'], $dbHosts)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			$names_by_hostid[$application['hostid']][] = $application['name'];
-
-			$application['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
-		unset($application);
 
 		$this->checkDuplicates($names_by_hostid);
 	}
@@ -392,8 +389,8 @@ class CApplication extends CApiService {
 
 		$applicationids = DB::insertBatch('applications', $applications);
 
-		foreach ($applications as $num => &$application) {
-			$application['applicationid'] = $applicationids[$num];
+		foreach ($applications as $index => &$application) {
+			$application['applicationid'] = $applicationids[$index];
 		}
 		unset($application);
 
