@@ -25,27 +25,20 @@
 class CApplicationManager {
 
 	/**
-	 * Create new application.
-	 * If $batch is true it performs batch insert, in this case all applications must have same fields in same order.
+	 * Create new applications.
 	 *
 	 * @param array $applications
-	 * @param bool  $batch
 	 *
 	 * @return array
 	 */
-	public function create(array $applications, $batch = false) {
+	public function create(array $applications) {
 		$insertApplications = $applications;
 		foreach ($insertApplications as &$app) {
 			unset($app['applicationTemplates']);
 		}
 		unset($app);
 
-		if ($batch) {
-			$applicationids = DB::insertBatch('applications', $insertApplications);
-		}
-		else {
-			$applicationids = DB::insert('applications', $insertApplications);
-		}
+		$applicationids = DB::insertBatch('applications', $insertApplications);
 
 		$applicationTemplates = [];
 		foreach ($applications as $anum => &$application) {
@@ -575,7 +568,7 @@ class CApplicationManager {
 		}
 
 		if (!empty($appsCreate)) {
-			$newApps = $this->create($appsCreate, true);
+			$newApps = $this->create($appsCreate);
 			foreach ($newApps as $key => $newApp) {
 				$applications[$key]['applicationid'] = $newApp['applicationid'];
 			}
