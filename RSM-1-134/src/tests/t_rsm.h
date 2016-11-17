@@ -1,6 +1,9 @@
 #ifndef _T_RSM_H_
 #define _T_RSM_H_
 
+#include "sysinc.h"
+#include "zbxtypes.h"
+
 const char	epp_passphrase[];
 const char      *progname = "";
 const char      title_message[] = "";
@@ -41,10 +44,10 @@ int	CONFIG_HISTSYNCER_FORKS;
 int	CONFIG_HISTSYNCER_FREQUENCY;
 int	CONFIG_CONFSYNCER_FORKS;
 int	CONFIG_CONFSYNCER_FREQUENCY;
-int	CONFIG_CONF_CACHE_SIZE;
-int	CONFIG_HISTORY_CACHE_SIZE;
-int	CONFIG_TRENDS_CACHE_SIZE;
-int	CONFIG_TEXT_CACHE_SIZE;
+zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
+zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
+zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
 int	CONFIG_DISABLE_HOUSEKEEPING;
 int	CONFIG_UNREACHABLE_PERIOD;
 int	CONFIG_UNREACHABLE_DELAY;
