@@ -58,15 +58,6 @@ class CApplicationManager {
 		// link inherited apps
 		DB::insertBatch('application_template', $applicationTemplates);
 
-		// TODO: REMOVE info
-		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
-				' FROM applications a'.
-				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-				' WHERE '.dbConditionInt('a.applicationid', $applicationids));
-		while ($app = DBfetch($dbCursor)) {
-			info(_s('Created: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
-		}
-
 		return $applications;
 	}
 
@@ -103,17 +94,6 @@ class CApplicationManager {
 				' WHERE '.dbConditionInt('at.applicationid', zbx_objectValues($applications, 'applicationid'))
 			));
 			DB::replace('application_template', $dbApplicationTemplates, $applicationTemplates);
-		}
-
-		// TODO: REMOVE info
-		$dbCursor = DBselect(
-			'SELECT a.name,h.name AS hostname'.
-			' FROM applications a'.
-				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-			' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applications, 'applicationid'))
-		);
-		while ($app = DBfetch($dbCursor)) {
-			info(_s('Updated: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
 		}
 
 		return $applications;
