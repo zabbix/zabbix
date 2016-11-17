@@ -4547,6 +4547,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	token->token.r = pr - *data - 1;
 	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
+
 	ret = SUCCEED;
 clean:
 	zbx_free(replace_to);
