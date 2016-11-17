@@ -653,7 +653,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 	const char	*__function_name = "lld_make_item";
 
 	char		*buffer = NULL, err[MAX_STRING_LEN];
-	int		ret = FAIL, i;
+	int		i;
 	zbx_lld_item_t	*item = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
