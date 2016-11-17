@@ -206,10 +206,6 @@ if (hasRequest('form')) {
 					'hosts' => $hosts,
 					'templates' => $templates
 				]);
-
-				if ($result) {
-					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupId, $name, null, null, null);
-				}
 			}
 		}
 

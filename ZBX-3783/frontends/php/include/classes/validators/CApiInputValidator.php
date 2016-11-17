@@ -83,6 +83,9 @@ class CApiInputValidator {
 
 			case API_OBJECTS:
 				return self::validateObjects($rule, $data, $path, $error);
+
+			case API_HG_NAME:
+				return self::validateHostGroupName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -106,6 +109,7 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 			case API_ID:
 			case API_OBJECT:
+			case API_HG_NAME:
 				return true;
 
 			case API_IDS:
@@ -134,7 +138,9 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateStringUtf8($rule, &$data, $path, &$error) {
-		if (array_key_exists('flags', $rule) && ($rule['flags'] & API_ALLOW_NULL) && $data === null) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
 			return true;
 		}
 
@@ -148,7 +154,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('flags', $rule) && ($rule['flags'] & API_NOT_EMPTY) && $data === '') {
+		if (($flags & API_NOT_EMPTY) && $data === '') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
@@ -173,7 +179,9 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateId($rule, &$data, $path, &$error) {
-		if (array_key_exists('flags', $rule) && ($rule['flags'] & API_ALLOW_NULL) && $data === null) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
 			return true;
 		}
 
@@ -290,6 +298,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param array  $rule['fields']
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -334,6 +343,47 @@ class CApiInputValidator {
 		return true;
 	}
 
+	/**
+	 * Host group name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateHostGroupName($rule, &$data, $path, &$error) {
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if ($data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$host_group_name_validator = new CHostGroupNameValidator();
+
+		if (!$host_group_name_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $host_group_name_validator->getError());
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * Array of ids uniqueness validator.
 	 *
