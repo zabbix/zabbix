@@ -39,6 +39,13 @@
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_auth.h>
 
+#define RETURN_IF_CB_DATA_NULL(x, y)							\
+	if (NULL == (x))								\
+	{										\
+		zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", (y));	\
+		return;									\
+	}
+
 typedef union
 {
 	double		threshold;
@@ -472,6 +479,8 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 != err)
@@ -555,6 +564,8 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 	ipmi_entity_t		*ent;
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
+
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -710,6 +721,8 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 	ipmi_entity_t		*ent;
 	size_t			sz;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 != err)
@@ -762,6 +775,8 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 	const char		*__function_name = "zbx_got_control_setting_cb";
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_control_t	*c;
+
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -880,6 +895,8 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 	const char	*__function_name = "zbx_sensor_change_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	/* ignore non-readable sensors (e.g. Event-only) */
@@ -908,6 +925,8 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 	const char	*__function_name = "zbx_control_change_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	switch (op)
@@ -933,6 +952,8 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	if (op == IPMI_ADDED)
@@ -953,6 +974,8 @@ static void	zbx_domain_closed_cb(void *cb_data)
 	const char	*__function_name = "zbx_domain_closed_cb";
 	zbx_ipmi_host_t	*h = cb_data;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
 	h->domain_up = 0;
@@ -968,6 +991,8 @@ static void	zbx_setup_done_cb(ipmi_domain_t *domain, int err, unsigned int conn_
 	const char	*__function_name = "zbx_setup_done_cb";
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
+
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
@@ -995,6 +1020,8 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	const char	*__function_name = "zbx_domain_up_cb";
 	zbx_ipmi_host_t	*h = cb_data;
+
+	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p, host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
@@ -1190,6 +1217,8 @@ static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = cb_data;
 
+	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_domains_iterate_cb");
+
 	ipmi_domain_get_name(domain, name, sizeof(name));
 
 	if (0 == strcmp(domain_name, name))
@@ -1201,6 +1230,8 @@ static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	zbx_ipmi_host_t	*h = cb_data;
 	int		ret;
+
+	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_domain_close_cb");
 
 	if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, h)))
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", ret);
