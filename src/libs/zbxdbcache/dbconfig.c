@@ -9311,14 +9311,14 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_condition_free                                            *
+ * Function: zbx_db_condition_clean                                            *
  *                                                                            *
- * Purpose: frees condition data structure                                    *
+ * Purpose: cleans condition data structure                                    *
  *                                                                            *
  * Parameters: condition - [IN] the condition data to free                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_condition_free(DB_CONDITION *condition)
+static void	zbx_db_condition_clean(DB_CONDITION *condition)
 {
 	zbx_free(condition->value2);
 	zbx_free(condition->value);
@@ -9332,7 +9332,7 @@ void	zbx_conditions_eval_free(zbx_hashset_t *uniq_conditions)
 	zbx_hashset_iter_reset(uniq_conditions, &iter);
 
 	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-		zbx_db_condition_free(condition);
+		zbx_db_condition_clean(condition);
 }
 
 /******************************************************************************
@@ -9402,7 +9402,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 			*formula = string_replace(*formula, search, replace);
 			zbx_free(old_formula);
 
-			zbx_db_condition_free(&condition);
+			zbx_db_condition_clean(&condition);
 		}
 
 		zbx_vector_ptr_append(conditions, uniq_condition);
