@@ -474,9 +474,6 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 {
 	const char		*__function_name = "zbx_got_thresh_reading_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
-	const char		*e_string, *s_type_string, *s_reading_type_string;
-	ipmi_entity_t		*ent;
-	const char		*percent = "", *base, *mod_use = "", *modifier = "", *rate;
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
@@ -520,36 +517,41 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 		case IPMI_BOTH_VALUES_PRESENT:
 			s->value.threshold = val;
 
-			/* next lines only for debug logging */
-			ent = ipmi_sensor_get_entity(sensor);
-			e_string = ipmi_entity_get_entity_id_string(ent);
-			s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
-			s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
-
-			base = ipmi_sensor_get_base_unit_string(sensor);
-			if (ipmi_sensor_get_percentage(sensor))
-				percent = "%";
-			switch (ipmi_sensor_get_modifier_unit_use(sensor))
+			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
-				case IPMI_MODIFIER_UNIT_NONE:
-					break;
-				case IPMI_MODIFIER_UNIT_BASE_DIV_MOD:
-					mod_use = "/";
-					modifier = ipmi_sensor_get_modifier_unit_string(sensor);
-					break;
-				case IPMI_MODIFIER_UNIT_BASE_MULT_MOD:
-					mod_use = "*";
-					modifier = ipmi_sensor_get_modifier_unit_string(sensor);
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-			rate = ipmi_sensor_get_rate_unit_string(sensor);
+				const char	*percent = "", *base, *mod_use = "", *modifier = "", *rate;
+				const char	*e_string, *s_type_string, *s_reading_type_string;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL "%s %s%s%s%s]",
-					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-					e_string, s_type_string, s_reading_type_string, val, percent, base,
-					mod_use, modifier, rate);
+				e_string = ipmi_entity_get_entity_id_string(ipmi_sensor_get_entity(sensor));
+				s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
+				s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
+				base = ipmi_sensor_get_base_unit_string(sensor);
+
+				if (0 != ipmi_sensor_get_percentage(sensor))
+					percent = "%";
+
+				switch (ipmi_sensor_get_modifier_unit_use(sensor))
+				{
+					case IPMI_MODIFIER_UNIT_NONE:
+						break;
+					case IPMI_MODIFIER_UNIT_BASE_DIV_MOD:
+						mod_use = "/";
+						modifier = ipmi_sensor_get_modifier_unit_string(sensor);
+						break;
+					case IPMI_MODIFIER_UNIT_BASE_MULT_MOD:
+						mod_use = "*";
+						modifier = ipmi_sensor_get_modifier_unit_string(sensor);
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+				rate = ipmi_sensor_get_rate_unit_string(sensor);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL "%s %s%s%s%s]",
+						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
+						s->id_sz), e_string, s_type_string, s_reading_type_string, val, percent,
+						base, mod_use, modifier, rate);
+			}
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -566,7 +568,6 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 	const char		*__function_name = "zbx_got_discrete_states_cb";
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int			id, i, val, ret, is_state_set;
-	ipmi_entity_t		*ent;
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
@@ -600,8 +601,7 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 		goto out;
 	}
 
-	ent = ipmi_sensor_get_entity(sensor);
-	id = ipmi_entity_get_entity_id(ent);
+	id = ipmi_entity_get_entity_id(ipmi_sensor_get_entity(sensor));
 
 	/* Discrete values are 16-bit. We're storing them into a 64-bit uint. */
 #define MAX_DISCRETE_STATES	15
@@ -757,7 +757,6 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 	int			n;
 	zbx_ipmi_control_t	*c;
 	const char		*e_string;
-	ipmi_entity_t		*ent;
 	size_t			sz;
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
@@ -791,8 +790,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 		goto out;
 	}
 
-	ent = ipmi_control_get_entity(control);
-	e_string = ipmi_entity_get_entity_id_string(ent);
+	e_string = ipmi_entity_get_entity_id_string(ipmi_control_get_entity(control));
 
 	for (n = 0; n < c->num_values; n++)
 	{
@@ -800,7 +798,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 				c->c_name, e_string, n + 1, val[n]);
 	}
 
-	sz = sizeof(int) * c->num_values;
+	sz = sizeof(int) * (size_t)c->num_values;
 	memcpy(c->val, val, sz);
 out:
 	h->done = 1;
@@ -849,8 +847,8 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 
 static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 {
-	const char		*__function_name = "zbx_read_ipmi_control";
-	int			ret;
+	const char	*__function_name = "zbx_read_ipmi_control";
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c->c_name, h->ip, h->port);
 
@@ -879,8 +877,8 @@ out:
 
 static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int value)
 {
-	const char		*__function_name = "zbx_set_ipmi_control";
-	int			ret;
+	const char	*__function_name = "zbx_set_ipmi_control";
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d' value:%d",
 			__function_name, c->c_name, h->ip, h->port, value);
@@ -1273,7 +1271,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	const char	*__function_name = "zbx_close_inactive_host";
 
 	char		domain_name[11];	/* max int length */
-	int		ret = FAIL;
+	int		ret = FAIL, res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
 
@@ -1283,9 +1281,13 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 
 	h->done = 0;
 	domain_close_ok = 0;
-	ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h);
 
-	if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
+	if (0 != (res = ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: [0x%x]", __function_name,
+				res);
+	}
+	else if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
 	{
 		zbx_free_ipmi_connection(h);
 		ret = SUCCEED;
