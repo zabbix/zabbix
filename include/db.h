@@ -344,7 +344,6 @@ typedef struct
 	int		condition_result;
 	unsigned char	conditiontype;
 	unsigned char	operator;
-	unsigned char	eventsource;
 }
 DB_CONDITION;
 
