@@ -123,7 +123,7 @@ class CJson {
 
 	/**
 	 * Used for fallback _json_encode().
-	 * If true than non-associative array is encoded as object.
+	 * If true then non-associative array is encoded as object.
 	 *
 	 * @var bool
 	 */
@@ -131,7 +131,7 @@ class CJson {
 
 	/**
 	 * Used for fallback _json_encode().
-	 * If true than forward slashes are escaped.
+	 * If true then forward slashes are escaped.
 	 *
 	 * @var bool
 	 */
