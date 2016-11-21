@@ -473,7 +473,7 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 
 	if ($config['event_ack_enable']) {
 		$options['output'][] = 'acknowledged';
-		$options['select_acknowledges'] = API_OUTPUT_COUNT;
+		$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
 	}
 
 	$events = API::Event()->get($options);
