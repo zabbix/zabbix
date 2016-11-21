@@ -100,18 +100,6 @@ $event = reset($events);
 $alerts = [];
 $r_alerts = [];
 
-$real_event = DBfetch(DBselect('SELECT eventid FROM event_recovery WHERE r_eventid='.zbx_dbstr($event['eventid'])));
-
-if ($real_event) {
-	$options['eventids'] = [$real_event['eventid']];
-
-	$events = API::Event()->get($options);
-	if (!$events) {
-		access_deny();
-	}
-	$event = reset($events);
-}
-
 if ($event['alerts']) {
 	$alerts = $event['alerts'];
 	CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
