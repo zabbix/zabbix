@@ -169,6 +169,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
+				['type' => API_ID],
+				1.23E+11,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
 				['type' => API_OBJECT, 'fields' => []],
 				[],
 				'/',
