@@ -420,11 +420,7 @@ class CHostGroup extends CApiService {
 
 		$this->inheritRights($groups);
 
-		foreach ($groups as $group) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], 'groups',
-				null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groups);
 
 		return ['groupids' => $groupids];
 	}
@@ -456,13 +452,7 @@ class CHostGroup extends CApiService {
 
 		DB::update('groups', $upd_groups);
 
-		foreach ($groups as $group) {
-			$db_group = $db_groups[$group['groupid']];
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $db_group['name'],
-				'groups', $db_group, $group
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groups, $db_groups);
 
 		return ['groupids' => zbx_objectValues($groups, 'groupid')];
 	}
@@ -676,11 +666,7 @@ class CHostGroup extends CApiService {
 			'value_id' => $groupids
 		]);
 
-		foreach ($groupids as $groupid) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $db_groups[$groupid]['name'],
-				'groups', null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $db_groups);
 
 		return ['groupids' => $groupids];
 	}
