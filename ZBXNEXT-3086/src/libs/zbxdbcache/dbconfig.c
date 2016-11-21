@@ -9440,18 +9440,21 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
 			}
 			else
 			{
-				char	search[ZBX_MAX_UINT64_LEN + 2];
-				char	replace[ZBX_MAX_UINT64_LEN + 2];
-				char	*old_formula;
+				if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+				{
+					char	search[ZBX_MAX_UINT64_LEN + 2];
+					char	replace[ZBX_MAX_UINT64_LEN + 2];
+					char	*old_formula;
 
-				zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}",
-						condition->conditionid);
-				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}",
-						uniq_condition->conditionid);
+					zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}",
+							condition->conditionid);
+					zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}",
+							uniq_condition->conditionid);
 
-				old_formula = action->formula;
-				action->formula = string_replace(action->formula, search, replace);
-				zbx_free(old_formula);
+					old_formula = action->formula;
+					action->formula = string_replace(action->formula, search, replace);
+					zbx_free(old_formula);
+				}
 
 				zbx_db_condition_clean(condition);
 			}
