@@ -1623,15 +1623,15 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 	const DB_CONDITION	*condition1 = d1, *condition2 = d2;
 	int			ret;
 
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->eventsource, condition2->eventsource);
+
 	if (0 != (ret = strcmp(condition1->value, condition2->value)))
 		return ret;
 
 	if (0 != (ret = strcmp(condition1->value2, condition2->value2)))
 		return ret;
-
-	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
-	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
-	ZBX_RETURN_IF_NOT_EQUAL(condition1->eventsource, condition2->eventsource);
 
 	return 0;
 }
