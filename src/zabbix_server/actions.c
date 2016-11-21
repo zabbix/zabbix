@@ -1618,6 +1618,19 @@ int	is_recovery_event(const DB_EVENT *event)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: uniq_conditions_compare_func                                     *
+ *                                                                            *
+ * Purpose: compare to find equal conditions                                  *
+ *                                                                            *
+ * Parameters: d1 - [IN] condition structure to compare to d2                 *
+ *             d2 - [IN] condition structure to compare to d1                 *
+ *                                                                            *
+ * Return value: 0 - equal                                                    *
+ *               not 0 - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
 static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 {
 	const DB_CONDITION	*condition1 = d1, *condition2 = d2;
@@ -1635,6 +1648,18 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: uniq_conditions_hash_func                                        *
+ *                                                                            *
+ * Purpose: generate hash based on condition values                           *
+ *                                                                            *
+ * Parameters: data - [IN] condition structure                                *
+ *                                                                            *
+ *                                                                            *
+ * Return value: hash is generated                                            *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 {
 	const DB_CONDITION	*condition = data;
@@ -1648,7 +1673,18 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 	return hash;
 }
 
-static void	process_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
+/******************************************************************************
+ *                                                                            *
+ * Function: check_event_conditions                                           *
+ *                                                                            *
+ * Purpose: check all unique conditions for given event and source            *
+ *                                                                            *
+ * Parameters: event           - [IN]     event that need conditions checking *
+ *             uniq_conditions - [IN/OUT] conditions that will be checked and *
+ *                                        updated with result                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
 {
 	zbx_hashset_iter_t	iter;
 	DB_CONDITION		*condition;
@@ -1716,7 +1752,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			continue;
 		}
 
-		process_event_conditions(event, uniq_conditions);
+		check_event_conditions(event, uniq_conditions);
 
 		for (j = 0; j < actions.values_num; j++)
 		{
@@ -1747,7 +1783,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
-		zbx_conditions_eval_free(&uniq_conditions[i]);
+		zbx_conditions_eval_clean(&uniq_conditions[i]);
 		zbx_hashset_destroy(&uniq_conditions[i]);
 	}
 

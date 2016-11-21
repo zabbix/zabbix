@@ -9324,7 +9324,16 @@ static void	zbx_db_condition_clean(DB_CONDITION *condition)
 	zbx_free(condition->value);
 }
 
-void	zbx_conditions_eval_free(zbx_hashset_t *uniq_conditions)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_conditions_eval_clean                                        *
+ *                                                                            *
+ * Purpose: cleans condition data structures from hashset                     *
+ *                                                                            *
+ * Parameters: uniq_conditions - [IN] hashset with data structures to clean   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions)
 {
 	zbx_hashset_iter_t	iter;
 	DB_CONDITION		*condition;
@@ -9388,6 +9397,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		zbx_vector_ptr_append(conditions, condition);
 	}
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_action_eval_create                                            *
@@ -9418,7 +9428,26 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 
 	return action;
 }
-
+/******************************************************************************
+ *                                                                            *
+ * Function: prepare_actions_eval                                             *
+ *                                                                            *
+ * Purpose: make actions to point, to conditions from hashset, where all      *
+ *          conditions are unique, this ensures that we don't double check    *
+ *          same conditions.                                                  *
+ *                                                                            *
+ * Parameters: actions         - [IN/OUT] all conditions are added to hashset *
+ *                                        then cleaned, actions will now      *
+ *                                        point to conditions from hashset.   *
+ *                                        for custom expression also          *
+ *                                        replaces formula                    *
+ *             uniq_conditions - [OUT]    unique conditions that actions      *
+ *                                        point to (several sources)          *
+ *                                                                            *
+ * Comments: The returned conditions must be freed with                       *
+ *           zbx_conditions_eval_clean() function later.                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
 {
 	int	i, j;
@@ -9427,7 +9456,6 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
 	{
 		zbx_action_eval_t	*action = actions->values[i];
 
-		/* free conditions and make them point to hashset */
 		for (j = 0; j < action->conditions.values_num; j++)
 		{
 			DB_CONDITION	*uniq_condition, *condition = action->conditions.values[j];
@@ -9471,11 +9499,14 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
  *                                                                            *
  * Purpose: gets action evaluation data                                       *
  *                                                                            *
- * Parameters: actions     - [OUT] the action evaluation data                 *
+ * Parameters: actions         - [OUT] the action evaluation data             *
+ *             uniq_conditions - [OUT] unique conditions that actions         *
+ *                                     point to (several sources)             *
  *                                                                            *
  * Comments: The returned actions and conditions must be freed with           *
- *           zbx_action_eval_free() and zbx_conditions_eval_free()            *
+ *           zbx_action_eval_free() and zbx_conditions_eval_clean()           *
  *           functions later.                                                 *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
 {
