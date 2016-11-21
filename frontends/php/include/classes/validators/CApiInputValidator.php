@@ -130,6 +130,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
+	 * @param array  $rule['in']      (optional)
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -159,6 +160,13 @@ class CApiInputValidator {
 			return false;
 		}
 
+		if (array_key_exists('in', $rule) && !in_array($data, $rule['in'], true)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be one of %1$s', implode(', ', $rule['in']))
+			);
+			return false;
+		}
+
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
@@ -185,7 +193,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (!is_scalar($data) || !ctype_digit(strval($data))) {
+		if (!is_scalar($data) || is_double($data)|| !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
 		}

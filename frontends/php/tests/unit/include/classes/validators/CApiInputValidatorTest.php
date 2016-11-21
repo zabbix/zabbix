@@ -79,6 +79,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_STRING_UTF8, 'in' => ['xml', 'json']],
+				'json',
+				'/1/name',
+				'json'
+			],
+			[
+				['type' => API_STRING_UTF8, 'in' => ['xml', 'json']],
+				'XML',
+				'/1/name',
+				'Invalid parameter "/1/name": value must be one of xml, json.'
+			],
+			[
 				['type' => API_ID],
 				'-1',
 				'/1/id',
@@ -149,6 +161,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'9223372036854775808',
 				'/1/id',
 				'Invalid parameter "/1/id": a number is too large.'
+			],
+			[
+				['type' => API_ID],
+				0.0,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => []],
@@ -288,6 +306,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '3'],
 				'/',
 				'Invalid parameter "/10": value (3) already exists.'
+			],
+			[
+				['type' => API_IDS, 'uniq' => true],
+				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, 0.0],
+				'/',
+				'Invalid parameter "/10": a number is expected.'
 			],
 			[
 				['type' => API_IDS, 'uniq' => true],
