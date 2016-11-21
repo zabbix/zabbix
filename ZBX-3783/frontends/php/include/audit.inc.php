@@ -143,6 +143,12 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 
 function add_audit_bulk($action, $resourcetype, array $objects, array $objects_old = null) {
 	switch ($resourcetype) {
+		case AUDIT_RESOURCE_APPLICATION:
+			$field_name_resourceid = 'applicationid';
+			$field_name_resourcename = 'name';
+			$table_name = 'applications';
+			break;
+
 		case AUDIT_RESOURCE_HOST_GROUP:
 			$field_name_resourceid = 'groupid';
 			$field_name_resourcename = 'name';

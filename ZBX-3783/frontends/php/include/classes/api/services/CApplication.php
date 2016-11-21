@@ -400,11 +400,7 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		foreach ($applications as $application) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $application['applicationid'],
-				$application['name'], 'applications', null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
 
 		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
@@ -436,13 +432,7 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		foreach ($applications as $application) {
-			$db_application = $db_applications[$application['applicationid']];
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $application['applicationid'],
-				$db_application['name'], 'applications', $db_application, $application
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
 
 		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
@@ -511,11 +501,7 @@ class CApplication extends CApiService {
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
-		foreach ($db_applications as $applicationid => $db_application) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $applicationid, $db_application['name'],
-				'applications', null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $db_applications);
 
 		return ['applicationids' => $applicationids];
 	}
