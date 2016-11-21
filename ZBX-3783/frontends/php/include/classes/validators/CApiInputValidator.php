@@ -75,6 +75,9 @@ class CApiInputValidator {
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
 
+			case API_BOOLEAN:
+				return self::validateBoolean($rule, $data, $path, $error);
+
 			case API_OBJECT:
 				return self::validateObject($rule, $data, $path, $error);
 
@@ -108,6 +111,7 @@ class CApiInputValidator {
 		switch ($rule['type']) {
 			case API_STRING_UTF8:
 			case API_ID:
+			case API_BOOLEAN:
 			case API_OBJECT:
 			case API_HG_NAME:
 				return true;
@@ -205,6 +209,32 @@ class CApiInputValidator {
 
 		if (is_string($data) && $data[0] === '0' && strlen($data) > 1) {
 			$data = ltrim($data, '0');
+		}
+
+		return true;
+	}
+
+	/**
+	 * Boolean validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateBoolean($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (!is_bool($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a boolean is expected'));
+			return false;
 		}
 
 		return true;

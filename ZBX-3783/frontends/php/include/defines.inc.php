@@ -980,13 +980,17 @@ define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
 // API validation
-// data types
+// scalar data types
 define('API_STRING_UTF8',	1);
 define('API_ID',			2);
-define('API_OBJECT',		3);
-define('API_IDS',			4);
-define('API_OBJECTS',		5);
-define('API_HG_NAME',		6);
+define('API_BOOLEAN',		3);
+// arrays
+define('API_OBJECT',		4);
+define('API_IDS',			5);
+define('API_OBJECTS',		6);
+// specific types
+define('API_HG_NAME',		7);
+
 // flags
 define('API_REQUIRED',		0x01);
 define('API_NOT_EMPTY',		0x02);
