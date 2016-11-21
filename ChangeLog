@@ -23,6 +23,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+........S. [ZBX-11440] fixed memory leak when resolving simple macros (vso)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
 ........S. [ZBX-11454] fixed OK event not updating trigger state without open problems (wiper)
