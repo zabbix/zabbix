@@ -9428,6 +9428,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 
 	return action;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: prepare_actions_eval                                             *
