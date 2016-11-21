@@ -703,12 +703,33 @@ foreach ($triggers as $trigger) {
 				continue;
 			}
 
-			$value = ($event['r_eventid'] == 0) ? TRIGGER_VALUE_TRUE : TRIGGER_VALUE_FALSE;
-			$eventStatusSpan = new CSpan(trigger_value2str($value));
+			if ($event['r_eventid'] == 0) {
+				$in_closing = false;
 
-			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($eventStatusSpan, $value, $event['clock'],
-				$config['event_ack_enable'] && $event['acknowledged']
+				if ($config['event_ack_enable']) {
+					foreach ($event['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							$in_closing = true;
+							break;
+						}
+					}
+				}
+
+				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				$value_clock = $in_closing ? time() : $event['clock'];
+			}
+			else {
+				$value = TRIGGER_VALUE_FALSE;
+				$value_str = _('RESOLVED');
+				$value_clock = $event['r_clock'];
+			}
+
+			$cell_status = new CSpan($value_str);
+
+			// Add colors and blinking to span depending on configuration and trigger parameters.
+			addTriggerValueStyle($cell_status, $value, $value_clock,
+				$config['event_ack_enable'] ? (bool) $event['acknowledges'] : false
 			);
 
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -727,7 +748,7 @@ foreach ($triggers as $trigger) {
 			$triggerTable->addRow(
 				(new CRow([
 					(new CCol())->setColSpan($config['event_ack_enable'] ? 3 : 2),
-					(new CCol($eventStatusSpan))->setColSpan(2),
+					(new CCol($cell_status))->setColSpan(2),
 					$clock,
 					$r_clock,
 					zbx_date2age($event['clock']),
