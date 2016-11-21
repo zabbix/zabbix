@@ -9364,11 +9364,10 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
  *             conditions - [OUT] the conditions vector                       *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions,
-		char **formula, zbx_hashset_t *uniq_conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
 {
 	int				i;
-	DB_CONDITION			condition, *uniq_condition;
+	DB_CONDITION			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
 	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
@@ -9377,38 +9376,18 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 	{
 		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
 
-		condition.conditionid = dc_condition->conditionid;
-		condition.actionid = dc_action->actionid;
-		condition.conditiontype = dc_condition->conditiontype;
-		condition.operator = dc_condition->op;
-		condition.value = zbx_strdup(NULL, dc_condition->value);
-		condition.value2 = zbx_strdup(NULL, dc_condition->value2);
-		condition.eventsource = dc_action->eventsource;
+		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
 
-		if (NULL == (uniq_condition = zbx_hashset_search(uniq_conditions, &condition)))
-		{
-			uniq_condition = zbx_hashset_insert(uniq_conditions, &condition, sizeof(DB_CONDITION));
-		}
-		else
-		{
-			char	search[ZBX_MAX_UINT64_LEN + 2];
-			char	replace[ZBX_MAX_UINT64_LEN + 2];
-			char	*old_formula;
+		condition->conditionid = dc_condition->conditionid;
+		condition->actionid = dc_action->actionid;
+		condition->conditiontype = dc_condition->conditiontype;
+		condition->operator = dc_condition->op;
+		condition->value = zbx_strdup(NULL, dc_condition->value);
+		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
 
-			zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}", condition.conditionid);
-			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", uniq_condition->conditionid);
-
-			old_formula = *formula;
-			*formula = string_replace(*formula, search, replace);
-			zbx_free(old_formula);
-
-			zbx_db_condition_clean(&condition);
-		}
-
-		zbx_vector_ptr_append(conditions, uniq_condition);
+		zbx_vector_ptr_append(conditions, condition);
 	}
 }
-
 /******************************************************************************
  *                                                                            *
  * Function: dc_action_eval_create                                            *
@@ -9423,8 +9402,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
  *           function later.                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action,
-		zbx_hashset_t *uniq_conditions)
+static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action)
 {
 	zbx_action_eval_t		*action;
 
@@ -9436,9 +9414,52 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->formula = zbx_strdup(NULL, dc_action->formula);
 	zbx_vector_ptr_create(&action->conditions);
 
-	dc_action_copy_conditions(dc_action, &action->conditions, &action->formula, uniq_conditions);
+	dc_action_copy_conditions(dc_action, &action->conditions);
 
 	return action;
+}
+
+static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
+{
+	int	i, j;
+
+	for (i = 0; i < actions->values_num; i++)
+	{
+		zbx_action_eval_t	*action = actions->values[i];
+
+		/* free conditions and make them point to hashset */
+		for (j = 0; j < action->conditions.values_num; j++)
+		{
+			DB_CONDITION	*uniq_condition, *condition = action->conditions.values[j];
+
+			if (NULL == (uniq_condition = zbx_hashset_search(&uniq_conditions[action->eventsource],
+					condition)))
+			{
+				uniq_condition = zbx_hashset_insert(&uniq_conditions[action->eventsource],
+						condition, sizeof(DB_CONDITION));
+			}
+			else
+			{
+				char	search[ZBX_MAX_UINT64_LEN + 2];
+				char	replace[ZBX_MAX_UINT64_LEN + 2];
+				char	*old_formula;
+
+				zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}",
+						condition->conditionid);
+				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}",
+						uniq_condition->conditionid);
+
+				old_formula = action->formula;
+				action->formula = string_replace(action->formula, search, replace);
+				zbx_free(old_formula);
+
+				zbx_db_condition_clean(condition);
+			}
+
+			zbx_free(action->conditions.values[j]);
+			action->conditions.values[j] = uniq_condition;
+		}
+	}
 }
 
 /******************************************************************************
@@ -9449,9 +9470,9 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
  *                                                                            *
  * Parameters: actions     - [OUT] the action evaluation data                 *
  *                                                                            *
- * Comments: The returned actions must be freed with zbx_action_eval_free()   *
- *           function later.                                                  *
- *                                                                            *
+ * Comments: The returned actions and conditions must be freed with           *
+ *           zbx_action_eval_free() and zbx_conditions_eval_free()            *
+ *           functions later.                                                 *
  ******************************************************************************/
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
 {
@@ -9467,13 +9488,17 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 
 	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action, uniq_conditions));
+		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
 	}
 
 	UNLOCK_CACHE;
 
+	prepare_actions_eval(actions, uniq_conditions);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __function_name, actions->values_num);
 }
+
+
 
 /******************************************************************************
  *                                                                            *

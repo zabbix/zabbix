@@ -1625,7 +1625,6 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
 
 	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
 	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
-	ZBX_RETURN_IF_NOT_EQUAL(condition1->eventsource, condition2->eventsource);
 
 	if (0 != (ret = strcmp(condition1->value, condition2->value)))
 		return ret;
@@ -1645,7 +1644,6 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value2, strlen(condition->value2), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->conditiontype, 1, hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->operator, 1, hash);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->eventsource, 1, hash);
 
 	return hash;
 }
@@ -1655,13 +1653,10 @@ static void	process_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_
 	zbx_hashset_iter_t	iter;
 	DB_CONDITION		*condition;
 
-	zbx_hashset_iter_reset(uniq_conditions, &iter);
+	zbx_hashset_iter_reset(&uniq_conditions[event->source], &iter);
 
 	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-	{
-		if (condition->eventsource == event->source)
-			condition->condition_result = check_action_condition(event, condition);
-	}
+		condition->condition_result = check_action_condition(event, condition);
 }
 
 /******************************************************************************
@@ -1684,7 +1679,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_vector_ptr_t		actions;
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_hashset_t			rec_escalations;
-	zbx_hashset_t			uniq_conditions;
+	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -1692,11 +1687,14 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_hashset_create(&rec_escalations, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create(&uniq_conditions, 0, uniq_conditions_hash_func,
-			uniq_conditions_compare_func);
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func,
+				uniq_conditions_compare_func);
+	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, &uniq_conditions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
@@ -1718,7 +1716,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			continue;
 		}
 
-		process_event_conditions(event, &uniq_conditions);
+		process_event_conditions(event, uniq_conditions);
 
 		for (j = 0; j < actions.values_num; j++)
 		{
@@ -1747,8 +1745,11 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		}
 	}
 
-	zbx_conditions_eval_free(&uniq_conditions);
-	zbx_hashset_destroy(&uniq_conditions);
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_conditions_eval_free(&uniq_conditions[i]);
+		zbx_hashset_destroy(&uniq_conditions[i]);
+	}
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
