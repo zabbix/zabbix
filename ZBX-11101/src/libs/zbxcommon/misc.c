@@ -52,7 +52,7 @@ typedef struct zbx_scheduler_interval
 }
 zbx_scheduler_interval_t;
 
-ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
+static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
 
@@ -3073,10 +3073,20 @@ fail:
 	return res;
 }
 
+void	zbx_alarm_flag_set(void)
+{
+	zbx_timed_out = 1;
+}
+
+void	zbx_alarm_flag_clear(void)
+{
+	zbx_timed_out = 0;
+}
+
 #if !defined(_WINDOWS)
 unsigned int	zbx_alarm_on(unsigned int seconds)
 {
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 
 	return alarm(seconds);
 }
@@ -3086,7 +3096,12 @@ unsigned int	zbx_alarm_off(void)
 	unsigned int	ret;
 
 	ret = alarm(0);
-	zbx_timed_out = 0;
+	zbx_alarm_flag_clear();
 	return ret;
 }
 #endif
+
+int	zbx_alarm_timed_out(void)
+{
+	return (0 == zbx_timed_out ? FAIL : SUCCEED);
+}

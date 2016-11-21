@@ -530,7 +530,8 @@ class CScreen extends CApiService {
 
 				foreach ($screen['users'] as $share) {
 					// Check required parameters.
-					$missing_keys = checkRequiredKeys($share, $required_fields);
+					$missing_keys = array_diff($required_fields, array_keys($share));
+
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User sharing is missing parameters: %1$s for screen "%2$s".',
@@ -604,7 +605,8 @@ class CScreen extends CApiService {
 
 				foreach ($screen['userGroups'] as $share) {
 					// Check required parameters.
-					$missing_keys = checkRequiredKeys($share, $required_fields);
+					$missing_keys = array_diff($required_fields, array_keys($share));
+
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User group sharing is missing parameters: %1$s for screen "%2$s".',
@@ -869,7 +871,8 @@ class CScreen extends CApiService {
 
 				foreach ($screen['users'] as $share) {
 					// Check required parameters.
-					$missing_keys = checkRequiredKeys($share, $required_fields);
+					$missing_keys = array_diff($required_fields, array_keys($share));
+
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User sharing is missing parameters: %1$s for screen "%2$s".',
@@ -942,7 +945,8 @@ class CScreen extends CApiService {
 
 				foreach ($screen['userGroups'] as $share) {
 					// Check required parameters.
-					$missing_keys = checkRequiredKeys($share, $required_fields);
+					$missing_keys = array_diff($required_fields, array_keys($share));
+
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User group sharing is missing parameters: %1$s for screen "%2$s".',
