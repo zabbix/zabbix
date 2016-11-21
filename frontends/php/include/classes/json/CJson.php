@@ -125,35 +125,43 @@ class CJson {
 	private static $forceObject = null;
 
 	/**
+	 * Used for fallback _json_encode().
+	 * When it is true than forward slashes are escaped.
 	 *
+	 * @var bool
+	 */
+	private $escape_slashes = true;
+
+	/**
 	 * Encodes the mixed $valueToEncode into JSON format.
 	 *
-	 * @param mixed $valueToEncode Value to be encoded into JSON format
-	 *
-	 * @param array $deQuote Array of keys whose values should **not** be
-	 * quoted in encoded string.
-	 *
-	 * @param bool $forceObject force all arrays to objects
+	 * @param mixed  $valueToEncode    Value to be encoded into JSON format.
+	 * @param array  $deQuote          Array of keys whose values should **not** be quoted in encoded string.
+	 * @param bool   $forceObject      Force all arrays to objects.
+	 * @param bool   $escape_slashes
 	 *
 	 * @return string JSON encoded value
-	 *
 	 */
-	public function encode($valueToEncode, $deQuote = [], $forceObject = false) {
+	public function encode($valueToEncode, $deQuote = [], $forceObject = false, $escape_slashes = true) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')
 				&& defined('JSON_UNESCAPED_SLASHES')) {
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
 
-			$encoded = json_encode($valueToEncode, JSON_UNESCAPED_SLASHES | ($forceObject ? JSON_FORCE_OBJECT : 0));
+			$encoded = json_encode($valueToEncode,
+				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($forceObject ? JSON_FORCE_OBJECT : 0)
+			);
 
 			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
 			}
 		}
 		else {
-			// fall back to php-only method
+			// Fall back to php-only method.
+
 			self::$forceObject = $forceObject ? true : null;
+			$this->escape_slashes = $escape_slashes;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
@@ -321,8 +329,9 @@ class CJson {
 							$ascii .= '\r';
 							break;
 						case $ord_var_c == 0x22:
+						case ($ord_var_c == 0x2F && $this->escape_slashes):
 						case $ord_var_c == 0x5C:
-							// double quote, slosh
+							// double quote, slash, slosh
 							$ascii .= '\\'.$var{$c};
 							break;
 						case ($ord_var_c >= 0x20 && $ord_var_c <= 0x7F):
