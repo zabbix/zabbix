@@ -92,12 +92,6 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_ID],
-				'-1',
-				'/1/id',
-				'Invalid parameter "/1/id": a number is expected.'
-			],
-			[
-				['type' => API_ID],
 				0,
 				'/1/id',
 				0
@@ -173,6 +167,54 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				1.23E+11,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_BOOLEAN],
+				true,
+				'/1/createMissing',
+				true
+			],
+			[
+				['type' => API_BOOLEAN],
+				false,
+				'/1/createMissing',
+				false
+			],
+			[
+				['type' => API_BOOLEAN],
+				'-1',
+				'/1/createMissing',
+				'Invalid parameter "/1/createMissing": a boolean is expected.'
+			],
+			[
+				['type' => API_BOOLEAN],
+				0,
+				'/1/createMissing',
+				'Invalid parameter "/1/createMissing": a boolean is expected.'
+			],
+			[
+				['type' => API_BOOLEAN],
+				[],
+				'/1/createMissing',
+				'Invalid parameter "/1/createMissing": a boolean is expected.'
+			],
+			[
+				['type' => API_BOOLEAN],
+				0.0,
+				'/1/createMissing',
+				'Invalid parameter "/1/createMissing": a boolean is expected.'
+			],
+			[
+				['type' => API_BOOLEAN],
+				null,
+				'/1/createMissing',
+				'Invalid parameter "/1/createMissing": a boolean is expected.'
+			],
+			[
+				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/id',
+				null
 			],
 			[
 				['type' => API_OBJECT, 'fields' => []],
