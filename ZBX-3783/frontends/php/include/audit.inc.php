@@ -141,6 +141,91 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 }
 
+function add_audit_bulk($action, $resourcetype, array $objects, array $objects_old = null) {
+	switch ($resourcetype) {
+		case AUDIT_RESOURCE_HOST_GROUP:
+			$field_name_resourceid = 'groupid';
+			$field_name_resourcename = 'name';
+			$table_name = 'groups';
+			break;
+
+		default:
+			return false;
+	}
+
+	$clock = time();
+	$ip = array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== ''
+		? $_SERVER['HTTP_X_FORWARDED_FOR']
+		: $_SERVER['REMOTE_ADDR'];
+	$ip = substr($ip, 0, 39);
+
+	$auditlog = [];
+	$objects_diff = [];
+
+	foreach ($objects as $object) {
+		$resourceid = $object[$field_name_resourceid];
+
+		if ($action == AUDIT_ACTION_UPDATE) {
+			$object_old = $objects_old[$resourceid];
+			$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
+
+			if (!$object_diff) {
+				continue;
+			}
+
+			foreach ($object_diff as $field_name => &$values) {
+				$values = [
+					'old' => $object_old[$field_name],
+					'new' => $object[$field_name]
+				];
+			}
+			unset($values);
+
+			$objects_diff[] = $object_diff;
+		}
+
+		$resourcename = $object[$field_name_resourcename];
+
+		if (mb_strlen($resourcename) > 255) {
+			$resourcename = mb_substr($resourcename, 0, 252).'...';
+		}
+
+		$auditlog[] = [
+			'userid' => CWebUser::$data['userid'],
+			'clock' => $clock,
+			'ip' => $ip,
+			'action' => $action,
+			'resourcetype' => $resourcetype,
+			'resourceid' => $resourceid,
+			'resourcename' => $resourcename
+		];
+	}
+
+	if ($auditlog) {
+		$auditids = DB::insertBatch('auditlog', $auditlog);
+
+		if ($action == AUDIT_ACTION_UPDATE) {
+			$auditlog_details = [];
+
+			foreach ($objects_diff as $index => $object_diff) {
+				foreach ($object_diff as $field_name => $values) {
+					$auditlog_details[] = [
+						'auditid' => $auditids[$index],
+						'table_name' => $table_name,
+						'field_name' => $field_name,
+						'oldvalue' => $values['old'],
+						'newvalue' => $values['new']
+					];
+				}
+			}
+
+			DB::insertBatch('auditlog_details', $auditlog_details);
+		}
+	}
+
+	return true;
+}
+
 function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
 	if ($userId === null) {
 		$userId = CWebUser::$data['userid'];
