@@ -9501,8 +9501,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __function_name, actions->values_num);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_availability_update_ts                                   *
