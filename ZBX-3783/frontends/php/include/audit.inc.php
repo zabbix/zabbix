@@ -155,6 +155,12 @@ function add_audit_bulk($action, $resourcetype, array $objects, array $objects_o
 			$table_name = 'groups';
 			break;
 
+		case AUDIT_RESOURCE_VALUE_MAP:
+			$field_name_resourceid = 'valuemapid';
+			$field_name_resourcename = 'name';
+			$table_name = 'valuemaps';
+			break;
+
 		default:
 			return false;
 	}
@@ -188,9 +194,12 @@ function add_audit_bulk($action, $resourcetype, array $objects, array $objects_o
 			unset($values);
 
 			$objects_diff[] = $object_diff;
-		}
 
-		$resourcename = $object[$field_name_resourcename];
+			$resourcename = $object_old[$field_name_resourcename];
+		}
+		else {
+			$resourcename = $object[$field_name_resourcename];
+		}
 
 		if (mb_strlen($resourcename) > 255) {
 			$resourcename = mb_substr($resourcename, 0, 252).'...';

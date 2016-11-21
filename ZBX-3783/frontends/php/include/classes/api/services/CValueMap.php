@@ -108,23 +108,22 @@ class CValueMap extends CApiService {
 
 		$mappings = [];
 
-		foreach ($valuemaps as $key => $valuemap) {
+		foreach ($valuemaps as $index => &$valuemap) {
+			$valuemap['valuemapid'] = $valuemapids[$index];
+
 			foreach ($valuemap['mappings'] as $mapping) {
 				$mappings[] = [
-					'valuemapid' => $valuemapids[$key],
+					'valuemapid' => $valuemap['valuemapid'],
 					'value' => $mapping['value'],
 					'newvalue' => $mapping['newvalue']
 				];
 			}
 		}
+		unset($valuemap);
 
 		DB::insertBatch('mappings', $mappings);
 
-		foreach ($valuemaps as $key => $valuemap) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemapids[$key], $valuemap['name'],
-				null, null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemaps);
 
 		return ['valuemapids' => $valuemapids];
 	}
@@ -142,110 +141,83 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function update($valuemaps) {
-		$this->validateUpdate($valuemaps);
+		$this->validateUpdate($valuemaps, $db_valuemaps);
 
 		$upd_valuemaps = [];
-		$upd_mappings = [];
+		$mappings = [];
 
 		foreach ($valuemaps as $valuemap) {
 			$valuemapid = $valuemap['valuemapid'];
 
-			if (array_key_exists('mappings', $valuemap)) {
-				$upd_mappings[$valuemapid] = [];
-				foreach ($valuemap['mappings'] as $mapping) {
-					$upd_mappings[$valuemapid][$mapping['value']] = $mapping['newvalue'];
-				}
+			$db_valuemap = $db_valuemaps[$valuemapid];
+
+			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
+				$upd_valuemaps[] = [
+					'values' => ['name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
 			}
 
-			unset($valuemap['valuemapid'], $valuemap['mappings']);
-
-			// Skip updating value maps, if name is not given.
-			if (array_key_exists('name', $valuemap)) {
-				$upd_valuemaps[$valuemapid] = $valuemap;
+			if (array_key_exists('mappings', $valuemap)) {
+				$mappings[$valuemapid] = [];
+				foreach ($valuemap['mappings'] as $mapping) {
+					$mappings[$valuemapid][$mapping['value']] = $mapping['newvalue'];
+				}
 			}
 		}
 
 		if ($upd_valuemaps) {
-			$db_valuemaps = API::getApiService()->select('valuemaps', [
-				'output' => ['valuemapid', 'name'],
-				'valuemapids' => array_keys($upd_valuemaps)
-			]);
-
-			$update = [];
-
-			foreach ($db_valuemaps as $db_valuemap) {
-				$upd_valuemap = $upd_valuemaps[$db_valuemap['valuemapid']];
-
-				// Skip updating value maps, if name was not changed.
-				if ($upd_valuemap['name'] !== $db_valuemap['name']) {
-					$update[] = [
-						'values' => $upd_valuemap,
-						'where' => ['valuemapid' => $db_valuemap['valuemapid']]
-					];
-
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'],
-						$db_valuemap['name'], 'valuemaps', $db_valuemap, $upd_valuemap
-					);
-				}
-			}
-
-			if ($update) {
-				DB::update('valuemaps', $update);
-			}
+			DB::update('valuemaps', $upd_valuemaps);
 		}
 
-		if ($upd_mappings) {
+		if ($mappings) {
 			$db_mappings = API::getApiService()->select('mappings', [
 				'output' => ['mappingid', 'valuemapid', 'value', 'newvalue'],
-				'filter' => ['valuemapid' => array_keys($upd_mappings)]
+				'filter' => ['valuemapid' => array_keys($mappings)]
 			]);
 
-			$insert_mapings = [];
-			$update_mapings = [];
-			$delete_mapingids = [];
+			$ins_mapings = [];
+			$upd_mapings = [];
+			$del_mapingids = [];
 
 			foreach ($db_mappings as $db_mapping) {
-				if (array_key_exists($db_mapping['valuemapid'], $upd_mappings)) {
-					$upd_mapping = &$upd_mappings[$db_mapping['valuemapid']];
+				$mapping = &$mappings[$db_mapping['valuemapid']];
 
-					if (array_key_exists($db_mapping['value'], $upd_mapping)) {
-						if ($upd_mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
-							$update_mapings[] = [
-								'values' => ['newvalue' => $upd_mapping[$db_mapping['value']]],
-								'where' => ['mappingid' => $db_mapping['mappingid']]
-							];
-						}
-						unset($upd_mapping[$db_mapping['value']]);
+				if (array_key_exists($db_mapping['value'], $mapping)) {
+					if ($mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
+						$upd_mapings[] = [
+							'values' => ['newvalue' => $mapping[$db_mapping['value']]],
+							'where' => ['mappingid' => $db_mapping['mappingid']]
+						];
 					}
-					else {
-						$delete_mapingids[] = $db_mapping['mappingid'];
-					}
-
-					unset($upd_mapping);
+					unset($mapping[$db_mapping['value']]);
 				}
 				else {
-					$delete_mapingids[] = $db_mapping['mappingid'];
+					$del_mapingids[] = $db_mapping['mappingid'];
+				}
+			}
+			unset($mapping);
+
+			foreach ($mappings as $valuemapid => $mapping) {
+				foreach ($mapping as $value => $newvalue) {
+					$ins_mapings[] = ['valuemapid' => $valuemapid, 'value' => $value, 'newvalue' => $newvalue];
 				}
 			}
 
-			foreach ($upd_mappings as $valuemapid => $upd_mapping) {
-				foreach ($upd_mapping as $value => $newvalue) {
-					$insert_mapings[] = ['valuemapid' => $valuemapid, 'value' => $value, 'newvalue' => $newvalue];
-				}
+			if ($del_mapingids) {
+				DB::delete('mappings', ['mappingid' => $del_mapingids]);
 			}
 
-			if ($insert_mapings) {
-				DB::insertBatch('mappings', $insert_mapings);
+			if ($upd_mapings) {
+				DB::update('mappings', $upd_mapings);
 			}
 
-			if ($update_mapings) {
-				DB::update('mappings', $update_mapings);
-			}
-
-			if ($delete_mapingids) {
-				DB::delete('mappings', ['mappingid' => $delete_mapingids]);
+			if ($ins_mapings) {
+				DB::insertBatch('mappings', $ins_mapings);
 			}
 		}
+
+		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
 
 		return ['valuemapids' => zbx_objectValues($valuemaps, 'valuemapid')];
 	}
@@ -290,13 +262,30 @@ class CValueMap extends CApiService {
 			$this->deleteByIds($valuemapids);
 		}
 
-		foreach ($db_valuemaps as $db_valuemap) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'],
-				$db_valuemap['name'], null, null, null
-			);
-		}
+		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemaps);
 
 		return ['valuemapids' => $valuemapids];
+	}
+
+	/**
+	 * Check for duplicated value maps.
+	 *
+	 * @param array  $names
+	 *
+	 * @throws APIException  if value map already exists.
+	 */
+	private function checkDuplicates($names) {
+		$db_valuemaps = API::getApiService()->select('valuemaps', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($db_valuemaps) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Value map "%1$s" already exists.', $db_valuemaps[0]['name'])
+			);
+		}
 	}
 
 	/**
@@ -322,26 +311,18 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check if value map already exists.
-		$db_valuemaps = API::getApiService()->select('valuemaps', [
-			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($valuemaps, 'name')],
-			'limit' => 1
-		]);
-
-		if ($db_valuemaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value map "%1$s" already exists.', $db_valuemaps[0]['name']));
-		}
+		$this->checkDuplicates(zbx_objectValues($valuemaps, 'name'));
 	}
 
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
 	 * @param array $valuemaps
+	 * @param array $db_valuemaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$valuemaps) {
+	protected function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update value maps.'));
 		}
@@ -365,7 +346,7 @@ class CValueMap extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$check_names = [];
+		$names = [];
 
 		foreach ($valuemaps as $valuemap) {
 			// Check if this value map exists.
@@ -377,29 +358,13 @@ class CValueMap extends CApiService {
 
 			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
 
-			if (array_key_exists('name', $valuemap)) {
-				if ($db_valuemap['name'] !== $valuemap['name']) {
-					$check_names[] = $valuemap;
-				}
+			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
+				$names[] = $valuemap['name'];
 			}
 		}
 
-		if ($check_names) {
-			// Check if value map already exists.
-			$db_valuemap_names = API::getApiService()->select('valuemaps', [
-				'output' => ['valuemapid', 'name'],
-				'filter' => ['name' => zbx_objectValues($check_names, 'name')]
-			]);
-			$db_valuemap_names = zbx_toHash($db_valuemap_names, 'name');
-
-			foreach ($check_names as $valuemap) {
-				if (array_key_exists($valuemap['name'], $db_valuemap_names)
-						&& bccomp($db_valuemap_names[$valuemap['name']]['valuemapid'], $valuemap['valuemapid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Value map "%1$s" already exists.', $valuemap['name'])
-					);
-				}
-			}
+		if ($names) {
+			$this->checkDuplicates($names);
 		}
 	}
 
