@@ -121,12 +121,17 @@ class CJson {
 	public function __destruct() {
 	}
 
-	// used for fallback _json_encode
-	private static $forceObject = null;
+	/**
+	 * Used for fallback _json_encode().
+	 * If true than non-associative array is encoded as object.
+	 *
+	 * @var bool
+	 */
+	private $force_object = false;
 
 	/**
 	 * Used for fallback _json_encode().
-	 * When it is true than forward slashes are escaped.
+	 * If true than forward slashes are escaped.
 	 *
 	 * @var bool
 	 */
@@ -137,12 +142,12 @@ class CJson {
 	 *
 	 * @param mixed  $valueToEncode    Value to be encoded into JSON format.
 	 * @param array  $deQuote          Array of keys whose values should **not** be quoted in encoded string.
-	 * @param bool   $forceObject      Force all arrays to objects.
+	 * @param bool   $force_object     Force all arrays to objects.
 	 * @param bool   $escape_slashes
 	 *
 	 * @return string JSON encoded value
 	 */
-	public function encode($valueToEncode, $deQuote = [], $forceObject = false, $escape_slashes = true) {
+	public function encode($valueToEncode, $deQuote = [], $force_object = false, $escape_slashes = true) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')
 				&& defined('JSON_UNESCAPED_SLASHES')) {
 			if ($this->_config['noerror']) {
@@ -150,7 +155,7 @@ class CJson {
 			}
 
 			$encoded = json_encode($valueToEncode,
-				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($forceObject ? JSON_FORCE_OBJECT : 0)
+				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($force_object ? JSON_FORCE_OBJECT : 0)
 			);
 
 			if ($this->_config['noerror']) {
@@ -160,7 +165,7 @@ class CJson {
 		else {
 			// Fall back to php-only method.
 
-			self::$forceObject = $forceObject ? true : null;
+			$this->force_object = $force_object;
 			$this->escape_slashes = $escape_slashes;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
@@ -410,7 +415,8 @@ class CJson {
 				 */
 
 				// treat as a JSON object
-				if (self::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
+				if ($this->force_object || is_array($var) && count($var)
+						&& array_keys($var) !== range(0, sizeof($var) - 1)) {
 					$properties = array_map([$this, '_name_value'], array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}
