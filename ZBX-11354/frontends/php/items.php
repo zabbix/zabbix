@@ -440,7 +440,6 @@ elseif (isset($_REQUEST['save'])) {
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
 			'data_type' => get_request('data_type'),
-			'applications' => $applications,
 			'inventory_link' => get_request('inventory_link')
 		);
 
@@ -462,9 +461,18 @@ elseif (isset($_REQUEST['save'])) {
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
 
+			// compare applications
+			natsort($dbItem['applications']);
+			natsort($applications);
+			if (array_values($dbItem['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
 			$result = API::Item()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+
 			$result = API::Item()->create($item);
 		}
 	}
