@@ -1045,7 +1045,7 @@ else {
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sortField],
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,
