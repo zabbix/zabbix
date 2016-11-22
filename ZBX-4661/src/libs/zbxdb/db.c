@@ -1636,6 +1636,26 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
 
+	if (OCI_SUCCESS != rc)
+	{
+		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
+				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
+		{
+			zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
+			return NULL;
+		}
+
+		switch (errcode)
+		{
+			case 1012:	/* ORA-01012: not logged on */
+			case 2396:	/* ORA-02396: exceeded maximum idle time */
+			case 3113:	/* ORA-03113: end-of-file on communication channel */
+			case 3114:	/* ORA-03114: not connected to ORACLE */
+				zabbix_errlog(ERR_Z3006, errcode, errbuf);
+				return NULL;
+		}
+	}
+
 	for (i = 0; i < result->ncolumn; i++)
 	{
 		ub4	alloc, amount;
@@ -1681,26 +1701,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		}
 
 		result->values[i][amount] = '\0';
-	}
-
-	if (OCI_SUCCESS == rc)
-		return result->values;
-
-	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
-			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
-	{
-		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
-		return NULL;
-	}
-
-	switch (errcode)
-	{
-		case 1012:	/* ORA-01012: not logged on */
-		case 2396:	/* ORA-02396: exceeded maximum idle time */
-		case 3113:	/* ORA-03113: end-of-file on communication channel */
-		case 3114:	/* ORA-03114: not connected to ORACLE */
-			zabbix_errlog(ERR_Z3006, errcode, errbuf);
-			return NULL;
 	}
 
 	return result->values;
