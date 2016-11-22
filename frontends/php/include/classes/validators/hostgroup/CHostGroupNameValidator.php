@@ -43,8 +43,7 @@ class CHostGroupNameValidator extends CValidator {
 			return false;
 		}
 
-		if ($name[0] === '/' || substr($name, -1) === '/' || strpos($name, '//') !== false
-				|| strpos($name, '*') !== false) {
+		if ($name[0] === '/' || substr($name, -1) === '/' || strpos($name, '//') !== false) {
 			$this->setError(_s('invalid group name "%1$s"', $name));
 
 			return false;
