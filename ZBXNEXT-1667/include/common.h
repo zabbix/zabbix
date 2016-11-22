@@ -1213,7 +1213,7 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 #define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
 
-void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_function_param_parse(const char *expr, size_t len, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);

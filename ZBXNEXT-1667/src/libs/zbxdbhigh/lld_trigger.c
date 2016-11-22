@@ -1026,7 +1026,7 @@ static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *
 
 	*exp = NULL;
 
-	if (FAIL == (ret = substitute_function_parameters(e, 0, exp, &exp_alloc, &exp_offset, jp_row,
+	if (FAIL == (ret = substitute_function_parameters(e, strlen(e), 0, exp, &exp_alloc, &exp_offset, jp_row,
 			err, sizeof(err))))
 	{
 		*error = zbx_strdcat(*error, err);

@@ -4526,10 +4526,8 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
 
-	pr[par_r] = '\0';
-	ret = substitute_function_parameters(pr + par_l + 1, 0, &replace_to, &replace_to_alloc, &replace_to_offset,
+	ret = substitute_function_parameters(pr + par_l + 1, par_r - (par_l + 1), 0, &replace_to, &replace_to_alloc, &replace_to_offset,
 			jp_row, error, max_error_len);
-	pr[par_r] = ')';
 
 	pl = pr + par_r;
 	pr += par_r + 1;
@@ -4705,10 +4703,8 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
 	size_t	exp_alloc = 0, exp_offset = 0;
 	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
 
-	(*data)[par_r] = '\0';
-	ret = substitute_function_parameters(*data + par_l + 1, 0, &exp, &exp_alloc, &exp_offset, jp_row,
+	ret = substitute_function_parameters(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset, jp_row,
 			error, max_error_len);
-	(*data)[par_r] = ')';
 
 	if (SUCCEED == ret)
 	{
@@ -4936,26 +4932,24 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	return ret;
 }
 
-int	substitute_function_parameters(const char *e, unsigned char key_in_param,
+int	substitute_function_parameters(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_function_parameters";
 	int		ret = SUCCEED;
-	size_t		sep_pos, len;
+	size_t		sep_pos;
 	char		*param = NULL;
 	const char	*p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	len = strlen(e);
-
 	for (p = e; p - e < len ; p += sep_pos + 1)
 	{
-		size_t	param_pos, param_len;
+		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
 
-		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+		zbx_function_param_parse(p, rel_len, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
@@ -5004,8 +4998,9 @@ int	substitute_function_parameters(const char *e, unsigned char key_in_param,
 		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, param);
 
 		/* copy what was after the parameter (including separator) */
-		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
-				sep_pos - param_pos - param_len + 1);
+		if (sep_pos < rel_len)
+			zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
+					sep_pos - param_pos - param_len + 1);
 	}
 out:
 	zbx_free(param);
