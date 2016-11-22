@@ -4365,7 +4365,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate");
 			}
-			else if (SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			else if (NULL == issuer && SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain peer certificate issuer or subject");
 			}
