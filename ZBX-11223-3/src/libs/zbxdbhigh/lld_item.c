@@ -563,7 +563,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		/* substitute LLD macros in function parameters */
 
-		for (p = e + par_l + 1; p < e + par_r ; p += sep_pos + 1)
+		for (p = e + par_l + 1; p < e + par_r; p += sep_pos + 1)
 		{
 			size_t	param_pos, param_len;
 			int	quoted;
