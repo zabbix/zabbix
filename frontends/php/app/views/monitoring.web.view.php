@@ -46,7 +46,7 @@ $this->addJsFile('flickerfreescreen.js');
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
 			'mode' => SCREEN_MODE_JS,
 			'dataId' => 'httptest',
-			'groupid' => $data['pageFilter']->groupid,
+			'groupid' => $data['pageFilter']->groupids,
 			'hostid' => $data['pageFilter']->hostid,
 			'page' => $data['page'],
 			'data' => [

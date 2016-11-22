@@ -588,7 +588,7 @@ else {
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1

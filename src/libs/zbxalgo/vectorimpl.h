@@ -88,6 +88,13 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 	vector->values[vector->values_num++] = *value;								\
 }														\
 														\
+void	zbx_vector_ ## __id ## _append_vector(zbx_vector_ ## __id ## _t *vector, zbx_vector_ ## __id ## _t *src)\
+{														\
+	zbx_vector_ ## __id ## _reserve(vector, vector->values_num + src->values_num);				\
+	memcpy(vector->values + vector->values_num, src->values, src->values_num * sizeof(__type));		\
+	vector->values_num = vector->values_num + src->values_num;						\
+}														\
+														\
 void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, int index)			\
 {														\
 	if (!(0 <= index && index < vector->values_num))							\
@@ -259,6 +266,7 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	vector->values_num = 0;											\
 }
+
 
 #define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
 														\

@@ -70,11 +70,11 @@ jQuery(function($) {
 			var ms = this.first().data('multiSelect');
 
 			var data = [];
-			for (var id in ms.values.selected) {
-				var item = ms.values.selected[id];
+			for (var key in ms.values.selected) {
+				var item = ms.values.selected[key];
 
 				data[data.length] = {
-					id: id,
+					id: item.id,
 					name: item.name,
 					prefix: item.prefix === 'undefined' ? '' : item.prefix
 				};
@@ -111,8 +111,8 @@ jQuery(function($) {
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
-					for (var id in ms.values.selected) {
-						removeSelected(id, obj, ms.values, ms.options);
+					for (var name in ms.values.selected) {
+						removeSelected(ms.values.selected[name], obj, ms.values, ms.options);
 					}
 
 					cleanAvailable(item, ms.values);
@@ -131,8 +131,8 @@ jQuery(function($) {
 				var obj = $(this);
 				var ms = $(this).data('multiSelect');
 
-				for (var id in ms.values.selected) {
-					removeSelected(id, obj, ms.values, ms.options);
+				for (var name in ms.values.selected) {
+					removeSelected(ms.values.selected[name], obj, ms.values, ms.options);
 				}
 
 				cleanAvailable(obj, ms.values);
@@ -156,7 +156,6 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
-	 * @param bool   options['nested']				allow to select subgroups
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
@@ -190,7 +189,6 @@ jQuery(function($) {
 			disabled: false,
 			selectedLimit: 0,
 			limit: 20,
-			nested: false,
 			popup: [],
 			styles: []
 		};
@@ -303,21 +301,15 @@ jQuery(function($) {
 
 										values.isAjaxLoaded = false;
 
-										var request_data = {
-											search: values.search,
-											limit: getLimit(values, options)
-										}
-
-										if (options.nested) {
-											request_data.nested = options.nested;
-										}
-
 										jqxhr = $.ajax({
 											url: options.url + '&curtime=' + new CDate().getTime(),
 											type: 'GET',
 											dataType: 'json',
 											cache: false,
-											data: request_data,
+											data: {
+												search: values.search,
+												limit: getLimit(values, options)
+											},
 											success: function(data) {
 												values.isAjaxLoaded = true;
 
@@ -344,7 +336,7 @@ jQuery(function($) {
 							if (!empty(input.val())) {
 								var selected = $('.available li.suggest-hover', obj);
 
-								select(selected.data('id'), obj, values, options);
+								select(selected.data('name'), obj, values, options);
 
 								// stop form submit
 								cancelEvent(e);
@@ -357,9 +349,12 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var prev = selected.prev();
-
-									removeSelected(selected.data('id'), obj, values, options);
+									var prev = selected.prev(),
+										item = {
+										id: selected.data('id'),
+										name: selected.data('name')
+									};
+									removeSelected(item, obj, values, options);
 
 									if (prev.length > 0) {
 										prev.addClass('selected');
@@ -382,9 +377,12 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									var next = selected.next();
-
-									removeSelected(selected.data('id'), obj, values, options);
+									var next = selected.next(),
+										item = {
+										id: selected.data('id'),
+										name: selected.data('name')
+									};
+									removeSelected(item, obj, values, options);
 
 									if (next.length > 0) {
 										next.addClass('selected');
@@ -649,10 +647,10 @@ jQuery(function($) {
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
-					if (typeof values.available[item.id] === 'undefined'
-							&& typeof values.selected[item.id] === 'undefined'
-							&& typeof values.ignored[item.id] === 'undefined') {
-						values.available[item.id] = item;
+					if (typeof values.available[item.name] === 'undefined'
+							&& typeof values.selected[item.name] === 'undefined'
+							&& typeof values.ignored[item.name] === 'undefined') {
+						values.available[item.name] = item;
 					}
 				}
 				else {
@@ -707,9 +705,9 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.id]) == 'undefined') {
+		if (typeof(values.selected[item.name]) == 'undefined') {
 			removeDefaultValue(obj, options);
-			values.selected[item.id] = item;
+			values.selected[item.name] = item;
 
 			var prefix = typeof(item.prefix) == 'undefined' ? '' : item.prefix;
 
@@ -722,26 +720,15 @@ jQuery(function($) {
 				'data-prefix': prefix
 			}));
 
-			if (hasSubGroupPostfix(item.name) && options.nested) {
-				// Add hidden input.
-				obj.append($('<input>', {
-					type: 'hidden',
-					name: options.name.slice(0, -2) + '_subgroupids[]',
-					value: item.id
-				}));
-			}
-
 			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
 			});
 
 			if (!options.disabled) {
 				close_btn.click(function() {
-					removeSelected(item.id, obj, values, options);
+					removeSelected(item, obj, values, options);
 				});
 			}
-
-			var postfix = '';
 
 			var li = $('<li>', {
 				'data-id': item.id
@@ -750,7 +737,7 @@ jQuery(function($) {
 					'class': 'subfilter-enabled'
 				})
 					.append($('<span>', {
-						text: prefix + item.name + postfix
+						text: prefix + item.name
 					}))
 					.append(close_btn)
 			);
@@ -766,12 +753,12 @@ jQuery(function($) {
 		}
 	}
 
-	function removeSelected(id, obj, values, options) {
+	function removeSelected(item, obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', obj).remove();
-		$('input[value="' + id + '"]', obj).remove();
+		$('.selected li[data-id="' + item.id + '"]', obj).remove();
+		$('input[value="' + item.id + '"]', obj).remove();
 
-		delete values.selected[id];
+		delete values.selected[item.name];
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -793,7 +780,7 @@ jQuery(function($) {
 			'data-name': item.name
 		})
 		.click(function() {
-			select(item.id, obj, values, options);
+			select(item.name, obj, values, options);
 		})
 		.hover(function() {
 			$('.available li.suggest-hover', obj).removeClass('suggest-hover');
@@ -841,9 +828,9 @@ jQuery(function($) {
 		$('.available ul', obj).append(li);
 	}
 
-	function select(id, obj, values, options) {
+	function select(name, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[name], obj, values, options);
 
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
@@ -922,12 +909,20 @@ jQuery(function($) {
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
 			var li = $(this),
-				id = li.data('id'),
 				span = $('span.subfilter-enabled', li),
 				text = $('span:first-child', span),
-				t = empty(values.selected[id].prefix)
-					? values.selected[id].name
-					: values.selected[id].prefix + values.selected[id].name;
+				key = '';
+
+			$.each(values.selected, function(i, item) {
+				if (item.id == li.data('id')) {
+					key = item.name;
+					return false;
+				}
+			});
+
+			var t = empty(values.selected[key].prefix)
+				? values.selected[key].name
+				: values.selected[key].prefix + values.selected[key].name;
 
 			// rewrite previous text to original
 			text.text(t);
@@ -1008,13 +1003,5 @@ jQuery(function($) {
 		}
 
 		return length;
-	}
-
-	function hasSubGroupPostfix(str) {
-		if ('/*' === str.slice(-2)) {
-			return true;
-		}
-
-		return false;
 	}
 });
