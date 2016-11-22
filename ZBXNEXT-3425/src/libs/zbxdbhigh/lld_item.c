@@ -833,92 +833,127 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *                                                                            *
  * Purpose: substitutes lld macros in calculated item formula expression      *
  *                                                                            *
- * Parameters: data   - [IN/OUT] the expression                               *
- *             jp_row - [IN] the lld data row                                 *
+ * Parameters: data          - [IN/OUT] the expression                        *
+ *             jp_row        - [IN] the lld data row                          *
+ *             error         - [IN] pointer to string for reporting errors    *
+ *             max_error_len - [IN] size of 'error' string                    *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
+static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
 {
-	char		*exp, *tmp, *e, *func, *key, *host = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
-	zbx_function_t	funcdata;
-	int		i;
+	const char	*__function_name = "substitute_formula_macros";
+
+	char		*exp, *tmp, *e, *p, *param = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r, sep_pos;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	exp = zbx_malloc(NULL, exp_alloc);
 	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = *data; '\0' != *e; e += len)
+	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
-		/* get function data or jump over part of the string that is not a function */
-		if (FAIL == zbx_function_parse(&funcdata, e, &len))
+		/* substitute LLD macros in the part of the string preceding function parameters */
+
+		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
+		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, NULL, error, max_error_len))
+			goto out;
+
+		tmp_offset = strlen(tmp);
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
+
+		if (++tmp_offset > tmp_alloc)
+			tmp_alloc = tmp_offset;
+
+		tmp_offset = 0;
+
+		/* substitute LLD macros in function parameters */
+
+		for (p = e + par_l + 1; p - e < par_r ; p += sep_pos + 1)
 		{
-			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
-			continue;
-		}
+			size_t	param_pos, param_len;
+			int	quoted;
 
-		/* substitute LLD macros in the part of the string that was jumped over */
-		if (0 != tmp_offset)
-		{
-			size_t	tmp_len;
+			e[par_r] = '\0';
+			zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+			e[par_r] = ')';
 
-			substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
-			tmp_len = strlen(tmp);
+			/* copy what was before the parameter */
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p, param_pos);
 
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
+			/* prepare the parameter (macro substitutions and quoting) */
 
-			if (++tmp_len > tmp_alloc)
-				tmp_alloc = tmp_len;
+			zbx_free(param);
+			param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
-			tmp_offset = 0;
-		}
-
-		/* substitute LLD macros in function parameters (if any) */
-		if (0 < funcdata.nparam)
-		{
-			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
-			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
+			if (p - e == par_l + 1)
 			{
-				zbx_free(funcdata.params[0]);
-				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				char	*key = NULL, *host = NULL;
 
+				if (SUCCEED != parse_host_key(param, &host, &key) ||
+						SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+								MACRO_TYPE_ITEM_KEY, NULL, 0))
+				{
+					zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
+					zbx_free(host);
+					zbx_free(key);
+					goto out;
+				}
+
+				zbx_free(param);
 				if (NULL != host)
 				{
-					funcdata.params[0] = zbx_dsprintf(NULL, "%s:%s", host, key);
+					param = zbx_dsprintf(NULL, "%s:%s", host, key);
 					zbx_free(host);
 					zbx_free(key);
 				}
 				else
-				{
-					funcdata.params[0] = key;
-					key = NULL;
-				}
+					param = key;
+			}
+			else
+				substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+
+			if (SUCCEED != zbx_function_param_quote(&param, quoted))
+			{
+				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
+				goto out;
 			}
 
-			/* substitute LLD macros in the rest of the parameters (simple replacement) */
-			for (i = 1; i < funcdata.nparam; i++)
-				substitute_lld_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+			/* copy the parameter */
+			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, param);
+
+			/* copy what was after the parameter (including separator) */
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p + param_pos + param_len,
+					sep_pos - param_pos - param_len + 1);
 		}
-
-		/* substitute the original function in the string with the new one (with substituted LLD macros) */
-		zbx_function_tostr(&funcdata, e, len, &func);
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
-
-		/* cleanup */
-		zbx_free(func);
-		zbx_function_clean(&funcdata);
 	}
 
-	/* substitute the LLD macros in the remainder of the string that was jumped over */
-	if (0 != tmp_offset)
-	{
-		substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
-	}
+	/* substitute LLD macros in the remaining part */
 
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
+	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, NULL, error, max_error_len))
+		goto out;
+
+	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+
+	ret = SUCCEED;
+out:
+	zbx_free(param);
 	zbx_free(tmp);
 
-	zbx_free(*data);
-	*data = exp;
+	if (SUCCEED == ret)
+	{
+		zbx_free(*data);
+		*data = exp;
+	}
+	else
+		zbx_free(exp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -930,13 +965,18 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
  * Parameters: item_prototype - [IN] the item prototype                       *
  *             lld_row        - [IN] the lld row                              *
  *                                                                            *
+ * Returns: The created item or NULL if cannot create new item from prototype *
+ *                                                                            *
  ******************************************************************************/
-static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row)
+static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
+		char **error)
 {
 	const char		*__function_name = "lld_item_make";
 
 	zbx_lld_item_t		*item;
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
+	char			err[MAX_STRING_LEN];
+	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -955,7 +995,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	if (SUCCEED != substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+		ret = FAIL;
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
 	item->units_orig = NULL;
@@ -966,7 +1007,10 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->params_orig = NULL;
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
-		substitute_formula_macros(&item->params, jp_row);
+	{
+		if (SUCCEED != substitute_formula_macros(&item->params, jp_row, err, sizeof(err)))
+			ret = FAIL;
+	}
 	else
 		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 
@@ -990,6 +1034,13 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
+	if (FAIL == ret)
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
+		lld_item_free(item);
+		item = NULL;
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return item;
@@ -1007,11 +1058,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		zbx_lld_item_t *item)
+		zbx_lld_item_t *item, char **error)
 {
 	const char		*__function_name = "lld_item_update";
 
-	char			*buffer = NULL;
+	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1031,7 +1082,11 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	{
 		item->key_orig = item->key;
 		item->key = zbx_strdup(NULL, item_prototype->key);
-		substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		if (SUCCEED != substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
+				err, sizeof(err)))
+		{
+			goto out;
+		}
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 	}
 
@@ -1049,7 +1104,10 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->params);
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
-		substitute_formula_macros(&buffer, jp_row);
+	{
+		if (SUCCEED != substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
+			goto out;
+	}
 	else
 		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 
@@ -1098,7 +1156,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
-
+out:
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1120,7 +1178,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
-		zbx_vector_ptr_t *items, zbx_hashset_t *items_index)
+		zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
 {
 	const char			*__function_name = "lld_items_make";
 	int				i, j, index;
@@ -1190,15 +1248,16 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
 			{
-				item = lld_item_make(item_prototype, item_index_local.lld_row);
-
-				/* add the created item to items vector and update index */
-				zbx_vector_ptr_append(items, item);
-				item_index_local.item = item;
-				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
+				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row, error)))
+				{
+					/* add the created item to items vector and update index */
+					zbx_vector_ptr_append(items, item);
+					item_index_local.item = item;
+					zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
+				}
 			}
 			else
-				lld_item_update(item_prototype, item_index_local.lld_row, item_index->item);
+				lld_item_update(item_prototype, item_index_local.lld_row, item_index->item, error);
 		}
 	}
 
@@ -3178,7 +3237,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 	lld_item_application_prototypes_get(&item_prototypes, &application_prototypes);
 
 	lld_items_get(&item_prototypes, &items);
-	lld_items_make(&item_prototypes, lld_rows, &items, &items_index);
+	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
 	lld_items_validate(hostid, &items, error);
 
 	lld_items_applications_get(lld_ruleid, &items_applications);

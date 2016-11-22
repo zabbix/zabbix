@@ -365,7 +365,9 @@ class CTemplate extends CHostGeneral {
 		foreach ($templates as $template) {
 			// check if hosts have at least 1 group
 			if (!isset($template['groups']) || !$template['groups']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Template "%1$s" cannot be without host group.', $template['host'])
+				);
 			}
 
 			$template['groups'] = zbx_toArray($template['groups']);
@@ -737,6 +739,10 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function massUpdate(array $data) {
+		if (!array_key_exists('templates', $data) || !is_array($data['templates'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'templates'));
+		}
+
 		$this->validateMassUpdate($data);
 
 		$templates = zbx_toArray($data['templates']);
@@ -921,7 +927,7 @@ class CTemplate extends CHostGeneral {
 		$templates = zbx_toArray($data['templates']);
 
 		$dbTemplates = $this->get([
-			'output' => ['templateid'],
+			'output' => ['templateid', 'host'],
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -934,9 +940,12 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// check if templates have at least 1 group
-		if (isset($data['groups']) && !$data['groups']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template.'));
+		if (array_key_exists('groups', $data) && !$data['groups'] && $dbTemplates) {
+			$template = reset($dbTemplates);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Template "%1$s" cannot be without host group.', $template['host'])
+			);
 		}
 
 		// check name
