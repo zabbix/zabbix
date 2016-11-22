@@ -63,21 +63,20 @@ static void	free_expression(expression_t *exp)
 	exp->functions_num = 0;
 }
 
-static int	calcitem_add_function(expression_t *exp, char *func, char *params)
+static int	calcitem_add_function(expression_t *exp, char *host, char *key, char *func, char *params)
 {
 	function_t	*f;
 
 	if (exp->functions_alloc == exp->functions_num)
 	{
 		exp->functions_alloc += 8;
-		exp->functions = zbx_realloc(exp->functions,
-				exp->functions_alloc * sizeof(function_t));
+		exp->functions = zbx_realloc(exp->functions, exp->functions_alloc * sizeof(function_t));
 	}
 
 	f = &exp->functions[exp->functions_num++];
 	f->functionid = exp->functions_num;
-	f->host = NULL;
-	f->key = NULL;
+	f->host = host;
+	f->key = key;
 	f->func = func;
 	f->params = params;
 	f->value = NULL;
@@ -88,73 +87,78 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_parse_expression";
-	char		*e, *f, *func = NULL, *params = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, len;
-	int		functionid, ret;
+
+	char		*e, *buf = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
+	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params; '\0' != *e; e++)
+	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r); e += par_r + 1)
 	{
-		if ('{' == *e && '$' == *(e + 1))	/* user macro ? */
+		char	*func, *params, *host = NULL, *key = NULL;
+		size_t	param_pos, param_len, sep_pos;
+		int	functionid, quoted;
+
+		/* copy the part of the string preceding function */
+		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
+
+		/* extract the first function parameter and <host:>key reference from it */
+
+		e[par_r] = '\0';
+		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
+		e[par_r] = ')';
+
+		zbx_free(buf);
+		buf = zbx_function_param_unquote_dyn(e + par_l + 1 + param_pos, param_len, &quoted);
+
+		if (SUCCEED != parse_host_key(buf, &host, &key))
 		{
-			int	macro_r, context_l, context_r;
-
-			/* find length of user macro and copy the user macro verbatim */
-
-			if (SUCCEED == zbx_user_macro_parse(e, &macro_r, &context_l, &context_r))
-			{
-				zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, (size_t)macro_r + 1);
-				e += macro_r;	/* skip to position after user macro */
-			}
-			else
-				zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *e);
-
-			continue;
+			zbx_snprintf(error, max_error_len, "Invalid first parameter in function [%.*s].",
+					par_r - f_pos + 1, e + f_pos);
+			goto out;
 		}
+		if (NULL == host)
+			host = zbx_strdup(NULL, dc_item->host.host);
 
-		if (SUCCEED != is_function_char(*e))
+		/* extract function name and remaining parameters */
+
+		e[par_l] = '\0';
+		func = zbx_strdup(NULL, e + f_pos);
+		e[par_l] = '(';
+
+		if (')' != e[par_l + 1 + sep_pos]) /* first parameter is not the only one */
 		{
-			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *e);
-			continue;
+			e[par_r] = '\0';
+			params = zbx_strdup(NULL, e + par_l + 1 + sep_pos + 1);
+			e[par_r] = ')';
 		}
+		else	/* the only parameter of the function was <host:>key reference */
+			params = zbx_strdup(NULL, "");
 
-		if ((0 == strncmp("and", e, len = 3) || 0 == strncmp("not", e, 3) || 0 == strncmp("or", e, len = 2)) &&
-				NULL != strchr("()" ZBX_WHITESPACE, e[len]))
-		{
-			zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, len);
-			e += len - 1;
-			continue;
-		}
+		functionid = calcitem_add_function(exp, host, key, func, params);
 
-		f = e;
-		if (SUCCEED != parse_function(&e, &func, &params))
-		{
-			e = f;
-			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *f);
-			continue;
-		}
-		else
-			e--;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s:%s.%s(%s)'",
+				__function_name, functionid, host, key, func, params);
 
-		functionid = calcitem_add_function(exp, func, params);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s(%s)'",
-				__function_name, functionid, func, params);
-
-		func = NULL;
-		params = NULL;
-
+		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
 	}
 
+	/* copy the remaining part */
+	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL,
-				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
-		ret = NOTSUPPORTED;
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL, &exp->exp,
+			MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len))
+	{
+		ret = SUCCEED;
+	}
+out:
+	zbx_free(buf);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -184,33 +188,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
-		f = &exp->functions[i];
-
-		buf = get_param_dyn(f->params, 1);	/* for first parameter result is not NULL */
-
-		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
-		{
-			zbx_snprintf(error, max_error_len,
-					"Invalid first parameter in function [%s(%s)].",
-					f->func, f->params);
-			ret = NOTSUPPORTED;
-		}
-
-		zbx_free(buf);
-
-		if (SUCCEED != ret)
-			goto out;
-
-		if (NULL == f->host)
-			f->host = strdup(dc_item->host.host);
-
-		keys[i].host = f->host;
-		keys[i].key = f->key;
-
-		remove_param(f->params, 1);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() function:'%s:%s.%s(%s)'",
-				__function_name, f->host, f->key, f->func, f->params);
+		keys[i].host = exp->functions[i].host;
+		keys[i].key = exp->functions[i].key;
 	}
 
 	DCconfig_get_items_by_keys(items, keys, errcodes, exp->functions_num);
@@ -323,7 +302,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 	}
 
 	DCconfig_clean_items(items, errcodes, exp->functions_num);
-out:
+
 	zbx_free(errcodes);
 	zbx_free(items);
 	zbx_free(keys);

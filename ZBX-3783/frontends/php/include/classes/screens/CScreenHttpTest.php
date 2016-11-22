@@ -72,8 +72,8 @@ class CScreenHttpTest extends CScreenBase {
 			if ($this->hostid != 0) {
 				$options['hostids'] = [$this->hostid];
 			}
-			elseif ($this->groupid != 0) {
-				$options['groupids'] = [$this->groupid];
+			elseif ($this->groupid) {
+				$options['groupids'] = zbx_toArray($this->groupid);
 			}
 
 			$httptests = API::HttpTest()->get($options);

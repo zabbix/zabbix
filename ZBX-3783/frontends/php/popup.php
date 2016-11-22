@@ -376,16 +376,7 @@ elseif ($withMonitoredTriggers) {
 
 $pageFilter = new CPageFilter($options);
 
-// get groupid
-$groupid = null;
-if ($pageFilter->groupsSelected) {
-	if ($pageFilter->groupid > 0) {
-		$groupid = $pageFilter->groupid;
-	}
-}
-else {
-	$groupid = 0;
-}
+$groupids = $pageFilter->groupids;
 
 // get hostid
 $hostid = null;
@@ -731,7 +722,7 @@ elseif ($srctbl == 'templates') {
 
 	$options = [
 		'output' => ['templateid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'preservekeys' => true
 	];
 
@@ -817,7 +808,7 @@ elseif ($srctbl == 'hosts') {
 
 	$options = [
 		'output' => ['hostid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'preservekeys' => true
 	];
 
@@ -898,7 +889,7 @@ elseif ($srctbl == 'host_templates') {
 
 	$options = [
 		'output' => ['hostid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'templated_hosts' => true,
 		'preservekeys' => true
 	];
@@ -1101,7 +1092,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	}
 	else {
 		if ($hostid === null) {
-			$options['groupids'] = $groupid;
+			$options['groupids'] = $groupids;
 		}
 		else {
 			$options['hostids'] = [$hostid];
@@ -1374,7 +1365,7 @@ elseif ($srctbl == 'applications') {
 		'hostids' => $hostid
 	];
 	if (is_null($hostid)) {
-		$options['groupids'] = $groupid;
+		$options['groupids'] = $groupids;
 	}
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;
@@ -1847,7 +1838,7 @@ elseif ($srctbl == 'scripts') {
 		'preservekeys' => true
 	];
 	if (is_null($hostid)) {
-		$options['groupids'] = $groupid;
+		$options['groupids'] = $groupids;
 	}
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;

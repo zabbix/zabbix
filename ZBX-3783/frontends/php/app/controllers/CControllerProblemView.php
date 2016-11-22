@@ -52,7 +52,6 @@ class CControllerProblemView extends CController {
 			'filter_inventory' =>		'array',
 			'filter_tags' =>			'array',
 			'filter_maintenance' =>		'in 1',
-			'filter_groupids_subgroupids' => 'array_id',
 			'filter_unacknowledged' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
@@ -109,9 +108,6 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::updateArray('web.problem.filter.subgroupids', $this->getInput('filter_groupids_subgroupids', []),
-				PROFILE_TYPE_ID
-			);
 			CProfile::updateArray('web.problem.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 			CProfile::update('web.problem.filter.application', $this->getInput('filter_application', ''),
 				PROFILE_TYPE_STR
@@ -160,7 +156,6 @@ class CControllerProblemView extends CController {
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.problem.filter.show');
 			CProfile::deleteIdx('web.problem.filter.groupids');
-			CProfile::deleteIdx('web.problem.filter.subgroupids');
 			CProfile::deleteIdx('web.problem.filter.hostids');
 			CProfile::delete('web.problem.filter.application');
 			CProfile::deleteIdx('web.problem.filter.triggerids');
@@ -190,16 +185,6 @@ class CControllerProblemView extends CController {
 				'groupids' => $filter_groupids,
 				'preservekeys' => true
 			]), ['groupid' => 'id']);
-
-			$filter_subgroupids = CProfile::getArray('web.problem.filter.subgroupids', []);
-
-			foreach ($filter_subgroupids as $groupid) {
-				if (array_key_exists($groupid, $groups)) {
-					$groups[$groupid]['name'] .= '/*';
-				}
-			}
-
-			$filter_groupids = getMultiselectGroupIds($filter_groupids , $filter_subgroupids);
 		}
 
 		$filter_triggers = $filter_triggerids

@@ -482,7 +482,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestAssertAttribute("//textarea[@id='variables']", 'rows', 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestAssertVisibleId('cancel');
@@ -503,7 +503,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAssertVisibleId('clone');
 			$this->zbxTestAssertElementValue('clone', 'Clone');
 
-			$this->zbxTestAssertElementNotPresentId('delete');
+			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
 		}
 		else {
 			$this->zbxTestAssertElementPresentId('add');

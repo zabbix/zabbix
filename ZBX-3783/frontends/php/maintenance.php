@@ -533,7 +533,7 @@ else {
 	];
 
 	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
-		$options['groupids'] = $pageFilter->groupid;
+		$options['groupids'] = $pageFilter->groupids;
 	}
 	else {
 		$options['groupids'] = $config['dropdown_first_entry'] ? null : [];

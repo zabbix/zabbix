@@ -178,12 +178,12 @@ class CTag extends CObject {
 		);
 
 		$this->onMouseover(
-			'hintBox.HintWraper(event, this, jQuery("#'.$id.'"), "'.$span_class.'", "'.$styles.'");'
+			'hintBox.HintWraper(event, this, jQuery("#'.$id.'").html(), "'.$span_class.'", "'.$styles.'");'
 		);
 
 		if ($freeze_on_click) {
 			$this->onClick(
-				'hintBox.showStaticHint(event, this, jQuery("#'.$id.'"), "'.$span_class.'", false, "'.$styles.'");'
+				'hintBox.showStaticHint(event, this, jQuery("#'.$id.'").html(), "'.$span_class.'", false, "'.$styles.'");'
 			);
 		}
 
