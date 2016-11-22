@@ -2191,7 +2191,7 @@ static void	zbx_log_peer_cert(const char *function_name, const x509_crt *cert)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate issuer, subject or serial: %s",
-				function_name, error);
+				function_name, ZBX_NULL2STR(error));
 
 		zbx_free(error);
 	}
