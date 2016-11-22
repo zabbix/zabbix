@@ -1265,10 +1265,23 @@ function count_operations_delay($operations, $def_period = 0) {
  * @param string $alerts[n]['sendto']
  * @param string $alerts[n]['message']
  * @param string $alerts[n]['error']
+ * @param array  $r_alerts
+ * @param string $r_alerts[n]['alertid']
+ * @param string $r_alerts[n]['userid']
+ * @param int    $r_alerts[n]['alerttype']
+ * @param array  $r_alerts[n]['mediatypes']
+ * @param string $r_alerts[n]['clock']
+ * @param int    $r_alerts[n]['esc_step']
+ * @param int    $r_alerts[n]['status']
+ * @param int    $r_alerts[n]['retries']
+ * @param string $r_alerts[n]['subject']
+ * @param string $r_alerts[n]['sendto']
+ * @param string $r_alerts[n]['message']
+ * @param string $r_alerts[n]['error']
  *
  * @return CTableInfo
  */
-function getActionMessages(array $alerts) {
+function getActionMessages(array $alerts, array $r_alerts) {
 	$dbUsers = API::User()->get([
 		'output' => ['userid', 'alias', 'name', 'surname'],
 		'userids' => zbx_objectValues($alerts, 'userid'),
@@ -1279,50 +1292,70 @@ function getActionMessages(array $alerts) {
 		_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient'), _('Message'), _('Info')
 	]);
 
-	foreach ($alerts as $alert) {
-		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
-			continue;
+	$recovery = true;
+
+	foreach ([$r_alerts, $alerts] as $alerts_data) {
+		$show_header = true;
+
+		foreach ($alerts_data as $alert) {
+			if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
+				continue;
+			}
+
+			$mediaType = array_pop($alert['mediatypes']);
+
+			switch ($alert['status']) {
+				case ALERT_STATUS_SENT:
+					$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
+					$retries = '';
+					break;
+
+				case ALERT_STATUS_NOT_SENT:
+					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+					$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
+					break;
+
+				default:
+					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+					$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
+			}
+
+			$recipient = $alert['userid']
+				? array_key_exists($alert['userid'], $dbUsers)
+					? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
+					: _('Inaccessible user')
+				: $alert['sendto'];
+
+			$info_icons = [];
+			if ($alert['error'] !== '') {
+				$info_icons[] = makeErrorIcon($alert['error']);
+			}
+
+			if ($show_header) {
+				$table->addRow(
+					(new CRow(
+						(new CCol(
+							new CTag('h4', true, $recovery ? _('Recovery') : _('Problem'))
+						))->setColSpan($table->getNumCols())
+					))->addClass(ZBX_STYLE_HOVER_NOBG)
+				);
+
+				$show_header = false;
+			}
+
+			$table->addRow([
+				$alert['esc_step'],
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				isset($mediaType['description']) ? $mediaType['description'] : '',
+				$status,
+				$retries,
+				$recipient,
+				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+				makeInformationList($info_icons)
+			]);
 		}
 
-		$mediaType = array_pop($alert['mediatypes']);
-
-		switch ($alert['status']) {
-			case ALERT_STATUS_SENT:
-				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-				$retries = '';
-				break;
-
-			case ALERT_STATUS_NOT_SENT:
-				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-				$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
-				break;
-
-			default:
-				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-				$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
-		}
-
-		$recipient = $alert['userid']
-			? array_key_exists($alert['userid'], $dbUsers)
-				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
-				: _('Inaccessible user')
-			: $alert['sendto'];
-
-		$info_icons = [];
-		if ($alert['error'] !== '') {
-			$info_icons[] = makeErrorIcon($alert['error']);
-		}
-
-		$table->addRow([
-			$alert['esc_step'],
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-			isset($mediaType['description']) ? $mediaType['description'] : '',
-			$status,
-			$retries,
-			$recipient,
-			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-			makeInformationList($info_icons)
-		]);
+		$recovery = false;
 	}
 
 	return $table;
@@ -1339,38 +1372,66 @@ function getActionMessages(array $alerts) {
  * @param int    $alerts[n]['status']
  * @param string $alerts[n]['message']
  * @param string $alerts[n]['error']
+ * @param array  $r_alerts
+ * @param string $r_alerts[n]['alertid']
+ * @param int    $r_alerts[n]['alerttype']
+ * @param string $r_alerts[n]['clock']
+ * @param int    $r_alerts[n]['esc_step']
+ * @param int    $r_alerts[n]['status']
+ * @param string $r_alerts[n]['message']
+ * @param string $r_alerts[n]['error']
  *
  * @return CTableInfo
  */
-function getActionCommands(array $alerts) {
+function getActionCommands(array $alerts, array $r_alerts) {
 	$table = (new CTableInfo())->setHeader([_('Step'), _('Time'), _('Status'), _('Command'), _('Error')]);
 
-	foreach ($alerts as $alert) {
-		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
-			continue;
+	$recovery = true;
+
+	foreach ([$r_alerts, $alerts] as $alerts_data) {
+		$show_header = true;
+
+		foreach ($alerts_data as $alert) {
+			if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
+				continue;
+			}
+
+			switch ($alert['status']) {
+				case ALERT_STATUS_SENT:
+					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
+					break;
+
+				case ALERT_STATUS_NOT_SENT:
+					$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+					break;
+
+				default:
+					$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+					break;
+			}
+
+			if ($show_header) {
+				$table->addRow(
+					(new CRow(
+						(new CCol(
+							new CTag('h4', true, $recovery ? _('Recovery') : _('Problem'))
+						))->setColSpan($table->getNumCols())
+					))->addClass(ZBX_STYLE_HOVER_NOBG)
+				);
+
+				$show_header = false;
+			}
+
+			$table->addRow([
+				$alert['esc_step'],
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				$status,
+				zbx_nl2br($alert['message']),
+				$alert['error'] ? (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED) : ''
+			]);
 		}
 
-		switch ($alert['status']) {
-			case ALERT_STATUS_SENT:
-				$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
-				break;
-
-			case ALERT_STATUS_NOT_SENT:
-				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
-				break;
-
-			default:
-				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-				break;
-		}
-
-		$table->addRow([
-			$alert['esc_step'],
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-			$status,
-			zbx_nl2br($alert['message']),
-			$alert['error'] ? (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED) : ''
-		]);
+		$recovery = false;
 	}
 
 	return $table;

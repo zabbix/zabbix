@@ -275,7 +275,8 @@ $triggerTable = (new CTableInfo())
 		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 		_('Status'),
 		_('Info'),
-		make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
+		make_sorting_header(_('Time'), 'lastchange', $sortField, $sortOrder),
+		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? _('Recovery time') : null,
 		_('Age'),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Ack') : null,
@@ -459,9 +460,10 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 	unset($trigger);
 
 	$options = [
-		'output' => ['eventid', 'objectid', 'clock', 'value'],
+		'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'value'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
+		'value' => TRIGGER_VALUE_TRUE,
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
 		'time_till' => time(),
@@ -470,13 +472,40 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 	];
 
 	if ($config['event_ack_enable']) {
-		$options['select_acknowledges'] = API_OUTPUT_COUNT;
 		$options['output'][] = 'acknowledged';
+		$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
 	}
+
 	$events = API::Event()->get($options);
 
-	foreach ($events as $event) {
-		$triggers[$event['objectid']]['events'][] = $event;
+	if ($events) {
+		$r_eventids = [];
+
+		foreach ($events as $event) {
+			$r_eventids[$event['r_eventid']] = true;
+		}
+		unset($r_eventids[0]);
+
+		$r_events = $r_eventids
+			? API::Event()->get([
+				'output' => ['clock'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'eventids' => array_keys($r_eventids),
+				'preservekeys' => true
+			])
+			: [];
+
+		foreach ($events as $event) {
+			if (array_key_exists($event['r_eventid'], $r_events)) {
+				$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
+			}
+			else {
+				$event['r_clock'] = 0;
+			}
+
+			$triggers[$event['objectid']]['events'][] = $event;
+		}
 	}
 }
 
@@ -657,6 +686,7 @@ foreach ($triggers as $trigger) {
 					->setArgument('filter_triggerids[]', $trigger['triggerid'])
 					->setArgument('filter_set', '1')
 			),
+		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		$ackColumn,
@@ -669,20 +699,47 @@ foreach ($triggers as $trigger) {
 		$next_event_clock = time();
 
 		foreach (array_slice($trigger['events'], 0, $config['event_show_max']) as $enum => $event) {
-			if ($showEvents == EVENTS_OPTION_NOT_ACK) {
-				if ($event['acknowledged'] || $event['value'] != TRIGGER_VALUE_TRUE) {
-					continue;
-				}
+			if ($showEvents == EVENTS_OPTION_NOT_ACK && $event['acknowledged']) {
+				continue;
 			}
 
-			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+			if ($event['r_eventid'] == 0) {
+				$in_closing = false;
 
-			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'],
-				$config['event_ack_enable'] && $event['acknowledged']);
+				if ($config['event_ack_enable']) {
+					foreach ($event['acknowledges'] as $acknowledge) {
+						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
+							$in_closing = true;
+							break;
+						}
+					}
+				}
+
+				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				$value_clock = $in_closing ? time() : $event['clock'];
+			}
+			else {
+				$value = TRIGGER_VALUE_FALSE;
+				$value_str = _('RESOLVED');
+				$value_clock = $event['r_clock'];
+			}
+
+			$cell_status = new CSpan($value_str);
+
+			// Add colors and blinking to span depending on configuration and trigger parameters.
+			addTriggerValueStyle($cell_status, $value, $value_clock,
+				$config['event_ack_enable'] ? (bool) $event['acknowledges'] : false
+			);
 
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']);
+
+			$r_clock = ($event['r_eventid'] == 0)
+				? ''
+				: new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
+					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']
+				);
 
 			if ($enum != 0) {
 				$next_event_clock = $trigger['events'][$enum - 1]['clock'];
@@ -691,8 +748,9 @@ foreach ($triggers as $trigger) {
 			$triggerTable->addRow(
 				(new CRow([
 					(new CCol())->setColSpan($config['event_ack_enable'] ? 3 : 2),
-					(new CCol($eventStatusSpan))->setColSpan(2),
+					(new CCol($cell_status))->setColSpan(2),
 					$clock,
+					$r_clock,
 					zbx_date2age($event['clock']),
 					zbx_date2age($next_event_clock, $event['clock']),
 					$config['event_ack_enable']

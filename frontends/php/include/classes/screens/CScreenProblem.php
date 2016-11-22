@@ -711,7 +711,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = (new CCol(new CLink($cell_r_clock,
 						(new CUrl('tr_events.php'))
 							->setArgument('triggerid', $problem['objectid'])
-							->setArgument('eventid', $problem['r_eventid'])
+							->setArgument('eventid', $problem['eventid'])
 					)))
 						->addClass(ZBX_STYLE_NOWRAP)
 						->addClass(ZBX_STYLE_RIGHT);

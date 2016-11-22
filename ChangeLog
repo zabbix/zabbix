@@ -15,6 +15,7 @@ Bug fixes:
 Changes for 3.2.2rc1
 
 New features:
+..F....... [ZBXNEXT-3425] implemented more compact problem view in triggers list, event details and history of events (Ivo)
 .......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
