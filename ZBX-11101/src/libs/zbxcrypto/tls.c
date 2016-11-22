@@ -2181,20 +2181,25 @@ static void	zbx_log_peer_cert(const char *function_name, const x509_crt *cert)
 {
 	char	issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX], serial[128], *error = NULL;
 
-	if (SUCCEED == zbx_x509_dn_gets(&cert->issuer, issuer, sizeof(issuer), &error) &&
-			SUCCEED == zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), &error) &&
-			0 < x509_serial_gets(serial, sizeof(serial), &cert->serial))
+	if (SUCCEED != zbx_x509_dn_gets(&cert->issuer, issuer, sizeof(issuer), &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate issuer: %s", function_name, error);
+	}
+	else if (SUCCEED != zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate subject: %s", function_name, error);
+	}
+	else if (0 > x509_serial_gets(serial, sizeof(serial), &cert->serial))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate serial", function_name);
+	}
+	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() peer certificate issuer:\"%s\" subject:\"%s\" serial:\"%s\"",
 				function_name, issuer, subject, serial);
 	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate issuer, subject or serial: %s",
-				function_name, ZBX_NULL2STR(error));
 
-		zbx_free(error);
-	}
+	zbx_free(error);
 }
 #elif defined(HAVE_GNUTLS)
 static void	zbx_log_peer_cert(const char *function_name, const gnutls_x509_crt_t cert)
