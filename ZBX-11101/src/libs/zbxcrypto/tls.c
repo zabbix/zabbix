@@ -2197,22 +2197,21 @@ static void	zbx_log_peer_cert(const char *function_name, const x509_crt *cert)
 	}
 }
 #elif defined(HAVE_GNUTLS)
-static void	zbx_log_peer_cert(const gnutls_x509_crt_t cert)
+static void	zbx_log_peer_cert(const char *function_name, const gnutls_x509_crt_t cert)
 {
-	const char	*__function_name = "zbx_log_peer_cert";
 	int		res;
 	gnutls_datum_t	cert_print;
 
 	if (GNUTLS_E_SUCCESS == (res = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &cert_print)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "peer certificate: %s", cert_print.data);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate: %s", function_name, cert_print.data);
 
 		gnutls_free(cert_print.data);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): gnutls_x509_crt_print() failed: %d %s",
-				__function_name, res, gnutls_strerror(res));
+				function_name, res, gnutls_strerror(res));
 	}
 }
 #endif
@@ -4086,7 +4085,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 				zbx_free(error_tmp);
 			}
 			else
-				zbx_log_peer_cert(peer_cert);
+				zbx_log_peer_cert(__function_name, peer_cert);
 		}
 
 		/* verify peer certificate */
@@ -4875,7 +4874,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			}
 			else
 			{
-				zbx_log_peer_cert(peer_cert);
+				zbx_log_peer_cert(__function_name, peer_cert);
 				gnutls_x509_crt_deinit(peer_cert);
 			}
 		}
