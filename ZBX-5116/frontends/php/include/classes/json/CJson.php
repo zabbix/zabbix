@@ -334,7 +334,9 @@ class CJson {
 							$ascii .= '\r';
 							break;
 						case $ord_var_c == 0x22:
+							// falls through
 						case ($ord_var_c == 0x2F && $this->escape_slashes):
+							// falls through
 						case $ord_var_c == 0x5C:
 							// double quote, slash, slosh
 							$ascii .= '\\'.$var{$c};
