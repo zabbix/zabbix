@@ -38,9 +38,7 @@ $fields = [
 	'filterEnable' =>				[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
 	'grpswitch' =>					[T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null],
 	'groupids' =>					[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
-	'groupids_subgroupids' =>		[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
 	'hidegroupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
-	'hidegroupids_subgroupids' =>	[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
 	'trgSeverity' =>				[T_ZBX_INT, O_OPT, P_SYS,			null,			null],
 	'trigger_name' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,			null],
 	'maintenance' =>				[T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null],
@@ -66,36 +64,24 @@ if (hasRequest('update')) {
 		if ($_REQUEST['grpswitch'] == 1) {
 			// show groups
 			$groupids = getRequest('groupids', []);
-			$subgroupids = getRequest('groupids_subgroupids', []);
 
 			$result = true;
 
 			DBstart();
 
 			$result &= CFavorite::remove('web.dashconf.groups.groupids');
-			$result &= CFavorite::remove('web.dashconf.groups.subgroupids');
 
 			foreach ($groupids as $groupid) {
 				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupid);
 			}
 
-			foreach ($subgroupids as $groupid) {
-				$result &= CFavorite::add('web.dashconf.groups.subgroupids', $groupid);
-			}
-
 			// hide groups
 			$hide_groupids = getRequest('hidegroupids', []);
-			$hide_subgroupids = getRequest('hidegroupids_subgroupids', []);
 
 			$result &= CFavorite::remove('web.dashconf.groups.hide.groupids');
-			$result &= CFavorite::remove('web.dashconf.groups.hide.subgroupids');
 
 			foreach ($hide_groupids as $groupid) {
 				$result &= CFavorite::add('web.dashconf.groups.hide.groupids', $groupid);
-			}
-
-			foreach ($hide_subgroupids as $groupid) {
-				$result &= CFavorite::add('web.dashconf.groups.hide.subgroupids', $groupid);
 			}
 
 			DBend($result);
@@ -145,9 +131,7 @@ if (hasRequest('form_refresh')) {
 	// groups
 	$data['grpswitch'] = getRequest('grpswitch', 0);
 	$groupids = getRequest('groupids', []);
-	$subgroupids = getRequest('groupids_subgroupids', []);
 	$hide_groupids = getRequest('hidegroupids', []);
-	$hide_subgroupids = getRequest('hidegroupids_subgroupids', []);
 }
 else {
 	$data['isFilterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
@@ -161,9 +145,7 @@ else {
 	// groups
 	$data['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
 	$groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-	$subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value');
 	$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
-	$hide_subgroupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value');
 }
 
 $data['severity'] = zbx_toHash($data['severity']);
@@ -184,12 +166,6 @@ if ($data['grpswitch']) {
 		'preservekeys' => true
 	]);
 
-	foreach ($subgroupids as $groupid) {
-		if (array_key_exists($groupid, $data['groups'])) {
-			$data['groups'][$groupid]['name'] .= '/*';
-		}
-	}
-
 	CArrayHelper::sort($data['groups'], [
 		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
@@ -207,12 +183,6 @@ if ($data['grpswitch']) {
 		'groupids' => $hide_groupids,
 		'preservekeys' => true
 	]);
-
-	foreach ($hide_subgroupids as $groupid) {
-		if (array_key_exists($groupid, $data['hideGroups'])) {
-			$data['hideGroups'][$groupid]['name'] .= '/*';
-		}
-	}
 
 	CArrayHelper::sort($data['hideGroups'], [
 		['field' => 'name', 'order' => ZBX_SORT_UP]

@@ -740,6 +740,7 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
  * Function: correlation_match_event_hostgroup                                *
  *                                                                            *
  * Purpose: checks if the event matches the specified host group              *
+ *          (including nested groups)                                         *
  *                                                                            *
  * Parameters: event   - [IN] the new event to check                          *
  *             groupid - [IN] the group id to match                           *
@@ -750,21 +751,35 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
  ******************************************************************************/
 static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t groupid)
 {
-	DB_RESULT	result;
-	int		ret = FAIL;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	zbx_vector_uint64_t	groupids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
-	result = DBselect("select hg.groupid"
+	zbx_vector_uint64_create(&groupids);
+	zbx_dc_get_nested_hostgroupids(&groupid, 1, &groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hg.groupid"
 				" from groups g,hosts_groups hg,items i,functions f"
-				" where hg.groupid=" ZBX_FS_UI64
-				" and hg.hostid=i.hostid"
+				" where f.triggerid=" ZBX_FS_UI64
 				" and i.itemid=f.itemid"
-				" and f.triggerid=" ZBX_FS_UI64,
-				groupid, event->objectid);
+				" and hg.hostid=i.hostid"
+				" and",
+				event->objectid);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+			groupids.values_num);
+
+	result = DBselect("%s", sql);
 
 	if (NULL != DBfetch(result))
 		ret = SUCCEED;
 
 	DBfree_result(result);
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&groupids);
 
 	return ret;
 }
