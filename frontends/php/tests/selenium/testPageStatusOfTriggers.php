@@ -28,7 +28,7 @@ class testPageStatusOfTriggers extends CWebTest {
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(['Group', 'Host']);
-		$this->zbxTestTextPresent(['Severity', 'Status', 'Info', 'Last change', 'Age', 'Ack', 'Host', 'Name', 'Description']);
+		$this->zbxTestTextPresent(['Severity', 'Status', 'Info', 'Time', 'Age', 'Ack', 'Host', 'Name', 'Description']);
 		$this->zbxTestTextPresent('Filter');
 	}
 

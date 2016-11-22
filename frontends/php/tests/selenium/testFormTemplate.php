@@ -107,7 +107,7 @@ class testFormTemplate extends CWebTest {
 					'remove_group' => 'Templates',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'No groups for template "Without groups".',
+						'Template "Without groups" cannot be without host group.',
 					]
 
 				]

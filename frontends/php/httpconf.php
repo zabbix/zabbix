@@ -670,7 +670,7 @@ else {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
 		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
+			$options['groupids'] = $data['pageFilter']->groupids;
 		}
 		$httpTests = API::HttpTest()->get($options);
 

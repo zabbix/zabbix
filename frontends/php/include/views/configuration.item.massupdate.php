@@ -489,7 +489,7 @@ $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
 // append buttons to form
 $itemTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	[new CButtonCancel(url_param('groupid').url_param('hostid'))]
+	[new CButtonCancel(url_param('hostid'))]
 ));
 
 $itemForm->addItem($itemTab);
