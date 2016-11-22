@@ -139,7 +139,7 @@ int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
 			params = (char **)zbx_realloc(params, sizeof(char *) * param_alloc);
 		}
 
-		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+		zbx_function_param_parse(ptr, strlen(ptr), &param_pos, &param_len, &sep_pos);
 		params[nparam++] = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 	}
 
