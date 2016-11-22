@@ -73,14 +73,16 @@
 #elif defined(HAVE_ORACLE)
 
 #	include "oci.h"
+#	include "zbxalgo.h"
 
 	typedef struct
 	{
-		OCIEnv		*envhp;
-		OCIError	*errhp;
-		OCISvcCtx	*svchp;
-		OCIServer	*srvhp;
-		OCIStmt		*stmthp;	/* the statement handle for execute operations */
+		OCIEnv			*envhp;
+		OCIError		*errhp;
+		OCISvcCtx		*svchp;
+		OCIServer		*srvhp;
+		OCIStmt			*stmthp;	/* the statement handle for execute operations */
+		zbx_vector_ptr_t	db_results;
 	}
 	zbx_oracle_db_handle_t;
 

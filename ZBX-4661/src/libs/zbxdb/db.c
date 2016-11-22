@@ -24,8 +24,6 @@
 #include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"
-#elif defined(HAVE_ORACLE)
-#	include "zbxalgo.h"
 #endif
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
@@ -39,7 +37,6 @@ static zbx_ibm_db2_handle_t	ibm_db2;
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
 static zbx_oracle_db_handle_t	oracle;
-static zbx_vector_ptr_t	results;
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
@@ -51,6 +48,8 @@ static PHP_MUTEX		sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result(DB_RESULT result);
+
 static const char	*zbx_oci_error(sword status, sb4 *err)
 {
 	static char	errbuf[512];
@@ -323,7 +322,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 	memset(&oracle, 0, sizeof(oracle));
 
-	zbx_vector_ptr_create(&results);
+	zbx_vector_ptr_create(&oracle.db_results);
 
 	/* connection string format: [//]host[:port][/service name] */
 
@@ -567,6 +566,19 @@ void	zbx_db_close()
 		conn = NULL;
 	}
 #elif defined(HAVE_ORACLE)
+	if (0 != oracle.db_results.values_num)
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
+
+		for (i = 0; i < oracle.db_results.values_num; i++)
+		{
+			/* deallocate all handles before environment is deallocated */
+			OCI_DBclean_result(oracle.db_results.values[i]);
+		}
+	}
+
 	/* deallocate statement handle */
 	if (NULL != oracle.stmthp)
 	{
@@ -586,22 +598,6 @@ void	zbx_db_close()
 		oracle.errhp = NULL;
 	}
 
-	if (0 != results.values_num)
-	{
-		int	i;
-
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
-
-		for (i = 0; i < results.values_num; i++)
-		{
-			/* deallocate all handles before environment is deallocated */
-			DB_RESULT	result = results.values[i];
-
-			OCIHandleFree(result->stmthp, OCI_HTYPE_STMT);
-			result->stmthp = NULL;
-		}
-	}
-
 	if (NULL != oracle.srvhp)
 	{
 		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
@@ -615,7 +611,7 @@ void	zbx_db_close()
 		oracle.envhp = NULL;
 	}
 
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_ptr_destroy(&oracle.db_results);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != conn)
 	{
@@ -1253,7 +1249,7 @@ error:
 	}
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
-	zbx_vector_ptr_append(&results, result);
+	zbx_vector_ptr_append(&oracle.db_results, result);
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
@@ -1796,11 +1792,8 @@ void	IBM_DB2free_result(DB_RESULT result)
 	zbx_free(result);
 }
 #elif defined(HAVE_ORACLE)
-/* in zbxdb.h - #define DBfree_result   OCI_DBfree_result */
-void	OCI_DBfree_result(DB_RESULT result)
+static void	OCI_DBclean_result(DB_RESULT result)
 {
-	int	i;
-
 	if (NULL == result)
 		return;
 
@@ -1815,10 +1808,7 @@ void	OCI_DBfree_result(DB_RESULT result)
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
-				/* OCI will deallocate a descriptor if the environment handle is deallocated. */
-				if (NULL != result->stmthp)
-					OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
-
+				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
 				result->clobs[i] = NULL;
 			}
 		}
@@ -1829,13 +1819,27 @@ void	OCI_DBfree_result(DB_RESULT result)
 	}
 
 	if (result->stmthp)
-		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
-
-	for (i = 0; i < results.values_num; i++)
 	{
-		if (results.values[i] == result)
+		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
+		result->stmthp = NULL;
+	}
+}
+
+/* in zbxdb.h - #define DBfree_result   OCI_DBfree_result */
+void	OCI_DBfree_result(DB_RESULT result)
+{
+	int i;
+
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result(result);
+
+	for (i = 0; i < oracle.db_results.values_num; i++)
+	{
+		if (oracle.db_results.values[i] == result)
 		{
-			zbx_vector_ptr_remove(&results, i);
+			zbx_vector_ptr_remove_noorder(&oracle.db_results, i);
 			break;
 		}
 	}
