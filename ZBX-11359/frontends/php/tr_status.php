@@ -357,14 +357,12 @@ if ($config['event_ack_enable']) {
 		}
 	}
 
-	$problem_events = API::Problem()->get([
+	$problem_events = API::Event()->get([
 		'output' => ['eventid', 'objectid'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'objectids' => $triggerIds,
-		'filter' => [
-			'r_eventid' => null
-		],
+		'value' => TRIGGER_VALUE_TRUE,
 		'sortfield' => 'eventid',
 		'sortorder' => 'DESC'
 	]);
@@ -570,37 +568,33 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$trigger['value'],
 		$trigger['lastchange'],
-		$config['event_ack_enable'] ? ($trigger['last_problem_eventid'] == 0) : false
+		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
 	if ($config['event_ack_enable']) {
-		$ack_checkbox = '';
-
 		if ($trigger['hasEvents']) {
-			$ackColumn = '';
-			if ($trigger['last_problem_eventid'] != 0) {
-				$ack_checkbox = new CCheckBox('eventids['.$trigger['last_problem_eventid'].']',
-					$trigger['last_problem_eventid']
-				);
+			$ack_checkbox = new CCheckBox('eventids['.$trigger['last_problem_eventid'].']',
+				$trigger['last_problem_eventid']
+			);
 
-				$ackColumn = [
-					(new CLink(
-						($trigger['event_count'] != 0) ? _('No') : _('Yes'),
-						'zabbix.php?action=acknowledge.edit'.
-							'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
-							'&eventids[]='.$trigger['last_problem_eventid'].
-							'&backurl='.$page['file']
-					))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(($trigger['event_count'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-				];
+			$ackColumn = [
+				(new CLink(
+					($trigger['event_count'] != 0) ? _('No') : _('Yes'),
+					'zabbix.php?action=acknowledge.edit'.
+						'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
+						'&eventids[]='.$trigger['last_problem_eventid'].
+						'&backurl='.$page['file']
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(($trigger['event_count'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
+			];
 
-				if ($trigger['event_count'] != 0) {
-					$ackColumn[] = CViewHelper::showNum($trigger['event_count']);
-				}
+			if ($trigger['event_count'] != 0) {
+				$ackColumn[] = CViewHelper::showNum($trigger['event_count']);
 			}
 		}
 		else {
+			$ack_checkbox = '';
 			$ackColumn = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 	}
