@@ -4526,8 +4526,8 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
 
-	ret = substitute_function_parameters(pr + par_l + 1, par_r - (par_l + 1), 0, &replace_to, &replace_to_alloc, &replace_to_offset,
-			jp_row, error, max_error_len);
+	ret = substitute_function_parameters(pr + par_l + 1, par_r - (par_l + 1), 0,
+			&replace_to, &replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len);
 
 	pl = pr + par_r;
 	pr += par_r + 1;
@@ -4703,8 +4703,8 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
 	size_t	exp_alloc = 0, exp_offset = 0;
 	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
 
-	ret = substitute_function_parameters(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset, jp_row,
-			error, max_error_len);
+	ret = substitute_function_parameters(*data + par_l + 1, par_r - (par_l + 1), 0,
+			&exp, &exp_alloc, &exp_offset, jp_row, error, max_error_len);
 
 	if (SUCCEED == ret)
 	{

@@ -3740,21 +3740,23 @@ static size_t	zbx_no_function(const char *expr)
 
 /******************************************************************************
  *                                                                            *
- * Function: function_match_parenthesis                                       *
+ * Function: function_validate_parameters                                     *
  *                                                                            *
- * Purpose: given the position of opening function parenthesis find the       *
- *          position of a closing one                                         *
+ * Purpose: validate parameters and give position of terminator if found and  *
+ *          not quoted                                                        *
  *                                                                            *
- * Parameters: expr     - [IN] string to parse                                *
- *             par_l    - [IN] position of the opening parenthesis            *
- *             par_r    - [OUT] position of the closing parenthesis           *
+ * Parameters: expr       - [IN] string to parse that contains parameters     *
+ *             terminator - [IN] use ')' if parameters end with parenthesis   *
+ *                               or '\0' if ends with NULL terminator         *
+ *             par_r      - [OUT] position of the terminator if found         *
  *                                                                            *
- * Return value: SUCCEED - closing parenthesis was found                      *
- *               FAIL    - string after par_l does not look like a valid      *
- *                         function parameter list                            *
+ * Return value: SUCCEED -  closing parenthesis was found or other custom     *
+ *                          terminator and not quoted                         *
+ *               FAIL    -  does not look like a valid                        *
+ *                          function parameter list                           *
  *                                                                            *
  ******************************************************************************/
-static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r)
+static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r)
 {
 #define ZBX_FUNC_PARAM_NEXT		0
 #define ZBX_FUNC_PARAM_QUOTED		1
@@ -3764,9 +3766,9 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
 	const char	*ptr;
 	int		state = ZBX_FUNC_PARAM_NEXT;
 
-	for (ptr = expr + par_l + 1; '\0' != *ptr; ptr++)
+	for (ptr = expr; '\0' != *ptr; ptr++)
 	{
-		if (')' == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
+		if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
 		{
 			*par_r = ptr - expr;
 			return SUCCEED;
@@ -3799,12 +3801,65 @@ static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *pa
 		}
 	}
 
+	if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
+	{
+		*par_r = ptr - expr;
+		return SUCCEED;
+	}
+
 	return FAIL;
 
 #undef ZBX_FUNC_PARAM_NEXT
 #undef ZBX_FUNC_PARAM_QUOTED
 #undef ZBX_FUNC_PARAM_UNQUOTED
 #undef ZBX_FUNC_PARAM_POSTQUOTED
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_match_parenthesis                                       *
+ *                                                                            *
+ * Purpose: given the position of opening function parenthesis find the       *
+ *          position of a closing one                                         *
+ *                                                                            *
+ * Parameters: expr     - [IN] string to parse                                *
+ *             par_l    - [IN] position of the opening parenthesis            *
+ *             par_r    - [OUT] position of the closing parenthesis           *
+ *                                                                            *
+ * Return value: SUCCEED - closing parenthesis was found                      *
+ *               FAIL    - string after par_l does not look like a valid      *
+ *                         function parameter list                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r)
+{
+	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r))
+	{
+		*par_r += par_l + 1;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_function_validate_parameters                                 *
+ *                                                                            *
+ * Purpose: validate parameters that end with '\0'                            *
+ *                                                                            *
+ * Parameters: expr       - [IN] string to parse that contains parameters     *
+ *             length     - [OUT] length of parameters                        *
+ *                                                                            *
+ * Return value: SUCCEED -  null termination encountered when quotes are      *
+ *                          closed and no other error                         *
+ *               FAIL    -  does not look like a valid                        *
+ *                          function parameter list                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_validate_parameters(const char *expr, size_t *length)
+{
+	return function_validate_parameters(expr, '\0', length);
 }
 
 /******************************************************************************
