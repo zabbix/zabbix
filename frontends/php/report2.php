@@ -59,7 +59,7 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
 		access_deny();
 	}
-	if (getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
+	if (getRequest('filter_hostid') && !isReadableTemplates([getRequest('filter_hostid')])) {
 		access_deny();
 	}
 	if (getRequest('tpl_triggerid')) {
@@ -77,7 +77,7 @@ else {
 	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
 		access_deny();
 	}
-	if (getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
+	if (getRequest('filter_hostid') && !isReadableHosts([getRequest('filter_hostid')])) {
 		access_deny();
 	}
 }

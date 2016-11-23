@@ -62,7 +62,7 @@ $data = [];
 if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
+if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();
 }
 if (hasRequest('elementid')) {

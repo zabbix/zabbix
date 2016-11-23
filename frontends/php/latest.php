@@ -58,7 +58,7 @@ check_fields($fields);
 if (getRequest('groupids') && !isReadableHostGroups(getRequest('groupids'))) {
 	access_deny();
 }
-if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
+if (getRequest('hostids') && !isReadableHosts(getRequest('hostids'))) {
 	access_deny();
 }
 
