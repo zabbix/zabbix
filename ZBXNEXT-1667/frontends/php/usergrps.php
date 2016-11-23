@@ -59,7 +59,7 @@ $fields = [
 	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'groupids_subgroupids' => [T_ZBX_STR, O_OPT, null,		 null,	null],
+	'subgroups' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
@@ -374,9 +374,15 @@ if (hasRequest('form')) {
 
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
+		if (hasRequest('subgroups')) {
+			$groupids = [];
+			$groupids_subgroupids = getRequest('groupids', []);
+		}
+		else {
+			$groupids = getRequest('groupids', []);
+			$groupids_subgroupids = [];
+		}
 
-		$groupids = getRequest('groupids', []);
-		$groupids_subgroupids = getRequest('groupids_subgroupids', []);
 		$new_permission = getRequest('new_permission', PERM_NONE);
 
 		$data['groups_rights'] = collapseHostGroupRights(

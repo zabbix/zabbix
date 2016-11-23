@@ -88,7 +88,6 @@ if ($data['action'] == 'problem.view') {
 				'name' => 'filter_groupids[]',
 				'objectName' => 'hostGroup',
 				'data' => $data['filter']['groups'],
-				'nested' => true,
 				'popup' => [
 					'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=filter_groupids_'.
 						'&srcfld1=groupid&multiselect=1'

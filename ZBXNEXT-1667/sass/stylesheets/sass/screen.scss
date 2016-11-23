@@ -1829,8 +1829,9 @@ select {
 
 	position: absolute !important;
 	top: auto !important;
-	width: 1px !important;
-	height: 1px !important;
+	width: 16px !important;
+	height: 16px !important;
+	z-index: 1;
 	@include opacity(0);
 
 	+ label span {

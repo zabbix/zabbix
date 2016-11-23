@@ -1194,8 +1194,9 @@ select {
 .checkbox-radio {
   position: absolute !important;
   top: auto !important;
-  width: 1px !important;
-  height: 1px !important;
+  width: 16px !important;
+  height: 16px !important;
+  z-index: 1;
   opacity: 0;
   filter: alpha(opacity=0); }
   .checkbox-radio[type="checkbox"] + label span {

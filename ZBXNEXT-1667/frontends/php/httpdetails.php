@@ -128,17 +128,19 @@ $items = DBfetchArray(DBselect(
 
 $graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($items));
 
-$src = 'chart3.php?height=150'.
-	'&name='.$http_test_name.': '._('Speed').
-	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
-	'&httptestid='.$httptest['httptestid'].
-	'&graphtype='.GRAPH_TYPE_STACKED.
-	'&period='.$graph_in->timeline['period'].
-	'&stime='.$graph_in->timeline['stime'].
-	'&profileIdx='.$graph_in->profileIdx.
-	'&profileIdx2='.$graph_in->profileIdx2;
+$url = (new CUrl('chart3.php'))
+	->setArgument('height', 150)
+	->setArgument('name', $http_test_name.': '._('Speed'))
+	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_IN)
+	->setArgument('httptestid', $httptest['httptestid'])
+	->setArgument('graphtype', GRAPH_TYPE_STACKED)
+	->setArgument('period', $graph_in->timeline['period'])
+	->setArgument('stime', $graph_in->timeline['stime'])
+	->setArgument('profileIdx', $graph_in->profileIdx)
+	->setArgument('profileIdx2', $graph_in->profileIdx2)
+	->getUrl();
 
-$graphs[] = (new CDiv(new CLink(null, $src)))
+$graphs[] = (new CDiv(new CLink(null, $url)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_in')
 	->setAttribute('data-timestamp', time());
@@ -146,7 +148,7 @@ $graphs[] = (new CDiv(new CLink(null, $src)))
 $time_control_data = [
 	'id' => 'graph_in',
 	'containerid' => 'flickerfreescreen_graph_in',
-	'src' => $src,
+	'src' => $url,
 	'objDims' => $graph_dims,
 	'loadSBox' => 1,
 	'loadImage' => 1,
@@ -171,17 +173,19 @@ $graph_time = new CScreenBase([
 	'stime' => getRequest('stime')
 ]);
 
-$src = 'chart3.php?height=150'.
-	'&name='.$http_test_name.': '._('Response time').
-	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
-	'&httptestid='.$httptest['httptestid'].
-	'&graphtype='.GRAPH_TYPE_STACKED.
-	'&period='.$graph_time->timeline['period'].
-	'&stime='.$graph_time->timeline['stime'].
-	'&profileIdx='.$graph_time->profileIdx.
-	'&profileIdx2='.$graph_time->profileIdx2;
+$url = (new CUrl('chart3.php'))
+	->setArgument('height', 150)
+	->setArgument('name', $http_test_name.': '._('Response time'))
+	->setArgument('http_item_type', HTTPSTEP_ITEM_TYPE_IN)
+	->setArgument('httptestid', $httptest['httptestid'])
+	->setArgument('graphtype', GRAPH_TYPE_STACKED)
+	->setArgument('period', $graph_time->timeline['period'])
+	->setArgument('stime', $graph_time->timeline['stime'])
+	->setArgument('profileIdx', $graph_time->profileIdx)
+	->setArgument('profileIdx2', $graph_time->profileIdx2)
+	->getUrl();
 
-$graphs[] = (new CDiv(new CLink(null, $src)))
+$graphs[] = (new CDiv(new CLink(null, $url)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_time')
 	->setAttribute('data-timestamp', time());
@@ -189,7 +193,7 @@ $graphs[] = (new CDiv(new CLink(null, $src)))
 $time_control_data = [
 	'id' => 'graph_time',
 	'containerid' => 'flickerfreescreen_graph_time',
-	'src' => $src,
+	'src' => $url,
 	'objDims' => $graph_dims,
 	'loadSBox' => 1,
 	'loadImage' => 1,
