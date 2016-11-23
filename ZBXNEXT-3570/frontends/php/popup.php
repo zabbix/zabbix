@@ -227,12 +227,12 @@ check_fields($fields);
 
 // validate permissions
 if (getRequest('only_hostid')) {
-	if (!API::Host()->isReadable([$_REQUEST['only_hostid']])) {
+	if (!isReadableHostTemplates([getRequest('only_hostid')])) {
 		access_deny();
 	}
 }
 else {
-	if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']])) {
+	if (getRequest('hostid') && !isReadableHostTemplates([getRequest('hostid')])) {
 		access_deny();
 	}
 	if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {

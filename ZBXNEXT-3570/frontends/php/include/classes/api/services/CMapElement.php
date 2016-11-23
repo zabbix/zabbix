@@ -93,7 +93,8 @@ abstract class CMapElement extends CApiService {
 		}
 
 		$groupids = [];
-		$hostIds = $triggerIds = $mapIds = [];
+		$hostids = [];
+		$triggerIds = $mapIds = [];
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -101,7 +102,7 @@ abstract class CMapElement extends CApiService {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST:
-					$hostIds[$selement['elementid']] = $selement['elementid'];
+					$hostids[$selement['elementid']] = true;
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -115,9 +116,9 @@ abstract class CMapElement extends CApiService {
 		}
 
 		$this->checkHostGroupsPermissions(array_keys($groupids));
+		$this->checkHostsPermissions(array_keys($hostids));
 
-		if (($hostIds && !API::Host()->isReadable($hostIds))
-				|| ($triggerIds && !API::Trigger()->isReadable($triggerIds))
+		if (($triggerIds && !API::Trigger()->isReadable($triggerIds))
 				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -138,6 +139,28 @@ abstract class CMapElement extends CApiService {
 			]);
 
 			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host
+	 *
+	 * @param array $hostids
+	 */
+	private function checkHostsPermissions(array $hostids) {
+		if ($hostids) {
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids
+			]);
+
+			if ($count != count($hostids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);

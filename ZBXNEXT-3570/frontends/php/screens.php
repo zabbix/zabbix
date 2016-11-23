@@ -66,11 +66,10 @@ if (getRequest('tr_groupid') && !isReadableHostGroups([getRequest('tr_groupid')]
 }
 
 // Validate host IDs.
-$validate_hostids = array_filter([
-	getRequest('hostid'),
-	getRequest('tr_hostid')
-]);
-if ($validate_hostids && !API::Host()->isReadable($validate_hostids)) {
+if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
+	access_deny();
+}
+if (getRequest('tr_hostid') && !isReadableHosts([getRequest('tr_hostid')])) {
 	access_deny();
 }
 
