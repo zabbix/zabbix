@@ -2823,7 +2823,7 @@ out:
  * Parameters: item  - [IN/OUT] the item data                                 *
  *             sock  - [IN] the connection socket                             *
  *             args  - [IN] the validator arguments                           *
- *             error - [OUT] the error message                                *
+ *             error - unused                                                 *
  *                                                                            *
  * Return value:  SUCCEED - the validation was successful                     *
  *                FAIL    - otherwise                                         *
@@ -2855,7 +2855,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *                                                                            *
  * Purpose: validates item received from active agent                         *
  *                                                                            *
- * Parameters: item  - [IN/OUT] the item data                                 *
+ * Parameters: item  - [IN] the item data                                     *
  *             sock  - [IN] the connection socket                             *
  *             args  - [IN] the validator arguments                           *
  *             error - [OUT] the error message                                *
@@ -2889,7 +2889,7 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *                                                                            *
  * Purpose: validates item received from sender                               *
  *                                                                            *
- * Parameters: item  - [IN/OUT] the item data                                 *
+ * Parameters: item  - [IN] the item data                                     *
  *             sock  - [IN] the connection socket                             *
  *             args  - [IN] the validator arguments                           *
  *             error - [OUT] the error message                                *
@@ -2947,7 +2947,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
  *             validator_args - [IN] the user arguments passed to validator   *
  *                                   function                                 *
  *             info           - [OUT] address of a pointer to the info string *
- *                                  (should be freed by the caller)           *
+ *                                    (should be freed by the caller)         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -2977,13 +2977,13 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		ts_diff.ns = 0;
 	}
 
+	sec = zbx_time();
+
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
 		*info = zbx_strdup(*info, zbx_json_strerror());
 		goto out;
 	}
-
-	sec = zbx_time();
 
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);

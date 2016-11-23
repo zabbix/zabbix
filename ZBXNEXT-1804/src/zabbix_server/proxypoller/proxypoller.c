@@ -37,7 +37,7 @@ extern int		server_num, process_num;
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
-	int		ret;
+	int		ret = FAIL;
 	char		*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
@@ -61,7 +61,7 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
+			goto out;
 	}
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
 			proxy->tls_connect, tls_arg1, tls_arg2)))
@@ -69,7 +69,7 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -146,7 +146,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 	const char	*__function_name = "get_data_from_proxy";
 	zbx_socket_t	s;
 	struct zbx_json	j;
-	int		ret = FAIL;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __function_name, request);
 
@@ -554,7 +554,7 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	if (0 == (version = proxy->version))
 	{
 		if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
-			return FAIL;
+			goto out;
 
 		if ('\0' == *answer)
 			zbx_proxy_update_version(proxy, NULL);
@@ -581,13 +581,16 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	}
 
 	if (NULL == answer && SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts))
-		return FAIL;
+		goto out;
 
 	ret = proxy_process_proxy_data(proxy, answer, &ts, more);
 
 	zbx_free(answer);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
+	if (SUCCEED == ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

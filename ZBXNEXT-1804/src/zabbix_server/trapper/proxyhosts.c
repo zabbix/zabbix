@@ -39,7 +39,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	const char	*__function_name = "recv_host_availability";
 
 	char		host[HOST_HOST_LEN_MAX], *error = NULL;
-	int		ret;
+	int		ret = FAIL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
