@@ -3634,7 +3634,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		{
 			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
 					" loaded");
-			goto out;
+			goto out1;
 		}
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -3645,14 +3645,14 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		if (NULL == ciphersuites_psk)
 		{
 			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
-			goto out;
+			goto out1;
 		}
 	}
 	else
 	{
 		*error = zbx_strdup(*error, "invalid connection parameters");
 		THIS_SHOULD_NEVER_HAPPEN;
-		goto out;
+		goto out1;
 	}
 
 	/* set up TLS context */
