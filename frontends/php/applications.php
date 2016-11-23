@@ -297,7 +297,7 @@ else {
 		$applications = API::Application()->get([
 			'output' => ['applicationid'],
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1

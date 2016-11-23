@@ -270,9 +270,12 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 
 static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
-	const char	*__function_name = "check_script_permissions";
-	DB_RESULT	result;
-	int		ret = SUCCEED;
+	const char		*__function_name = "check_script_permissions";
+	DB_RESULT		result;
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	groupids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64,
 			__function_name, groupid, hostid);
@@ -280,12 +283,23 @@ static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 	if (0 == groupid)
 		goto exit;
 
-	result = DBselect(
+	zbx_vector_uint64_create(&groupids);
+	zbx_dc_get_nested_hostgroupids(&groupid, 1, &groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid"
 			" from hosts_groups"
 			" where hostid=" ZBX_FS_UI64
-				" and groupid=" ZBX_FS_UI64,
-			hostid, groupid);
+				" and",
+			hostid);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+			groupids.values_num);
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&groupids);
 
 	if (NULL == DBfetch(result))
 		ret = FAIL;

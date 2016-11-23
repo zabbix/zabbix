@@ -1110,8 +1110,7 @@ class testFormGraphPrototype extends CWebTest {
 				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('groupid'));
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-				$this->zbxTestClickLinkTextWait($this->itemSimple);
-				$this->zbxTestWaitWindowClose();
+				$this->zbxTestClickLinkAndWaitWindowClose($this->itemSimple);
 
 				$this->zbxTestClickWait('add_protoitem');
 				$this->zbxTestSwitchToNewWindow();

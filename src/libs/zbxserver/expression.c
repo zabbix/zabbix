@@ -3606,23 +3606,38 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_IP, 0);
+				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.dns_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_DNS, 0);
+				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.addr);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_CONN, 0);
+				}
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
@@ -3771,27 +3786,30 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 		}
 
-		if (1 == require_numeric && NULL != replace_to)
-		{
-			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
-				wrap_negative_double_suffix(&replace_to, NULL);
-			else if (NULL != error)
-				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
-		}
-
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (0 != func_macro)
 			{
-				ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
+				if (SUCCEED != (ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
 						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
-						&replace_to);
+						&replace_to)))
+				{
+					zbx_free(replace_to);
+				}
 			}
 			else
 			{
 				/* ignore functions with macros not supporting them */
 				zbx_free(replace_to);
 			}
+		}
+
+		if (1 == require_numeric && NULL != replace_to)
+		{
+			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+				wrap_negative_double_suffix(&replace_to, NULL);
+			else if (NULL != error)
+				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
 
 		if (FAIL == ret)
@@ -4742,7 +4760,7 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
  *                            if a function macro is supported.               *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
- *             max_erro_len - [IN] the size of error buffer                   *
+ *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *

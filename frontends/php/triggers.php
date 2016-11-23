@@ -622,7 +622,7 @@ else {
 		'groupid' => getRequest('groupid'),
 		'hostid' => getRequest('hostid')
 	]);
-	$data['groupid'] = $data['pageFilter']->groupid;
+	$data['groupid'] = $data['pageFilter']->groupids;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	// get triggers
@@ -665,7 +665,7 @@ else {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
 		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
+			$options['groupids'] = $data['pageFilter']->groupids;
 		}
 		$data['triggers'] = API::Trigger()->get($options);
 	}
