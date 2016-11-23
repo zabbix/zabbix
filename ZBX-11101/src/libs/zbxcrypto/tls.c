@@ -943,9 +943,7 @@ static int	zbx_is_ciphersuite_cert(const int *p)
 	else
 		return FAIL;
 }
-#endif
 
-#if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_is_ciphersuite_psk                                           *
@@ -976,9 +974,7 @@ static int	zbx_is_ciphersuite_psk(const int *p)
 	else
 		return FAIL;
 }
-#endif
 
-#if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_is_ciphersuite_all                                           *
@@ -1011,9 +1007,7 @@ static int	zbx_is_ciphersuite_all(const int *p)
 	else
 		return FAIL;
 }
-#endif
 
-#if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ciphersuites                                                 *
