@@ -1,8 +1,6 @@
 Changes for 3.0.6rc1
 
 New features:
-..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
-A......... [ZBX-11483] improved API script.execute validation (Oleg)
 .......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
@@ -11,6 +9,8 @@ A......... [ZBX-11483] improved API script.execute validation (Oleg)
 
 Bug fixes:
 ..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
+..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
 A.F.....S. [ZBX-11347] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters for items without interface (asaveljevs, Ivo, Sasha)
