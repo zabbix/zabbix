@@ -1676,16 +1676,12 @@ class CAction extends CApiService {
 				'Incorrect action operation host. Host does not exist or you have no access to this host.'
 			));
 		}
-		if ($all_userids && !API::User()->isReadable($all_userids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation user. User does not exist or you have no access to this user.'
-			));
-		}
-		if ($all_usrgrpids && !API::UserGroup()->isReadable($all_usrgrpids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
-			));
-		}
+		$this->checkUsersPermissions($all_userids,
+			_('Incorrect action operation user. User does not exist or you have no access to this user.')
+		);
+		$this->checkUserGroupsPermissions($all_usrgrpids, _(
+			'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
+		));
 
 		return true;
 	}
@@ -2716,20 +2712,64 @@ class CAction extends CApiService {
 	 * @param tring $error
 	 */
 	private function checkHostGroupsPermissions(array $groupids, $error) {
-		if (!$groupids) {
-			return true;
+		if ($groupids) {
+			$groupids = array_unique($groupids);
+
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids,
+				'editable' => true
+			]);
+
+			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
+	}
 
-		$groupids = array_unique($groupids);
+	/**
+	 * Checks if the current user has access to the given users.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given users
+	 *
+	 * @param array  $userids
+	 * @param string $error
+	 */
+	protected function checkUsersPermissions(array $userids, $error) {
+		if ($userids) {
+			$userids = array_unique($userids);
 
-		$count = API::HostGroup()->get([
-			'countOutput' => true,
-			'groupids' => $groupids,
-			'editable' => true
-		]);
+			$count = API::User()->get([
+				'countOutput' => true,
+				'userids' => $userids
+			]);
 
-		if ($count != count($groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			if ($count != count($userids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given user groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given user groups
+	 *
+	 * @param array  $usrgrpids
+	 * @param string $error
+	 */
+	protected function checkUserGroupsPermissions(array $usrgrpids, $error) {
+		if ($usrgrpids) {
+			$usrgrpids = array_unique($usrgrpids);
+
+			$count = API::UserGroup()->get([
+				'countOutput' => true,
+				'usrgrpids' => $usrgrpids
+			]);
+
+			if ($count != count($usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 	}
 }
