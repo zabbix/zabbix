@@ -869,7 +869,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		/* substitute LLD macros in function parameters */
 
-		ret = substitute_function_parameters(e + par_l + 1, par_r - (par_l + 1), 1,
+		ret = substitute_function_lld_param(e + par_l + 1, par_r - (par_l + 1), 1,
 				&exp, &exp_alloc, &exp_offset, jp_row, error, max_error_len);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
 
