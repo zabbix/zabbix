@@ -35,7 +35,7 @@ void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 {
 	const char	*__function_name = "recv_discovery_data";
 
-	int		ret;
+	int		ret = FAIL;
 	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 	DC_PROXY	proxy;
 
