@@ -303,7 +303,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 
 	if (0 == groupids.values_num)
 	{
-		zbx_strcpy_alloc(error, &error_offset, &error_alloc, "No groups in list ");
+		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "No groups in list ");
 		goto out;
 	}
 
@@ -337,7 +337,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 
 	if (0 == itemids->values_num)
 	{
-		zbx_strcpy_alloc(error, &error_offset, &error_alloc, "No items for key \"%s\" in group(s) ");
+		zbx_strcpy_alloc(error,  &error_alloc, &error_offset,"No items for key \"%s\" in group(s) ");
 		goto out;
 	}
 
@@ -348,8 +348,8 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 out:
 	if (FAIL == ret)
 	{
-		aggregate_quote_groups(error, &error_offset, &error_alloc, groups);
-		zbx_chrcpy_alloc(error, &error_offset, &error_alloc, '.');
+		aggregate_quote_groups(error, &error_alloc, &error_offset, groups);
+		zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '.');
 	}
 
 	zbx_vector_uint64_destroy(&groupids);
