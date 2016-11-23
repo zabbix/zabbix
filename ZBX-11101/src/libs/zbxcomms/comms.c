@@ -1873,6 +1873,28 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_connection_type_name                                     *
+ *                                                                            *
+ * Purpose: translate connection type code to name                            *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_tcp_connection_type_name(unsigned int type)
+{
+	switch (type)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			return "unencrypted";
+		case ZBX_TCP_SEC_TLS_CERT:
+			return "TLS with certificate";
+		case ZBX_TCP_SEC_TLS_PSK:
+			return "TLS with PSK";
+		default:
+			return "unknown";
+	}
+}
+
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
 	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);

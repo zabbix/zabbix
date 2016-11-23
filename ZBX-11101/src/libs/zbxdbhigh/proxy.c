@@ -166,7 +166,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
-				zbx_tls_connection_type_name(sock->connection_type));
+				zbx_tcp_connection_type_name(sock->connection_type));
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
 
@@ -2143,7 +2143,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 					zabbix_log(LOG_LEVEL_WARNING, "connection of type \"%s\" is not allowed for"
 							" host \"%s\" item \"%s\" (not every rejected item might be"
 							" reported)",
-							zbx_tls_connection_type_name(sock->connection_type),
+							zbx_tcp_connection_type_name(sock->connection_type),
 							items[i].host.host, items[i].key_orig);
 					flag_host_allow = 0;
 					continue;

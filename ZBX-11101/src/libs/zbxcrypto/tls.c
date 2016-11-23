@@ -5534,28 +5534,6 @@ void	zbx_tls_close(zbx_socket_t *s)
 }
 #endif
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_tls_connection_type_name                                     *
- *                                                                            *
- * Purpose: translate connection type code to name                            *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_tls_connection_type_name(unsigned int type)
-{
-	switch (type)
-	{
-		case ZBX_TCP_SEC_UNENCRYPTED:
-			return "unencrypted";
-		case ZBX_TCP_SEC_TLS_CERT:
-			return "TLS with certificate";
-		case ZBX_TCP_SEC_TLS_PSK:
-			return "TLS with PSK";
-		default:
-			return "unknown";
-	}
-}
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
