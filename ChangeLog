@@ -5,7 +5,7 @@ New features:
 ..F....PS. [ZBXNEXT-2970] increased maximum supported SNMP trapper file size (vso)
 .....J.... [ZBXNEXT-1141] added support for AtomicBoolean, AtomicInteger, and AtomicLong to Java gateway (asaveljevs)
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
-A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Sasha, viktors)
+A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
