@@ -1668,11 +1668,9 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($all_groupids && !API::HostGroup()->isWritable($all_groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
-			));
-		}
+		$this->checkHostGroupsPermissions($all_groupids, _(
+			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
+		));
 		if ($all_hostids && !API::Host()->isWritable($all_hostids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _(
 				'Incorrect action operation host. Host does not exist or you have no access to this host.'
@@ -2668,12 +2666,9 @@ class CAction extends CApiService {
 			}
 		}
 
-		if (!API::HostGroup()->isWritable($hostGroupIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
-			);
-		}
+		$this->checkHostGroupsPermissions($hostGroupIdsAll,
+			_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
+		);
 		if (!API::Host()->isWritable($hostIdsAll)) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -2709,6 +2704,32 @@ class CAction extends CApiService {
 				ZBX_API_ERROR_PARAMETERS,
 				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
 			);
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 *
+	 * @param array $groupids
+	 * @param tring $error
+	 */
+	private function checkHostGroupsPermissions(array $groupids, $error) {
+		if (!$groupids) {
+			return true;
+		}
+
+		$groupids = array_unique($groupids);
+
+		$count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => $groupids,
+			'editable' => true
+		]);
+
+		if ($count != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 		}
 	}
 }

@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -224,7 +225,7 @@ else {
 }
 
 $filterGroupId = getRequest('filter_groupid');
-if ($filterGroupId && !API::HostGroup()->isWritable([$filterGroupId])) {
+if ($filterGroupId && !isWritableHostGroups([$filterGroupId])) {
 	access_deny();
 }
 
