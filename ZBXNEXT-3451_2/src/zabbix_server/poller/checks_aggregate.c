@@ -227,6 +227,42 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 
 /******************************************************************************
  *                                                                            *
+ * Function: quote_string                                                     *
+ *                                                                            *
+ * Purpose: quotes string by enclosing it in double quotes and escaping       *
+ *          double quotes inside string with '\'.                             *
+ *                                                                            *
+ * Parameters: str    - [IN/OUT] the string to quote                          *
+ *             sz_str - [IN] the string length                                *
+ *                                                                            *
+ * Comments: The '\' character itself is not quoted. As the result if string  *
+ *           ends with '\' it can be quoted (for example for error messages), *
+ *           but it's impossible to unquote it.                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	quote_string(char **str, size_t sz_src)
+{
+	size_t	sz_dst;
+
+	sz_dst = zbx_get_escape_string_len(*str, "\"") + 3;
+
+	*str = realloc(*str, sz_dst);
+
+	(*str)[--sz_dst] = '\0';
+	(*str)[--sz_dst] = '"';
+
+	while (0 < sz_src)
+	{
+		(*str)[--sz_dst] = (*str)[--sz_src];
+
+		if ('"' == (*str)[sz_src])
+			(*str)[--sz_dst] = '\\';
+	}
+	(*str)[--sz_dst] = '"';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: aggregate_quote_groups                                           *
  *                                                                            *
  * Purpose: quotes the individual groups in the list if necessary             *
@@ -247,7 +283,7 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
 		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
 		separator = ", ";
 
-		(void)quote_key_param(&group, 1);
+		quote_string(&group, strlen(group));
 		zbx_strcpy_alloc(str, str_alloc, str_offset, group);
 		zbx_free(group);
 	}
