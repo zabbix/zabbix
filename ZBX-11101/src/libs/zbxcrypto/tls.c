@@ -18,6 +18,9 @@
 **/
 
 #include "common.h"
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
 #include "comms.h"
 #include "threads.h"
 #include "log.h"
@@ -146,7 +149,6 @@ static void	OPENSSL_cleanup(void)
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 struct zbx_tls_context
 {
 #if defined(HAVE_POLARSSL)
@@ -159,12 +161,10 @@ struct zbx_tls_context
 	SSL				*ctx;
 #endif
 };
-#endif
 
 extern unsigned int			configured_tls_connect_mode;
 extern unsigned int			configured_tls_accept_modes;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
 
 extern int				CONFIG_PASSIVE_FORKS;
@@ -190,7 +190,6 @@ ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
 size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
-#endif
 
 #if defined(HAVE_POLARSSL)
 ZBX_THREAD_LOCAL static x509_crt		*ca_cert		= NULL;
@@ -472,7 +471,6 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_parameter_name                                           *
@@ -541,9 +539,7 @@ static const char	*zbx_tls_parameter_name(int type, char **param)
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_parameter_not_empty                                      *
@@ -589,9 +585,7 @@ static void	zbx_tls_parameter_not_empty(char **param)
 		exit(EXIT_FAILURE);
 	}
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_validation_error                                         *
@@ -703,9 +697,7 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2)
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_validate_config                                          *
@@ -916,7 +908,6 @@ void	zbx_tls_validate_config(void)
 		}
 	}
 }
-#endif	/* defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
@@ -1091,7 +1082,6 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_psk_hex2bin                                                  *
@@ -1143,7 +1133,6 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
 
 	return len;
 }
-#endif
 
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
@@ -1482,7 +1471,6 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_check_psk_identity_len                                       *
@@ -1500,9 +1488,7 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
 		exit(EXIT_FAILURE);
 	}
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_read_psk_file                                                *
@@ -1586,7 +1572,6 @@ out:
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
 }
-#endif
 
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
@@ -2347,7 +2332,6 @@ out:
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_verify_issuer_subject                                        *
@@ -2481,9 +2465,7 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 
 	return FAIL;
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_check_server_issuer_subject                                  *
@@ -2528,9 +2510,7 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 
 	return SUCCEED;
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_library_init                                             *
@@ -2573,9 +2553,7 @@ static void	zbx_tls_library_init(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
 #endif
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_library_deinit                                           *
@@ -2599,9 +2577,7 @@ void	zbx_tls_library_deinit(void)
 	}
 #endif
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -2615,7 +2591,6 @@ void	zbx_tls_init_parent(void)
 	zbx_tls_library_init();		/* on MS Windows initialize crypto libraries in parent thread */
 #endif
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3455,7 +3430,6 @@ out1:
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_free_on_signal                                           *
@@ -3468,9 +3442,7 @@ void	zbx_tls_free_on_signal(void)
 	if (NULL != my_psk)
 		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_free                                                     *
@@ -3590,7 +3562,6 @@ void	zbx_tls_free(void)
 #endif
 #endif
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -5184,7 +5155,6 @@ out1:
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
@@ -5426,9 +5396,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	return (ssize_t)res;
 #endif
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_close                                                    *
@@ -5532,9 +5500,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 #endif
 	zbx_free(s->tls_ctx);
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_get_attr_cert                                            *
@@ -5647,9 +5613,7 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	return SUCCEED;
 }
-#endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_get_attr_psk                                             *
@@ -5682,9 +5646,8 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	return SUCCEED;
 }
-#endif
 
-#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_pass_vars                                                *
@@ -5762,4 +5725,6 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 	psk_len_for_cb = args->psk_len_for_cb;
 #endif
 }
+#endif
+
 #endif
