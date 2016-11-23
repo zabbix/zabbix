@@ -4485,8 +4485,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 	int	ret = FAIL;
 
 	pl = pr = *data + token->token.l;
-	if ('{' != *pr++)
-		return FAIL;
+	pr++;	/* skip '{' */
 
 	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
 	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
