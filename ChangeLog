@@ -5,6 +5,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
@@ -1497,6 +1498,7 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
 A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
