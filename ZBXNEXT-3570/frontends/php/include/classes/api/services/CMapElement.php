@@ -114,11 +114,34 @@ abstract class CMapElement extends CApiService {
 			}
 		}
 
-		if (($groupids && !isReadableHostGroups(array_keys($groupids)))
-				|| ($hostIds && !API::Host()->isReadable($hostIds))
+		$this->checkHostGroupsPermissions(array_keys($groupids));
+
+		if (($hostIds && !API::Host()->isReadable($hostIds))
 				|| ($triggerIds && !API::Trigger()->isReadable($triggerIds))
 				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 *
+	 * @param array $groupids
+	 */
+	private function checkHostGroupsPermissions(array $groupids) {
+		if ($groupids) {
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids
+			]);
+
+			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
