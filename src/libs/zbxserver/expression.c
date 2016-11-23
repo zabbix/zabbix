@@ -4526,7 +4526,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
 
-	ret = substitute_function_parameters(pr + par_l + 1, par_r - (par_l + 1), 0,
+	ret = substitute_function_lld_param(pr + par_l + 1, par_r - (par_l + 1), 0,
 			&replace_to, &replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len);
 
 	pl = pr + par_r;
@@ -4703,8 +4703,8 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
 	size_t	exp_alloc = 0, exp_offset = 0;
 	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
 
-	ret = substitute_function_parameters(*data + par_l + 1, par_r - (par_l + 1), 0,
-			&exp, &exp_alloc, &exp_offset, jp_row, error, max_error_len);
+	ret = substitute_function_lld_param(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset,
+			jp_row, error, max_error_len);
 
 	if (SUCCEED == ret)
 	{
@@ -4932,11 +4932,11 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	return ret;
 }
 
-int	substitute_function_parameters(const char *e, size_t len, unsigned char key_in_param,
+int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
-	const char	*__function_name = "substitute_function_parameters";
+	const char	*__function_name = "substitute_function_lld_param";
 	int		ret = SUCCEED;
 	size_t		sep_pos;
 	char		*param = NULL;
