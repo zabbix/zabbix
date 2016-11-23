@@ -3813,13 +3813,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			zbx_tls_close(s);
 			goto out1;
 		}
-
-		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
 	else	/* pre-shared key */
 	{
-		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
-
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			/* special print: s->tls_ctx->ctx->psk_identity is not '\0'-terminated */
@@ -3828,8 +3824,13 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
-			ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
+	s->connection_type = tls_connect;
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
+				ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
+	}
 
 	return SUCCEED;
 
@@ -4111,11 +4112,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 		if (NULL != peer_cert)
 			gnutls_x509_crt_deinit(peer_cert);
-
-		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
-	else	/* pre-shared key */
-		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
+
+	s->connection_type = tls_connect;
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
@@ -4400,11 +4399,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			zbx_tls_close(s);
 			goto out1;
 		}
-
-		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
-	else	/* pre-shared key */
-		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
+
+	s->connection_type = tls_connect;
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
