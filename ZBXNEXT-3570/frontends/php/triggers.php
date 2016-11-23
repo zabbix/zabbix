@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -146,7 +147,7 @@ if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
 
 // Validate permissions to group.
 $groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable([$groupId])) {
+if ($groupId && !isWritableHostGroups([$groupId])) {
 	access_deny();
 }
 

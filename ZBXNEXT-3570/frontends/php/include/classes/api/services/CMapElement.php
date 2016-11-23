@@ -92,26 +92,30 @@ abstract class CMapElement extends CApiService {
 			return;
 		}
 
-		$hostIds = $groupIds = $triggerIds = $mapIds = [];
+		$groupids = [];
+		$hostIds = $triggerIds = $mapIds = [];
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$groupids[$selement['elementid']] = true;
+					break;
+
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					$hostIds[$selement['elementid']] = $selement['elementid'];
 					break;
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$groupIds[$selement['elementid']] = $selement['elementid'];
-					break;
+
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					$triggerIds[$selement['elementid']] = $selement['elementid'];
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_MAP:
 					$mapIds[$selement['elementid']] = $selement['elementid'];
 					break;
 			}
 		}
 
-		if (($hostIds && !API::Host()->isReadable($hostIds))
-				|| ($groupIds && !API::HostGroup()->isReadable($groupIds))
+		if (($groupids && !isReadableHostGroups(array_keys($groupids)))
+				|| ($hostIds && !API::Host()->isReadable($hostIds))
 				|| ($triggerIds && !API::Trigger()->isReadable($triggerIds))
 				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

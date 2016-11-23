@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -231,8 +232,10 @@ if (getRequest('only_hostid')) {
 	}
 }
 else {
-	if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']]) ||
-			getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
+	if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']])) {
+		access_deny();
+	}
+	if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 		access_deny();
 	}
 }

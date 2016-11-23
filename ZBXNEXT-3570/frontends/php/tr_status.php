@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['file'] = 'tr_status.php';
 $page['title'] = _('Triggers');
@@ -61,7 +62,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])) {
+if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
 if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {

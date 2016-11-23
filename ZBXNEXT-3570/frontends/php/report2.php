@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
@@ -52,9 +53,13 @@ CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_
  * Permissions
  */
 if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-	if (getRequest('hostgroupid') && !API::HostGroup()->isReadable([$_REQUEST['hostgroupid']])
-			|| getRequest('filter_groupid') && !API::HostGroup()->isReadable([$_REQUEST['filter_groupid']])
-			|| getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
+	if (getRequest('hostgroupid') && !isReadableHostGroups([getRequest('hostgroupid')])) {
+		access_deny();
+	}
+	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
+		access_deny();
+	}
+	if (getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
 		access_deny();
 	}
 	if (getRequest('tpl_triggerid')) {
@@ -69,8 +74,10 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	}
 }
 else {
-	if (getRequest('filter_groupid') && !API::HostGroup()->isReadable([$_REQUEST['filter_groupid']])
-			|| getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
+	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
+		access_deny();
+	}
+	if (getRequest('filter_hostid') && !API::Host()->isReadable([$_REQUEST['filter_hostid']])) {
 		access_deny();
 	}
 }

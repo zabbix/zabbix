@@ -662,10 +662,17 @@ class CCorrelation extends CApiService {
 		}
 
 		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids && !API::HostGroup()->isReadable(array_keys($groupids))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupids) {
+			$groups_count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($groupids)
+			]);
+
+			if ($groups_count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -909,10 +916,17 @@ class CCorrelation extends CApiService {
 		}
 
 		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids && !API::HostGroup()->isReadable(array_keys($groupids))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupids) {
+			$groups_count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($groupids)
+			]);
+
+			if ($groups_count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
