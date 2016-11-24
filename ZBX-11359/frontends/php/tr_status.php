@@ -464,10 +464,15 @@ else {
 	$showHideAllButton = null;
 }
 
+$form = (new CForm('get', 'zabbix.php'))
+	->setName('tr_status')
+	->addVar('backurl', $page['file'])
+	->addVar('acknowledge_type', ZBX_ACKNOWLEDGE_PROBLEM);
+
 if ($config['event_ack_enable']) {
 	$headerCheckBox = (new CColHeader(
 		(new CCheckBox('all_eventids'))
-			->onClick("checkAll('tr_status', 'all_eventids', 'eventids');")
+			->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 else {
@@ -779,13 +784,7 @@ $triggerWidget = (new CWidget())
 		]))
 			->render()
 	)
-	->addItem(
-		(new CForm('get', 'zabbix.php'))
-			->setName('tr_status')
-			->addVar('backurl', $page['file'])
-			->addVar('acknowledge_type', ZBX_ACKNOWLEDGE_PROBLEM)
-			->addItem([$triggerTable, $paging, $footer])
-	)
+	->addItem($form->addItem([$triggerTable, $paging, $footer]))
 	->show();
 
 zbx_add_post_js('jqBlink.blink();');
