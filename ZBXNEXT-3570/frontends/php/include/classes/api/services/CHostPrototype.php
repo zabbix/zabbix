@@ -1027,8 +1027,20 @@ class CHostPrototype extends CHostBase {
 	 * @param array $discoveryRuleIds
 	 */
 	protected function checkDiscoveryRulePermissions(array $discoveryRuleIds) {
-		if (!API::DiscoveryRule()->isWritable($discoveryRuleIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($discoveryRuleIds) {
+			$discoveryRuleIds = array_unique($discoveryRuleIds);
+
+			$count = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'itemids' => $discoveryRuleIds,
+				'editable' => true
+			]);
+
+			if ($count != count($discoveryRuleIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
