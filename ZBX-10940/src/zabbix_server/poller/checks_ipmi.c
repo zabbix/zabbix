@@ -924,7 +924,8 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent=%p sensor:%p op:%d",
+			__function_name, h->ip, h->port, h, ent, sensor, op);
 
 	/* ignore non-readable sensors (e.g. Event-only) */
 	if (0 != ipmi_sensor_get_is_readable(sensor))
@@ -956,7 +957,8 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent=%p control:%p op:%d",
+			__function_name, h->ip, h->port, h, ent, control, op);
 
 	switch (op)
 	{
@@ -985,7 +987,14 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char	entity_name[IPMI_ENTITY_NAME_LEN];
+
+		ipmi_entity_get_name(entity, entity_name, sizeof(entity_name));
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p entity=%p:'%s' op:%d",
+				__function_name, h->ip, h->port, h, domain, entity, entity_name, op);
+	}
 
 	if (op == IPMI_ADDED)
 	{
@@ -1284,8 +1293,8 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 
 	if (0 != (res = ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: [0x%x]", __function_name,
-				res);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: %s", __function_name,
+				zbx_strerror(res));
 	}
 	else if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
 	{
