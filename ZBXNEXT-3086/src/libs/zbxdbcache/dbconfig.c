@@ -9459,9 +9459,13 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
 
 		for (j = 0; j < action->conditions.values_num; j++)
 		{
-			DB_CONDITION	*uniq_condition, *condition = action->conditions.values[j];
+			DB_CONDITION	*uniq_condition = NULL, *condition = action->conditions.values[j];
 
-			if (NULL == (uniq_condition = zbx_hashset_search(&uniq_conditions[action->eventsource],
+			if (EVENT_SOURCE_COUNT <= action->eventsource)
+			{
+				zbx_db_condition_clean(condition);
+			}
+			else if (NULL == (uniq_condition = zbx_hashset_search(&uniq_conditions[action->eventsource],
 					condition)))
 			{
 				uniq_condition = zbx_hashset_insert(&uniq_conditions[action->eventsource],
