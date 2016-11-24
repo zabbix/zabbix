@@ -67,12 +67,12 @@ if (isset($_REQUEST['add'])) {
 		}
 
 		echo '<script type="text/javascript">
-				add_media("'.$_REQUEST['dstfrm'].'",'.
-				$_REQUEST['media'].','.
-				zbx_jsvalue($_REQUEST['mediatypeid']).','.
-				CJs::encodeJson($_REQUEST['sendto']).',"'.
-				$_REQUEST['period'].'",'.
-				$_REQUEST['active'].','.
+				add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
+				CJs::encodeJson($_REQUEST['media']).','.
+				CJs::encodeJson($_REQUEST['mediatypeid']).','.
+				CJs::encodeJson($_REQUEST['sendto']).','.
+				CJs::encodeJson($_REQUEST['period']).','.
+				CJs::encodeJson($_REQUEST['active']).','.
 				$severity.');'.
 				'</script>';
 	}
