@@ -81,7 +81,7 @@ else {
 		access_deny();
 	}
 }
-if (getRequest('triggerid') && !API::Trigger()->isReadable([$_REQUEST['triggerid']])) {
+if (getRequest('triggerid') && !isReadableTriggers([getRequest('triggerid')])) {
 	access_deny();
 }
 

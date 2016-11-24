@@ -337,29 +337,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * Check if user has read permissions for given icon map IDs.
-	 * @param $ids
-	 * @return bool
-	 */
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'iconmapids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
 	 * Check if user has write permissions for given icon map IDs.
 	 * @param $ids
 	 * @return bool

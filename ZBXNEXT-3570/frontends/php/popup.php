@@ -239,8 +239,15 @@ else {
 		access_deny();
 	}
 }
-if (getRequest('parent_discoveryid') && !API::DiscoveryRule()->isReadable([$_REQUEST['parent_discoveryid']])) {
-	access_deny();
+if (getRequest('parent_discoveryid')) {
+	$lld_rules = API::DiscoveryRule()->get([
+		'output' => [],
+		'itemids' => getRequest('parent_discoveryid')
+	]);
+
+	if (!$lld_rules) {
+		access_deny();
+	}
 }
 
 $dstfrm = getRequest('dstfrm', ''); // destination form

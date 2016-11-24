@@ -728,8 +728,17 @@ class CTrigger extends CTriggerGeneral {
 			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
 
-		if (!$this->isReadable($depTtriggerIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($depTtriggerIds) {
+			$count = $this->get([
+				'countOutput' => true,
+				'triggerids' => $depTtriggerIds
+			]);
+
+			if ($count != count($depTtriggerIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$this->checkDependencies($triggers);
@@ -1129,27 +1138,6 @@ class CTrigger extends CTriggerGeneral {
 				_s('Duplicate dependencies in trigger "%1$s".', $dplTrigger['description'])
 			);
 		}
-	}
-
-	/**
-	 * Check if user has read permissions for triggers.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'triggerids' => $ids,
-			'countOutput' => true
-		]);
-
-		return count($ids) == $count;
 	}
 
 	/**

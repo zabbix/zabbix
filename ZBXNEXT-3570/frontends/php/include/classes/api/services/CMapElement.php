@@ -94,7 +94,9 @@ abstract class CMapElement extends CApiService {
 
 		$groupids = [];
 		$hostids = [];
-		$triggerIds = $mapIds = [];
+		$triggerids = [];
+		$sysmapids = [];
+
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -106,22 +108,19 @@ abstract class CMapElement extends CApiService {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$triggerIds[$selement['elementid']] = $selement['elementid'];
+					$triggerids[$selement['elementid']] = true;
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$mapIds[$selement['elementid']] = $selement['elementid'];
+					$sysmapids[$selement['elementid']] = true;
 					break;
 			}
 		}
 
 		$this->checkHostGroupsPermissions(array_keys($groupids));
 		$this->checkHostsPermissions(array_keys($hostids));
-
-		if (($triggerIds && !API::Trigger()->isReadable($triggerIds))
-				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkTriggersPermissions(array_keys($triggerids));
+		$this->checkMapsPermissions(array_keys($sysmapids));
 	}
 
 	/**
@@ -149,7 +148,7 @@ abstract class CMapElement extends CApiService {
 	/**
 	 * Checks if the current user has access to the given hosts.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given host
+	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
 	 * @param array $hostids
 	 */
@@ -161,6 +160,50 @@ abstract class CMapElement extends CApiService {
 			]);
 
 			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given triggers.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given triggers
+	 *
+	 * @param array $triggerids
+	 */
+	private function checkTriggersPermissions(array $triggerids) {
+		if ($triggerids) {
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given maps.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given maps
+	 *
+	 * @param array $sysmapids
+	 */
+	private function checkMapsPermissions(array $sysmapids) {
+		if ($sysmapids) {
+			$count = API::Map()->get([
+				'countOutput' => true,
+				'sysmapids' => $sysmapids
+			]);
+
+			if ($count != count($sysmapids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);

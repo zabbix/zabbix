@@ -982,26 +982,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Returns true if all of the given objects are available for reading.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'countOutput' => true
-		]);
-		return count($ids) == $count;
-	}
-
-	/**
 	 * Returns true if all of the given objects are available for writing.
 	 *
 	 * @param $ids

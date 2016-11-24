@@ -450,7 +450,12 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// check if the given discovery rules exist
-		if (!$this->isReadable($data['discoveryids'])) {
+		$count = $this->get([
+			'itemids' => $data['discoveryids'],
+			'countOutput' => true
+		]);
+
+		if ($count != count($data['discoveryids'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -485,32 +490,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->inherit($items, $data['hostids']);
 
 		return true;
-	}
-
-	/**
-	 * Returns true if the given discovery rules exists and are available for
-	 * reading.
-	 *
-	 * @param array $ids	An array if item IDs
-	 *
-	 * @return bool
-	 */
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		elseif (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'itemids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
 	}
 
 	/**

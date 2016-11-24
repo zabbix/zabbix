@@ -452,28 +452,6 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check if user has read permissions for proxy.
-	 *
-	 * @param array $proxyIds
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $proxyIds) {
-		if (empty($proxyIds)) {
-			return true;
-		}
-
-		$proxyIds = array_unique($proxyIds);
-
-		$count = $this->get([
-			'proxyids' => $proxyIds,
-			'countOutput' => true
-		]);
-
-		return (count($proxyIds) == $count);
-	}
-
-	/**
 	 * Check if user has write permissions for proxy.
 	 *
 	 * @param array $proxyIds
