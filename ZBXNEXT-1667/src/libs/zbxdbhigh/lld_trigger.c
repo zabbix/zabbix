@@ -1025,7 +1025,6 @@ static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *
 	size_t	length;
 	char	err[64];
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "e [%s]", e);
 	if (FAIL == zbx_function_validate_parameters(e, &length))
 	{
 		*error = zbx_dsprintf(*error, "Invalid parameter \"%s\"", e);
