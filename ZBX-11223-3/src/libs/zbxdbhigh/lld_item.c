@@ -749,7 +749,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		if (0 != strcmp(item->key_proto, key_proto))
 		{
-			buffer = zbx_strdup(NULL, key_proto);
+			buffer = zbx_strdup(buffer, key_proto);
 
 			if (SUCCEED == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
 				sizeof(err)))
