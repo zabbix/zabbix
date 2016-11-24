@@ -26,6 +26,7 @@ function get_last_event_by_triggerid($triggerId) {
 		' WHERE e.objectid='.zbx_dbstr($triggerId).
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.value='.TRIGGER_VALUE_TRUE.
 		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
 		1
 	));
