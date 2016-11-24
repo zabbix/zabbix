@@ -227,6 +227,42 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 
 /******************************************************************************
  *                                                                            *
+ * Function: quote_string                                                     *
+ *                                                                            *
+ * Purpose: quotes string by enclosing it in double quotes and escaping       *
+ *          double quotes inside string with '\'.                             *
+ *                                                                            *
+ * Parameters: str    - [IN/OUT] the string to quote                          *
+ *             sz_str - [IN] the string length                                *
+ *                                                                            *
+ * Comments: The '\' character itself is not quoted. As the result if string  *
+ *           ends with '\' it can be quoted (for example for error messages), *
+ *           but it's impossible to unquote it.                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	quote_string(char **str, size_t sz_src)
+{
+	size_t	sz_dst;
+
+	sz_dst = zbx_get_escape_string_len(*str, "\"") + 3;
+
+	*str = zbx_realloc(*str, sz_dst);
+
+	(*str)[--sz_dst] = '\0';
+	(*str)[--sz_dst] = '"';
+
+	while (0 < sz_src)
+	{
+		(*str)[--sz_dst] = (*str)[--sz_src];
+
+		if ('"' == (*str)[sz_src])
+			(*str)[--sz_dst] = '\\';
+	}
+	(*str)[--sz_dst] = '"';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: aggregate_quote_groups                                           *
  *                                                                            *
  * Purpose: quotes the individual groups in the list if necessary             *
@@ -247,7 +283,7 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
 		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
 		separator = ", ";
 
-		quote_key_param(&group, 1);
+		quote_string(&group, strlen(group));
 		zbx_strcpy_alloc(str, str_alloc, str_offset, group);
 		zbx_free(group);
 	}
@@ -303,7 +339,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 
 	if (0 == groupids.values_num)
 	{
-		zbx_strcpy_alloc(error, &error_offset, &error_alloc, "No groups in list ");
+		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "No groups in list ");
 		goto out;
 	}
 
@@ -337,7 +373,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 
 	if (0 == itemids->values_num)
 	{
-		zbx_strcpy_alloc(error, &error_offset, &error_alloc, "No items for key \"%s\" in group(s) ");
+		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "No items for key \"%s\" in group(s) ");
 		goto out;
 	}
 
@@ -348,8 +384,8 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 out:
 	if (FAIL == ret)
 	{
-		aggregate_quote_groups(error, &error_offset, &error_alloc, groups);
-		zbx_chrcpy_alloc(error, &error_offset, &error_alloc, '.');
+		aggregate_quote_groups(error, &error_alloc, &error_offset, groups);
+		zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '.');
 	}
 
 	zbx_vector_uint64_destroy(&groupids);
