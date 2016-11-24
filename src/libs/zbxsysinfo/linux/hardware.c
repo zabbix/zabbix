@@ -105,7 +105,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
 	zbx_stat_t	file_buf;
 
-	if (-1 != zbx_stat(SYS_TABLE_FILE, &file_buf) && -1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
+	if (-1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)) && -1 != fstat(fd, &file_buf))
 	{
 		smbuf = zbx_malloc(NULL, file_buf.st_size);
 
