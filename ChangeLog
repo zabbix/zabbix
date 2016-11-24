@@ -26,6 +26,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11359] fixed event acknowledgement in triggers list view when last event is a recovery event (Gunars)
 ..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
 ..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
 ..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
