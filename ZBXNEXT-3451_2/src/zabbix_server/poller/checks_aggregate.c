@@ -246,7 +246,7 @@ static void	quote_string(char **str, size_t sz_src)
 
 	sz_dst = zbx_get_escape_string_len(*str, "\"") + 3;
 
-	*str = realloc(*str, sz_dst);
+	*str = zbx_realloc(*str, sz_dst);
 
 	(*str)[--sz_dst] = '\0';
 	(*str)[--sz_dst] = '"';
