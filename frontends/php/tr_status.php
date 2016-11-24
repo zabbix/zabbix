@@ -269,7 +269,7 @@ $paging = getPagingLine($triggers, $sortOrder, $url);
 $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'comments',
-		'error', 'state', 'recovery_mode'
+		'error', 'state', 'recovery_mode', 'recovery_expression'
 	],
 	'selectHosts' => ['hostid', 'name', 'status'],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
