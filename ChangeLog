@@ -5,10 +5,11 @@ New features:
 ..F....PS. [ZBXNEXT-2970] increased maximum supported SNMP trapper file size (vso)
 .....J.... [ZBXNEXT-1141] added support for AtomicBoolean, AtomicInteger, and AtomicLong to Java gateway (asaveljevs)
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
-A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Sasha, viktors)
+A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
@@ -25,7 +26,11 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
-..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
+...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
+..F....... [ZBX-11359] fixed event acknowledgement in triggers list view when last event is a recovery event (Gunars)
+..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
+..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 ........S. [ZBX-11440] fixed memory leak when resolving simple macros (vso)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
@@ -261,8 +266,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.6rc1
 
 New features:
-..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
-A......... [ZBX-11483] improved API script.execute validation (Oleg)
 .......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
 ........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
@@ -270,8 +273,13 @@ A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
+..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
+..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
 A.F.....S. [ZBX-11347] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters for items without interface (asaveljevs, Ivo, Sasha)
 ..F....... [ZBX-11475] fixed copying sharing properties while cloning screen or network maps (Cemeris)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
@@ -1811,7 +1819,9 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
-..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
+...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
 A......... [ZBX-11483] improved API script.execute validation (Oleg)
@@ -3303,7 +3313,8 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
-..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)

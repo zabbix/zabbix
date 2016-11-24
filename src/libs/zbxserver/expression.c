@@ -4967,7 +4967,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		goto out;
 	}
 
-	for (p = e; p - e < len ; p += sep_pos + 1)
+	for (p = e; p < len + e ; p += sep_pos + 1)
 	{
 		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
