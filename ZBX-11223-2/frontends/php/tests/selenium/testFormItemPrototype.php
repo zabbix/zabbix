@@ -1337,6 +1337,9 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestAssertVisibleId('update');
 			$this->zbxTestAssertElementValue('update', 'Update');
 		}
+		elseif (isset($templateid)) {
+			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
+		}
 		else {
 			$this->zbxTestAssertElementNotPresentId('delete');
 		}

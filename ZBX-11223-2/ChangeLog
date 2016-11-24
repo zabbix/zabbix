@@ -8,6 +8,18 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
+..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
+..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
+...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
+........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
+A.F.....S. [ZBX-11347] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters for items without interface (asaveljevs, Ivo, Sasha)
+..F....... [ZBX-11475] fixed copying sharing properties while cloning screen or network maps (Cemeris)
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
+..F....... [ZBX-11195] fixed icon mapping visual issues in edit form (Oleg, Pavel)
+..F....... [ZBX-11390] fixed error hint displaying (Oleg)
 ..F....... [ZBX-11246] added disabled "delete" button for edit forms of templated item, item prototype, web scenario and discovery rule (Cemeris)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
 A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
@@ -1542,6 +1554,14 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
+...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
+........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
+A.F.....S. [ZBX-11347] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters for items without interface (asaveljevs, Ivo, Sasha)
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ........S. [ZBX-11223] rewritten calculated item formula parsing, simple macro parsing and LLD macro parsing; fixed several problems with function parsing (gleb, Sergejs)
 A......... [ZBX-11121] disallowed leaving user without linked user groups with usergroup.update, usergroup.massupdate, usergroup.delete API methods (Cemeris)
 ...G...... [ZBX-11292] fixed getting network interface statistics on Oracle Solaris 10/11 (Andris)
@@ -3028,6 +3048,10 @@ Changes for 2.0.20rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
+A......... [ZBX-11483] improved API script.execute validation (Oleg)
+...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)
 
 --------------------------------------------------------------------------------
