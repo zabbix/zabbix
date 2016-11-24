@@ -577,7 +577,7 @@ foreach ($triggers as $trigger) {
 				$trigger['last_problem_eventid']
 			);
 
-			$ackColumn = [
+			$ack_column = [
 				(new CLink(
 					($trigger['event_count'] != 0) ? _('No') : _('Yes'),
 					'zabbix.php?action=acknowledge.edit'.
@@ -590,17 +590,17 @@ foreach ($triggers as $trigger) {
 			];
 
 			if ($trigger['event_count'] != 0) {
-				$ackColumn[] = CViewHelper::showNum($trigger['event_count']);
+				$ack_column[] = CViewHelper::showNum($trigger['event_count']);
 			}
 		}
 		else {
 			$ack_checkbox = '';
-			$ackColumn = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
+			$ack_column = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 	else {
 		$ack_checkbox = null;
-		$ackColumn = null;
+		$ack_column = null;
 	}
 
 	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
@@ -647,7 +647,7 @@ foreach ($triggers as $trigger) {
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
-		$ackColumn,
+		$ack_column,
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
 		$comments
