@@ -439,52 +439,29 @@ class CProxy extends CApiService {
 	 *  - cannot delete proxy if it is used to monitor host
 	 *  - cannot delete proxy if it is used in discovery rule
 	 *
-	 * @param array $proxyIds
+	 * @param array $proxyids
 	 */
-	protected function validateDelete(array $proxyIds) {
-		if (empty($proxyIds)) {
+	protected function validateDelete(array $proxyids) {
+		if (empty($proxyids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($proxyIds);
-		$this->checkUsedInDiscoveryRule($proxyIds);
-		$this->checkUsedForMonitoring($proxyIds);
-	}
-
-	/**
-	 * Check if user has write permissions for proxy.
-	 *
-	 * @param array $proxyIds
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $proxyIds) {
-		if (empty($proxyIds)) {
-			return true;
-		}
-
-		$proxyIds = array_unique($proxyIds);
-
-		$count = $this->get([
-			'proxyids' => $proxyIds,
-			'editable' => true,
-			'countOutput' => true
+		$db_proxies = $this->get([
+			'output' => [],
+			'proxyids' => $proxyids,
+			'preservekeys' => true
 		]);
 
-		return (count($proxyIds) == $count);
-	}
-
-	/**
-	 * Checks if the given proxies are editable.
-	 *
-	 * @param array $proxyIds	proxy IDs to check
-	 *
-	 * @throws APIException		if the user has no permissions to edit proxies or a proxy does not exist
-	 */
-	protected function checkPermissions(array $proxyIds) {
-		if (!$this->isWritable($proxyIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		foreach ($proxyids as $proxyid) {
+			if (!array_key_exists($proxyid, $db_proxies)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
+
+		$this->checkUsedInDiscoveryRule($proxyids);
+		$this->checkUsedForMonitoring($proxyids);
 	}
 
 	/**

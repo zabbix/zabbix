@@ -2695,12 +2695,9 @@ class CAction extends CApiService {
 				_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
 			);
 		}
-		if (!API::Proxy()->isWritable($proxyIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-			);
-		}
+		$this->checkProxiesPermissions($proxyIdsAll,
+			_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
+		);
 	}
 
 	/**
@@ -2768,6 +2765,30 @@ class CAction extends CApiService {
 			]);
 
 			if ($count != count($usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given proxies.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given proxies
+	 *
+	 * @param array  $proxyids
+	 * @param string $error
+	 */
+	protected function checkProxiesPermissions(array $proxyids, $error) {
+		if ($proxyids) {
+			$proxyids = array_unique($proxyids);
+
+			$count = API::Proxy()->get([
+				'countOutput' => true,
+				'proxyids' => $proxyids,
+				'editable' => true
+			]);
+
+			if ($count != count($proxyids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}
