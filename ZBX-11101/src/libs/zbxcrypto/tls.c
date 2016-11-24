@@ -5277,11 +5277,17 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #endif
 #if defined(HAVE_POLARSSL)
 	int	res;
+#elif defined(HAVE_GNUTLS)
+	ssize_t	res;
+#elif defined(HAVE_OPENSSL)
+	int	res;
+#endif
 
 #if defined(_WINDOWS)
 	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
+#if defined(HAVE_POLARSSL)
 	do
 	{
 		res = ssl_read(s->tls_ctx->ctx, (unsigned char *)buf, len);
@@ -5310,12 +5316,6 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 	return (ssize_t)res;
 #elif defined(HAVE_GNUTLS)
-	ssize_t	res;
-
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 	do
 	{
 		res = gnutls_record_recv(s->tls_ctx->ctx, buf, len);
@@ -5343,12 +5343,6 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 	return res;
 #elif defined(HAVE_OPENSSL)
-	int	res;
-
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 	if (0 >= (res = SSL_read(s->tls_ctx->ctx, buf, (int)len)))
 	{
 		/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
