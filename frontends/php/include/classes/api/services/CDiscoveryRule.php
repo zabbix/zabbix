@@ -493,33 +493,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Returns true if the given discovery rules exists and are available for
-	 * writing.
-	 *
-	 * @param array $ids	An array if item IDs
-	 *
-	 * @return bool
-	 */
-	public function isWritable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		elseif (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'itemids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
 	 * Copies all of the triggers from the source discovery to the target discovery rule.
 	 *
 	 * @throws APIException if trigger saving fails
