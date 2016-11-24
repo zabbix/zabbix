@@ -270,6 +270,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
 ..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
 ..F....... [DEV-554] fixed possible XSS in media popup (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
