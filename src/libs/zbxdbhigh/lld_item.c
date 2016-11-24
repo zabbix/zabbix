@@ -565,7 +565,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		/* substitute LLD macros in function parameters */
 
-		for (p = e + par_l + 1; p - e < par_r ; p += sep_pos + 1)
+		for (p = e + par_l + 1; p < e + par_r; p += sep_pos + 1)
 		{
 			size_t	param_pos, param_len;
 			int	quoted;
@@ -582,7 +582,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 			zbx_free(param);
 			param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
-			if (p - e == par_l + 1)
+			if (p == e + par_l + 1)
 			{
 				char	*key = NULL, *host = NULL;
 
@@ -650,14 +650,14 @@ out:
 	return ret;
 }
 
-static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
+static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
 		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
 		unsigned char type, struct zbx_json_parse *jp_row, char **error)
 {
 	const char	*__function_name = "lld_make_item";
 
 	char		*buffer = NULL, err[MAX_STRING_LEN];
-	int		ret = FAIL, i;
+	int		i;
 	zbx_lld_item_t	*item = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -670,8 +670,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 			continue;
 
 		buffer = zbx_strdup(buffer, item->key_proto);
-		if (FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
-			goto out;
+
+		if (SUCCEED != substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0))
+			continue;
 
 		if (0 == strcmp(item->key, buffer))
 			break;
@@ -680,6 +681,7 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 	if (i == items->values_num)	/* no item found */
 	{
 		item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
+		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
 		item->itemid = 0;
 		item->lastcheck = 0;
@@ -694,10 +696,10 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 		item->key = zbx_strdup(NULL, key_proto);
 		item->key_orig = NULL;
 
-		if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
-				err, sizeof(err)))
+		if (SUCCEED != substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
+				sizeof(err)))
 		{
-			goto out;
+			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 		}
 
 		item->params = zbx_strdup(NULL, params_proto);
@@ -705,8 +707,11 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 
 		if (ITEM_TYPE_CALCULATED == type)
 		{
-			if (FAIL == substitute_formula_macros(&item->params, jp_row, err, sizeof(err)))
-				goto out;
+			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) &&
+					SUCCEED != substitute_formula_macros(&item->params, jp_row, err, sizeof(err)))
+			{
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			}
 		}
 		else
 			substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -724,9 +729,14 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 		zbx_lrtrim(item->description, ZBX_WHITESPACE);
 
 		zbx_vector_uint64_create(&item->new_applicationids);
-		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
-		zbx_vector_ptr_append(items, item);
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
+			*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
+			lld_item_free(item);
+		}
+		else
+			zbx_vector_ptr_append(items, item);
 	}
 	else
 	{
@@ -743,34 +753,51 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 
 		if (0 != strcmp(item->key_proto, key_proto))
 		{
-			item->key_orig = item->key;
-			item->key = zbx_strdup(NULL, key_proto);
-			if (FAIL == substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY,
-					err, sizeof(err)))
-			{
-				goto out;
-			}
+			buffer = zbx_strdup(buffer, key_proto);
 
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
+			if (SUCCEED == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
+				sizeof(err)))
+			{
+				item->key_orig = item->key;
+				item->key = buffer;
+				buffer = NULL;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
+			}
+			else
+				*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 		}
 
 		buffer = zbx_strdup(buffer, params_proto);
 
 		if (ITEM_TYPE_CALCULATED == type)
 		{
-			if (FAIL == substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
-				goto out;
+			if (SUCCEED == substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
+			{
+				zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+				if (0 != strcmp(item->params, buffer))
+				{
+					item->params_orig = item->params;
+					item->params = buffer;
+					buffer = NULL;
+					item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
+				}
+			}
+			else
+				*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 		}
 		else
-			substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->params, buffer))
 		{
-			item->params_orig = item->params;
-			item->params = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
+			substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+			if (0 != strcmp(item->params, buffer))
+			{
+				item->params_orig = item->params;
+				item->params = buffer;
+				buffer = NULL;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
+			}
 		}
 
 		buffer = zbx_strdup(buffer, snmp_oid_proto);
@@ -800,19 +827,9 @@ static int	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const 
 
 	item->jp_row = jp_row;
 
-	ret = SUCCEED;
-out:
-	if (FAIL == ret)
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: %s.\n",
-				(i == items->values_num ? "create" : "update"), err);
-	}
-
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
 }
 
 static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
