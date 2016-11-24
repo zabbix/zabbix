@@ -4966,7 +4966,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
 
-		zbx_function_param_parse(p, rel_len, &param_pos, &param_len, &sep_pos);
+		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);

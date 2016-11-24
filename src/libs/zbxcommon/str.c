@@ -3564,39 +3564,38 @@ static int	function_parse_name(const char *expr, size_t *length)
  * Purpose: parses function parameter                                         *
  *                                                                            *
  * Parameters: expr      - [IN] pre-validated function parameter list         *
- *             len       - [IN] length of parameter list                      *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length including trailing      *
  *                               whitespace for unquoted parameter            *
  *             sep_pos   - [OUT] the parameter separator character            *
- *                               (',') position or ('\0') position if         *
- *                               null terminated                              *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_function_param_parse(const char *expr, size_t len, size_t *param_pos, size_t *length, size_t *sep_pos)
+void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
 	const char	*ptr = expr;
 
 	/* skip the leading whitespace */
-	while (len > ptr - expr && ' ' == *ptr)
+	while (' ' == *ptr)
 		ptr++;
 
 	*param_pos = ptr - expr;
 
 	if ('"' == *ptr)	/* quoted parameter */
 	{
-		for (ptr++; len > ptr - expr && ('"' != *ptr || '\\' == *(ptr - 1)); ptr++)
+		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
 			;
 
 		*length = ++ptr - expr - *param_pos;
 
 		/* skip trailing whitespace to find the next parameter */
-		while (len > ptr - expr && ' ' == *ptr)
+		while (' ' == *ptr)
 			ptr++;
 	}
 	else	/* unquoted parameter */
 	{
-		for (ptr = expr; len > ptr - expr && ',' != *ptr; ptr++)
+		for (ptr = expr; '\0' != *ptr && ')' != *ptr && ',' != *ptr; ptr++)
 			;
 
 		*length = ptr - expr - *param_pos;
