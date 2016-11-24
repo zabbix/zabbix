@@ -1683,16 +1683,23 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
  *             uniq_conditions - [IN/OUT] conditions that will be checked and *
  *                                        updated with result                 *
  *                                                                            *
+ * Return value: SICCESS if valid event source, otherwise FAIL                *
+ *                                                                            *
  ******************************************************************************/
-static void	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
+static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
 {
 	zbx_hashset_iter_t	iter;
 	DB_CONDITION		*condition;
+
+	if (EVENT_SOURCE_COUNT <= (unsigned char)event->source)
+		return FAIL;
 
 	zbx_hashset_iter_reset(&uniq_conditions[event->source], &iter);
 
 	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
 		condition->condition_result = check_action_condition(event, condition);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1752,30 +1759,31 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			continue;
 		}
 
-		check_event_conditions(event, uniq_conditions);
-
-		for (j = 0; j < actions.values_num; j++)
+		if (SUCCEED == check_event_conditions(event, uniq_conditions))
 		{
-			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
-
-			if (action->eventsource != event->source)
-				continue;
-
-			if (SUCCEED == check_action_conditions(event, action))
+			for (j = 0; j < actions.values_num; j++)
 			{
-				zbx_escalation_new_t	*new_escalation;
+				zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
 
-				/* command and message operations handled by escalators even for    */
-				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
-				new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
-				new_escalation->actionid = action->actionid;
-				new_escalation->event = event;
-				zbx_vector_ptr_append(&new_escalations, new_escalation);
+				if (action->eventsource != event->source)
+					continue;
 
-				if (EVENT_SOURCE_DISCOVERY == event->source ||
-						EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+				if (SUCCEED == check_action_conditions(event, action))
 				{
-					execute_operations(event, action->actionid);
+					zbx_escalation_new_t	*new_escalation;
+
+					/* command and message operations handled by escalators even for    */
+					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
+					new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+					new_escalation->actionid = action->actionid;
+					new_escalation->event = event;
+					zbx_vector_ptr_append(&new_escalations, new_escalation);
+
+					if (EVENT_SOURCE_DISCOVERY == event->source ||
+							EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+					{
+						execute_operations(event, action->actionid);
+					}
 				}
 			}
 		}
