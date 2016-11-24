@@ -575,24 +575,6 @@ abstract class CItemGeneral extends CApiService {
 		return $matchingInterface;
 	}
 
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'itemids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	public function isWritable($ids) {
 		if (!is_array($ids)) {
 			return false;

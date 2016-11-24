@@ -838,28 +838,6 @@ class CDRule extends CApiService {
 	}
 
 	/**
-	 * Check if user has read permissions for discovery rule.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'druleids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
 	 * Check if user has write permissions for discovery rule.
 	 *
 	 * @param array $ids

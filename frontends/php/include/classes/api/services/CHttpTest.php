@@ -810,28 +810,6 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * Check if user has read permissions on http test with given ids.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'httptestids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
 	 * Check if user has write permissions on http test with given ids.
 	 *
 	 * @param array $ids

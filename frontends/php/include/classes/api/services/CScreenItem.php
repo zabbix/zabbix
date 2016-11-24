@@ -395,31 +395,6 @@ class CScreenItem extends CApiService {
 	}
 
 	/**
-	 * Returns true if the given screen items exist and are available for reading.
-	 *
-	 * @param array $screenItemIds
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $screenItemIds) {
-		if (!is_array($screenItemIds)) {
-			return false;
-		}
-		elseif (empty($screenItemIds)) {
-			return true;
-		}
-
-		$screenItemIds = array_unique($screenItemIds);
-
-		$count = $this->get([
-			'screenitemids' => $screenItemIds,
-			'countOutput' => true
-		]);
-
-		return (count($screenItemIds) == $count);
-	}
-
-	/**
 	 * Returns true if the given screen items exist and are available for writing.
 	 *
 	 * @param array $screenItemIds	An array if screen item IDs

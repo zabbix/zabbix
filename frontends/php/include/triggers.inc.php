@@ -2157,3 +2157,17 @@ function makeTriggersHostsList(array $triggers_hosts) {
 
 	return $triggers_hosts;
 }
+
+/**
+ * Check if user has read permissions for triggers.
+ *
+ * @param $triggerids
+ *
+ * @return bool
+ */
+function isReadableTriggers(array $triggerids) {
+	return count($triggerids) == API::Trigger()->get([
+		'triggerids' => $triggerids,
+		'countOutput' => true
+	]);
+}

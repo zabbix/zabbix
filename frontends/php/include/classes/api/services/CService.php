@@ -654,13 +654,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * Returns true if all of the given objects are available for reading.
+	 * Returns true if all of the given objects are available for writing.
 	 *
 	 * @param $ids
 	 *
 	 * @return bool
 	 */
-	public function isReadable(array $ids) {
+	public function isWritable(array $ids) {
 		if (empty($ids)) {
 			return true;
 		}
@@ -671,17 +671,6 @@ class CService extends CApiService {
 			'countOutput' => true
 		]);
 		return count($ids) == $count;
-	}
-
-	/**
-	 * Returns true if all of the given objects are available for writing.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		return $this->isReadable($ids);
 	}
 
 	/**
@@ -1007,14 +996,24 @@ class CService extends CApiService {
 	 * @param array $services
 	 */
 	protected function checkTriggerPermissions(array $services) {
-		$triggerIds = [];
+		$triggerids = [];
 		foreach ($services as $service) {
 			if (!empty($service['triggerid'])) {
-				$triggerIds[] = $service['triggerid'];
+				$triggerids[$service['triggerid']] = true;
 			}
 		}
-		if (!API::Trigger()->isReadable($triggerIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+
+		if ($triggerids) {
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => array_keys($triggerids)
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -1023,11 +1022,22 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException if at least one of the services doesn't exist
 	 *
-	 * @param array $serviceIds
+	 * @param array $serviceids
 	 */
-	protected function checkServicePermissions(array $serviceIds) {
-		if (!$this->isReadable($serviceIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkServicePermissions(array $serviceids) {
+		if ($serviceids) {
+			$serviceids = array_unique($serviceids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'serviceids' => $serviceids
+			]);
+
+			if ($count != count($serviceids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
