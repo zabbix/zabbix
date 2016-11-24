@@ -4961,6 +4961,12 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (0 == len)
+	{
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, "");
+		goto out;
+	}
+
 	for (p = e; p - e < len ; p += sep_pos + 1)
 	{
 		size_t	param_pos, param_len, rel_len = len - (p - e);
