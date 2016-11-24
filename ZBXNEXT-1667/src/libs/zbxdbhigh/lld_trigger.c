@@ -1025,8 +1025,7 @@ static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *
 	size_t	length;
 	char	err[64];
 
-	*exp = NULL;
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "e [%s]", e);
 	if (FAIL == zbx_function_validate_parameters(e, &length))
 	{
 		*error = zbx_dsprintf(*error, "Invalid parameter \"%s\"", e);
@@ -1037,7 +1036,6 @@ static int	lld_parameter_make(const char *e, char **exp, struct zbx_json_parse *
 			err, sizeof(err))))
 	{
 		*error = zbx_strdup(*error, err);
-		zbx_free(*exp);
 	}
 
 	return ret;
@@ -1048,7 +1046,7 @@ static int	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_
 {
 	int			i, ret;
 	zbx_lld_function_t	*function = NULL;
-	char			*proto_parameter;
+	char			*proto_parameter = NULL;
 
 	for (i = 0; i < functions->values_num; i++)
 	{
