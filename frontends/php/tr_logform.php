@@ -72,8 +72,16 @@ if (getRequest('itemid')) {
 	}
 }
 
-if (getRequest('triggerid') && !API::Trigger()->isWritable([$_REQUEST['triggerid']])) {
-	access_deny();
+if (getRequest('triggerid')) {
+	$triggers = API::Trigger()->get([
+		'output' => [],
+		'triggerids' => getRequest('triggerid'),
+		'editable' => true
+	]);
+
+	if (!$triggers) {
+		access_deny();
+	}
 }
 
 $itemid = getRequest('itemid', 0);

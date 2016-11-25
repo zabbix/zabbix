@@ -2677,12 +2677,9 @@ class CAction extends CApiService {
 				_('Incorrect action condition template. Template does not exist or you have no access to it.')
 			);
 		}
-		if (!API::Trigger()->isWritable($triggerIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
-			);
-		}
+		$this->checkTriggersPermissions($triggerIdsAll,
+			_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
+		);
 		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -2770,6 +2767,29 @@ class CAction extends CApiService {
 		}
 	}
 
+	/**
+	 * Checks if the current user has access to the given triggers.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given triggers
+	 *
+	 * @param array  $triggerids
+	 * @param string $error
+	 */
+	protected function checkTriggersPermissions(array $triggerids, $error) {
+		if ($triggerids) {
+			$triggerids = array_unique($triggerids);
+
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids,
+				'editable' => true
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
 	/**
 	 * Checks if the current user has access to the given proxies.
 	 *
