@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+........S. [ZBXNEXT-1667] added support of LLD macros in function parameters of trigger prototype expression, name, description and tags, and in function parameters of graph prototype name (vso)
 ..F....... [ZBXNEXT-707] implemented full clone functionality for all types of screens (Cemeris)
 ..F....PS. [ZBXNEXT-2970] increased maximum supported SNMP trapper file size (vso)
 .....J.... [ZBXNEXT-1141] added support for AtomicBoolean, AtomicInteger, and AtomicLong to Java gateway (asaveljevs)
