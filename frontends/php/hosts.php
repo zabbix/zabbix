@@ -125,8 +125,16 @@ check_fields($fields);
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		access_deny();
+	}
 }
 
 $hostIds = getRequest('hosts', []);

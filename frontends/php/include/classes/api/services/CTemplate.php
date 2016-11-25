@@ -680,6 +680,31 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 *
+	 * @param array $hostids    an array of host or template IDs
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 */
+	protected function checkHostPermissions(array $hostids) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
 	 * Additionally allows to link templates to hosts and other templates.
 	 *
 	 * Checks write permissions for templates.
@@ -701,11 +726,7 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
 			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
-			if (!API::Host()->isWritable($hostIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+			$this->checkHostPermissions($hostIds);
 
 			// check if any of the hosts are discovered
 			$this->checkValidator($hostIds, new CHostNormalValidator([
@@ -1038,7 +1059,7 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$templateids = zbx_toArray($data['templateids']);
 
-		$this->checkPermissions($templateIds, _('You do not have permission to perform this operation.'));
+		$this->checkPermissions($templateids, _('You do not have permission to perform this operation.'));
 
 		if (isset($data['hostids'])) {
 			// check if any of the hosts are discovered

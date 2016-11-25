@@ -420,6 +420,39 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
+	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 *
+	 * @param array $hostids    an array of host or template IDs
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 */
+	protected function checkHostPermissions(array $hostids) {
+		if ($hostids) {
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
 	 * Validate web scenario parameters for create method.
 	 *  - check if web scenario with same name already exists
 	 *  - check if web scenario has at least one step
@@ -428,6 +461,7 @@ class CHttpTest extends CApiService {
 	 */
 	protected function validateCreate(array $httpTests) {
 		$required_fields = ['name', 'hostid', 'steps'];
+		$hostids = [];
 
 		foreach ($httpTests as $httpTest) {
 			$missing_keys = array_diff($required_fields, array_keys($httpTest));
@@ -437,12 +471,11 @@ class CHttpTest extends CApiService {
 					_s('Web scenario missing parameters: %1$s', implode(', ', $missing_keys))
 				);
 			}
+
+			$hostids[$httpTest['hostid']] = true;
 		}
 
-		$hostIds = zbx_objectValues($httpTests, 'hostid');
-		if (!API::Host()->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkHostPermissions(array_keys($hostids));
 
 		foreach ($httpTests as $httpTest) {
 			if (zbx_empty($httpTest['name'])) {

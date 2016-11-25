@@ -1671,11 +1671,9 @@ class CAction extends CApiService {
 		$this->checkHostGroupsPermissions($all_groupids, _(
 			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
 		));
-		if ($all_hostids && !API::Host()->isWritable($all_hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation host. Host does not exist or you have no access to this host.'
-			));
-		}
+		$this->checkHostsPermissions($all_hostids,
+			_('Incorrect action operation host. Host does not exist or you have no access to this host.')
+		);
 		$this->checkUsersPermissions($all_userids,
 			_('Incorrect action operation user. User does not exist or you have no access to this user.')
 		);
@@ -2665,12 +2663,9 @@ class CAction extends CApiService {
 		$this->checkHostGroupsPermissions($hostGroupIdsAll,
 			_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
 		);
-		if (!API::Host()->isWritable($hostIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition host. Host does not exist or you have no access to it.')
-			);
-		}
+		$this->checkHostsPermissions($hostIdsAll,
+			_('Incorrect action condition host. Host does not exist or you have no access to it.')
+		);
 		$this->checkTemplatesPermissions($templateIdsAll,
 			_('Incorrect action condition template. Template does not exist or you have no access to it.')
 		);
@@ -2707,6 +2702,30 @@ class CAction extends CApiService {
 			]);
 
 			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts
+	 *
+	 * @param array $hostids
+	 * @param tring $error
+	 */
+	private function checkHostsPermissions(array $hostids, $error) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}

@@ -156,15 +156,29 @@ if ($triggerIds) {
 }
 
 // Validate permissions to group.
-$groupId = getRequest('groupid');
-if ($groupId && !isWritableHostGroups([$groupId])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
 
 // Validate permissions to host.
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable([$hostId])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => getRequest('hostid'),
+			'editable' => true
+		]);
+
+		if (!$templates) {
+			access_deny();
+		}
+	}
 }
 
 /*
