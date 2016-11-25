@@ -92,8 +92,16 @@ check_fields($fields);
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('templateid') && !API::Template()->isWritable([$_REQUEST['templateid']])) {
-	access_deny();
+if (getRequest('templateid')) {
+	$templates = API::Template()->get([
+		'output' => [],
+		'templateids' => getRequest('templateid'),
+		'editable' => true
+	]);
+
+	if (!$templates) {
+		access_deny();
+	}
 }
 
 $templateIds = getRequest('templates', []);

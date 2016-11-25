@@ -2671,12 +2671,9 @@ class CAction extends CApiService {
 				_('Incorrect action condition host. Host does not exist or you have no access to it.')
 			);
 		}
-		if (!API::Template()->isWritable($templateIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition template. Template does not exist or you have no access to it.')
-			);
-		}
+		$this->checkTemplatesPermissions($templateIdsAll,
+			_('Incorrect action condition template. Template does not exist or you have no access to it.')
+		);
 		$this->checkTriggersPermissions($triggerIdsAll,
 			_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
 		);
@@ -2756,6 +2753,30 @@ class CAction extends CApiService {
 			]);
 
 			if ($count != count($usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given templates.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given templates
+	 *
+	 * @param array  $templateids
+	 * @param string $error
+	 */
+	protected function checkTemplatesPermissions(array $templateids, $error) {
+		if ($templateids) {
+			$templateids = array_unique($templateids);
+
+			$count = API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
+
+			if ($count != count($templateids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}

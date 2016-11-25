@@ -695,10 +695,7 @@ class CTemplate extends CHostGeneral {
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
 		$templateIds = zbx_objectValues($templates, 'templateid');
 
-		// check permissions
-		if (!$this->isWritable($templateIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkPermissions($templateIds, _('No permissions to referred object or it does not exist!'));
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
@@ -1041,10 +1038,7 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$templateids = zbx_toArray($data['templateids']);
 
-		// check permissions
-		if (!$this->isWritable($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($templateIds, _('You do not have permission to perform this operation.'));
 
 		if (isset($data['hostids'])) {
 			// check if any of the hosts are discovered
@@ -1063,27 +1057,25 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Check if user has write permissions for templates.
 	 *
-	 * @param array $ids
+	 * @param array  $templateids
+	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
+	private function checkPermissions(array $templateids, $error) {
+		if ($templateids) {
+			$templateids = array_unique($templateids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
+
+			if ($count != count($templateids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'templateids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
