@@ -205,8 +205,16 @@ if (!$discoveryRule) {
 }
 
 $itemPrototypeId = getRequest('itemid');
-if ($itemPrototypeId && !API::ItemPrototype()->isWritable([$itemPrototypeId])) {
-	access_deny();
+if ($itemPrototypeId) {
+	$item_prorotypes = API::ItemPrototype()->get([
+		'output' => [],
+		'itemids' => $itemPrototypeId,
+		'editable' => true
+	]);
+
+	if (!$item_prorotypes) {
+		access_deny();
+	}
 }
 
 /*
