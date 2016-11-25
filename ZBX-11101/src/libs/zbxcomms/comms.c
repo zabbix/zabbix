@@ -1457,15 +1457,14 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char	*error = NULL;
-#endif
 #if defined(_WINDOWS)
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
+		char	*error = NULL;
+
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
