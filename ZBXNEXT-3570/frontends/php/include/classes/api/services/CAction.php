@@ -2680,12 +2680,9 @@ class CAction extends CApiService {
 		$this->checkTriggersPermissions($triggerIdsAll,
 			_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
 		);
-		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
-			);
-		}
+		$this->checkDRulesPermissions($discoveryRuleIdsAll,
+			_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
+		);
 		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -2790,6 +2787,31 @@ class CAction extends CApiService {
 			}
 		}
 	}
+
+	/**
+	 * Checks if the current user has access to the given discovery rules.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given discovery rules
+	 *
+	 * @param array  $druleids
+	 * @param string $error
+	 */
+	protected function checkDRulesPermissions(array $druleids, $error) {
+		if ($druleids) {
+			$druleids = array_unique($druleids);
+
+			$count = API::DRule()->get([
+				'countOutput' => true,
+				'druleids' => $druleids,
+				'editable' => true
+			]);
+
+			if ($count != count($druleids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
 	/**
 	 * Checks if the current user has access to the given proxies.
 	 *
