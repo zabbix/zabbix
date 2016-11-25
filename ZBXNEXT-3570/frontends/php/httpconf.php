@@ -125,9 +125,24 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		}
 	}
 }
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable([$hostId])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => getRequest('hostid'),
+			'editable' => true
+		]);
+
+		if (!$templates) {
+			access_deny();
+		}
+	}
 }
 
 $groupId = getRequest('groupid');
