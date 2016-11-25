@@ -167,8 +167,6 @@ class CProxy extends CApiService {
 
 		$proxies = zbx_toArray($proxies);
 
-		$proxies = $this->convertDeprecatedValues($proxies);
-
 		$this->validateCreate($proxies);
 
 		foreach ($proxies as &$proxy) {
@@ -258,8 +256,6 @@ class CProxy extends CApiService {
 		}
 
 		$proxies = zbx_toArray($proxies);
-
-		$proxies = $this->convertDeprecatedValues($proxies);
 
 		$proxyids = zbx_objectValues($proxies, 'proxyid');
 
@@ -553,28 +549,6 @@ class CProxy extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Convert deprecated "interfaces" to "interface".
-	 *
-	 * @param array $proxies
-	 *
-	 * @return array
-	 */
-	protected function convertDeprecatedValues($proxies) {
-		foreach ($proxies as $key => $proxy) {
-			if (isset($proxy['interfaces'])) {
-				$this->deprecated('Array of "interfaces" is deprecated, use single "interface" instead.');
-
-				$proxy['interface'] = reset($proxy['interfaces']);
-				unset($proxy['interfaces']);
-
-				$proxies[$key] = $proxy;
-			}
-		}
-
-		return $proxies;
 	}
 
 	/**
