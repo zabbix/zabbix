@@ -4712,6 +4712,22 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_func_macro                                            *
+ *                                                                            *
+ * Purpose: substitute lld macros in function macro parameters                *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer                          *
+ *             token  - [IN/OUT] the token with funciton macro location data  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
@@ -4799,17 +4815,6 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					/* LLD macros must be ignored inside supported function macros.       */
-					/* For example when expanding lld macro {#LLDMACRO} with value "ABC"  */
-					/* {{ITEM.VALUE}.regsub({#LLDMACRO})} should be translated to         */
-					/*     {{ITEM.VALUE}.regsub({#LLDMACRO})}, but                        */
-					/* {{ITEM.KEY}.regsub({#LLDMACRO})} should be translated to           */
-					/*     {{ITEM.KEY}.regsub(ABC)}                                       */
-					/* In the first case the expression contains valid function macro and */
-					/* lld macros are not supported inside function macro parameters.     */
-					/* In the second case {ITEM.KEY} macro does not support functions, so */
-					/* it is not a valid function macro and is processed as a plain text, */
-					/* expanding lld macros inside it.                                    */
 					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, error, max_error_len);
@@ -4949,6 +4954,29 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_function_lld_param                                    *
+ *                                                                            *
+ * Purpose: substitute lld macros in function parameters                      *
+ *                                                                            *
+ * Parameters: e            - [IN] the function parameter list without        *
+ *                                 enclosing parentheses:                     *
+ *                                       <p1>, <p2>, ...<pN>                  *
+ *             len          - [IN] the length of function parameter list      *
+ *             key_in_param - [IN] 1 - the first parameter must be host:key   *
+ *                                 0 - otherwise                              *
+ *             exp          - [IN/OUT] output buffer                          *
+ *             exp_alloc    - [IN/OUT] the size of output buffer              *
+ *             exp_offset   - [IN/OUT] the current position in output buffer  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
 int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
