@@ -8,6 +8,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ...G...... [ZBX-11397] fixed security best practices violation (TOCTOU) warning (vso)
 ..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
 ..F....... [ZBX-10531] fixed IE not displaying color picker (Ivo)
