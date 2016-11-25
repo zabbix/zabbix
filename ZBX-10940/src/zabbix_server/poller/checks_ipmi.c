@@ -1128,8 +1128,6 @@ static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
 {
 	int	i;
 
-	h->con->close_connection(h->con);
-
 	for (i = 0; i < h->control_count; i++)
 	{
 		zbx_free(h->controls[i].c_name);
