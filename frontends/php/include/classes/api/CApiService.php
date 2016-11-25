@@ -711,7 +711,7 @@ class CApiService {
 
 	/**
 	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
-	 * object from from the source object.
+	 * object from the source object.
 	 *
 	 * Matching objects in both arrays must have the same keys.
 	 *
@@ -735,7 +735,7 @@ class CApiService {
 
 	/**
 	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
-	 * object from from the source object.
+	 * object from the source object.
 	 *
 	 * @param array  $objects
 	 * @param array  $source
