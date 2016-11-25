@@ -154,29 +154,7 @@ class CDCheck extends CApiService {
 			$result = zbx_cleanHashes($result);
 		}
 
-	return $result;
-	}
-
-	/**
-	 * Check if user has write permissions for discovery checks.
-	 *
-	 * @param array $ids
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'dcheckids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
+		return $result;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
