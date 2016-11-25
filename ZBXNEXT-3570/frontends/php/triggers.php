@@ -141,8 +141,18 @@ if ($triggerId !== null) {
 $triggerIds = getRequest('g_triggerid', []);
 $triggerIds = zbx_toArray($triggerIds);
 
-if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
-	access_deny();
+if ($triggerIds) {
+	$triggerIds = array_unique($triggerIds);
+
+	$count = API::Trigger()->get([
+		'countOutput' => true,
+		'triggerids' => $triggerIds,
+		'editable' => true
+	]);
+
+	if ($count != count($triggerIds)) {
+		access_deny();
+	}
 }
 
 // Validate permissions to group.
