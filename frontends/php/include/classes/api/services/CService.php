@@ -654,26 +654,6 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * Returns true if all of the given objects are available for writing.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'serviceids' => $ids,
-			'countOutput' => true
-		]);
-		return count($ids) == $count;
-	}
-
-	/**
 	 * Deletes the dependencies of the parent services on the given services.
 	 *
 	 * @param $serviceIds
@@ -684,7 +664,6 @@ class CService extends CApiService {
 			'soft' => 0
 		]);
 	}
-
 
 	/**
 	 * Returns an array of triggers which are in a problem state and are linked to the given services.
