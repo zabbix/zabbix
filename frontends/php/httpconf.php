@@ -111,8 +111,18 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 	if (!empty($_REQUEST['group_httptestid'])) {
 		$testIds = array_merge($testIds, $_REQUEST['group_httptestid']);
 	}
-	if (!API::HttpTest()->isWritable($testIds)) {
-		access_deny();
+	if ($testIds) {
+		$testIds = array_unique($testIds);
+
+		$count = API::HttpTest()->get([
+			'countOutput' => true,
+			'httptestids' => $testIds,
+			'editable' => true
+		]);
+
+		if ($count != count($testIds)) {
+			access_deny();
+		}
 	}
 }
 $hostId = getRequest('hostid');

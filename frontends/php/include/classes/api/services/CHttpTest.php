@@ -486,8 +486,19 @@ class CHttpTest extends CApiService {
 	 * @return array $httpTests
 	 */
 	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
-		if (!$this->isWritable(array_keys($httpTests))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		$db_httptests = $this->get([
+			'output' => [],
+			'httptestids' => array_keys($httpTests),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($httpTests as $httpTest) {
+			if (!array_key_exists($httpTest['httptestid'], $db_httptests)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, [
@@ -807,29 +818,6 @@ class CHttpTest extends CApiService {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check if user has write permissions on http test with given ids.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'httptestids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
