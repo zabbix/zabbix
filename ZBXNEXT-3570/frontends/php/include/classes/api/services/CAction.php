@@ -2683,12 +2683,9 @@ class CAction extends CApiService {
 		$this->checkDRulesPermissions($discoveryRuleIdsAll,
 			_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
 		);
-		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
-			);
-		}
+		$this->checkDChecksPermissions($discoveryCheckIdsAll,
+			_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
+		);
 		$this->checkProxiesPermissions($proxyIdsAll,
 			_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
 		);
@@ -2807,6 +2804,30 @@ class CAction extends CApiService {
 			]);
 
 			if ($count != count($druleids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given discovery checks.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given discovery checks
+	 *
+	 * @param array  $dcheckids
+	 * @param string $error
+	 */
+	protected function checkDChecksPermissions(array $dcheckids, $error) {
+		if ($dcheckids) {
+			$dcheckids = array_unique($dcheckids);
+
+			$count = API::DCheck()->get([
+				'countOutput' => true,
+				'dcheckids' => $dcheckids,
+				'editable' => true
+			]);
+
+			if ($count != count($dcheckids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}
