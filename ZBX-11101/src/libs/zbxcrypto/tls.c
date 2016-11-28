@@ -5149,6 +5149,22 @@ out1:
 }
 #endif
 
+#if defined(HAVE_POLARSSL)
+#	define ZBX_TLS_READ(ctx, buf, len)	ssl_read(ctx, (unsigned char *)(buf), len)
+#	define ZBX_TLS_READ_FUNC_NAME		"ssl_read"
+#	define ZBX_TLS_WANT_READ(res)		(POLARSSL_ERR_NET_WANT_READ == (res))
+#elif defined(HAVE_GNUTLS)
+#	define ZBX_TLS_READ(ctx, buf, len)	gnutls_record_recv(ctx, buf, len)
+#	define ZBX_TLS_READ_FUNC_NAME		"gnutls_record_recv"
+#	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res))
+#elif defined(HAVE_OPENSSL)
+#	define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
+#	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
+#	define ZBX_TLS_WANT_READ(res)		FAIL
+/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
+/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
+#endif
+
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
@@ -5287,22 +5303,22 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
-#if defined(HAVE_POLARSSL)
 	do
 	{
-		res = ssl_read(s->tls_ctx->ctx, (unsigned char *)buf, len);
+		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
-			*error = zbx_strdup(*error, "ssl_read() timed out");
+			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
 	}
-	while (POLARSSL_ERR_NET_WANT_READ == res);
+	while (SUCCEED == ZBX_TLS_WANT_READ(res));
 
+#if defined(HAVE_POLARSSL)
 	if (0 > res)
 	{
 		char	err[128];	/* 128 bytes are enough for PolarSSL error messages */
@@ -5312,24 +5328,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 		return ZBX_PROTO_ERROR;
 	}
-
-	return (ssize_t)res;
 #elif defined(HAVE_GNUTLS)
-	do
-	{
-		res = gnutls_record_recv(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			*error = zbx_strdup(*error, "gnutls_record_recv() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-	}
-	while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);
-
 	if (0 > res)
 	{
 		/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
@@ -5338,27 +5337,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 		return ZBX_PROTO_ERROR;
 	}
-
-	return res;
 #elif defined(HAVE_OPENSSL)
-	do
-	{
-		/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
-		/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
-
-		res = SSL_read(s->tls_ctx->ctx, buf, (int)len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			*error = zbx_strdup(*error, "SSL_read() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-	}
-	while (0);
-
 	if (0 >= res)
 	{
 		int	error_code;
@@ -5384,9 +5363,9 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 		return ZBX_PROTO_ERROR;
 	}
+#endif
 
 	return (ssize_t)res;
-#endif
 }
 
 /******************************************************************************
