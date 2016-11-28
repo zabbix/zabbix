@@ -336,10 +336,8 @@ function make_system_status($filter, $backurl) {
 
 	$events = [];
 	foreach ($problem_events as $problem_event) {
-		if (!array_key_exists('event', $triggers[$problem_event['objectid']])) {
-			$triggers[$problem_event['objectid']]['event'] = $problem_event;
-			$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
-		}
+		$triggers[$problem_event['objectid']]['event'] = $problem_event;
+		$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
 	}
 
 	// get acknowledges
@@ -358,7 +356,7 @@ function make_system_status($filter, $backurl) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		// event
-		if ($trigger['event']) {
+		if (array_key_exists('event', $trigger)) {
 			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
 				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
 				: 0;
@@ -588,10 +586,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	$events = [];
 	foreach ($problem_events as $problem_event) {
-		if (!array_key_exists('lastEvent', $triggers[$problem_event['objectid']])) {
-			$triggers[$problem_event['objectid']]['lastEvent'] = $problem_event;
-			$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
-		}
+		$triggers[$problem_event['objectid']]['lastEvent'] = $problem_event;
+		$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
 	}
 
 	// get acknowledges
@@ -707,7 +703,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// trigger has events
-		if ($trigger['lastEvent']) {
+		if (array_key_exists('lastEvent', $trigger)) {
 			// description
 			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, [
 				'clock' => $trigger['lastEvent']['clock'],
@@ -724,7 +720,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		if ($config['event_ack_enable']) {
-			if ($trigger['lastEvent']) {
+			if (array_key_exists('lastEvent', $trigger)) {
 				$trigger['lastEvent']['acknowledges'] =
 					$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
 
@@ -738,7 +734,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// description
-		if ($trigger['lastEvent'] || $trigger['comments'] !== '' || $trigger['url'] !== '') {
+		if (array_key_exists('lastEvent', $trigger) || $trigger['comments'] !== '' || $trigger['url'] !== '') {
 			$description = (new CSpan($description))
 				->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px')
 				->addClass(ZBX_STYLE_LINK_ACTION);
@@ -754,7 +750,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		);
 
 		// actions
-		$action_hint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+		$action_hint = (array_key_exists('lastEvent', $trigger) && isset($actions[$trigger['lastEvent']['eventid']]))
 			? $actions[$trigger['lastEvent']['eventid']]
 			: SPACE;
 
