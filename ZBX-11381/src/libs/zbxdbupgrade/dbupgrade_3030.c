@@ -139,6 +139,23 @@ static int	DBpatch_3030012(void)
 	return DBmodify_field_type("globalvars", &field);
 }
 
+static int	DBpatch_3030013(void)
+{
+	const ZBX_FIELD	field = {"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	if (ZBX_DB_OK > DBadd_field("alerts", &field))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update alerts a"
+					" join event_recovery r on a.eventid = r.r_eventid"
+					" set a.r_eventid=a.eventid"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -158,5 +175,6 @@ DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
+DBPATCH_ADD(3030013, 0, 1)
 
 DBPATCH_END()

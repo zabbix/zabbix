@@ -74,7 +74,7 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
-	'clock', 'subject', 'message'
+	'clock', 'subject', 'message', 'r_eventid'
 ];
 $options = [
 	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'value'],
@@ -97,12 +97,20 @@ if (!$events) {
 }
 $event = reset($events);
 
-$alerts = [];
+$p_alerts = [];
 $r_alerts = [];
 
 if ($event['alerts']) {
 	$alerts = $event['alerts'];
 	CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+
+	foreach ($alerts as $alert)
+	{
+		if ($alert['r_eventid'] == 0)
+			$p_alerts[] = $alert;
+		else
+			$r_alerts[] = $alert;
+	}
 }
 
 if ($event['r_eventid'] != 0) {
@@ -120,11 +128,6 @@ if ($event['r_eventid'] != 0) {
 
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
-
-		if ($r_event['alerts']) {
-			$r_alerts = $r_event['alerts'];
-			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => SORT_DESC]]);
-		}
 	}
 }
 
@@ -150,10 +153,10 @@ $eventTab = (new CTable())
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
 				: null,
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($alerts, $r_alerts)))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($p_alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
 				->setHeader(_('Message actions'), [], false, 'tr_events.php'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($alerts, $r_alerts)))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($p_alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
 				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
