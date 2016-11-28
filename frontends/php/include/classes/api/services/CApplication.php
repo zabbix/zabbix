@@ -402,7 +402,7 @@ class CApplication extends CApiService {
 
 		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
 
-		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
+		return ['applicationids' => $applicationids];
 	}
 
 	/**

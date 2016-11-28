@@ -155,6 +155,12 @@ function add_audit_bulk($action, $resourcetype, array $objects, array $objects_o
 			$table_name = 'groups';
 			break;
 
+		case AUDIT_RESOURCE_USER_GROUP:
+			$field_name_resourceid = 'usrgrpid';
+			$field_name_resourcename = 'name';
+			$table_name = 'usrgrp';
+			break;
+
 		case AUDIT_RESOURCE_VALUE_MAP:
 			$field_name_resourceid = 'valuemapid';
 			$field_name_resourcename = 'name';
