@@ -357,24 +357,13 @@ if ($config['event_ack_enable']) {
 		}
 	}
 
-	$problem_events = API::Event()->get([
-		'output' => ['eventid', 'objectid'],
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'objectids' => $triggerIds,
-		'value' => TRIGGER_VALUE_TRUE,
-		'sortfield' => 'eventid',
-		'sortorder' => 'DESC'
-	]);
+	$problem_events = getTriggerLastProblem($triggerIds);
 
-	if ($problem_events) {
-		foreach ($problem_events as $problem_event) {
-			if ($triggers[$problem_event['objectid']]['last_problem_eventid'] == 0) {
-				$triggers[$problem_event['objectid']]['last_problem_eventid'] = $problem_event['eventid'];
-			}
+	foreach ($problem_events as $problem_event) {
+		if ($triggers[$problem_event['objectid']]['last_problem_eventid'] == 0) {
+			$triggers[$problem_event['objectid']]['last_problem_eventid'] = $problem_event['eventid'];
 		}
 	}
-
 }
 
 if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {

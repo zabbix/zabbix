@@ -316,7 +316,6 @@ function make_system_status($filter, $backurl) {
 		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange', 'expression'],
 		'selectGroups' => ['groupid'],
 		'selectHosts' => ['name'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'groupids' => $groupIds,
@@ -333,16 +332,14 @@ function make_system_status($filter, $backurl) {
 		'preservekeys' => true
 	]);
 
+	$problem_events = getTriggerLastProblem(array_keys($triggers));
+
 	$events = [];
-
-	foreach ($triggers as $triggerId => $trigger) {
-		if ($trigger['lastEvent']) {
-			$eventid = $trigger['lastEvent']['eventid'];
-			$events[$eventid] = ['eventid' => $eventid];
+	foreach ($problem_events as $problem_event) {
+		if (!array_key_exists('event', $triggers[$problem_event['objectid']])) {
+			$triggers[$problem_event['objectid']]['event'] = $problem_event;
+			$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
 		}
-
-		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
-		unset($triggers[$triggerId]['lastEvent']);
 	}
 
 	// get acknowledges
@@ -569,7 +566,6 @@ function make_latest_issues(array $filter = [], $backurl) {
 			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
 		],
 		'selectHosts' => ['hostid'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
 			? true
 			: null,
@@ -588,17 +584,21 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'countOutput' => true
 	]));
 
+	$problem_events = getTriggerLastProblem(array_keys($triggers));
+
+	$events = [];
+	foreach ($problem_events as $problem_event) {
+		if (!array_key_exists('lastEvent', $triggers[$problem_event['objectid']])) {
+			$triggers[$problem_event['objectid']]['lastEvent'] = $problem_event;
+			$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
+		}
+	}
+
 	// get acknowledges
 	$hostids = [];
-	$events = [];
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			$hostids[$host['hostid']] = true;
-		}
-
-		if ($trigger['lastEvent']) {
-			$eventid = $trigger['lastEvent']['eventid'];
-			$events[$eventid] = ['eventid' => $eventid];
 		}
 	}
 

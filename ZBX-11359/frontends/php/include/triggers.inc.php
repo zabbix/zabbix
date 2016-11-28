@@ -797,7 +797,11 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			$ack = null;
 
 			if ($config['event_ack_enable']) {
-				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
+				$event = getTriggerLastProblem([$trigger['triggerid']]);
+
+				if ($event) {
+					$event = reset($event);
+
 					if ($screenid !== null) {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
@@ -2156,4 +2160,28 @@ function makeTriggersHostsList(array $triggers_hosts) {
 	unset($hosts);
 
 	return $triggers_hosts;
+}
+
+/**
+ * Get last problem event for each trigger.
+ *
+ * @param array $triggerids
+ *
+ * @return array
+ */
+function getTriggerLastProblem(array $triggerids) {
+	$problem_events = DBfetchArray(DBselect(
+		'SELECT e1.eventid,e1.objectid,e1.clock,e1.acknowledged,e1.ns'.
+		' FROM events e1,'.
+			' (SELECT e2.objectid,MAX(e2.eventid) AS eventid'.
+			' FROM events e2'.
+			' WHERE '.dbConditionInt('e2.objectid', $triggerids).
+				' AND e2.source='.EVENT_SOURCE_TRIGGERS.
+				' AND e2.object='.EVENT_OBJECT_TRIGGER.
+				' AND e2.value='.TRIGGER_VALUE_TRUE.
+			' GROUP BY e2.objectid) e3'.
+		' WHERE e1.eventid=e3.eventid'
+	));
+
+	return $problem_events;
 }
