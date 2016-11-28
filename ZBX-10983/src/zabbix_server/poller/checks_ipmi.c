@@ -924,7 +924,7 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent=%p sensor:%p op:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p sensor:%p op:%d",
 			__function_name, h->ip, h->port, h, ent, sensor, op);
 
 	/* ignore non-readable sensors (e.g. Event-only) */
@@ -957,7 +957,7 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent=%p control:%p op:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p control:%p op:%d",
 			__function_name, h->ip, h->port, h, ent, control, op);
 
 	switch (op)
@@ -992,7 +992,8 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 		char	entity_name[IPMI_ENTITY_NAME_LEN];
 
 		ipmi_entity_get_name(entity, entity_name, sizeof(entity_name));
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p entity=%p:'%s' op:%d",
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p entity:%p:'%s' op:%d",
 				__function_name, h->ip, h->port, h, domain, entity, entity_name, op);
 	}
 
