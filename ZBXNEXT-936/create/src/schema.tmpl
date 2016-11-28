@@ -1442,10 +1442,36 @@ INDEX		|1		|correlationid
 TABLE|task|taskid|
 FIELD		|taskid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|clock		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ttl		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|status
+
 
 TABLE|task_close_problem|taskid|
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
+
+TABLE|task_remote_command|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL 	|0			|0|task
+FIELD		|command_type	|t_integer	|'0'	|NOT NULL 	|0
+FIELD		|execute_on	|t_integer	|'0'	|NOT NULL 	|0
+FIELD		|port		|t_integer	|'0'	|NOT NULL 	|0
+FIELD		|authtype	|t_integer	|'0'	|NOT NULL 	|0
+FIELD		|username	|t_varchar(64)	|''	|NOT NULL 	|0
+FIELD		|password	|t_varchar(64)	|''	|NOT NULL 	|0
+FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL 	|0
+FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|command	|t_shorttext	|''	|NOT NULL 	|0
+FIELD		|alertid	|t_id		|'0'	|NULL     	|0
+FIELD		|parent_taskid	|t_id		|'0'	|NULL     	|0
+FIELD		|hostid		|t_id		|'0'	|NOT NULL 	|0
+
+TABLE|task_remote_command_result|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|0|task
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|parent_taskid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|error		|t_shorttext	|''	|NOT NULL	|0
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
