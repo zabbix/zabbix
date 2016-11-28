@@ -68,7 +68,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	item.key = zbx_dsprintf(item.key, "system.run[%s,\"%s\"]", param, NULL == result ? "nowait" : "wait");
+	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "wait");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 
 	init_result(&agent_result);
