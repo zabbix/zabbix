@@ -170,7 +170,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function create($usrgrps) {
+	public function create(array $usrgrps) {
 		$this->validateCreate($usrgrps);
 
 		$ins_usrgrps = [];
@@ -339,7 +339,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException  if user group already exists.
 	 */
-	private function checkDuplicates($names) {
+	private function checkDuplicates(array $names) {
 		$db_usrgrps = API::getApiService()->select('usrgrp', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
@@ -459,7 +459,7 @@ class CUserGroup extends CApiService {
 	 * @param array  $usrgrps
 	 * @param string $method
 	 */
-	private function updateRights($usrgrps, $method) {
+	private function updateRights(array $usrgrps, $method) {
 		$rights = [];
 
 		foreach ($usrgrps as $index => $usrgrp) {
@@ -532,7 +532,7 @@ class CUserGroup extends CApiService {
 	 * @param array  $usrgrps
 	 * @param string $method
 	 */
-	private function updateUsersGroups($usrgrps, $method) {
+	private function updateUsersGroups(array $usrgrps, $method) {
 		$users_groups = [];
 
 		foreach ($usrgrps as $index => $usrgrp) {
