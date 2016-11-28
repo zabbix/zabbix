@@ -982,14 +982,15 @@ define('XML_REQUIRED',		0x08);
 // API validation
 // scalar data types
 define('API_STRING_UTF8',	1);
-define('API_ID',			2);
-define('API_BOOLEAN',		3);
+define('API_INT32',			2);
+define('API_ID',			3);
+define('API_BOOLEAN',		4);
 // arrays
-define('API_OBJECT',		4);
-define('API_IDS',			5);
-define('API_OBJECTS',		6);
+define('API_OBJECT',		5);
+define('API_IDS',			6);
+define('API_OBJECTS',		7);
 // specific types
-define('API_HG_NAME',		7);
+define('API_HG_NAME',		8);
 
 // flags
 define('API_REQUIRED',		0x01);

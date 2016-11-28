@@ -72,6 +72,9 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_INT32:
+				return self::validateInt32($rule, $data, $path, $error);
+
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
 
@@ -110,6 +113,7 @@ class CApiInputValidator {
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
 			case API_STRING_UTF8:
+			case API_INT32:
 			case API_ID:
 			case API_BOOLEAN:
 			case API_OBJECT:
@@ -180,6 +184,49 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Integers validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['in']      (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateInt32($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if ((!is_int($data) && !is_string($data)) || 1 != preg_match('/^\-?[0-9]+$/', strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		if (bccomp($data, '-2147483648') < 0 || bccomp($data, '2147483647') > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+			return false;
+		}
+
+		if (array_key_exists('in', $rule) && !in_array($data, $rule['in'])) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be one of %1$s', implode(', ', $rule['in']))
+			);
+			return false;
+		}
+
+		if (is_string($data)) {
+			$data = (int) $data;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
@@ -197,7 +244,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (!is_scalar($data) || is_double($data)|| !ctype_digit(strval($data))) {
+		if (!is_scalar($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
 		}

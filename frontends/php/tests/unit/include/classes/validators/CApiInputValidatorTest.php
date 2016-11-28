@@ -91,6 +91,138 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": value must be one of xml, json.'
 			],
 			[
+				['type' => API_INT32],
+				0,
+				'/1/int',
+				0
+			],
+			[
+				['type' => API_INT32],
+				12345,
+				'/1/int',
+				12345
+			],
+			[
+				['type' => API_INT32],
+				-12345,
+				'/1/int',
+				-12345
+			],
+			[
+				['type' => API_INT32],
+				'012345',
+				'/1/int',
+				12345
+			],
+			[
+				['type' => API_INT32],
+				'-12345',
+				'/1/int',
+				-12345
+			],
+			[
+				['type' => API_INT32],
+				'-012345',
+				'/1/int',
+				-12345
+			],
+			[
+				['type' => API_INT32],
+				'-2147483648',
+				'/1/int',
+				-2147483648
+			],
+			[
+				['type' => API_INT32],
+				'2147483647',
+				'/1/int',
+				2147483647
+			],
+			[
+				['type' => API_INT32],
+				'-2147483649',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32],
+				'2147483648',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32],
+				'foo',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32],
+				[],
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32],
+				null,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_INT32],
+				0.0,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32],
+				1.23E+11,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32, 'in' => [0, 1, 2]],
+				1,
+				'/1/int',
+				1
+			],
+			[
+				['type' => API_INT32, 'in' => [-1, 0, 1, 2]],
+				'01',
+				'/1/int',
+				1
+			],
+			[
+				['type' => API_INT32, 'in' => [-1, 0, 1, 2]],
+				-1,
+				'/1/int',
+				-1
+			],
+			[
+				['type' => API_INT32, 'in' => [-1, 0, 1, 2]],
+				'-1',
+				'/1/int',
+				-1
+			],
+			[
+				['type' => API_INT32, 'in' => [-1, 0, 1, 2]],
+				'-01',
+				'/1/int',
+				-1
+			],
+			[
+				['type' => API_INT32, 'in' => [-1, 0, 1, 2]],
+				-2,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of -1, 0, 1, 2.'
+			],
+			[
 				['type' => API_ID],
 				0,
 				'/1/id',
