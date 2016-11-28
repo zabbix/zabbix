@@ -242,6 +242,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestDoubleClickBeforeMessage($click_id, $id) {
+		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::id($click_id)));
 		$this->zbxTestClickWait($click_id);
 		$msg = count($this->webDriver->findElements(WebDriverBy::className('msg-bad')));
 		if (!$this->zbxTestElementPresentId($id) and $msg === 0){

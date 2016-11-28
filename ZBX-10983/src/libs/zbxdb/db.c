@@ -95,13 +95,16 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 #elif defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
+#include "zbxalgo.h"
+
 typedef struct
 {
-	OCIEnv		*envhp;
-	OCIError	*errhp;
-	OCISvcCtx	*svchp;
-	OCIServer	*srvhp;
-	OCIStmt		*stmthp;	/* the statement handle for execute operations */
+	OCIEnv			*envhp;
+	OCIError		*errhp;
+	OCISvcCtx		*svchp;
+	OCIServer		*srvhp;
+	OCIStmt			*stmthp;	/* the statement handle for execute operations */
+	zbx_vector_ptr_t	db_results;
 }
 zbx_oracle_db_handle_t;
 
@@ -127,6 +130,8 @@ static ZBX_MUTEX		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result(DB_RESULT result);
+
 static const char	*zbx_oci_error(sword status, sb4 *err)
 {
 	static char	errbuf[512];
@@ -429,6 +434,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 	memset(&oracle, 0, sizeof(oracle));
 
+	zbx_vector_ptr_create(&oracle.db_results);
+
 	/* connection string format: [//]host[:port][/service name] */
 
 	if ('\0' != *host)
@@ -684,6 +691,19 @@ void	zbx_db_close(void)
 		conn = NULL;
 	}
 #elif defined(HAVE_ORACLE)
+	if (0 != oracle.db_results.values_num)
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
+
+		for (i = 0; i < oracle.db_results.values_num; i++)
+		{
+			/* deallocate all handles before environment is deallocated */
+			OCI_DBclean_result(oracle.db_results.values[i]);
+		}
+	}
+
 	/* deallocate statement handle */
 	if (NULL != oracle.stmthp)
 	{
@@ -703,17 +723,20 @@ void	zbx_db_close(void)
 		oracle.errhp = NULL;
 	}
 
-	if (NULL != oracle.envhp)
-	{
-		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-		oracle.envhp = NULL;
-	}
-
 	if (NULL != oracle.srvhp)
 	{
 		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
 		oracle.srvhp = NULL;
 	}
+
+	if (NULL != oracle.envhp)
+	{
+		/* delete the environment handle, which deallocates all other handles associated with it */
+		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+		oracle.envhp = NULL;
+	}
+
+	zbx_vector_ptr_destroy(&oracle.db_results);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != conn)
 	{
@@ -1394,6 +1417,7 @@ error:
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	memset(result, 0, sizeof(struct zbx_db_result));
+	zbx_vector_ptr_append(&oracle.db_results, result);
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
@@ -1711,8 +1735,31 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return (DB_ROW)mysql_fetch_row(result->result);
 #elif defined(HAVE_ORACLE)
+	if (NULL == result->stmthp)
+		return NULL;
+
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
+
+	if (OCI_SUCCESS != rc)
+	{
+		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
+				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
+		{
+			zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
+			return NULL;
+		}
+
+		switch (errcode)
+		{
+			case 1012:	/* ORA-01012: not logged on */
+			case 2396:	/* ORA-02396: exceeded maximum idle time */
+			case 3113:	/* ORA-03113: end-of-file on communication channel */
+			case 3114:	/* ORA-03114: not connected to ORACLE */
+				zabbix_errlog(ERR_Z3006, errcode, errbuf);
+				return NULL;
+		}
+	}
 
 	for (i = 0; i < result->ncolumn; i++)
 	{
@@ -1759,26 +1806,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		}
 
 		result->values[i][amount] = '\0';
-	}
-
-	if (OCI_SUCCESS == rc)
-		return result->values;
-
-	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
-			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
-	{
-		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
-		return NULL;
-	}
-
-	switch (errcode)
-	{
-		case 1012:	/* ORA-01012: not logged on */
-		case 2396:	/* ORA-02396: exceeded maximum idle time */
-		case 3113:	/* ORA-03113: end-of-file on communication channel */
-		case 3114:	/* ORA-03114: not connected to ORACLE */
-			zabbix_errlog(ERR_Z3006, errcode, errbuf);
-			return NULL;
 	}
 
 	return result->values;
@@ -1843,6 +1870,41 @@ int	zbx_db_is_null(const char *field)
 	return FAIL;
 }
 
+#if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+		{
+			zbx_free(result->values[i]);
+
+			/* deallocate the lob locator variable */
+			if (NULL != result->clobs[i])
+			{
+				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
+				result->clobs[i] = NULL;
+			}
+		}
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
+	}
+
+	if (result->stmthp)
+	{
+		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
+		result->stmthp = NULL;
+	}
+}
+#endif
+
 void	DBfree_result(DB_RESULT result)
 {
 #if defined(HAVE_IBM_DB2)
@@ -1874,32 +1936,21 @@ void	DBfree_result(DB_RESULT result)
 	mysql_free_result(result->result);
 	zbx_free(result);
 #elif defined(HAVE_ORACLE)
+	int i;
+
 	if (NULL == result)
 		return;
 
-	if (NULL != result->values)
+	OCI_DBclean_result(result);
+
+	for (i = 0; i < oracle.db_results.values_num; i++)
 	{
-		int	i;
-
-		for (i = 0; i < result->ncolumn; i++)
+		if (oracle.db_results.values[i] == result)
 		{
-			zbx_free(result->values[i]);
-
-			/* deallocate the lob locator variable */
-			if (NULL != result->clobs[i])
-			{
-				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
-				result->clobs[i] = NULL;
-			}
+			zbx_vector_ptr_remove_noorder(&oracle.db_results, i);
+			break;
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
-
-	if (result->stmthp)
-		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 
 	zbx_free(result);
 #elif defined(HAVE_POSTGRESQL)
