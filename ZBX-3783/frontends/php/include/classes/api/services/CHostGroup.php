@@ -404,7 +404,6 @@ class CHostGroup extends CApiService {
 	 * Create host groups.
 	 *
 	 * @param array  $groups
-	 * @param string $groups[]['name']
 	 *
 	 * @return array
 	 */
@@ -429,10 +428,8 @@ class CHostGroup extends CApiService {
 	 * Update host groups.
 	 *
 	 * @param array  $groups
-	 * @param string $groups[]['groupid']
-	 * @param string $groups[]['name']
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function update(array $groups) {
 		$this->validateUpdate($groups, $db_groups);
@@ -679,7 +676,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException  if host group already exists.
 	 */
-	private function checkDuplicates($names) {
+	private function checkDuplicates(array $names) {
 		$db_groups = API::getApiService()->select('groups', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],

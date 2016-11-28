@@ -241,7 +241,7 @@ class CApplication extends CApiService {
 	 *
 	 * @param array  $applicationids
 	 */
-	private function hasTemplatedApplications($applicationids) {
+	private function hasTemplatedApplications(array $applicationids) {
 		return (bool) DBfetchArray(DBselect(
 			'SELECT NULL FROM application_template at WHERE '.dbConditionInt('at.applicationid', $applicationids), 1
 		));
@@ -254,7 +254,7 @@ class CApplication extends CApiService {
 	 *
 	 * @throws APIException  if application already exists.
 	 */
-	private function checkDuplicates($names_by_hostid) {
+	private function checkDuplicates(array $names_by_hostid) {
 		$sql_where = [];
 		foreach ($names_by_hostid as $hostid => $names) {
 			$sql_where[] = '(a.hostid='.$hostid.' AND '.dbConditionString('a.name', $names).')';

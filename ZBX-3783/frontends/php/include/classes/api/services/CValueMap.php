@@ -93,15 +93,11 @@ class CValueMap extends CApiService {
 	/**
 	 * Add value maps.
 	 *
-	 * @param array  $valuemaps                              An array of value maps.
-	 * @param string $valuemaps[]['name']                    Name of the value map.
-	 * @param array  $valuemaps[]['mappings']                Value mappings for value map.
-	 * @param string $valuemaps[]['mappings'][]['value']     Value mapping original value.
-	 * @param string $valuemaps[]['mappings'][]['newvalue']  Value to which the original value is mapped to.
+	 * @param array  $valuemaps
 	 *
 	 * @return array
 	 */
-	public function create($valuemaps) {
+	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps);
 
 		$valuemapids = DB::insertBatch('valuemaps', $valuemaps);
@@ -131,16 +127,11 @@ class CValueMap extends CApiService {
 	/**
 	 * Update value maps.
 	 *
-	 * @param array		$valuemaps								An array of value maps.
-	 * @param string	$valuemaps[]['valuemapid']				ID of the value map.
-	 * @param string	$valuemaps[]['name']					Name of the value map (optional).
-	 * @param array		$valuemaps[]['mappings']				Value mappings for value map (optional).
-	 * @param string	$valuemaps[]['mappings'][]['value']		Value mapping original value (optional).
-	 * @param string	$valuemaps[]['mappings'][]['newvalue']	Value to which the original value is mapped to (optional).
+	 * @param array $valuemap
 	 *
 	 * @return array
 	 */
-	public function update($valuemaps) {
+	public function update(array $valuemaps) {
 		$this->validateUpdate($valuemaps, $db_valuemaps);
 
 		$upd_valuemaps = [];
@@ -274,7 +265,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException  if value map already exists.
 	 */
-	private function checkDuplicates($names) {
+	private function checkDuplicates(array $names) {
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
@@ -295,7 +286,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$valuemaps) {
+	private function validateCreate(array &$valuemaps) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create value maps.'));
 		}
@@ -322,7 +313,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
+	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update value maps.'));
 		}
