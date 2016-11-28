@@ -139,6 +139,13 @@ static int	DBpatch_3030012(void)
 	return DBmodify_field_type("globalvars", &field);
 }
 
+static int	DBpatch_3030013(void)
+{
+	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -158,5 +165,6 @@ DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
+DBPATCH_ADD(3030013, 0, 1)
 
 DBPATCH_END()
