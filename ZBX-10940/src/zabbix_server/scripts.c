@@ -37,7 +37,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	const char	*__function_name = "zbx_execute_script_on_agent";
 	int		ret;
 	AGENT_RESULT	agent_result;
-	char		*param, *port = NULL;
+	char		*param = NULL, *port = NULL;
 	DC_ITEM		item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -62,10 +62,15 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	param = zbx_dyn_escape_string(command, "\"");
-	item.key = zbx_dsprintf(item.key, "system.run[\"%s\",\"%s\"]", param, NULL == result ? "nowait" : "wait");
+	param = zbx_strdup(param, command);
+	if (SUCCEED != (ret = quote_key_param(&param, 0)))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid param [%s]", param);
+		goto fail;
+	}
+
+	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "wait");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
-	zbx_free(param);
 
 	init_result(&agent_result);
 
@@ -87,6 +92,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	zbx_free(item.key);
 fail:
 	zbx_free(port);
+	zbx_free(param);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
