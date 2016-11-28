@@ -123,7 +123,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	{
 		request = zbx_dsprintf(NULL, "%s\n", key);
 
-		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
+		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
 			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
