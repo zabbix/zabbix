@@ -5152,11 +5152,11 @@ out1:
 #if defined(HAVE_POLARSSL)
 #	define ZBX_TLS_READ(ctx, buf, len)	ssl_read(ctx, (unsigned char *)(buf), len)
 #	define ZBX_TLS_READ_FUNC_NAME		"ssl_read"
-#	define ZBX_TLS_WANT_READ(res)		(POLARSSL_ERR_NET_WANT_READ == (res))
+#	define ZBX_TLS_WANT_READ(res)		(POLARSSL_ERR_NET_WANT_READ == (res) ? SUCCEED : FAIL)
 #elif defined(HAVE_GNUTLS)
 #	define ZBX_TLS_READ(ctx, buf, len)	gnutls_record_recv(ctx, buf, len)
 #	define ZBX_TLS_READ_FUNC_NAME		"gnutls_record_recv"
-#	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res))
+#	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
 #elif defined(HAVE_OPENSSL)
 #	define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
 #	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
