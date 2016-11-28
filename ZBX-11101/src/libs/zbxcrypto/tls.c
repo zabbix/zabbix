@@ -5295,14 +5295,13 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			*error = zbx_strdup(*error, "ssl_read() timed out");
+			return ZBX_PROTO_ERROR;
+		}
 	}
-	while (POLARSSL_ERR_NET_WANT_READ == res && FAIL == zbx_alarm_timed_out());
-
-	if (SUCCEED == zbx_alarm_timed_out())
-	{
-		*error = zbx_strdup(*error, "ssl_read() timed out");
-		return ZBX_PROTO_ERROR;
-	}
+	while (POLARSSL_ERR_NET_WANT_READ == res);
 
 	if (0 > res)
 	{
@@ -5323,14 +5322,13 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			*error = zbx_strdup(*error, "gnutls_record_recv() timed out");
+			return ZBX_PROTO_ERROR;
+		}
 	}
-	while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && FAIL == zbx_alarm_timed_out());
-
-	if (SUCCEED == zbx_alarm_timed_out())
-	{
-		*error = zbx_strdup(*error, "gnutls_record_recv() timed out");
-		return ZBX_PROTO_ERROR;
-	}
+	while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);
 
 	if (0 > res)
 	{
@@ -5343,12 +5341,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 
 	return res;
 #elif defined(HAVE_OPENSSL)
-	if (0 >= (res = SSL_read(s->tls_ctx->ctx, buf, (int)len)))
+	do
 	{
 		/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 		/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 
-		int	error_code;
+		res = SSL_read(s->tls_ctx->ctx, buf, (int)len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -5358,6 +5356,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 			*error = zbx_strdup(*error, "SSL_read() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+	}
+	while (0);
+
+	if (0 >= res)
+	{
+		int	error_code;
 
 		error_code = SSL_get_error(s->tls_ctx->ctx, res);
 
