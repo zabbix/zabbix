@@ -1324,4 +1324,15 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
+#define ZBX_PREPROC_MULTIPLIER		1
+#define ZBX_PREPROC_RTRIM		2
+#define ZBX_PREPROC_LTRIM		3
+#define ZBX_PREPROC_TRIM		4
+#define ZBX_PREPROC_REGSUB		5
+#define ZBX_PREPROC_BOOL2DEC		6
+#define ZBX_PREPROC_OCT2DEC		7
+#define ZBX_PREPROC_HEX2DEC		8
+#define ZBX_PREPROC_DELTA_VALUE		9
+#define ZBX_PREPROC_DELTA_SPEED 	10
+
 #endif
