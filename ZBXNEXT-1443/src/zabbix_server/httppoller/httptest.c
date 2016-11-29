@@ -160,7 +160,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < num; i++)
 	{
@@ -248,7 +248,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < num; i++)
 	{

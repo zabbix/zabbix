@@ -440,7 +440,8 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	if (ZBX_VALUE_FUNC_LAST == item_func)
 	{
