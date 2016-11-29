@@ -169,6 +169,109 @@ static int	DBpatch_3030015(void)
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
 
+static void	DBpatch_3030016_add_text_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid)
+{
+	zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, 1, ZBX_PREPROC_RTRIM, ZBX_WHITESPACE);
+}
+
+static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
+		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
+{
+	int	step = 1;
+
+	switch (data_type)
+	{
+		ITEM_DATA_TYPE_BOOLEAN:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_BOOL2DEC, "");
+			break;
+		ITEM_DATA_TYPE_OCTAL:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_OCT2DEC, "");
+			break;
+		ITEM_DATA_TYPE_HEXADECIMAL:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_HEX2DEC, "");
+			break;
+	}
+
+	switch (delta)
+	{
+		case ITEM_STORE_SPEED_PER_SECOND:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_SPEED, "");
+			break;
+		case ITEM_STORE_SIMPLE_CHANGE:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_VALUE, "");
+			break;
+	}
+
+	if (NULL != formula)
+		zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_MULTIPLIER, formula);
+
+}
+
+static int	DBpatch_3030016(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	unsigned char	value_type, data_type, delta;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	itemid;
+	const char	*formula;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params", NULL);
+
+	result = DBselect("select itemid,value_type,data_type,multiplier,formula,delta from items");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(value_type, row[1]);
+
+		switch (value_type)
+		{
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				DBpatch_3030016_add_text_preproc_steps(&db_insert, itemid);
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UCHAR(data_type, row[2]);
+				formula = (1 ==  atoi(row[3]) ? row[4] : NULL);
+				ZBX_STR2UCHAR(delta, row[5]);
+				DBpatch_3030016_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
+						formula, delta);
+				break;
+		}
+	}
+
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_3030017(void)
+{
+	return DBdrop_field("items", "multiplier");
+}
+
+static int	DBpatch_3030018(void)
+{
+	return DBdrop_field("items", "formula");
+}
+
+static int	DBpatch_3030019(void)
+{
+	return DBdrop_field("items", "data_type");
+}
+
+static int	DBpatch_3030020(void)
+{
+	return DBdrop_field("items", "delta");
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -191,5 +294,6 @@ DBPATCH_ADD(3030012, 0, 1)
 DBPATCH_ADD(3030013, 0, 1)
 DBPATCH_ADD(3030014, 0, 1)
 DBPATCH_ADD(3030015, 0, 1)
+DBPATCH_ADD(3030016, 0, 1)
 
 DBPATCH_END()
