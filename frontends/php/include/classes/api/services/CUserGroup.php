@@ -222,7 +222,9 @@ class CUserGroup extends CApiService {
 		}
 
 		$this->checkDuplicates(zbx_objectValues($usrgrps, 'name'));
+		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps);
+		$this->checkHostGroups($usrgrps);
 	}
 
 	/**
@@ -328,8 +330,10 @@ class CUserGroup extends CApiService {
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
+		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
+		$this->checkHostGroups($usrgrps);
 	}
 
 	/**
@@ -348,6 +352,82 @@ class CUserGroup extends CApiService {
 
 		if ($db_usrgrps) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" already exists.', $db_usrgrps[0]['name']));
+		}
+	}
+
+	/**
+	 * Check for valid users.
+	 *
+	 * @param array  $usrgrps
+	 * @param array  $usrgrps[]['userids']   (optional)
+	 *
+	 * @throws APIException
+	 */
+	private function checkUsers(array $usrgrps) {
+		$userids = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			if (array_key_exists('userids', $usrgrp)) {
+				foreach ($usrgrp['userids'] as $userid) {
+					$userids[$userid] = true;
+				}
+			}
+		}
+
+		if (!$userids) {
+			return;
+		}
+
+		$userids = array_keys($userids);
+
+		$db_users = API::getApiService()->select('users', [
+			'output' => [],
+			'userids' => $userids,
+			'preservekeys' => true
+		]);
+
+		foreach ($userids as $userid) {
+			if (!array_key_exists($userid, $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', $userid));
+			}
+		}
+	}
+
+	/**
+	 * Check for valid host grups.
+	 *
+	 * @param array  $usrgrps
+	 * @param array  $usrgrps[]['rights']   (optional)
+	 *
+	 * @throws APIException
+	 */
+	private function checkHostGroups(array $usrgrps) {
+		$groupids = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			if (array_key_exists('rights', $usrgrp)) {
+				foreach ($usrgrp['rights'] as $right) {
+					$groupids[$right['id']] = true;
+				}
+			}
+		}
+
+		if (!$groupids) {
+			return;
+		}
+
+		$groupids = array_keys($groupids);
+
+		$db_groups = API::getApiService()->select('groups', [
+			'output' => [],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+
+		foreach ($groupids as $groupid) {
+			if (!array_key_exists($groupid, $db_groups)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group with ID "%1$s" is not available.', $groupid));
+			}
 		}
 	}
 
