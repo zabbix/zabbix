@@ -1867,7 +1867,6 @@ static void	proxy_get_history_data_simple(struct zbx_json *j, const char *proto_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, ht->table);
 
 	*more = ZBX_PROXY_DATA_DONE;
-	*lastid = 0;
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
@@ -1991,7 +1990,6 @@ static void	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx
 		string_buffer = zbx_malloc(string_buffer, string_buffer_alloc);
 
 	*more = ZBX_PROXY_DATA_DONE;
-	*lastid = 0;
 
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
