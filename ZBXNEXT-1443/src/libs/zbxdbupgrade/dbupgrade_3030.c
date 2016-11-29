@@ -139,6 +139,36 @@ static int	DBpatch_3030012(void)
 	return DBmodify_field_type("globalvars", &field);
 }
 
+static int	DBpatch_3030013(void)
+{
+	const ZBX_TABLE table =
+			{"item_preproc", "item_preprocid", 0,
+				{
+					{"item_preprocid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"step", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030014(void)
+{
+	return DBcreate_index("item_preproc", "item_preproc_1", "itemid, step", 0);
+}
+
+static int	DBpatch_3030015(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_preproc", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -158,5 +188,8 @@ DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
+DBPATCH_ADD(3030013, 0, 1)
+DBPATCH_ADD(3030014, 0, 1)
+DBPATCH_ADD(3030015, 0, 1)
 
 DBPATCH_END()
