@@ -816,6 +816,13 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 #endif
 
 #ifndef _WINDOWS
+typedef struct
+{
+	int	agent_ret;
+	size_t	data_size;	/* including header */
+}
+serial_header_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: serialize_agent_result                                           *
@@ -837,8 +844,9 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data_offset, int agent_ret,
 		AGENT_RESULT *result)
 {
-	char	**pvalue, result_type;
-	size_t	value_len;
+	char			**pvalue, result_type, *serial_header_pos;
+	size_t			value_len;
+	serial_header_t		serial_header;
 
 	if (SYSINFO_RET_OK == agent_ret)
 	{
@@ -883,16 +891,16 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		result_type = '-';
 	}
 
-	if (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
+	if (*data_alloc - *data_offset < value_len + 1 + sizeof(serial_header))
 	{
-		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
+		while (*data_alloc - *data_offset < value_len + 1 + sizeof(serial_header))
 			*data_alloc *= 1.5;
 
 		*data = zbx_realloc(*data, *data_alloc);
 	}
 
-	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
-	*data_offset += sizeof(int);
+	serial_header_pos = *data + *data_offset;
+	*data_offset += sizeof(serial_header);
 
 	(*data)[(*data_offset)++] = result_type;
 
@@ -901,6 +909,10 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		memcpy(*data + *data_offset, *pvalue, value_len);
 		*data_offset += value_len;
 	}
+
+	serial_header.agent_ret = agent_ret;
+	serial_header.data_size = *data_offset;
+	memcpy(serial_header_pos, &serial_header, sizeof(serial_header));
 }
 
 /******************************************************************************
@@ -915,20 +927,27 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  * Return value: the agent result return code (SYSINFO_RET_*)                 *
  *                                                                            *
  ******************************************************************************/
-static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
+static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *result)
 {
-	int	ret, agent_ret;
-	char	type;
+	int			ret;
+	char			type;
+	serial_header_t		serial_header;
 
-	memcpy(&agent_ret, data, sizeof(int));
-	data += sizeof(int);
+	if (sizeof(serial_header) > data_size)
+		return SYSINFO_RET_FAIL;
+
+	memcpy(&serial_header, data, sizeof(serial_header));
+	data += sizeof(serial_header);
+
+	if (data_size != serial_header.data_size)
+		return SYSINFO_RET_FAIL;
 
 	type = *data++;
 
 	if ('m' == type || 0 == strcmp(data, ZBX_NOTSUPPORTED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, data));
-		return agent_ret;
+		return serial_header.agent_ret;
 	}
 
 	switch (type)
@@ -950,7 +969,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 	}
 
 	/* return deserialized return code or SYSINFO_RET_FAIL if setting result data failed */
-	return (FAIL == ret ? SYSINFO_RET_FAIL : agent_ret);
+	return (FAIL == ret ? SYSINFO_RET_FAIL : serial_header.agent_ret);
 }
 
 /******************************************************************************
@@ -976,7 +995,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	int		ret = SYSINFO_RET_OK;
 	pid_t		pid;
 	int		fds[2], n, status;
-	char		buffer[MAX_STRING_LEN], *data;
+	char		buffer[MAX_STRING_LEN + sizeof(serial_header_t)], *data;
 	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
 	double		time_start;
 
@@ -1073,7 +1092,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
-			ret = deserialize_agent_result(data, result);
+			ret = deserialize_agent_result(data, data_offset, result);
 	}
 
 	zbx_free(data);
