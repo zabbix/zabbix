@@ -114,7 +114,7 @@ static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **erro
  ******************************************************************************/
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "send_proxydata";
+	const char	*__function_name = "zbx_send_proxy_data";
 
 	struct zbx_json	j;
 	zbx_uint64_t	areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
