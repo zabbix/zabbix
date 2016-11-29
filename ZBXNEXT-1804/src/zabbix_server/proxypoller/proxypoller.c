@@ -195,7 +195,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	zbx_socket_t	s;
 	struct zbx_json	j;
 
-	zbx_json_init(&j, 512 * 1024);
+	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&j, ZBX_PROTO_TAG_DATA);
@@ -204,7 +204,6 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
-
 		goto out;
 	}
 
@@ -256,31 +255,31 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
 
-	if (SUCCEED == get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL))
+	if (SUCCEED != get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL))
+		goto out;
+
+	if ('\0' == *answer)
 	{
-		if ('\0' == *answer)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host availability data:"
-					" check allowed connection types and access rights", proxy->host, proxy->addr);
-			goto out;
-		}
-
-		if (SUCCEED != zbx_json_open(answer, &jp))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
-					" %s", proxy->host, proxy->addr, zbx_json_strerror());
-			goto out;
-		}
-
-		if (SUCCEED != process_host_availability(&jp, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
-					" %s", proxy->host, proxy->addr, error);
-			goto out;
-		}
-
-		ret = SUCCEED;
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host availability data:"
+				" check allowed connection types and access rights", proxy->host, proxy->addr);
+		goto out;
 	}
+
+	if (SUCCEED != zbx_json_open(answer, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+				" %s", proxy->host, proxy->addr, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != process_host_availability(&jp, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+				" %s", proxy->host, proxy->addr, error);
+		goto out;
+	}
+
+	ret = SUCCEED;
 out:
 	zbx_free(error);
 	zbx_free(answer);
