@@ -492,7 +492,7 @@ class CUserGroup extends CApiService {
 		$ins_userids = [];
 		$del_userids = [];
 
-		foreach ($db_users_groups as $index => $db_user_group) {
+		foreach ($db_users_groups as $db_user_group) {
 			if (array_key_exists($db_user_group['userid'], $users_groups[$db_user_group['usrgrpid']])) {
 				unset($users_groups[$db_user_group['usrgrpid']][$db_user_group['userid']]);
 			}
@@ -542,7 +542,7 @@ class CUserGroup extends CApiService {
 	private function updateRights(array $usrgrps, $method) {
 		$rights = [];
 
-		foreach ($usrgrps as $index => $usrgrp) {
+		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('rights', $usrgrp)) {
 				$rights[$usrgrp['usrgrpid']] = [];
 
@@ -567,7 +567,7 @@ class CUserGroup extends CApiService {
 		$upd_rights = [];
 		$del_rightids = [];
 
-		foreach ($db_rights as $index => $db_right) {
+		foreach ($db_rights as $db_right) {
 			if (array_key_exists($db_right['groupid'], $rights)
 					&& array_key_exists($db_right['id'], $rights[$db_right['groupid']])) {
 				if ($db_right['permission'] != $rights[$db_right['groupid']][$db_right['id']]) {
@@ -615,7 +615,7 @@ class CUserGroup extends CApiService {
 	private function updateUsersGroups(array $usrgrps, $method) {
 		$users_groups = [];
 
-		foreach ($usrgrps as $index => $usrgrp) {
+		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('userids', $usrgrp)) {
 				$users_groups[$usrgrp['usrgrpid']] = [];
 
@@ -639,7 +639,7 @@ class CUserGroup extends CApiService {
 		$ins_users_groups = [];
 		$del_ids = [];
 
-		foreach ($db_users_groups as $index => $db_user_group) {
+		foreach ($db_users_groups as $db_user_group) {
 			if (array_key_exists($db_user_group['userid'], $users_groups[$db_user_group['usrgrpid']])) {
 				unset($users_groups[$db_user_group['usrgrpid']][$db_user_group['userid']]);
 			}
