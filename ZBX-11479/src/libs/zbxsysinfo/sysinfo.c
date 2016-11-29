@@ -972,6 +972,21 @@ static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *
 	return (FAIL == ret ? SYSINFO_RET_FAIL : serial_header.agent_ret);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: write_all                                                        *
+ *                                                                            *
+ * Purpose: call write in a loop, iterating until all the data is written.    *
+ *                                                                            *
+ * Parameters: fd      - [IN] descriptor                                      *
+ *             buf     - [IN] buffer to write                                 *
+ *             n       - [IN] bytes count to write                            *
+ *             written - [OUT] bytes actually written, can be lower than n    *
+ *                             in case error was encountered in last write    *
+ *                                                                            *
+ * Return value: the return value is the number of bytes actually written.    *
+ *               in case not all data is written returns -1                   *
+ ******************************************************************************/
 static ssize_t	write_all(int fd, const void *buf, size_t n, size_t *written)
 {
 	ssize_t	ret;
