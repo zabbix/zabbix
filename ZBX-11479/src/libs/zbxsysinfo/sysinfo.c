@@ -972,7 +972,7 @@ static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *
 	return (FAIL == ret ? SYSINFO_RET_FAIL : serial_header.agent_ret);
 }
 
-static ssize_t	write_all(int fd, const void *buf, size_t n, size_t *written)
+static int	write_all(int fd, const void *buf, size_t n, size_t *written)
 {
 	ssize_t	ret;
 
