@@ -844,9 +844,9 @@ serial_header_t;
 static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data_offset, int agent_ret,
 		AGENT_RESULT *result)
 {
-	char			**pvalue, result_type, *serial_header_pos;
-	size_t			value_len;
-	serial_header_t		serial_header;
+	char		**pvalue, result_type, *serial_header_pos;
+	size_t		value_len;
+	serial_header_t	serial_header;
 
 	if (SYSINFO_RET_OK == agent_ret)
 	{
@@ -929,9 +929,9 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  ******************************************************************************/
 static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *result)
 {
-	int			ret;
-	char			type;
-	serial_header_t		serial_header;
+	int		ret;
+	char		type;
+	serial_header_t	serial_header;
 
 	if (sizeof(serial_header) > data_size)
 		return SYSINFO_RET_FAIL;
