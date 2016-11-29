@@ -3300,8 +3300,6 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 --------------------------------------------------------------------------------
 Changes for 2.0.20rc1
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
