@@ -117,7 +117,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	const char	*__function_name = "send_proxydata";
 
 	struct zbx_json	j;
-	zbx_uint64_t	areg_lastid, history_lastid, discovery_lastid;
+	zbx_uint64_t	areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char		*error = NULL;
 	int		availability_ts, more_history, more_discovery, more_areg;
 

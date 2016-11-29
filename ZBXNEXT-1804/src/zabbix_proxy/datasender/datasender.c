@@ -49,7 +49,7 @@ static int	proxy_data_sender(int *more)
 	struct zbx_json	j;
 	int		ret = FAIL, availability_ts, history_records, discovery_records, areg_records, more_history,
 			more_discovery, more_areg;
-	zbx_uint64_t	history_lastid, discovery_lastid, areg_lastid;
+	zbx_uint64_t	history_lastid = 0, discovery_lastid = 0, areg_lastid = 0;
 	zbx_timespec_t	ts;
 	char		*error = NULL;
 
