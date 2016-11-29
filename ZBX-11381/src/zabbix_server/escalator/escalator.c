@@ -479,8 +479,9 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, DB_ESCALATION *escalation, c
 	}
 }
 
-static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const DC_HOST *host, zbx_uint64_t eventid,
-		zbx_uint64_t actionid, int esc_step, const char *command, zbx_alert_status_t status, const char *error)
+static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const DC_HOST *host,
+		zbx_uint64_t eventid, zbx_uint64_t r_eventid, zbx_uint64_t actionid, int esc_step,
+		const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
 	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
@@ -491,14 +492,14 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const 
 	if (0 == alerts_num)
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
-				"status", "error", "esc_step", "alerttype", NULL);
+				"status", "error", "esc_step", "alerttype", "r_eventid", NULL);
 	}
 
 	now = (int)time(NULL);
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
 
 	zbx_db_insert_add_values(db_insert, __UINT64_C(0), actionid, eventid, now, tmp, alert_status, error, esc_step,
-			(int)alerttype);
+			(int)alerttype, r_eventid);
 
 	zbx_free(tmp);
 
@@ -666,7 +667,8 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 	zbx_vector_uint64_destroy(&parent_groupids);
 }
 
-static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
+static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid,
+		zbx_uint64_t operationid, int esc_step)
 {
 	const char		*__function_name = "execute_commands";
 	DB_RESULT		result;
@@ -676,8 +678,11 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
+	const DB_EVENT		*c_event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	c_event = (NULL != r_event ? r_event : event);
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
@@ -776,7 +781,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
@@ -811,7 +816,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+			else if (SUCCEED == (rc = get_dynamic_hostid(c_event, &host, error, sizeof(error))))
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -847,7 +852,8 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
 
-		add_command_alert(&db_insert, alerts_num++, &host, event->eventid, actionid, esc_step, script.command,
+		add_command_alert(&db_insert, alerts_num++, &host, event->eventid,
+				(r_event == NULL ? 0 : r_event->eventid), actionid, esc_step, script.command,
 				status, error);
 skip:
 		zbx_script_clean(&script);
@@ -1164,7 +1170,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 							subject, message, event, NULL);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, action->actionid, operationid, escalation->esc_step);
+					execute_commands(event, NULL, action->actionid, operationid, escalation->esc_step);
 					break;
 			}
 		}
@@ -1313,7 +1319,7 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 							message);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(r_event, action->actionid, operationid, escalation->esc_step);
+					execute_commands(event, r_event, action->actionid, operationid, escalation->esc_step);
 					break;
 			}
 		}
