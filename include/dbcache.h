@@ -125,51 +125,62 @@ DC_HOST;
 
 typedef struct
 {
-	DC_HOST		host;
-	DC_INTERFACE	interface;
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	lastlogsize;
-	zbx_uint64_t	valuemapid;
-	unsigned char 	type;
-	unsigned char	data_type;
-	unsigned char	value_type;
-	unsigned char	delta;
-	unsigned char	multiplier;
-	unsigned char	state;
-	unsigned char	db_state;
-	unsigned char	snmpv3_securitylevel;
-	unsigned char	authtype;
-	unsigned char	flags;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
-	unsigned char	inventory_link;
-	unsigned char	status;
-	unsigned char	unreachable;
-	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
-	char		*formula;
-	char		*units;
-	int		delay;
-	int		nextcheck;
-	int		lastclock;
-	int		mtime;
-	int		history;
-	int		trends;
-	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
-	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
-	char		snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
-	char		snmp_oid_orig[ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
-	char		snmpv3_securityname_orig[ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
-	char		snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
-	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
-	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
-	char		*params;
-	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
-	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
-	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
-	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
-	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
-	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
-	char		*db_error;
+	unsigned char	type;
+	char		params[ITEM_PREPROC_PARAMS_LEN * 4 + 1];
+}
+zbx_item_preproc_t;
+
+typedef struct
+{
+	DC_HOST			host;
+	DC_INTERFACE		interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		valuemapid;
+	unsigned char 		type;
+	unsigned char		data_type;
+	unsigned char		value_type;
+	unsigned char		delta;
+	unsigned char		multiplier;
+	unsigned char		state;
+	unsigned char		db_state;
+	unsigned char		snmpv3_securitylevel;
+	unsigned char		authtype;
+	unsigned char		flags;
+	unsigned char		snmpv3_authprotocol;
+	unsigned char		snmpv3_privprotocol;
+	unsigned char		inventory_link;
+	unsigned char		status;
+	unsigned char		unreachable;
+	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
+	char			*formula;
+	char			*units;
+	int			delay;
+	int			nextcheck;
+	int			lastclock;
+	int			mtime;
+	int			history;
+	int			trends;
+	int			preproc_ops_num;
+	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
+	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
+	char			snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
+	char			snmp_oid_orig[ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
+	char			snmpv3_securityname_orig[ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
+	char			snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
+	char			snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
+	char			ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
+	char			*params;
+	char			delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
+	char			username_orig[ITEM_USERNAME_LEN_MAX], *username;
+	char			publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
+	char			privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
+	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
+	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char			*db_error;
+
+	zbx_item_preproc_t	*preproc_ops;
+
 }
 DC_ITEM;
 
@@ -435,6 +446,10 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
+/* flags for DCconfig_get_items_by_itemids() function to specify the data needed */
+#define ZBX_FLAG_ITEM_FIELDS_DEFAULT		__UINT64_C(0x0000)
+#define ZBX_FLAG_ITEM_FIELDS_PREPROC		__UINT64_C(0x0001)
+
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 void	DCsync_configuration(void);
@@ -447,7 +462,8 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
+		zbx_uint64_t flags);
 void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);

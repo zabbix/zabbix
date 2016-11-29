@@ -271,7 +271,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
-		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
+		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num,
+				ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
@@ -485,7 +486,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
-		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
+		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num,
+				ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);

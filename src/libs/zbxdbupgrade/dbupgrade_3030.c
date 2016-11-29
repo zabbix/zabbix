@@ -174,6 +174,8 @@ static void	DBpatch_3030016_add_text_preproc_steps(zbx_db_insert_t *db_insert, z
 	zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, 1, ZBX_PREPROC_RTRIM, ZBX_WHITESPACE);
 }
 
+#include "log.h"
+
 static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
 {
@@ -181,13 +183,13 @@ static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert
 
 	switch (data_type)
 	{
-		ITEM_DATA_TYPE_BOOLEAN:
+		case ITEM_DATA_TYPE_BOOLEAN:
 			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_BOOL2DEC, "");
 			break;
-		ITEM_DATA_TYPE_OCTAL:
+		case ITEM_DATA_TYPE_OCTAL:
 			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_OCT2DEC, "");
 			break;
-		ITEM_DATA_TYPE_HEXADECIMAL:
+		case ITEM_DATA_TYPE_HEXADECIMAL:
 			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_HEX2DEC, "");
 			break;
 	}
@@ -235,7 +237,7 @@ static int	DBpatch_3030016(void)
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 				ZBX_STR2UCHAR(data_type, row[2]);
-				formula = (1 ==  atoi(row[3]) ? row[4] : NULL);
+				formula = (1 == atoi(row[3]) ? row[4] : NULL);
 				ZBX_STR2UCHAR(delta, row[5]);
 				DBpatch_3030016_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
 						formula, delta);

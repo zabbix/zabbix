@@ -1533,7 +1533,8 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
 	errcodes = zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
 
@@ -1638,7 +1639,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
 			/* item disabled or deleted? */
-			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
+			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1,
+					ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 			if (SUCCEED != errcode)
 			{

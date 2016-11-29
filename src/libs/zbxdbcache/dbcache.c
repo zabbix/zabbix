@@ -1338,7 +1338,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num, ZBX_FLAG_ITEM_FIELDS_PREPROC);
 	DCget_delta_items(&delta_history, &itemids);
 
 	zbx_vector_uint64_clear(&itemids);	/* item ids that are not disabled and not deleted in DB */

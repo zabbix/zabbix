@@ -128,33 +128,35 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	zbx_uint64_t	interfaceid;
-	zbx_uint64_t	lastlogsize;
-	zbx_uint64_t	valuemapid;
-	const char	*key;
-	const char	*port;
-	const char	*units;
-	const char	*db_error;
-	ZBX_DC_TRIGGER	**triggers;
-	int		delay;
-	int		nextcheck;
-	int		lastclock;
-	int		mtime;
-	int		data_expected_from;
-	int		history;
-	unsigned char	type;
-	unsigned char	data_type;
-	unsigned char	value_type;
-	unsigned char	poller_type;
-	unsigned char	state;
-	unsigned char	db_state;
-	unsigned char	inventory_link;
-	unsigned char	location;
-	unsigned char	flags;
-	unsigned char	status;
-	unsigned char	unreachable;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		interfaceid;
+	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		valuemapid;
+	const char		*key;
+	const char		*port;
+	const char		*units;
+	const char		*db_error;
+	ZBX_DC_TRIGGER		**triggers;
+	int			delay;
+	int			nextcheck;
+	int			lastclock;
+	int			mtime;
+	int			data_expected_from;
+	int			history;
+	unsigned char		type;
+	unsigned char		data_type;
+	unsigned char		value_type;
+	unsigned char		poller_type;
+	unsigned char		state;
+	unsigned char		db_state;
+	unsigned char		inventory_link;
+	unsigned char		location;
+	unsigned char		flags;
+	unsigned char		status;
+	unsigned char		unreachable;
+
+	zbx_vector_ptr_t	preproc_ops;
 }
 ZBX_DC_ITEM;
 
@@ -587,6 +589,14 @@ zbx_dc_hostgroup_t;
 
 typedef struct
 {
+	zbx_uint64_t	item_preprocid;
+	unsigned char	type;
+	const char	*params;
+}
+zbx_dc_item_preproc_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			sync_ts;
@@ -635,6 +645,7 @@ typedef struct
 	zbx_hashset_t		corr_operations;
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
+	zbx_hashset_t		item_preproc;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -2528,6 +2539,9 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
 			item->unreachable = 0;
+
+			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
+					__config_mem_free_func);
 		}
 		else
 		{
@@ -2550,6 +2564,19 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					item->triggers[0] = NULL;
 				}
 			}
+
+			if (0 < item->preproc_ops.values_alloc)
+			{
+				if (0 == item->preproc_ops.values_num)
+				{
+					zbx_vector_ptr_destroy(&item->preproc_ops);
+					zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func,
+							__config_mem_realloc_func, __config_mem_free_func);
+				}
+				else
+					zbx_vector_ptr_clear(&item->preproc_ops);
+			}
+
 		}
 
 		item->status = status;
@@ -3096,6 +3123,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
+
+		zbx_vector_ptr_destroy(&item->preproc_ops);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -4322,6 +4351,82 @@ static void	DCsync_trigger_tags(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_item_preproc                                              *
+ *                                                                            *
+ * Purpose: Updates item preprocessing steps in configuration cache           *
+ *                                                                            *
+ * Parameters: result - [IN] the result of item preprocessing steps database  *
+ *                           select                                           *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - item_preprocid                                               *
+ *           1 - itemid                                                       *
+ *           2 - type                                                         *
+ *           3 - params                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_item_preproc(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_item_preproc";
+
+	DB_ROW			row;
+	zbx_vector_uint64_t	syncids;
+	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
+	int			found;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+	zbx_dc_item_preproc_t	*preproc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&syncids);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		if (itemid != lastitemid && NULL == (item = zbx_hashset_search(&config->items, &itemid)))
+			continue;
+
+		ZBX_STR2UINT64(item_preprocid, row[0]);
+		zbx_vector_uint64_append(&syncids, item_preprocid);
+
+		preproc = DCfind_id(&config->item_preproc, item_preprocid, sizeof(zbx_dc_item_preproc_t), &found);
+
+		ZBX_STR2UCHAR(preproc->type, row[2]);
+		DCstrpool_replace(found, &preproc->params, row[3]);
+
+		/* cleared in DCsync_items() */
+		zbx_vector_ptr_append(&item->preproc_ops, preproc);
+
+		lastitemid = itemid;
+	}
+
+	/* remove deleted correlation operations */
+
+	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->corr_operations, &iter);
+
+	while (NULL != (preproc = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&syncids, preproc->item_preprocid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			continue;
+		}
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&syncids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_config_select                                             *
@@ -4376,6 +4481,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		corr_condition_result = NULL;
 	DB_RESULT		corr_operation_result = NULL;
 	DB_RESULT		hgroups_result = NULL;
+	DB_RESULT		itempp_result = NULL;
 
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
@@ -4383,7 +4489,7 @@ void	DCsync_configuration(void)
 				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
 				trigger_tag_sec, trigger_tag_sec2, correlation_sec, correlation_sec2,
 				corr_condition_sec, corr_condition_sec2, corr_operation_sec, corr_operation_sec2,
-				hgroups_sec, hgroups_sec2,
+				hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2,
 				total, total2;
 	const zbx_strpool_t	*strpool;
 
@@ -4631,6 +4737,15 @@ void	DCsync_configuration(void)
 		goto out;
 	hgroups_sec = zbx_time() - sec;
 
+	itempp_sec = zbx_time();
+	if (NULL == (itempp_result = DBselect("select item_preprocid,itemid,type,params from item_preproc"
+			" order by itemid,step")))
+	{
+		goto out;
+	}
+
+	itempp_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4711,14 +4826,18 @@ void	DCsync_configuration(void)
 	DCsync_hostgroups(hgroups_result);
 	hgroups_sec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_item_preproc(itempp_result);
+	itempp_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
 	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 			action_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
-			corr_condition_sec + corr_operation_sec + hgroups_sec;
+			corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 			expr_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 + correlation_sec2 +
-			corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2;
+			corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 + itempp_sec2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -4758,6 +4877,8 @@ void	DCsync_configuration(void)
 			corr_operation_sec, corr_operation_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			hgroups_sec, hgroups_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			itempp_sec, itempp_sec2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
@@ -4855,6 +4976,8 @@ void	DCsync_configuration(void)
 			config->corr_operations.num_data, config->corr_operations.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
 			config->hostgroups.num_data, config->hostgroups.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item procs : %d (%d slots)", __function_name,
+			config->item_preproc.num_data, config->item_preproc.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -4900,6 +5023,7 @@ out:
 	DBfree_result(corr_condition_result);
 	DBfree_result(corr_operation_result);
 	DBfree_result(hgroups_result);
+	DBfree_result(itempp_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -5278,6 +5402,8 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->hostgroups, 0);
 	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
+
+	CREATE_HASHSET(config->item_preproc, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -5735,7 +5861,7 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 	dst_interface->port = 0;
 }
 
-static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
+static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint64_t flags)
 {
 	const ZBX_DC_NUMITEM		*numitem;
 	const ZBX_DC_LOGITEM		*logitem;
@@ -5944,6 +6070,32 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				/* nothing to do */;
 		}
 	}
+
+	if (0 != (flags & ZBX_FLAG_ITEM_FIELDS_PREPROC))
+	{
+		if (0 != (dst_item->preproc_ops_num = src_item->preproc_ops.values_num))
+		{
+			int	i;
+
+			dst_item->preproc_ops = zbx_malloc(NULL, sizeof(zbx_item_preproc_t) *
+					src_item->preproc_ops.values_num);
+
+			for (i = 0; i < src_item->preproc_ops.values_num; i++)
+			{
+				zbx_dc_item_preproc_t	*dc_preproc = src_item->preproc_ops.values[i];
+
+				dst_item->preproc_ops[i].type = dc_preproc->type;
+				strscpy(dst_item->preproc_ops[i].params, dc_preproc->params);
+			}
+		}
+		else
+			dst_item->preproc_ops = NULL;
+	}
+	else
+	{
+		dst_item->preproc_ops_num = 0;
+		dst_item->preproc_ops = NULL;
+	}
 }
 
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
@@ -5972,6 +6124,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 		}
 
 		zbx_free(items[i].db_error);
+		zbx_free(items[i].preproc_ops);
 	}
 }
 
@@ -6105,7 +6258,7 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 		}
 
 		DCget_host(&items[i].host, dc_host);
-		DCget_item(&items[i], dc_item);
+		DCget_item(&items[i], dc_item, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 		errcodes[i] = SUCCEED;
 	}
 
@@ -6126,7 +6279,8 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
+		zbx_uint64_t flags)
 {
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
@@ -6144,7 +6298,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 		}
 
 		DCget_host(&items[i].host, dc_host);
-		DCget_item(&items[i], dc_item);
+		DCget_item(&items[i], dc_item, flags);
 		errcodes[i] = SUCCEED;
 	}
 
@@ -6926,7 +7080,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&items[num].host, dc_host);
-		DCget_item(&items[num], dc_item);
+		DCget_item(&items[num], dc_item, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 		num++;
 
 		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type) &&
@@ -7053,7 +7207,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 		}
 
 		DCget_host(&(*items)[items_num].host, dc_host);
-		DCget_item(&(*items)[items_num], dc_item);
+		DCget_item(&(*items)[items_num], dc_item, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 		items_num++;
 	}
 unlock:
