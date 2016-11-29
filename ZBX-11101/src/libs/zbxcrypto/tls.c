@@ -4125,6 +4125,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
+	s->tls_ctx->ctx = NULL;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -4922,6 +4923,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
+	s->tls_ctx->ctx = NULL;
 
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
