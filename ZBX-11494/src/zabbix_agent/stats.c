@@ -418,6 +418,10 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
 
 	zbx_free(args);
+#ifdef _AIX
+	/* initialise collecting of vmstat data early to avoid ZBX_NONSUPPORTED on start */
+	collect_vmstat_data(&collector->vmstat);
+#endif
 
 	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
