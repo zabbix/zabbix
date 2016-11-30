@@ -331,26 +331,25 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
-void	string_replace_realloc(char **data, const char *sub_str1, const char *sub_str2)
+void	string_replace_realloc(char **str, const char *sub_str1, const char *sub_str2)
 {
-	char	*str = *data, *p;
-	long	len;
-	size_t	l, r;
+	const char	*haystack = *str, *substring;
+	size_t		l, r, len;
 
-	assert(*data);
+	assert(*str);
 	assert(sub_str1);
 	assert(sub_str2);
 
-	len = strlen(sub_str1);
+	if (0 == (len = strlen(sub_str1)))
+		return;
 
-	while (NULL != (p = strstr(str, sub_str1)))
+	while (NULL != (substring = strstr(haystack, sub_str1)))
 	{
-		l = p - *data;
+		l = substring - *str;
 		r = l + len - 1;
-		zbx_replace_string(data, l, &r, sub_str2);
-		str += r + 1;
+		zbx_replace_string(str, l, &r, sub_str2);
+		haystack += r + 1;
 	}
-
 }
 
 /* Has to be rewritten to avoid malloc */
