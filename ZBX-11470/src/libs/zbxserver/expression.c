@@ -279,7 +279,7 @@ static void	zbx_free_numbers(char ***numbers, int count)
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char	**numbers = NULL, *new_str = NULL, replace[3] = "$0";
+	char	**numbers = NULL, replace[3] = "$0";
 	int	numbers_cnt = 0, i = 0;
 
 	numbers = extract_numbers(expression, &numbers_cnt);
