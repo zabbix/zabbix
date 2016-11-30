@@ -2393,18 +2393,12 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	{
 		if (SUCCEED != zbx_x509_dn_gets(&cert->issuer, tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
-			issuer_mismatch = 1;
 	}
 
 	if (NULL != subject && '\0' != *subject)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(&cert->subject, tls_subject, sizeof(tls_subject), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
-			subject_mismatch = 1;
 	}
 #elif defined(HAVE_GNUTLS)
 	if (NULL == (cert = zbx_get_peer_cert(tls_ctx->ctx, error)))
@@ -2421,9 +2415,6 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
-			issuer_mismatch = 1;
 	}
 
 	if (NULL != subject && '\0' != *subject)
@@ -2437,9 +2428,6 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
-			subject_mismatch = 1;
 	}
 
 	gnutls_x509_crt_deinit(cert);
@@ -2454,35 +2442,37 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_issuer_name(cert), tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
-			issuer_mismatch = 1;
 	}
 
 	if (NULL != subject && '\0' != *subject)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_subject_name(cert), tls_subject, sizeof(tls_subject), error))
 			return FAIL;
-
-		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
-			subject_mismatch = 1;
 	}
 
 	X509_free(cert);
 #endif
+	/* simplified match, not compliant with RFC 4517, 4518 */
+
+	if (NULL != issuer && '\0' != *issuer)
+		issuer_mismatch = strcmp(tls_issuer, issuer);
+
+	if (NULL != subject && '\0' != *subject)
+		subject_mismatch = strcmp(tls_subject, subject);
+
 	if (0 == issuer_mismatch && 0 == subject_mismatch)
 		return SUCCEED;
 
-	if (1 == issuer_mismatch)
+	if (0 != issuer_mismatch)
 	{
 		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
 				tls_issuer, issuer);
 	}
 
-	if (1 == subject_mismatch)
+	if (0 != subject_mismatch)
 	{
-		if (1 == issuer_mismatch)
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", ");
+		if (0 != issuer_mismatch)
+			zbx_strcpy_alloc(error, &error_alloc, &error_offset, ", ");
 
 		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: \"%s\"",
 				tls_subject, subject);
