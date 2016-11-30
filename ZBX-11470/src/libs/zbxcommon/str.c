@@ -348,7 +348,7 @@ void	string_replace_realloc(char **str, const char *sub_str1, const char *sub_st
 		l = substring - *str;
 		r = l + len - 1;
 		zbx_replace_string(str, l, &r, sub_str2);
-		haystack += r + 1;
+		haystack = *str + r + 1;
 	}
 }
 
