@@ -287,9 +287,7 @@ static void	expand_trigger_description_constants(char **data, const char *expres
 	for (i = 0; i < 9; i++)
 	{
 		replace[1] = '0' + i + 1;
-		new_str = string_replace(*data, replace, i < numbers_cnt ?  numbers[i] : "");
-		zbx_free(*data);
-		*data = new_str;
+		string_replace_realloc(data, replace, i < numbers_cnt ?  numbers[i] : "");
 	}
 
 	zbx_free_numbers(&numbers, numbers_cnt);
