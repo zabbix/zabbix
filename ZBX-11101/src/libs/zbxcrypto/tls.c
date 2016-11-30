@@ -2372,7 +2372,7 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	size_t			error_alloc = 0, error_offset = 0;
 #if defined(HAVE_POLARSSL)
 	x509_crt		*cert;
-#if defined(HAVE_GNUTLS)
+#elif defined(HAVE_GNUTLS)
 	gnutls_x509_crt_t	cert;
 	gnutls_x509_dn_t	dn;
 	int			res;
