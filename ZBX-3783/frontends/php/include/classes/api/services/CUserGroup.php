@@ -1014,7 +1014,7 @@ class CUserGroup extends CApiService {
 	 * @param array $usrgrpids
 	 * @param array $db_usrgrps
 	 */
-	protected function validateDelete(array $usrgrpids, array &$db_usrgrps = null) {
+	protected function validateDelete(array &$usrgrpids, array &$db_usrgrps = null) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
