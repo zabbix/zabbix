@@ -876,9 +876,6 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		esc_period = atoi(row[2]);
 		evaltype = (unsigned char)atoi(row[3]);
 
-		if (0 == esc_period)	/* use default value */
-			esc_period = action->esc_period;
-
 		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
 		{
 			unsigned char	default_msg;
@@ -886,6 +883,9 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
+
+			if (0 == esc_period)
+				esc_period = action->esc_period;
 
 			if (0 == next_esc_period || next_esc_period > esc_period)
 				next_esc_period = esc_period;
@@ -959,7 +959,6 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		if (1 == operations)
 		{
-			next_esc_period = (0 != next_esc_period) ? next_esc_period : action->esc_period;
 			escalation->nextcheck = time(NULL) + next_esc_period;
 		}
 		else
