@@ -958,9 +958,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		}
 
 		if (1 == operations)
-		{
 			escalation->nextcheck = time(NULL) + next_esc_period;
-		}
 		else
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
