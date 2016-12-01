@@ -2223,7 +2223,7 @@ static void	zbx_log_peer_cert(const char *function_name, const zbx_tls_context_t
 {
 	char			*error = NULL;
 #if defined(HAVE_POLARSSL)
-	x509_crt		*cert;
+	const x509_crt		*cert;
 	char			issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX], serial[128];
 #elif defined(HAVE_GNUTLS)
 	gnutls_x509_crt_t	cert;
@@ -2371,7 +2371,7 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	int			issuer_mismatch = 0, subject_mismatch = 0;
 	size_t			error_alloc = 0, error_offset = 0;
 #if defined(HAVE_POLARSSL)
-	x509_crt		*cert;
+	const x509_crt		*cert;
 #elif defined(HAVE_GNUTLS)
 	gnutls_x509_crt_t	cert;
 	gnutls_x509_dn_t	dn;
@@ -4353,7 +4353,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	int			ret = FAIL, res;
-	const x509_crt		*peer_cert;
 	const ssl_ciphersuite_t	*info;
 #if defined(_WINDOWS)
 	double			sec;
