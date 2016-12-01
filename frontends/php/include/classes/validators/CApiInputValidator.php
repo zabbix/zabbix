@@ -138,7 +138,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
-	 * @param array  $rule['in']      (optional)
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -168,9 +168,9 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, $rule['in'], true)) {
+		if (array_key_exists('in', $rule) && !in_array($data, explode(',', $rule['in']), true)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', implode(', ', $rule['in']))
+				_s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
 			);
 			return false;
 		}
@@ -188,7 +188,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
-	 * @param int    $rule['in']      (optional)
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -212,11 +212,30 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, $rule['in'])) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', implode(', ', $rule['in']))
-			);
-			return false;
+		if (array_key_exists('in', $rule)) {
+			$valid = false;
+
+			foreach (explode(',', $rule['in']) as $in) {
+				if (strpos($in, ':') !== false) {
+					list($from, $to) = explode(':', $in);
+				}
+				else {
+					$from = $in;
+					$to = $in;
+				}
+
+				if ($from <= $data && $data <= $to) {
+					$valid = true;
+					break;
+				}
+			}
+
+			if (!$valid) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
+				);
+				return false;
+			}
 		}
 
 		if (is_string($data)) {
