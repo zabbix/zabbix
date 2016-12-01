@@ -1898,6 +1898,22 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/ready[summation]", 1, result);
+
+	/* the returned result is milliseconds from the last measurement interval, convert to percentage */
+	if (SYSINFO_RET_OK == ret && ISSET_UI64(result))
+	{
+		zbx_vmware_perf_entity_t	*entity;
+		zbx_vmware_vm_t			*vm;
+
+		/* the vm and entity requests cannot fail, or the result wouldn't be set */
+		vm = service_vm_get(service, uuid);
+		entity = zbx_vmware_service_get_perf_entity(service, "VirtualMachine", vm->id);
+
+		if (0 != entity->refresh)
+			SET_DBL_RESULT(result, (double)result->ui64 / (entity->refresh * 1000));
+
+		UNSET_UI64_RESULT(result);
+	}
 unlock:
 	zbx_vmware_unlock();
 out:
