@@ -981,27 +981,20 @@ static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *
  * Parameters: fd      - [IN] descriptor                                      *
  *             buf     - [IN] buffer to write                                 *
  *             n       - [IN] bytes count to write                            *
- *             written - [OUT] bytes actually written, can be lower than n    *
- *                             in case error was encountered in last write    *
  *                                                                            *
- * Return value: the return value is the number of bytes actually written.    *
- *               in case not all data is written returns -1                   *
  ******************************************************************************/
-static ssize_t	write_all(int fd, const void *buf, size_t n, size_t *written)
+static void	write_all(int fd, const void *buf, size_t n)
 {
 	ssize_t	ret;
+	size_t	written = 0;
 
-	*written = 0;
-
-	while (*written < n)
+	while (written < n)
 	{
-		if (-1 != (ret = write(fd, buf + *written, n - *written)))
-			*written += ret;
+		if (-1 != (ret = write(fd, buf + written, n - written)))
+			written += ret;
 		else
-			return ret;
+			break;
 	}
-
-	return *written;
 }
 
 /******************************************************************************
@@ -1053,7 +1046,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (0 == pid)
 	{
-		size_t	written;
 		zabbix_log(LOG_LEVEL_DEBUG, "executing in data process for cmd:'%s'", cmd);
 
 		signal(SIGILL, SIG_DFL);
@@ -1066,7 +1058,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		ret = metric_func(cmd, param, flags, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		write_all(fds[1], data, data_offset, &written);
+		write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);
