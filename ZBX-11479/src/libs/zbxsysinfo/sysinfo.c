@@ -816,13 +816,6 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 #endif
 
 #ifndef _WINDOWS
-typedef struct
-{
-	int	agent_ret;
-	size_t	data_size;	/* including header */
-}
-serial_header_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: serialize_agent_result                                           *
@@ -844,9 +837,9 @@ serial_header_t;
 static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data_offset, int agent_ret,
 		AGENT_RESULT *result)
 {
-	char		**pvalue, result_type, *serial_header_pos;
+	char		**pvalue, result_type, *len_pos;
 	size_t		value_len;
-	serial_header_t	serial_header;
+	zbx_uint64_t	len64;
 
 	if (SYSINFO_RET_OK == agent_ret)
 	{
@@ -891,16 +884,19 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		result_type = '-';
 	}
 
-	if (*data_alloc - *data_offset < value_len + 1 + sizeof(serial_header))
+	if (*data_alloc - *data_offset < value_len + 1 + sizeof(int) + sizeof(zbx_uint64_t))
 	{
-		while (*data_alloc - *data_offset < value_len + 1 + sizeof(serial_header))
+		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int) + sizeof(zbx_uint64_t))
 			*data_alloc *= 1.5;
 
 		*data = zbx_realloc(*data, *data_alloc);
 	}
 
-	serial_header_pos = *data + *data_offset;
-	*data_offset += sizeof(serial_header);
+	len_pos = *data + *data_offset;
+	*data_offset += sizeof(zbx_uint64_t);
+
+	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
+	*data_offset += sizeof(int);
 
 	(*data)[(*data_offset)++] = result_type;
 
@@ -910,9 +906,9 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		*data_offset += value_len;
 	}
 
-	serial_header.agent_ret = agent_ret;
-	serial_header.data_size = *data_offset;
-	memcpy(serial_header_pos, &serial_header, sizeof(serial_header));
+	len64 = *data_offset;
+	len64 = zbx_htole_uint64(len64);
+	memcpy(len_pos, &len64, sizeof(zbx_uint64_t));
 }
 
 /******************************************************************************
@@ -929,25 +925,29 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  ******************************************************************************/
 static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *result)
 {
-	int		ret;
+	int		ret, agent_ret;
 	char		type;
-	serial_header_t	serial_header;
+	zbx_uint64_t	expected_len;
 
-	if (sizeof(serial_header) > data_size)
+	if (sizeof(zbx_uint64_t) > data_size)
 		return SYSINFO_RET_FAIL;
 
-	memcpy(&serial_header, data, sizeof(serial_header));
-	data += sizeof(serial_header);
+	memcpy(&expected_len, data, sizeof(zbx_uint64_t));
+	expected_len = zbx_letoh_uint64(expected_len);
+	data += sizeof(zbx_uint64_t);
 
-	if (data_size != serial_header.data_size)
+	if (data_size != expected_len)
 		return SYSINFO_RET_FAIL;
+
+	memcpy(&agent_ret, data, sizeof(int));
+	data += sizeof(int);
 
 	type = *data++;
 
 	if ('m' == type || 0 == strcmp(data, ZBX_NOTSUPPORTED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, data));
-		return serial_header.agent_ret;
+		return agent_ret;
 	}
 
 	switch (type)
@@ -969,7 +969,7 @@ static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *
 	}
 
 	/* return deserialized return code or SYSINFO_RET_FAIL if setting result data failed */
-	return (FAIL == ret ? SYSINFO_RET_FAIL : serial_header.agent_ret);
+	return (FAIL == ret ? SYSINFO_RET_FAIL : agent_ret);
 }
 
 /******************************************************************************
@@ -1020,7 +1020,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	int		ret = SYSINFO_RET_OK;
 	pid_t		pid;
 	int		fds[2], n, status;
-	char		buffer[MAX_STRING_LEN + sizeof(serial_header_t)], *data;
+	char		buffer[MAX_STRING_LEN + sizeof(zbx_uint64_t) + sizeof(int)], *data;
 	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
 	double		time_start;
 
