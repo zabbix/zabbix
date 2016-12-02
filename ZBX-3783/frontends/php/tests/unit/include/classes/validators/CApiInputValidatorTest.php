@@ -798,6 +798,55 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/name',
 				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
 			],
+			[
+				['type' => API_TIME_PERIOD, 'length' => 16],
+				'1-7,00:00-24:00',
+				'/1/period',
+				'1-7,00:00-24:00'
+			],
+			[
+				['type' => API_TIME_PERIOD, 'flags' => API_MULTIPLE],
+				'1-5,09:00-18:00;6-7,09:00-15:00',
+				'/1/period',
+				'1-5,09:00-18:00;6-7,09:00-15:00'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				'1-5,09:00-18:00;6-7,09:00-15:00',
+				'/1/period',
+				'Invalid parameter "/1/period": a time period is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				'',
+				'/1/period',
+				'Invalid parameter "/1/period": cannot be empty.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				[],
+				'/1/period',
+				'Invalid parameter "/1/period": a character string is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				null,
+				'/1/period',
+				'Invalid parameter "/1/period": a character string is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				'1,00:00-24:00a',
+				'/1/period',
+				'Invalid parameter "/1/period": a time period is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				// broken UTF-8 byte sequence
+				'1-7'."\xd1".',00:00-24:00',
+				'/1/period',
+				'Invalid parameter "/1/period": invalid byte sequence in UTF-8.'
+			]
 		];
 	}
 

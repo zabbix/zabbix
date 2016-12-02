@@ -991,12 +991,14 @@ define('API_IDS',			6);
 define('API_OBJECTS',		7);
 // specific types
 define('API_HG_NAME',		8);
+define('API_TIME_PERIOD',	9);
 
 // flags
 define('API_REQUIRED',		0x01);
 define('API_NOT_EMPTY',		0x02);
 define('API_ALLOW_NULL',	0x04);
 define('API_NORMALIZE',		0x08);
+define('API_MULTIPLE',		0x10);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
