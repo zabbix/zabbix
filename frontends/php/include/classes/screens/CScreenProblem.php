@@ -637,7 +637,7 @@ class CScreenProblem extends CScreenBase {
 			if ($this->config['event_ack_enable']) {
 				$header_check_box = (new CColHeader(
 					(new CCheckBox('all_eventids'))
-						->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
+						->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
 				))->addClass(ZBX_STYLE_CELL_WIDTH);
 			}
 			else {

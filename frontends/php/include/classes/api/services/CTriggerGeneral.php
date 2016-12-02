@@ -1151,19 +1151,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$expressionData = new CTriggerExpression(['lldmacros' => false]);
 				$error_wrong_host = _('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.');
+				$triggerFunctionValidator = new CFunctionValidator(['lldmacros' => false]);
 				break;
 
 			case 'CTriggerPrototype':
 				$expressionData = new CTriggerExpression();
 				$error_wrong_host = _('Incorrect trigger prototype expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously.');
+				$triggerFunctionValidator = new CFunctionValidator();
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
-
-		$triggerFunctionValidator = new CFunctionValidator();
 
 		/*
 		 * [

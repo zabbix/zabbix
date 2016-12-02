@@ -4495,15 +4495,15 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *           structure host, key, func fields.                                *
  *                                                                            *
  ******************************************************************************/
-static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
+static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
 {
 	char	*pl, *pr, *key = NULL, *replace_to = NULL;
 	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0, par_l, par_r;
 	int	ret = FAIL;
 
 	pl = pr = *data + token->token.l;
-	if ('{' != *pr++)
-		return FAIL;
+	pr++;	/* skip '{' */
 
 	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
 	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
@@ -4541,16 +4541,21 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
 		goto clean;
 
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
+
+	ret = substitute_function_lld_param(pr + par_l + 1, par_r - (par_l + 1), 0,
+			&replace_to, &replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len);
+
+	pl = pr + par_r;
 	pr += par_r + 1;
 
-	if ('}' != *pr++)
+	if (FAIL == ret || '}' != *pr++)
 		goto clean;
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	token->token.r = pr - *data - 1;
 	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
-
 	ret = SUCCEED;
 clean:
 	zbx_free(replace_to);
@@ -4709,6 +4714,45 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
 
 /******************************************************************************
  *                                                                            *
+ * Function: substitute_func_macro                                            *
+ *                                                                            *
+ * Purpose: substitute lld macros in function macro parameters                *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer                          *
+ *             token  - [IN/OUT] the token with funciton macro location data  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	int	ret;
+	char	*exp = NULL;
+	size_t	exp_alloc = 0, exp_offset = 0;
+	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
+
+	ret = substitute_function_lld_param(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset,
+			jp_row, error, max_error_len);
+
+	if (SUCCEED == ret)
+	{
+		/* copy what is left including closing parenthesis and replace function parameters */
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + par_r, token->token.r - (par_r - 1));
+		zbx_replace_string(data, par_l + 1, &token->token.r, exp);
+	}
+
+	zbx_free(exp);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_lld_macros                                            *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
@@ -4767,23 +4811,15 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
-					process_simple_macro_token(data, &token, jp_row);
+					process_simple_macro_token(data, &token, jp_row, error, max_error_len);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					/* LLD macros must be ignored inside supported function macros.       */
-					/* For example when expanding lld macro {#LLDMACRO} with value "ABC"  */
-					/* {{ITEM.VALUE}.regsub({#LLDMACRO})} should be translated to         */
-					/*     {{ITEM.VALUE}.regsub({#LLDMACRO})}, but                        */
-					/* {{ITEM.KEY}.regsub({#LLDMACRO})} should be translated to           */
-					/*     {{ITEM.KEY}.regsub(ABC)}                                       */
-					/* In the first case the expression contains valid function macro and */
-					/* lld macros are not supported inside function macro parameters.     */
-					/* In the second case {ITEM.KEY} macro does not support functions, so */
-					/* it is not a valid function macro and is processed as a plain text, */
-					/* expanding lld macros inside it.                                    */
 					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
+					{
+						ret = substitute_func_macro(data, &token, jp_row, error, max_error_len);
 						pos = token.token.r;
+					}
 					break;
 			}
 		}
@@ -4914,6 +4950,113 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_function_lld_param                                    *
+ *                                                                            *
+ * Purpose: substitute lld macros in function parameters                      *
+ *                                                                            *
+ * Parameters: e            - [IN] the function parameter list without        *
+ *                                 enclosing parentheses:                     *
+ *                                       <p1>, <p2>, ...<pN>                  *
+ *             len          - [IN] the length of function parameter list      *
+ *             key_in_param - [IN] 1 - the first parameter must be host:key   *
+ *                                 0 - otherwise                              *
+ *             exp          - [IN/OUT] output buffer                          *
+ *             exp_alloc    - [IN/OUT] the size of output buffer              *
+ *             exp_offset   - [IN/OUT] the current position in output buffer  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
+		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	const char	*__function_name = "substitute_function_lld_param";
+	int		ret = SUCCEED;
+	size_t		sep_pos;
+	char		*param = NULL;
+	const char	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == len)
+	{
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, "");
+		goto out;
+	}
+
+	for (p = e; p < len + e ; p += sep_pos + 1)
+	{
+		size_t	param_pos, param_len, rel_len = len - (p - e);
+		int	quoted;
+
+		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+
+		/* copy what was before the parameter */
+		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
+
+		/* prepare the parameter (macro substitutions and quoting) */
+
+		zbx_free(param);
+		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
+
+		if (1 == key_in_param && p == e)
+		{
+			char	*key = NULL, *host = NULL;
+
+			if (SUCCEED != parse_host_key(param, &host, &key) ||
+					SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+							MACRO_TYPE_ITEM_KEY, NULL, 0))
+			{
+				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
+				zbx_free(host);
+				zbx_free(key);
+				ret = FAIL;
+				goto out;
+			}
+
+			zbx_free(param);
+			if (NULL != host)
+			{
+				param = zbx_dsprintf(NULL, "%s:%s", host, key);
+				zbx_free(host);
+				zbx_free(key);
+			}
+			else
+				param = key;
+		}
+		else
+			substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+
+		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		{
+			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
+			ret = FAIL;
+			goto out;
+		}
+
+		/* copy the parameter */
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, param);
+
+		/* copy what was after the parameter (including separator) */
+		if (sep_pos < rel_len)
+			zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
+					sep_pos - param_pos - param_len + 1);
+	}
+out:
+	zbx_free(param);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
