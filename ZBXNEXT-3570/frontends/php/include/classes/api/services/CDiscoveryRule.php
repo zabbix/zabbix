@@ -483,8 +483,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// check if the given discovery rules exist
 		$count = $this->get([
-			'itemids' => $data['discoveryids'],
-			'countOutput' => true
+			'countOutput' => true,
+			'itemids' => $data['discoveryids']
 		]);
 
 		if ($count != count($data['discoveryids'])) {
