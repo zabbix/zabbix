@@ -696,9 +696,7 @@ class CUser extends CApiService {
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
-		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkPermissions(zbx_objectValues($users, 'userid'));
 
 		$mediaDBfields = [
 			'period' => null,
@@ -874,10 +872,7 @@ class CUser extends CApiService {
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
-		// validate user permissions
-		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkPermissions(zbx_objectValues($users, 'userid'));
 
 		// validate media permissions
 		$mediaIds = [];
@@ -1267,43 +1262,6 @@ class CUser extends CApiService {
 		return $userData;
 	}
 
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'userids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	public function isWritable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'userids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1353,12 +1311,20 @@ class CUser extends CApiService {
 	/**
 	 * Checks if the given users are editable.
 	 *
-	 * @param array $userIds	user ids to check
+	 * @param array $userids	user ids to check
 	 *
 	 * @throws APIException		if the user has no permissions to edit users or a user does not exist
 	 */
-	protected function checkPermissions(array $userIds) {
-		if (!$this->isWritable($userIds)) {
+	protected function checkPermissions(array $userids) {
+		$userids = array_unique($userids);
+
+		$count = $this->get([
+			'countOutput' => true,
+			'userids' => $userids,
+			'editable' => true
+		]);
+
+		if ($count != count($userids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}

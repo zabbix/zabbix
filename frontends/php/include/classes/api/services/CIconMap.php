@@ -317,8 +317,20 @@ class CIconMap extends CApiService {
 		if (empty($iconmapids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-		if (!$this->isWritable($iconmapids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+
+		$db_iconmaps = $this->get([
+			'output' => [],
+			'iconmapids' => $iconmapids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($iconmapids as $iconmapid) {
+			if (!array_key_exists($iconmapid, $db_iconmaps)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$sql = 'SELECT m.name AS mapname, im.name as iconmapname'.
@@ -334,53 +346,6 @@ class CIconMap extends CApiService {
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
 		return ['iconmapids' => $iconmapids];
-	}
-
-	/**
-	 * Check if user has read permissions for given icon map IDs.
-	 * @param $ids
-	 * @return bool
-	 */
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'iconmapids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
-	 * Check if user has write permissions for given icon map IDs.
-	 * @param $ids
-	 * @return bool
-	 */
-	public function isWritable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'iconmapids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return count($ids) == $count;
 	}
 
 	/**
