@@ -1334,15 +1334,14 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  * Purpose: check if actions have to be processed for the event               *
  *          (check all conditions of the action)                              *
  *                                                                            *
- * Parameters: event - event to check                                         *
- *             actionid - action ID for matching                              *
+ * Parameters: actionid - action ID for matching                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *action)
+static int	check_action_conditions(zbx_action_eval_t *action)
 {
 	const char	*__function_name = "check_action_conditions";
 
@@ -1768,7 +1767,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 				if (action->eventsource != event->source)
 					continue;
 
-				if (SUCCEED == check_action_conditions(event, action))
+				if (SUCCEED == check_action_conditions(action))
 				{
 					zbx_escalation_new_t	*new_escalation;
 
