@@ -128,7 +128,7 @@ int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression + par_l + 1, par_r - par_l - 1);
 	params = (char **)zbx_malloc(NULL, sizeof(char *) * param_alloc);
 
-	for (ptr = buf; ptr - buf < buf_offset; ptr += sep_pos + 1)
+	for (ptr = buf; ptr < buf + buf_offset; ptr += sep_pos + 1)
 	{
 		size_t	param_pos, param_len;
 		int	quoted;

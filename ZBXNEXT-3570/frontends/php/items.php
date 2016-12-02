@@ -1171,7 +1171,6 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['itemids'],
-		'selectItems' => ['itemid'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	]);
 	$hostCount = count($data['hosts']);
@@ -1214,7 +1213,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 			// set the initial chosen interface to one of the interfaces the items use
 			$items = API::Item()->get([
-				'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+				'itemids' => $data['itemids'],
 				'output' => ['itemid', 'type']
 			]);
 			$usedInterfacesTypes = [];
