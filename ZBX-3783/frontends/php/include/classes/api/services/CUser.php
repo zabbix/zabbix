@@ -1318,6 +1318,16 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $user) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
+			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'userData' =>	['type' => API_FLAG]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+
 		$name = $user['user'];
 		$password = md5($user['password']);
 
