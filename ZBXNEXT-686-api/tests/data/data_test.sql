@@ -1326,3 +1326,25 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
+
+-- API tests
+-- application
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50010, 1);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40066, 50009, 50022, 0, 3, 0, 'API item wit application', 'api_item_application', 30, 90, 365, 0, '', NULL, '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40067, 50009, 50022, 0, 3, 0, 'API item wit application massadd1', 'api_item_application_massadd1', 30, 90, 365, 0, '', NULL, '', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40068, 50009, 50022, 0, 3, 0, 'API item wit application massadd2', 'api_item_application_massadd2', 30, 90, 365, 0, '', NULL, '', '', 0);
+INSERT INTO applications (applicationid,hostid,name) VALUES (366,50009,'API application');
+INSERT INTO applications (applicationid,hostid,name) VALUES (367,50009,'API host application for update');
+INSERT INTO applications (applicationid,hostid,name) VALUES (368,10093,'API template application for update');
+INSERT INTO applications (applicationid,hostid,name) VALUES (370,50009,'API application delete');
+INSERT INTO applications (applicationid,hostid,name) VALUES (371,50009,'API application delete2');
+INSERT INTO applications (applicationid,hostid,name) VALUES (372,50009,'API application delete3');
+INSERT INTO applications (applicationid,hostid,name) VALUES (373,50009,'API application delete4');
+INSERT INTO applications (applicationid,hostid,name) VALUES (374,50009,'API application for items');
+INSERT INTO applications (applicationid,hostid,name) VALUES (375,50009,'API application for items2');
+INSERT INTO applications (applicationid,hostid,name) VALUES (376,50009,'API application for items3');
