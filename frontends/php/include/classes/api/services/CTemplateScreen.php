@@ -748,8 +748,13 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
-		// check permissions on templates
-		if (!API::Template()->isWritable($templateIds)) {
+		$count = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateIds,
+			'editable' => true
+		]);
+
+		if ($count != count($templateIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
