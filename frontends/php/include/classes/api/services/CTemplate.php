@@ -680,6 +680,31 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 *
+	 * @param array $hostids    an array of host or template IDs
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 */
+	protected function checkHostPermissions(array $hostids) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
 	 * Additionally allows to link templates to hosts and other templates.
 	 *
 	 * Checks write permissions for templates.
@@ -695,20 +720,13 @@ class CTemplate extends CHostGeneral {
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
 		$templateIds = zbx_objectValues($templates, 'templateid');
 
-		// check permissions
-		if (!$this->isWritable($templateIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkPermissions($templateIds, _('No permissions to referred object or it does not exist!'));
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
 			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
-			if (!API::Host()->isWritable($hostIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+			$this->checkHostPermissions($hostIds);
 
 			// check if any of the hosts are discovered
 			$this->checkValidator($hostIds, new CHostNormalValidator([
@@ -1041,10 +1059,7 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$templateids = zbx_toArray($data['templateids']);
 
-		// check permissions
-		if (!$this->isWritable($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($templateids, _('You do not have permission to perform this operation.'));
 
 		if (isset($data['hostids'])) {
 			// check if any of the hosts are discovered
@@ -1061,54 +1076,27 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Check if user has read permissions for templates.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'templateids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
 	 * Check if user has write permissions for templates.
 	 *
-	 * @param array $ids
+	 * @param array  $templateids
+	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
+	private function checkPermissions(array $templateids, $error) {
+		if ($templateids) {
+			$templateids = array_unique($templateids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
+
+			if ($count != count($templateids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'templateids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

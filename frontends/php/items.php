@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -223,14 +224,28 @@ else {
 	}
 }
 
-$filterGroupId = getRequest('filter_groupid');
-if ($filterGroupId && !API::HostGroup()->isWritable([$filterGroupId])) {
+if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_groupid')])) {
 	access_deny();
 }
 
-$filterHostId = getRequest('filter_hostid');
-if ($filterHostId && !API::Host()->isWritable([$filterHostId])) {
-	access_deny();
+if (getRequest('filter_hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('filter_hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => getRequest('filter_hostid'),
+			'editable' => true
+		]);
+
+		if (!$templates) {
+			access_deny();
+		}
+	}
 }
 
 if (!empty($hosts)) {

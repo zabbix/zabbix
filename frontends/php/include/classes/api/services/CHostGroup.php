@@ -1030,10 +1030,18 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		if ($groupIdsToAdd && !$this->isWritable($groupIdsToAdd)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupIdsToAdd) {
+			$count = $this->get([
+				'countOutput' => true,
+				'groupids' => $groupIdsToAdd,
+				'editable' => true
+			]);
+
+			if ($count != count($groupIdsToAdd)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -1151,13 +1159,21 @@ class CHostGroup extends CApiService {
 		}
 
 		// Continue to check new, existing or removable groups for given hosts and templates.
-		$groupIdsToUpdate = array_merge($groupIdsToAdd, $groupIdsToRemove);
+		$groupIdsToUpdate = $groupIdsToAdd + $groupIdsToRemove;
 
 		// Validate write permissions only to changed (added/removed) groups for given hosts and templates.
-		if ($groupIdsToUpdate && !$this->isWritable($groupIdsToUpdate)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupIdsToUpdate) {
+			$count = $this->get([
+				'countOutput' => true,
+				'groupids' => $groupIdsToUpdate,
+				'editable' => true
+			]);
+
+			if ($count != count($groupIdsToUpdate)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		// Check if groups can be removed from given hosts and templates. Only check if no groups are added.
@@ -1268,10 +1284,18 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		if ($groupIdsToRemove && !$this->isWritable($groupIdsToRemove)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupIdsToRemove) {
+			$count = $this->get([
+				'countOutput' => true,
+				'groupids' => $groupIdsToRemove,
+				'editable' => true
+			]);
+
+			if ($count != count($groupIdsToRemove)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupIdsToRemove);
@@ -1293,56 +1317,6 @@ class CHostGroup extends CApiService {
 				);
 			}
 		}
-	}
-
-	/**
-	 * Check if user has read permissions for host groups.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'groupids' => $ids,
-			'countOutput' => true
-		]);
-		return count($ids) == $count;
-	}
-
-	/**
-	 * Check if user has write permissions for host groups.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'groupids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return count($ids) == $count;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

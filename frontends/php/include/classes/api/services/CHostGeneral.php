@@ -25,6 +25,41 @@
 abstract class CHostGeneral extends CHostBase {
 
 	/**
+	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 *
+	 * @param array $hostids    an array of host or template IDs
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 */
+	private function checkHostPermissions(array $hostids) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
 	 * Allows to:
 	 * - add hosts to groups;
 	 * - link templates to hosts;
@@ -58,11 +93,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		// link templates
 		if (!empty($data['templates_link'])) {
-			if (!API::Host()->isWritable($allHostIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+			$this->checkHostPermissions($allHostIds);
 
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
@@ -108,11 +139,7 @@ abstract class CHostGeneral extends CHostBase {
 	public function massRemove(array $data) {
 		$allHostIds = array_merge($data['hostids'], $data['templateids']);
 
-		if (!API::Host()->isWritable($allHostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
-		}
+		$this->checkHostPermissions($allHostIds);
 
 		if (!empty($data['templateids_link'])) {
 			$this->unlink(zbx_toArray($data['templateids_link']), $allHostIds);
