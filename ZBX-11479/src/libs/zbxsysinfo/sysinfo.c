@@ -995,7 +995,7 @@ static ssize_t	write_all(int fd, const void *buf, size_t n, size_t *written)
 
 	while (*written < n)
 	{
-		if (0 < (ret = write(fd, buf + *written, n - *written)))
+		if (-1 != (ret = write(fd, buf + *written, n - *written)))
 			*written += ret;
 		else
 			return ret;
