@@ -169,13 +169,6 @@ static int	DBpatch_3030015(void)
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
 
-static void	DBpatch_3030016_add_text_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid)
-{
-	zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, 1, ZBX_PREPROC_RTRIM, ZBX_WHITESPACE);
-}
-
-#include "log.h"
-
 static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
 {
@@ -230,10 +223,6 @@ static int	DBpatch_3030016(void)
 
 		switch (value_type)
 		{
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				DBpatch_3030016_add_text_preproc_steps(&db_insert, itemid);
-				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 				ZBX_STR2UCHAR(data_type, row[2]);
