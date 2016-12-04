@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-04 11:11+0200\n"
-"PO-Revision-Date: 2016-05-09 06:46+0300\n"
-"Last-Translator: Jesús Manuel <i72moblj@uco.es>\n"
+"PO-Revision-Date: 2016-10-04 15:37+0300\n"
+"Last-Translator: jmmurillo <jmmurillom@tcpsi.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1462769217.000000\n"
+"X-POOTLE-MTIME: 1475588262.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -67,7 +67,7 @@ msgstr[1] "%1$s ítems"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Línea: %2$s | Columna: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -137,7 +137,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:546
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinitamente)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -1442,20 +1442,20 @@ msgstr "No se pudo conectar a la base de datos."
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede copiar el gráfico"
+msgstr[1] "No se pueden copiar los gráficos"
 
 #: items.php:822
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede copiar el item"
+msgstr[1] "No se pueden copiar los items"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede copiar el disparador"
+msgstr[1] "No se pueden copiar los disparadores"
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -2161,13 +2161,13 @@ msgstr "No se puede procesar aplicaciones desde diferentes equipos o plantillas.
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "No se puede leer JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "No se puede leer XML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2208,9 +2208,9 @@ msgstr "No se pudo establecer \"%1$s\" para el ítem \"%2$s\"."
 
 #: include/classes/api/services/CTemplateScreen.php:609
 #: include/classes/api/services/CTemplateScreen.php:707
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr "No pude definir\"%1$s\" para la pantalla plantilla \"%2$s\"."
+msgstr "No pude definir\"%1$s\" para la palntilla de pantalla \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -4328,11 +4328,11 @@ msgstr "La diferencia entre los valores máximo y mínimo en un periodo T es ≠
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "La direfencia entre el valor de fecha y hora del item y fecha y hora del servidor Zabbix es mayor de T segundos, entonces N = 1, 1 - en otro caso"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Diferencia entre el valor de fecha y hora del item y la fecha y hora del servidor Zabbix es mayor de T segundos, entonces N NO 0, 1 - en caso contrario"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -4341,7 +4341,7 @@ msgstr "Si hay diferencia entre el valor más reciente y el que lo precede, ento
 #: popup_trexpr.php:282
 #, fuzzy
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr "Diferencia entre el último y los valores anteriores, entonces N NO 1, 0 - en otro caso"
+msgstr "Diferencia entre el último y el anterior valor, entonces N NO 1, 0 - en otro caso"
 
 #: popup_trexpr.php:242
 msgid "Difference between last and previous value is < N"
@@ -4621,7 +4621,7 @@ msgstr "Estado del descubrimiento"
 #: include/classes/items/CHelpItems.php:551
 #, fuzzy
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr "Estadísticas de lectura de disco. Devuelve entero si tipo es sectores, operaciones, bytes; decimal si tipo es sps, ops, bps"
+msgstr "Estadísticas de lectura de disco. Devuelve entero si el tipo es sectores, operaciones, bytes; decimal si el tipo es sps, ops, bps."
 
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:595
@@ -4912,7 +4912,7 @@ msgstr "Vaciar el archivo de claves SSL del escenario web \"%1$s\"."
 #: include/classes/validators/CActionCondValidator.php:197
 #, fuzzy
 msgid "Empty action condition."
-msgstr "Vaciar condición de acción."
+msgstr "Condición de acción vacía."
 
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
@@ -4922,7 +4922,7 @@ msgstr "Vaciar nombre del prototipo de aplicación en el prototipo del elemento 
 #: include/classes/validators/CColorValidator.php:33
 #, fuzzy
 msgid "Empty color."
-msgstr "Vaciar color."
+msgstr "Color vacío."
 
 #: include/classes/api/services/CAction.php:1885
 #, c-format
@@ -4942,7 +4942,7 @@ msgstr "Filtro de condición de macro vacío para la regla de descubrimiento \"%
 #: include/classes/api/services/CHostPrototype.php:456
 #, fuzzy
 msgid "Empty host ID for host prototype."
-msgstr "Quitar ID de equipo del prototipo de equipo."
+msgstr "ID de equipo vacío para prototipo de equipo."
 
 #: include/classes/api/services/CHostPrototype.php:172
 msgid "Empty host."
@@ -5690,7 +5690,7 @@ msgstr "Primero"
 #: include/func.inc.php:1529
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Primero"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
@@ -5801,7 +5801,7 @@ msgstr "Función"
 #: popup_trexpr.php:812
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "La función \"%1$s\" no puede ser usada con el item seleccionado \"%2$s\""
 
 #: app/views/administration.mediatype.edit.php:112
 #: app/views/administration.mediatype.list.php:64
@@ -5838,7 +5838,7 @@ msgstr "Alemán(de_DE)"
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:603
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "Obtener el contenido de la pagina web. Devuelve el código de la web como texto."
 
 #: include/triggers.inc.php:1347 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5858,11 +5858,11 @@ msgstr "Scripts globales"
 
 #: include/views/hostmacros.php:46
 msgid "Global value"
-msgstr ""
+msgstr "Valor global"
 
 #: jsLoader.php:197
 msgid "Go to"
-msgstr ""
+msgstr "Ir a"
 
 #: app/views/system.warning.php:26 include/func.inc.php:1694
 msgid "Go to dashboard"
@@ -5922,7 +5922,7 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:370
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "La gráfica \"%1$s\" no se puede heredar. No estan los items requerido en \"%2$s\"."
 
 #: include/classes/api/services/CTemplateScreen.php:550
 #, c-format
@@ -5941,8 +5941,8 @@ msgstr "Gráfico añadido"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Gráfico copiado"
+msgstr[1] "Gráficos copiados"
 
 #: graphs.php:295
 msgid "Graph deleted"
@@ -5983,15 +5983,15 @@ msgstr "Prototipo de gráfica agregado"
 
 #: graphs.php:287
 msgid "Graph prototype deleted"
-msgstr ""
+msgstr "Gráfico prototipo eliminado"
 
 #: include/classes/screens/CScreenLldGraph.php:169
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "Gráfico prototipo no encontrado"
 
 #: graphs.php:227
 msgid "Graph prototype updated"
-msgstr ""
+msgstr "Gráfico prototipo actualizado"
 
 #: include/html.inc.php:485 include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:24
@@ -5999,11 +5999,11 @@ msgstr ""
 #: include/views/configuration.host.edit.php:510
 #: include/views/configuration.template.edit.php:338 popup.php:95
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Gráficos prototipos"
 
 #: graphs.php:311
 msgid "Graph prototypes deleted"
-msgstr ""
+msgstr "Gráficos prototipos eliminados"
 
 #: include/views/js/configuration.graph.edit.js.php:40
 msgid "Graph sum"
@@ -6167,7 +6167,7 @@ msgstr "Grupos"
 
 #: include/views/configuration.maintenance.edit.php:201
 msgid "Groups in maintenance"
-msgstr ""
+msgstr "Grupos en mantenimiento"
 
 #: include/translateDefines.inc.php:35
 msgid "H:i"
@@ -6240,15 +6240,15 @@ msgstr "Hexadecimal"
 
 #: include/views/monitoring.sysmap.constructor.php:45 jsLoader.php:139
 msgid "Hidden"
-msgstr ""
+msgstr "Oculto"
 
 #: include/views/common.filter.trigger.php:55
 msgid "Hide all"
-msgstr ""
+msgstr "Ocultar todo"
 
 #: include/html.inc.php:905
 msgid "Hide debug"
-msgstr ""
+msgstr "Ocultar depuración"
 
 #: include/views/monitoring.history.php:155
 msgid "Hide selected"
@@ -6453,26 +6453,26 @@ msgstr ""
 #: include/classes/api/services/CHostGroup.php:563
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "El grupo de equipo \"%1$s\" no puede ser eliminado, porque esta usado en un script global."
 
 #: include/classes/api/services/CHostGroup.php:517
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "El grupo de equipo \"%1$s\" es interno y no puede ser eliminado."
 
 #: include/views/js/monitoring.sysmaps.js.php:27
 msgid "Host group elements"
-msgstr ""
+msgstr "Elementos del grupo de equipos"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:129
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr ""
+msgstr "Problemas del grupo de equipos"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Host group label type"
-msgstr ""
+msgstr "Etiqueta de tipo de grupos de equipo"
 
 #: include/classes/api/services/CHostGroup.php:371
 #: include/classes/api/services/CHostGroup.php:460
@@ -6520,7 +6520,7 @@ msgstr "Tipo de etiqueta de equipo"
 
 #: include/views/hostmacros.php:173
 msgid "Host macros"
-msgstr ""
+msgstr "Macros de equipo"
 
 #: include/actions.inc.php:62
 msgid "Host metadata"
@@ -6536,11 +6536,11 @@ msgstr "Nombre de equipo"
 #: include/classes/api/services/CHostPrototype.php:174
 #, c-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "Nombre del equipo para el equipo protoripo \"%1$s\" debe contener macros."
 
 #: include/hosts.inc.php:284
 msgid "Host networks"
-msgstr ""
+msgstr "Red de equipos"
 
 #: include/classes/api/services/CHostPrototype.php:783
 #, c-format
@@ -6584,22 +6584,22 @@ msgstr "Prototipo de equipo actualizado"
 #: include/classes/api/services/CHostPrototype.php:1130
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "El equipo protoripo con nombre \"%1$s\" ya existe en la regla de descubrimiento \"%2$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:1126
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "El equpo protoripo con nombre \"%1$s\" ya existe."
 
 #: include/classes/api/services/CHostPrototype.php:1138
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr ""
+msgstr "El equipo protoripo con nombre visible \"%1$s\" ya exsite en la regla de descubrimiento \"%2$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:1135
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "El equipo prototipo con nombre visible \"%1$s\" ya existe."
 
 #: include/html.inc.php:496
 #: include/views/configuration.host.discovery.list.php:99
@@ -6607,11 +6607,11 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:30
 #: include/views/configuration.host.prototype.list.php:23
 msgid "Host prototypes"
-msgstr ""
+msgstr "Equipos prototipos"
 
 #: host_prototypes.php:255
 msgid "Host prototypes deleted"
-msgstr ""
+msgstr "Equipos prototipos eliminados"
 
 #: include/hosts.inc.php:294
 msgid "Host router"
