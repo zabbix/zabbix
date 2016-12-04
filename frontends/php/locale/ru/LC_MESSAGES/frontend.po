@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-04 11:11+0200\n"
-"PO-Revision-Date: 2016-07-05 13:10+0300\n"
+"PO-Revision-Date: 2016-09-14 09:48+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1467717014.000000\n"
+"X-POOTLE-MTIME: 1473839307.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -3426,11 +3426,11 @@ msgstr "Создать преобразование значений"
 
 #: include/views/configuration.httpconf.list.php:25
 msgid "Create web scenario"
-msgstr "Создать веб сценарий"
+msgstr "Создать веб-сценарий"
 
 #: include/views/configuration.httpconf.list.php:22
 msgid "Create web scenario (select host first)"
-msgstr "Создать веб сценарий (сначала выберите узел сети)"
+msgstr "Создать веб-сценарий (сначала выберите узел сети)"
 
 #: include/classes/api/managers/CApplicationManager.php:74
 #, c-format
