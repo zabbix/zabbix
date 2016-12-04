@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:12+0300\n"
+"POT-Creation-Date: 2016-12-04 11:34+0200\n"
 "PO-Revision-Date: 2016-02-11 04:41+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2472,7 +2472,7 @@ msgstr "사용자'%1$s'로 로그인"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "%2$s'에서 유저 '%1$s'로 로그인"
 
-#: api/classes/CScript.php:431
+#: api/classes/CScript.php:445
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2483,7 +2483,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"에 설정된 서버의 IP 혹은 DNS가 올바르지 않음;\n"
 "2. DNS서버의 설정이 올바르지 않음.\n"
 
-#: api/classes/CScript.php:422
+#: api/classes/CScript.php:436
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2498,7 +2498,7 @@ msgstr ""
 "3. Zabbix서버의 데몬이 동작하지 않음;\n"
 "4. 방화벽이 TCP접속을 블록.\n"
 
-#: api/classes/CScript.php:428
+#: api/classes/CScript.php:442
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -4200,27 +4200,27 @@ msgstr "영어 (en_US)"
 msgid "Error"
 msgstr "에러"
 
-#: api/classes/CScript.php:436
+#: api/classes/CScript.php:450
 msgid "Error description"
 msgstr "설명 에러"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:488
 msgid "Error description: can't read script response, check connection."
 msgstr "에러 상세내용: 스크립트의 응답이 없습니다. 커넥션을 확인해주세요."
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:465
 msgid "Error description: can't send command, check connection."
 msgstr "에러 상세내용:커맨드를 송신할 수 없습니다. 커넥션을 확인해주세요."
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:481
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "에러 상세내용: \"include/defines.inc.php\"에 설정되어있는 정수 ZBX_SCRIPT_BYTES_LIMIT의 읽기 바이트 제한에 도달하였습니다. 설정치를 증가시켜 다시 시도해주세요."
 
-#: api/classes/CScript.php:463
+#: api/classes/CScript.php:477
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "에러 상세내용: \"include/defines.inc.php\"에 설정되어있는 정수 ZBX_SCRIPT_TIMEOUT의 타임아웃에 도달하였습니다. 설정치를 증가시켜 다시 시도해주세요."
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:496
 msgid "Error description: empty response received."
 msgstr "에러 상세내용: 수신한 값이 비어있습니다."
 
@@ -5926,7 +5926,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "설정항목이 잘못되어 있습니다."
 
 #: api/classes/CHostInterface.php:500 api/classes/CHostInterface.php:690
-#: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:537
+#: api/classes/CItemGeneral.php:174 api/classes/CScript.php:411
+#: api/classes/CWebCheck.php:537
 msgid "Incorrect arguments passed to function."
 msgstr "잘못된 인수의 값이 함수에 전달되었습니다."
 
@@ -8443,7 +8444,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CScreen.php:578 api/classes/CScript.php:420
+#: api/classes/CScript.php:430 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
@@ -13247,11 +13249,10 @@ msgstr "액션 클로벌 스크립트 \"%s\"의 타겟이 지정되어 있지 �
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367
-#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
-#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
-#: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
-#: api/classes/CWebCheck.php:523
+#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:1066
+#: api/classes/CTemplate.php:1126 api/classes/CTemplate.php:1266
+#: api/classes/CTemplate.php:1298 api/classes/CTemplate.php:1532
+#: api/classes/CTemplateScreen.php:736 api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "조작 가능한 권한이 없습니다."
 
@@ -13354,7 +13355,7 @@ msgstr "Zabbix는 일시적으로 이용할 수 없습니다!"
 msgid "Zabbix server"
 msgstr "Zabbix 서버"
 
-#: api/classes/CScript.php:425
+#: api/classes/CScript.php:439
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

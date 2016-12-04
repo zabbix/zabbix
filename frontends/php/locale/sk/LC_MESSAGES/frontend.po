@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:12+0300\n"
+"POT-Creation-Date: 2016-12-04 11:34+0200\n"
 "PO-Revision-Date: 2014-06-09 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2491,7 +2491,7 @@ msgstr "Prihlásený ako '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Pripojené ako '%1$s' z '%2$s'"
 
-#: api/classes/CScript.php:431
+#: api/classes/CScript.php:445
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2502,7 +2502,7 @@ msgstr ""
 "1. Zlé nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Zlé nastavenie DNS servera.\n"
 
-#: api/classes/CScript.php:422
+#: api/classes/CScript.php:436
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2517,7 +2517,7 @@ msgstr ""
 "3. Zabbix server démon nie je spustený;\n"
 "4. Firewall blokuje TCP spojenie.\n"
 
-#: api/classes/CScript.php:428
+#: api/classes/CScript.php:442
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -4222,27 +4222,27 @@ msgstr "Anglicky (en_US)"
 msgid "Error"
 msgstr "Chyba"
 
-#: api/classes/CScript.php:436
+#: api/classes/CScript.php:450
 msgid "Error description"
 msgstr "Popis chyby"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:488
 msgid "Error description: can't read script response, check connection."
 msgstr "Popis chyby: nemôžem čítať odpoveď skriptu, skontrolujte spojenie."
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:465
 msgid "Error description: can't send command, check connection."
 msgstr "Popis chyby: nemôžem odoslať príkaz, skontrolujte spojenie."
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:481
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Popis chyby: obmedzenie definované v \"include/defines.inc.php\", konštanta ZBX_SCRIPT_BYTES_LIMIT bola dosiahnutá. Môžte sa pokúsiť zvýšiť túto hodnotu."
 
-#: api/classes/CScript.php:463
+#: api/classes/CScript.php:477
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Popis chyby: obmedzenie definované v \"include/defines.inc.php\", konštanta ZBX_SCRIPT_TIMEOUT bola dosiahnutá. Môžte sa pokúsiť zvýšiť túto hodnotu."
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:496
 msgid "Error description: empty response received."
 msgstr "Popis chyby: prijatá prázdna odpoveď."
 
@@ -5948,7 +5948,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "Funkcii boli predané neplatné argumenty"
 
 #: api/classes/CHostInterface.php:500 api/classes/CHostInterface.php:690
-#: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:537
+#: api/classes/CItemGeneral.php:174 api/classes/CScript.php:411
+#: api/classes/CWebCheck.php:537
 msgid "Incorrect arguments passed to function."
 msgstr "Funkcii boli predané neplatné argumenty."
 
@@ -8473,7 +8474,8 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CScreen.php:578 api/classes/CScript.php:420
+#: api/classes/CScript.php:430 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
@@ -13289,11 +13291,10 @@ msgstr "Nešpecifikovali ste ciele pre akciu globálneho skriptu \"%s\"."
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367
-#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
-#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
-#: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
-#: api/classes/CWebCheck.php:523
+#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:1066
+#: api/classes/CTemplate.php:1126 api/classes/CTemplate.php:1266
+#: api/classes/CTemplate.php:1298 api/classes/CTemplate.php:1532
+#: api/classes/CTemplateScreen.php:736 api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
 
@@ -13396,7 +13397,7 @@ msgstr "Zabbix je dočasne nedostupný!"
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
-#: api/classes/CScript.php:425
+#: api/classes/CScript.php:439
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"

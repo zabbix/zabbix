@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:12+0300\n"
+"POT-Creation-Date: 2016-12-04 11:34+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -2489,7 +2489,7 @@ msgstr "Свързан като '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Свързан като '%1$s' от '%2$s'"
 
-#: api/classes/CScript.php:431
+#: api/classes/CScript.php:445
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -2500,7 +2500,7 @@ msgstr ""
 "1. Неправилно IP/DNS на сървъра в \"zabbix.conf.php\";\n"
 "2. Неправилна конфигурация на DNS сървър.\n"
 
-#: api/classes/CScript.php:422
+#: api/classes/CScript.php:436
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -2515,7 +2515,7 @@ msgstr ""
 "3. Демона на Zabbix сървъра не работи;\n"
 "4. Защитната стена блокира TCP връзката.\n"
 
-#: api/classes/CScript.php:428
+#: api/classes/CScript.php:442
 #, php-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -4220,27 +4220,27 @@ msgstr "Английски (US)"
 msgid "Error"
 msgstr "Грешка"
 
-#: api/classes/CScript.php:436
+#: api/classes/CScript.php:450
 msgid "Error description"
 msgstr "Описание на грешката"
 
-#: api/classes/CScript.php:474
+#: api/classes/CScript.php:488
 msgid "Error description: can't read script response, check connection."
 msgstr "Описание на грешката: не успя да прочете отговора на скрипта, проверете връзката."
 
-#: api/classes/CScript.php:451
+#: api/classes/CScript.php:465
 msgid "Error description: can't send command, check connection."
 msgstr "Описание на грешката: не успя да изпрати командата, проверете връзката."
 
-#: api/classes/CScript.php:467
+#: api/classes/CScript.php:481
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr "Описание на грешката: константа ZBX_SCRIPT_BYTES_LIMIT - определението в \"include/defines.inc.php\" надвишава допустимия лимит. Можете да опитате, да увеличите стойността."
 
-#: api/classes/CScript.php:463
+#: api/classes/CScript.php:477
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr "Описание на грешката: константа ZBX_SCRIPT_TIMEOUT - определението просрочване на времето в \"include/defines.inc.php\" е надвишено. Можете да опитате, да увеличите стойността."
 
-#: api/classes/CScript.php:482
+#: api/classes/CScript.php:496
 msgid "Error description: empty response received."
 msgstr "Описание на грешката: получен празен отговор."
 
@@ -5953,7 +5953,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "Подадени са неправилни аргументи за функцията"
 
 #: api/classes/CHostInterface.php:500 api/classes/CHostInterface.php:690
-#: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:537
+#: api/classes/CItemGeneral.php:174 api/classes/CScript.php:411
+#: api/classes/CWebCheck.php:537
 msgid "Incorrect arguments passed to function."
 msgstr "Подадени са неправилни аргументи за функцията."
 
@@ -8477,7 +8478,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CScreen.php:578 api/classes/CScript.php:420
+#: api/classes/CScript.php:430 api/classes/CService.php:1254
 #: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
@@ -13294,11 +13296,10 @@ msgstr "Вие не сте уточнили цели за глобален ск�
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367
-#: api/classes/CScript.php:417 api/classes/CTemplate.php:974
-#: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
-#: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
-#: api/classes/CWebCheck.php:523
+#: api/classes/CTemplate.php:974 api/classes/CTemplate.php:1066
+#: api/classes/CTemplate.php:1126 api/classes/CTemplate.php:1266
+#: api/classes/CTemplate.php:1298 api/classes/CTemplate.php:1532
+#: api/classes/CTemplateScreen.php:736 api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "Вие нямате права за извършване на тази операция."
 
@@ -13401,7 +13402,7 @@ msgstr "Zabbix е временно недостъпен!"
 msgid "Zabbix server"
 msgstr "Zabbix сървър"
 
-#: api/classes/CScript.php:425
+#: api/classes/CScript.php:439
 #, php-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
