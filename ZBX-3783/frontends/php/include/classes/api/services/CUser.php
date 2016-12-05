@@ -787,34 +787,10 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		// Delete action operation msg.
-		$db_operations = DBFetchArray(DBselect(
-			'SELECT DISTINCT om.operationid'.
-			' FROM opmessage_usr om'.
-			' WHERE '.dbConditionInt('om.userid', $userids)
-		));
-
-		DB::delete('opmessage_usr', ['userid' => $userids]);
-
-		// Delete empty operations.
-		$del_operations = DBFetchArray(DBselect(
-			'SELECT DISTINCT o.operationid,o.actionid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
-				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
-				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
-		));
-
-		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
 		DB::delete('media', ['userid' => $userids]);
 		DB::delete('profiles', ['userid' => $userids]);
 		DB::delete('users_groups', ['userid' => $userids]);
 		DB::delete('users', ['userid' => $userids]);
-
-		$actionids = zbx_objectValues($del_operations, 'actionid');
-		if ($actionids) {
-			$this->disableActionsWithoutOperations($actionids);
-		}
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, $db_users);
 
@@ -860,6 +836,22 @@ class CUser extends CApiService {
 					_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
 				);
 			}
+		}
+
+		// Check if deleted users used in actions.
+		$db_actions = DBselect(
+			'SELECT a.name,om.userid'.
+			' FROM opmessage_usr om,operations o,actions a'.
+			' WHERE om.operationid=o.operationid'.
+				' AND o.actionid=a.actionid'.
+				' AND '.dbConditionInt('om.userid', $userids),
+			1
+		);
+
+		if ($db_action = DBfetch($db_actions)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User "%1$s" is used in "%2$s" action.',
+				$db_users[$db_action['userid']]['alias'], $db_action['name']
+			));
 		}
 
 		// Check if deleted users have a map.
@@ -1641,35 +1633,5 @@ class CUser extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Disable actions that do not have operations.
-	 */
-	protected function disableActionsWithoutOperations(array $actionids) {
-		$actions = DBFetchArray(DBselect(
-			'SELECT DISTINCT a.actionid'.
-			' FROM actions a'.
-			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
-				' AND '.dbConditionInt('a.actionid', $actionids)
-		));
-
-		$actions_without_operations = zbx_objectValues($actions, 'actionid');
-		if ($actions_without_operations) {
-			$this->disableActions($actions_without_operations);
-		}
-	}
-
-	/**
-	 * Disable actions.
-	 *
-	 * @param array $actionids
-	 */
-	protected function disableActions(array $actionids) {
-		$update = [
-			'values' => ['status' => ACTION_STATUS_DISABLED],
-			'where' => ['actionid' => $actionids]
-		];
-		DB::update('actions', $update);
 	}
 }
