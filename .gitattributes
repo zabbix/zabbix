@@ -300,6 +300,9 @@ sass/img_source/icons-sprite.ai -text
 sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
+src/libs/zbxcommon/variant.c -text
+src/libs/zbxdbcache/item_preproc.c -text
+src/libs/zbxdbcache/item_preproc.h -text
 src/libs/zbxdbhigh/trigger.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text

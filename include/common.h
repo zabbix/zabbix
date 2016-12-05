@@ -1335,4 +1335,34 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_DELTA_VALUE		9
 #define ZBX_PREPROC_DELTA_SPEED 	10
 
+
+zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
+
+typedef struct
+{
+	unsigned char	type;
+	history_value_t	data;
+}
+zbx_variant_t;
+
+#define ZBX_VARIANT_NONE	0
+#define ZBX_VARIANT_STR		1
+#define ZBX_VARIANT_LOG		2
+#define ZBX_VARIANT_UI64	3
+#define ZBX_VARIANT_DBL		4
+
+void	zbx_variant_clear(zbx_variant_t *value);
+void	zbx_variant_set_str(zbx_variant_t *value, char *text);
+void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
+void	zbx_variant_set_ui64(zbx_variant_t *value, double dbl);
+void	zbx_variant_set_log(zbx_variant_t *value, zbx_log_value_t *log);
+void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
+int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
+
+int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_variant_value_desc(const zbx_variant_t *value);
+const char	*zbx_variant_type_desc(const zbx_variant_t *value);
+
+int	zbx_validate_value_dbl(double value);
+
 #endif
