@@ -1035,7 +1035,9 @@ static void	zbx_setup_done_cb(ipmi_domain_t *domain, int err, unsigned int conn_
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p err:%d conn_num:%u port_num:%u"
+			" still_connected:%d cb_data:%p", __function_name, h->ip, h->port, h, domain, err, conn_num,
+			port_num, still_connected, cb_data);
 
 	if (0 != err)
 	{
@@ -1064,7 +1066,8 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p, host:'[%s]:%d'", __function_name, h, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' domain:%p cb_data:%p", __function_name, h->ip,
+			h->port, domain, cb_data);
 
 	h->domain_up = 1;
 	h->done = 1;
@@ -1127,7 +1130,10 @@ out:
 
 static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
 {
-	int	i;
+	const char	*__function_name = "zbx_free_ipmi_connection";
+	int		i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' h:%p", __function_name, h->ip, h->port, h);
 
 	for (i = 0; i < h->control_count; i++)
 	{
@@ -1143,6 +1149,8 @@ static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
 	zbx_free(h->err);
 
 	zbx_free(h);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	zbx_free_ipmi_handler(void)
