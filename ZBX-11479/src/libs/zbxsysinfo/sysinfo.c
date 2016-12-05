@@ -986,14 +986,11 @@ static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *
 static void	write_all(int fd, const void *buf, size_t n)
 {
 	ssize_t	ret;
-	size_t	written = 0;
 
-	while (written < n)
+	while (0 < n && -1 != (ret = write(fd, buf, n)))
 	{
-		if (-1 != (ret = write(fd, buf + written, n - written)))
-			written += ret;
-		else
-			break;
+		buf += ret;
+		n -= ret;
 	}
 }
 
