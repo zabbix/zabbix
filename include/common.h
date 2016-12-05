@@ -862,7 +862,7 @@ ZBX_TASK_EX;
 	(data << ZBX_RTC_DATA_SHIFT))
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
-void	string_replace_realloc(char **str, const char *sub_str1, const char *sub_str2);
+void	zbx_string_replace_realloc(char **str, const char *search, const char *replace_to);
 
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
