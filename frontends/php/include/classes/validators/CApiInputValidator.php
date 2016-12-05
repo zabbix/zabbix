@@ -81,6 +81,9 @@ class CApiInputValidator {
 			case API_BOOLEAN:
 				return self::validateBoolean($rule, $data, $path, $error);
 
+			case API_FLAG:
+				return self::validateFlag($rule, $data, $path, $error);
+
 			case API_OBJECT:
 				return self::validateObject($rule, $data, $path, $error);
 
@@ -119,6 +122,7 @@ class CApiInputValidator {
 			case API_INT32:
 			case API_ID:
 			case API_BOOLEAN:
+			case API_FLAG:
 			case API_OBJECT:
 			case API_HG_NAME:
 			case API_TIME_PERIOD:
@@ -299,6 +303,31 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a boolean is expected'));
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Flag validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFlag($rule, &$data, $path, &$error) {
+		if (is_bool($data)) {
+			return true;
+		}
+
+		/**
+		 * @deprecated  As of version 3.4, use boolean flags only.
+		 */
+		trigger_error('Non-boolean flags are deprecated.', E_USER_NOTICE);
+
+		$data = !is_null($data);
 
 		return true;
 	}

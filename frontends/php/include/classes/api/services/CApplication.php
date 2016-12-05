@@ -400,7 +400,7 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
 
 		return ['applicationids' => $applicationids];
 	}
@@ -432,7 +432,7 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
 
 		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
@@ -501,7 +501,7 @@ class CApplication extends CApiService {
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
-		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $db_applications);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $db_applications);
 
 		return ['applicationids' => $applicationids];
 	}

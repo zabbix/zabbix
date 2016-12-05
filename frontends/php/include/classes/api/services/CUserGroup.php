@@ -189,7 +189,7 @@ class CUserGroup extends CApiService {
 		$this->updateRights($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_GROUP, $usrgrps);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_GROUP, $usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -270,7 +270,7 @@ class CUserGroup extends CApiService {
 		$this->updateRights($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid')];
 	}
@@ -1001,7 +1001,7 @@ class CUserGroup extends CApiService {
 			$this->disableActionsWithoutOperations($actionids);
 		}
 
-		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, $db_usrgrps);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -1197,11 +1197,5 @@ class CUserGroup extends CApiService {
 			'where' => ['actionid' => $actionids]
 		];
 		DB::update('actions', $update);
-
-		foreach($actionids as $actionid) {
-			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
-				_('Action disabled due to deletion of user group.'), null
-			);
-		}
 	}
 }

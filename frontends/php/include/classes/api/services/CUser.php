@@ -239,7 +239,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER, $users);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER, $users);
 
 		return ['userids' => $userids];
 	}
@@ -343,7 +343,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, $users, $db_users);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => zbx_objectValues($users, 'userid')];
 	}
@@ -816,7 +816,7 @@ class CUser extends CApiService {
 			$this->disableActionsWithoutOperations($actionids);
 		}
 
-		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, $db_users);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
 	}
@@ -1274,38 +1274,39 @@ class CUser extends CApiService {
 		}
 	}
 
-	private function dbLogin($user) {
-		$login = DBfetch(DBselect(
-			'SELECT NULL'.
-			' FROM users u'.
-			' WHERE u.alias='.zbx_dbstr($user['user']).
-				' AND u.passwd='.zbx_dbstr(md5($user['password']))
-		));
-
-		if ($login) {
-			return true;
+	public function logout($user) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
-		}
-	}
 
-	public function logout() {
-		$sessionId = CWebUser::$data['sessionid'];
+		$sessionid = self::$userData['sessionid'];
 
-		$session = DBfetch(DBselect(
-			'SELECT s.userid'.
-			' FROM sessions s'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionId).
-				' AND s.status='.ZBX_SESSION_ACTIVE
-		));
+		$db_sessions = API::getApiService()->select('sessions', [
+			'output' => ['userid'],
+			'filter' => [
+				'sessionid' => $sessionid,
+				'status' => ZBX_SESSION_ACTIVE
+			],
+			'limit' => 1
+		]);
 
-		if (!$session) {
+		if (!$db_sessions) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
 		}
 
-		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
+		DB::delete('sessions', [
+			'status' => ZBX_SESSION_PASSIVE,
+			'userid' => $db_sessions[0]['userid']
+		]);
+		DB::update('sessions', [
+			'values' => ['status' => ZBX_SESSION_PASSIVE],
+			'where' => ['sessionid' => $sessionid]
+		]);
+
+		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
+
+		self::$userData = null;
 
 		return true;
 	}
@@ -1318,220 +1319,245 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $user) {
-		$name = $user['user'];
-		$password = md5($user['password']);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'userData' =>	['type' => API_FLAG]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
-		$userInfo = DBfetch(DBselect(
-			'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
-			' FROM users u'.
-			' WHERE u.alias='.zbx_dbstr($name)
-		));
-		if (!$userInfo) {
+		$db_users = API::getApiService()->select('users', [
+			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+			],
+			'filter' => ['alias' => $user['user']]
+		]);
+
+		if (!$db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 		}
 
-		// check if user is blocked
-		if ($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			if ((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userInfo['attempt_clock']))));
+		$db_user = $db_users[0];
+
+		// Check if user is blocked.
+		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+			$time_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+
+			if ($time_left > 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
+				);
 			}
 
-			DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
+			DB::update('users', [
+				'values' => ['attempt_clock' => time()],
+				'where' => ['userid' => $db_user['userid']]
+			]);
 		}
 
-		// check system permissions
-		if (!check_perm2system($userInfo['userid'])) {
+		$usrgrps = $this->getUserGroupsData($db_user['userid']);
+
+		$db_user['debug_mode'] = $usrgrps['debug_mode'];
+		$db_user['userip'] = $usrgrps['userip'];
+		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		// Check system permissions.
+		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 		}
 
-		$dbAccess = DBfetch(DBselect(
-			'SELECT MAX(g.gui_access) AS gui_access'.
-			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userInfo['userid']).
-				' AND g.usrgrpid=ug.usrgrpid'
-		));
-
-		if (zbx_empty($dbAccess['gui_access'])) {
-			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
-		}
-		else {
-			$guiAccess = $dbAccess['gui_access'];
-		}
-
 		$config = select_config();
-		$authType = $config['authentication_type'];
+		$authentication_type = $config['authentication_type'];
 
-		switch ($guiAccess) {
-			case GROUP_GUI_ACCESS_INTERNAL:
-				$authType = ($authType == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
-				break;
-			case GROUP_GUI_ACCESS_DISABLED:
-				/* fall through */
-			case GROUP_GUI_ACCESS_SYSTEM:
-				/* fall through */
+		if ($db_user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
+			$authentication_type = ($authentication_type == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
 		}
 
-		if ($authType == ZBX_AUTH_HTTP) {
+		if ($authentication_type == ZBX_AUTH_HTTP) {
 			// if PHP_AUTH_USER is not set, it means that HTTP authentication is not enabled
-			if (!isset($_SERVER['PHP_AUTH_USER'])) {
+			if (!array_key_exists('PHP_AUTH_USER', $_SERVER)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot login.'));
 			}
 			// check if the user name used when calling the API matches the one used for HTTP authentication
-			elseif ($name !== $_SERVER['PHP_AUTH_USER']) {
+			elseif ($user['user'] !== $_SERVER['PHP_AUTH_USER']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Login name "%1$s" does not match the name "%2$s" used to pass HTTP authentication.',
-						$name, $_SERVER['PHP_AUTH_USER']
+						$user['user'], $_SERVER['PHP_AUTH_USER']
 					)
 				);
 			}
 		}
 
 		try {
-			switch ($authType) {
+			switch ($authentication_type) {
 				case ZBX_AUTH_LDAP:
 					$this->ldapLogin($user);
 					break;
+
 				case ZBX_AUTH_INTERNAL:
-					$this->dbLogin($user);
+					if (md5($user['password']) !== $db_user['passwd']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+					}
 					break;
-				case ZBX_AUTH_HTTP:
 			}
 		}
 		catch (APIException $e) {
-			$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-					? $_SERVER['HTTP_X_FORWARDED_FOR']
-					: $_SERVER['REMOTE_ADDR'];
-			$userInfo['attempt_failed']++;
+			DB::update('users', [
+				'values' => [
+					'attempt_failed' => ++$db_user['attempt_failed'],
+					'attempt_clock' => time(),
+					'attempt_ip' => $db_user['userip']
+				],
+				'where' => ['userid' => $db_user['userid']]
+			]);
 
-			DBexecute(
-				'UPDATE users'.
-				' SET attempt_failed='.zbx_dbstr($userInfo['attempt_failed']).','.
-					' attempt_clock='.time().','.
-					' attempt_ip='.zbx_dbstr($ip).
-				' WHERE userid='.zbx_dbstr($userInfo['userid'])
+			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+				$db_user['userip']
 			);
 
-			add_audit_details(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $userInfo['userid'], '',
-				_s('Login failed "%s".', $name), $userInfo['userid']
-			);
 			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
-		// start session
-		$sessionid = md5(time().$password.$name.rand(0, 10000000));
-		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status)'.
-			' VALUES ('.zbx_dbstr($sessionid).','.zbx_dbstr($userInfo['userid']).','.time().','.ZBX_SESSION_ACTIVE.')'
-		);
+		// Start session.
+		unset($db_user['passwd']);
+		$db_user['sessionid'] = md5(time().md5($user['password']).$user['user'].rand(0, 10000000));
 
-		$userData = $this->_getUserData($userInfo['userid']);
-		$userData['sessionid'] = $sessionid;
-		$userData['gui_access'] = $guiAccess;
+		DB::insert('sessions', [[
+			'sessionid' => $db_user['sessionid'],
+			'userid' => $db_user['userid'],
+			'lastaccess' => time(),
+			'status' => ZBX_SESSION_ACTIVE
+		]], false);
 
-		if ($userInfo['attempt_failed']) {
-			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($userInfo['userid']));
+		if ($db_user['attempt_failed'] != 0) {
+			DB::update('users', [
+				'values' => ['attempt_failed' => 0],
+				'where' => ['userid' => $db_user['userid']]
+			]);
 		}
 
-		CWebUser::$data = self::$userData = $userData;
+		self::$userData = $db_user;
 
-		return isset($user['userData']) ? $userData : $userData['sessionid'];
+		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+
+		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
 	}
 
 	/**
 	 * Check if session id is authenticated.
 	 *
-	 * @param array $sessionid		session id
+	 * @param array $session
 	 *
-	 * @return array				an array of user data
+	 * @return array
 	 */
-	public function checkAuthentication(array $sessionid) {
-		$sessionid = reset($sessionid);
+	public function checkAuthentication(array $session) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$sessionid = $session['sessionid'];
 
 		// access DB only once per page load
-		if (!is_null(self::$userData)) {
+		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
 			return self::$userData;
 		}
 
 		$time = time();
 
-		$userInfo = DBfetch(DBselect(
-			'SELECT u.userid,u.autologout,s.lastaccess'.
-			' FROM sessions s,users u'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND s.userid=u.userid'.
-				' AND (s.lastaccess+u.autologout>'.$time.' OR u.autologout=0)'
-		));
+		$db_sessions = API::getApiService()->select('sessions', [
+			'output' => ['userid', 'lastaccess'],
+			'sessionids' => $sessionid,
+			'filter' => ['status' => ZBX_SESSION_ACTIVE]
+		]);
 
-		if (!$userInfo) {
+		if (!$db_sessions) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
-		// don't check permissions on the same second
-		if ($time != $userInfo['lastaccess']) {
-			if (!check_perm2system($userInfo['userid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
-			}
+		$db_session = $db_sessions[0];
 
-			if ($userInfo['autologout'] > 0) {
-				DBexecute(
-					'DELETE FROM sessions'.
-					' WHERE userid='.zbx_dbstr($userInfo['userid']).
-						' AND lastaccess<'.(time() - $userInfo['autologout'])
-				);
-			}
+		$db_users = API::getApiService()->select('users', [
+			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page'
+			],
+			'userids' => $db_session['userid']
+		]);
 
-			DBexecute(
-				'UPDATE sessions'.
-				' SET lastaccess='.time().
-				' WHERE userid='.zbx_dbstr($userInfo['userid']).
-					' AND sessionid='.zbx_dbstr($sessionid)
-			);
+		if (!$db_users) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
-		$dbAccess = DBfetch(DBselect(
-			'SELECT MAX(g.gui_access) AS gui_access'.
-			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userInfo['userid']).
-				' AND g.usrgrpid=ug.usrgrpid'
-		));
+		$db_user = $db_users[0];
 
-		if (!zbx_empty($dbAccess['gui_access'])) {
-			$guiAccess = $dbAccess['gui_access'];
+		$usrgrps = $this->getUserGroupsData($db_user['userid']);
+
+		$db_user['sessionid'] = $sessionid;
+		$db_user['debug_mode'] = $usrgrps['debug_mode'];
+		$db_user['userip'] = $usrgrps['userip'];
+		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		// Check system permissions.
+		if (($db_user['autologout'] != 0 && $db_session['lastaccess'] + $db_user['autologout'] <= $time)
+				|| $usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
+			DB::delete('sessions', [
+				'status' => ZBX_SESSION_PASSIVE,
+				'userid' => $db_user['userid']
+			]);
+			DB::update('sessions', [
+				'values' => ['status' => ZBX_SESSION_PASSIVE],
+				'where' => ['sessionid' => $sessionid]
+			]);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
-		else {
-			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
+
+		if ($time != $db_session['lastaccess']) {
+			DB::update('sessions', [
+				'values' => ['lastaccess' => $time],
+				'where' => ['sessionid' => $sessionid]
+			]);
 		}
 
-		$userData = $this->_getUserData($userInfo['userid']);
-		$userData['sessionid'] = $sessionid;
-		$userData['gui_access'] = $guiAccess;
+		self::$userData = $db_user;
 
-		CWebUser::$data = self::$userData = $userData;
-
-		return $userData;
+		return $db_user;
 	}
 
-	private function _getUserData($userid) {
-		$userData = DBfetch(DBselect(
-			'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
-			' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
-			' FROM users u'.
-			' WHERE u.userid='.zbx_dbstr($userid)
-		));
+	private function getUserGroupsData($userid) {
+		$usrgrps = [
+			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
+			'userip' => (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== '')
+				? $_SERVER['HTTP_X_FORWARDED_FOR']
+				: $_SERVER['REMOTE_ADDR'],
+			'users_status' => GROUP_STATUS_ENABLED,
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM
+		];
 
-		$userData['debug_mode'] = (bool) DBfetch(DBselect(
-			'SELECT ug.userid'.
+		$db_usrgrps = DBselect(
+			'SELECT g.debug_mode,g.users_status,g.gui_access'.
 			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userid).
-				' AND g.usrgrpid=ug.usrgrpid'.
-				' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
-		));
+			' WHERE g.usrgrpid=ug.usrgrpid'.
+				' AND ug.userid='.$userid
+		);
 
-		$userData['userip'] = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'])
-			? $_SERVER['HTTP_X_FORWARDED_FOR']
-			: $_SERVER['REMOTE_ADDR'];
+		while ($db_usrgrp = DBfetch($db_usrgrps)) {
+			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+				$usrgrps['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
+			}
+			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
+				$users_status = GROUP_STATUS_DISABLED;
+			}
+			if ($db_usrgrp['gui_access'] > $usrgrps['gui_access']) {
+				$usrgrps['gui_access'] = $db_usrgrp['gui_access'];
+			}
+		}
 
-		return $userData;
+		return $usrgrps;
 	}
 
 	public function isReadable($ids) {
@@ -1645,11 +1671,5 @@ class CUser extends CApiService {
 			'where' => ['actionid' => $actionids]
 		];
 		DB::update('actions', $update);
-
-		foreach($actionids as $actionid) {
-			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
-				_('Action disabled due to deletion of user.'), null
-			);
-		}
 	}
 }

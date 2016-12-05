@@ -985,13 +985,14 @@ define('API_STRING_UTF8',	1);
 define('API_INT32',			2);
 define('API_ID',			3);
 define('API_BOOLEAN',		4);
+define('API_FLAG',			5);
 // arrays
-define('API_OBJECT',		5);
-define('API_IDS',			6);
-define('API_OBJECTS',		7);
+define('API_OBJECT',		6);
+define('API_IDS',			7);
+define('API_OBJECTS',		8);
 // specific types
-define('API_HG_NAME',		8);
-define('API_TIME_PERIOD',	9);
+define('API_HG_NAME',		9);
+define('API_TIME_PERIOD',	10);
 
 // flags
 define('API_REQUIRED',		0x01);
