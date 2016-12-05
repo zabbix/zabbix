@@ -1252,7 +1252,7 @@ out:
 	return h;
 }
 
-static ipmi_domain_id_t	domain_id_ptr;
+static ipmi_domain_id_t	domain_id;		/* global variable for passing OpenIPMI domain ID between callbacks */
 static int		domain_close_ok;
 
 /* callback function invoked from OpenIPMI */
@@ -1265,7 +1265,7 @@ static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
 	ipmi_domain_get_name(domain, name, sizeof(name));
 
 	if (0 == strcmp(domain_name, name))
-		domain_id_ptr = ipmi_domain_convert_to_id(domain);
+		domain_id = ipmi_domain_convert_to_id(domain);
 }
 
 /* callback function invoked from OpenIPMI */
@@ -1298,7 +1298,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	h->done = 0;
 	domain_close_ok = 0;
 
-	if (0 != (res = ipmi_domain_pointer_cb(domain_id_ptr, zbx_domain_close_cb, h)))
+	if (0 != (res = ipmi_domain_pointer_cb(domain_id, zbx_domain_close_cb, h)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: %s", __function_name,
 				zbx_strerror(res));
