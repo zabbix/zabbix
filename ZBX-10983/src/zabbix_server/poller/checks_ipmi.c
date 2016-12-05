@@ -1256,14 +1256,17 @@ static ipmi_domain_id_t	domain_id;		/* global variable for passing OpenIPMI doma
 static int		domain_close_ok;
 
 /* callback function invoked from OpenIPMI */
-static void	zbx_domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
+static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = cb_data;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_domains_iterate_cb");
+	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_get_domain_id_by_name_cb");
 
+	/* from 'domain' pointer find the domain's name */
 	ipmi_domain_get_name(domain, name, sizeof(name));
 
+	/* if the domain's name match with the name we are searching for then store the domain's ID into */
+	/* global variable */
 	if (0 == strcmp(domain_name, name))
 		domain_id = ipmi_domain_convert_to_id(domain);
 }
@@ -1293,7 +1296,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
-	ipmi_domain_iterate_domains(zbx_domains_iterate_cb, domain_name);
+	ipmi_domain_iterate_domains(zbx_get_domain_id_by_name_cb, domain_name);
 
 	h->done = 0;
 	domain_close_ok = 0;
