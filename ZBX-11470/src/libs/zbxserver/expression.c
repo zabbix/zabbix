@@ -210,7 +210,6 @@ static char 	**extract_numbers(const char *str, int *count)
 
 	for (s = str; '\0' != *s && *count < 9; s++)	/* find start of number */
 	{
-
 		if (!isdigit(*s))
 			continue;
 
