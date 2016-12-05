@@ -2215,54 +2215,34 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		}
 		else
 		{
-			int	res = SUCCEED;
-
 			init_result(&result);
 
 			if (NULL != values[i].value)
-			{
-				res = set_result_type(&result, items[i].value_type,
-						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
-						values[i].value);
-			}
+				SET_TEXT_RESULT(&result, zbx_strdup(NULL, values[i].value));
 
-			if (SUCCEED == res)
+			if (ITEM_VALUE_TYPE_LOG == items[i].value_type && NULL != values[i].value)
 			{
-				if (ITEM_VALUE_TYPE_LOG == items[i].value_type && NULL != values[i].value)
+				result.log->timestamp = values[i].timestamp;
+				if (NULL != values[i].source)
 				{
-					result.log->timestamp = values[i].timestamp;
-					if (NULL != values[i].source)
-					{
-						zbx_replace_invalid_utf8(values[i].source);
-						result.log->source = zbx_strdup(result.log->source, values[i].source);
-					}
-					result.log->severity = values[i].severity;
-					result.log->logeventid = values[i].logeventid;
-
-					calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
+					zbx_replace_invalid_utf8(values[i].source);
+					result.log->source = zbx_strdup(result.log->source, values[i].source);
 				}
+				result.log->severity = values[i].severity;
+				result.log->logeventid = values[i].logeventid;
 
-				if (0 != values[i].meta)
-					set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
-
-				items[i].state = ITEM_STATE_NORMAL;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
-						&values[i].ts, items[i].state, NULL);
-
-				if (NULL != processed)
-					(*processed)++;
+				calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
 			}
-			else if (ISSET_MSG(&result))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
-						items[i].host.host, items[i].key_orig, result.msg);
 
-				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, result.msg);
-			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
+			if (0 != values[i].meta)
+				set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
+
+			items[i].state = ITEM_STATE_NORMAL;
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
+					&values[i].ts, items[i].state, NULL);
+
+			if (NULL != processed)
+				(*processed)++;
 
 			free_result(&result);
 		}

@@ -140,8 +140,6 @@ typedef struct
 	unsigned char 		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
-	unsigned char		delta;
-	unsigned char		multiplier;
 	unsigned char		state;
 	unsigned char		db_state;
 	unsigned char		snmpv3_securitylevel;
@@ -153,7 +151,6 @@ typedef struct
 	unsigned char		status;
 	unsigned char		unreachable;
 	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
-	char			*formula;
 	char			*units;
 	int			delay;
 	int			nextcheck;

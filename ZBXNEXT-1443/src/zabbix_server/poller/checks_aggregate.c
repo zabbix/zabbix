@@ -20,6 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "valuecache.h"
+#include "dbcache.h"
 
 #include "checks_aggregate.h"
 
