@@ -105,9 +105,12 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
+	// CWebUser is not initianized in CUser->login() method.
+	$userid = ($action == AUDIT_ACTION_LOGIN) ? $resourceid : CWebUser::$data['userid'];
+
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$values = [
-		'userid' => CWebUser::$data['userid'],
+		'userid' => $userid,
 		'clock' => time(),
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
@@ -139,118 +142,6 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	catch (DBException $e) {
 		return false;
 	}
-}
-
-function add_audit_bulk($action, $resourcetype, array $objects, array $objects_old = null) {
-	switch ($resourcetype) {
-		case AUDIT_RESOURCE_APPLICATION:
-			$field_name_resourceid = 'applicationid';
-			$field_name_resourcename = 'name';
-			$table_name = 'applications';
-			break;
-
-		case AUDIT_RESOURCE_HOST_GROUP:
-			$field_name_resourceid = 'groupid';
-			$field_name_resourcename = 'name';
-			$table_name = 'groups';
-			break;
-
-		case AUDIT_RESOURCE_USER:
-			$field_name_resourceid = 'userid';
-			$field_name_resourcename = 'alias';
-			$table_name = 'users';
-			break;
-
-		case AUDIT_RESOURCE_USER_GROUP:
-			$field_name_resourceid = 'usrgrpid';
-			$field_name_resourcename = 'name';
-			$table_name = 'usrgrp';
-			break;
-
-		case AUDIT_RESOURCE_VALUE_MAP:
-			$field_name_resourceid = 'valuemapid';
-			$field_name_resourcename = 'name';
-			$table_name = 'valuemaps';
-			break;
-
-		default:
-			return false;
-	}
-
-	$clock = time();
-	$ip = array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== ''
-		? $_SERVER['HTTP_X_FORWARDED_FOR']
-		: $_SERVER['REMOTE_ADDR'];
-	$ip = substr($ip, 0, 39);
-
-	$auditlog = [];
-	$objects_diff = [];
-
-	foreach ($objects as $object) {
-		$resourceid = $object[$field_name_resourceid];
-
-		if ($action == AUDIT_ACTION_UPDATE) {
-			$object_old = $objects_old[$resourceid];
-			$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
-
-			if (!$object_diff) {
-				continue;
-			}
-
-			foreach ($object_diff as $field_name => &$values) {
-				$values = [
-					'old' => $object_old[$field_name],
-					'new' => $object[$field_name]
-				];
-			}
-			unset($values);
-
-			$objects_diff[] = $object_diff;
-
-			$resourcename = $object_old[$field_name_resourcename];
-		}
-		else {
-			$resourcename = $object[$field_name_resourcename];
-		}
-
-		if (mb_strlen($resourcename) > 255) {
-			$resourcename = mb_substr($resourcename, 0, 252).'...';
-		}
-
-		$auditlog[] = [
-			'userid' => CWebUser::$data['userid'],
-			'clock' => $clock,
-			'ip' => $ip,
-			'action' => $action,
-			'resourcetype' => $resourcetype,
-			'resourceid' => $resourceid,
-			'resourcename' => $resourcename
-		];
-	}
-
-	if ($auditlog) {
-		$auditids = DB::insertBatch('auditlog', $auditlog);
-
-		if ($action == AUDIT_ACTION_UPDATE) {
-			$auditlog_details = [];
-
-			foreach ($objects_diff as $index => $object_diff) {
-				foreach ($object_diff as $field_name => $values) {
-					$auditlog_details[] = [
-						'auditid' => $auditids[$index],
-						'table_name' => $table_name,
-						'field_name' => $field_name,
-						'oldvalue' => $values['old'],
-						'newvalue' => $values['new']
-					];
-				}
-			}
-
-			DB::insertBatch('auditlog_details', $auditlog_details);
-		}
-	}
-
-	return true;
 }
 
 function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
