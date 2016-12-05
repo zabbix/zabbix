@@ -482,6 +482,9 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		ret = FAIL;
 	}
 
+	if (SUCCEED == ret)
+		zbx_vector_uint64_append(&condition->objectids, event->objectid);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -860,6 +863,9 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 		ret = FAIL;
 	}
 
+	if (SUCCEED == ret)
+		zbx_vector_uint64_append(&condition->objectids, event->objectid);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -966,6 +972,9 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 				(int)condition->operator, condition->conditionid);
 		ret = FAIL;
 	}
+
+	if (SUCCEED == ret)
+		zbx_vector_uint64_append(&condition->objectids, event->objectid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1275,6 +1284,42 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret)
+		zbx_vector_uint64_append(&condition->objectids, event->objectid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	check_events_condition(const DB_EVENT *events, DB_CONDITION *condition)
+{
+	const char	*__function_name = "check_action_condition";
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
+
+	switch (events->source)
+	{
+		case EVENT_SOURCE_TRIGGERS:
+			ret = check_trigger_condition(events, condition);
+			break;
+		case EVENT_SOURCE_DISCOVERY:
+			ret = check_discovery_condition(events, condition);
+			break;
+		case EVENT_SOURCE_AUTO_REGISTRATION:
+			ret = check_auto_registration_condition(events, condition);
+			break;
+		case EVENT_SOURCE_INTERNAL:
+			ret = check_internal_condition(events, condition);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
+					events->source, condition->conditionid);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1296,33 +1341,16 @@ out:
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_action_condition";
-	int		ret = FAIL;
+	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
-			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
-			condition->value, condition->value2);
+	zbx_vector_uint64_create(&condition->objectids);
 
-	switch (event->source)
-	{
-		case EVENT_SOURCE_TRIGGERS:
-			ret = check_trigger_condition(event, condition);
-			break;
-		case EVENT_SOURCE_DISCOVERY:
-			ret = check_discovery_condition(event, condition);
-			break;
-		case EVENT_SOURCE_AUTO_REGISTRATION:
-			ret = check_auto_registration_condition(event, condition);
-			break;
-		case EVENT_SOURCE_INTERNAL:
-			ret = check_internal_condition(event, condition);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
-					event->source, condition->conditionid);
-	}
+	check_events_condition(event, condition);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	if (1 == condition->objectids.values_num && condition->objectids.values[0] == event->objectid)
+		ret = SUCCEED;
+
+	zbx_vector_uint64_destroy(&condition->objectids);
 
 	return ret;
 }
