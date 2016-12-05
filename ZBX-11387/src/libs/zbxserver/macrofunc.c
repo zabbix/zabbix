@@ -98,7 +98,7 @@ static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
  *               FAIL    - the function calculation failed.                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
+int	zbx_calculate_macro_function(const char *expression, char **out)
 {
 	typedef enum
 	{
@@ -114,7 +114,7 @@ int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
 	size_t			nparam = 0, param_alloc = 8, buf_alloc = 0, buf_offset = 0, par_l, par_r, sep_pos;
 	zbx_macro_func_t	macro_func = MACRO_FUNC_UNKNOWN;
 
-	if (SUCCEED != zbx_function_validate(expression, &par_l, &par_r) || len != par_r + 1)
+	if (SUCCEED != zbx_function_validate(expression, &par_l, &par_r))
 		return FAIL;
 
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression, par_l);
