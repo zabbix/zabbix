@@ -974,32 +974,9 @@ class CUserGroup extends CApiService {
 	public function delete(array $usrgrpids) {
 		$this->validateDelete($usrgrpids, $db_usrgrps);
 
-		$db_operations = DBFetchArray(DBselect(
-			'SELECT DISTINCT om.operationid'.
-			' FROM opmessage_grp om'.
-			' WHERE '.dbConditionInt('om.usrgrpid', $usrgrpids)
-		));
-
-		DB::delete('opmessage_grp', ['usrgrpid' => $usrgrpids]);
-
-		// delete empty operations
-		$del_operations = DBFetchArray(DBselect(
-			'SELECT DISTINCT o.operationid,o.actionid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
-				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
-				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
-		));
-
-		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
 		DB::delete('rights', ['groupid' => $usrgrpids]);
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
-
-		$actionids = zbx_objectValues($del_operations, 'actionid');
-		if ($actionids) {
-			$this->disableActionsWithoutOperations($actionids);
-		}
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, $db_usrgrps);
 
@@ -1046,7 +1023,23 @@ class CUserGroup extends CApiService {
 			];
 		}
 
-		// check if user group is used in scripts
+		// Check if user groups are used in actions.
+		$db_actions = DBselect(
+			'SELECT a.name,og.usrgrpid'.
+			' FROM opmessage_grp og,operations o,actions a'.
+			' WHERE og.operationid=o.operationid'.
+				' AND o.actionid=a.actionid'.
+				' AND '.dbConditionInt('og.usrgrpid', $usrgrpids),
+			1
+		);
+
+		if ($db_action = DBfetch($db_actions)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is used in "%2$s" action.',
+				$db_usrgrps[$db_action['usrgrpid']]['name'], $db_action['name']
+			));
+		}
+
+		// Check if user groups are used in scripts.
 		$db_scripts = API::getApiService()->select('scripts', [
 			'output' => ['name', 'usrgrpid'],
 			'filter' => ['usrgrpid' => $usrgrpids],
@@ -1055,12 +1048,11 @@ class CUserGroup extends CApiService {
 
 		if ($db_scripts) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is used in script "%2$s".',
-				$db_usrgrps[$db_scripts[0]['usrgrpid']]['name'],
-				$db_scripts[0]['name']
+				$db_usrgrps[$db_scripts[0]['usrgrpid']]['name'], $db_scripts[0]['name']
 			));
 		}
 
-		// check if user group is used in config
+		// Check if user group are used in config.
 		$config = select_config();
 
 		if (array_key_exists($config['alert_usrgrpid'], $db_usrgrps)) {
@@ -1167,35 +1159,5 @@ class CUserGroup extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Disable actions that do not have operations.
-	 */
-	protected function disableActionsWithoutOperations(array $actionids) {
-		$actions = DBFetchArray(DBselect(
-			'SELECT DISTINCT a.actionid'.
-			' FROM actions a'.
-			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
-				' AND '.dbConditionInt('a.actionid', $actionids)
-		));
-
-		$actions_without_operations = zbx_objectValues($actions, 'actionid');
-		if ($actions_without_operations) {
-			$this->disableActions($actions_without_operations);
-		}
-	}
-
-	/**
-	 * Disable actions.
-	 *
-	 * @param array $actionids
-	 */
-	protected function disableActions(array $actionids) {
-		$update = [
-			'values' => ['status' => ACTION_STATUS_DISABLED],
-			'where' => ['actionid' => $actionids]
-		];
-		DB::update('actions', $update);
 	}
 }
