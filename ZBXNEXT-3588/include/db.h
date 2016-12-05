@@ -341,7 +341,6 @@ typedef struct
 	zbx_uint64_t		actionid;
 	char			*value;
 	char			*value2;
-	int			condition_result;
 	unsigned char		conditiontype;
 	unsigned char		operator;
 	zbx_vector_uint64_t	objectids;
