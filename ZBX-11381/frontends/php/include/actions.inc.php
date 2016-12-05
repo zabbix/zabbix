@@ -1590,18 +1590,10 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			}
 		}
 
-		if ($row['r_eventid'] == 0)
-		{
-			if (!array_key_exists($row['eventid'], $p_alerts)) {
-				$p_alerts[$row['eventid']] = [];
-			}
+		if ($row['r_eventid'] == 0) {
 			$p_alerts[$row['eventid']][] = $alert;
 		}
-		else
-		{
-			if (!array_key_exists($row['eventid'], $r_alerts)) {
-				$r_alerts[$row['eventid']] = [];
-			}
+		else {
 			$r_alerts[$row['eventid']][] = $alert;
 		}
 	}
