@@ -208,8 +208,9 @@ static char 	**extract_numbers(const char *str, int *count)
 
 	*count = 0;
 
-	for (s = str; '\0' != *s; s++)	/* find start of number */
+	for (s = str; '\0' != *s && *count < 9; s++)	/* find start of number */
 	{
+
 		if (!isdigit(*s))
 			continue;
 
@@ -251,7 +252,6 @@ static char 	**extract_numbers(const char *str, int *count)
 		if ('\0' == *(s = e))
 			break;
 	}
-
 	return result;
 }
 
@@ -287,7 +287,7 @@ static void	expand_trigger_description_constants(char **data, const char *expres
 	for (i = 0; i < 9; i++)
 	{
 		replace[1] = '0' + i + 1;
-		string_replace_realloc(data, replace, i < numbers_cnt ?  numbers[i] : "");
+		zbx_string_replace_realloc(data, replace, i < numbers_cnt ?  numbers[i] : "");
 	}
 
 	zbx_free_numbers(&numbers, numbers_cnt);
