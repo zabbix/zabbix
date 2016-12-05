@@ -1128,9 +1128,9 @@ out:
 	return ret;
 }
 
-static void	zbx_free_ipmi_connection(zbx_ipmi_host_t *h)
+static void	zbx_free_ipmi_host(zbx_ipmi_host_t *h)
 {
-	const char	*__function_name = "zbx_free_ipmi_connection";
+	const char	*__function_name = "zbx_free_ipmi_host";
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' h:%p", __function_name, h->ip, h->port, h);
@@ -1166,7 +1166,7 @@ void	zbx_free_ipmi_handler(void)
 		h = hosts;
 		hosts = hosts->next;
 
-		zbx_free_ipmi_connection(h);
+		zbx_free_ipmi_host(h);
 	}
 
 	os_hnd->free_os_handler(os_hnd);
@@ -1308,7 +1308,7 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	}
 	else if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
 	{
-		zbx_free_ipmi_connection(h);
+		zbx_free_ipmi_host(h);
 		ret = SUCCEED;
 	}
 
