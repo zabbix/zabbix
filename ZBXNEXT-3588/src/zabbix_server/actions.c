@@ -100,19 +100,19 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
  *                                                                            *
  * Function: check_trigger_condition                                          *
  *                                                                            *
- * Purpose: check if event matches single condition                           *
+ * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event - trigger event to check                                 *
- *                                  (event->source == EVENT_SOURCE_TRIGGERS)  *
- *             condition - condition for matching                             *
+ * Parameters: event      [IN]  - event to check                              *
+ *             events_num [IN]  - event count to check                        *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Return value: SUCCEED - at least one match, FAIL - otherwise               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
-		DB_CONDITION *condition)
+static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_trigger_condition";
 	DB_RESULT	result;
@@ -129,7 +129,7 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, un
 
 		ret = FAIL;
 
-		if (FAIL == is_escalation_event(event) || source != event->source)
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
 			continue;
 
 		if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
@@ -147,7 +147,7 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, un
 			{
 				const DB_EVENT	*event = &events[i];
 
-				if (FAIL == is_escalation_event(event) || source != event->source)
+				if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
 					continue;
 
 				zbx_vector_uint64_append(&triggerids, event->objectid);
@@ -551,19 +551,19 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, un
  *                                                                            *
  * Function: check_discovery_condition                                        *
  *                                                                            *
- * Purpose: check if event matches single condition                           *
+ * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event - discovery event to check                               *
- *                                 (event->source == EVENT_SOURCE_DISCOVERY)  *
- *             condition - condition for matching                             *
+ * Parameters: event      [IN]  - event to check                              *
+ *             events_num [IN]  - event count to check                        *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Return value: SUCCEED - at least one match, FAIL - otherwise               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
-		DB_CONDITION *condition)
+static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_discovery_condition";
 	DB_RESULT	result;
@@ -579,7 +579,7 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
 
 		ret = FAIL;
 
-		if (FAIL == is_escalation_event(event) || source != event->source)
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
 			continue;
 
 		if (CONDITION_TYPE_DRULE == condition->conditiontype)
@@ -942,19 +942,19 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
  *                                                                            *
  * Function: check_auto_registration_condition                                *
  *                                                                            *
- * Purpose: check if event matches single condition                           *
+ * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event - auto registration event to check                       *
- *                         (event->source == EVENT_SOURCE_AUTO_REGISTRATION)  *
- *             condition - condition for matching                             *
+ * Parameters: event      [IN]  - event to check                              *
+ *             events_num [IN]  - event count to check                        *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Return value: SUCCEED - at least one match, FAIL - otherwise               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_auto_registration_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
-		DB_CONDITION *condition)
+static int	check_auto_registration_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_auto_registration_condition";
 	DB_RESULT	result;
@@ -971,7 +971,7 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
 
 		ret = FAIL;
 
-		if (FAIL == is_escalation_event(event) || source != event->source)
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_AUTO_REGISTRATION != event->source)
 			continue;
 
 		switch (condition->conditiontype)
@@ -1063,16 +1063,17 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
  *                                                                            *
  * Function: check_internal_condition                                         *
  *                                                                            *
- * Purpose: check if internal event matches single condition                  *
+ * Purpose: check if internal events match single condition                   *
  *                                                                            *
- * Parameters: event     - [IN] trigger event to check                        *
- *             condition - [IN] condition for matching                        *
+ * Parameters: event      [IN]  - event to check                              *
+ *             events_num [IN]  - event count to check                        *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Return value: SUCCEED - at least one match, FAIL - otherwise               *
  *                                                                            *
  ******************************************************************************/
-static int	check_internal_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
-		DB_CONDITION *condition)
+static int	check_internal_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_internal_condition";
 	DB_RESULT	result;
@@ -1089,7 +1090,7 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, u
 
 		ret = FAIL;
 
-		if (FAIL == is_escalation_event(event) || source != event->source)
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
 			continue;
 
 		if (EVENT_OBJECT_TRIGGER != event->object && EVENT_OBJECT_ITEM != event->object &&
@@ -1387,12 +1388,11 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, u
  *                                                                            *
  * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
- * Parameters: events [IN] - events to check                                  *
- *             events_num [IN] - events count                                 *
- *             source [IN] - specific event source that need checking         *
- *                                                                            *
- *             condition [IN/OUT] - condition for matching, outputs event ids *
- *                                  that match condition                      *
+ * Parameters: event      [IN]  - trigger event to check                      *
+ *             events_num [IN]  - event count to check                        *
+ *             source     [IN] - specific event source that need checking     *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                  event ids that match condition            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -1409,16 +1409,16 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			check_trigger_condition(events, events_num, source, condition);
+			check_trigger_condition(events, events_num, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			check_discovery_condition(events, events_num, source, condition);
+			check_discovery_condition(events, events_num, condition);
 			break;
 		case EVENT_SOURCE_AUTO_REGISTRATION:
-			check_auto_registration_condition(events, events_num, source, condition);
+			check_auto_registration_condition(events, events_num, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			check_internal_condition(events, events_num, source, condition);
+			check_internal_condition(events, events_num, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
