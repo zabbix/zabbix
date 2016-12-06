@@ -134,7 +134,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 			" and",
 		condition_value);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, " t.triggerid",
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
 				triggerids.values, triggerids.values_num);
 
 	result = DBselect("%s", sql);
