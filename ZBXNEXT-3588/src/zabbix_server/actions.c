@@ -1381,11 +1381,26 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, u
 	return ret;
 }
 
-static int	check_events_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
+/******************************************************************************
+ *                                                                            *
+ * Function: check_events_condition                                           *
+ *                                                                            *
+ * Purpose: check if multiple event matches single condition                  *
+ *                                                                            *
+ * Parameters: events [IN] - events to check                                  *
+ *             events_num [IN] - events count                                 *
+ *             source [IN] - specific event source that need checking         *
+ *                                                                            *
+ *             condition [IN/OUT] - condition for matching, outputs event ids *
+ *                                  that match condition                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_events_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
 		DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_action_condition";
-	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
@@ -1394,25 +1409,23 @@ static int	check_events_condition(const DB_EVENT *events, size_t events_num, uns
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			ret = check_trigger_condition(events, events_num, source, condition);
+			check_trigger_condition(events, events_num, source, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			ret = check_discovery_condition(events, events_num, source, condition);
+			check_discovery_condition(events, events_num, source, condition);
 			break;
 		case EVENT_SOURCE_AUTO_REGISTRATION:
-			ret = check_auto_registration_condition(events, events_num, source, condition);
+			check_auto_registration_condition(events, events_num, source, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			ret = check_internal_condition(events, events_num, source, condition);
+			check_internal_condition(events, events_num, source, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
 					source, condition->conditionid);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	get_events_conditions_results(const DB_EVENT *events, size_t events_num,
