@@ -1730,10 +1730,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
-	{
-		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func,
-				uniq_conditions_compare_func);
-	}
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
 
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions, uniq_conditions);
