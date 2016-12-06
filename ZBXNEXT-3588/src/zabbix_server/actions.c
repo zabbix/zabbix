@@ -1385,7 +1385,7 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, u
  *                                                                            *
  * Function: check_events_condition                                           *
  *                                                                            *
- * Purpose: check if multiple event matches single condition                  *
+ * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
  * Parameters: events [IN] - events to check                                  *
  *             events_num [IN] - events count                                 *
@@ -1427,8 +1427,24 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
-static void	get_events_conditions_results(const DB_EVENT *events, size_t events_num,
+/******************************************************************************
+ *                                                                            *
+ * Function: check_events_conditions                                          *
+ *                                                                            *
+ * Purpose: check if multiple events matches multiple conditions              *
+ *                                                                            *
+ *                                                                            *
+ * Parameters: events [IN] - events to check                                  *
+ *             events_num [IN] - events count                                 *
+ *             source [IN] - specific event source that need checking         *
+ *                                                                            *
+ *             condition [IN/OUT] - condition for matching, outputs event ids *
+ *                                  that match condition                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_events_conditions(const DB_EVENT *events, size_t events_num,
 		zbx_hashset_t *uniq_conditions)
 {
 	int	i;
@@ -1904,7 +1920,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions, uniq_conditions);
 
-	get_events_conditions_results(events, events_num, uniq_conditions);
+	check_events_conditions(events, events_num, uniq_conditions);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
