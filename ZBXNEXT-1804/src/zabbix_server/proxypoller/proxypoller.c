@@ -231,6 +231,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	disconnect_proxy(&s);
 out:
+	zbx_free(error);
 	zbx_json_free(&j);
 
 	return ret;
