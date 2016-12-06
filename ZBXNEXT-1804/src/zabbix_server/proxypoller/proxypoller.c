@@ -224,8 +224,13 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		{
 			struct zbx_json_parse	jp;
 
-			zbx_json_open(s.buffer, &jp);
-			zbx_proxy_update_version(proxy, &jp);
+			if (SUCCEED != zbx_json_open(s.buffer, &jp))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid configuration data response received from proxy"
+						" \"%s\" at \"%s\": %s", proxy->host, s.peer, zbx_json_strerror);
+			}
+			else
+				zbx_proxy_update_version(proxy, &jp);
 		}
 	}
 
