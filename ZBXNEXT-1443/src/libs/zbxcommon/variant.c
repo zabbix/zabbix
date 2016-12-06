@@ -26,7 +26,7 @@ zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src)
 
 	log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
-	log->source = zbx_strdup(NULL, src->source);
+	log->source = (NULL != src->source ? zbx_strdup(NULL, src->source) : NULL);
 	log->value = zbx_strdup(NULL, src->value);
 	log->timestamp = src->timestamp;
 	log->logeventid = src->logeventid;
@@ -183,8 +183,8 @@ static int	variant_to_str(zbx_variant_t *value)
 			value_str = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);
 			break;
 		case ZBX_VARIANT_LOG:
-			value_str = value->data.str;
-			value->data.str = NULL;
+			value_str = value->data.log->value;
+			value->data.log->value = NULL;
 			break;
 		default:
 			return FAIL;
