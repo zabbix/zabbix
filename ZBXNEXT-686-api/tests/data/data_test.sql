@@ -1328,23 +1328,31 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
 
 -- API tests
--- application
+-- applications
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 4);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50010, 1);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40066, 50009, 50022, 0, 3, 0, 'API item wit application', 'api_item_application', 30, 90, 365, 0, '', NULL, '', '', 0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40067, 50009, 50022, 0, 3, 0, 'API item wit application massadd1', 'api_item_application_massadd1', 30, 90, 365, 0, '', NULL, '', '', 0);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags) VALUES (40068, 50009, 50022, 0, 3, 0, 'API item wit application massadd2', 'api_item_application_massadd2', 30, 90, 365, 0, '', NULL, '', '', 0);
 INSERT INTO applications (applicationid,hostid,name) VALUES (366,50009,'API application');
 INSERT INTO applications (applicationid,hostid,name) VALUES (367,50009,'API host application for update');
 INSERT INTO applications (applicationid,hostid,name) VALUES (368,10093,'API template application for update');
-INSERT INTO applications (applicationid,hostid,name) VALUES (370,50009,'API application delete');
-INSERT INTO applications (applicationid,hostid,name) VALUES (371,50009,'API application delete2');
-INSERT INTO applications (applicationid,hostid,name) VALUES (372,50009,'API application delete3');
-INSERT INTO applications (applicationid,hostid,name) VALUES (373,50009,'API application delete4');
-INSERT INTO applications (applicationid,hostid,name) VALUES (374,50009,'API application for items');
-INSERT INTO applications (applicationid,hostid,name) VALUES (375,50009,'API application for items2');
-INSERT INTO applications (applicationid,hostid,name) VALUES (376,50009,'API application for items3');
+INSERT INTO applications (applicationid,hostid,name) VALUES (369,50010,'API templated application');
+INSERT INTO applications (applicationid,hostid,name) VALUES (370,50009,'API templated application');
+INSERT INTO applications (applicationid,hostid,name) VALUES (371,50009,'API application delete');
+INSERT INTO applications (applicationid,hostid,name) VALUES (372,50009,'API application delete2');
+INSERT INTO applications (applicationid,hostid,name) VALUES (373,50009,'API application delete3');
+INSERT INTO applications (applicationid,hostid,name) VALUES (374,50009,'API application delete4');
+INSERT INTO application_template (application_templateid,applicationid,templateid) VALUES (52,370,369);
+-- discovered application
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags) VALUES (40066, 50009, 50022, 0, 2,'Api discovery rule','vfs.fs.discovery',30,90,0,'','',1);
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags) VALUES (40067, 50009, 50022, 0, 2,'Api discovery item','vfs.fs.size[{#FSNAME},free]',30,90,0,'','',2);
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags) VALUES (40068, 50009, 50022, 0, 2,'Api discovery item','vfs.fs.size[/,free]',30,90,0,'','',4);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
+INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
+INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'Api discovery application',4);
+INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (2,40066,'Api discovery application');
+INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'Api discovery application');
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (5893,375,40068);
+INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);

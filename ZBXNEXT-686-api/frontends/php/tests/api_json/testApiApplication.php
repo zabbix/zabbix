@@ -30,12 +30,6 @@ class API_JSON_Application extends CZabbixTest {
 		return [
 			[
 				'application' => [
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": the parameter "hostid" is missing.'
-			],
-			[
-				'application' => [
 					'name' => 'application without hostid',
 					'hostid' => ''
 				],
@@ -49,14 +43,6 @@ class API_JSON_Application extends CZabbixTest {
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				'application' => [
-					'name' => 'API application',
-					'hostid' => '50009'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Application "API application" already exists.'
 			],
 			[
 				'application' => [
@@ -93,24 +79,96 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
+					'name' => 'API application',
+					'hostid' => '50009'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Application "API application" already exists.'
+			],
+			[
+				'application' => [
+					[
+					'name' => 'One application with existing name',
+					'hostid' => '50009'
+					],
+					[
+					'name' => 'API application',
+					'hostid' => '50009'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Application "API application" already exists.'
+			],
+			[
+				'application' => [
+					'name' => 'API templated application',
+					'hostid' => '50009'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Application "API templated application" already exists.'
+			],
+			[
+				'application' => [
+					'name' => 'Api discovery application',
+					'hostid' => '50009'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Application "Api discovery application" already exists.'
+			],
+			[
+				'application' => [
+					[
+					'name' => 'Applications with two identical name',
+					'hostid' => '50009'
+					],
+					[
+					'name' => 'Applications with two identical name',
+					'hostid' => '50009'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, Applications with two identical name) already exists.'
+			],
+			[
+				'application' => [
+					[
+					'name' => 'Api application create one',
+					'hostid' => '50009'
+					],
+					[
+					'name' => 'Api application create two',
+					'hostid' => '50009'
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'application' => [
+					[
 					'name' => 'api host application create',
 					'hostid' => '50009'
+					]
 				],
 				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'application' => [
+					[
 					'name' => 'api template application create',
 					'hostid' => '10093'
+					]
 				],
 				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'application' => [
+					[
 					'name' => 'УТФ-8',
 					'hostid' => '50009'
+					]
 				],
 				'success_expected' => true,
 				'expected_error' => null
@@ -122,18 +180,19 @@ class API_JSON_Application extends CZabbixTest {
 	* @dataProvider application_create_data
 	*/
 	public function testApplication_create($application, $success_expected, $expected_error) {
-		$result = $this->api_acall('application.create', [$application], $debug);
+		$result = $this->api_acall('application.create', $application, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
 			$this->assertFalse(array_key_exists('error', $result));
 
-			$dbResult = DBSelect('select * from applications where applicationid='.$result['result']['applicationids'][0]);
-			$dbRow = DBFetch($dbResult);
-			$this->assertEquals($dbRow['hostid'], $application['hostid']);
-			$this->assertEquals($dbRow['name'], $application['name']);
-			$this->assertEquals($dbRow['flags'], 0);
-		}
+			foreach ($result['result']['applicationids'] as $key => $id) {
+				$dbResult = DBSelect('select * from applications where applicationid='.$id);
+				$dbRow = DBFetch($dbResult);
+				$this->assertEquals($dbRow['hostid'], $application[$key]['hostid']);
+				$this->assertEquals($dbRow['name'], $application[$key]['name']);
+				$this->assertEquals($dbRow['flags'], 0);
+			}		}
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
@@ -146,7 +205,7 @@ class API_JSON_Application extends CZabbixTest {
 		return [
 			[
 				'template_application' => [
-					'name' => 'API templated application',
+					'name' => 'API create new templated application',
 					'hostid' => '50010'
 				],
 				'different_application_name' => true,
@@ -203,65 +262,107 @@ class API_JSON_Application extends CZabbixTest {
 		return [
 			[
 				'application' => [
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": the parameter "applicationid" is missing.'
-			],
-			[
-				'application' => [
+					[
 					'applicationid' => ''
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
 				'application' => [
+					[
 					'applicationid' => '367',
 					'name' => ''
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'application' => [
-					'applicationid' => '367',
-					'name' => 'API application'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Application "API application" already exists.'
-			],
-			[
-				'application' => [
+					[
 					'applicationid' => '123456',
 					'name' => 'application with not existing id'
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'application' => [
+					[
 					'applicationid' => '367',
 					'name' => 'non existent parametr',
 					'flags' => '4'
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
 			[
 				'application' => [
+					[
 					'applicationid' => 'abc',
 					'name' => 'id not number'
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
 			[
 				'application' => [
+					[
 					'applicationid' => '.',
 					'name' => 'id not number'
+					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
+			],
+			[
+				'application' => [
+					[
+					'applicationid' => '370',
+					'name' => 'Update templated application'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Cannot update templated applications.'
+			],
+			[
+				'application' => [
+					[
+					'applicationid' => '375',
+					'name' => 'Api discovery application update'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Cannot update discovered application "Api discovery application".'
+			],
+			[
+				'application' => [
+					[
+					'applicationid' => '367',
+					'name' => 'API application'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Application "API application" already exists.'
+			],
+			[
+				'application' => [
+					[
+					'applicationid' => '367',
+					'name' => 'update two application'
+					],
+					[
+					'applicationid' => '371',
+					'name' => 'update two application'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, update two application) already exists.'
 			],
 			[
 				'application' => [
@@ -294,7 +395,7 @@ class API_JSON_Application extends CZabbixTest {
 	* @dataProvider application_update_data
 	*/
 	public function testApplication_update($application, $success_expected, $expected_error) {
-		$result = $this->api_acall('application.update', [$application], $debug);
+		$result = $this->api_acall('application.update', $application, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
@@ -311,17 +412,18 @@ class API_JSON_Application extends CZabbixTest {
 			$this->assertTrue(array_key_exists('error', $result));
 
 			$this->assertEquals($expected_error, $result['error']['data']);
+			foreach ($application as $applications) {
+				if (isset($applications['name'])){
+					$dbResult = "select * from applications where applicationid=".$applications['applicationid'].
+							" and name='".$applications['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
+				}
+			}
 		}
 	}
 
 	public static function application_delete_data() {
 		return [
-			[
-				'application' => [
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/": cannot be empty.'
-			],
 			[
 				'application' => [
 					''
@@ -338,7 +440,7 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
-					'370',
+					'371',
 					'flags' => '4'
 				],
 				'success_expected' => false,
@@ -360,7 +462,7 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
-					'370',
+					'371',
 					'123456'
 				],
 				'success_expected' => false,
@@ -368,7 +470,7 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
-					'370',
+					'371',
 					'abc'
 				],
 				'success_expected' => false,
@@ -376,7 +478,7 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
-					'370',
+					'371',
 					''
 				],
 				'success_expected' => false,
@@ -384,15 +486,29 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
-					'371'
+					'370'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Cannot delete templated application.'
+			],
+			[
+				'application' => [
+					'375'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Cannot delete discovered application "Api discovery application".'
+			],
+			[
+				'application' => [
+					'372'
 				],
 				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
 				'application' => [
-					'372',
-					'373'
+					'373',
+					'374'
 				],
 				'success_expected' => true,
 				'expected_error' => null
@@ -423,218 +539,11 @@ class API_JSON_Application extends CZabbixTest {
 		}
 	}
 
-	public static function application_massadd_data() {
-		return [
-			[
-				'application' => [
-				],
-				'success_expected' => false,
-				'expected_error' => 'Empty input parameters.'
-			],
-			[
-				'application' => [
-					'applications' => [
-					],
-					'items' => [
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Empty input parameters.'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => ''
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40066'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '374'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '374'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '123456'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '123456'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40066'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => 'abc'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40066'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '374'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40066'
-						],
-						[
-							'flags' => '4'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '374'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40066'
-						]
-					],
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'application' => [
-					'applications' => [
-						[
-							'applicationid' => '375'
-						],
-						[
-							'applicationid' => '376'
-						]
-					],
-					'items' => [
-						[
-							'itemid' => '40067'
-						],
-						[
-							'itemid' => '40068'
-						]
-					],
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider application_massadd_data
-	*/
-	public function testApplication_massadd($application, $success_expected, $expected_error) {
-		$result = $this->api_acall('application.massadd', $application, $debug);
-
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
-			foreach ($result['result']['applicationids'] as $id) {
-				foreach ($application['items'] as $item) {
-					$sql = 'select * from items_applications where applicationid='.$id.' and itemid='.$item['itemid'];
-					$this->assertEquals(1, DBcount($sql));
-				}
-			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
-		}
-	}
-
 	public static function application_get_data() {
 		return [
 			[
 				'application' => [
 					'applicationids' => '123456'
-				],
-				'get_result' =>[
-				],
-				'success_expected' => false,
-			],
-			[
-				'application' => [
-					'applicationids' => ''
-				],
-				'get_result' =>[
-				],
-				'success_expected' => false,
-			],
-			[
-				'application' => [
-					'applicationids' => '.'
-				],
-				'get_result' =>[
-				],
-				'success_expected' => false,
-			],
-			[
-				'application' => [
-					'applicationids' => 'abc'
 				],
 				'get_result' =>[
 				],
