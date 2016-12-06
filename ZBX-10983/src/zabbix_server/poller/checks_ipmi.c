@@ -439,8 +439,8 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
 	const char	*__function_name = "zbx_delete_ipmi_control";
-	int	i;
-	size_t	sz;
+	int		i;
+	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p pcontrol:%p", __function_name, h, control);
 
@@ -451,8 +451,7 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 
 		sz = sizeof(zbx_ipmi_control_t);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "control '%s@[%s]:%d' deleted",
-				h->controls[i].c_name, h->ip, h->port);
+		zabbix_log(LOG_LEVEL_DEBUG, "control '%s@[%s]:%d' deleted", h->controls[i].c_name, h->ip, h->port);
 
 		zbx_free(h->controls[i].c_name);
 		zbx_free(h->controls[i].val);
@@ -1262,11 +1261,10 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 
 	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_get_domain_id_by_name_cb");
 
-	/* from 'domain' pointer find the domain's name */
+	/* from 'domain' pointer find the domain name */
 	ipmi_domain_get_name(domain, name, sizeof(name));
 
-	/* if the domain's name match with the name we are searching for then store the domain's ID into */
-	/* global variable */
+	/* if the domain name matches the name we are searching for then store the domain ID into global variable */
 	if (0 == strcmp(domain_name, name))
 		domain_id = ipmi_domain_convert_to_id(domain);
 }
