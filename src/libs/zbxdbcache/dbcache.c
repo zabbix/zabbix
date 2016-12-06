@@ -1082,7 +1082,21 @@ static void	dc_history_set_error(ZBX_DC_HISTORY *hdata, char *errmsg)
 	hdata->flags |= ZBX_DC_FLAG_UNDEF;
 }
 
-static int	dc_history_convert(ZBX_DC_HISTORY *hdata, unsigned char value_type)
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_history_convert                                               *
+ *                                                                            *
+ * Purpose: convert variant value to type matching item value type            *
+ *                                                                            *
+ * Parameters: hdata      - [IN/OUT] the history data                         *
+ *             value_type - [IN] the item value type                          *
+ *             log        - [IN] optional log data, can be NULL               *
+ *                                                                            *
+ * Return value: SUCCEED - Value conversion was successful.                   *
+ *               FAIL    - Otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_history_convert(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_log_value_t *log)
 {
 	int	ret;
 
@@ -1099,7 +1113,16 @@ static int	dc_history_convert(ZBX_DC_HISTORY *hdata, unsigned char value_type)
 			ret = zbx_variant_convert(&hdata->value, ZBX_VARIANT_STR);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			ret = zbx_variant_convert(&hdata->value, ZBX_VARIANT_LOG);
+			if (NULL != log)
+			{
+				if (SUCCEED == (ret = zbx_variant_convert(&hdata->value, ZBX_VARIANT_STR)))
+				{
+					log->value = hdata->value.data.str;
+					zbx_variant_set_log(&hdata->value, log);
+				}
+			}
+			else
+				ret = zbx_variant_convert(&hdata->value, ZBX_VARIANT_LOG);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1143,14 +1166,26 @@ static int	dc_history_convert(ZBX_DC_HISTORY *hdata, unsigned char value_type)
  ******************************************************************************/
 static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx_hashset_t *delta_history)
 {
-	int	i, ret = SUCCEED;
-	char	*errmsg = NULL;
+	int		i, ret = SUCCEED;
+	char		*errmsg = NULL;
+	zbx_log_value_t	*log = NULL;
 
 	if (ZBX_VARIANT_NONE == hdata->value.type)
 		return SUCCEED;
 
 	if (ITEM_STATE_NOTSUPPORTED == hdata->state)
 		return FAIL;
+
+	if (0 == item->preproc_ops_num)
+		goto out;
+
+	if (ITEM_VALUE_TYPE_LOG == item->value_type && ZBX_VARIANT_LOG == hdata->value.type)
+	{
+		/* backup log data and use only its value for preprocessing */
+		log = hdata->value.data.log;
+		zbx_variant_set_str(&hdata->value, log->value);
+		log->value = NULL;
+	}
 
 	for (i = 0; i < item->preproc_ops_num; i++)
 	{
@@ -1167,8 +1202,9 @@ static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx
 			return SUCCEED;
 		}
 	}
+out:
+	dc_history_convert(hdata, item->value_type, log);
 
-	dc_history_convert(hdata, item->value_type);
 	return SUCCEED;
 }
 
@@ -3011,6 +3047,9 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->mtime = hc_data->mtime;
 
 	zbx_variant_set_variant(&history->value, &hc_data->value);
+
+	if (ZBX_VARIANT_NONE == history->value.type)
+		history->flags |= ZBX_DC_FLAG_UNDEF;
 }
 
 /******************************************************************************

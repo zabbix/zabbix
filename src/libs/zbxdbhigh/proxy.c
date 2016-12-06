@@ -2218,20 +2218,37 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			init_result(&result);
 
 			if (NULL != values[i].value)
-				SET_TEXT_RESULT(&result, zbx_strdup(NULL, values[i].value));
-
-			if (ITEM_VALUE_TYPE_LOG == items[i].value_type && NULL != values[i].value)
 			{
-				result.log->timestamp = values[i].timestamp;
-				if (NULL != values[i].source)
+				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
-					zbx_replace_invalid_utf8(values[i].source);
-					result.log->source = zbx_strdup(result.log->source, values[i].source);
-				}
-				result.log->severity = values[i].severity;
-				result.log->logeventid = values[i].logeventid;
+					zbx_log_t	*log;
 
-				calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
+					log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
+					log->value = zbx_strdup(NULL, values[i].value);
+
+					if (0 == values[i].timestamp)
+					{
+						log->timestamp = 0;
+						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+					}
+					else
+						log->timestamp = values[i].timestamp;
+
+					log->logeventid = values[i].logeventid;
+					log->severity = values[i].severity;
+
+					if (NULL != values[i].source)
+					{
+						zbx_replace_invalid_utf8(values[i].source);
+						log->source = zbx_strdup(NULL, values[i].source);
+					}
+					else
+						log->source = NULL;
+
+					SET_LOG_RESULT(&result, log);
+				}
+				else
+					SET_TEXT_RESULT(&result, zbx_strdup(NULL, values[i].value));
 			}
 
 			if (0 != values[i].meta)

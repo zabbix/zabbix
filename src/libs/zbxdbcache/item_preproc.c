@@ -680,6 +680,9 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 		return FAIL;
 	}
 
+	if (NULL == new_value)
+		new_value = zbx_strdup(NULL, "");
+
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_value);
 

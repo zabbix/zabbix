@@ -2528,7 +2528,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[19]);
 			item->db_state = item->state;
-			ZBX_STR2UINT64(item->lastlogsize, row[3]);
+			ZBX_STR2UINT64(item->lastlogsize, row[30]);
 			item->mtime = atoi(row[31]);
 			DCstrpool_replace(found, &item->db_error, row[37]);
 			item->data_expected_from = now;
