@@ -134,34 +134,76 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, un
 
 		if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 		{
+			char			*sql = NULL;
+			size_t			sql_alloc = 256, sql_offset;
+			zbx_vector_uint64_t	triggerids;
+
 			ZBX_STR2UINT64(condition_value, condition->value);
 
-			result = DBselect(
-					"select distinct hg.groupid"
-					" from hosts_groups hg,hosts h,items i,functions f,triggers t"
-					" where hg.hostid=h.hostid"
-						" and h.hostid=i.hostid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and hg.groupid=" ZBX_FS_UI64,
-					event->objectid,
-					condition_value);
+			zbx_vector_uint64_create(&triggerids);
+			sql = zbx_malloc(sql, sql_alloc);
+
+			for (; i < events_num; i++)
+			{
+				const DB_EVENT	*event = &events[i];
+
+				if (FAIL == is_escalation_event(event) || source != event->source)
+					continue;
+
+				zbx_vector_uint64_append(&triggerids, event->objectid);
+			}
+
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct t.triggerid"
+				" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+				" where hg.hostid=h.hostid"
+					" and h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and hg.groupid=" ZBX_FS_UI64
+					" and",
+				condition_value);
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, " t.triggerid",
+						triggerids.values, triggerids.values_num);
+
+			result = DBselect("%s", sql);
 
 			switch (condition->operator)
 			{
+
 				case CONDITION_OPERATOR_EQUAL:
-					if (NULL != DBfetch(result))
+					while (NULL != (row = DBfetch(result)))
+					{
+						zbx_uint64_t		objectid;
+
+						ZBX_STR2UINT64(objectid, row[0]);
+						zbx_vector_uint64_append(&condition->objectids, objectid);
+
 						ret = SUCCEED;
+					}
 					break;
 				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (NULL == DBfetch(result))
+					while (NULL == (row = DBfetch(result)))
+					{
+						zbx_uint64_t		objectid;
+
+						ZBX_STR2UINT64(objectid, row[0]);
+						zbx_vector_uint64_append(&condition->objectids, objectid);
+
 						ret = SUCCEED;
+					}
 					break;
 				default:
 					ret = NOTSUPPORTED;
 			}
+
 			DBfree_result(result);
+			zbx_vector_uint64_destroy(&triggerids);
+			zbx_free(sql);
+
+			break;	/* optimized to bulk select, don't loop further */
 		}
 		else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
 		{
