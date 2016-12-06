@@ -1252,6 +1252,9 @@ out:
 }
 
 static ipmi_domain_id_t	domain_id;		/* global variable for passing OpenIPMI domain ID between callbacks */
+static int		domain_id_found;	/* A flag to indicate whether the 'domain_id' carries a valid value. */
+						/* Values: 0 - not found, 1 - found. The flag is used because we */
+						/* cannot set 'domain_id' to NULL. */
 static int		domain_close_ok;
 
 /* callback function invoked from OpenIPMI */
@@ -1266,7 +1269,10 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 
 	/* if the domain name matches the name we are searching for then store the domain ID into global variable */
 	if (0 == strcmp(domain_name, name))
+	{
 		domain_id = ipmi_domain_convert_to_id(domain);
+		domain_id_found = 1;
+	}
 }
 
 /* callback function invoked from OpenIPMI */
@@ -1288,28 +1294,41 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	const char	*__function_name = "zbx_close_inactive_host";
 
 	char		domain_name[11];	/* max int length */
-	int		ret = FAIL, res;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
+	/* Search the list of domains in OpenIPMI library and find which one to close. It could happen that */
+	/* the domain is not found (e.g. if Zabbix allocated an IPMI host during network problem and the domain was */
+	/* closed by OpenIPMI library but the host is still in our 'hosts' list). */
+
+	domain_id_found = 0;
 	ipmi_domain_iterate_domains(zbx_get_domain_id_by_name_cb, domain_name);
 
 	h->done = 0;
 	domain_close_ok = 0;
 
-	if (0 != (res = ipmi_domain_pointer_cb(domain_id, zbx_domain_close_cb, h)))
+	if (1 == domain_id_found)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: %s", __function_name,
-				zbx_strerror(res));
-	}
-	else if (1 == domain_close_ok && SUCCEED == zbx_perform_openipmi_ops(h, __function_name))
-	{
-		zbx_free_ipmi_host(h);
-		ret = SUCCEED;
+		int	res;
+
+		if (0 != (res = ipmi_domain_pointer_cb(domain_id, zbx_domain_close_cb, h)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: %s", __function_name,
+					zbx_strerror(res));
+			goto out;
+		}
+
+		if (1 != domain_close_ok || SUCCEED != zbx_perform_openipmi_ops(h, __function_name))
+			goto out;
 	}
 
+	/* The domain was either successfully closed or not found. */
+	zbx_free_ipmi_host(h);
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
