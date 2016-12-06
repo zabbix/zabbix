@@ -115,7 +115,10 @@ int	zbx_calculate_macro_function(const char *expression, char **out)
 	zbx_macro_func_t	macro_func = MACRO_FUNC_UNKNOWN;
 
 	if (SUCCEED != zbx_function_validate(expression, &par_l, &par_r))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
+	}
 
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression, par_l);
 
