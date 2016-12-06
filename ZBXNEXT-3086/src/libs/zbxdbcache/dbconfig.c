@@ -9526,9 +9526,7 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 	zbx_hashset_iter_reset(&config->actions, &iter);
 
 	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
-	{
 		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
-	}
 
 	UNLOCK_CACHE;
 
