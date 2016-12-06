@@ -1427,6 +1427,7 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: check_events_conditions                                          *
@@ -1444,8 +1445,7 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_conditions(const DB_EVENT *events, size_t events_num,
-		zbx_hashset_t *uniq_conditions)
+static void	check_events_conditions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *uniq_conditions)
 {
 	int	i;
 
@@ -1510,7 +1510,19 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 	return ret;
 }
 
-int	event_matches_condition(const DB_EVENT *event, const DB_CONDITION *condition)
+/******************************************************************************
+ *                                                                            *
+ * Function: event_match_condition                                            *
+ *                                                                            *
+ * Purpose: check if event matches single previously checked condition        *
+ *                                                                            *
+ * Parameters: event - event to check                                         *
+ *             condition - condition with event ids that match condition      *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	event_match_condition(const DB_EVENT *event, const DB_CONDITION *condition)
 {
 	int	i = 0;
 
@@ -1562,7 +1574,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
 
-		condition_result = event_matches_condition(event, condition);
+		condition_result = event_match_condition(event, condition);
 
 		switch (action->evaltype)
 		{
