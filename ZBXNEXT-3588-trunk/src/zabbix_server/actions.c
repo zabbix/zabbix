@@ -95,6 +95,39 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_object_ids                                                   *
+ *                                                                            *
+ * Purpose: to get objectids of escalation events with specific source        *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             source     [IN]  - source of events to add                     *
+ *             objectids  [OUT] - event objectids to be used in condition     *
+ *                                allocation                                  *
+ * Return value: SUCCEED - at least one match                                 *
+ *               NOTSUPPORTED - not supported condition                       *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_object_ids(const DB_EVENT *events, size_t events_num, unsigned char source,
+		zbx_vector_uint64_t *objectids)
+{
+	int	i;
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event = &events[i];
+
+		if (FAIL == is_escalation_event(event) || source != event->source)
+			continue;
+
+		zbx_vector_uint64_append(objectids, event->objectid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_host_group_condition                                       *
@@ -105,19 +138,21 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
  *             events_num [IN]  - events count to check                       *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
+ *                                                                            *
  * Return value: SUCCEED - at least one match                                 *
  *               NOTSUPPORTED - not supported condition                       *
  *               FAIL - otherwise                                             *
+ *                                                                            *
  ******************************************************************************/
 static int	check_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	char			*sql = NULL, *operation;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_vector_uint64_t	triggerids, groupids;
+	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 
 	if (condition->operator == CONDITION_OPERATOR_EQUAL)
 		operation = " and";
@@ -128,25 +163,15 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_create(&objectids);
 	zbx_vector_uint64_create(&groupids);
 
-	for (i = 0; i < events_num; i++)
-	{
-		const DB_EVENT	*event = &events[i];
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
-
-		zbx_vector_uint64_append(&triggerids, event->objectid);
-	}
+	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
 
 	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"select distinct t.triggerid"
+		"select t.triggerid"
 		" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 		" where hg.hostid=h.hostid"
 			" and h.hostid=i.hostid"
@@ -155,7 +180,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 			" and");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
-				triggerids.values, triggerids.values_num);
+			objectids.values, objectids.values_num);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
@@ -169,13 +194,12 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 
 		ZBX_STR2UINT64(objectid, row[0]);
 		zbx_vector_uint64_append(&condition->objectids, objectid);
-
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
 
 	zbx_vector_uint64_destroy(&groupids);
-	zbx_vector_uint64_destroy(&triggerids);
+	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
 
 	return ret;
@@ -183,11 +207,76 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_maintenance_condition                                      *
+ *                                                                            *
+ * Purpose: check maintenance condition                                       *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - at least one match                                 *
+ *               NOTSUPPORTED - not supported condition                       *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	int			ret = FAIL, condition_value;
+
+	if (condition->operator == CONDITION_OPERATOR_IN)
+		condition_value = HOST_MAINTENANCE_STATUS_ON;
+	else if (condition->operator == CONDITION_OPERATOR_NOT_IN)
+		condition_value = HOST_MAINTENANCE_STATUS_OFF;
+	else
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select t.triggerid"
+			" from hosts h,items i,functions f,triggers t"
+			" where h.hostid=i.hostid"
+				" and h.maintenance_status=%d"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=t.triggerid"
+				" and",
+			condition_value);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+			objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+		zbx_vector_uint64_append(&condition->objectids, objectid);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: check_trigger_condition                                          *
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                              *
+ * Parameters: events     [IN]  - events to check                             *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
@@ -425,45 +514,8 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
 		}
 		else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 		{
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_IN:
-					result = DBselect(
-							"select count(*)"
-							" from hosts h,items i,functions f,triggers t"
-							" where h.hostid=i.hostid"
-								" and h.maintenance_status=%d"
-								" and i.itemid=f.itemid"
-								" and f.triggerid=t.triggerid"
-								" and t.triggerid=" ZBX_FS_UI64,
-							HOST_MAINTENANCE_STATUS_ON,
-							event->objectid);
-
-					if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) &&
-						0 != atoi(row[0]))
-						ret = SUCCEED;
-					DBfree_result(result);
-					break;
-				case CONDITION_OPERATOR_NOT_IN:
-					result = DBselect(
-							"select count(*)"
-							" from hosts h,items i,functions f,triggers t"
-							" where h.hostid=i.hostid"
-								" and h.maintenance_status=%d"
-								" and i.itemid=f.itemid"
-								" and f.triggerid=t.triggerid"
-								" and t.triggerid=" ZBX_FS_UI64,
-							HOST_MAINTENANCE_STATUS_OFF,
-							event->objectid);
-
-					if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) &&
-						0 != atoi(row[0]))
-						ret = SUCCEED;
-					DBfree_result(result);
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
+			check_maintenance_condition(events, events_num, condition);
+			break;
 		}
 		else if (CONDITION_TYPE_EVENT_ACKNOWLEDGED == condition->conditiontype)
 		{
@@ -1158,11 +1210,11 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, D
 						"select null"
 						" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 						" where hg.hostid=h.hostid"
-						" and h.hostid=i.hostid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and",
+							" and h.hostid=i.hostid"
+							" and i.itemid=f.itemid"
+							" and f.triggerid=t.triggerid"
+							" and t.triggerid=" ZBX_FS_UI64
+							" and",
 						event->objectid);
 				break;
 			default:
@@ -1170,9 +1222,9 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, D
 						"select null"
 						" from hosts_groups hg,hosts h,items i"
 						" where hg.hostid=h.hostid"
-						" and h.hostid=i.hostid"
-						" and i.itemid=" ZBX_FS_UI64
-						" and",
+							" and h.hostid=i.hostid"
+							" and i.itemid=" ZBX_FS_UI64
+							" and",
 						event->objectid);
 			}
 
