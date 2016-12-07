@@ -285,7 +285,6 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	enum ipmi_str_type_e	id_type;
 	int			id_sz;
 	size_t			sz;
-	char			full_name[MAX_STRING_LEN];
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, sizeof(id));
@@ -312,12 +311,19 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	s->reading_type = ipmi_sensor_get_event_reading_type(sensor);
 	s->type = ipmi_sensor_get_sensor_type(sensor);
 
-	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
-	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s'"
-			" reading_type:0x%x ('%s') type:0x%x ('%s') full_name:'%s'", h->ip, h->port,
-			s->id_type, s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-			s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor), s->type,
-			ipmi_sensor_get_sensor_type_string(s->sensor), full_name);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char	full_name[MAX_STRING_LEN];
+
+		ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s'"
+				" reading_type:0x%x ('%s') type:0x%x ('%s') full_name:'%s'", h->ip, h->port,
+				s->id_type, s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
+				s->id_sz), s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor),
+				s->type, ipmi_sensor_get_sensor_type_string(s->sensor), full_name);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, s);
 
 	return s;
@@ -330,8 +336,7 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 	int		i;
 	size_t		sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p psensor:%p",
-			__function_name, h, sensor);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p psensor:%p", __function_name, h, sensor);
 
 	for (i = 0; i < h->sensor_count; i++)
 	{
