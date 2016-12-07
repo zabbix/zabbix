@@ -762,7 +762,7 @@ class CUser extends CApiService {
 		}
 
 		if ($del_mediaids) {
-			DB::delete('media', ['id' => $del_mediaids]);
+			DB::delete('media', ['mediaid' => $del_mediaids]);
 		}
 	}
 
