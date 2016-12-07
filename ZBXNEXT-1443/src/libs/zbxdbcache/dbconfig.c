@@ -145,7 +145,6 @@ typedef struct
 	int			data_expected_from;
 	int			history;
 	unsigned char		type;
-	unsigned char		data_type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
 	unsigned char		state;
@@ -5877,7 +5876,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, zbx_uint6
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
-	dst_item->data_type = src_item->data_type;
 	dst_item->value_type = src_item->value_type;
 	strscpy(dst_item->key_orig, src_item->key);
 	dst_item->key = NULL;

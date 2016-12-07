@@ -1347,15 +1347,14 @@ zbx_variant_t;
 
 #define ZBX_VARIANT_NONE	0
 #define ZBX_VARIANT_STR		1
-#define ZBX_VARIANT_LOG		2
+#define ZBX_VARIANT_DBL		2
 #define ZBX_VARIANT_UI64	3
-#define ZBX_VARIANT_DBL		4
 
 void	zbx_variant_clear(zbx_variant_t *value);
+void	zbx_variant_set_none(zbx_variant_t *value);
 void	zbx_variant_set_str(zbx_variant_t *value, char *text);
 void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
 void	zbx_variant_set_ui64(zbx_variant_t *value, double dbl);
-void	zbx_variant_set_log(zbx_variant_t *value, zbx_log_value_t *log);
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 

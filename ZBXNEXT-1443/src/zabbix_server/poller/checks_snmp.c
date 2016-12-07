@@ -700,15 +700,13 @@ end:
 	return strval_dyn;
 }
 
-static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char value_type, unsigned char data_type,
-		AGENT_RESULT *result)
+static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result)
 {
 	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d value_type:%d data_type:%d", __function_name,
-			(int)var->type, (int)value_type, (int)data_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d", __function_name, (int)var->type);
 
 	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
@@ -719,9 +717,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		}
 		else
 		{
-			if (SUCCEED != set_result_type(result, value_type, data_type, strval_dyn))
-				ret = NOTSUPPORTED;
-
+			SET_TEXT_RESULT(result, strval_dyn);
 			zbx_free(strval_dyn);
 		}
 	}
@@ -754,8 +750,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
 
-		if (SUCCEED != set_result_type(result, value_type, data_type, buffer))
-			ret = NOTSUPPORTED;
+		SET_TEXT_RESULT(result, buffer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_OPAQUE_FLOAT == var->type)
@@ -1199,7 +1194,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				init_result(&snmp_result);
 
-				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
+				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result) &&
 						NULL != GET_STR_RESULT(&snmp_result))
 				{
 					walk_cb_func(walk_cb_arg, OID, snmp_oid, snmp_result.str);
@@ -1384,12 +1379,11 @@ retry:
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
 			{
-				(void)zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &results[j]);
+				(void)zbx_snmp_set_result(var, &results[j]);
 			}
 			else
 			{
-				errcodes[j] = zbx_snmp_set_result(var, items[j].value_type, items[j].data_type,
-						&results[j]);
+				errcodes[j] = zbx_snmp_set_result(var, &results[j]);
 			}
 		}
 

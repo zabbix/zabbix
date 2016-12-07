@@ -138,7 +138,6 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	unsigned char 		type;
-	unsigned char		data_type;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		db_state;

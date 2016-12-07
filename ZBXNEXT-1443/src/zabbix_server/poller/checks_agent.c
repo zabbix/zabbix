@@ -144,8 +144,8 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 					item->interface.addr));
 			ret = NETWORK_ERROR;
 		}
-		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, s.buffer))
-			ret = NOTSUPPORTED;
+		else
+			SET_TEXT_RESULT(result, s.buffer);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
