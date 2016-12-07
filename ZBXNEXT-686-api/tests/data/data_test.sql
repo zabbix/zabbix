@@ -1356,3 +1356,16 @@ INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'Api discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (5893,375,40068);
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
+-- valuemap
+INSERT INTO valuemaps (valuemapid,name) VALUES (18,'Api value map for update');
+INSERT INTO valuemaps (valuemapid,name) VALUES (19,'Api value map for update with mappings');
+INSERT INTO valuemaps (valuemapid,name) VALUES (20,'Api value map delete');
+INSERT INTO valuemaps (valuemapid,name) VALUES (21,'Api value map delete2');
+INSERT INTO valuemaps (valuemapid,name) VALUES (22,'Api value map delete3');
+INSERT INTO valuemaps (valuemapid,name) VALUES (23,'Api value map delete4');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (166,19,'One','Online');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (167,19,'Two','Offline');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (168,21,'Three','Other');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (169,22,'Four','Unknown');
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'test-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);

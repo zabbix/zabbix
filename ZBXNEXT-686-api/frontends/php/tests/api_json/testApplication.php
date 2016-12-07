@@ -366,6 +366,20 @@ class API_JSON_Application extends CZabbixTest {
 			],
 			[
 				'application' => [
+					[
+					'applicationid' => '367',
+					'name' => 'update application twice1'
+					],
+					[
+					'applicationid' => '367',
+					'name' => 'update application twice2'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (applicationid)=(367) already exists.'
+			],
+			[
+				'application' => [
 					'applicationid' => '367',
 					'name' => 'application updated'
 				],
@@ -483,6 +497,14 @@ class API_JSON_Application extends CZabbixTest {
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
+			],
+			[
+				'application' => [
+					'371',
+					'371'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (371) already exists.'
 			],
 			[
 				'application' => [
