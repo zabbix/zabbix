@@ -183,8 +183,9 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
 			}
-			else if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
+			else
 			{
+				SET_TEXT_RESULT(result, row[0]);
 				ret = SUCCEED;
 			}
 		}

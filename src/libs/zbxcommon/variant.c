@@ -20,21 +20,6 @@
 #include "common.h"
 #include "zbxalgo.h"
 
-zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src)
-{
-	zbx_log_value_t	*log;
-
-	log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
-
-	log->source = (NULL != src->source ? zbx_strdup(NULL, src->source) : NULL);
-	log->value = zbx_strdup(NULL, src->value);
-	log->timestamp = src->timestamp;
-	log->logeventid = src->logeventid;
-	log->severity = src->severity;
-
-	return log;
-}
-
 void	zbx_variant_clear(zbx_variant_t *value)
 {
 	switch (value->type)
@@ -42,10 +27,6 @@ void	zbx_variant_clear(zbx_variant_t *value)
 		case ZBX_VARIANT_STR:
 			zbx_free(value->data.str);
 			break;
-		case ZBX_VARIANT_LOG:
-			zbx_free(value->data.log->source);
-			zbx_free(value->data.log->value);
-			zbx_free(value->data.log);
 	}
 
 	value->type = ZBX_VARIANT_NONE;
@@ -69,10 +50,9 @@ void	zbx_variant_set_ui64(zbx_variant_t *value, double value_ui64)
 	value->type = ZBX_VARIANT_UI64;
 }
 
-void	zbx_variant_set_log(zbx_variant_t *value, zbx_log_value_t *log)
+void	zbx_variant_set_none(zbx_variant_t *value)
 {
-	value->data.log = log;
-	value->type = ZBX_VARIANT_LOG;
+	value->type = ZBX_VARIANT_NONE;
 }
 
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source)
@@ -87,9 +67,6 @@ void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source)
 			break;
 		case ZBX_VARIANT_DBL:
 			zbx_variant_set_dbl(value, source->data.dbl);
-			break;
-		case ZBX_VARIANT_LOG:
-			zbx_variant_set_log(value, zbx_log_value_dup(source->data.log));
 			break;
 		case ZBX_VARIANT_NONE:
 			value->type = ZBX_VARIANT_NONE;
@@ -111,9 +88,6 @@ static int	variant_to_dbl(zbx_variant_t *value)
 			return SUCCEED;
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
-			break;
-		case ZBX_VARIANT_LOG:
-			zbx_strlcpy(buffer, value->data.log->value, sizeof(buffer));
 			break;
 		default:
 			return FAIL;
@@ -148,9 +122,6 @@ static int	variant_to_ui64(zbx_variant_t *value)
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
 			break;
-		case ZBX_VARIANT_LOG:
-			zbx_strlcpy(buffer, value->data.log->value, sizeof(buffer));
-			break;
 		default:
 			return FAIL;
 	}
@@ -182,52 +153,12 @@ static int	variant_to_str(zbx_variant_t *value)
 		case ZBX_VARIANT_UI64:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);
 			break;
-		case ZBX_VARIANT_LOG:
-			value_str = value->data.log->value;
-			value->data.log->value = NULL;
-			break;
 		default:
 			return FAIL;
 	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, value_str);
-
-	return SUCCEED;
-}
-
-static int	variant_to_log(zbx_variant_t *value)
-{
-	zbx_log_value_t	*log;
-	char		*value_log;
-
-	switch (value->type)
-	{
-		case ZBX_VARIANT_LOG:
-			return SUCCEED;
-		case ZBX_VARIANT_DBL:
-			value_log = zbx_dsprintf(NULL, ZBX_FS_DBL, value->data.dbl);
-			break;
-		case ZBX_VARIANT_UI64:
-			value_log = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);
-			break;
-		case ZBX_VARIANT_STR:
-			value_log = value->data.str;
-			value->data.str = NULL;
-			break;
-		default:
-			return FAIL;
-	}
-
-	log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
-	log->logeventid = 0;
-	log->severity = 0;
-	log->timestamp = 0;
-	log->source = NULL;
-	log->value = value_log;
-
-	zbx_variant_clear(value);
-	zbx_variant_set_log(value, log);
 
 	return SUCCEED;
 }
@@ -242,8 +173,6 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 			return variant_to_dbl(value);
 		case ZBX_VARIANT_STR:
 			return variant_to_str(value);
-		case ZBX_VARIANT_LOG:
-			return variant_to_log(value);
 		case ZBX_VARIANT_NONE:
 			zbx_variant_clear(value);
 			return SUCCEED;
@@ -285,8 +214,6 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 
 	switch (value->type)
 	{
-		case ZBX_VARIANT_LOG:
-			return value->data.log->value;
 		case ZBX_VARIANT_DBL:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value->data.dbl);
 			return buffer;
@@ -307,8 +234,6 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 {
 	switch (value->type)
 	{
-		case ZBX_VARIANT_LOG:
-			return "log";
 		case ZBX_VARIANT_DBL:
 			return "double";
 		case ZBX_VARIANT_UI64:

@@ -178,6 +178,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	zbx_vmware_perf_counter_t	*perfcounter;
 	zbx_ptr_pair_t			*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t			value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __function_name,
 			type, id, counterid, instance);
@@ -231,9 +232,13 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, perfvalue->second))
+
+
+	if (SUCCEED == is_uint64(perfvalue->second, &value))
 	{
-		result->ui64 *= coeff;
+		value *= coeff;
+
+		SET_UI64_RESULT(result, value);
 		ret = SYSINFO_RET_OK;
 	}
 out:
@@ -650,7 +655,7 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 			init_result(add_result);
 
-			if (SUCCEED == (ret = set_result_type(add_result, item->value_type, item->flags, value)))
+			if (SUCCEED == (ret = set_result_type(add_result, item->value_type, value)))
 			{
 				set_result_meta(add_result, ids.values[i], 0);
 

@@ -151,10 +151,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
-			errcodes[i] = SUCCEED;
-		else
-			errcodes[i] = NOTSUPPORTED;
+		SET_TEXT_RESULT(&results[i], trap);
+		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
 		free_request(&request);
@@ -162,10 +160,8 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		if (SUCCEED == set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
-			errcodes[fb] = SUCCEED;
-		else
-			errcodes[fb] = NOTSUPPORTED;
+		SET_TEXT_RESULT(&results[fb], trap);
+		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}
 

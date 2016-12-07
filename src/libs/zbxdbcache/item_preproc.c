@@ -79,9 +79,6 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
 		case ZBX_VARIANT_STR:
 			ret = zbx_variant_set_numeric(&value_num, value->data.str);
 			break;
-		case ZBX_VARIANT_LOG:
-			ret = zbx_variant_set_numeric(&value_num, value->data.log->value);
-			break;
 		default:
 			ret = FAIL;
 	}
@@ -514,9 +511,6 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 	{
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
-			break;
-		case ZBX_VARIANT_LOG:
-			zbx_strlcpy(buffer, value->data.log->value, sizeof(buffer));
 			break;
 		default:
 			*errmsg = zbx_strdup(NULL, "invalid value type");
