@@ -251,15 +251,10 @@ static int	DBpatch_3030017(void)
 
 static int	DBpatch_3030018(void)
 {
-	return DBdrop_field("items", "formula");
-}
-
-static int	DBpatch_3030019(void)
-{
 	return DBdrop_field("items", "data_type");
 }
 
-static int	DBpatch_3030020(void)
+static int	DBpatch_3030019(void)
 {
 	return DBdrop_field("items", "delta");
 }
@@ -280,12 +275,6 @@ static int	DBpatch_3030019(void)
 {
 	return SUCCEED;
 }
-
-static int	DBpatch_3030020(void)
-{
-	return SUCCEED;
-}
-
 
 #endif
 
@@ -313,6 +302,5 @@ DBPATCH_ADD(3030016, 0, 1)
 DBPATCH_ADD(3030017, 0, 1)
 DBPATCH_ADD(3030018, 0, 1)
 DBPATCH_ADD(3030019, 0, 1)
-DBPATCH_ADD(3030020, 0, 1)
 
 DBPATCH_END()

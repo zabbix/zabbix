@@ -307,8 +307,6 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|delta		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
@@ -322,7 +320,6 @@ FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
@@ -1458,4 +1455,4 @@ INDEX		|1		|itemid,step
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030016	|3030016
+ROW		|3030019	|3030019
