@@ -1374,18 +1374,6 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'multiplier' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'delta' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'snmpv3_securityname' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1464,12 +1452,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => '',
-			],
-			'data_type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
 			],
 			'authtype' => [
 				'null' => false,
