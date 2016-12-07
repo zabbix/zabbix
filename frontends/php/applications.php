@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -78,11 +79,27 @@ if (hasRequest('action')) {
 		}
 	}
 }
-if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => getRequest('hostid'),
+			'editable' => true
+		]);
+
+		if (!$templates) {
+			access_deny();
+		}
+	}
 }
 
 $pageFilter = new CPageFilter([
@@ -297,7 +314,7 @@ else {
 		$applications = API::Application()->get([
 			'output' => ['applicationid'],
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1

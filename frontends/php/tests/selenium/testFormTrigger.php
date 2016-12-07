@@ -300,18 +300,18 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'size', 20);
 
-		$this->zbxTestAssertVisibleId('priority_0');
+		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
 		$this->zbxTestAssertElementText("//*[@id='priority_0']/../label", 'Not classified');
-		$this->zbxTestAssertVisibleId('priority_1');
+		$this->zbxTestAssertElementPresentId('priority_1');
 		$this->zbxTestAssertElementText("//*[@id='priority_1']/../label", 'Information');
-		$this->zbxTestAssertVisibleId('priority_2');
+		$this->zbxTestAssertElementPresentId('priority_2');
 		$this->zbxTestAssertElementText("//*[@id='priority_2']/../label", 'Warning');
-		$this->zbxTestAssertVisibleId('priority_3');
+		$this->zbxTestAssertElementPresentId('priority_3');
 		$this->zbxTestAssertElementText("//*[@id='priority_3']/../label", 'Average');
-		$this->zbxTestAssertVisibleId('priority_4');
+		$this->zbxTestAssertElementPresentId('priority_4');
 		$this->zbxTestAssertElementText("//*[@id='priority_4']/../label", 'High');
-		$this->zbxTestAssertVisibleId('priority_5');
+		$this->zbxTestAssertElementPresentId('priority_5');
 		$this->zbxTestAssertElementText("//*[@id='priority_5']/../label", 'Disaster');
 
 		if (isset($data['severity'])) {
@@ -338,7 +338,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->zbxTestAssertAttribute("//input[@id='status']", 'type', 'checkbox');
 
 		$this->zbxTestAssertVisibleId('cancel');

@@ -637,7 +637,7 @@ class CScreenProblem extends CScreenBase {
 			if ($this->config['event_ack_enable']) {
 				$header_check_box = (new CColHeader(
 					(new CCheckBox('all_eventids'))
-						->onClick("checkAll('".$form->GetName()."', 'all_eventids', 'eventids');")
+						->onClick("checkAll('".$form->getName()."', 'all_eventids', 'eventids');")
 				))->addClass(ZBX_STYLE_CELL_WIDTH);
 			}
 			else {
@@ -711,7 +711,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = (new CCol(new CLink($cell_r_clock,
 						(new CUrl('tr_events.php'))
 							->setArgument('triggerid', $problem['objectid'])
-							->setArgument('eventid', $problem['r_eventid'])
+							->setArgument('eventid', $problem['eventid'])
 					)))
 						->addClass(ZBX_STYLE_NOWRAP)
 						->addClass(ZBX_STYLE_RIGHT);

@@ -56,7 +56,12 @@ if (!check_fields($fields)) {
 }
 
 if ($httptestid = getRequest('httptestid', false)) {
-	if (!API::HttpTest()->isReadable([$_REQUEST['httptestid']])) {
+	$httptests = API::HttpTest()->get([
+		'output' => [],
+		'httptestids' => $httptestid
+	]);
+
+	if (!$httptests) {
 		access_deny();
 	}
 

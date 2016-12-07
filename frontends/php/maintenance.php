@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/maintenances.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -97,7 +98,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
 if (isset($_REQUEST['maintenanceid'])) {
@@ -533,7 +534,7 @@ else {
 	];
 
 	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
-		$options['groupids'] = $pageFilter->groupid;
+		$options['groupids'] = $pageFilter->groupids;
 	}
 	else {
 		$options['groupids'] = $config['dropdown_first_entry'] ? null : [];
