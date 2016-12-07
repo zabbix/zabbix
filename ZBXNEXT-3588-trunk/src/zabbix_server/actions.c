@@ -267,6 +267,73 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
 }
 /******************************************************************************
  *                                                                            *
+ * Function: check_host_condition                                             *
+ *                                                                            *
+ * Purpose: check host condition                                              *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	char			*sql = NULL, *operation;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	int			condition_value;
+
+	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+		operation = " and";
+	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		operation = " and not";
+	else
+		return NOTSUPPORTED;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	zbx_vector_uint64_create(&objectids);
+
+	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select t.triggerid"
+			" from items i,functions f,triggers t"
+			" where i.itemid=f.itemid"
+				" and f.triggerid=t.triggerid"
+				"%s i.hostid=" ZBX_FS_UI64
+				" and",
+			operation,
+			condition_value);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+				objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+		zbx_vector_uint64_append(&condition->objectids, objectid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_trigger_condition                                          *
  *                                                                            *
  * Purpose: check if events match single condition                            *
@@ -371,32 +438,8 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
 		}
 		else if (CONDITION_TYPE_HOST == condition->conditiontype)
 		{
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					result = DBselect(
-							"select distinct i.hostid"
-							" from items i,functions f,triggers t"
-							" where i.itemid=f.itemid"
-								" and f.triggerid=t.triggerid"
-								" and t.triggerid=" ZBX_FS_UI64
-								" and i.hostid=" ZBX_FS_UI64,
-							event->objectid,
-							condition_value);
-
-					if (NULL != DBfetch(result))
-						ret = SUCCEED;
-					DBfree_result(result);
-
-					if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
-						ret = (SUCCEED == ret) ? FAIL : SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
+			check_host_condition(events, events_num, condition);
+			break;
 		}
 		else if (CONDITION_TYPE_TRIGGER == condition->conditiontype)
 		{
