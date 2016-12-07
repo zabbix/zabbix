@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.20rc1');
+define('ZABBIX_VERSION',		'2.0.20');
 define('ZABBIX_API_VERSION',	'2.0.20');
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
