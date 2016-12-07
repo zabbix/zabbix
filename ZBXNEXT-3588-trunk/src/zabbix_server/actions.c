@@ -139,9 +139,8 @@ static void	get_object_ids(const DB_EVENT *events, size_t events_num, unsigned c
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match                                 *
- *               NOTSUPPORTED - not supported condition                       *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
 static int	check_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
@@ -152,7 +151,6 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 	DB_ROW			row;
 	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
-	int			ret = FAIL;
 
 	if (condition->operator == CONDITION_OPERATOR_EQUAL)
 		operation = " and";
@@ -194,7 +192,6 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 
 		ZBX_STR2UINT64(objectid, row[0]);
 		zbx_vector_uint64_append(&condition->objectids, objectid);
-		ret = SUCCEED;
 	}
 	DBfree_result(result);
 
@@ -202,7 +199,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -216,9 +213,8 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match                                 *
- *               NOTSUPPORTED - not supported condition                       *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
 static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
@@ -228,7 +224,7 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	objectids;
-	int			ret = FAIL, condition_value;
+	int			condition_value;
 
 	if (condition->operator == CONDITION_OPERATOR_IN)
 		condition_value = HOST_MAINTENANCE_STATUS_ON;
@@ -261,14 +257,13 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
 
 		ZBX_STR2UINT64(objectid, row[0]);
 		zbx_vector_uint64_append(&condition->objectids, objectid);
-		ret = SUCCEED;
 	}
 	DBfree_result(result);
 
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
 
-	return ret;
+	return SUCCEED;
 }
 /******************************************************************************
  *                                                                            *
