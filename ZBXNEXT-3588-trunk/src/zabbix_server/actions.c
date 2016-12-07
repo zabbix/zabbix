@@ -95,25 +95,43 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 
 	return ret;
 }
-
+/******************************************************************************
+ *                                                                            *
+ * Function: check_host_group_condition                                       *
+ *                                                                            *
+ * Purpose: check host group condition                                        *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ * Return value: SUCCEED - at least one match                                 *
+ *               NOTSUPPORTED - not supported condition                       *
+ *               FAIL - otherwise                                             *
+ ******************************************************************************/
 static int	check_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
+	char			*sql = NULL, *operation;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	triggerids, groupids;
 	zbx_uint64_t		condition_value;
-	int			i, j, ret = FAIL;
+	int			i, ret = FAIL;
+
+	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+		operation = " and";
+	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		operation = " and not";
+	else
+		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_vector_uint64_create(&groupids);
-	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
-
 	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_create(&groupids);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -125,7 +143,8 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 		zbx_vector_uint64_append(&triggerids, event->objectid);
 	}
 
-	sql_offset = 0;
+	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select distinct t.triggerid"
 		" from hosts_groups hg,hosts h,items i,functions f,triggers t"
@@ -135,59 +154,26 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 			" and f.triggerid=t.triggerid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
-				groupids.values_num);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
 				triggerids.values, triggerids.values_num);
 
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
 	result = DBselect("%s", sql);
 
-	switch (condition->operator)
+	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	objectid;
 
-		case CONDITION_OPERATOR_EQUAL:
-			while (NULL != (row = DBfetch(result)))
-			{
-				zbx_uint64_t	objectid;
+		ZBX_STR2UINT64(objectid, row[0]);
+		zbx_vector_uint64_append(&condition->objectids, objectid);
 
-				ZBX_STR2UINT64(objectid, row[0]);
-				zbx_vector_uint64_append(&condition->objectids, objectid);
-				ret = SUCCEED;
-			}
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-
-			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				zbx_uint64_t	objectid;
-				int		index;
-
-				ZBX_STR2UINT64(objectid, row[0]);
-
-				if (FAIL != (index = zbx_vector_uint64_bsearch(&triggerids, objectid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				{
-					zbx_vector_uint64_remove(&triggerids, index);
-				}
-
-				ret = SUCCEED;
-			}
-
-			for (j = 0; j < triggerids.values_num; j++)
-			{
-				zbx_vector_uint64_append(&condition->objectids, triggerids.values[j]);
-			}
-
-			break;
-		default:
-			ret = NOTSUPPORTED;
+		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
+
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
@@ -201,7 +187,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event      [IN]  - event to check                              *
+ * Parameters: events     [IN]  - events to check                              *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
@@ -584,7 +570,7 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event      [IN]  - event to check                              *
+ * Parameters: events     [IN]  - events to check                              *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
@@ -975,7 +961,7 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: event      [IN]  - event to check                              *
+ * Parameters: events     [IN]  - events to check                             *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
@@ -1096,7 +1082,7 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
  *                                                                            *
  * Purpose: check if internal events match single condition                   *
  *                                                                            *
- * Parameters: event      [IN]  - event to check                              *
+ * Parameters: events     [IN]  - events to check                              *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
@@ -1432,7 +1418,7 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, D
  *                                                                            *
  * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
- * Parameters: event      [IN]  - trigger event to check                      *
+ * Parameters: events     [IN]  - trigger events to check                      *
  *             events_num [IN]  - event count to check                        *
  *             source     [IN] - specific event source that need checking     *
  *             condition  [IN/OUT] - condition for matching, outputs          *
