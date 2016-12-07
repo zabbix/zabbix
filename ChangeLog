@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+........S. [ZBXNEXT-3086] improved performance of action condition evaluation by ensuring that equivalent conditions are only checked once, thus there will be less queries to database (vso)
 A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" methods as well as the "proxy.interfaces" parameter (Sasha)
 ..F.....S. [ZBXNEXT-1667] added support of LLD macros in function parameters of trigger prototype expression (Ivo, vso)
 ........S. [ZBXNEXT-1667] added support of LLD macros in function parameters when using function with ITEM.VALUE, ITEM.LASTVALUE in trigger prototype name, description and tags (vso)
