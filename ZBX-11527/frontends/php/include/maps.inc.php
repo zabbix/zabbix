@@ -661,11 +661,25 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
-		$info['iconid'] = $selement['iconid_on'];
-		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info']['unack'] = array(
 			'msg' => _('PROBLEM'),
 			'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+		);
+
+		if (!array_key_exists('maintenance_title', $i)) {
+			$info['iconid'] = $selement['iconid_on'];
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+
+			return $info;
+		}
+	}
+
+	if (array_key_exists('maintenance_title', $i)) {
+		$info['iconid'] = $selement['iconid_maintenance'];
+		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+		$info['info']['maintenance'] = array(
+			'msg' => _('MAINTENANCE').' ('.$i['maintenance_title'].')',
+			'color' => $colors['Orange']
 		);
 	}
 	elseif ($i['trigger_disabled']) {
@@ -742,7 +756,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		}
 	}
 
-	if ($i['maintenance']) {
+	if (array_key_exists('maintenance_title', $i)) {
 		$info['iconid'] = $selement['iconid_maintenance'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		$info['info']['maintenance'] = array(
@@ -1118,6 +1132,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($triggers_map)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectHosts' => array('maintenance_status', 'maintenanceid'),
 			'selectLastEvent' => array('acknowledged'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
@@ -1140,6 +1155,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($triggers_map_submaps)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectHosts' => array('maintenance_status', 'maintenanceid'),
 			'selectLastEvent' => array('acknowledged'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
@@ -1176,7 +1192,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		);
 
 		$triggers = API::Trigger()->get($triggerOptions);
-
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1221,6 +1236,16 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $all_triggers[$triggerId];
 
+				foreach ($trigger['hosts'] as $host) {
+					if (array_key_exists('maintenance_status', $host)
+							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+						$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
+						$i['maintenance_title'] = $maintenance['name'];
+
+						break;
+					}
+				}
+
 			if ($options['severity_min'] <= $trigger['priority']) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
 					$i['trigger_disabled']++;
@@ -1259,11 +1284,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($all_triggers[$lastProblemId]);
 		}
 
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST && $i['maintenance'] == 1) {
-			$mnt = get_maintenance_by_maintenanceid($all_hosts[$last_hostid]['maintenanceid']);
-			$i['maintenance_title'] = $mnt['name'];
-		}
-
 		// replace default icons
 		if (!$selement['iconid_on']) {
 			$selement['iconid_on'] = $selement['iconid_off'];
@@ -1285,6 +1305,11 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
+				if ($i['maintenance'] > 0) {
+					$mnt = get_maintenance_by_maintenanceid($all_hosts[$last_hostid]['maintenanceid']);
+					$i['maintenance_title'] = $mnt['name'];
+				}
+
 				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap, $hostInventories[$selement['elementid']]);
