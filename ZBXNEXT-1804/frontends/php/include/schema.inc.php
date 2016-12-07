@@ -5259,8 +5259,8 @@ return [
 			],
 			'snmp_lastsize' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_UINT,
+				'length' => 20,
 				'default' => '0',
 			],
 		],

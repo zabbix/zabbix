@@ -573,6 +573,19 @@ typedef struct
 }
 zbx_dc_correlation_t;
 
+#define ZBX_DC_HOSTGROUP_FLAGS_NONE		0
+#define ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS	1
+
+typedef struct
+{
+	zbx_uint64_t		groupid;
+	const char		*name;
+
+	zbx_vector_uint64_t	nested_groupids;
+	unsigned char		flags;
+}
+zbx_dc_hostgroup_t;
+
 typedef struct
 {
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
@@ -621,6 +634,8 @@ typedef struct
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
+	zbx_hashset_t		hostgroups;
+	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -4047,6 +4062,90 @@ static void	DCsync_corr_operations(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static int	dc_compare_hgroups(const void *d1, const void *d2)
+{
+	const zbx_dc_hostgroup_t	*g1 = *((const zbx_dc_hostgroup_t **)d1);
+	const zbx_dc_hostgroup_t	*g2 = *((const zbx_dc_hostgroup_t **)d2);
+
+	return strcmp(g1->name, g2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_hostgroups                                                *
+ *                                                                            *
+ * Purpose: Updates host groups configuration cache                           *
+ *                                                                            *
+ * Parameters: result - [IN] the result of host groups database select        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - groupid                                                      *
+ *           1 - name                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_hostgroups(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_hostgroups";
+
+	DB_ROW			row;
+	zbx_vector_uint64_t	syncids;
+	zbx_uint64_t 		groupid;
+	zbx_dc_hostgroup_t		*group;
+	int			found;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&syncids);
+
+	/* clear host group index */
+	zbx_vector_ptr_clear(&config->hostgroups_name);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		zbx_vector_uint64_append(&syncids, groupid);
+
+		group = DCfind_id(&config->hostgroups, groupid, sizeof(zbx_dc_hostgroup_t), &found);
+
+		/* recreate the nested groupid cache to free memory if nested groups were removed */
+		if (0 != found)
+			zbx_vector_uint64_destroy(&group->nested_groupids);
+
+		zbx_vector_uint64_create_ext(&group->nested_groupids, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+
+		DCstrpool_replace(found, &group->name, row[1]);
+
+		group->flags = ZBX_DC_HOSTGROUP_FLAGS_NONE;
+
+		zbx_vector_ptr_append(&config->hostgroups_name, group);
+	}
+
+	zbx_vector_ptr_sort(&config->hostgroups_name, dc_compare_hgroups);
+
+	/* remove deleted host groups */
+
+	zbx_vector_uint64_sort(&syncids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->hostgroups, &iter);
+
+	while (NULL != (group = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&syncids, group->groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_vector_uint64_destroy(&group->nested_groupids);
+		zbx_strpool_release(group->name);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&syncids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_compare_action_conditions_by_type                             *
@@ -4278,6 +4377,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		correlation_result = NULL;
 	DB_RESULT		corr_condition_result = NULL;
 	DB_RESULT		corr_operation_result = NULL;
+	DB_RESULT		hgroups_result = NULL;
 
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
@@ -4285,6 +4385,7 @@ void	DCsync_configuration(void)
 				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
 				trigger_tag_sec, trigger_tag_sec2, correlation_sec, correlation_sec2,
 				corr_condition_sec, corr_condition_sec2, corr_operation_sec, corr_operation_sec2,
+				hgroups_sec, hgroups_sec2,
 				total, total2;
 	const zbx_strpool_t	*strpool;
 
@@ -4527,6 +4628,11 @@ void	DCsync_configuration(void)
 	}
 	corr_operation_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (NULL == (hgroups_result = DBselect("select groupid,name from groups")))
+		goto out;
+	hgroups_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4603,14 +4709,18 @@ void	DCsync_configuration(void)
 	DCsync_corr_operations(corr_operation_result);
 	corr_operation_sec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_hostgroups(hgroups_result);
+	hgroups_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
 	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 			action_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
-			corr_condition_sec + corr_operation_sec;
+			corr_condition_sec + corr_operation_sec + hgroups_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 			expr_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 + correlation_sec2 +
-			corr_condition_sec2 + corr_operation_sec2;
+			corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -4648,6 +4758,8 @@ void	DCsync_configuration(void)
 			corr_condition_sec, corr_condition_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			corr_operation_sec, corr_operation_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			hgroups_sec, hgroups_sec2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
@@ -4743,6 +4855,8 @@ void	DCsync_configuration(void)
 			config->corr_conditions.num_data, config->corr_conditions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
 			config->corr_operations.num_data, config->corr_operations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
+			config->hostgroups.num_data, config->hostgroups.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -4787,6 +4901,7 @@ out:
 	DBfree_result(correlation_result);
 	DBfree_result(corr_condition_result);
 	DBfree_result(corr_operation_result);
+	DBfree_result(hgroups_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -5162,6 +5277,9 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->correlations, 0);
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
+	CREATE_HASHSET(config->hostgroups, 0);
+	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
+			__config_mem_free_func);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -9770,6 +9888,116 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_get_nested_hostgroupids                                       *
+ *                                                                            *
+ * Purpose: gets nested group ids for the specified host group                *
+ *          (including the target group id)                                   *
+ *                                                                            *
+ * Parameter: groupid         - [IN] the parent group identifier              *
+ *            nested_groupids - [OUT] the nested + parent group ids           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
+{
+	zbx_dc_hostgroup_t	*parent_group, *group;
+
+	zbx_vector_uint64_append(nested_groupids, groupid);
+
+	/* The target group id will not be found in the configuration cache if target group was removed */
+	/* between call to this function and the configuration cache look-up below. The target group id */
+	/* is nevertheless returned so that the SELECT statements of the callers work even if no group  */
+	/* was found.                                                                                   */
+
+	if (NULL != (parent_group = zbx_hashset_search(&config->hostgroups, &groupid)))
+	{
+		if (0 == (parent_group->flags & ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS))
+		{
+			int	index, len;
+
+			index = zbx_vector_ptr_bsearch(&config->hostgroups_name, parent_group, dc_compare_hgroups);
+			len = strlen(parent_group->name);
+
+			while (++index < config->hostgroups_name.values_num)
+			{
+				group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
+
+				if (0 != strncmp(group->name, parent_group->name, len))
+					break;
+
+				if ('\0' == group->name[len] || '/' == group->name[len])
+					zbx_vector_uint64_append(&parent_group->nested_groupids, group->groupid);
+			}
+
+			parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
+		}
+
+		zbx_vector_uint64_append_vector(nested_groupids, &parent_group->nested_groupids);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_nested_hostgroupids                                   *
+ *                                                                            *
+ * Purpose: gets nested group ids for the specified host groups               *
+ *                                                                            *
+ * Parameter: groupids        - [IN] the parent group identifiers             *
+ *            groupids_num    - [IN] the number of parent groups              *
+ *            nested_groupids - [OUT] the nested + parent group ids           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids)
+{
+	int	i;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < groupids_num; i++)
+		dc_get_nested_hostgroupids(groupids[i], nested_groupids);
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_nested_hostgroupids_by_names                          *
+ *                                                                            *
+ * Purpose: gets nested group ids for the specified host groups               *
+ *                                                                            *
+ * Parameter: names           - [IN] the parent group names                   *
+ *            names_num       - [IN] the number of parent groups              *
+ *            nested_groupids - [OUT] the nested + parent group ids           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_nested_hostgroupids_by_names(char **names, int names_num, zbx_vector_uint64_t *nested_groupids)
+{
+	int	i, index;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < names_num; i++)
+	{
+		zbx_dc_hostgroup_t	group_local = {.name = names[i]}, *group;
+
+		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
+				dc_compare_hgroups)))
+		{
+			group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
+			dc_get_nested_hostgroupids(group->groupid, nested_groupids);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_get_active_proxy_by_name                                  *
  *                                                                            *
  * Purpose: gets active proxy data by its name from configuration cache       *
@@ -9781,7 +10009,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - proxy data were retrieved successfully                       *
- *     FAIL    - failed to retriev proxy data, error message is set           *
+ *     FAIL    - failed to retrieve proxy data, error message is set          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error)
@@ -9892,6 +10120,3 @@ void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values,
 
 	UNLOCK_CACHE;
 }
-
-
-

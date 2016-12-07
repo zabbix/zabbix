@@ -575,43 +575,6 @@ abstract class CItemGeneral extends CApiService {
 		return $matchingInterface;
 	}
 
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'itemids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	public function isWritable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'itemids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	/**
 	 * Checks whether the given items are referenced by any graphs and tries to
 	 * unset these references, if they are no longer used.

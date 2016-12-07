@@ -111,13 +111,38 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 	if (!empty($_REQUEST['group_httptestid'])) {
 		$testIds = array_merge($testIds, $_REQUEST['group_httptestid']);
 	}
-	if (!API::HttpTest()->isWritable($testIds)) {
-		access_deny();
+	if ($testIds) {
+		$testIds = array_unique($testIds);
+
+		$count = API::HttpTest()->get([
+			'countOutput' => true,
+			'httptestids' => $testIds,
+			'editable' => true
+		]);
+
+		if ($count != count($testIds)) {
+			access_deny();
+		}
 	}
 }
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable([$hostId])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => getRequest('hostid'),
+			'editable' => true
+		]);
+
+		if (!$templates) {
+			access_deny();
+		}
+	}
 }
 
 $groupId = getRequest('groupid');
@@ -670,7 +695,7 @@ else {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
 		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
+			$options['groupids'] = $data['pageFilter']->groupids;
 		}
 		$httpTests = API::HttpTest()->get($options);
 

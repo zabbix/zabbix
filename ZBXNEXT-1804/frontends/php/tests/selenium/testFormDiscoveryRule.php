@@ -642,7 +642,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('tab_macroTab');

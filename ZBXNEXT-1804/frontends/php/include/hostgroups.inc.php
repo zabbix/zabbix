@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,17 +18,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "13 September 2016";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "3.3.0";
+/**
+ * Check if user has read permissions for host groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isReadableHostGroups(array $groupids) {
+	return count($groupids) == API::HostGroup()->get([
+		'countOutput' => true,
+		'groupids' => $groupids
+	]);
+}
 
-	static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
-	}
+/**
+ * Check if user has write permissions for host groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isWritableHostGroups(array $groupids) {
+	return count($groupids) == API::HostGroup()->get([
+		'countOutput' => true,
+		'groupids' => $groupids,
+		'editable' => true
+	]);
 }
