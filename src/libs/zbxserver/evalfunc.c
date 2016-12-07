@@ -2899,7 +2899,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 {
 	const char	*__function_name = "evaluate_macro_function";
 
-	zbx_host_key_t	host_key = {host, key};
+	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
 	char		*error = NULL;
 	int		ret = FAIL, errcode;
