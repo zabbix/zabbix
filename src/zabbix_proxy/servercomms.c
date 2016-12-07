@@ -128,6 +128,7 @@ int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
