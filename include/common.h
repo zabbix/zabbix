@@ -195,6 +195,7 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTO_REGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
+#define EVENT_SOURCE_COUNT		4
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
