@@ -417,7 +417,7 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|esc_period	|t_varchar(255)	|'0'	|NOT NULL	|0
 FIELD		|def_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|def_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
@@ -431,7 +431,7 @@ TABLE|operations|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0
 FIELD		|actionid	|t_id		|	|NOT NULL	|0			|1|actions
 FIELD		|operationtype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|esc_period	|t_varchar(255)	|'0'	|NOT NULL	|0
 FIELD		|esc_step_from	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|esc_step_to	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
