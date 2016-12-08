@@ -54,7 +54,8 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  * Purpose: execute custom multiplier preprocessing operation on variant      *
  *          value type                                                        *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to process                  *
+ * Parameters: item          - [IN] the item                                  *
+ *             value         - [IN/OUT] the value to process                  *
  *             params        - [IN] the operation parameters                  *
  *             errmsg        - [OUT] error message                            *
  *                                                                            *
@@ -62,7 +63,8 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier_variant(const DC_ITEM *item, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
 	zbx_uint64_t	multiplier_ui64, value_ui64;
 	double		value_dbl;
@@ -89,6 +91,16 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
 		return FAIL;
 	}
 
+	switch (item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_variant_convert(&value_num, ZBX_VARIANT_DBL);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_variant_convert(&value_num, ZBX_VARIANT_UI64);
+			break;
+	}
+
 	switch (value_num.type)
 	{
 		case ZBX_VARIANT_DBL:
@@ -107,12 +119,6 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
 			else
 				value_ui64 = (double)value_num.data.ui64 * atof(params);
 
-			/* check for overflow */
-			if (value_ui64 < value_num.data.ui64)
-			{
-				*errmsg = zbx_strdup(*errmsg, "value is too large");
-				return FAIL;
-			}
 			zbx_variant_clear(value);
 			zbx_variant_set_ui64(value, value_ui64);
 			break;
@@ -138,11 +144,11 @@ static int	item_preproc_multiplier_variant(zbx_variant_t *value, const char *par
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_multiplier(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_multiplier(const DC_ITEM *item, zbx_variant_t *value, const char *params, char **errmsg)
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_multiplier_variant(value, params, &err))
+	if (SUCCEED == item_preproc_multiplier_variant(item, value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "Cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
@@ -737,7 +743,7 @@ int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timesp
 	switch (op->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			return item_preproc_multiplier(value, op->params, errmsg);
+			return item_preproc_multiplier(item, value, op->params, errmsg);
 		case ZBX_PREPROC_RTRIM:
 			return item_preproc_rtrim(value, op->params, errmsg);
 		case ZBX_PREPROC_LTRIM:

@@ -151,7 +151,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		SET_TEXT_RESULT(&results[i], trap);
+		set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, trap);
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
@@ -160,7 +160,7 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		SET_TEXT_RESULT(&results[fb], trap);
+		set_result_type(&results[fb], ITEM_VALUE_TYPE_TEXT, trap);
 		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}

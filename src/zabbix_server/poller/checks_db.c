@@ -185,7 +185,7 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 			}
 			else
 			{
-				SET_TEXT_RESULT(result, row[0]);
+				set_result_type(result, ITEM_VALUE_TYPE_TEXT, row[0]);
 				ret = SUCCEED;
 			}
 		}

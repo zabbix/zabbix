@@ -71,7 +71,7 @@ static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errc
 
 				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
-					SET_TEXT_RESULT(&results[i], value);
+					set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, value);
 					errcodes[i] = SUCCEED;
 				}
 				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
