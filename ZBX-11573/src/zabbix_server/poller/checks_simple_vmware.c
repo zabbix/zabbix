@@ -1222,7 +1222,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_STATUS, result);
 
-	if (SYSINFO_RET_OK == ret)
+	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
 			SET_UI64_RESULT(result, 0);
