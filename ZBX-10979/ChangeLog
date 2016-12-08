@@ -1,3 +1,9 @@
+Changes for 3.0.6
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), Persian, Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.6rc1
 
 New features:
@@ -1548,6 +1554,12 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.16
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), Spanish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.16rc1
 
 New features:
@@ -3042,6 +3054,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.20
+
+2.0.20rc1 was released as 2.0.20 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.20rc1
