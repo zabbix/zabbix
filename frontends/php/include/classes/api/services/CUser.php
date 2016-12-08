@@ -389,11 +389,18 @@ class CUser extends CApiService {
 		}
 
 		$db_users = $this->get([
+			'output' => [],
+			'userids' => zbx_objectValues($users, 'userid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		// 'passwd' can't be received by the user.get method
+		$db_users = API::getApiService()->select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
 				'theme', 'type', 'refresh', 'rows_per_page'
 			],
-			'userids' => zbx_objectValues($users, 'userid'),
-			'editable' => true,
+			'userids' => array_keys($db_users),
 			'preservekeys' => true
 		]);
 
