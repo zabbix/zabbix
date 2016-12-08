@@ -93,6 +93,9 @@ static int	variant_to_dbl(zbx_variant_t *value)
 			return FAIL;
 	}
 
+	zbx_ltrim(buffer, " \"+");
+	zbx_rtrim(buffer, " \"\n\r");
+
 	if (SUCCEED != is_double(buffer))
 		return FAIL;
 

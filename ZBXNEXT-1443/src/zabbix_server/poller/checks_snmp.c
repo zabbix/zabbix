@@ -717,7 +717,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 		}
 		else
 		{
-			SET_TEXT_RESULT(result, strval_dyn);
+			set_result_type(result, ITEM_VALUE_TYPE_TEXT, strval_dyn);
 			zbx_free(strval_dyn);
 		}
 	}
@@ -750,7 +750,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
 
-		SET_TEXT_RESULT(result, buffer);
+		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buffer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_OPAQUE_FLOAT == var->type)

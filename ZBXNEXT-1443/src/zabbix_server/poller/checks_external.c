@@ -84,7 +84,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		SET_TEXT_RESULT(result, buf);
+		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
 		zbx_free(buf);
 
 		ret = SUCCEED;
