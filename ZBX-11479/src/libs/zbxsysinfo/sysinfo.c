@@ -837,9 +837,8 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data_offset, int agent_ret,
 		AGENT_RESULT *result)
 {
-	char		**pvalue, result_type;
-	size_t		value_len;
-	zbx_uint64_t	len64;
+	char	**pvalue, result_type;
+	size_t	value_len;
 
 	if (SYSINFO_RET_OK == agent_ret)
 	{
@@ -884,15 +883,13 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		result_type = '-';
 	}
 
-	if (*data_alloc - *data_offset < (len64 = sizeof(zbx_uint64_t) + sizeof(int) + 1 + value_len))
+	if (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
 	{
-		*data_alloc += len64 - *data_alloc - *data_offset;
+		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
+			*data_alloc *= 1.5;
+
 		*data = zbx_realloc(*data, *data_alloc);
 	}
-
-	len64 = zbx_htole_uint64(len64);
-	memcpy(*data + *data_offset, &len64, sizeof(zbx_uint64_t));
-	*data_offset += sizeof(zbx_uint64_t);
 
 	memcpy(*data + *data_offset, &agent_ret, sizeof(int));
 	*data_offset += sizeof(int);
@@ -918,21 +915,10 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  * Return value: the agent result return code (SYSINFO_RET_*)                 *
  *                                                                            *
  ******************************************************************************/
-static int	deserialize_agent_result(char *data, size_t data_size, AGENT_RESULT *result)
+static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 {
-	int		ret, agent_ret;
-	char		type;
-	zbx_uint64_t	expected_len;
-
-	if (sizeof(zbx_uint64_t) > data_size)
-		return SYSINFO_RET_FAIL;
-
-	memcpy(&expected_len, data, sizeof(zbx_uint64_t));
-	expected_len = zbx_letoh_uint64(expected_len);
-	data += sizeof(zbx_uint64_t);
-
-	if (data_size != expected_len)
-		return SYSINFO_RET_FAIL;
+	int	ret, agent_ret;
+	char	type;
 
 	memcpy(&agent_ret, data, sizeof(int));
 	data += sizeof(int);
@@ -1012,7 +998,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 	int		ret = SYSINFO_RET_OK;
 	pid_t		pid;
 	int		fds[2], n, status;
-	char		buffer[MAX_STRING_LEN + sizeof(zbx_uint64_t) + sizeof(int)], *data;
+	char		buffer[MAX_STRING_LEN], *data;
 	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
 	double		time_start;
 
@@ -1109,7 +1095,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
-			ret = deserialize_agent_result(data, data_offset, result);
+			ret = deserialize_agent_result(data, result);
 	}
 
 	zbx_free(data);
