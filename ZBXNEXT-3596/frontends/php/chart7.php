@@ -108,7 +108,7 @@ $graph->setWidth(getRequest('width', 400));
 $graph->setHeight(getRequest('height', 300));
 
 foreach ($items as $item) {
-	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+	$graph->addGraphItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
 }
 $graph->draw();
 

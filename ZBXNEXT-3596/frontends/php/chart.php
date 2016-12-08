@@ -22,7 +22,9 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'chart.php';
-$page['type'] = PAGE_TYPE_IMAGE;
+// SVG
+//$page['type'] = PAGE_TYPE_IMAGE;
+$page['type'] = PAGE_TYPE_SVG;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -84,6 +86,7 @@ $timeline = CScreenBase::calculateTime([
 	'stime' => getRequest('stime')
 ]);
 
+
 $graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
@@ -113,11 +116,14 @@ if (isset($_REQUEST['height'])) {
 }
 
 foreach ($items as $item) {
-	$graph->addItem($item['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
+	$graph->addGraphItem($item['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
 		rgb2hex(get_next_color(1))
 	);
 }
 
+//$graph->setWidth(1100);
+$graph->setHeight(300);
+$graph->setAttribute('style', 'background:white');
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

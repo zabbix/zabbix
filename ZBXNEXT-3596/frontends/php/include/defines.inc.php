@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.3.0');
+define('ZABBIX_VERSION',		'3.2.0');
 define('ZABBIX_API_VERSION',	'3.3.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
 define('ZABBIX_DB_VERSION',		3030012);
@@ -119,6 +119,7 @@ define('PAGE_TYPE_TEXT_FILE',			8); // api call
 define('PAGE_TYPE_TEXT',				9); // simple text
 define('PAGE_TYPE_CSV',					10); // CSV format
 define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
+define('PAGE_TYPE_SVG',					12); // SVG graphics
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);

@@ -101,6 +101,15 @@ switch ($page['type']) {
 			define('ZBX_PAGE_NO_MENU', 1);
 		}
 		break;
+	case PAGE_TYPE_SVG:
+		header('Content-Type: image/svg+xml; charset=UTF-8');
+		echo '<?xml version="1.0" standalone="no"?';
+		echo '>';
+		echo '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
+		break;
 	case PAGE_TYPE_HTML:
 	default:
 		header('Content-Type: text/html; charset=UTF-8');

@@ -96,7 +96,7 @@ CArrayHelper::sort($dbGraph['gitems'], [
 
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	$graph->addItem(
+	$graph->addGraphItem(
 		$gItem['itemid'],
 		$gItem['calc_fnc'],
 		$gItem['color'],

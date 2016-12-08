@@ -34,7 +34,7 @@ class CPieGraphDraw extends CGraphDraw {
 	/********************************************************************************************************/
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
+	public function addGraphItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
 
 		$this->items[$this->num] = reset($items);
@@ -661,6 +661,8 @@ class CPieGraphDraw extends CGraphDraw {
 		else {
 			$this->im = imagecreate($this->fullSizeX, $this->fullSizeY);
 		}
+		$this->im_svg = new CTag('svg');
+
 		$this->initColors();
 		$this->drawRectangle();
 		$this->drawHeader();

@@ -19,16 +19,18 @@
 **/
 
 
-abstract class CGraphDraw {
+class CGraphDraw extends CSvg {
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
+		parent::__construct();
+
 		$this->stime = null;
-		$this->fullSizeX = null;
+		$this->fullSizeX = 900;
 		$this->fullSizeY = null;
 		$this->m_minY = null;
 		$this->m_maxY = null;
 		$this->data = [];
-		$this->items = null;
+		$this->graph_items = null;
 		$this->min = null;
 		$this->max = null;
 		$this->avg = null;
@@ -42,7 +44,7 @@ abstract class CGraphDraw {
 		$this->im = null;
 		$this->period = SEC_PER_HOUR;
 		$this->from = 0;
-		$this->sizeX = 900; // default graph size X
+		$this->sizeX = null; // default graph size X
 		$this->sizeY = 200; // default graph size Y
 		$this->shiftXleft = 100;
 		$this->shiftXright = 50;
@@ -150,7 +152,11 @@ abstract class CGraphDraw {
 		if (is_null($value)) {
 			$value = 900;
 		}
-		$this->sizeX = $value;
+//		$this->sizeX = $value;
+		$this->fullSizeX = $value;
+		// TODO SVG
+//		$this->setAttribute('width', ($this->sizeX+150).'px');
+		$this->setAttribute('width', $this->fullSizeX.'px');
 	}
 
 	public function setHeight($value = null) {
@@ -161,15 +167,17 @@ abstract class CGraphDraw {
 			$value = 900;
 		}
 		$this->sizeY = $value;
+		// TODO SVG
+		$this->setAttribute('height', ($this->sizeY+300).'px');
 	}
 
 	public function getLastValue($num) {
-		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
+		$data = &$this->data[$this->graph_items[$num]['itemid']][$this->graph_items[$num]['calc_type']];
 
 		if (isset($data)) {
 			for ($i = $this->sizeX - 1; $i >= 0; $i--) {
 				if (!empty($data['count'][$i])) {
-					switch ($this->items[$num]['calc_fnc']) {
+					switch ($this->graph_items[$num]['calc_fnc']) {
 						case CALC_FNC_MIN:
 							return $data['min'][$i];
 						case CALC_FNC_MAX:
@@ -200,33 +208,26 @@ abstract class CGraphDraw {
 
 	public function drawHeader() {
 		if (!isset($this->header)) {
-			$str = $this->items[0]['hostname'].NAME_DELIMITER.$this->items[0]['name'];
+			$str = $this->graph_items[0]['hostname'].NAME_DELIMITER.$this->graph_items[0]['name'];
 		}
 		else {
 			// TODO: graphs shouldn't resolve names themselves
-			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
+			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->graph_items);
 		}
 
 		if ($this->period) {
 			$str .= $this->period2str($this->period);
 		}
 
-		// calculate largest font size that can fit graph header
-		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
-		for ($fontsize = 11; $fontsize > 7; $fontsize--) {
-			$dims = imageTextSize($fontsize, 0, $str);
-			$x = $this->fullSizeX / 2 - ($dims['width'] / 2);
-
-			// most important information must be displayed, period can be out of the graph
-			if ($x < 2) {
-				$x = 2;
-			}
-			if ($dims['width'] <= $this->fullSizeX) {
-				break;
-			}
-		}
-
-		imageText($this->im, $fontsize, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
+		$this->addItem(
+			(new CText(
+				$this->fullSizeX/2,
+				24,
+				$str,
+				0,
+				$this->graphtheme['textcolor']))
+			->setAttribute('text-anchor', 'middle')
+		);
 	}
 
 	public function setHeader($header) {
@@ -234,11 +235,13 @@ abstract class CGraphDraw {
 	}
 
 	public function drawLogo() {
-		imagestringup($this->im, 1,
-			$this->fullSizeX - 10,
-			$this->fullSizeY - 50,
-			ZABBIX_HOMEPAGE,
-			$this->getColor('Gray')
+		$this->addItem(
+			(new CText(
+				$this->fullSizeX - 10,
+				$this->fullSizeY - 50,
+				ZABBIX_HOMEPAGE,
+				'Gray'))
+				->setAngle(-90)
 		);
 	}
 

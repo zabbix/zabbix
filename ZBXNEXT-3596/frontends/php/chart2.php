@@ -23,7 +23,9 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'chart2.php';
-$page['type'] = PAGE_TYPE_IMAGE;
+// SVG
+//$page['type'] = PAGE_TYPE_IMAGE;
+$page['type'] = PAGE_TYPE_SVG;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -82,7 +84,7 @@ CArrayHelper::sort($dbGraph['gitems'], [
 
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	$graph->addItem(
+	$graph->addGraphItem(
 		$gItem['itemid'],
 		$gItem['yaxisside'],
 		$gItem['calc_fnc'],
@@ -130,6 +132,8 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
+$graph->setHeight(300);
+$graph->setAttribute('style', 'background:white');
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

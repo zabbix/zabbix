@@ -159,7 +159,7 @@ $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
 
 foreach ($items as $item) {
-	$graph->addItem(
+	$graph->addGraphItem(
 		$item['itemid'],
 		isset($item['yaxisside']) ? $item['yaxisside'] : null,
 		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
