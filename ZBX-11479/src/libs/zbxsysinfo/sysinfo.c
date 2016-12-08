@@ -884,13 +884,9 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		result_type = '-';
 	}
 
-	len64 = value_len + 1 + sizeof(int) + sizeof(zbx_uint64_t);
-
-	if (*data_alloc - *data_offset < len64)
+	if (*data_alloc - *data_offset < (len64 = sizeof(zbx_uint64_t) + sizeof(int) + 1 + value_len))
 	{
-		while (*data_alloc - *data_offset < len64)
-			*data_alloc *= 1.5;
-
+		*data_alloc += len64 - *data_alloc - *data_offset;
 		*data = zbx_realloc(*data, *data_alloc);
 	}
 
