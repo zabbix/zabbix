@@ -678,8 +678,8 @@ class testValuemap extends CZabbixTest {
 				'method' => 'valuemap.update',
 				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
 				'valuemap' => [
-						'valuemapid' => '19',
-						'name' => 'Api value update as afmin user',
+					'valuemapid' => '19',
+					'name' => 'Api value update as admin user',
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],
@@ -709,8 +709,8 @@ class testValuemap extends CZabbixTest {
 				'method' => 'valuemap.update',
 				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
 				'valuemap' => [
-						'valuemapid' => '19',
-						'name' => 'Api value update as zabbix user',
+					'valuemapid' => '19',
+					'name' => 'Api value update as zabbix user',
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],
@@ -721,7 +721,7 @@ class testValuemap extends CZabbixTest {
 					'20'
 				],
 				'expected_error' => 'Only super admins can delete value maps.'
-			],
+			]
 		];
 	}
 

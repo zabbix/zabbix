@@ -1332,8 +1332,10 @@ UPDATE config SET server_check_interval = 0 WHERE configid = 1;
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 4);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50010, 1);
+INSERT INTO groups (groupid,name,internal) VALUES (50012,'Api group for hosts',0);
+INSERT INTO groups (groupid,name,internal) VALUES (50013,'Api group for templates',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
 INSERT INTO applications (applicationid,hostid,name) VALUES (366,50009,'API application');
 INSERT INTO applications (applicationid,hostid,name) VALUES (367,50009,'API host application for update');
@@ -1356,6 +1358,7 @@ INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,2,'Api discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (5893,375,40068);
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
+
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (18,'Api value map for update');
 INSERT INTO valuemaps (valuemapid,name) VALUES (19,'Api value map for update with mappings');
@@ -1369,3 +1372,21 @@ INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (168,21,'Three
 INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (169,22,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'test-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
+
+-- host groups
+INSERT INTO groups (groupid,name,internal) VALUES (50005,'Api host group for update',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
+INSERT INTO groups (groupid,name,internal) VALUES (50006,'Api host group for update internal',1);
+INSERT INTO groups (groupid,name,internal) VALUES (50007,'Api host group delete internal',1);
+INSERT INTO groups (groupid,name,internal) VALUES (50008,'Api host group delete',0);
+INSERT INTO groups (groupid,name,internal) VALUES (50009,'Api host group delete2',0);
+INSERT INTO groups (groupid,name,internal) VALUES (50010,'Api host group delete3',0);
+INSERT INTO groups (groupid,name,internal) VALUES (50011,'Api host group delete4',0);
+-- discovered host groups
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'Api host prototype {#FSNAME}', 'Api host prototype {#FSNAME}', 0, 2, '');
+INSERT INTO groups (groupid,name,internal) VALUES (50014,'Api group for host prototype',0);
+INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,40066);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (8, 50011, 'Api discovery group {#HV.NAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (9, 50011, '', 50014, NULL);
+INSERT INTO groups (groupid,name,internal,flags) VALUES (50015,'Api discovery group {#HV.NAME}',0,4);
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 8, 'Api discovery group {#HV.NAME}');

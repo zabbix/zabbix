@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class API_JSON_Application extends CZabbixTest {
+class testApplication extends CZabbixTest {
 
 	public function testApplication_backup() {
 		DBsave_tables('applications');
@@ -192,7 +192,8 @@ class API_JSON_Application extends CZabbixTest {
 				$this->assertEquals($dbRow['hostid'], $application[$key]['hostid']);
 				$this->assertEquals($dbRow['name'], $application[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
-			}		}
+			}
+		}
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
