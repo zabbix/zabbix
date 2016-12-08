@@ -3,6 +3,7 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.6
