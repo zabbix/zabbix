@@ -15,6 +15,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
 A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
@@ -25,6 +26,7 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.2
@@ -289,6 +291,7 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.6
