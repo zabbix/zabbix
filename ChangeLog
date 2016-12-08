@@ -3,6 +3,7 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
