@@ -963,9 +963,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			escalation->nextcheck = time(NULL) + next_esc_period;
 		}
 		else
-		{
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
-		}
 	}
 
 	/* schedule nextcheck for sleeping escalations */
