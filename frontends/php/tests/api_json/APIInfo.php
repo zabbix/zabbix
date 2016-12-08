@@ -26,14 +26,14 @@ class API_JSON_APIInfo extends CZabbixTest {
 		$result = $this->api_acall('apiinfo.version', array(), $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.2.16');
+		$this->assertSame($result['result'], '2.2.17');
 	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
 		$result = $this->api_call('apiinfo.version', array(), $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.2.16');
+		$this->assertSame($result['result'], '2.2.17');
 	}
 
 }
