@@ -48,6 +48,7 @@ A.......S. [ZBXNEXT-3457] added support of user macros for trigger tags; dropped
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ........S. [ZBX-11509] fixed system.run command parameter to be quoted only if it contains special characters (vso)
 .......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [ZBX-11359] fixed event acknowledgement in triggers list view when last event is a recovery event (Gunars)
@@ -310,6 +311,7 @@ New features:
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
+...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ........S. [ZBX-11509] fixed system.run command parameter to be quoted only if it contains special characters (vso)
 .......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [ZBX-11445] fixed update of item host interface from items massupdate form (Cemeris)
@@ -1870,6 +1872,7 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ........S. [ZBX-11509] fixed system.run command parameter to be quoted only if it contains special characters (vso)
 .......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
 ..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
