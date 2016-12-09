@@ -52,6 +52,10 @@ class CAudit {
 	 * @param array  $objects_old
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
+		$black_list = [
+			'users' => ['passwd']
+		];
+
 		switch ($resourcetype) {
 			case AUDIT_RESOURCE_APPLICATION:
 				$field_name_resourceid = 'applicationid';
@@ -98,6 +102,14 @@ class CAudit {
 
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
+
+				// Removed blacklisted fields from updated data.
+				if (array_key_exists($table_name, $black_list)) {
+					foreach ($black_list[$table_name] as $field_name) {
+						unset($object[$field_name]);
+					}
+				}
+
 				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
 
 				if (!$object_diff) {
