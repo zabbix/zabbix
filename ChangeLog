@@ -4794,7 +4794,7 @@ A......... [ZBX-4519] fixed impossibility to delete template : Unknown column 'h
 ..F....... [ZBX-4407] fixed import hosts from 1.8 version (sanja)
 A......... [ZBX-4425] fixed item prototype interface mapping when cloning a discovery rule (Pavels)
 ..F....... [ZBX-4459] fixed values are cleared when try to add incorrect value mapping, negative values now allowed (Vedmak)
-..F....... [ZBX-4458] fixed js error in global macro form, changed layout to be consistant with other places (Vedmak)
+..F....... [ZBX-4458] fixed js error in global macro form, changed layout to be consistent with other places (Vedmak)
 ..F....... [ZBX-4449] fixed IT services SLA graph permission checks (Pavels)
 A......... [ZBX-4448] fixed proxy interface validation (Pavels)
 ..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (Pavels)
