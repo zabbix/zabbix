@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:11+0200\n"
+"POT-Creation-Date: 2016-12-09 11:43+0200\n"
 "PO-Revision-Date: 2016-09-08 01:16+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -626,7 +626,7 @@ msgid "Agent"
 msgstr "エージェント"
 
 #: include/classes/items/CHelpItems.php:69
-#: include/classes/items/CHelpItems.php:343
+#: include/classes/items/CHelpItems.php:347
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "エージェントの状態チェック。エージェントが使用可能な場合は「1」を返し、使用不可なら何も返さない。"
 
@@ -635,7 +635,7 @@ msgid "Agent encryption"
 msgstr "エージェント暗号化"
 
 #: include/classes/items/CHelpItems.php:65
-#: include/classes/items/CHelpItems.php:339
+#: include/classes/items/CHelpItems.php:343
 msgid "Agent host name. Returns string"
 msgstr "エージェントのホスト名。文字列値を返す。"
 
@@ -650,7 +650,7 @@ msgstr "エージェントのインターフェース"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "エージェント、SNMP、JMX、IPMIインターフェース"
 
-#: include/classes/items/CHelpItems.php:629
+#: include/classes/items/CHelpItems.php:637
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "アグリゲートチェックは監視対象のホスト上でエージェントが起動している必要はありません。Zabbixサーバーはデータベースから直接情報を収集します。詳細はZabbixマニュアル参照。"
 
@@ -859,8 +859,8 @@ msgstr "メンテナンス待ち"
 msgid "Apr"
 msgstr "4月"
 
-#: include/forms.inc.php:1801 include/func.inc.php:119
-#: include/func.inc.php:256 jsLoader.php:116
+#: include/forms.inc.php:1801 include/func.inc.php:119 include/func.inc.php:256
+#: jsLoader.php:116
 msgid "April"
 msgstr "4月"
 
@@ -973,8 +973,8 @@ msgstr "監査ログ"
 msgid "Aug"
 msgstr "8月"
 
-#: include/forms.inc.php:1785 include/func.inc.php:123
-#: include/func.inc.php:260 jsLoader.php:120
+#: include/forms.inc.php:1785 include/func.inc.php:123 include/func.inc.php:260
+#: jsLoader.php:120
 msgid "August"
 msgstr "8月"
 
@@ -1209,17 +1209,17 @@ msgid "CONFIGURATION OF TRIGGERS"
 msgstr "トリガーの設定"
 
 #: include/classes/items/CHelpItems.php:205
-#: include/classes/items/CHelpItems.php:499
+#: include/classes/items/CHelpItems.php:503
 msgid "CPU information. Returns string or integer"
 msgstr "CPU情報。文字列値または整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:181
-#: include/classes/items/CHelpItems.php:475
+#: include/classes/items/CHelpItems.php:479
 msgid "CPU load. Returns float"
 msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:193
-#: include/classes/items/CHelpItems.php:487
+#: include/classes/items/CHelpItems.php:491
 msgid "CPU utilisation percentage. Returns float"
 msgstr "CPU使用率。浮動小数点値を返す。"
 
@@ -2624,11 +2624,11 @@ msgstr "ディスカバリチェックが検証できません：リクエスト
 msgid "Case sensitive"
 msgstr "大文字小文字を区別"
 
-#: include/classes/items/CHelpItems.php:873
+#: include/classes/items/CHelpItems.php:881
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "正規表現に一致するすべてのSNMPトラップをキャッチする。正規表現が指定されない場合は、すべてのトラップをキャッチする。"
 
-#: include/classes/items/CHelpItems.php:869
+#: include/classes/items/CHelpItems.php:877
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMPトラップをキャッチする。"
 
@@ -2686,7 +2686,7 @@ msgid "Chassis"
 msgstr "シャーシ"
 
 #: include/classes/items/CHelpItems.php:201
-#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:499
 msgid "Chassis information. Returns string"
 msgstr "シャーシ情報。文字列値を返す。"
 
@@ -2720,55 +2720,55 @@ msgid "Checks"
 msgstr "チェック"
 
 #: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:379
+#: include/classes/items/CHelpItems.php:383
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "DNSサービス起動チェック。DNSがダウン(サーバーが応答しないかDNSの名前解決に失敗)している場合は「0」を返し、DNSが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:285
-#: include/classes/items/CHelpItems.php:575
+#: include/classes/items/CHelpItems.php:579
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
 msgstr "ファイル存在チェック。ファイルが存在しない場合は「0」を返し、通常のファイルが存在するか存在する通常のファイルへのリンク(シンボリックでもハードでも)があれば「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:117
-#: include/classes/items/CHelpItems.php:411
+#: include/classes/items/CHelpItems.php:415
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "指定されたポートでのTCP接続性チェック。接続できない場合は「0」を返し、接続できる場合は「1」を返す。"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:643
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "サーバーがICMP pingでアクセス可能かチェック。ICMP pingに失敗した場合は「0」を返し、ICMP pingに成功した場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:415
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:419
+#: include/classes/items/CHelpItems.php:655
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "サービス起動とTCP接続性チェック。サービスが停止している場合は「0」を返し、サービスが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:133
-#: include/classes/items/CHelpItems.php:427
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:431
+#: include/classes/items/CHelpItems.php:663
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "サービス起動とUDP応答性チェック。サービスが停止している場合は「0」を返し、サービスが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:113
-#: include/classes/items/CHelpItems.php:407
+#: include/classes/items/CHelpItems.php:411
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "指定したTCPのポート番号が待ち受け状態になっているかチェック。待ち受け状態ではない場合は「0」を返し、待ち受け状態である場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:129
-#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:427
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "指定したUDPのポート番号が待ち受け状態になっているかチェック。待ち受け状態ではない場合は「0」を返し、待ち受け状態である場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:419
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:659
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "TCPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスへの接続にかかった秒数を返す。"
 
 #: include/classes/items/CHelpItems.php:137
-#: include/classes/items/CHelpItems.php:431
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:667
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "UDPサービスのパフォーマンスをチェック。サービスがダウンしている場合は「0」を返し、秒数を返す場合はサービスからの応答が返るまでの秒数を返す。"
 
@@ -3007,7 +3007,7 @@ msgstr "相関関係\"%1$s\"の実行条件が重複しています。"
 msgid "Configuration"
 msgstr "設定"
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:959
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
@@ -3362,7 +3362,7 @@ msgid "Count"
 msgstr "カウント"
 
 #: include/classes/items/CHelpItems.php:189
-#: include/classes/items/CHelpItems.php:483
+#: include/classes/items/CHelpItems.php:487
 msgid "Count of context switches. Returns integer"
 msgstr "コンテキストスイッチの回数。整数値を返す。"
 
@@ -3733,7 +3733,7 @@ msgstr "破線"
 msgid "Data"
 msgstr "データ"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:995
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "データキャッシュの統計。cache - values (mode: all, float, uint, str, log, text)、history (mode: pfree, total, used, free)、trend (mode: pfree, total, used, free)、text (mode: pfree, total, used, free)。"
 
@@ -3894,8 +3894,8 @@ msgstr "デバッグモードを更新しました"
 msgid "Dec"
 msgstr "12月"
 
-#: include/forms.inc.php:1825 include/func.inc.php:127
-#: include/func.inc.php:264 jsLoader.php:124
+#: include/forms.inc.php:1825 include/func.inc.php:127 include/func.inc.php:264
+#: jsLoader.php:124
 msgid "December"
 msgstr "12月"
 
@@ -4418,7 +4418,7 @@ msgid "Description updated"
 msgstr "説明を更新しました"
 
 #: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:547
+#: include/classes/items/CHelpItems.php:551
 msgid "Detailed host information. Returns string"
 msgstr "詳細なホスト情報。文字列値を返す。"
 
@@ -4442,7 +4442,7 @@ msgid "Device"
 msgstr "デバイス"
 
 #: include/classes/items/CHelpItems.php:177
-#: include/classes/items/CHelpItems.php:471
+#: include/classes/items/CHelpItems.php:475
 msgid "Device interrupts. Returns integer"
 msgstr "デバイスの割り込み回数。整数値を返す。"
 
@@ -4499,13 +4499,18 @@ msgid "Difference between last and previous value is NOT N"
 msgstr "最新値と前回値の差 NOT N"
 
 #: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:451
+#: include/classes/items/CHelpItems.php:455
 msgid "Different information about specific process(es). Returns float"
 msgstr "特定のプロセスに関する様々な情報。浮動小数点値を返す。"
 
 #: include/views/monitoring.screen.list.php:73
 msgid "Dimension (cols x rows)"
 msgstr "大きさ (列 x 行)"
+
+#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:611
+msgid "Directory size (in bytes), dir - Absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - Mode used to get directory size (\"apparent\" or \"disk\"), <max_depth> - maximal traversal depth for directories. Returns integer."
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:146
 #: include/views/administration.auditlogs.list.php:45
@@ -4694,9 +4699,9 @@ msgid "Discovery object"
 msgstr "ディスカバリオブジェクト"
 
 #: app/views/monitoring.discovery.view.php:34
-#: app/views/monitoring.widget.discovery.view.php:46
-#: include/actions.inc.php:48 include/audit.inc.php:43
-#: include/forms.inc.php:977 include/views/configuration.discovery.edit.php:95
+#: app/views/monitoring.widget.discovery.view.php:46 include/actions.inc.php:48
+#: include/audit.inc.php:43 include/forms.inc.php:977
+#: include/views/configuration.discovery.edit.php:95
 msgid "Discovery rule"
 msgstr "ディスカバリルール"
 
@@ -4760,23 +4765,22 @@ msgid "Discovery rules deleted"
 msgstr "ディスカバリのルールを削除しました"
 
 #: app/views/monitoring.dashboard.view.php:118
-#: app/views/monitoring.widget.discovery.view.php:60
-#: include/actions.inc.php:54
+#: app/views/monitoring.widget.discovery.view.php:60 include/actions.inc.php:54
 msgid "Discovery status"
 msgstr "ディスカバリのステータス"
 
 #: include/classes/items/CHelpItems.php:269
-#: include/classes/items/CHelpItems.php:559
+#: include/classes/items/CHelpItems.php:563
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "ディスク読み込み統計。typeがsectors、operations、bytesの場合は整数値を返す。typeがsps、ops、bpsの場合は浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:313
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:607
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "ディスク容量。バイト単位であれば整数値で返し、パーセンテージであれば浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:273
-#: include/classes/items/CHelpItems.php:563
+#: include/classes/items/CHelpItems.php:567
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "ディスク書き込み統計。typeがsectors、operations、bytesの場合は整数値を返す。typeがsps、ops、bpsの場合は浮動小数点値を返す。"
 
@@ -5454,8 +5458,7 @@ msgstr "障害対応コメント入力"
 msgid "Event acknowledges \"%1$s\"."
 msgstr "イベントの障害対応コメント\"%1$s\"."
 
-#: include/menu.inc.php:233
-#: include/views/configuration.correlation.list.php:23
+#: include/menu.inc.php:233 include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
 msgstr "イベント相関関係"
 
@@ -5475,7 +5478,7 @@ msgstr "イベント生成"
 msgid "Event list [previous 20]"
 msgstr "イベントリスト [直近20]"
 
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:355
 msgid "Event log monitoring. Returns log"
 msgstr "イベントログの監視。ログ値を返す。"
 
@@ -5524,8 +5527,8 @@ msgstr "実行"
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 
-#: include/classes/items/CHelpItems.php:333
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:337
+#: include/classes/items/CHelpItems.php:631
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "WMIクエリを実行して最初の検索結果を返却。リクエストに応じて整数値、浮動小数点値、文字列値、テキスト値を返す。"
 
@@ -5721,8 +5724,8 @@ msgstr "お気に入り"
 msgid "Feb"
 msgstr "2月"
 
-#: include/forms.inc.php:1781 include/func.inc.php:117
-#: include/func.inc.php:254 jsLoader.php:114
+#: include/forms.inc.php:1781 include/func.inc.php:117 include/func.inc.php:254
+#: jsLoader.php:114
 msgid "February"
 msgstr "2月"
 
@@ -5796,7 +5799,7 @@ msgid "Field \"host\" is mandatory."
 msgstr "フィールド\"host\"は必須です。"
 
 #: include/classes/items/CHelpItems.php:277
-#: include/classes/items/CHelpItems.php:567
+#: include/classes/items/CHelpItems.php:571
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "ファイルのチェックサム計算。UNIXのcksumアルゴリズムで計算する。整数値を返す。"
 
@@ -5815,12 +5818,12 @@ msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "表示するために生成したファイルが存在しません。\"%s\"を見つけます。"
 
 #: include/classes/items/CHelpItems.php:301
-#: include/classes/items/CHelpItems.php:591
+#: include/classes/items/CHelpItems.php:595
 msgid "File size (in bytes). Returns integer"
 msgstr "バイト単位のファイルサイズ。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:305
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "ファイルの時刻情報。UNIXのタイムスタンプで整数値を返す。"
 
@@ -5847,17 +5850,17 @@ msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherw
 msgstr "最新値に文字列Vが存在する場合N = 1、その他の場合 N = 0 (#条件)"
 
 #: include/classes/items/CHelpItems.php:297
-#: include/classes/items/CHelpItems.php:587
+#: include/classes/items/CHelpItems.php:591
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "ファイル内の文字列検索。存在しない場合は「0」を返し、存在する場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:293
-#: include/classes/items/CHelpItems.php:583
+#: include/classes/items/CHelpItems.php:587
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "ファイル内の文字列検索。一致する文字列を含む行かoutputパラメータで指定したものを返す。"
 
-#: include/classes/items/CHelpItems.php:329
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:333
+#: include/classes/items/CHelpItems.php:627
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Webページ上の文字列検索。一致する文字列かoutputパラメータで指定したものを返す。"
 
@@ -6022,8 +6025,8 @@ msgstr "グルジア語 (ka_GE)"
 msgid "German (de_DE)"
 msgstr "ドイツ語 (de_DE)"
 
-#: include/classes/items/CHelpItems.php:321
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:325
+#: include/classes/items/CHelpItems.php:619
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Webページコンテンツ取得。テキストとしてWebページのソースを返す。"
 
@@ -6402,7 +6405,7 @@ msgid "Hardware (Full details)"
 msgstr "ハードウェア (詳細)"
 
 #: include/classes/items/CHelpItems.php:161
-#: include/classes/items/CHelpItems.php:455
+#: include/classes/items/CHelpItems.php:459
 msgid "Hardware sensor reading. Returns float"
 msgstr "ハードウェアセンサーの読み込み。 浮動小数点値を返す。"
 
@@ -6420,8 +6423,7 @@ msgstr "ヘブライ語 (he_IL)"
 #: include/views/js/monitoring.sysmaps.js.php:47
 #: include/views/monitoring.screen.constructor.edit.php:686
 #: include/views/monitoring.sysmap.edit.php:109
-#: include/views/monitoring.sysmap.list.php:50 screenedit.php:68
-#: sysmaps.php:50
+#: include/views/monitoring.sysmap.list.php:50 screenedit.php:68 sysmaps.php:50
 msgid "Height"
 msgstr "高さ"
 
@@ -7257,8 +7259,7 @@ msgstr "インポートに成功しました"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "インベントリフィールド\"%s\"が存在しないためフィルターが行えません。"
 
-#: include/classes/html/CTweenBox.php:72
-#: include/classes/html/CTweenBox.php:102
+#: include/classes/html/CTweenBox.php:72 include/classes/html/CTweenBox.php:102
 #: include/views/configuration.template.edit.php:156
 msgid "In"
 msgstr "使用中"
@@ -7305,7 +7306,7 @@ msgid "Include subgroups"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:97
-#: include/classes/items/CHelpItems.php:391
+#: include/classes/items/CHelpItems.php:395
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "ネットワークインターフェースの受信統計。整数値を返す。"
 
@@ -8339,7 +8340,7 @@ msgid "Information"
 msgstr "情報"
 
 #: include/classes/items/CHelpItems.php:165
-#: include/classes/items/CHelpItems.php:459
+#: include/classes/items/CHelpItems.php:463
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "サービス情報の取得。引数がstateやstartupなら整数値を返す。引数がdisplayname、path、userなら文字列値を返す。引数がdescriptionならテキスト値を返す。具体的には引数がstateで状態が開始なら「0」、一時停止なら「１」、開始中なら「2」、一時停止中なら「3」、再開中なら「4」、停止中なら「5」、停止なら「6」、不明なら「7」、該当サービスなしなら「255」を返す。また、引数がstartupでスタートアップの種類が自動なら「0」、自動(遅延開始)なら「1」、手動なら「2」、無効なら「3」、不明なら「4」を返す。"
 
@@ -8715,8 +8716,7 @@ msgstr "3つ目のパラメータが正しくありません。"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "表示名\"%s\"が正しくありません。使用できる文字: \"a-z\"および\".\"。"
 
-#: include/menu.inc.php:129
-#: include/views/configuration.host.massupdate.php:388
+#: include/menu.inc.php:129 include/views/configuration.host.massupdate.php:388
 msgid "Inventory"
 msgstr "インベントリ"
 
@@ -9018,8 +9018,8 @@ msgstr "JabberID"
 msgid "Jan"
 msgstr "1月"
 
-#: include/forms.inc.php:1771 include/func.inc.php:116
-#: include/func.inc.php:253 jsLoader.php:113
+#: include/forms.inc.php:1771 include/func.inc.php:116 include/func.inc.php:253
+#: jsLoader.php:113
 msgid "January"
 msgstr "1月"
 
@@ -9031,8 +9031,8 @@ msgstr "日本語 (ja_JP)"
 msgid "Jul"
 msgstr "7月"
 
-#: include/forms.inc.php:1775 include/func.inc.php:122
-#: include/func.inc.php:259 jsLoader.php:119
+#: include/forms.inc.php:1775 include/func.inc.php:122 include/func.inc.php:259
+#: jsLoader.php:119
 msgid "July"
 msgstr "7月"
 
@@ -9040,8 +9040,8 @@ msgstr "7月"
 msgid "Jun"
 msgstr "6月"
 
-#: include/forms.inc.php:1821 include/func.inc.php:121
-#: include/func.inc.php:258 jsLoader.php:118
+#: include/forms.inc.php:1821 include/func.inc.php:121 include/func.inc.php:258
+#: jsLoader.php:118
 msgid "June"
 msgstr "6月"
 
@@ -9351,22 +9351,22 @@ msgid "List of user shares"
 msgstr "共有するユーザー"
 
 #: include/classes/items/CHelpItems.php:213
-#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:511
 msgid "Listing of MAC addresses. Returns string"
 msgstr "MACアドレスのリスト。文字列値を返す。"
 
 #: include/classes/items/CHelpItems.php:209
-#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:507
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "PCIまたはUSBのデバイスリスト。テキスト値を返す。"
 
 #: include/classes/items/CHelpItems.php:237
-#: include/classes/items/CHelpItems.php:531
+#: include/classes/items/CHelpItems.php:535
 msgid "Listing of installed packages. Returns text"
 msgstr "インストールされたパッケージリスト。テキスト値を返す。"
 
 #: include/classes/items/CHelpItems.php:169
-#: include/classes/items/CHelpItems.php:463
+#: include/classes/items/CHelpItems.php:467
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "サービスのリスト。空であれば「0」を返し、存在する場合はサービスのリストを改行で区切られたテキスト値を返す。"
 
@@ -9374,8 +9374,8 @@ msgstr "サービスのリスト。空であれば「0」を返し、存在す�
 msgid "Lithuanian (lt_LT)"
 msgstr "リトアニア語 (lt_LT)"
 
-#: include/classes/items/CHelpItems.php:325
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:329
+#: include/classes/items/CHelpItems.php:623
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Webページ全体の秒単位での読み込み時間。浮動小数点値を返す。"
 
@@ -9407,11 +9407,11 @@ msgstr "経度"
 msgid "Log"
 msgstr "ログ"
 
-#: include/classes/items/CHelpItems.php:367
+#: include/classes/items/CHelpItems.php:371
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "ログローテーションに対応したログファイル監視。ログ値を返す。"
 
-#: include/classes/items/CHelpItems.php:363
+#: include/classes/items/CHelpItems.php:367
 msgid "Log file monitoring. Returns log"
 msgstr "ログファイル監視。ログ値を返す。"
 
@@ -9528,7 +9528,7 @@ msgid "MD5"
 msgstr "MD5"
 
 #: include/classes/items/CHelpItems.php:289
-#: include/classes/items/CHelpItems.php:579
+#: include/classes/items/CHelpItems.php:583
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値を文字列値で返す。"
 
@@ -9724,8 +9724,8 @@ msgstr "マッピング"
 
 #: app/views/monitoring.dashboard.view.php:58
 #: app/views/monitoring.map.view.php:26 include/menu.inc.php:98
-#: include/views/conf.import.php:40
-#: include/views/monitoring.sysmap.list.php:22 popup.php:103
+#: include/views/conf.import.php:40 include/views/monitoring.sysmap.list.php:22
+#: popup.php:103
 msgid "Maps"
 msgstr "マップ"
 
@@ -9733,8 +9733,8 @@ msgstr "マップ"
 msgid "Mar"
 msgstr "3月"
 
-#: include/forms.inc.php:1791 include/func.inc.php:118
-#: include/func.inc.php:255 jsLoader.php:115
+#: include/forms.inc.php:1791 include/func.inc.php:118 include/func.inc.php:255
+#: jsLoader.php:115
 msgid "March"
 msgstr "3月"
 
@@ -9787,12 +9787,12 @@ msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
 #: include/classes/items/CHelpItems.php:77
-#: include/classes/items/CHelpItems.php:355
+#: include/classes/items/CHelpItems.php:359
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "OSがサポートしている最大ファイルオープン数。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:81
-#: include/classes/items/CHelpItems.php:359
+#: include/classes/items/CHelpItems.php:363
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "OSがサポートしている最大プロセス数。整数値を返す。"
 
@@ -9818,8 +9818,8 @@ msgstr "期間Tの値の最大値 > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "期間Tの値の最大値 NOT N"
 
-#: include/forms.inc.php:1811 include/func.inc.php:120
-#: include/func.inc.php:257 jsLoader.php:117
+#: include/forms.inc.php:1811 include/func.inc.php:120 include/func.inc.php:257
+#: jsLoader.php:117
 msgid "May"
 msgstr "5月"
 
@@ -9893,13 +9893,13 @@ msgstr "メンバー"
 msgid "Memory limit: %1$s"
 msgstr "メモリ上限: %1$s"
 
-#: include/classes/items/CHelpItems.php:317
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:321
+#: include/classes/items/CHelpItems.php:615
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "バイト単位もしくはトータルからのパーセンテージでのメモリーサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:149
-#: include/classes/items/CHelpItems.php:443
+#: include/classes/items/CHelpItems.php:447
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "バイト単位でのプロセスの使用メモリ。整数値を返す。"
 
@@ -10259,7 +10259,7 @@ msgid "Network discovery event and alert data storage period (in days) \"%1$s\".
 msgstr "ネットワークディスカバリイベントとアラートのデータ保存期間 (日) \"%1$s\"。"
 
 #: include/classes/items/CHelpItems.php:101
-#: include/classes/items/CHelpItems.php:395
+#: include/classes/items/CHelpItems.php:399
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "ネットワークインターフェースのリスト(インタフェースの種別や状態、IPv4のアドレスや概要を含む)。テキスト値を返す。"
 
@@ -11034,8 +11034,8 @@ msgstr "以前障害メッセージを送った先に通知"
 msgid "Nov"
 msgstr "11月"
 
-#: include/forms.inc.php:1815 include/func.inc.php:126
-#: include/func.inc.php:263 jsLoader.php:123
+#: include/forms.inc.php:1815 include/func.inc.php:126 include/func.inc.php:263
+#: jsLoader.php:123
 msgid "November"
 msgstr "11月"
 
@@ -11044,11 +11044,11 @@ msgid "Now"
 msgstr "現在"
 
 #: include/classes/items/CHelpItems.php:185
-#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:483
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU数。整数値を返す。"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:911
 msgid "Number of enabled items on the host."
 msgstr "ホスト上の有効アイテム数。"
 
@@ -11060,44 +11060,44 @@ msgstr "ホスト数 (有効/無効/テンプレート)"
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "アイテム数 (有効/無効/取得不可)"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:931
 msgid "Number of items in Zabbix database."
 msgstr "Zabbixデータベース内のアイテム数。"
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:951
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "サーバーへ未送信のプロキシ内のヒストリアイテム数"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "fromからtoまでの時間遅れているキュー内のアイテム数。"
 
-#: include/classes/items/CHelpItems.php:375
+#: include/classes/items/CHelpItems.php:379
 msgid "Number of matching lines since the last check of the item with log rotation support. Returns integer"
 msgstr "ログローテーションに対応したアイテムの最終チェック時からの一致行数。整数値を返す。"
 
-#: include/classes/items/CHelpItems.php:371
+#: include/classes/items/CHelpItems.php:375
 msgid "Number of matching lines since the last check of the item. Returns integer"
 msgstr "アイテムの最終チェック時からの一致行数。整数値を返す。"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:927
 msgid "Number of monitored hosts"
 msgstr "監視ホスト数"
 
 #: include/classes/items/CHelpItems.php:93
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:391
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "ネットワークの衝突数。整数値を返す。"
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:715
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上のプロセッサコア数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:719
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上のプロセッサスレッド数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:783
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシン上のプロセッサ数、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
@@ -11150,15 +11150,15 @@ msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 NOT N"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "トリガー数 (有効/無効 [障害/正常])"
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:975
 msgid "Number of triggers in Zabbix database."
 msgstr "Zabbixデータベース内のトリガー数。"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:935
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Zabbixデータベース内の取得不可アイテム数。"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:915
 msgid "Number of unsupported items on the host."
 msgstr "ホスト上の取得不可アイテム数。"
 
@@ -11167,44 +11167,44 @@ msgid "Number of users (online)"
 msgstr "ユーザー数 (オンライン)"
 
 #: include/classes/items/CHelpItems.php:265
-#: include/classes/items/CHelpItems.php:555
+#: include/classes/items/CHelpItems.php:559
 msgid "Number of users logged in. Returns integer"
 msgstr "ログインしているユーザー数。整数値を返す。"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of values stored in table HISTORY."
 msgstr "テーブルHISTORY内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "テーブルHISTORY_LOG内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:899
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "テーブルHISTORY_STR内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:903
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "テーブルHISTORY_TEXT内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:907
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "テーブルHISTORY_UINT内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:967
 msgid "Number of values stored in table TRENDS."
 msgstr "テーブルTRENDS内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:971
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "テーブルTRENDS_UINT内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:771
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上の仮想マシン数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:309
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:603
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "iノードの数値またはパーセンテージ。数値であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
@@ -11289,8 +11289,8 @@ msgstr "10月"
 msgid "Octal"
 msgstr "8進数"
 
-#: include/forms.inc.php:1805 include/func.inc.php:125
-#: include/func.inc.php:262 jsLoader.php:122
+#: include/forms.inc.php:1805 include/func.inc.php:125 include/func.inc.php:262
+#: jsLoader.php:122
 msgid "October"
 msgstr "10月"
 
@@ -11299,10 +11299,9 @@ msgstr "10月"
 msgid "Off"
 msgstr "OFF"
 
-#: app/views/monitoring.widget.web.view.php:76
-#: app/views/report.services.php:60 app/views/report.services.php:61
-#: app/views/report.services.php:62 app/views/report.services.php:63
-#: include/classes/html/CTriggersInfo.php:76
+#: app/views/monitoring.widget.web.view.php:76 app/views/report.services.php:60
+#: app/views/report.services.php:61 app/views/report.services.php:62
+#: app/views/report.services.php:63 include/classes/html/CTriggersInfo.php:76
 #: include/views/administration.users.list.php:111
 #: include/views/js/conf.import.js.php:24 report2.php:500
 msgid "Ok"
@@ -11477,7 +11476,7 @@ msgid "Opera"
 msgstr "Opera"
 
 #: include/classes/items/CHelpItems.php:233
-#: include/classes/items/CHelpItems.php:527
+#: include/classes/items/CHelpItems.php:531
 msgid "Operating system information. Returns string"
 msgstr "OS情報。文字列値を返す。"
 
@@ -11597,8 +11596,8 @@ msgstr "Or"
 msgid "Original"
 msgstr "変更なし"
 
-#: include/classes/html/CTweenBox.php:75
-#: include/classes/html/CTweenBox.php:105 include/html.inc.php:844
+#: include/classes/html/CTweenBox.php:75 include/classes/html/CTweenBox.php:105
+#: include/html.inc.php:844
 msgid "Other"
 msgstr "その他"
 
@@ -11636,7 +11635,7 @@ msgid "Others"
 msgstr "その他"
 
 #: include/classes/items/CHelpItems.php:105
-#: include/classes/items/CHelpItems.php:399
+#: include/classes/items/CHelpItems.php:403
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "ネットワークインターフェースの送信統計。整数値を返す。"
 
@@ -12009,7 +12008,7 @@ msgid "Percentile line (right)"
 msgstr "パーセンタイルライン (右)"
 
 #: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "DNSクエリの実行。要求した情報のタイプの文字列を返す。"
 
@@ -12294,7 +12293,7 @@ msgid "Problems"
 msgstr "障害"
 
 #: include/classes/items/CHelpItems.php:145
-#: include/classes/items/CHelpItems.php:439
+#: include/classes/items/CHelpItems.php:443
 msgid "Process CPU utilisation percentage. Returns float"
 msgstr "プロセスごとのCPU使用率。浮動小数点値を返す。"
 
@@ -12743,7 +12742,7 @@ msgstr "必要なホストへのアクセス権"
 msgid "Required performance (vps)"
 msgstr "要求パフォーマンス (vps)"
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:963
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Zabbixサーバーの要求パフォーマンスを1秒ごとに期待される新しい値で取得。"
 
@@ -12854,7 +12853,7 @@ msgid "Retrieve only headers"
 msgstr "ヘッダーのみを取得"
 
 #: include/classes/items/CHelpItems.php:281
-#: include/classes/items/CHelpItems.php:571
+#: include/classes/items/CHelpItems.php:575
 msgid "Retrieving contents of a file. Returns text"
 msgstr "ファイルのコンテンツ取得。テキスト値を返す。"
 
@@ -12862,27 +12861,27 @@ msgstr "ファイルのコンテンツ取得。テキスト値を返す。"
 msgid "Retry"
 msgstr "再試行"
 
-#: include/classes/items/CHelpItems.php:993
+#: include/classes/items/CHelpItems.php:1001
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQLクエリ実行結果の最初の行の最初の列を返却。"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:651
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "ICMP pingの応答時間を秒で返却。例： 0.02"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:923
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "ホスト上の特定のチェック種別の稼働状況返却。このアイテムの値がホストリストの稼働状況アイコンに対応する。有効なtypes： agent, snmp, ipmi, jmx。"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:919
 msgid "Returns current maintenance status of the host."
 msgstr "ホストの現在のメンテナンス状態を返却。"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:939
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "関連付けられているZabbix Java Gatewayの情報返却。有効なオプション：ping, version。"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:647
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP pingパケットのロスト率を返却。"
 
@@ -12963,7 +12962,7 @@ msgid "Run remote commands on hosts"
 msgstr "ホストでリモートコマンドを実行"
 
 #: include/classes/items/CHelpItems.php:221
-#: include/classes/items/CHelpItems.php:515
+#: include/classes/items/CHelpItems.php:519
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "ホスト上で指定したコマンドの実行。コマンドの実行結果のテキスト値を返す。モードでnowaitを指定した場合はコマンドの実行結果に関わらず1を返す。"
 
@@ -13102,8 +13101,7 @@ msgstr "SQLの実行に失敗しました\"%1$s\""
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQLの実行に失敗しました\"%1$s\"。"
 
-#: include/discovery.inc.php:47
-#: include/views/configuration.action.edit.php:834
+#: include/discovery.inc.php:47 include/views/configuration.action.edit.php:834
 #: include/views/configuration.action.edit.php:1543
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SSH"
@@ -13539,8 +13537,8 @@ msgstr "9月"
 msgid "Separated"
 msgstr "障害数と未対応数を表示"
 
-#: include/forms.inc.php:1795 include/func.inc.php:124
-#: include/func.inc.php:261 jsLoader.php:121
+#: include/forms.inc.php:1795 include/func.inc.php:124 include/func.inc.php:261
+#: jsLoader.php:121
 msgid "September"
 msgstr "9月"
 
@@ -13640,8 +13638,8 @@ msgstr "インベントリモードの設定"
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:161
 #: include/classes/screens/CScreenProblem.php:672
-#: include/classes/screens/CScreenProblem.php:850
-#: include/triggers.inc.php:1090 include/views/configuration.item.list.php:133
+#: include/classes/screens/CScreenProblem.php:850 include/triggers.inc.php:1090
+#: include/views/configuration.item.list.php:133
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:42
 #: include/views/configuration.trigger.prototype.massupdate.php:39
@@ -13950,7 +13948,7 @@ msgid "Software application E"
 msgstr "ソフトウェアアプリケーションE"
 
 #: include/classes/items/CHelpItems.php:229
-#: include/classes/items/CHelpItems.php:523
+#: include/classes/items/CHelpItems.php:527
 msgid "Software architecture information. Returns string"
 msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す。"
 
@@ -14008,7 +14006,7 @@ msgstr "標準のアイテム"
 msgid "Start in"
 msgstr "開始時刻"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:887
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Zabbixサーバーの起動時刻、UNIXタイムスタンプ。"
 
@@ -14171,7 +14169,7 @@ msgid "Success Audit"
 msgstr "成功の監査"
 
 #: include/classes/items/CHelpItems.php:109
-#: include/classes/items/CHelpItems.php:403
+#: include/classes/items/CHelpItems.php:407
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "ネットワークインターフェースの送受信合計値。整数値を返す。"
 
@@ -14211,17 +14209,17 @@ msgid "Surname"
 msgstr "名字"
 
 #: include/classes/items/CHelpItems.php:241
-#: include/classes/items/CHelpItems.php:535
+#: include/classes/items/CHelpItems.php:539
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "スワップイン（デバイスからメモリへ）の統計。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:245
-#: include/classes/items/CHelpItems.php:539
+#: include/classes/items/CHelpItems.php:543
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "スワップアウト（メモリからデバイスへ）の統計。 整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:249
-#: include/classes/items/CHelpItems.php:543
+#: include/classes/items/CHelpItems.php:547
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "スワップ容量のサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
@@ -14234,7 +14232,7 @@ msgid "Switching authentication method will reset all except this session! Conti
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
 
 #: include/classes/items/CHelpItems.php:173
-#: include/classes/items/CHelpItems.php:467
+#: include/classes/items/CHelpItems.php:471
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "システムのブート時刻。UNIXのタイムスタンプで整数値を返す。"
 
@@ -14247,12 +14245,12 @@ msgid "System error."
 msgstr "システムエラー。"
 
 #: include/classes/items/CHelpItems.php:197
-#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:495
 msgid "System host name. Returns string"
 msgstr "システムのホスト名。文字列値を返す。"
 
 #: include/classes/items/CHelpItems.php:225
-#: include/classes/items/CHelpItems.php:519
+#: include/classes/items/CHelpItems.php:523
 msgid "System statistics. Returns integer or float"
 msgstr "システム統計値。整数値または浮動小数点値を返す。"
 
@@ -14264,12 +14262,12 @@ msgid "System status"
 msgstr "システムステータス"
 
 #: include/classes/items/CHelpItems.php:217
-#: include/classes/items/CHelpItems.php:511
+#: include/classes/items/CHelpItems.php:515
 msgid "System time. Returns integer with type as utc; string - with type as local"
 msgstr "システム時間。typeがutcであった場合は整数値を返し、typeがlocalであった場合は文字列値を返す。"
 
 #: include/classes/items/CHelpItems.php:261
-#: include/classes/items/CHelpItems.php:551
+#: include/classes/items/CHelpItems.php:555
 msgid "System uptime in seconds. Returns integer"
 msgstr "システムの稼働秒数。整数値を返す。"
 
@@ -14360,8 +14358,7 @@ msgstr "ターゲットリスト"
 msgid "Target type"
 msgstr "ターゲットタイプ"
 
-#: include/discovery.inc.php:61
-#: include/views/configuration.action.edit.php:835
+#: include/discovery.inc.php:61 include/views/configuration.action.edit.php:835
 #: include/views/configuration.action.edit.php:1544
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "Telnet"
@@ -14607,7 +14604,7 @@ msgid "The item is not discovered anymore and will be deleted the next time disc
 msgstr "ディスカバリされたアイテムが見つかりませんでした。次のディスカバリルールの処理時に削除されます。"
 
 #: include/classes/items/CHelpItems.php:153
-#: include/classes/items/CHelpItems.php:447
+#: include/classes/items/CHelpItems.php:451
 msgid "The number of processes. Returns integer"
 msgstr "プロセス数。整数値を返す。"
 
@@ -14710,11 +14707,11 @@ msgstr "時間 (昇順)"
 msgid "Time (descending)"
 msgstr "時間 (降順)"
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:943
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "特定のZabbixのプロセスもしくはプロセスグループ(<type>や<num>で特定できるもの)が<state>で消費している時間のパーセンテージ。"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:947
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "プロキシへの最終アクセス時刻。name - プロキシ名、param - lastaccess。UNIXタイムスタンプ。"
 
@@ -14805,7 +14802,7 @@ msgstr "トータル時間: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "トランザクションがクローズされていません。終了します..."
 
-#: include/classes/items/CHelpItems.php:997
+#: include/classes/items/CHelpItems.php:1005
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "変換したSQLクエリの実行結果をローレベルディスカバリのJSONオプジェクトに挿入。"
 
@@ -15018,8 +15015,7 @@ msgstr[0] "トリガーのプロトタイプを更新しました"
 #: include/views/configuration.template.edit.php:318
 #: include/views/configuration.trigger.prototype.edit.php:25
 #: include/views/configuration.trigger.prototype.list.php:23
-#: include/views/configuration.trigger.prototype.massupdate.php:24
-#: popup.php:63
+#: include/views/configuration.trigger.prototype.massupdate.php:24 popup.php:63
 msgid "Trigger prototypes"
 msgstr "トリガーのプロトタイプ"
 
@@ -15220,8 +15216,7 @@ msgstr "タイプ"
 msgid "UNKNOWN"
 msgstr "不明"
 
-#: include/screens.inc.php:44
-#: include/views/configuration.httpconf.edit.php:162
+#: include/screens.inc.php:44 include/views/configuration.httpconf.edit.php:162
 #: include/views/configuration.httpconf.popup.php:90
 #: include/views/configuration.trigger.prototype.edit.php:517
 #: include/views/configuration.triggers.edit.php:545
@@ -15336,8 +15331,7 @@ msgid "Units"
 msgstr "単位"
 
 #: app/views/monitoring.widget.web.view.php:76 include/actions.inc.php:114
-#: include/actions.inc.php:1077
-#: include/classes/screens/CScreenHostsInfo.php:89
+#: include/actions.inc.php:1077 include/classes/screens/CScreenHostsInfo.php:89
 #: include/classes/screens/CScreenHttpTestDetails.php:117
 #: include/classes/screens/CScreenHttpTest.php:162
 #: include/correlation.inc.php:124 include/discovery.inc.php:115
@@ -15675,7 +15669,7 @@ msgstr "上位レベルのマップ"
 msgid "Uptime"
 msgstr "アップタイム"
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:979
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Zabbixサーバープロセスの稼働秒数。"
 
@@ -15837,8 +15831,7 @@ msgstr "マップ\"%2$s\"のユーザーグループでの共有にはパラメ�
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"のユーザーグループでの共有にはパラメータ:%1$s が必要です。"
 
-#: include/menu.inc.php:278
-#: include/views/administration.usergroups.edit.php:22
+#: include/menu.inc.php:278 include/views/administration.usergroups.edit.php:22
 #: include/views/administration.usergroups.list.php:22
 #: include/views/monitoring.screen.edit.php:129
 #: include/views/monitoring.slideconf.edit.php:173
@@ -15941,8 +15934,7 @@ msgstr "アカウント名\"%s\"を持つユーザーがすでに存在します
 msgid "Username"
 msgstr "ユーザー名"
 
-#: include/menu.inc.php:282
-#: include/views/administration.usergroups.edit.php:54
+#: include/menu.inc.php:282 include/views/administration.usergroups.edit.php:54
 #: include/views/administration.usergroups.list.php:144
 #: include/views/administration.users.edit.php:28
 #: include/views/administration.users.list.php:29
@@ -15960,195 +15952,195 @@ msgstr "ユーザー数 (オンライン)"
 msgid "Users unblocked"
 msgstr "ユーザーのブロックを解除しました"
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:991
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free, pfree, used, pused。"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> - VMwareクラスター名"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "VMwareのイベントログ、<url> - VMwareサービスURL"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのBIOS uuid、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのバルーニングされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMwareハイパーバイザーのデータストア読み込み統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<datastore> - データストア名、<mode> - latency"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMwareハイパーバイザーのデータストア書き込み統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<datastore> - データストア名、<mode> - latency"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのモデル、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク入力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<mode> - bps"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク出力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<mode> - bps"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMwareハイパーバイザーのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー周波数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサーモデル、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのステータス、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのトータルメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーの稼働秒数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーの利用済メモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーベンダー名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーバージョン、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMwareサービスフルネーム、<url> - VMwareサービスURL"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMwareサービスバージョン、<url> - VMwareサービスURL"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMwareバーチャルマシンのバルーニングされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのコミットされたストレージ容量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware仮想マシンのディスクデバイスの読み込み統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名、<instance> - ディスクデバイスインスタンス、<mode> - bps/ops - 毎秒のバイト/オペレーション"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware仮想マシンのディスクデバイスの書き込み統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名、<instance> - ディスクデバイスインスタンス、<mode> - bps/ops - 毎秒のバイト/オペレーション"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware仮想マシンのファイルシステム統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名、<fsname> - ファイルシステム名、<mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのゲストのメモリ利用量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのホストのメモリ利用量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンハイパーバイザー名、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシン名、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware仮想マシンネットワークインターフェース入力統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名、<instance> - ネットワークインターフェースインスタンス、<mode> - bps/pps - 毎秒バイト/パケット"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware仮想マシンネットワークインターフェース出力統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名、<instance> - ネットワークインターフェースインスタンス、<mode> - bps/pps - 毎秒バイト/パケット"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware仮想マシンのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシン電源状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンプライベートメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのプロセッサ有効時間率(%)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのプロセッサ利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの共有メモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのトータルメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのコミットされていないストレージ容量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの共有していないストレージの容量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの稼働秒数、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンホスト名"
 
@@ -16214,11 +16206,11 @@ msgstr "\"%1$s\"の値\"%2$s\"は小数点より前の桁数が多すぎます: 
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "\"%1$s\"の値\"%2$s\"は長すぎます: 小数点より前は%3$s桁までで小数点以下は%4$sまでです。"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:987
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "値キャッシュの効果。有効なパラメータ：requests, hits, misses。"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:983
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "値キャッシュ統計。有効なパラメータ：total, free, pfree, used, pused。"
 
@@ -16272,7 +16264,7 @@ msgid "Value mappings for value maps will be updated!"
 msgstr "値のマッピングを更新しました！"
 
 #: include/classes/items/CHelpItems.php:141
-#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:439
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "任意のパフォーマンスカウンター値。リクエストに応じて、整数値、浮動小数点値、文字列値、テキスト値を返す。"
 
@@ -16298,7 +16290,7 @@ msgid "Verbose"
 msgstr "Verbose"
 
 #: include/classes/items/CHelpItems.php:73
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:351
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Zabbixエージェントのバージョン。文字列値を返す。"
 
@@ -16494,8 +16486,7 @@ msgstr "有効な時間帯"
 #: include/views/js/monitoring.sysmaps.js.php:41
 #: include/views/monitoring.screen.constructor.edit.php:683
 #: include/views/monitoring.sysmap.edit.php:105
-#: include/views/monitoring.sysmap.list.php:49 screenedit.php:67
-#: sysmaps.php:49
+#: include/views/monitoring.sysmap.list.php:49 screenedit.php:67 sysmaps.php:49
 msgid "Width"
 msgstr "幅"
 
