@@ -81,7 +81,7 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
  *                                                                            *
  * Purpose: load aliases from configuration                                   *
  *                                                                            *
- * Parameters: lines - aliase entries from configuration file                 *
+ * Parameters: lines - alias entries from configuration file                  *
  *                                                                            *
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
