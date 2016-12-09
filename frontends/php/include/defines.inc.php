@@ -905,7 +905,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 		)*? # match \" or any character except "
 	\")
 	|
-	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at beginning and any character except , and ] afterwards
 	|
 	() # match empty and only empty part
 )');

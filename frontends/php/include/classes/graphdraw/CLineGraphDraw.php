@@ -284,7 +284,7 @@ class CLineGraphDraw extends CGraphDraw {
 				/* --------------------------------------------------
 					We are taking graph on 1px more than we need,
 					and here we are skiping first px, because of MOD (in SELECT),
-					it combines prelast point (it would be last point if not that 1px in begining)
+					it combines prelast point (it would be last point if not that 1px in beginning)
 					and first point, but we still losing prelast point :(
 					but now we've got the first point.
 				--------------------------------------------------*/
