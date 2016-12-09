@@ -65,7 +65,7 @@ struct zbx_db_result
 	int		cursor;
 	DB_ROW		values;
 #elif defined(HAVE_SQLITE3)
-	int		curow;
+	int		currow;
 	char		**data;
 	int		nrow;
 	int		ncolumn;
@@ -1604,7 +1604,7 @@ error:
 		zbx_mutex_lock(&sqlite_access);
 
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
-	result->curow = 0;
+	result->currow = 0;
 
 lbl_get_table:
 	if (SQLITE_OK != (ret = sqlite3_get_table(conn,sql, &result->data, &result->nrow, &result->ncolumn, &error)))
@@ -1863,15 +1863,15 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	return result->values;
 #elif defined(HAVE_SQLITE3)
 	/* EOF */
-	if (result->curow >= result->nrow)
+	if (result->currow >= result->nrow)
 		return NULL;
 
 	if (NULL == result->data)
 		return NULL;
 
-	result->curow++;	/* NOTE: first row == header row */
+	result->currow++;	/* NOTE: first row == header row */
 
-	return &(result->data[result->curow * result->ncolumn]);
+	return &(result->data[result->currow * result->ncolumn]);
 #endif
 }
 
