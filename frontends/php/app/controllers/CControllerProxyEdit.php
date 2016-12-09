@@ -99,7 +99,7 @@ class CControllerProxyEdit extends CController {
 			'form_refresh' => 0
 		];
 
-		// get values from the dabatase
+		// get values from the database
 		if ($this->hasInput('proxyid')) {
 			$data['proxyid'] = $this->getInput('proxyid');
 

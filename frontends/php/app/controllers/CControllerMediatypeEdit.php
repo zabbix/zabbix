@@ -121,7 +121,7 @@ class CControllerMediatypeEdit extends CController {
 			'status' => MEDIA_TYPE_STATUS_ACTIVE
 		];
 
-		// get values from the dabatase
+		// get values from the database
 		if ($this->hasInput('mediatypeid')) {
 			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
 			$data['type'] = $this->mediatype['type'];

@@ -86,7 +86,7 @@ class CControllerScriptEdit extends CController {
 			'hgstype' => 0
 		];
 
-		// get values from the dabatase
+		// get values from the database
 		if ($this->hasInput('scriptid')) {
 			$scripts = API::Script()->get([
 				'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
