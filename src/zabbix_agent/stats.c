@@ -354,7 +354,7 @@ void	diskstat_shm_extend()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* caclulate the size of the new shared memory segment */
+	/* calculate the size of the new shared memory segment */
 	old_max = diskdevices->max_diskdev;
 
 	if (old_max < 4)
