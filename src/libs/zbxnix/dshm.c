@@ -163,7 +163,7 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm)
  *                                                                            *
  * Return value: SUCCEED - the local reference to dynamic shared memory       *
  *                         segment was validated successfully and contains    *
- *                         corret dynamic shared memory segment address       *
+ *                         correct dynamic shared memory segment address      *
  *               FAIL    - otherwise. The errmsg contains error message and   *
  *                         must be freed by the caller.                       *
  *                                                                            *
