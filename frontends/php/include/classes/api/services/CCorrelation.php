@@ -953,7 +953,7 @@ class CCorrelation extends CApiService {
 	 * depend on it. As a result return host group IDs that need to be validated afterwards. Otherwise don't return
 	 * anything, just throw an error.
 	 *
-	 * @param array					$correlation											One correlation contaning the conditions.
+	 * @param array					$correlation											One correlation containing the conditions.
 	 * @param string				$correlation['name']									Correlation name for error messages.
 	 * @param array					$correlation['filter']									Correlation filter array containing	the conditions.
 	 * @param array					$correlation['filter']['conditions']					An array of correlation conditions.
@@ -1184,7 +1184,7 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validate correlation filter "formula" field.
 	 *
-	 * @param array				$correlation						One correlation contaning the filter, formula and name.
+	 * @param array				$correlation						One correlation containing the filter, formula and name.
 	 * @param string			$correlation['name']				Correlation name for error messages.
 	 * @param array				$correlation['filter']				Correlation filter array containing the formula.
 	 * @param string			$correlation['filter']['formula']	User-defined expression to be used for evaluating
@@ -1210,7 +1210,7 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
 	 *
-	 * @param array				$correlation										One correlation contaning array of
+	 * @param array				$correlation										One correlation containing array of
 	 *																				conditions and name.
 	 * @param string			$correlation['name']								Correlation name for error messages.
 	 * @param array				$correlation['filter']								Correlation filter array containing
@@ -1266,7 +1266,7 @@ class CCorrelation extends CApiService {
 	 * Validate correlation operations. Check if "operations" is valid, if "type" is valid and there are no duplicate
 	 * operations in correlation.
 	 *
-	 * @param array					$correlation						One correlation contaning array of operations and name.
+	 * @param array					$correlation						One correlation containing array of operations and name.
 	 * @param string				$correlation['name']				Correlation name for error messages.
 	 * @param array					$correlation['operations']			An array of correlation operations.
 	 * @param int					$correlation['operations']['type']	Correlation operation type.
