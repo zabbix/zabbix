@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 17:29+0300\n"
+"POT-Creation-Date: 2016-12-04 11:10+0200\n"
 "PO-Revision-Date: 2016-02-09 14:12+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -227,19 +227,19 @@ msgstr "アクセスは拒否されました！"
 msgid "Access denied."
 msgstr "アクセスは拒否されました。"
 
-#: api/classes/CUser.php:1058
+#: api/classes/CUser.php:1060
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "アカウントは%s秒間ブロックされています"
 
-#: events.php:590 events.php:603 include/actions.inc.php:256
+#: events.php:540 events.php:553 include/actions.inc.php:256
 #: include/blocks.inc.php:953 include/blocks.inc.php:1529
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
 msgstr "コメントあり"
 
-#: acknow.php:230 jsLoader.php:199 tr_status.php:729
+#: acknow.php:230 jsLoader.php:199 tr_status.php:730
 msgid "Acknowledge"
 msgstr "障害対応コメント"
 
@@ -259,7 +259,7 @@ msgstr "コメントを入力して戻る"
 msgid "Acknowledge status"
 msgstr "障害対応コメントのステータス"
 
-#: include/events.inc.php:189 tr_status.php:375 tr_status.php:740
+#: include/events.inc.php:189 tr_status.php:375 tr_status.php:741
 msgid "Acknowledged"
 msgstr "障害対応済"
 
@@ -348,7 +348,7 @@ msgstr "アクションの実行内容"
 msgid "Action updated"
 msgstr "アクションを更新しました"
 
-#: events.php:591 events.php:604 include/blocks.inc.php:954
+#: events.php:541 events.php:554 include/blocks.inc.php:954
 #: include/blocks.inc.php:1530 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
@@ -430,7 +430,7 @@ msgstr "終了日時"
 #: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.history.php:100 popup_bitem.php:166
 #: popup_media.php:141 popup_period.php:134 tr_logform.php:293
-#: tr_status.php:784
+#: tr_status.php:785
 msgid "Add"
 msgstr "追加"
 
@@ -988,7 +988,7 @@ msgstr "明るく"
 msgid "Bulgarian (bg_BG)"
 msgstr "ブルガリア語 (bg_BG)"
 
-#: tr_status.php:871
+#: tr_status.php:872
 msgid "Bulk acknowledge"
 msgstr "障害対応コメントの一括処理"
 
@@ -1220,11 +1220,11 @@ msgstr "有効な権限"
 msgid "Callback"
 msgstr "コールバック"
 
-#: api/classes/CTemplate.php:1037 api/classes/CTemplate.php:1047
+#: api/classes/CTemplate.php:1044 api/classes/CTemplate.php:1054
 msgid "Can't link template"
 msgstr "テンプレートをリンクできません"
 
-#: api/classes/CTemplate.php:1008 api/classes/CTemplate.php:1026
+#: api/classes/CTemplate.php:1015 api/classes/CTemplate.php:1033
 msgid "Can't unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
@@ -1529,7 +1529,7 @@ msgstr "新しい要素を作成できません"
 msgid "Cannot create screen."
 msgstr "スクリーンを作成できません。"
 
-#: api/classes/CUser.php:1398
+#: api/classes/CUser.php:1400
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbixユーザー\"%1$s\"を削除できません。ユーザーを無効に設定してください。"
@@ -1603,7 +1603,7 @@ msgstr "アイコンのマッピングを削除できません"
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
-#: api/classes/CHost.php:1273
+#: api/classes/CHost.php:1290
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
@@ -1660,16 +1660,16 @@ msgstr "スクリーンを削除できません"
 msgid "Cannot delete script"
 msgstr "スクリプトを削除できません"
 
-#: api/classes/CScript.php:504
+#: api/classes/CScript.php:516
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "スクリプトを削除できません。\"scriptids\"の値が空白です"
 
-#: api/classes/CScript.php:536
+#: api/classes/CScript.php:548
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実行するアクション\"%2$s\"に利用されています。"
 
-#: api/classes/CScript.php:519
+#: api/classes/CScript.php:531
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%1$s\"は存在しません。"
@@ -1719,7 +1719,7 @@ msgstr "テンプレートのアイテムを削除できません"
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
 
-#: api/classes/CHttpTest.php:392
+#: api/classes/CHttpTest.php:393
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "テンプレートのウェブシナリオ\"%1$s\"を削除できません。"
@@ -1752,7 +1752,7 @@ msgstr "ローレベルディスカバリによって作成されたトリガー
 msgid "Cannot delete user"
 msgstr "ユーザーを削除できません"
 
-#: api/classes/CUser.php:949
+#: api/classes/CUser.php:951
 msgid "Cannot delete user media."
 msgstr "ユーザーのメディアを削除できません"
 
@@ -2042,7 +2042,7 @@ msgstr "ツリーをフォーマットできません。サービスのリンク
 msgid "Cannot format tree."
 msgstr "ツリーをフォーマットできません。"
 
-#: api/classes/CTemplate.php:933
+#: api/classes/CTemplate.php:940
 msgid "Cannot have empty visible template name"
 msgstr "テンプレート名に空白は設定できません"
 
@@ -2073,35 +2073,35 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 msgid "Cannot insert trigger expression"
 msgstr "トリガー条件式を追加できません"
 
-#: api/classes/CUser.php:738
+#: api/classes/CUser.php:740
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
-#: api/classes/CHost.php:1251
+#: api/classes/CHost.php:1268
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
-#: api/classes/CUser.php:1099
+#: api/classes/CUser.php:1101
 msgid "Cannot login."
 msgstr "ログインできません。"
 
-#: api/classes/CUser.php:1021
+#: api/classes/CUser.php:1023
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
-#: api/classes/CHost.php:1111
+#: api/classes/CHost.php:1128
 msgid "Cannot mass update host name."
 msgstr "ホスト名を一括更新できません"
 
-#: api/classes/CTemplate.php:883
+#: api/classes/CTemplate.php:890
 msgid "Cannot mass update template name"
 msgstr "テンプレート名を一括更新できません"
 
-#: api/classes/CHost.php:1101
+#: api/classes/CHost.php:1118
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名は一括更新できません。"
 
-#: api/classes/CTemplate.php:850
+#: api/classes/CTemplate.php:857
 msgid "Cannot mass update visible template name"
 msgstr "テンプレートの表示名を一括更新できません"
 
@@ -2185,7 +2185,7 @@ msgstr "スクリーン\"%1$s\"に\"templateid\"を設定できません。"
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "トリガーのプロトタイプ\"%1$s\"に\"templateid\"を設定できません。"
 
-#: api/classes/CHost.php:703 api/classes/CHost.php:1156
+#: api/classes/CHost.php:705 api/classes/CHost.php:1173
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "無効の状態のインベントリのフィールドは設定できません。"
 
@@ -2229,7 +2229,7 @@ msgstr "アイテムのリンク削除と削除が行えません"
 msgid "Cannot unlink and clear triggers"
 msgstr "トリガーのリンク削除と削除が行えません"
 
-#: api/classes/CHost.php:1242
+#: api/classes/CHost.php:1259
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
@@ -2238,7 +2238,7 @@ msgstr "テンプレートのリンクを削除できません"
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "トリガー\"%s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを利用しています。"
 
-#: api/classes/CHost.php:716
+#: api/classes/CHost.php:718
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr "発見されたホストの\"%1$s\"を更新できません"
@@ -2319,7 +2319,7 @@ msgstr "アクションを更新できません"
 msgid "Cannot update application"
 msgstr "アプリケーションを更新できません"
 
-#: tr_comments.php:69
+#: tr_comments.php:71
 msgid "Cannot update comment"
 msgstr "コメントを更新できません"
 
@@ -2357,8 +2357,8 @@ msgstr "グループを更新できません"
 msgid "Cannot update group."
 msgstr "グループを更新できません"
 
-#: api/classes/CHostGroup.php:940 api/classes/CHostGroup.php:1045
-#: api/classes/CHostGroup.php:1186
+#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1039
+#: api/classes/CHostGroup.php:1167
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のグループを更新できません"
@@ -2474,7 +2474,7 @@ msgstr "テンプレートを更新できません"
 msgid "Cannot update templated applications."
 msgstr "テンプレートのアプリケーションを更新できません。"
 
-#: api/classes/CTemplate.php:806 api/classes/CTemplate.php:1127
+#: api/classes/CTemplate.php:808 api/classes/CTemplate.php:1134
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のテンプレートを更新できません"
@@ -2495,7 +2495,7 @@ msgstr "トリガーのプロトタイプが更新できません"
 msgid "Cannot update user"
 msgstr "ユーザーを更新できません"
 
-#: api/classes/CUser.php:818
+#: api/classes/CUser.php:820
 msgid "Cannot update user media."
 msgstr "ユーザーのメディアを更新できません"
 
@@ -2803,12 +2803,12 @@ msgstr "コマンドを設定してください。"
 msgid "Commands"
 msgstr "コマンド"
 
-#: tr_comments.php:69
+#: tr_comments.php:71
 msgid "Comment updated"
 msgstr "コメントを更新しました"
 
 #: include/acknow.inc.php:49 include/views/monitoring.triggerComment.php:39
-#: tr_comments.php:76 tr_logform.php:371 tr_status.php:379
+#: tr_logform.php:371 tr_status.php:379
 msgid "Comments"
 msgstr "コメント"
 
@@ -3114,7 +3114,7 @@ msgstr "コピー"
 msgid "Copy selected to ..."
 msgstr "選択をコピー..."
 
-#: api/classes/CUser.php:1144
+#: api/classes/CUser.php:1146
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "ユーザー\"%s\"のログイン"
@@ -3436,7 +3436,7 @@ msgstr "DISCOVERED"
 msgid "DM"
 msgstr "分散監視"
 
-#: events.php:509 events.php:518 hosts.php:780
+#: events.php:459 events.php:468 hosts.php:780
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -4037,7 +4037,7 @@ msgstr "削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のグラフ\"%1$s\"。"
 
-#: api/classes/CHost.php:1601
+#: api/classes/CHost.php:1618
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
@@ -4062,7 +4062,7 @@ msgstr "削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "削除: プロキシ \"%1$s\"."
 
-#: api/classes/CTemplate.php:766
+#: api/classes/CTemplate.php:768
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "削除: テンプレート\"%1$s\"。"
@@ -4077,7 +4077,7 @@ msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CHttpTest.php:452
+#: api/classes/CHttpTest.php:453
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のウェブシナリオ\"%1$s\"。"
@@ -4107,14 +4107,14 @@ msgstr "拒否"
 msgid "Dependencies"
 msgstr "依存関係"
 
-#: include/triggers.inc.php:1376 tr_status.php:628
+#: include/triggers.inc.php:1376 tr_status.php:629
 msgid "Dependent"
 msgstr "依存先"
 
 #: include/triggers.inc.php:1356
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
-#: tr_status.php:612
+#: tr_status.php:613
 msgid "Depends on"
 msgstr "依存先"
 
@@ -4122,7 +4122,7 @@ msgstr "依存先"
 msgid "Deployment status"
 msgstr "配布ステータス"
 
-#: events.php:510 events.php:519 events.php:586 events.php:599
+#: events.php:460 events.php:469 events.php:536 events.php:549
 #: include/classes/screens/CScreenEvents.php:42
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
@@ -4565,12 +4565,12 @@ msgstr "ホストのプロトタイプ\"%1$s\"のグループのプロトタイ�
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "ホストのプロトタイプ\"%1$s\"のホストグループID\"%2$s\"が重複しています。"
 
-#: api/classes/CHost.php:760
+#: api/classes/CHost.php:762
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "ホストが重複しています。同じホスト名\"%s\"を持つホスト設定がすでに存在しています。"
 
-#: api/classes/CHost.php:792
+#: api/classes/CHost.php:794
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "ホストが重複しています。同じホストの表示名\"%s\"を持つホストがすでに存在しています。"
@@ -4580,7 +4580,7 @@ msgstr "ホストが重複しています。同じホストの表示名\"%s\"を
 msgid "Duplicate map name for map \"%s\"."
 msgstr "マップ\"%s\"のマップ名が重複しています"
 
-#: api/classes/CScript.php:411 api/classes/CScript.php:467
+#: api/classes/CScript.php:423 api/classes/CScript.php:479
 #, c-format
 msgid "Duplicate script name \"%1$s\"."
 msgstr "スクリプト名\"%1$s\"は重複しています"
@@ -4595,7 +4595,7 @@ msgstr "重要度名\"%s\"は重複しています"
 msgid "Duplicate user alias \"%s\"."
 msgstr "ユーザー名\"%s\"は重複しています"
 
-#: events.php:589 events.php:602 include/events.inc.php:202
+#: events.php:539 events.php:552 include/events.inc.php:202
 #: include/events.inc.php:279 include/events.inc.php:282 tr_status.php:374
 msgid "Duration"
 msgstr "継続期間"
@@ -4701,16 +4701,16 @@ msgstr "ホストが空白です。"
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1454
 #: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
-#: api/classes/CService.php:515 api/classes/CTemplate.php:627
+#: api/classes/CService.php:515 api/classes/CTemplate.php:629
 #: api/classes/CTrigger.php:875 api/classes/CTrigger.php:948
 #: api/classes/CTrigger.php:1038 api/classes/CTriggerPrototype.php:613
-#: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
+#: api/classes/CUserGroup.php:653 api/classes/CUserMacro.php:394
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:568
 msgid "Empty input parameter."
 msgstr "入力パラメータが空白です"
 
@@ -4735,12 +4735,12 @@ msgstr "グループのプロトタイプの名前が空白です。"
 msgid "Empty name for host prototype \"%1$s\"."
 msgstr "ホストのプロトタイプ\"%1$s\"の名前が空白です。"
 
-#: api/classes/CScript.php:569
+#: api/classes/CScript.php:581
 #, c-format
 msgid "Empty name for script \"%1$s\"."
 msgstr "スクリプト\"%1$s\"の名前が空白です。"
 
-#: api/classes/CScript.php:408 api/classes/CScript.php:464
+#: api/classes/CScript.php:420 api/classes/CScript.php:476
 msgid "Empty name for script."
 msgstr "スクリプトの名前が空白です。"
 
@@ -4916,7 +4916,7 @@ msgstr "英語 (en_US)"
 msgid "Error"
 msgstr "エラー"
 
-#: include/db.inc.php:870
+#: include/db.inc.php:874
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
@@ -5143,7 +5143,7 @@ msgstr "失敗"
 msgid "Failed"
 msgstr "失敗"
 
-#: api/classes/CTemplate.php:611
+#: api/classes/CTemplate.php:613
 msgid "Failed to update template"
 msgstr "テンプレートの更新の失敗"
 
@@ -5185,6 +5185,7 @@ msgstr "フィールド"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
+#: api/classes/CHost.php:1084 api/classes/CTemplate.php:827
 #: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -5224,7 +5225,7 @@ msgstr "フィールド\"%1$s\"が入力されていません。"
 msgid "Field \"druleid\" is required."
 msgstr "フィールド\"druleid\"を指定してください"
 
-#: api/classes/CTemplate.php:496
+#: api/classes/CTemplate.php:498
 msgid "Field \"host\" is mandatory"
 msgstr "フィールド\"host\"は必須です"
 
@@ -5500,7 +5501,7 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:67
 #: include/views/configuration.triggers.list.php:292 templates.php:658
-#: tr_status.php:873
+#: tr_status.php:874
 msgid "Go"
 msgstr "実行"
 
@@ -5730,7 +5731,7 @@ msgstr "グリッド"
 msgid "Group"
 msgstr "グループ"
 
-#: api/classes/CHostGroup.php:606
+#: api/classes/CHostGroup.php:608
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "ホストのプロトタイプで利用されているためグループ\"%1$s\"は削除できません。"
@@ -5986,7 +5987,7 @@ msgstr "横"
 msgid "Horizontal align"
 msgstr "横位置"
 
-#: events.php:293 events.php:534 events.php:585 events.php:598 httpmon.php:73
+#: events.php:293 events.php:484 events.php:535 events.php:548 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:632 include/blocks.inc.php:679
 #: include/blocks.inc.php:937 include/blocks.inc.php:948
@@ -6027,10 +6028,16 @@ msgstr "横位置"
 msgid "Host"
 msgstr "ホスト"
 
-#: api/classes/CHost.php:1124 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1141 api/classes/CTemplate.php:514
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "ホスト\"%1$s\"はすでに存在しています。"
+
+#: api/classes/CHostGroup.php:1454 api/classes/CHost.php:677
+#: api/classes/CHost.php:684 api/classes/CHost.php:1109
+#, c-format
+msgid "Host \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: api/classes/CProxy.php:591
 #, c-format
@@ -6101,17 +6108,12 @@ msgstr "ホストグループ"
 msgid "Host group \"%1$s\" already exists."
 msgstr "ホストグループ\"%1$s\"はすでに存在しています。"
 
-#: api/classes/CHostGroup.php:638
+#: api/classes/CHostGroup.php:641
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "グローバルスクリプトに利用されているためホストグループ\"%1$s\"を削除できません。"
 
-#: api/classes/CHostGroup.php:619
-#, c-format
-msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr "いくつかのホストが所属しているためホストグループ\"%1$s\"を削除できません。"
-
-#: api/classes/CHostGroup.php:593
+#: api/classes/CHostGroup.php:595
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "ホストグループ\"%1$s\"は内部的に使用されているため削除できません。"
@@ -6207,8 +6209,8 @@ msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在し�
 
 #: api/classes/CHostPrototype.php:189
 #, c-format
-msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr "ホストのプロトタイプ\"%1$s\"は少なくとも1つ以上のホストグループが設定されている必要があります。"
+msgid "Host prototype \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
@@ -6286,7 +6288,7 @@ msgstr "ホストのサブネットマスク"
 msgid "Host time"
 msgstr "ホスト時間"
 
-#: api/classes/CHost.php:1003
+#: api/classes/CHost.php:1013
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
@@ -6294,22 +6296,22 @@ msgstr "ホストの更新に失敗しました"
 msgid "Host updated"
 msgstr "ホストを更新しました"
 
-#: api/classes/CTemplate.php:908
+#: api/classes/CTemplate.php:915
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "同じホスト名\"%1$s\"を持つホストがすでに存在します。"
 
-#: api/classes/CHost.php:822
+#: api/classes/CHost.php:824
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "同じホスト名\"%s\"を持つホストがすでに存在します。"
 
-#: api/classes/CTemplate.php:526 api/classes/CTemplate.php:875
+#: api/classes/CTemplate.php:528 api/classes/CTemplate.php:882
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在します。"
 
-#: api/classes/CHost.php:828
+#: api/classes/CHost.php:830
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します。"
@@ -6402,7 +6404,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:508 events.php:517 hosts.php:781
+#: events.php:458 events.php:467 hosts.php:781
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6943,8 +6945,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "設定項目が間違っています"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
-#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:534
-#: api/classes/CItemGeneral.php:197
+#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:535
+#: api/classes/CItemGeneral.php:197 api/classes/CScript.php:293
 msgid "Incorrect arguments passed to function."
 msgstr "不正な引数が関数に渡されました。"
 
@@ -6971,7 +6973,7 @@ msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
 msgid "Incorrect characters used for Node name."
 msgstr "ノード名に不正な文字列が利用されています。"
 
-#: api/classes/CTemplate.php:501
+#: api/classes/CTemplate.php:503
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
 msgstr "テンプレート名\"%1$s\"に不正な文字列が利用されています"
@@ -6981,7 +6983,7 @@ msgstr "テンプレート名\"%1$s\"に不正な文字列が利用されてい�
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"に不正な文字列が使用されています。"
 
-#: api/classes/CHost.php:756 api/classes/CHost.php:1107
+#: api/classes/CHost.php:758 api/classes/CHost.php:1124
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
@@ -6991,7 +6993,7 @@ msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "プロキシ名\"%1$s\"に利用されている文字列が正しくありません。"
 
-#: api/classes/CTemplate.php:916
+#: api/classes/CTemplate.php:923
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "テンプレート名\"%1$s\"に利用されている文字列が正しくありません。"
@@ -7114,7 +7116,7 @@ msgstr "インターフェースのIPパラメータ\"%s\"が正しくありま�
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "インターフェースのポート\"%s\"が正しくありません。"
 
-#: api/classes/CHost.php:709
+#: api/classes/CHost.php:711
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "インベントリのフィールド\"%s\"が正しくありません。"
@@ -7193,7 +7195,7 @@ msgstr "マップ\"%s\"の高さの値が正しくありません。"
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "マップ\"%s\"の幅の値が正しくありません。"
 
-#: api/classes/CScript.php:576
+#: api/classes/CScript.php:588
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
 msgstr "スクリプト\"%1$s\"のメニューパスが正しくありません。"
@@ -7330,7 +7332,7 @@ msgstr "ステータスが正しくありません。"
 msgid "Incorrect template screen ID."
 msgstr "テンプレートスクリーンIDが正しくありません。"
 
-#: api/classes/CUser.php:362
+#: api/classes/CUser.php:364
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "ユーザー\"%1$s\"のテーマが正しくありません。"
@@ -7629,12 +7631,12 @@ msgid "Invalid maintenance period"
 msgstr "メンテナンス期間が正しくありません。"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:241
-#: api/classes/CScreenItem.php:302 api/classes/CScript.php:442
+#: api/classes/CScreenItem.php:302 api/classes/CScript.php:454
 #: api/classes/CService.php:206 api/classes/CService.php:382
 #: api/classes/CService.php:1474 api/classes/CUserMacro.php:339
-#: api/classes/CUserMacro.php:472 api/classes/CUser.php:673
-#: api/classes/CUser.php:693 api/classes/CUser.php:851
-#: api/classes/CUser.php:896 api/rpc/class.cjsonrpc.php:197
+#: api/classes/CUserMacro.php:472 api/classes/CUser.php:675
+#: api/classes/CUser.php:695 api/classes/CUser.php:853
+#: api/classes/CUser.php:898 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "メソッドのパラメータが正しくありません。"
 
@@ -7651,7 +7653,7 @@ msgstr "パラメータが正しくありません。"
 msgid "Invalid period for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の期間が正しくありません。"
 
-#: api/classes/CHttpTest.php:663 api/classes/CHttpTest.php:669
+#: api/classes/CHttpTest.php:664 api/classes/CHttpTest.php:670
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "レスポンスコード\"%1$s\"が正しくありません。"
@@ -7678,7 +7680,7 @@ msgstr "表示名\"%s\"が正しくありません。利用できる文字: \"a-
 msgid "Inventory"
 msgstr "インベントリ"
 
-#: api/classes/CHost.php:1292
+#: api/classes/CHost.php:1309
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
@@ -7896,12 +7898,6 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不�
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
-
-#: api/classes/managers/CHttpTestManager.php:713
-#: api/classes/managers/CHttpTestManager.php:844
-#, c-format
-msgid "Item with key \"%1$s\" already exists."
-msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します。"
 
 #: hosts.php:815 hosts.php:906 include/html.inc.php:425
 #: include/html.inc.php:429 include/items.inc.php:735
@@ -8415,12 +8411,12 @@ msgstr "ログイン"
 msgid "Login as Guest"
 msgstr "ゲストとしてログイン"
 
-#: api/classes/CUser.php:1136
+#: api/classes/CUser.php:1138
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "ログイン失敗\"%s\""
 
-#: api/classes/CUser.php:1104
+#: api/classes/CUser.php:1106
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr "ユーザー名\"%1$s\"がHTTP認証で利用したユーザー名\"%2$s\"と一致しません。"
@@ -8429,8 +8425,8 @@ msgstr "ユーザー名\"%1$s\"がHTTP認証で利用したユーザー名\"%2$s
 msgid "Login name or password is incorrect!"
 msgstr "ログイン名かパスワードが間違っています!"
 
-#: api/classes/CUser.php:984 api/classes/CUser.php:1003
-#: api/classes/CUser.php:1052
+#: api/classes/CUser.php:986 api/classes/CUser.php:1005
+#: api/classes/CUser.php:1054
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
 
@@ -8609,11 +8605,11 @@ msgstr "メンテナンスタイプ"
 msgid "Maintenance updated"
 msgstr "メンテナンスを更新しました"
 
-#: include/blocks.inc.php:981 tr_status.php:678
+#: include/blocks.inc.php:981 tr_status.php:679
 msgid "Maintenance with data collection"
 msgstr "データ収集ありのメンテナンス"
 
-#: include/blocks.inc.php:980 tr_status.php:677
+#: include/blocks.inc.php:980 tr_status.php:678
 msgid "Maintenance without data collection"
 msgstr "データ収集なしのメンテナンス"
 
@@ -8780,7 +8776,7 @@ msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "エイリアスの最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
-#: api/classes/CHost.php:746
+#: api/classes/CHost.php:748
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8823,7 +8819,7 @@ msgstr "期間Tの値の最大値 > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "期間Tの値の最大値 NOT N"
 
-#: api/classes/CHost.php:782
+#: api/classes/CHost.php:784
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9382,7 +9378,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "次へ"
 
-#: events.php:839 include/events.inc.php:362 include/events.inc.php:380
+#: events.php:789 include/events.inc.php:362 include/events.inc.php:380
 #: include/func.inc.php:2442 include/triggers.inc.php:1604
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
@@ -9582,7 +9578,7 @@ msgstr "要素が選択されていません！"
 msgid "No errors found."
 msgstr "エラーはありません。"
 
-#: include/blocks.inc.php:1026 include/blocks.inc.php:1552 tr_status.php:750
+#: include/blocks.inc.php:1026 include/blocks.inc.php:1552 tr_status.php:751
 msgid "No events"
 msgstr "イベントはありません"
 
@@ -9631,25 +9627,7 @@ msgstr "グラフが追加されていません。"
 msgid "No graphs found."
 msgstr "グラフはありません。"
 
-#: api/classes/CHost.php:676 api/classes/CHost.php:683
-#, c-format
-msgid "No groups for host \"%s\"."
-msgstr "ホスト\"%s\"にグループが設定されていません。"
-
-#: api/classes/CHost.php:1093
-msgid "No groups for hosts."
-msgstr "ホストにグループが設定されていません。"
-
-#: api/classes/CTemplate.php:842
-msgid "No groups for template"
-msgstr "テンプレートにグループが設定されていません"
-
-#: api/classes/CTemplate.php:460
-#, c-format
-msgid "No groups for template \"%1$s\"."
-msgstr "テンプレート\"%1$s\"にグループが設定されていません。"
-
-#: api/classes/CHost.php:1461
+#: api/classes/CHost.php:1478
 msgid "No host ID given."
 msgstr "ホストIDが存在しません。"
 
@@ -9728,7 +9706,7 @@ msgstr "インターフェースが見つかりません。"
 msgid "No interface provided for proxy \"%s\"."
 msgstr "プロキシ\"%s\"にインターフェースが設定されていません。"
 
-#: api/classes/CHost.php:730 api/classes/CHost.php:736
+#: api/classes/CHost.php:732 api/classes/CHost.php:738
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "ホスト\"%s\"にインターフェースが設定されていません。"
@@ -9855,7 +9833,7 @@ msgstr "マップ\"%1$s\"への権限がありません。"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"への権限がありません。"
 
-#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
+#: api/classes/CUser.php:1068 api/classes/CUser.php:1196
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -9870,16 +9848,16 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:509
-#: api/classes/CHostGroup.php:588 api/classes/CHostGroup.php:974
-#: api/classes/CHostGroup.php:1004 api/classes/CHostGroup.php:1133
-#: api/classes/CHostGroup.php:1235 api/classes/CHostGroup.php:1262
+#: api/classes/CHostGroup.php:590 api/classes/CHostGroup.php:977
+#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1101
+#: api/classes/CHostGroup.php:1215 api/classes/CHostGroup.php:1234
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
-#: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHost.php:671 api/classes/CHost.php:691
+#: api/classes/CHost.php:1841 api/classes/CHostPrototype.php:1021
 #: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
-#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
-#: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:396
+#: api/classes/CHttpTest.php:606 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:240 api/classes/CItem.php:690
@@ -9892,18 +9870,19 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CProxy.php:213 api/classes/CProxy.php:285
 #: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
 #: api/classes/CScreenItem.php:445 api/classes/CScreen.php:498
-#: api/classes/CScreen.php:676 api/classes/CService.php:1257
-#: api/classes/CService.php:1272 api/classes/CTemplate.php:800
-#: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
+#: api/classes/CScreen.php:676 api/classes/CScript.php:302
+#: api/classes/CScript.php:312 api/classes/CService.php:1257
+#: api/classes/CService.php:1272 api/classes/CTemplate.php:802
+#: api/classes/CTemplate.php:1003 api/classes/CTemplate.php:1128
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
-#: api/classes/CUser.php:680 api/classes/CUser.php:859
-#: api/classes/CUser.php:879 api/classes/CUser.php:938
-#: api/classes/CUser.php:1363 include/func.inc.php:2082
+#: api/classes/CUser.php:682 api/classes/CUser.php:861
+#: api/classes/CUser.php:881 api/classes/CUser.php:940
+#: api/classes/CUser.php:1365 include/func.inc.php:2082
 msgid "No permissions to referred object or it does not exist!"
 msgstr "対象が存在しないか、アクセス権がありません！"
 
@@ -10027,7 +10006,7 @@ msgstr "トリガーが設定されていません。"
 msgid "No triggers found."
 msgstr "トリガーが存在しません。"
 
-#: api/classes/CUser.php:590
+#: api/classes/CUser.php:592
 msgid "No user ID given."
 msgstr "ユーザー IDが存在しません。"
 
@@ -10056,7 +10035,7 @@ msgstr "値が存在しません。"
 msgid "No web scenarios found."
 msgstr "ウェブシナリオが設定されていません。"
 
-#: events.php:584 events.php:597 hosts.php:812 httpmon.php:86
+#: events.php:534 events.php:547 hosts.php:812 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:400
 #: include/blocks.inc.php:947 include/blocks.inc.php:1122
@@ -10149,7 +10128,7 @@ msgstr "テンプレートではないアイテム"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "すべてのテンプレートは\"%s\"にリンクされていません。"
 
-#: api/classes/CUser.php:384
+#: api/classes/CUser.php:386
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "ゲストユーザーはパスワードを設定できません。"
 
@@ -10477,8 +10456,7 @@ msgstr "ステータスが変化したトリガーの点滅期間"
 msgid "Once"
 msgstr "一度だけ"
 
-#: api/classes/CHostGroup.php:1142 api/classes/CHostGroup.php:1151
-#: api/classes/CHostGroup.php:1244
+#: api/classes/CHostGroup.php:1110
 msgid "One of the objects is left without a host group."
 msgstr "ホストグループが設定されていないオブジェクトが残っています"
 
@@ -10517,7 +10495,7 @@ msgstr "特権管理者のみがメディアタイプを削除できます。"
 
 #: api/classes/CUserGroup.php:237 api/classes/CUserGroup.php:288
 #: api/classes/CUserGroup.php:312 api/classes/CUserGroup.php:407
-#: api/classes/CUserGroup.php:631
+#: api/classes/CUserGroup.php:649
 msgid "Only Super Admins can delete user groups."
 msgstr "特権管理者のみがユーザーグループを削除できます。"
 
@@ -10533,19 +10511,19 @@ msgstr "特権管理者のみがグローバルマクロを更新できます。
 msgid "Only Super Admins can update icon maps."
 msgstr "特権管理者のみがアイコンのマッピングを更新できます。"
 
-#: api/classes/CUser.php:669
+#: api/classes/CUser.php:671
 msgid "Only Zabbix Admins can add user media."
 msgstr "特権管理者のみがユーザーのメディアを追加できます。"
 
-#: api/classes/CUser.php:847
+#: api/classes/CUser.php:849
 msgid "Only Zabbix Admins can change user media."
 msgstr "特権管理者のみがユーザーのメディアを変更できます。"
 
-#: api/classes/CUser.php:928
+#: api/classes/CUser.php:930
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
-#: api/classes/CHttpTest.php:690
+#: api/classes/CHttpTest.php:691
 msgid "Only characters are allowed."
 msgstr "文字列のみ使用することができます。"
 
@@ -11242,7 +11220,7 @@ msgstr "秘密鍵ファイル"
 msgid "Privilege level"
 msgstr "特権レベル"
 
-#: api/classes/CUser.php:975
+#: api/classes/CUser.php:977
 msgid "Probably php-ldap module is missing."
 msgstr "php-ldapモジュールが見つかりません。"
 
@@ -12231,8 +12209,8 @@ msgstr "スクリーン"
 msgid "Script"
 msgstr "スクリプト"
 
-#: api/classes/CScript.php:424 api/classes/CScript.php:485
-#: api/classes/CScript.php:617
+#: api/classes/CScript.php:436 api/classes/CScript.php:497
+#: api/classes/CScript.php:629
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "スクリプト\"%1$s\"はすでに存在します。"
@@ -12245,7 +12223,7 @@ msgstr "スクリプトを追加しました"
 msgid "Script deleted"
 msgstr "スクリプトを削除しました"
 
-#: api/classes/CScript.php:609
+#: api/classes/CScript.php:621
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "スクリプトのメニューパス\"%1$s\"はスクリプト名\"%2$s\"にすでに利用されています。"
@@ -12255,7 +12233,7 @@ msgstr "スクリプトのメニューパス\"%1$s\"はスクリプト名\"%2$s\
 msgid "Script name"
 msgstr "スクリプト名"
 
-#: api/classes/CScript.php:596
+#: api/classes/CScript.php:608
 #, c-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
 msgstr "スクリプト名\"%1$s\"はスクリプト\"%2$s\"のメニューパスにすでに利用されています。"
@@ -12268,7 +12246,7 @@ msgstr "スクリプトプロファイラ"
 msgid "Script updated"
 msgstr "スクリプトを更新しました"
 
-#: api/classes/CScript.php:459
+#: api/classes/CScript.php:471
 #, c-format
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトID\"%1$s\"は存在しません。"
@@ -12366,7 +12344,7 @@ msgstr "セキュリティ名"
 #: include/views/configuration.screen.constructor.edit.php:465
 #: include/views/configuration.screen.constructor.edit.php:543
 #: include/views/configuration.screen.constructor.edit.php:550
-#: include/views/configuration.services.child.list.php:63
+#: include/views/configuration.services.child.list.php:65
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
 #: include/views/js/configuration.sysmaps.js.php:107
@@ -12481,7 +12459,7 @@ msgstr "サーバー情報"
 msgid "Server time"
 msgstr "サーバー時間"
 
-#: events.php:548 include/actions.inc.php:105
+#: events.php:498 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:277
 #: include/views/configuration.services.parent.list.php:36 services.php:466
@@ -12549,11 +12527,11 @@ msgstr "サービス"
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
-#: api/classes/CUser.php:1188
+#: api/classes/CUser.php:1190
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
-#: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
+#: events.php:538 events.php:551 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
 #: include/triggers.inc.php:1599 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
@@ -12577,7 +12555,7 @@ msgstr "深刻度を設定してください。"
 #: include/reports.inc.php:456
 #: include/views/configuration.application.list.php:63
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:422
-#: tr_status.php:784 tr_status.php:789
+#: tr_status.php:785 tr_status.php:790
 msgid "Show"
 msgstr "表示"
 
@@ -12904,7 +12882,7 @@ msgstr "ステータス"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "サービスの状態。0 - 実行中、1 - 一時停止中、2 - 開始待ち、3 - 一時停止待ち、4 - 続行待ち、5 - 停止待ち、6 - 停止、7 - 不明、255 - 該当サービスなし"
 
-#: events.php:511 events.php:520 events.php:587 events.php:600 hosts.php:822
+#: events.php:461 events.php:470 events.php:537 events.php:550 hosts.php:822
 #: httpdetails.php:136 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -13210,10 +13188,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "テンプレート"
 
-#: api/classes/CHost.php:1129 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1146 api/classes/CTemplate.php:510
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "テンプレート\"%1$s\"はすでに存在します。"
+
+#: api/classes/CHostGroup.php:1459 api/classes/CTemplate.php:461
+#: api/classes/CTemplate.php:850
+#, c-format
+msgid "Template \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, c-format
@@ -13275,22 +13259,22 @@ msgstr "テンプレートを更新しました"
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "キー\"%1$s\"を持つアイテムを含むテンプレートがすでにホストにリンクされています。"
 
-#: api/classes/CTemplate.php:900
+#: api/classes/CTemplate.php:907
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "同じ名前\"%1$s\"を持つテンプレートがすでに存在します。"
 
-#: api/classes/CHost.php:838
+#: api/classes/CHost.php:840
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "同じ名前\"%s\"を持つテンプレートがすでに存在します。"
 
-#: api/classes/CTemplate.php:519 api/classes/CTemplate.php:867
+#: api/classes/CTemplate.php:521 api/classes/CTemplate.php:874
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在します。"
 
-#: api/classes/CHost.php:844
+#: api/classes/CHost.php:846
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "同じ表示名\"%s\"を持つテンプレートがすでに存在します"
@@ -13416,7 +13400,7 @@ msgstr "受信したJSONは正しくないJSON-RPCリクエストです。"
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "受信したリモートプロシージャーは存在しないか利用することができません。"
 
-#: api/classes/CHttpTest.php:573
+#: api/classes/CHttpTest.php:574
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "ウェブシナリオが設定されているホストと異なるホストに所属するアプリケーションが利用されています。"
 
@@ -13476,7 +13460,7 @@ msgstr "木曜"
 msgid "Till"
 msgstr "終了"
 
-#: events.php:507 events.php:516 events.php:583 events.php:596
+#: events.php:457 events.php:466 events.php:533 events.php:546
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
 #: include/actions.inc.php:925 include/blocks.inc.php:941
@@ -13641,8 +13625,8 @@ msgstr "トレンド"
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:103 jsLoader.php:148
-#: jsLoader.php:215 report5.php:60 services.php:468 tr_comments.php:75
-#: tr_logform.php:152 tr_logform.php:165
+#: jsLoader.php:215 report5.php:60 services.php:468 tr_logform.php:152
+#: tr_logform.php:165
 msgid "Trigger"
 msgstr "トリガー"
 
@@ -14094,8 +14078,8 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 msgid "Units"
 msgstr "単位"
 
-#: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:957 httpdetails.php:168 httpmon.php:170
+#: events.php:481 events.php:482 events.php:492 events.php:493 events.php:494
+#: events.php:495 hosts.php:957 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14346,7 +14330,7 @@ msgstr "更新: \"%2$s\"のトリガー\"%1$s\"。"
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
-#: api/classes/managers/CHttpTestManager.php:264
+#: api/classes/managers/CHttpTestManager.php:282
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のウェブシナリオ\"%1$s\"。"
@@ -14401,10 +14385,11 @@ msgstr "アクションで利用"
 msgid "User"
 msgstr "ユーザー"
 
-#: api/classes/CUser.php:338
+#: api/classes/CUserGroup.php:518 api/classes/CUserGroup.php:707
+#: api/classes/CUser.php:339
 #, c-format
-msgid "User \"%s\" cannot be without user group."
-msgstr "ユーザー\"%s\"にユーザーグループを設定してください。"
+msgid "User \"%1$s\" cannot be without user group."
+msgstr ""
 
 #: users.php:248
 msgid "User added"
@@ -14414,7 +14399,7 @@ msgstr "ユーザーを追加しました"
 msgid "User can't change type for himself"
 msgstr "ユーザーは自身のユーザータイプを変更できません"
 
-#: api/classes/CUserGroup.php:462
+#: api/classes/CUserGroup.php:465
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
@@ -14444,17 +14429,12 @@ msgstr "ユーザーを削除しました"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: api/classes/CUserGroup.php:685
-#, c-format
-msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr "ユーザーグループ\"%1$s\"はユーザー\"%2$s\"が所属する唯一のグループです。"
-
-#: api/classes/CUserGroup.php:668
+#: api/classes/CUserGroup.php:686
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "ユーザーグループ\"%1$s\"はデータベース停止メッセージの設定に利用されています。"
 
-#: api/classes/CUserGroup.php:657
+#: api/classes/CUserGroup.php:675
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
@@ -14490,16 +14470,16 @@ msgstr "データベース停止メッセージ\"%1$s\"の送信先グループ�
 msgid "User groups"
 msgstr "ユーザーグループ"
 
-#: api/classes/CUser.php:1376
+#: api/classes/CUser.php:1378
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
 
-#: api/classes/CUser.php:351
+#: api/classes/CUser.php:353
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のWebインターフェースへのアクセス設定を変更することはできません。"
 
-#: api/classes/CUser.php:355
+#: api/classes/CUser.php:357
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のシステムステータスを変更することはできません。"
@@ -14547,7 +14527,7 @@ msgstr "ユーザーの種類"
 msgid "User updated"
 msgstr "ユーザーを更新しました"
 
-#: api/classes/CUser.php:400
+#: api/classes/CUser.php:402
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "アカウント名\"%s\"を持つユーザーがすでに存在します。"
@@ -14938,7 +14918,7 @@ msgstr "仮想メモリステータス。"
 msgid "Visible name"
 msgstr "表示名"
 
-#: api/classes/CHost.php:771
+#: api/classes/CHost.php:773
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "ホスト名を設定しない場合、表示名は必須項目です。"
 
@@ -14976,13 +14956,13 @@ msgstr "ウェブ"
 msgid "Web monitoring"
 msgstr "ウェブ監視"
 
-#: api/classes/managers/CHttpTestManager.php:383
-#: api/classes/managers/CHttpTestManager.php:391
+#: api/classes/managers/CHttpTestManager.php:401
+#: api/classes/managers/CHttpTestManager.php:409
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "ウェブシナリオ\"%1$s\"はホスト\"%2$s\"にすでに存在します。"
 
-#: api/classes/CHttpTest.php:480 api/classes/CHttpTest.php:529
+#: api/classes/CHttpTest.php:481 api/classes/CHttpTest.php:530
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "ウェブシナリオ\"%1$s\"はすでに存在します。"
@@ -15001,29 +14981,29 @@ msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "ウェブシナリオを有効にしました"
 
-#: api/classes/CHttpTest.php:473 api/classes/CHttpTest.php:510
+#: api/classes/CHttpTest.php:474 api/classes/CHttpTest.php:511
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr "ウェブシナリオに%1$sが設定されていません"
 
-#: api/classes/CHttpTest.php:595
+#: api/classes/CHttpTest.php:596
 msgid "Web scenario must have at least one step."
 msgstr "ウェブシナリオは少なくとも1つ以上のステップが設定されている必要があります。"
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:639
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr "ウェブシナリオにステップ\"%1$s\"がすでに存在します。"
 
-#: api/classes/CHttpTest.php:618
+#: api/classes/CHttpTest.php:619
 msgid "Web scenario step URL cannot be empty."
 msgstr "ウェブシナリオのステップのURLが設定されていません。"
 
-#: api/classes/CHttpTest.php:613
+#: api/classes/CHttpTest.php:614
 msgid "Web scenario step name cannot be empty."
 msgstr "ウェブシナリオのステップ名が設定されていません。"
 
-#: api/classes/CHttpTest.php:622
+#: api/classes/CHttpTest.php:623
 msgid "Web scenario step number cannot be less than 1."
 msgstr "ウェブシナリオのステップ数は1以下にはできません。"
 
@@ -15173,7 +15153,7 @@ msgstr "メディアタイプの設定が正しくありません。"
 msgid "Wrong fields for proxy \"%1$s\"."
 msgstr "プロキシ\"%1$s\"の設定が正しくありません。"
 
-#: api/classes/CScript.php:405
+#: api/classes/CScript.php:417
 msgid "Wrong fields for script."
 msgstr "スクリプトの設定が正しくありません。"
 
@@ -15300,7 +15280,7 @@ msgstr "年"
 msgid "Yearly"
 msgstr "毎年"
 
-#: events.php:839 include/blocks.inc.php:767
+#: events.php:789 include/blocks.inc.php:767
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2442
 #: include/triggers.inc.php:1604
@@ -15317,7 +15297,7 @@ msgstr "ヨタ"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
-#: api/classes/CUser.php:367
+#: api/classes/CUser.php:369
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "ユーザー\"%s\"の権限変更は許可されていません。"
@@ -15349,15 +15329,14 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "アクションのグローバルスクリプト\"%s\"のターゲットが指定されていません。"
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1030 api/classes/CHost.php:1087
-#: api/classes/CHost.php:1403 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1040 api/classes/CHost.php:1101
+#: api/classes/CHost.php:1420 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:551 api/classes/CMaintenance.php:670
-#: api/classes/CMaintenance.php:682 api/classes/CScript.php:300
-#: api/classes/CScript.php:397 api/classes/CScript.php:437
-#: api/classes/CScript.php:500 api/classes/CTemplate.php:480
-#: api/classes/CTemplate.php:580 api/classes/CTemplate.php:641
-#: api/classes/CTemplate.php:791 api/classes/CTemplate.php:836
-#: api/classes/CTemplate.php:1115
+#: api/classes/CMaintenance.php:682 api/classes/CScript.php:409
+#: api/classes/CScript.php:449 api/classes/CScript.php:512
+#: api/classes/CTemplate.php:482 api/classes/CTemplate.php:582
+#: api/classes/CTemplate.php:643 api/classes/CTemplate.php:793
+#: api/classes/CTemplate.php:842 api/classes/CTemplate.php:1122
 msgid "You do not have permission to perform this operation."
 msgstr "操作に対する権限がありません。"
 
@@ -15620,8 +15599,8 @@ msgstr "Y/m/d H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:123
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:715
-#: tr_status.php:833
+#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:716
+#: tr_status.php:834
 msgid "d M Y H:i:s"
 msgstr "Y/m/d H:i:s"
 
