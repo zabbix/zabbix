@@ -970,10 +970,15 @@ static int	write_all(int fd, const void *buf, size_t n)
 {
 	ssize_t	ret;
 
-	while (0 < n && -1 != (ret = write(fd, buf, n)))
+	while (0 < n)
 	{
-		buf += ret;
-		n -= ret;
+		if (-1 != (ret = write(fd, buf, n)))
+		{
+			buf += ret;
+			n -= ret;
+		}
+		else if (EINTR != errno)
+			break;
 	}
 
 	return 0 < n ? FAIL : SUCCEED;
