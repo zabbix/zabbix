@@ -25,6 +25,7 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
@@ -292,6 +293,7 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
@@ -1858,6 +1860,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 
 --------------------------------------------------------------------------------
