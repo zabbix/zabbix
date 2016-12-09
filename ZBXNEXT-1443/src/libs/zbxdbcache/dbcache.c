@@ -1810,6 +1810,9 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 			continue;
 
+		if (ITEM_VALUE_TYPE_LOG != h->value_type)
+			continue;
+
 		if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			zbx_log_value_t *log = h->value.log;
