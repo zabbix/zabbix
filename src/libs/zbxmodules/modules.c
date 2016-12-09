@@ -248,7 +248,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	module_tmp.lib = lib;
 	if (FAIL != zbx_vector_ptr_search(&modules, &module_tmp, zbx_module_compare_func))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already beed loaded", name);
+		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already been loaded", name);
 		return SUCCEED;
 	}
 
