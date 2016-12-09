@@ -9707,7 +9707,7 @@ Changes for 1.0alpha12:
  - added support for memory[free], memory[total] and memory[shared] for FreeBSD (Alexei)
  - minor fixes in doc/manual.txt (Alexei)
  - minor fixes in INSTALL (Alexei)
- - added support for check_port[*], which tries to connect to the port (Aelxei)
+ - added support for check_port[*], which tries to connect to the port (Alexei)
  - new type of parameters: parameter[*], actual value of "*" can be passed from Zabbix server (Alexei)
  - zabbix_agentd will lower scheduling priority to 5 (Alexei)
  - fixed broken customized graphs, file chart2.html (Alexei)
