@@ -485,7 +485,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'params' => getRequest('params'),
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
 			'data_type' => getRequest('data_type'),
-			'applications' => $applications,
 			'inventory_link' => getRequest('inventory_link')
 		];
 
@@ -507,9 +506,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
 
+			// compare applications
+			natsort($dbItem['applications']);
+			natsort($applications);
+			if (array_values($dbItem['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
 			$result = API::Item()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+
 			$result = API::Item()->create($item);
 		}
 	}
