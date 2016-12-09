@@ -1299,6 +1299,38 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: write_all                                                        *
+ *                                                                            *
+ * Purpose: call write in a loop, iterating until all the data is written.    *
+ *                                                                            *
+ * Parameters: fd      - [IN] descriptor                                      *
+ *             buf     - [IN] buffer to write                                 *
+ *             n       - [IN] bytes count to write                            *
+ *                                                                            *
+ * Return value: SUCCEED - n bytes successfully written                       *
+ *               FAIL    - less than n bytes are written                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	write_all(int fd, const void *buf, size_t n)
+{
+	ssize_t	ret;
+
+	while (0 < n)
+	{
+		if (-1 != (ret = write(fd, buf, n)))
+		{
+			buf += ret;
+			n -= ret;
+		}
+		else if (EINTR != errno)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
  * Purpose: execute metric in a separate process/thread so it can be          *
@@ -1357,14 +1389,14 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		ret = metric_func(request, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		write(fds[1], data, data_offset);
+		ret = write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);
 
 		close(fds[1]);
 
-		exit(0);
+		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	close(fds[1]);
@@ -1413,6 +1445,11 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
 			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+		}
+		else if (EXIT_SUCCESS != WEXITSTATUS(status))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
