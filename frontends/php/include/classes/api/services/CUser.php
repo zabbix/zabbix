@@ -1549,7 +1549,7 @@ class CUser extends CApiService {
 				$usrgrps['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-				$users_status = GROUP_STATUS_DISABLED;
+				$usrgrps['users_status'] = GROUP_STATUS_DISABLED;
 			}
 			if ($db_usrgrp['gui_access'] > $usrgrps['gui_access']) {
 				$usrgrps['gui_access'] = $db_usrgrp['gui_access'];
