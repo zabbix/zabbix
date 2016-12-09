@@ -646,7 +646,7 @@ Changes for 3.0.1rc1
 
 Bug fixes:
 A......... [ZBX-10399] fixed "undefined index" errors with broken value maps (Sasha)
-.......PS. [ZBX-10415] fixed host availabilty update errors on Oracle database (wiper)
+.......PS. [ZBX-10415] fixed host availability update errors on Oracle database (wiper)
 ..F....... [ZBX-10398] fixed misplaced "Edit screen" and "Edit slide show" buttons when screen is having dynamic elements (Ivo)
 .......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 ..F....... [ZBX-10341] fixed template screen import (Oleg)
@@ -9075,7 +9075,7 @@ Changes for 1.0beta13:
  - deleted host to be renamed to "<host> [DELETED]" (Alexei)
  - added function now() (Alexei)
  - fixed action maintenance screen (Alexei)
- - redesigned availablity chart (Alexei)
+ - redesigned availability chart (Alexei)
  - support for zabbix[trends] (Alexei)
  - added table 'trends' (Alexei)
  - cosmetic changes for IT Services screen (Alexei)
