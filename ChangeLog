@@ -9506,7 +9506,7 @@ Changes for 1.0beta4:
  - support for --enable-static for ./configure (Alexei)
  - housekeeping period for alarms and alerts to be set in days (Alexei)
  - created directory upgrades/dbpatches/1.0beta3_to_1.0beta4 (Alexei)
- - more anvanced algorithm for updating disable_until field (Alexei)
+ - more advanced algorithm for updating disable_until field (Alexei)
  - problem with "Lost connection to DB" solved (Alexei)
  - function DBis_empty(), code cleanup (Alexei)
  - unreachable parameters will not be shown in Queue (Alexei)
