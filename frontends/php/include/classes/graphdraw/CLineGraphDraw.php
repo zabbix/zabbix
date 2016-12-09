@@ -1439,7 +1439,7 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ($sub_interval == SEC_PER_MONTH * 6) {
 				// First step calculation.
 				if ($i == 0) {
-					// If month > July, then chanage it to 1st of January of the next year.
+					// If month > July, then change it to 1st of January of the next year.
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
@@ -1464,7 +1464,7 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ($sub_interval == SEC_PER_MONTH * 4) {
 				// First step calculation.
 				if ($i == 0) {
-					// If month > September, then chanage it to 1st of January of the next year.
+					// If month > September, then change it to 1st of January of the next year.
 					if (date('m', $this->stime) > 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
