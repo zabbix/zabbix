@@ -3024,7 +3024,7 @@ A.F.I..PS. [ZBXNEXT-1633] implemented host prototypes (Pavels, Sasha)
 Bug fixes:
 .......P.. [ZBX-6936] fixed MySQL errors when updating configuration of the proxy (Sasha)
 .......P.. [ZBX-6929] fixed updating of lastlogsize and mtime in the proxy's database (Sasha)
-....I..... [ZBX-6890] added missing indexes in child-tables for foreign key contraints, rename some indexes to meet naming convention (Andris)
+....I..... [ZBX-6890] added missing indexes in child-tables for foreign key constraints, rename some indexes to meet naming convention (Andris)
 ..F....... [ZBX-6887] allowed to translate "Internal" in a different way in authentication, event and user context (Eduard)
 A......... [ZBX-6124] removed unused API methods (Eduard)
 ..F....... [ZBX-6927] improved validation messages (Eduard)
