@@ -76,7 +76,7 @@ jQuery(function($) {
 		window.setTimeout(checkStatus, checker.timeout);
 	}
 
-	// start server status checks with 5 sec dealy after page is loaded
+	// start server status checks with 5 sec delay after page is loaded
 	window.setTimeout(function() {
 		checkStatus(true);
 	}, 5000);
