@@ -145,7 +145,7 @@ class CControllerAcknowledgeCreate extends CController {
 
 		/*
 		 * There might be nothing more to acknowledge since previous action closed all the events. This will also
-		 * acknowlege only selected events in case there is no need to close the events.
+		 * acknowledge only selected events in case there is no need to close the events.
 		 */
 		if ($result && $eventids_to_ack) {
 			$result = API::Event()->acknowledge([
