@@ -334,10 +334,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 void	zbx_string_replace_realloc(char **str, const char *search, const char *replace_to)
 {
 	const char	*haystack = *str, *substring;
-	size_t		l, r, len;
-
-	if(NULL == *str || NULL == search || NULL == replace_to || 0 == (len = strlen(search)))
-		return;
+	size_t		l, r, len = strlen(search);
 
 	while (NULL != (substring = strstr(haystack, search)))
 	{
