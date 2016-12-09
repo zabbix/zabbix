@@ -281,7 +281,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
 
 						$sql = "SELECT h.hostid FROM hosts h, interface i WHERE h.host='$name' AND h.status=$mode and h.hostid=i.hostid and i.port='$port' and i.dns='$dns' and i.ip='$ip' and i.main=".INTERFACE_PRIMARY;
-						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Interface was not linked correcty to proxy');
+						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Interface was not linked correctly to proxy');
 						break;
 				}
 				break;
