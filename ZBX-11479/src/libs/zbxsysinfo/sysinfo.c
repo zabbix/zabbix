@@ -965,6 +965,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *                                                                            *
  * Return value: SUCCEED - n bytes successfully written                       *
  *               FAIL    - less than n bytes are written                      *
+ *                                                                            *
  ******************************************************************************/
 static int	write_all(int fd, const void *buf, size_t n)
 {
@@ -978,10 +979,10 @@ static int	write_all(int fd, const void *buf, size_t n)
 			n -= ret;
 		}
 		else if (EINTR != errno)
-			break;
+			return FAIL;
 	}
 
-	return 0 < n ? FAIL : SUCCEED;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1033,7 +1034,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (0 == pid)
 	{
-		int	exit_status;
 		zabbix_log(LOG_LEVEL_DEBUG, "executing in data process for cmd:'%s'", cmd);
 
 		signal(SIGILL, SIG_DFL);
@@ -1046,17 +1046,14 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		ret = metric_func(cmd, param, flags, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		if (SUCCEED == write_all(fds[1], data, data_offset))
-			exit_status = EXIT_SUCCESS;
-		else
-			exit_status = EXIT_FAILURE;
+		ret = write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);
 
 		close(fds[1]);
 
-		exit(exit_status);
+		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	close(fds[1]);
