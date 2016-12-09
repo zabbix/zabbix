@@ -7032,7 +7032,7 @@ Changes for 1.6.6
  - [ZBX-824] fixed net.tcp.service to work with host DNS name (Alexei)
  - [ZBX-967] cosmetic changes in --help output of zabbix_get and zabbix_sender (Alexei)
  - [ZBX-898] fixed slow performance of events component on a screen (Alexei)
- - [ZBX-920] addedd missing indexes to DB upgrade patch for 1.6 (Alexei)
+ - [ZBX-920] added missing indexes to DB upgrade patch for 1.6 (Alexei)
  - [ZBX-854] added support of template triggers for actions (Alexei)
  - [ZBX-916] phrase 'delete selected' replaced by translatable S_DELETE_SELECTED (Alexei)
  - [ZBX-960] fixed confirmation questions in Configuration->Hosts->Host groups (Alexei)
