@@ -4088,7 +4088,7 @@ A.F....... [ZBX-5648] fixed problems with "templateid" in API; added check for "
 ..F....... [ZBX-5665] fixed LLD created triggers not being deleted when related trigger prototype is deleted (Vedmak)
 ...G...... [ZBX-5661] fixed keys "vfs.dev.read" and "vfs.dev.write" with "ops" and "sps" parameters on Linux and FreeBSD (Andris)
 ...G...... [ZBX-5614] fixed agent compiling problem on OpenBSD 5.1 (Andris)
-........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" autentication (Sasha)
+........S. [ZBX-5674] fixed execution of actions with SSH commands with "Public key" authentication (Sasha)
 A......... [ZBX-5656] fixed timeperiod validation (Eduard)
 ..F....... [ZBX-5660] fixed expression constructor exp labels style (Eduard)
 ..F....... [ZBX-3204] changed generating and reading algorithm for trigger expression condition functions, and fixed English translation (Oleg)
