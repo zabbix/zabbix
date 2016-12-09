@@ -59,7 +59,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 			$this->zbxTestAssertElementPresentId('snmptrap_logging');
 			$this->zbxTestAssertElementPresentId('default_inventory_mode');
 
-			// ckecking presence of drop-down elements
+			// checking presence of drop-down elements
 			$this->zbxTestAssertElementPresentId('discovery_groupid');
 			$this->zbxTestAssertElementPresentId('alert_usrgrpid');
 		}
