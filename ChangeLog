@@ -8206,7 +8206,7 @@ Integrated from 1.1.x
  - improved macro variables substitution in message body/subject (Eugene)
  - fixed order of displaying log files (Eugene)
  - added support of 'pfree' and 'pused' for 'vfs.fs.size' of windows (Eugene)
- - added '<=' comporator for trigger severity of action conditions (Eugene)
+ - added '<=' comparator for trigger severity of action conditions (Eugene)
  - fixed problem with escape characters in triggers (Eugene)
  - fixed 'system.cpu.util[*]' for Tru64 (Eugene)
  - disabled exit code handling of UserParameter scripts (Eugene)
