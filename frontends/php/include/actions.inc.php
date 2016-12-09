@@ -84,7 +84,7 @@ function discovery_object2str($object = null) {
  *
  * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
  * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
- * For other action condition types values are returned as they are or converted using simple string convertion
+ * For other action condition types values are returned as they are or converted using simple string conversion
  * functions according to action condition type.
  *
  * @param array $actions							array of actions
