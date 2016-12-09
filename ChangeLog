@@ -5959,7 +5959,7 @@ Changes for 1.8.4rc1
  - [ZBX-1425] option ALL is added to host group dropdown when adding or editing host group (KB)
  - [ZBX-1675] fixed map element coordinates do not update after the element has been dragged (Vedmak)
  - [ZBX-1292] item names are now prefixed with host names, if they are from different hosts in trigger description popup (KB)
- - [ZBX-2844] added HTML escaping of screen names in combox box output in monitoring (KB)
+ - [ZBX-2844] added HTML escaping of screen names in combo box output in monitoring (KB)
  - [ZBXNEXT-373] added support for NTLM authentication to Web monitoring (asaveljevs,Vedmak)
  - [ZBX-1486] when multiple map elements are selected, pressing "Remove" in editing form removes all selected elements (KB)
  - [ZBX-1442] when linking objects during map editing, link "apply" does not close the form any more (KB)
