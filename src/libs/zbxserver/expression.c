@@ -185,35 +185,34 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: extract_numbers                                                  *
+ * Function: extract_number                                                   *
  *                                                                            *
- * Purpose: Extract from string numbers with prefixes (A-Z)                   *
+ * Purpose: Extract from string number with prefix (A-Z)                      *
  *                                                                            *
- * Return value:                                                              *
+ * Parameters: str - [IN/OUT] null terminated trigger expression              *
+ *                            will set pointer after number                   *
+ *             len - [OUT]    length of number at returned position           *
+ *                                                                            *
+ * Return value: pointer to number position                                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           Use zbx_free_numbers to free allocated memory                    *
  *                                                                            *
  ******************************************************************************/
-static char 	**extract_numbers(const char *str, int *count)
+static const char	*extract_number(const char **str, size_t *len)
 {
-	char		**result = NULL;
-	const char	*s, *e;
+	const char	*s, *e, *number_pos = NULL;
 	int		dot_found;
-	size_t		len;
 
-	assert(count);
+	*len = 0;
 
-	*count = 0;
-
-	for (s = str; '\0' != *s && *count < 9; s++)	/* find start of number */
+	for (s = *str; '\0' != *s; s++)	/* find start of number */
 	{
 		if (!isdigit(*s))
 			continue;
 
-		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		if (s != *str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 		{
 			/* skip functions '{65432}' */
 			s = e;
@@ -240,31 +239,17 @@ static char 	**extract_numbers(const char *str, int *count)
 		}
 
 		/* number found */
+		number_pos = s;
+		*len = e - s;
+		s = e;
 
-		len = e - s;
-		(*count)++;
-		result = zbx_realloc(result, sizeof(char *) * (*count));
-		result[(*count) - 1] = zbx_malloc(NULL, len + 1);
-		memcpy(result[(*count) - 1], s, len);
-		result[(*count) - 1][len] = '\0';
+		break;
 
-		if ('\0' == *(s = e))
-			break;
 	}
-	return result;
-}
 
-static void	zbx_free_numbers(char ***numbers, int count)
-{
-	int	i;
+	*str = s;
 
-	if (NULL == numbers || NULL == *numbers)
-		return;
-
-	for (i = 0; i < count; i++)
-		zbx_free((*numbers)[i]);
-
-	zbx_free(*numbers);
+	return number_pos;
 }
 
 /******************************************************************************
@@ -278,18 +263,33 @@ static void	zbx_free_numbers(char ***numbers, int count)
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char	**numbers = NULL, replace[3] = "$0";
-	int	numbers_cnt = 0, i = 0;
-
-	numbers = extract_numbers(expression, &numbers_cnt);
+	char		*number, replace[3] = "$0";
+	const char	*number_pos;
+	int		numbers_cnt = 0, i = 0;
+	size_t		len;
 
 	for (i = 0; i < 9; i++)
 	{
 		replace[1] = '0' + i + 1;
-		zbx_string_replace_realloc(data, replace, i < numbers_cnt ?  numbers[i] : "");
-	}
 
-	zbx_free_numbers(&numbers, numbers_cnt);
+		if (NULL != strstr(*data, replace))	/* at least one occurrence */
+		{
+			while (i >= numbers_cnt && NULL != (number_pos = extract_number(&expression, &len)))
+				numbers_cnt++;
+
+			if (i < numbers_cnt)
+			{
+				number = zbx_malloc(NULL, len + 1);
+				memcpy(number, number_pos, len);
+				number[len] = '\0';
+
+				zbx_string_replace_realloc(data, replace, number);
+				zbx_free(number);
+			}
+			else
+				zbx_string_replace_realloc(data, replace, "");
+		}
+	}
 }
 
 static void	DCexpand_trigger_expression(char **expression)
