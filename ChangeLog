@@ -3,6 +3,7 @@ Changes for 2.0.21rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.20
