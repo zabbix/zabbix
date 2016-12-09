@@ -963,8 +963,10 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *             buf     - [IN] buffer to write                                 *
  *             n       - [IN] bytes count to write                            *
  *                                                                            *
+ * Return value: SUCCEED - n bytes successfully written                       *
+ *               FAIL    - less than n bytes are written                      *
  ******************************************************************************/
-static void	write_all(int fd, const void *buf, size_t n)
+static int	write_all(int fd, const void *buf, size_t n)
 {
 	ssize_t	ret;
 
@@ -973,6 +975,8 @@ static void	write_all(int fd, const void *buf, size_t n)
 		buf += ret;
 		n -= ret;
 	}
+
+	return 0 < n ? FAIL : SUCCEED;
 }
 
 /******************************************************************************
@@ -1024,6 +1028,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 
 	if (0 == pid)
 	{
+		int	exit_status;
 		zabbix_log(LOG_LEVEL_DEBUG, "executing in data process for cmd:'%s'", cmd);
 
 		signal(SIGILL, SIG_DFL);
@@ -1036,14 +1041,17 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		ret = metric_func(cmd, param, flags, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		write_all(fds[1], data, data_offset);
+		if (SUCCEED == write_all(fds[1], data, data_offset))
+			exit_status = EXIT_SUCCESS;
+		else
+			exit_status = EXIT_FAILURE;
 
 		zbx_free(data);
 		free_result(result);
 
 		close(fds[1]);
 
-		exit(0);
+		exit(exit_status);
 	}
 
 	close(fds[1]);
@@ -1092,6 +1100,11 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, const char *cmd, 
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
 			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+		}
+		else if (EXIT_SUCCESS != WEXITSTATUS(status))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
