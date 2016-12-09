@@ -3861,7 +3861,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		error = zbx_dsprintf(error, "dannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
