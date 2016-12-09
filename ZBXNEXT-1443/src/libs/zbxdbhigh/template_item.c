@@ -57,10 +57,7 @@ typedef struct
 	int		trends;
 	unsigned char	type;
 	unsigned char	value_type;
-	unsigned char	data_type;
 	unsigned char	status;
-	unsigned char	multiplier;
-	unsigned char	delta;
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
@@ -153,8 +150,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	DBget_interfaces_by_hostid(hostid, interfaceids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.data_type,ti.delay,ti.delay_flex,"
-				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,ti.multiplier,ti.delta,"
+			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.delay,ti.delay_flex,"
+				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,"
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
@@ -176,21 +173,18 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UINT64(item->templateid, row[0]);
 		ZBX_STR2UCHAR(item->type, row[3]);
 		ZBX_STR2UCHAR(item->value_type, row[4]);
-		ZBX_STR2UCHAR(item->data_type, row[5]);
-		item->delay = atoi(row[6]);
-		item->history = atoi(row[8]);
-		item->trends = atoi(row[9]);
-		ZBX_STR2UCHAR(item->status, row[10]);
-		ZBX_STR2UCHAR(item->multiplier, row[13]);
-		ZBX_STR2UCHAR(item->delta, row[14]);
-		ZBX_DBROW2UINT64(item->valuemapid, row[17]);
-		ZBX_STR2UCHAR(item->snmpv3_securitylevel, row[23]);
-		ZBX_STR2UCHAR(item->snmpv3_authprotocol, row[24]);
-		ZBX_STR2UCHAR(item->snmpv3_privprotocol, row[26]);
-		ZBX_STR2UCHAR(item->authtype, row[28]);
-		ZBX_STR2UCHAR(item->flags, row[33]);
-		ZBX_STR2UCHAR(item->inventory_link, row[35]);
-		ZBX_STR2UCHAR(item->evaltype, row[39]);
+		item->delay = atoi(row[5]);
+		item->history = atoi(row[7]);
+		item->trends = atoi(row[8]);
+		ZBX_STR2UCHAR(item->status, row[9]);
+		ZBX_DBROW2UINT64(item->valuemapid, row[14]);
+		ZBX_STR2UCHAR(item->snmpv3_securitylevel, row[20]);
+		ZBX_STR2UCHAR(item->snmpv3_authprotocol, row[21]);
+		ZBX_STR2UCHAR(item->snmpv3_privprotocol, row[23]);
+		ZBX_STR2UCHAR(item->authtype, row[25]);
+		ZBX_STR2UCHAR(item->flags, row[30]);
+		ZBX_STR2UCHAR(item->inventory_link, row[32]);
+		ZBX_STR2UCHAR(item->evaltype, row[36]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -210,31 +204,31 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		}
 
 		item->name = zbx_strdup(NULL, row[1]);
-		item->delay_flex = zbx_strdup(NULL, row[7]);
-		item->trapper_hosts = zbx_strdup(NULL, row[11]);
-		item->units = zbx_strdup(NULL, row[12]);
-		item->formula = zbx_strdup(NULL, row[15]);
-		item->logtimefmt = zbx_strdup(NULL, row[16]);
-		item->params = zbx_strdup(NULL, row[18]);
-		item->ipmi_sensor = zbx_strdup(NULL, row[19]);
-		item->snmp_community = zbx_strdup(NULL, row[20]);
-		item->snmp_oid = zbx_strdup(NULL, row[21]);
-		item->snmpv3_securityname = zbx_strdup(NULL, row[22]);
-		item->snmpv3_authpassphrase = zbx_strdup(NULL, row[25]);
-		item->snmpv3_privpassphrase = zbx_strdup(NULL, row[27]);
-		item->username = zbx_strdup(NULL, row[29]);
-		item->password = zbx_strdup(NULL, row[30]);
-		item->publickey = zbx_strdup(NULL, row[31]);
-		item->privatekey = zbx_strdup(NULL, row[32]);
-		item->description = zbx_strdup(NULL, row[34]);
-		item->lifetime = zbx_strdup(NULL, row[36]);
-		item->snmpv3_contextname = zbx_strdup(NULL, row[37]);
-		item->port = zbx_strdup(NULL, row[40]);
+		item->delay_flex = zbx_strdup(NULL, row[6]);
+		item->trapper_hosts = zbx_strdup(NULL, row[10]);
+		item->units = zbx_strdup(NULL, row[11]);
+		item->formula = zbx_strdup(NULL, row[12]);
+		item->logtimefmt = zbx_strdup(NULL, row[13]);
+		item->params = zbx_strdup(NULL, row[15]);
+		item->ipmi_sensor = zbx_strdup(NULL, row[16]);
+		item->snmp_community = zbx_strdup(NULL, row[17]);
+		item->snmp_oid = zbx_strdup(NULL, row[18]);
+		item->snmpv3_securityname = zbx_strdup(NULL, row[19]);
+		item->snmpv3_authpassphrase = zbx_strdup(NULL, row[22]);
+		item->snmpv3_privpassphrase = zbx_strdup(NULL, row[24]);
+		item->username = zbx_strdup(NULL, row[26]);
+		item->password = zbx_strdup(NULL, row[27]);
+		item->publickey = zbx_strdup(NULL, row[28]);
+		item->privatekey = zbx_strdup(NULL, row[29]);
+		item->description = zbx_strdup(NULL, row[31]);
+		item->lifetime = zbx_strdup(NULL, row[33]);
+		item->snmpv3_contextname = zbx_strdup(NULL, row[34]);
+		item->port = zbx_strdup(NULL, row[37]);
 
-		if (SUCCEED != DBis_null(row[38]))
+		if (SUCCEED != DBis_null(row[35]))
 		{
 			item->key = NULL;
-			ZBX_STR2UINT64(item->itemid, row[38]);
+			ZBX_STR2UINT64(item->itemid, row[35]);
 		}
 		else
 		{
@@ -488,7 +482,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
  *              rules  - [IN] the ldd rule mapping                            *
  *                                                                            *
  ******************************************************************************/
-void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
+static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
@@ -541,7 +535,6 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				" set name='%s',"
 					"type=%d,"
 					"value_type=%d,"
-					"data_type=%d,"
 					"delay=%d,"
 					"delay_flex='%s',"
 					"history=%d,"
@@ -549,8 +542,6 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					"status=%d,"
 					"trapper_hosts='%s',"
 					"units='%s',"
-					"multiplier=%d,"
-					"delta=%d,"
 					"formula='%s',"
 					"logtimefmt='%s',"
 					"valuemapid=%s,"
@@ -580,9 +571,9 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					"port='%s'"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type,
-				(int)item->data_type, item->delay, delay_flex_esc,
+				item->delay, delay_flex_esc,
 				item->history, item->trends, (int)item->status, trapper_hosts_esc,
-				units_esc, (int)item->multiplier, (int)item->delta, formula_esc,
+				units_esc, formula_esc,
 				logtimefmt_esc, DBsql_id_ins(item->valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc,
 				snmpv3_securityname_esc, (int)item->snmpv3_securitylevel,
@@ -632,8 +623,8 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	itemid = DBget_maxid_num("items", new_items);
 
 	zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
-			"data_type", "delay", "delay_flex", "history", "trends", "status", "trapper_hosts", "units",
-			"multiplier", "delta", "formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
+			"delay", "delay_flex", "history", "trends", "status", "trapper_hosts", "units",
+			"formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
 			"snmp_community", "snmp_oid", "snmpv3_securityname", "snmpv3_securitylevel",
 			"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol", "snmpv3_privpassphrase",
 			"authtype", "username", "password", "publickey", "privatekey", "templateid", "flags",
@@ -649,9 +640,9 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, itemid, item->name, item->key, hostid, (int)item->type,
-				(int)item->value_type, (int)item->data_type, item->delay, item->delay_flex,
+				(int)item->value_type, item->delay, item->delay_flex,
 				item->history, item->trends, (int)item->status, item->trapper_hosts, item->units,
-				(int)item->multiplier, (int)item->delta, item->formula, item->logtimefmt,
+				item->formula, item->logtimefmt,
 				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_community, item->snmp_oid,
 				item->snmpv3_securityname, (int)item->snmpv3_securitylevel,
 				(int)item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
@@ -811,7 +802,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
  * Parameters:  items   - [IN] the template items                             *
  *                                                                            *
  ******************************************************************************/
-void	save_template_item_applications(zbx_vector_ptr_t *items)
+static void	save_template_item_applications(zbx_vector_ptr_t *items)
 {
 	typedef struct
 	{
@@ -903,7 +894,7 @@ out:
  *              items   - [IN] the template items                             *
  *                                                                            *
  ******************************************************************************/
-void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
+static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 {
 	typedef struct
 	{
@@ -998,7 +989,7 @@ out:
  * Parameters:  item  - [IN] the template item                                *
  *                                                                            *
  ******************************************************************************/
-void	free_template_item(zbx_template_item_t *item)
+static void	free_template_item(zbx_template_item_t *item)
 {
 	zbx_free(item->port);
 	zbx_free(item->snmpv3_contextname);
@@ -1035,7 +1026,7 @@ void	free_template_item(zbx_template_item_t *item)
  * Parameters:  item  - [IN] the lld rule condition                           *
  *                                                                            *
  ******************************************************************************/
-void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
+static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
 {
 	zbx_free(condition->macro);
 	zbx_free(condition->value);
@@ -1051,7 +1042,7 @@ void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
  * Parameters:  item  - [IN] the lld rule mapping                             *
  *                                                                            *
  ******************************************************************************/
-void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
+static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
 	zbx_vector_ptr_clear_ext(&rule->conditions, (zbx_clean_func_t)free_lld_rule_condition);
 	zbx_vector_ptr_destroy(&rule->conditions);
@@ -1059,6 +1050,109 @@ void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 	zbx_vector_uint64_destroy(&rule->conditionids);
 
 	zbx_free(rule);
+}
+
+static zbx_hash_t	template_item_hash_func(const void *d)
+{
+	const zbx_template_item_t	*item = *(const zbx_template_item_t **)d;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&item->templateid);
+}
+
+static int	template_item_compare_func(const void *d1, const void *d2)
+{
+	const zbx_template_item_t	*item1 = *(const zbx_template_item_t **)d1;
+	const zbx_template_item_t	*item2 = *(const zbx_template_item_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item1->templateid, item2->templateid);
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: copy_template_items_preproc                                      *
+ *                                                                            *
+ * Purpose: copy template item preprocessing options                          *
+ *                                                                            *
+ * Parameters: templateids - [IN] array of template IDs                       *
+ *             items       - [IN] array of new/updated items                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
+{
+	zbx_vector_uint64_t		itemids;
+	zbx_hashset_t			items_t;
+	int				i;
+	const zbx_template_item_t	*item, **pitem;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_db_insert_t			db_insert;
+
+	if (0 == items->values_num)
+		return;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+
+	/* remove old item preprocessing options */
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (const zbx_template_item_t *)items->values[i];
+
+		if (NULL == item->key)
+			zbx_vector_uint64_append(&itemids, item->itemid);
+
+		zbx_hashset_insert(&items_t, &item, sizeof(item));
+	}
+
+	if (0 != itemids.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		DBexecute("%s", sql);
+		sql_offset = 0;
+	}
+
+	zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params", NULL);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ip.itemid,ip.step,ip.type,ip.params"
+				" from item_preproc ip,items ti"
+				" where ip.itemid=ti.itemid"
+				" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_template_item_t	item_local, *pitem_local = &item_local;
+
+		ZBX_STR2UINT64(item_local.templateid, row[0]);
+		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (*pitem)->itemid, atoi(row[1]), atoi(row[2]),
+				row[3]);
+
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(sql);
+	zbx_hashset_destroy(&items_t);
+	zbx_vector_uint64_destroy(&itemids);
 }
 
 /******************************************************************************
@@ -1097,6 +1191,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	save_template_lld_rules(&items, &lld_rules, new_conditions);
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
+	copy_template_items_preproc(templateids, &items);
 out:
 	zbx_vector_ptr_clear_ext(&lld_rules, (zbx_clean_func_t)free_lld_rule_map);
 	zbx_vector_ptr_destroy(&lld_rules);
