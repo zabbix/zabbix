@@ -1030,10 +1030,12 @@ static void	zbx_domain_closed_cb(void *cb_data)
 }
 
 /* callback function invoked from OpenIPMI */
-static void	zbx_setup_done_cb(ipmi_domain_t *domain, int err, unsigned int conn_num, unsigned int port_num,
+static void	zbx_connection_change_cb(ipmi_domain_t *domain, int err, unsigned int conn_num, unsigned int port_num,
 		int still_connected, void *cb_data)
 {
-	const char	*__function_name = "zbx_setup_done_cb";
+	/* this function is called when a connection comes up or goes down */
+
+	const char	*__function_name = "zbx_connection_change_cb";
 	int		ret;
 	zbx_ipmi_host_t	*h = cb_data;
 
@@ -1237,8 +1239,8 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
-	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_setup_done_cb, h, zbx_domain_up_cb, h, options,
-			ARRSIZE(options), NULL)))
+	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_connection_change_cb, h, zbx_domain_up_cb, h,
+			options, ARRSIZE(options), NULL)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. ipmi_open_domain() failed: %s",
 				h->ip, h->port, zbx_strerror(ret));
