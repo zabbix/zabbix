@@ -96,6 +96,9 @@ class CApiInputValidator {
 			case API_HG_NAME:
 				return self::validateHostGroupName($rule, $data, $path, $error);
 
+			case API_SCRIPT_NAME:
+				return self::validateScriptName($rule, $data, $path, $error);
+
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
 		}
@@ -125,6 +128,7 @@ class CApiInputValidator {
 			case API_FLAG:
 			case API_OBJECT:
 			case API_HG_NAME:
+			case API_SCRIPT_NAME:
 			case API_TIME_PERIOD:
 				return true;
 
@@ -510,6 +514,47 @@ class CApiInputValidator {
 		if (!$host_group_name_validator->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $host_group_name_validator->getError());
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Global script name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateScriptName($rule, &$data, $path, &$error) {
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$folders = splitPath($data);
+		$folders = array_map('trim', $folders);
+
+		// folder1/{empty}/name or folder1/folder2/{empty}
+		foreach ($folders as $folder) {
+			if ($folder === '') {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory or script name cannot be empty'));
+				return false;
+			}
 		}
 
 		return true;

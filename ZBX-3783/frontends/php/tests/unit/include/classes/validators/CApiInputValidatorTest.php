@@ -805,6 +805,61 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
 			],
 			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'Detect operating system',
+				'/1/name',
+				'Detect operating system'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'folder1/folder2\/',
+				'/1/name',
+				'folder1/folder2\/'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'Detect operating system+',
+				'/1/name',
+				'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/b/c/',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/'.'/c',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				null,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				// broken UTF-8 byte sequence
+				'Detect '."\xd1".'perating system',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_TIME_PERIOD, 'length' => 16],
 				'1-7,00:00-24:00',
 				'/1/period',

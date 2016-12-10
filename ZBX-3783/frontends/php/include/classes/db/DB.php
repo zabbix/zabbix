@@ -259,7 +259,13 @@ class DB {
 	 * @return int
 	 */
 	public static function getFieldLength($table_name, $field_name) {
+		global $DB;
+
 		$schema = self::getSchema($table_name);
+
+		if ($schema['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
+			return ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65536;
+		}
 
 		return $schema['fields'][$field_name]['length'];
 	}
