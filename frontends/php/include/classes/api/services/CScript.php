@@ -459,6 +459,8 @@ class CScript extends CApiService {
 		}
 		unset($db_script);
 
+		$uniq_names = [];
+
 		foreach ($names as $name) {
 			$name_orig = $name;
 
@@ -466,6 +468,11 @@ class CScript extends CApiService {
 			$name = implode('/', $folders);
 			array_pop($folders);
 			$path = implode('/', $folders);
+
+			if (array_key_exists($name, $uniq_names)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $name));
+			}
+			$uniq_names[$name] = true;
 
 			foreach ($db_scripts as $db_script) {
 				// check duplicate script names in same menu path
