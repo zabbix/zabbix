@@ -279,6 +279,7 @@ class CUserGroup extends CApiService {
 	 * Validates the input parameters for the update() method.
 	 *
 	 * @param array $usrgrps
+	 * @param array $db_usrgrps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

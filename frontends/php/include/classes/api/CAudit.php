@@ -69,6 +69,12 @@ class CAudit {
 				$table_name = 'groups';
 				break;
 
+			case AUDIT_RESOURCE_SCRIPT:
+				$field_name_resourceid = 'scriptid';
+				$field_name_resourcename = 'name';
+				$table_name = 'scripts';
+				break;
+
 			case AUDIT_RESOURCE_USER:
 				$field_name_resourceid = 'userid';
 				$field_name_resourcename = 'alias';

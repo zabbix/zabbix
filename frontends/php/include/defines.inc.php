@@ -992,7 +992,8 @@ define('API_IDS',			7);
 define('API_OBJECTS',		8);
 // specific types
 define('API_HG_NAME',		9);
-define('API_TIME_PERIOD',	10);
+define('API_SCRIPT_NAME',	10);
+define('API_TIME_PERIOD',	11);
 
 // flags
 define('API_REQUIRED',		0x01);
