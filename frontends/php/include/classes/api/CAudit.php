@@ -52,8 +52,8 @@ class CAudit {
 	 * @param array  $objects_old
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
-		$black_list = [
-			'users' => ['passwd']
+		$masked_fields = [
+			'users' => ['passwd' => true]
 		];
 
 		switch ($resourcetype) {
@@ -103,13 +103,6 @@ class CAudit {
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
 
-				// Removed blacklisted fields from updated data.
-				if (array_key_exists($table_name, $black_list)) {
-					foreach ($black_list[$table_name] as $field_name) {
-						unset($object[$field_name]);
-					}
-				}
-
 				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
 
 				if (!$object_diff) {
@@ -117,6 +110,12 @@ class CAudit {
 				}
 
 				foreach ($object_diff as $field_name => &$values) {
+					if (array_key_exists($table_name, $masked_fields)
+							&& array_key_exists($field_name, $masked_fields[$table_name])) {
+						$object_old[$field_name] = '********';
+						$object[$field_name] = '********';
+					}
+
 					$values = [
 						'old' => $object_old[$field_name],
 						'new' => $object[$field_name]
