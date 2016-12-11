@@ -99,6 +99,9 @@ class CApiInputValidator {
 			case API_SCRIPT_NAME:
 				return self::validateScriptName($rule, $data, $path, $error);
 
+			case API_USER_MACRO:
+				return self::validateUserMacro($rule, $data, $path, $error);
+
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
 		}
@@ -129,6 +132,7 @@ class CApiInputValidator {
 			case API_OBJECT:
 			case API_HG_NAME:
 			case API_SCRIPT_NAME:
+			case API_USER_MACRO:
 			case API_TIME_PERIOD:
 				return true;
 
@@ -555,6 +559,48 @@ class CApiInputValidator {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory or script name cannot be empty'));
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * User macro validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUserMacro($rule, &$data, $path, &$error) {
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if ($data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an user macro is expected'));
+			return false;
 		}
 
 		return true;

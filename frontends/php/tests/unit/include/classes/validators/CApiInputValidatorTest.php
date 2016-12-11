@@ -860,6 +860,61 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_USER_MACRO, 'length' => 8],
+				'{$MACRO}',
+				'/1/macro',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_USER_MACRO, 'length' => 19],
+				'{$MACRO: "context"}',
+				'/1/macro',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_USER_MACRO, 'length' => 18],
+				'{$MACRO: "context"}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": value is too long.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRo}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRO} ',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRO: "context"',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				[],
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				null,
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: '."\xd1".'ontext}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_TIME_PERIOD, 'length' => 16],
 				'1-7,00:00-24:00',
 				'/1/period',
