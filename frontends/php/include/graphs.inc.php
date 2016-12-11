@@ -106,7 +106,7 @@ function getGraphDims($graphid = null) {
 		return $graphDims;
 	}
 
-	// zoom featers
+	// zoom features
 	$dbGraphs = DBselect(
 		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
 		' FROM graphs g,graphs_items gi'.
