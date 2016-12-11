@@ -4718,7 +4718,7 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
  * Purpose: substitute lld macros in function macro parameters                *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
- *             token  - [IN/OUT] the token with funciton macro location data  *
+ *             token  - [IN/OUT] the token with function macro location data  *
  *             jp_row - [IN] discovery data                                   *
  *             error  - [OUT] error message                                   *
  *             max_error_len - [IN] the size of error buffer                  *
