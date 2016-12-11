@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,15 +18,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYAUTOREG_H
-#define ZABBIX_PROXYAUTOREG_H
 
-#include "comms.h"
-#include "zbxjson.h"
+/**
+ * Check if user has read permissions for host groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isReadableHostGroups(array $groupids) {
+	return count($groupids) == API::HostGroup()->get([
+		'countOutput' => true,
+		'groupids' => $groupids
+	]);
+}
 
-extern int	CONFIG_TIMEOUT;
-
-void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	send_areg_data(zbx_socket_t *sock);
-
-#endif
+/**
+ * Check if user has write permissions for host groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isWritableHostGroups(array $groupids) {
+	return count($groupids) == API::HostGroup()->get([
+		'countOutput' => true,
+		'groupids' => $groupids,
+		'editable' => true
+	]);
+}

@@ -103,7 +103,8 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
 
-#define ZBX_TCP_PROTOCOL	0x01
+#define ZBX_TCP_PROTOCOL		0x01
+#define ZBX_TCP_COMPONENT_VERSION	0x02
 
 #define ZBX_TCP_SEC_UNENCRYPTED		1		/* do not use encryption with this socket */
 #define ZBX_TCP_SEC_TLS_PSK		2		/* use TLS with pre-shared key (PSK) with this socket */
@@ -168,6 +169,9 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int 
 
 #define zbx_send_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, ZBX_TCP_PROTOCOL, timeout)
+
+#define zbx_send_proxy_response(sock, result, info, timeout) \
+		zbx_send_response_ext(sock, result, info, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPONENT_VERSION , timeout)
 
 #define zbx_send_response_raw(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, 0, timeout)

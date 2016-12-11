@@ -225,23 +225,20 @@ typedef struct
 	char            host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		version;
 	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
-	unsigned char	tls_connect;				/* how to connect: ZBX_TCP_SEC_UNENCRYPTED, */
-								/* ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT */
-#if HOST_TLS_ISSUER_LEN_MAX > HOST_TLS_PSK_IDENTITY_LEN_MAX
-	char		tls_arg1[HOST_TLS_ISSUER_LEN_MAX];	/* for passing 'tls_issuer' or 'tls_psk_identity' */
-								/* depending on value of 'tls_connect' */
-#else
-	char		tls_arg1[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-#endif
-#if HOST_TLS_SUBJECT_LEN_MAX > HOST_TLS_PSK_LEN_MAX
-	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' */
-								/* depending on value of 'tls_connect' */
-#else
-	char		tls_arg2[HOST_TLS_PSK_LEN_MAX];
+
+	unsigned char	tls_connect;
+	unsigned char	tls_accept;
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
 }
 DC_PROXY;
@@ -258,8 +255,8 @@ zbx_action_eval_t;
 
 typedef struct
 {
-	const char	*host;
-	const char	*key;
+	char	*host;
+	char	*key;
 }
 zbx_host_key_t;
 
@@ -553,8 +550,9 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability(void);
 
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions);
 void	zbx_action_eval_free(zbx_action_eval_t *action);
+void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 
@@ -591,4 +589,23 @@ zbx_hc_item_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
+int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
+void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
+
+typedef struct
+{
+	zbx_timespec_t	ts;
+	char		*value;	/* NULL in case of meta record (see "meta" field below) */
+	char		*source;
+	zbx_uint64_t	lastlogsize;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	unsigned char	state;
+	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
+}
+zbx_agent_value_t;
+
+void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
 #endif

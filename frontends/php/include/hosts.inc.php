@@ -1061,3 +1061,56 @@ function getHostInventoryModes() {
 		HOST_INVENTORY_AUTOMATIC => _('Automatic')
 	];
 }
+
+/**
+ * Check if user has read permissions for hosts.
+ *
+ * @param array $hostids
+ *
+ * @return bool
+ */
+function isReadableHosts(array $hostids) {
+	return count($hostids) == API::Host()->get([
+		'countOutput' => true,
+		'hostids' => $hostids
+	]);
+}
+
+/**
+ * Check if user has read permissions for templates.
+ *
+ * @param array $templateids
+ *
+ * @return bool
+ */
+function isReadableTemplates(array $templateids) {
+	return count($templateids) == API::Template()->get([
+		'countOutput' => true,
+		'templateids' => $templateids
+	]);
+}
+
+/**
+ * Check if user has read permissions for hosts or templates.
+ *
+ * @param array $hostids
+ *
+ * @return bool
+ */
+function isReadableHostTemplates(array $hostids) {
+	$count = API::Host()->get([
+		'countOutput' => true,
+		'hostids' => $hostids
+	]);
+
+	if ($count == count($hostids)) {
+		return true;
+	}
+
+	$count += API::Template()->get([
+		'countOutput' => true,
+		'templateids' => $hostids
+	]);
+
+	return ($count == count($hostids));
+}

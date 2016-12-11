@@ -981,51 +981,8 @@ class CHostPrototype extends CHostBase {
 		return ['hostids' => $hostPrototypeIds];
 	}
 
-	/**
-	 * Returns true if all of the given objects are available for reading.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'countOutput' => true
-		]);
-		return count($ids) == $count;
-	}
-
-	/**
-	 * Returns true if all of the given objects are available for writing.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-		return count($ids) == $count;
-	}
-
 	protected function link(array $templateids, array $targetids) {
-		if (!$this->isWritable($targetids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkHostPrototypePermissions($targetids);
 
 		$links = parent::link($templateids, $targetids);
 
@@ -1070,8 +1027,20 @@ class CHostPrototype extends CHostBase {
 	 * @param array $discoveryRuleIds
 	 */
 	protected function checkDiscoveryRulePermissions(array $discoveryRuleIds) {
-		if (!API::DiscoveryRule()->isWritable($discoveryRuleIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($discoveryRuleIds) {
+			$discoveryRuleIds = array_unique($discoveryRuleIds);
+
+			$count = API::DiscoveryRule()->get([
+				'countOutput' => true,
+				'itemids' => $discoveryRuleIds,
+				'editable' => true
+			]);
+
+			if ($count != count($discoveryRuleIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -1080,11 +1049,21 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given host groups
 	 *
-	 * @param array $hostGroupIds
+	 * @param array $groupids
 	 */
-	protected function checkHostGroupsPermissions(array $hostGroupIds) {
-		if (!API::HostGroup()->isWritable($hostGroupIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkHostGroupsPermissions(array $groupids) {
+		if ($groupids) {
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids,
+				'editable' => true
+			]);
+
+			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -1096,8 +1075,20 @@ class CHostPrototype extends CHostBase {
 	 * @param array $hostPrototypeIds
 	 */
 	protected function checkHostPrototypePermissions(array $hostPrototypeIds) {
-		if (!$this->isWritable($hostPrototypeIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($hostPrototypeIds) {
+			$hostPrototypeIds = array_unique($hostPrototypeIds);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'hostids' => $hostPrototypeIds,
+				'editable' => true
+			]);
+
+			if ($count != count($hostPrototypeIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
