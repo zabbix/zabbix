@@ -172,12 +172,12 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test_parse($rule, $error_exprected, $result_expected) {
+	public function test_parse($rule, $error_expected, $result_expected) {
 		$parser = new CValidationRule();
 
 		$rc = $parser->parse($rule);
 
 		$this->assertEquals($result_expected, $rc);
-		$this->assertEquals($error_exprected, $parser->getError());
+		$this->assertEquals($error_expected, $parser->getError());
 	}
 }
