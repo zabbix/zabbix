@@ -1315,7 +1315,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_YEAR * 80, 'sub' => SEC_PER_YEAR * 40]	// 80 years and 40 years
 		];
 
-		// Default inteval values.
+		// Default interval values.
 		$distance = SEC_PER_YEAR * 5;
 		$main_interval = 0;
 		$sub_interval = 0;
