@@ -76,7 +76,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
 
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
-	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP depricated functions is used.])
+	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP deprecated functions is used.])
                AC_MSG_RESULT(yes)
 
 	       if test "x$enable_static" = "xyes"; then
