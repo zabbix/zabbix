@@ -26,7 +26,7 @@ class CGraphDraw extends CSvg {
 
 		$this->stime = null;
 		$this->fullSizeX = 900;
-		$this->fullSizeY = null;
+		$this->fullSizeY = 200;
 		$this->m_minY = null;
 		$this->m_maxY = null;
 		$this->data = [];
@@ -45,7 +45,7 @@ class CGraphDraw extends CSvg {
 		$this->period = SEC_PER_HOUR;
 		$this->from = 0;
 		$this->sizeX = null; // default graph size X
-		$this->sizeY = 200; // default graph size Y
+		$this->sizeY = null; // default graph size Y
 		$this->shiftXleft = 100;
 		$this->shiftXright = 50;
 		$this->shiftXCaption = 0;
@@ -144,31 +144,31 @@ class CGraphDraw extends CSvg {
 		$this->from = $from;
 	}
 
-	public function setWidth($value = null) {
+	public function setWidth($width = null) {
 		// avoid sizex==0, to prevent division by zero later
-		if ($value == 0) {
-			$value = null;
+		if ($width == 0) {
+			$width = null;
 		}
-		if (is_null($value)) {
-			$value = 900;
+		if (is_null($width)) {
+			$width = 900;
 		}
 //		$this->sizeX = $value;
-		$this->fullSizeX = $value;
+		$this->fullSizeX = $width;
 		// TODO SVG
 //		$this->setAttribute('width', ($this->sizeX+150).'px');
 		$this->setAttribute('width', $this->fullSizeX.'px');
 	}
 
-	public function setHeight($value = null) {
-		if ($value == 0) {
-			$value = null;
+	public function setHeight($height = null) {
+		if ($height == 0) {
+			$height = null;
 		}
-		if (is_null($value)) {
-			$value = 900;
+		if (is_null($height)) {
+			$height = 900;
 		}
-		$this->sizeY = $value;
+		$this->fullSizeY = $height;
 		// TODO SVG
-		$this->setAttribute('height', ($this->sizeY+300).'px');
+		$this->setAttribute('height', $this->fullSizeY.'px');
 	}
 
 	public function getLastValue($num) {

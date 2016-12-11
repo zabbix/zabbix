@@ -76,6 +76,20 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->shiftXright = 85;
 		}
 		$this->sizeX = $this->fullSizeX - $this->shiftXleft - $this->shiftXright - 1;
+		$this->sizeY = $this->fullSizeY - $this->shiftY - $this->legendOffsetY;
+
+		if ($this->drawLegend) {
+			$this->sizeY -= 14 * ($this->num + 1 + (($this->fullSizeY < 120) ? 0 : count($this->triggers))) + 8;
+		}
+
+		// if graph height is big enough, we reserve space for percent line legend
+		if ($this->fullSizeY >= ZBX_GRAPH_LEGEND_HEIGHT) {
+			foreach ($this->percentile as $percentile) {
+				if ($percentile['percent'] > 0 && $percentile['value']) {
+					$this->sizeY -= 14;
+				}
+			}
+		}
 	}
 
 	public function showWorkPeriod($value) {
@@ -2530,21 +2544,6 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcTriggers();
 		$this->calcZero();
 		$this->calcPercentile();
-
-		$this->fullSizeY = $this->sizeY + $this->shiftY + $this->legendOffsetY;
-
-		if ($this->drawLegend) {
-			$this->fullSizeY += 14 * ($this->num + 1 + (($this->sizeY < 120) ? 0 : count($this->triggers))) + 8;
-		}
-
-		// if graph height is big enough, we reserve space for percent line legend
-		if ($this->sizeY >= ZBX_GRAPH_LEGEND_HEIGHT) {
-			foreach ($this->percentile as $percentile) {
-				if ($percentile['percent'] > 0 && $percentile['value']) {
-					$this->fullSizeY += 14;
-				}
-			}
-		}
 
 		$this->im = imagecreate($this->fullSizeX, $this->fullSizeY);
 
