@@ -64,7 +64,7 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 				'success' => ['Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors',
 					'ERROR: error', 'Object state: CRITICAL', 'Log levels: DISASTER', 'Log levels: error'
 				],
-				'fail' => ['no errs or disastrs here']
+				'fail' => ['no errs or disasters here']
 			],
 			// regular expressions, TRUE, case-sensitive
 			[
