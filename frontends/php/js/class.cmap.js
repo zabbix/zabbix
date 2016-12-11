@@ -1172,7 +1172,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'hide',
-						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
+						value: '#iconProblemRow, #iconMaintenanceRow, #iconDisabledRow',
 						cond: [{
 							elementType: '4'
 						}]

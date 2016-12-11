@@ -137,7 +137,7 @@
 									(new CRow([
 										new CLabel(_('Maintenance'), 'iconid_maintenance'),
 										new CComboBox('iconid_maintenance')
-									]))->setId('iconMainetnanceRow')
+									]))->setId('iconMaintenanceRow')
 								)
 								->addRow(
 									(new CRow([

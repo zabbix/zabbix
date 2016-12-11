@@ -714,7 +714,7 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Reset seconds to zero in maintenace time values.
+	 * Reset seconds to zero in maintenance time values.
 	 *
 	 * @param array $maintenances passed by reference
 	 */
