@@ -474,7 +474,7 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate graph gerenal data on Create method.
+	 * Validate graph general data on Create method.
 	 * Check if new items are from same templated host, validate Y axis items and values and hosts and templates.
 	 *
 	 * @param array $graphs
