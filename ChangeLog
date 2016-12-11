@@ -3041,7 +3041,7 @@ New features:
 A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknowledgements (Ivo, Oleg)
 
 Bug fixes:
-...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
+...G...PS. [ZBX-6916] added space delimiter support in configuration file (igors)
 ..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
 ..F....... [ZBX-6878] fixed history screen log bug for two items, parameter itemid renamed to itemids (Vitalij)
 ..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)

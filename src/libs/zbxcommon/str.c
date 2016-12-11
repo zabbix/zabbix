@@ -1068,7 +1068,7 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -1163,7 +1163,7 @@ int	num_param(const char *p)
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
@@ -1312,7 +1312,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_param_len(const char *p, int num, size_t *sz)
@@ -1442,7 +1442,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 char	*get_param_dyn(const char *p, int num)
@@ -1797,7 +1797,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, size_t max_len)
@@ -1832,7 +1832,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)
