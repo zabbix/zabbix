@@ -4744,7 +4744,7 @@ Changes for 1.9.9
 
 New features:
 ..F....... [ZBX-4558] added audit logging when udpating and creating triggers (Pavels)
-..F....... [ZBXNEXT-1066] removed the "Monotoring - Hosts" page (Pavels)
+..F....... [ZBXNEXT-1066] removed the "Monitoring - Hosts" page (Pavels)
 ..F....... [ZBXNEXT-1066] remade the "Search" page layout (Pavels)
 ..F....... [ZBXNEXT-1066] added the host pop up menu to the "Events", "Event details", "Latest data" and "Overview" pages (Pavels)
 ..F....... [ZBXNEXT-1066] added the "Host screens" link to all of the host pop up menus (Pavels)
