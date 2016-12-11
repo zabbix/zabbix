@@ -505,7 +505,7 @@ var CNode = Class.create({
 			this.node.appendChild(item);
 		}
 		else if (is_string(item)) {
-			this.node.appendChild(documect.createTextNode(item));
+			this.node.appendChild(document.createTextNode(item));
 		}
 		else {
 			return true;
