@@ -1504,7 +1504,7 @@ function drawMapSelements(&$im, $map, $mapInfo) {
 	}
 }
 
-function drawMapHighligts(&$im, $map, $mapInfo) {
+function drawMapHighlights(&$im, $map, $mapInfo) {
 	$config = select_config();
 
 	$selements = $map['selements'];

@@ -173,7 +173,7 @@ else {
 drawMapConnectors($im, $map, $mapInfo, $allLinks);
 
 if (!isset($_REQUEST['noselements'])) {
-	drawMapHighligts($im, $map, $mapInfo);
+	drawMapHighlights($im, $map, $mapInfo);
 	drawMapSelements($im, $map, $mapInfo);
 }
 
