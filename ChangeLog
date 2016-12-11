@@ -6782,7 +6782,7 @@ Changes for 1.7.3
  - [ZBX-1328] better naming for mass operations in the list of host groups (Alexei)
  - [DEV-137] help link redirected to on-line documentation at www.zabbix.com/documentation/ (Alexei)
  - [ZBX-1329] fixed activating/deactivating host groups (Vedmak)
- - [ZBX-1383] fixed selection after mass operations, performance imrovements and links to host configuration in proxies screen (Vedmak)
+ - [ZBX-1383] fixed selection after mass operations, performance improvements and links to host configuration in proxies screen (Vedmak)
  - [ZBX-1377] fixed adding template with linked template (Vedmak)
  - [ZBX-1369] make more strings translatable (Richlv)
  - [ZBX-974] recompressed png images with pngcrush. max size reduction 28%, average reduction 10% (Richlv)
