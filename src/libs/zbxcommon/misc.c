@@ -884,7 +884,7 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function recursively calls itself for each filter fragment. *
@@ -1008,7 +1008,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if a filter already exists. This         *
