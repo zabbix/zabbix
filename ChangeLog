@@ -6748,7 +6748,7 @@ Changes for 1.7.4
  - [DEV-369] item check "log.regexp" was renamed to "logrt" to specify "log rotation" (Dmitry)
  - [DEV-339] added more internal checks zabbix[wcache,*] and zabbix[rcache,*] (Sasha)
  - [ZBX-1209] fixed new node not shown in the list after adding (Vedmak)
- - [ZBX-1221] fixed node adding mechanizm (Vedmak)
+ - [ZBX-1221] fixed node adding mechanism (Vedmak)
  - [ZBX-1400] changed none working time highlight colour for default graph themes (Aly)
  - [ZBX-1404] fixed undefined variable in screens (Aly)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
