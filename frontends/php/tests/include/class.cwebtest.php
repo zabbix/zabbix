@@ -142,8 +142,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestCheckHeader($header) {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::tagName('h1'));
-		$headerElemnt = $this->webDriver->findElement(WebDriverBy::tagName('h1'));
-		$this->assertEquals($header, $headerElemnt->getText());
+		$headerElement = $this->webDriver->findElement(WebDriverBy::tagName('h1'));
+		$this->assertEquals($header, $headerElement->getText());
 	}
 
 	public function zbxTestHeaderNotPresent($header) {
