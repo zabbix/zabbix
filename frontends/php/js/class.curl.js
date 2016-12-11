@@ -34,7 +34,7 @@ Curl.prototype = {
 	args:		null,
 
 	/**
-	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
+	 * WARNING: the class doesn't support parsing query strings with multi-dimensional arrays.
 	 *
 	 * @param url
 	 */
