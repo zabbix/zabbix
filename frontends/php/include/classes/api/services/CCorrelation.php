@@ -356,7 +356,7 @@ class CCorrelation extends CApiService {
 				// Check if evaltype has changed.
 				if (array_key_exists('evaltype', $correlation['filter'])) {
 					if ($correlation['filter']['evaltype'] != $db_correlation['filter']['evaltype']) {
-						// Clear formula field evaluation method is changed and no longer a custom experssion.
+						// Clear formula field evaluation method is changed and no longer a custom expression.
 						$correlation['evaltype'] = $correlation['filter']['evaltype'];
 
 						if ($correlation['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {

@@ -1122,7 +1122,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * For example: {localhost:system.cpu.load.last(0)}>10 will be translated to {12}>10 and
 	 *              created database representation.
 	 *
-	 * Note: All expresions must be already validated and exploded.
+	 * Note: All expressions must be already validated and exploded.
 	 *
 	 * @param array      $triggers                                   [IN]
 	 * @param string     $triggers[<tnum>]['description']            [IN]
