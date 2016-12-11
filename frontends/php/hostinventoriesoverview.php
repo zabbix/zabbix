@@ -68,7 +68,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['groupby'] = getRequest('groupby', '');
 $groupFieldTitle = '';
 
-$hostinvent_wdgt = (new CWidget())->setTitle(_('Host inventory overview'));
+$hostinventory_wdgt = (new CWidget())->setTitle(_('Host inventory overview'));
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
@@ -97,7 +97,7 @@ $controls = (new CList())
 		$inventoryFieldsComboBox
 	]);
 
-$hostinvent_wdgt->setControls(
+$hostinventory_wdgt->setControls(
 	(new CForm('get'))->addItem($controls)
 );
 
@@ -156,7 +156,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	}
 }
 
-$hostinvent_wdgt->addItem($table);
-$hostinvent_wdgt->show();
+$hostinventory_wdgt->addItem($table);
+$hostinventory_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
