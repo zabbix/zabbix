@@ -4713,7 +4713,7 @@ A......... [ZBX-954] increased API version to 1.4, Zabbix 1.8.x is using 1.3 (Al
 A.F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embedded screens (Pavels)
 ........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
 ..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
-..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
+..F.....S. [ZBX-4261] fixed discovery rules in the queue calculation (Sasha)
 ...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
 ..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
 ........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)

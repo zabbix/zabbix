@@ -1143,7 +1143,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param array $srcDiscovery   The source discovery rule to copy from
 	 * @param array $dstDiscovery   The target discovery rule to copy to
-	 * @param array $dstHost        The target host to copy the deiscovery rule to
+	 * @param array $dstHost        The target host to copy the discovery rule to
 	 *
 	 * @return array
 	 */
