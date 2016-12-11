@@ -29,7 +29,7 @@ typedef NETIO_STATUS (NETIOAPI_API_ *pGetIfEntry2_t)(PMIB_IF_ROW2 Row);
 
 /* GetIfEntry2() is available since Windows Vista and Windows Server 2008. In    */
 /* earlier Windows releases this pointer remains set to NULL and GetIfEntry() is */
-/* used dirrectly instead.                                                       */
+/* used directly instead.                                                        */
 static pGetIfEntry2_t	pGetIfEntry2 = NULL;
 
 /* GetIfEntry2() and GetIfEntry() work with different MIB interface structures.  */
