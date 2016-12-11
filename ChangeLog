@@ -832,7 +832,7 @@ Bug fixes:
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
-..F....... [ZBXNEXT-2662] fixed trimming of leading and trailing spaces in the proxy encription-related fields (Sasha)
+..F....... [ZBXNEXT-2662] fixed trimming of leading and trailing spaces in the proxy encryption-related fields (Sasha)
 ..F....... [ZBX-10022] fixed a web scenario name into the graphs (Sasha)
 ..F....... [ZBXNEXT-2662] fixed displaying of the server name on the pages (Pavel, Sasha)
 ..F.I..... [ZBXNEXT-2662] added ZBX_WIDGET_ROWS limitation for displaying of elements the popup windows (Sasha)
