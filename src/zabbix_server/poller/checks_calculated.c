@@ -234,12 +234,12 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		}
 
 		/* If the item is NOTSUPPORTED then evaluation is allowed for:   */
-		/*   - functions white-listed in evaluatable_for_notsupported(). */
+		/*   - functions white-listed in evaluable_for_notsupported().   */
 		/*     Their values can be evaluated to regular numbers even for */
 		/*     NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(f->func))
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluable_for_notsupported(f->func))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,

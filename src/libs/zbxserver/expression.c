@@ -4076,7 +4076,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 			/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
 			if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
-					FAIL == evaluatable_for_notsupported(func->function))
+					FAIL == evaluable_for_notsupported(func->function))
 			{
 				/* compose and store 'unknown' message for future use */
 				unknown_msg = zbx_dsprintf(NULL,

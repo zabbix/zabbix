@@ -22,6 +22,6 @@
 
 int	evaluate_macro_function(char *value, const char *host, const char *key,
 		const char *function, const char *parameter);
-int	evaluatable_for_notsupported(const char *fn);
+int	evaluable_for_notsupported(const char *fn);
 
 #endif

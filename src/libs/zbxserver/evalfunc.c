@@ -2951,7 +2951,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluatable_for_notsupported                                     *
+ * Function: evaluable_for_notsupported                                       *
  *                                                                            *
  * Purpose: check is function to be evaluated for NOTSUPPORTED items          *
  *                                                                            *
@@ -2961,7 +2961,7 @@ out:
  *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
  *                                                                            *
  ******************************************************************************/
-int	evaluatable_for_notsupported(const char *fn)
+int	evaluable_for_notsupported(const char *fn)
 {
 	/* functions date(), dayofmonth(), dayofweek(), now(), time() and nodata() are exceptions, */
 	/* they should be evaluated for NOTSUPPORTED items, too */
