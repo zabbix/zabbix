@@ -2137,7 +2137,7 @@ A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators
 
 Bug fixes:
 ........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
-..F....... [ZBX-9381] fixed empty host list in popup drowpdowns (Ivo)
+..F....... [ZBX-9381] fixed empty host list in popup dropdowns (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.10rc1
