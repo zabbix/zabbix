@@ -224,7 +224,7 @@ class CMediatype extends CApiService {
 				);
 			}
 
-			// Check additional fields and values depeding on type.
+			// Check additional fields and values depending on type.
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {
@@ -548,7 +548,7 @@ class CMediatype extends CApiService {
 					elseif ($db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
 							&& array_key_exists('passwd', $mediatype)
 							&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
-						// Check 'passwd' field depeding on authentication set from DB and when it is set to 'normal'.
+						// Check 'passwd' field depending on authentication set from DB and when it is set to 'normal'.
 
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Password required for media type "%1$s".', $mediatype['description'])

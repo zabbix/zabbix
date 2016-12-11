@@ -1987,7 +1987,7 @@ class CItemDelayFlexParser {
 			$this->pos++;
 		}
 
-		// String can end at any state. Validate the last entered characters depeding on the last state once more.
+		// String can end at any state. Validate the last entered characters depending on the last state once more.
 		switch ($state) {
 			case self::STATE_FLEXIBLE_MINUTE_TILL:
 				if (strlen($minutes_till) != 2) {
@@ -2333,8 +2333,8 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Validate the three time parameters "hours from", "minutes from" and "seconds from" with single function depeding
-	 * on "state". Hours, minutes and seconds have either one or two digits. If it is a single digit, depeding if
+	 * Validate the three time parameters "hours from", "minutes from" and "seconds from" with single function depending
+	 * on "state". Hours, minutes and seconds have either one or two digits. If it is a single digit, depending if
 	 * "state" valide previous character ("h" for hours, "m" for minutes, "s" for seconds or "," for all states).
 	 * Otherwise it checks behind two previous characters for "h", "m", "s" or ",".
 	 *
@@ -2374,7 +2374,7 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Validate the three time parameters "hours till", "minutes till" and "seconds till" with single function depeding
+	 * Validate the three time parameters "hours till", "minutes till" and "seconds till" with single function depending
 	 * on "state". Hours, minutes and seconds must be either one or two digits. If it is single digit previous character
 	 * must be "-". Otherwise it checks behind two previous characters for "-".
 	 *
@@ -2395,7 +2395,7 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Validate the three time parameters "hour step", "minute step" and "second step" with single function depeding on
+	 * Validate the three time parameters "hour step", "minute step" and "second step" with single function depending on
 	 * "state". Hours, minutes and seconds must be either one or two digits. If it is singe digit previous character
 	 * must be "/". Otherwise it checks behind two previous characters for "/".
 	 *
