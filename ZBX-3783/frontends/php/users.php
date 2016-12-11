@@ -93,18 +93,26 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (isset($_REQUEST['userid'])) {
+if (hasRequest('userid')) {
 	$users = API::User()->get([
 		'userids' => getRequest('userid'),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
 	]);
+
 	if (!$users) {
 		access_deny();
 	}
 }
-if (getRequest('filter_usrgrpid') && !API::UserGroup()->isWritable([$_REQUEST['filter_usrgrpid']])) {
-	access_deny();
+if (getRequest('filter_usrgrpid')) {
+	$usrgrps = API::UserGroup()->get([
+		'output' => [],
+		'usrgrpids' => getRequest('filter_usrgrpid')
+	]);
+
+	if (!$usrgrps) {
+		access_deny();
+	}
 }
 
 if (hasRequest('action')) {
