@@ -892,7 +892,7 @@ if (isset($data['insert'])) {
 		show_error_message(_('Cannot insert trigger expression'));
 	}
 }
-elseif (hasErrorMesssages()) {
+elseif (hasErrorMessages()) {
 	show_messages();
 }
 

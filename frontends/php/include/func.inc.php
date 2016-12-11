@@ -2183,7 +2183,7 @@ function imageOut(&$image, $format = null) {
  *
  * @return bool
  */
-function hasErrorMesssages() {
+function hasErrorMessages() {
 	global $ZBX_MESSAGES;
 
 	if (isset($ZBX_MESSAGES)) {

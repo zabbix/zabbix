@@ -78,7 +78,7 @@ if ($export) {
 
 	$export_data = $export->export();
 
-	if (hasErrorMesssages()) {
+	if (hasErrorMessages()) {
 		show_messages();
 	}
 	else {
