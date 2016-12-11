@@ -531,7 +531,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$sizeY,
 				$anglestart,
 				$angleend,
-				$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
+				$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0), // SVG
 				IMG_ARC_PIE
 			);
 			imagefilledarc(
@@ -575,7 +575,7 @@ class CPieGraphDraw extends CGraphDraw {
 					$sizeY,
 					$anglestart,
 					$angleend,
-					$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
+					$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0), // SVG
 					IMG_ARC_PIE
 				);
 				$anglestart = $angleend;

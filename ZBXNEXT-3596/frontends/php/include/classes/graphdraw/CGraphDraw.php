@@ -242,6 +242,7 @@ class CGraphDraw extends CSvg {
 				ZABBIX_HOMEPAGE,
 				'Gray'))
 				->setAngle(-90)
+				->setAttribute('opacity', '0.2')
 		);
 	}
 
@@ -251,31 +252,5 @@ class CGraphDraw extends CSvg {
 		}
 
 		return get_color($this->im, $color, $alfa);
-	}
-
-	public function getShadow($color, $alfa = 0) {
-		if (isset($this->colorsrgb[$color])) {
-			$red = $this->colorsrgb[$color][0];
-			$green = $this->colorsrgb[$color][1];
-			$blue = $this->colorsrgb[$color][2];
-		}
-		else {
-			list($red, $green, $blue) = hex2rgb($color);
-		}
-
-		if ($this->sum > 0) {
-			$red = (int)($red * 0.6);
-			$green = (int)($green * 0.6);
-			$blue = (int)($blue * 0.6);
-		}
-
-		$RGB = [$red, $green, $blue];
-
-		if (isset($alfa) && function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-				&& @imagecreatetruecolor(1, 1)) {
-			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alfa);
-		}
-
-		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
 	}
 }
