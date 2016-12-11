@@ -209,7 +209,7 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		if (getRequest('form') === 'full_clone') {
 			$output = ['resourcetype', 'resourceid', 'width', 'height', 'x', 'y', 'colspan', 'rowspan', 'elements',
-				'valign', 'haligh', 'style', 'url', 'max_columns'
+				'valign', 'halign', 'style', 'url', 'max_columns'
 			];
 
 			if (hasRequest('templateid')) {
