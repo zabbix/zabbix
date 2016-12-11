@@ -1433,7 +1433,7 @@ out:
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the contents were retrieved successfully           *
- *               FAIL    - the content retrieval faield                       *
+ *               FAIL    - the content retrieval field                        *
  *                                                                            *
  ******************************************************************************/
 static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char **error)

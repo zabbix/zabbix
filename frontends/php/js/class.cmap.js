@@ -881,7 +881,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			update: function(data, unsetUndefined) {
 				var fieldName,
-					dataFelds = [
+					dataFields = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
 						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
@@ -894,8 +894,8 @@ ZABBIX.apps.map = (function($) {
 				unsetUndefined = unsetUndefined || false;
 
 				// update elements fields, if not massupdate, remove fields that are not in new values
-				for (i = 0, ln = dataFelds.length; i < ln; i++) {
-					fieldName = dataFelds[i];
+				for (i = 0, ln = dataFields.length; i < ln; i++) {
+					fieldName = dataFields[i];
 
 					if (typeof data[fieldName] !== 'undefined') {
 						this.data[fieldName] = data[fieldName];
