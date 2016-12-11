@@ -51,7 +51,7 @@ class CFunctionValidator extends CValidator {
 
 	public function __construct(array $options = []) {
 		/*
-		 * CValidator is an abstract class, so no specific functionallity should be bound to it. Thus putting
+		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
 		 * an option "lldmacros" (or class variable $lldmacros) in it, is not preferred. Without it, class
 		 * initialization would fail due to __set(). So instead we create a local variable in this extended class
 		 * and remove the option "lldmacros" before calling the parent constructor.
