@@ -167,16 +167,16 @@ class CValueMap extends CApiService {
 				'filter' => ['valuemapid' => array_keys($mappings)]
 			]);
 
-			$ins_mapings = [];
-			$upd_mapings = [];
-			$del_mapingids = [];
+			$ins_mappings = [];
+			$upd_mappings = [];
+			$del_mappingids = [];
 
 			foreach ($db_mappings as $db_mapping) {
 				$mapping = &$mappings[$db_mapping['valuemapid']];
 
 				if (array_key_exists($db_mapping['value'], $mapping)) {
 					if ($mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
-						$upd_mapings[] = [
+						$upd_mappings[] = [
 							'values' => ['newvalue' => $mapping[$db_mapping['value']]],
 							'where' => ['mappingid' => $db_mapping['mappingid']]
 						];
@@ -184,27 +184,27 @@ class CValueMap extends CApiService {
 					unset($mapping[$db_mapping['value']]);
 				}
 				else {
-					$del_mapingids[] = $db_mapping['mappingid'];
+					$del_mappingids[] = $db_mapping['mappingid'];
 				}
 			}
 			unset($mapping);
 
 			foreach ($mappings as $valuemapid => $mapping) {
 				foreach ($mapping as $value => $newvalue) {
-					$ins_mapings[] = ['valuemapid' => $valuemapid, 'value' => $value, 'newvalue' => $newvalue];
+					$ins_mappings[] = ['valuemapid' => $valuemapid, 'value' => $value, 'newvalue' => $newvalue];
 				}
 			}
 
-			if ($del_mapingids) {
-				DB::delete('mappings', ['mappingid' => $del_mapingids]);
+			if ($del_mappingids) {
+				DB::delete('mappings', ['mappingid' => $del_mappingids]);
 			}
 
-			if ($upd_mapings) {
-				DB::update('mappings', $upd_mapings);
+			if ($upd_mappings) {
+				DB::update('mappings', $upd_mappings);
 			}
 
-			if ($ins_mapings) {
-				DB::insertBatch('mappings', $ins_mapings);
+			if ($ins_mappings) {
+				DB::insertBatch('mappings', $ins_mappings);
 			}
 		}
 
