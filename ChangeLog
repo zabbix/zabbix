@@ -995,7 +995,7 @@ A.F....... [ZBX-9810] fixed trigger prototype expression inheritance incorrectly
 ..F....... [ZBXNEXT-2662] fixed layout of checkboxes with labels (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] fixed layout of host inventory form (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] fixed media editing in user form (Sasha)
-..F....... [ZBXNEXT-2662] fixed saving of collapsible widgets in "Event detais" and "Global search" pages (Sasha)
+..F....... [ZBXNEXT-2662] fixed saving of collapsible widgets in "Event details" and "Global search" pages (Sasha)
 ..F....... [ZBXNEXT-2662] fixed displaying of vertical headers under IE10, IE11 and Edge (Sasha)
 ..F....... [ZBXNEXT-2662] fixed displaying of eventlog severities (Pavel, Sasha)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
