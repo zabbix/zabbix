@@ -1669,7 +1669,7 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		/**
-		 * Form for editin links.
+		 * Form for editing links.
 		 *
 		 * @param {Object} formContainer jQuesry object
 		 * @param {Object} sysmap

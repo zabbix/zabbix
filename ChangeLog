@@ -6641,7 +6641,7 @@ Changes for 1.8.1
  - [ZBX-1479] fixed host mass update (Vedmak)
  - [ZBX-1628] removed templates from status of triggers screen (Aly)
  - [ZBX-1508] fixed action map creation (Aly)
- - [ZBX-1593] fixed errors when admin tries to add hostgroup editin host (Vedmak)
+ - [ZBX-1593] fixed errors when admin tries to add hostgroup editing host (Vedmak)
  - [ZBX-1621] fixed displaying of ITservices graph text (Vedmak)
  - [ZBX-1553] fixed host group mass activate/disable operation (Vedmak)
  - [ZBX-1455] added sorting for host/global macros (Vedmak)
