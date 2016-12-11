@@ -4791,7 +4791,7 @@ void	DCsync_configuration(void)
 			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
 			config->interfaces.num_data, config->interfaces.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interface_ht: %d (%d slots)", __function_name,
 			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
 			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);

@@ -86,8 +86,8 @@ class testPageHosts extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 		$sqlApplications = "select * from applications where hostid=$hostid order by applicationid";
 		$oldHashApplications = DBhash($sqlApplications);
-		$sqlInteraface = "select * from interface where hostid=$hostid order by interfaceid";
-		$oldHashInterface = DBhash($sqlInteraface);
+		$sqlInterface = "select * from interface where hostid=$hostid order by interfaceid";
+		$oldHashInterface = DBhash($sqlInterface);
 		$sqlHostmacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
 		$oldHashHostmacro = DBhash($sqlHostmacro);
 		$sqlHostsgroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
@@ -131,7 +131,7 @@ class testPageHosts extends CWebTest {
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Host update changed data in table 'hosts'");
 		$this->assertEquals($oldHashItems, DBhash($sqlItems), "Chuck Norris: Host update changed data in table 'items'");
 		$this->assertEquals($oldHashApplications, DBhash($sqlApplications), "Chuck Norris: Host update changed data in table 'applications'");
-		$this->assertEquals($oldHashInterface, DBhash($sqlInteraface), "Chuck Norris: Host update changed data in table 'interface'");
+		$this->assertEquals($oldHashInterface, DBhash($sqlInterface), "Chuck Norris: Host update changed data in table 'interface'");
 		$this->assertEquals($oldHashHostmacro, DBhash($sqlHostmacro), "Chuck Norris: Host update changed data in table 'host_macro'");
 		$this->assertEquals($oldHashHostsgroups, DBhash($sqlHostsgroups), "Chuck Norris: Host update changed data in table 'hosts_groups'");
 		$this->assertEquals($oldHashHoststemplates, DBhash($sqlHoststemplates), "Chuck Norris: Host update changed data in table 'hosts_templates'");
