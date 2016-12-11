@@ -1393,7 +1393,7 @@ function getTriggerFormData(array $data) {
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
-		// select first host from triggers if gived not match
+		// select first host from triggers if given not match
 		$hosts = $trigger['hosts'];
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
