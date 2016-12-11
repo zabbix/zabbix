@@ -63,6 +63,12 @@ class CAudit {
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_MACRO:
+				$field_name_resourceid = 'globalmacroid';
+				$field_name_resourcename = 'macro';
+				$table_name = 'globalmacro';
+				break;
+
 			case AUDIT_RESOURCE_HOST_GROUP:
 				$field_name_resourceid = 'groupid';
 				$field_name_resourcename = 'name';
