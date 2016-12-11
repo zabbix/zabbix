@@ -537,12 +537,12 @@ if (str_in_array($srctbl, ['applications', 'triggers'])) {
 		$value2 = isset($_REQUEST['dstfld2']) && strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
 		$value3 = isset($_REQUEST['dstfld3']) && strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
 
-		$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-		$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
-		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
-		$epmtyScript .= ' close_window(); return false;';
+		$emptyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+		$emptyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
+		$emptyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
+		$emptyScript .= ' close_window(); return false;';
 
-		$controls[] = [(new CButton('empty', _('Empty')))->onClick($epmtyScript)];
+		$controls[] = [(new CButton('empty', _('Empty')))->onClick($emptyScript)];
 	}
 }
 

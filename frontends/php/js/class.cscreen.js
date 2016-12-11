@@ -102,7 +102,7 @@ Cscreen.prototype = {
 				element.parent().get(0).appendChild(dropDiv.get(0));
 				parent.appendChild(element.get(0));
 
-				// replace "change" link href for emtpy cells
+				// replace "change" link href for empty cells
 				var link = jQuery(element).find('.empty_change_link')[0];
 				if (link) {
 					var href = jQuery(link).attr('href');
