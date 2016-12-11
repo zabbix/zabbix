@@ -99,9 +99,9 @@ function parse_schema($path) {
 		$str .= "\t'$table' => [\n";
 		$str .= "\t\t'key' => '{$data['key']}',\n";
 		$str .= "\t\t'fields' => [\n";
-		foreach ($data['fields'] as $field => $fieldata) {
+		foreach ($data['fields'] as $field => $fielddata) {
 			$str .= "\t\t\t'$field' => [\n";
-			foreach ($fieldata as $name => $val) {
+			foreach ($fielddata as $name => $val) {
 				$str .= "\t\t\t\t'$name' => $val,\n";
 			}
 			$str .= "\t\t\t],\n";
