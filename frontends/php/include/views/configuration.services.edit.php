@@ -120,7 +120,7 @@ foreach ($this->data['children'] as $child) {
 		]))->setId('children_'.$child['serviceid'])
 	);
 }
-$servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
+$servicesDependenciesFormList = new CFormList('servicesDependenciesFormList');
 $servicesDependenciesFormList->addRow(
 	_('Depends on'),
 	(new CDiv([
