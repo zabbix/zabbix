@@ -3518,7 +3518,7 @@ title: Progress Indicators
 name: progress
 ---
 
-Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
+Progress indicators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
 
 ```html_example
 <div class="preloader-container">

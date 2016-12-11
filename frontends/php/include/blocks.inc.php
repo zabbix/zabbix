@@ -525,7 +525,7 @@ function make_status_of_zbx() {
 /**
  * Create DIV with latest problem triggers.
  *
- * If no sortfield and sortorder are defined, the sort indicater in the column name will not be displayed.
+ * If no sortfield and sortorder are defined, the sort indicator in the column name will not be displayed.
  *
  * @param array  $filter['groupids']
  * @param array  $filter['hostids']
