@@ -3075,7 +3075,7 @@ Text on html5 input types
    </li>
    <li>
       <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledInput" disabled></div>
    </li>
    <li>
       <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
@@ -3111,7 +3111,7 @@ Text on html5 input types
 
 ```html_example
 <label for="Radio"><input type="radio" id="Radio">I am a radio</label>
-<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
+<label for="RadioDisabled"><input type="radio" id="RadioDisabled" disabled>I am a disabled radio</label>
 ```
 
 ## Segmented Radio Controls
@@ -3128,7 +3128,7 @@ Text on html5 input types
 
 ```html_example
 <label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
-<label for="CheckBoxDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
+<label for="CheckBoxDisabled"><input type="checkbox" id="CheckBoxDisabled" disabled>I am a disabled checkbox</label>
 ```
 
 ## Radio and Checkbox Lists
