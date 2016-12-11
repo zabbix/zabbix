@@ -3850,7 +3850,7 @@ A......... [ZBX-6561] fixed undefined indexes and errors in configuration of net
 ....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
 ...G...... [ZBX-6470] fixed incorrect swap calculation on Solaris (dimir)
 ..F....... [ZBX-5760] fixed graph item legend being rendered incorrectly if the names of the items contain certain local symbols (Pavels)
-.......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
+.......PS. [ZBX-6526] fixed possible data uploading issues during server startup or network problems (wiper)
 ...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added right side y axis support in bar reports (Oleg)
