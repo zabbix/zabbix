@@ -859,7 +859,7 @@ class CItemPrototype extends CItemGeneral {
 			/*
 			 * Deleting an application prototype will automatically delete the link in 'item_application_prototype',
 			 * but it will not delete the actual discovered application. When the link is gone,
-			 * delete the discoveted application. Link between a regular item does not matter any more.
+			 * delete the discovered application. Link between a regular item does not matter any more.
 			 */
 			if ($discovered_applications) {
 				$discovered_applicationids = zbx_objectValues($discovered_applications, 'applicationid');
