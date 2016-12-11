@@ -9252,7 +9252,7 @@ Changes for 1.0beta9:
  - added support for disk_read_opsX[*],disk_write_opsX[*],disk_read_blksX[*], disk_write_blksX[*] (Alexei)
  - added basic support of monitoring of disk stats (Alexei)
  - session cookie will expire when session is closed (Alexei)
- - fixed situation when large SNMP values become nagative (Alexei)
+ - fixed situation when large SNMP values become negative (Alexei)
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)
  - status of triggers. If Select is used, no refresh (Alexei)
