@@ -170,7 +170,7 @@ function get_next_event($currentEvent, array $eventList = []) {
  * @param array  $event								An array of event data.
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
- * @param string $event['userid]					User ID who gerenerated the OK event.
+ * @param string $event['userid]					User ID who generated the OK event.
  * @param array  $trigger							An array of trigger data.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
