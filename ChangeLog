@@ -9263,7 +9263,7 @@ Changes for 1.0beta9:
  - fixed field order for PostgreSQL, table items (Alexei)
  - removed doc/manual.lyx (Alexei)
  - fixed resizing of simple graphs (Alexei)
- - suppor for "--with-net-snmp" and "--with-ucd-snmp" (Alexei)
+ - support for "--with-net-snmp" and "--with-ucd-snmp" (Alexei)
  - fixed type of services.goodsla. It's float now. (Alexei)
  - fixed addition of host triggers into IT Service tree (Alexei)
  - support of '(' and ')' in item keys (Alexei)
