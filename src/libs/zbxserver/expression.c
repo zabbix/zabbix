@@ -4571,7 +4571,7 @@ clean:
  * Parameters: data      - [IN/OUT] the expression containing lld macro       *
  *             token     - [IN/OUT] the token with lld macro location data    *
  *             flags     - [IN] the flags passed to                           *
- *                                  subtitute_discovery_macros() function     *
+ *                                  substitute_discovery_macros() function    *
  *             jp_row    - [IN] discovery data                                *
  *             error     - [OUT] should be not NULL if                        *
  *                               ZBX_MACRO_NUMERIC flag is set                *
