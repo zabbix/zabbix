@@ -74,7 +74,7 @@ class CScreenItem extends CApiService {
 	}
 
 	/**
-	 * Get screem item data.
+	 * Get screen item data.
 	 *
 	 * @param array $options
 	 * @param array $options['screenitemids']	Search by screen item IDs

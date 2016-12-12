@@ -6592,7 +6592,7 @@ Changes for 1.8.1
  - [ZBX-1734] changed severity colouring in events screen (Aly)
  - [ZBX-1573] fixed colon precedence in user right entries (Aly)
  - [ZBX-1708] fixed errors in log items history screen (Aly)
- - [ZBX-1715] fixed errors in IT Services parent selection sceren (Aly)
+ - [ZBX-1715] fixed errors in IT Services parent selection screen (Aly)
  - [ZBX-1652] fixed user media deletion on profile save (Aly)
  - [ZBX-1641] fixed handling of "Include" statement in configuration files (Sasha)
  - [ZBX-1580] reduced frontend memory usage (Vedmak)
