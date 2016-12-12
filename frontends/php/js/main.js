@@ -495,7 +495,7 @@ var hintBox = {
 			top = scrollTop + target.clientY + 10;
 		}
 
-		// fallback if doesn't fit verticaly but could fit if aligned to right or left
+		// fallback if doesn't fit vertically but could fit if aligned to right or left
 		if ((top - scrollTop + hint_height > wHeight)
 				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
 
