@@ -690,8 +690,10 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 	int		ret;
 	const char	*s_reading_type_string;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
-			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz), h->ip, h->port);
+	/* copy sensor details at start - it can go away and we won't be able to make an error message */
+	zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name, id_str, h->ip, h->port);
 
 	h->ret = SUCCEED;
 	h->done = 0;
@@ -701,10 +703,10 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, zbx_got_thresh_reading_cb, h)))
 			{
+				/* do not use pointer to sensor here - the sensor may have disappeared during */
+				/* ipmi_sensor_get_reading(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_reading() return error: 0x%x",
-						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
-						s->id_sz), ret);
+						" ipmi_sensor_get_reading() return error: 0x%x", id_str, ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -739,10 +741,10 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 		case 0x7f:
 			if (0 != (ret = ipmi_sensor_get_states(s->sensor, zbx_got_discrete_states_cb, h)))
 			{
+				/* do not use pointer to sensor here - the sensor may have disappeared during */
+				/* ipmi_sensor_get_states(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_states() return error: 0x%x",
-						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type,
-						s->id_sz), ret);
+						" ipmi_sensor_get_states() return error: 0x%x", id_str, ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
@@ -751,9 +753,7 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			s_reading_type_string = ipmi_sensor_get_event_reading_type_string(s->sensor);
 
 			h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-					" IPMI reading type \"%s\" is not supported",
-					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-					s_reading_type_string);
+					" IPMI reading type \"%s\" is not supported", id_str, s_reading_type_string);
 			h->ret = NOTSUPPORTED;
 			goto out;
 	}
@@ -863,6 +863,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 {
 	const char	*__function_name = "zbx_read_ipmi_control";
 	int		ret;
+	char		control_name[128];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c->c_name, h->ip, h->port);
 
@@ -873,13 +874,18 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 		goto out;
 	}
 
+	/* copy control name - it can go away and we won't be able to make an error message */
+	zbx_strlcpy(control_name, c->c_name, sizeof(control_name));
+
 	h->ret = SUCCEED;
 	h->done = 0;
 
 	if (0 != (ret = ipmi_control_get_val(c->control, zbx_got_control_reading_cb, h)))
 	{
+		/* do not use pointer to control here - the control may have disappeared during */
+		/* ipmi_control_get_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_get_val() return error: 0x%x",
-				c->c_name, ret);
+				control_name, ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
