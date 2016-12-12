@@ -3495,7 +3495,7 @@ Main navigation is used to jump between high level sections of the application.
 
 ##Tabs
 
-Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
+Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between unrelated content.
 
 ```html_example
 <ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
