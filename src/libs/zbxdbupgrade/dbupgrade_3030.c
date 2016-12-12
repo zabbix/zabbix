@@ -243,7 +243,6 @@ static int	DBpatch_3030016(void)
 	return ret;
 }
 
-/* WDN: remove comments
 static int	DBpatch_3030017(void)
 {
 	return DBdrop_field("items", "multiplier");
@@ -257,23 +256,6 @@ static int	DBpatch_3030018(void)
 static int	DBpatch_3030019(void)
 {
 	return DBdrop_field("items", "delta");
-}
-
-*/
-
-static int	DBpatch_3030017(void)
-{
-	return SUCCEED;
-}
-
-static int	DBpatch_3030018(void)
-{
-	return SUCCEED;
-}
-
-static int	DBpatch_3030019(void)
-{
-	return SUCCEED;
 }
 
 #endif

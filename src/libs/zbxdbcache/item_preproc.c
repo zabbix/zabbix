@@ -722,7 +722,7 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
- * Purpose: execute preprocessing step                                        *
+ * Purpose: execute preprocessing operation                                   *
  *                                                                            *
  * Parameters: item          - [IN] the item                                  *
  *             value         - [IN/OUT] the value to process                  *
