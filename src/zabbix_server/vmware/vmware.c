@@ -779,7 +779,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Function: vmware_shared_perf_entity_clean                                  *
  *                                                                            *
- * Purpose: cleans resources allocated by vmware peformance entity in vmware  *
+ * Purpose: cleans resources allocated by vmware performance entity in vmware *
  *          cache                                                             *
  *                                                                            *
  * Parameters: entity - [IN] the entity to free                               *
@@ -1257,7 +1257,7 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Function: vmware_perf_entity_free                                          *
  *                                                                            *
- * Purpose: frees vmware peformance entity and the resources allocated by it  *
+ * Purpose: frees vmware performance entity and the resources allocated by it *
  *                                                                            *
  * Parameters: entity - [IN] the entity to free                               *
  *                                                                            *
@@ -3539,7 +3539,7 @@ out:
  *                              values for the specified entity               *
  *                                                                            *
  * Return value: SUCCEED - the performance entity data was parsed             *
- *               FAIL    - the perofmance entity data did not contain valid   *
+ *               FAIL    - the performance entity data did not contain valid  *
  *                         values                                             *
  *                                                                            *
  ******************************************************************************/
