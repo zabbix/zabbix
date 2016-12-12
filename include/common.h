@@ -927,9 +927,9 @@ char	*get_param_dyn(const char *param, int num);
  *      cb_data   - [IN] callback function custom data                        *
  *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: SUCEED - if parameter doesn't change or has been changed     *
- *                        successfully                                        *
- *               FAIL   - otherwise                                           *
+ * Return value: SUCCEED - if parameter doesn't change or has been changed    *
+ *                         successfully                                       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *

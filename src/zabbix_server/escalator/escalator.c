@@ -1820,8 +1820,8 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
  *             action   - [OUT] action data                                   *
  *             error    - [OUT] message if action was disabled or deleted     *
  *                                                                            *
- * Return value: SUCEED - the action exists and is active                     *
- *               FAIL   - otherwise                                           *
+ * Return value: SUCCEED - the action exists and is active                    *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char **error)

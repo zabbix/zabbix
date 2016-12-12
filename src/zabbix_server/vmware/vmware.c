@@ -4406,8 +4406,8 @@ void	zbx_vmware_unlock(void)
  *                                                                            *
  * Parameters: stats   - [OUT] the vmware collector statistics                *
  *                                                                            *
- * Return value: SUCCEEED - the statistics were retrieved successfully        *
- *               FAIL     - no vmware collectors are running                  *
+ * Return value: SUCCEED - the statistics were retrieved successfully         *
+ *               FAIL    - no vmware collectors are running                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)

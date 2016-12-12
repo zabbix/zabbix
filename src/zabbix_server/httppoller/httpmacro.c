@@ -68,11 +68,11 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *             data     - [IN] the data for regexp matching (optional)        *
  *             err_str  - [OUT] the error message (optional)                  *
  *                                                                            *
- * Return value: SUCCEDED - the key/value pair was added successfully         *
- *                   FAIL - key/value pair adding to cache failed.            *
- *                          The failure reason can be either empty key/value, *
- *                          wrong key format or failed regular expression     *
- *                          match.                                            *
+ * Return value: SUCCEED - the key/value pair was added successfully          *
+ *                  FAIL - key/value pair adding to cache failed.             *
+ *                         The failure reason can be either empty key/value,  *
+ *                         wrong key format or failed regular expression      *
+ *                         match.                                             *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
