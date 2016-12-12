@@ -427,7 +427,6 @@ static int	check_application_condition(const DB_EVENT *events, size_t events_num
 
 	result = DBselect("%s", sql);
 
-
 	switch (condition->operator)
 	{
 		case CONDITION_OPERATOR_EQUAL:
@@ -1832,26 +1831,23 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
 			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
 			condition->value, condition->value2);
 
-	if (SUCCEED == is_escalation_present(events, events_num, source))
+	switch (source)
 	{
-		switch (source)
-		{
-			case EVENT_SOURCE_TRIGGERS:
-				check_trigger_condition(events, events_num, condition);
-				break;
-			case EVENT_SOURCE_DISCOVERY:
-				check_discovery_condition(events, events_num, condition);
-				break;
-			case EVENT_SOURCE_AUTO_REGISTRATION:
-				check_auto_registration_condition(events, events_num, condition);
-				break;
-			case EVENT_SOURCE_INTERNAL:
-				check_internal_condition(events, events_num, condition);
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
-						source, condition->conditionid);
-		}
+		case EVENT_SOURCE_TRIGGERS:
+			check_trigger_condition(events, events_num, condition);
+			break;
+		case EVENT_SOURCE_DISCOVERY:
+			check_discovery_condition(events, events_num, condition);
+			break;
+		case EVENT_SOURCE_AUTO_REGISTRATION:
+			check_auto_registration_condition(events, events_num, condition);
+			break;
+		case EVENT_SOURCE_INTERNAL:
+			check_internal_condition(events, events_num, condition);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
+					source, condition->conditionid);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1878,13 +1874,16 @@ static void	check_events_conditions(const DB_EVENT *events, size_t events_num, z
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
-		zbx_hashset_iter_t	iter;
-		DB_CONDITION		*condition;
+		if (SUCCEED == is_escalation_present(events, events_num, i))
+		{
+			zbx_hashset_iter_t	iter;
+			DB_CONDITION		*condition;
 
-		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
+			zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
 
-		while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-			check_events_condition(events, events_num, i, condition);
+			while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
+				check_events_condition(events, events_num, i, condition);
+		}
 	}
 }
 
