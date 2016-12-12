@@ -9759,7 +9759,7 @@ Changes for 1.0alpha10:
  - fixed double appearing of complex triggers in list of triggers
  - added form for changing host details
  - All calculations are made in C code instead of SQL statements
- - Housekeeping now runs as separate process, however it's part of zabix_suckerd
+ - Housekeeping now runs as separate process, however it's part of zabbix_suckerd
  - "Not monitored" will not be displayed
  - Calls to mhash() changed to md5(), thus eliminating use of php4-mhash module.
  - Added missing line in zabbix_suckerd. Now it reads items.snmp_oid from DB.
