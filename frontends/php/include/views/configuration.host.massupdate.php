@@ -152,8 +152,8 @@ $hostFormList->addRow(
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $data['proxy_hostid']);
 $proxyComboBox->addItem(0, _('(no proxy)'));
-foreach ($data['proxies'] as $proxie) {
-	$proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
+foreach ($data['proxies'] as $proxy) {
+	$proxyComboBox->addItem($proxy['hostid'], $proxy['host']);
 }
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
