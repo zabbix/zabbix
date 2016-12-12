@@ -2335,7 +2335,7 @@ class CItemDelayFlexParser {
 	/**
 	 * Validate the three time parameters "hours from", "minutes from" and "seconds from" with single function depending
 	 * on "state". Hours, minutes and seconds have either one or two digits. If it is a single digit, depending if
-	 * "state" valide previous character ("h" for hours, "m" for minutes, "s" for seconds or "," for all states).
+	 * "state" valid previous character ("h" for hours, "m" for minutes, "s" for seconds or "," for all states).
 	 * Otherwise it checks behind two previous characters for "h", "m", "s" or ",".
 	 *
 	 * Example: h1;h09,10;m1;m09,10,25;s1;s09,10,50
