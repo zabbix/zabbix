@@ -447,7 +447,7 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 
-			// add Y axis item IDs for persmission validation
+			// add Y axis item IDs for permission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -577,7 +577,7 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 
-			// add Y min axis item IDs for persmission validation
+			// add Y min axis item IDs for permission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -589,7 +589,7 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 
-			// add Y max axis item IDs for persmission validation
+			// add Y max axis item IDs for permission validation
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,

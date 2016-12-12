@@ -897,7 +897,7 @@ class CTemplate extends CHostGeneral {
 
 		/*
 		 * Update template and host group linkage. This procedure should be done the last because user can unlink
-		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * him self from a group with write permissions leaving only read permissions. Thus other procedures, like
 		 * host-template linking, macros update, must be done before this.
 		 */
 		if (isset($data['groups']) && $data['groups'] !== null && is_array($data['groups'])) {
