@@ -176,7 +176,7 @@ static int	item_preproc_multiplier(const DC_ITEM *item, zbx_variant_t *value, co
 static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *ts, unsigned char op_type,
 		zbx_item_history_value_t *hvalue)
 {
-	if (0 == hvalue->timestamp.sec || hvalue->value.dbl > value->data.dbl)
+	if (0 == hvalue->timestamp.sec || hvalue->value.data.dbl > value->data.dbl)
 		return FAIL;
 
 	switch (op_type)
@@ -185,12 +185,12 @@ static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *
 			if (0 <= zbx_timespec_compare(&hvalue->timestamp, ts))
 				return FAIL;
 
-			value->data.dbl = (value->data.dbl - hvalue->value.dbl) /
+			value->data.dbl = (value->data.dbl - hvalue->value.data.dbl) /
 					((ts->sec - hvalue->timestamp.sec) +
 						(double)(ts->ns - hvalue->timestamp.ns) / 1000000000);
 			break;
 		case ZBX_PREPROC_DELTA_VALUE:
-			value->data.dbl = value->data.dbl - hvalue->value.dbl;
+			value->data.dbl = value->data.dbl - hvalue->value.data.dbl;
 			break;
 	}
 
@@ -215,7 +215,7 @@ static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *
 static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t *ts, unsigned char op_type,
 		zbx_item_history_value_t *deltaitem)
 {
-	if (0 == deltaitem->timestamp.sec || deltaitem->value.dbl > value->data.dbl)
+	if (0 == deltaitem->timestamp.sec || deltaitem->value.data.dbl > value->data.dbl)
 		return FAIL;
 
 	switch (op_type)
@@ -224,12 +224,12 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
 			if (0 <= zbx_timespec_compare(&deltaitem->timestamp, ts))
 				return FAIL;
 
-			value->data.dbl = (value->data.dbl - deltaitem->value.dbl) /
+			value->data.dbl = (value->data.dbl - deltaitem->value.data.dbl) /
 					((ts->sec - deltaitem->timestamp.sec) +
 						(double)(ts->ns - deltaitem->timestamp.ns) / 1000000000);
 			break;
 		case ZBX_PREPROC_DELTA_VALUE:
-			value->data.dbl = value->data.dbl - deltaitem->value.dbl;
+			value->data.dbl = value->data.dbl - deltaitem->value.data.dbl;
 			break;
 	}
 
@@ -259,7 +259,7 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 {
 	int				ret = FAIL;
 	zbx_item_history_value_t	*deltaitem;
-	history_value_t			value_delta;
+	zbx_variant_t			value_delta;
 
 	switch (item->value_type)
 	{
@@ -282,7 +282,7 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 
 		deltaitem_local.itemid = item->itemid;
 		deltaitem_local.timestamp = *ts;
-		deltaitem_local.value = value->data;
+		zbx_variant_set_variant(&deltaitem_local.value, value);
 
 		zbx_hashset_insert(delta_history, &deltaitem_local, sizeof(deltaitem_local));
 
@@ -291,7 +291,7 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 		return SUCCEED;
 	}
 
-	value_delta = value->data;
+	zbx_variant_set_variant(&value_delta, value);
 
 	switch (item->value_type)
 	{
@@ -304,7 +304,7 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 	}
 
 	deltaitem->timestamp = *ts;
-	deltaitem->value = value_delta;
+	zbx_variant_set_variant(&deltaitem->value, &value_delta);
 
 	if (SUCCEED != ret)
 		zbx_variant_clear(value);

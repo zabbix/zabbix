@@ -397,7 +397,7 @@ typedef struct
 {
 	zbx_uint64_t		itemid;
 	zbx_timespec_t		timestamp;
-	history_value_t		value;
+	zbx_variant_t		value;
 }
 zbx_item_history_value_t;
 
