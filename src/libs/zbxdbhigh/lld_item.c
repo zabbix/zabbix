@@ -1895,8 +1895,6 @@ static void	lld_items_preproc_save(zbx_vector_ptr_t *items)
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
-
-		zbx_free(sql);
 	}
 
 	if (0 != new_preproc_num)
@@ -1916,6 +1914,8 @@ static void	lld_items_preproc_save(zbx_vector_ptr_t *items)
 
 		delete_preproc_num = deleteids.values_num;
 	}
+
+	zbx_free(sql);
 	zbx_vector_uint64_destroy(&deleteids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __function_name, new_preproc_num,
