@@ -1066,7 +1066,7 @@ var CScrollBar = Class.create({
 		}
 		this.dom.info_right.innerHTML = right_info;
 
-		// seting zoom link styles
+		// setting zoom link styles
 		this.setZoomLinksStyle();
 	},
 
