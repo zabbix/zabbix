@@ -1138,7 +1138,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             lld_rows        - [IN] the lld data rows                       *
  *             items           - [IN/OUT] sorted list of items                *
  *             items_index     - [OUT] index of items based on prototype ids  *
- *                                     and lld rows. Used to quckly find an   *
+ *                                     and lld rows. Used to quickly find an  *
  *                                     item by prototype and lld_row.         *
  *                                                                            *
  ******************************************************************************/
