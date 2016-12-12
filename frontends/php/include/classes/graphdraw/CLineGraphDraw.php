@@ -1585,13 +1585,13 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
-			// First element overlaping checks.
+			// First element overlapping checks.
 			if (($i == 0 && $position < $element_size['width']) || $new_time >= $this->to_time) {
 				$i++;
 				continue;
 			}
 
-			// Last element overlaping check.
+			// Last element overlapping check.
 			if ($position > $this->sizeX - $end_element_size['width'] / 2 - 2) {
 				break;
 			}
