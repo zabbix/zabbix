@@ -2426,8 +2426,8 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Purpose: copies tags from template triggers to created/linked triggers     *
  *                                                                            *
- * Parameters: new_triggerids - the created trigger ids                        *
- *             cur_triggerids - the linked trigfer ids                         *
+ * Parameters: new_triggerids - the created trigger ids                       *
+ *             cur_triggerids - the linked trigger ids                        *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *

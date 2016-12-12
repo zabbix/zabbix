@@ -8923,7 +8923,7 @@ Changes for 1.1alpha1:
  - show trigger dependencies in list of configuration of triggers (Alexei)
  - make Zabbix reset nextcheck for items when updating or adding a trigger (Alexei)
  - minimum value of PingerFrequency changed to 1 (Alexei)
- - different icons depending on a triger status for sysmaps (Alexei)
+ - different icons depending on a trigger status for sysmaps (Alexei)
  - added column sysmaps_hosts.icon_on (Alexei)
  - hierarchical maps (Alexei)
  - added column sysmaps_hosts.url (Alexei)
@@ -9740,7 +9740,7 @@ Changes for 1.0alpha10:
  - added support for trigger dependencies
  - added column dep_level to table TRIGGERS
  - added new host type: Workstation + frontends/php/images/sysmaps/Workstation.png
- - added table triger_depends
+ - added table trigger_depends
  - calls to perror() were changed to syslog() where possible
  - added status line to full screen version of form "Status of Triggers"
  - added directory upgrades/dbpatches/1.0alpha9_to_1.0alpha10/
