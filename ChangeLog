@@ -3053,7 +3053,7 @@ A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vital
 ..F....... [ZBX-6838] fixed not being able to select all host groups in the filter (Pavels)
 ..F....... [ZBX-6275] fixed error after saving an LLD rule (Guntis)
 ..F....... [ZBX-6275] fixed several "error" column displaying problems in template item and trigger list (Guntis)
-..F.....S. [ZBX-6882] fixed "Undexined index" on queue page; server won't include lld-rules in queue (Eduard, Sasha)
+..F.....S. [ZBX-6882] fixed "Undefined index" on queue page; server won't include lld-rules in queue (Eduard, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.1.2
