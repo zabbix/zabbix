@@ -3,6 +3,7 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
@@ -272,6 +273,7 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
@@ -1840,6 +1842,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
