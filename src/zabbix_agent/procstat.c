@@ -360,7 +360,7 @@ static size_t	procstat_strdup(void *base, const char *str)
  *          other process.                                                    *
  *                                                                            *
  * Comments: This function logs critical error and exits in the case of       *
- *           shared memory segement operation failure.                        *
+ *           shared memory segment operation failure.                         *
  *                                                                            *
  ******************************************************************************/
 static void	procstat_reattach(void)
