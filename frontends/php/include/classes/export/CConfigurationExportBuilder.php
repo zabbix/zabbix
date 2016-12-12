@@ -959,7 +959,7 @@ class CConfigurationExportBuilder {
 			$link['selementpos1'] = $flipped_selements[$link['selementid1']];
 			$link['selementpos2'] = $flipped_selements[$link['selementid2']];
 
-			// Sort selements positons asc.
+			// Sort selements positions asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
 				zbx_swap($link['selementpos1'], $link['selementpos2']);
 			}

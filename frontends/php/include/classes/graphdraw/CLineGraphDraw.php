@@ -1397,7 +1397,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$position = 0;
 		$i = 0;
 
-		// Calculate the next date and time, postion and determines label type (main or sub) for label placement.
+		// Calculate the next date and time, position and determines label type (main or sub) for label placement.
 		while ($this->stime + $i * $sub_interval + $sub_offset < $this->to_time) {
 			// Next step calculation by interval.
 
