@@ -123,6 +123,8 @@ static int	proxy_data_sender(int *more)
 	else
 		*more = ZBX_PROXY_DATA_DONE;
 
+	zbx_json_free(&j);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
 
 	return history_records + discovery_records + areg_records;
