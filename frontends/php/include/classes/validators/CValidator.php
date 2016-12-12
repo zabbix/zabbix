@@ -113,7 +113,7 @@ abstract class CValidator {
 
 
 	/**
-	 * Returns string represenation of a variable
+	 * Returns string representation of a variable
 	 *
 	 * @param mixed $value
 	 * @return string
