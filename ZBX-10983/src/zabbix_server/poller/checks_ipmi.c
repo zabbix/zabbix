@@ -647,9 +647,16 @@ out:
  *               FAIL - an error occurred while processing events             *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *function_name)
+static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 {
+	const char	*__function_name = "zbx_perform_openipmi_ops";
 	struct timeval	tv;
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p from %s()", __function_name, h->ip,
+				h->port, h, func_name);
+	}
 
 	tv.tv_sec = 10;		/* set timeout for one operation */
 	tv.tv_usec = 0;
@@ -663,12 +670,15 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *function_nam
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perform_one_op() error: %s", function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s(): error: %s", __function_name, func_name,
 					zbx_strerror(res));
 		}
 
 		return FAIL;
 	}
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s()", __function_name, func_name);
 
 	return SUCCEED;
 }
