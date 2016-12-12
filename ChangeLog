@@ -3980,7 +3980,7 @@ A.F....... [ZBX-6002] optimized fetching latest service alarms in Service API (d
 ..F....... [ZBX-6003] optimised Monitoring -> Maps page (Vedmak)
 A.F.....S. [ZBX-5862] fixed SQL condition algorithm (Andris, Eduard, Sasha)
 A.F....... [ZBX-4789] improved performance of permissions check (dotneft, Oleg, Sasha)
-..F....... [ZBX-5979] fixed Monitoring -> Events page not to show events from triggers that reference at least one disabled or unsuported item (Oleg)
+..F....... [ZBX-5979] fixed Monitoring -> Events page not to show events from triggers that reference at least one disabled or unsupported item (Oleg)
 ..F....... [ZBX-5985] fixed DB error in "Configuration of web monitoring" for PostgreSQL (Oleg)
 ..F....... [ZBX-5699] fixed configuration graph host ID passing in navigation (Eduard)
 A......... [ZBX-1946] improved error messages when validating screen item row and column spans (Pavels)
