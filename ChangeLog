@@ -9695,7 +9695,7 @@ Changes for 1.0alpha12:
  - availability report will not show not monitored hosts (Alexei)
  - "maxumum" changed to "maximum" in actions.html (Alexei)
  - "have been restarted" changed to "has been ..." (Alexei)
- - added support for opertor '=' (Alexei)
+ - added support for operator '=' (Alexei)
  - changes in timeout handling for zabbix_trapperd (Alexei)
  - changes in doc/manual.lyx (Alexei)
  - doc/manual.lyx created (Alexei)
