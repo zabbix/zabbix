@@ -52,7 +52,7 @@ typedef struct
 	/*    pair->second - value                  */
 	zbx_vector_ptr_pair_t	values;
 
-	/* the counter state, see ZBX_VMAWRE_COUNTER_* defines */
+	/* the counter state, see ZBX_VMWARE_COUNTER_* defines */
 	unsigned char		state;
 }
 zbx_vmware_perf_counter_t;
