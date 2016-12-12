@@ -1237,7 +1237,7 @@ class CTrigger extends CTriggerGeneral {
 				$outputFields = 'e.*';
 			}
 
-			// due to performance issues, avoid using 'ORDER BY' for outter SELECT
+			// due to performance issues, avoid using 'ORDER BY' for outer SELECT
 			$dbEvents = DBselect(
 				'SELECT '.$outputFields.
 				' FROM events e'.
