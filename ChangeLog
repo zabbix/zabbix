@@ -806,7 +806,7 @@ A.FGI..PS. [ZBXNEXT-1263] polished encryption support for communications between
 .D........ [ZBXNEXT-2637] fixed incorrect double quote character in the default agent configuration files (Richlv)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
 ...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
-...G...PS. [ZBX-8755] removed unutilised header file to eliminate build warnings (Sandis, viktors)
+...G...PS. [ZBX-8755] removed unused header file to eliminate build warnings (Sandis, viktors)
 .......PS. [ZBX-10066] fixed bug where host availability changes could be lost if proxy failed to send the update, fixed possibility of duplicate availability updates for passive proxies (wiper)
 ..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (Cemeris)
 ..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
