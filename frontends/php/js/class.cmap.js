@@ -1671,7 +1671,7 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for editing links.
 		 *
-		 * @param {Object} formContainer jQuesry object
+		 * @param {Object} formContainer jQuery object
 		 * @param {Object} sysmap
 		 */
 		function LinkForm(formContainer, sysmap) {
