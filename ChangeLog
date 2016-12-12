@@ -762,7 +762,7 @@ New features:
 ..F....... [ZBXNEXT-2662] implemented displaying of maps using graph_themes (Pavel, Sasha)
 ...GI..PS. [ZBX-10102] added support for log file meta information update for items with value type other than log (dimir)
 ..F....... [ZBXNEXT-2662] moved "sid" parameter into POST method for links with actions (Sasha)
-...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
+...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard output (wiper)
 
 Bug fixes:
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)

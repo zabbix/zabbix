@@ -554,7 +554,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		]);
 	}
 
-	// format the HTML ouput
+	// format the HTML output
 	foreach ($actions as $i => $action) {
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $j => $operation) {
