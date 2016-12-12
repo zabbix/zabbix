@@ -463,7 +463,7 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
  *                                                                            *
  * Function: is_same_file                                                     *
  *                                                                            *
- * Purpose: find out wheter a file from the old list and a file from the new  *
+ * Purpose: find out whether a file from the old list and a file from the new *
  *          list could be the same file                                       *
  *                                                                            *
  * Parameters:                                                                *
