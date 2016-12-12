@@ -51,7 +51,7 @@ abstract class CGraphDraw {
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
-		$this->axis_valuetype = []; // overal items type (int/float)
+		$this->axis_valuetype = []; // overall items type (int/float)
 		$this->graphtheme = [
 			'theme' => 'blue-theme',
 			'textcolor' => '1F2C33',

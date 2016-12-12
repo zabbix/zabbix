@@ -117,7 +117,7 @@ $params = [
 	'searchByAny' => true
 ];
 
-$overalCount = API::Host()->get($params);
+$overallCount = API::Host()->get($params);
 $viewCount = count($hosts);
 
 $table = (new CTableInfo())
@@ -253,7 +253,7 @@ $widgets = [];
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
 	->setHeader(_('Hosts'), [], false, 'search.php')
-	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
+	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overallCount)]));
 
 // Find Host groups
 $params = [
@@ -280,7 +280,7 @@ $params = [
 	'search' => ['name' => $search],
 	'countOutput' => 1
 ];
-$overalCount = API::HostGroup()->get($params);
+$overallCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
 
 $table = (new CTableInfo())
@@ -354,7 +354,7 @@ foreach ($hostGroups as $hnum => $group) {
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
 	->setHeader(_('Host groups'), [], false, 'search.php')
-	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
+	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overallCount)]));
 
 // FIND Templates
 if ($admin) {
@@ -400,7 +400,7 @@ if ($admin) {
 		'searchByAny' => true
 	];
 
-	$overalCount = API::Template()->get($params);
+	$overallCount = API::Template()->get($params);
 	$viewCount = count($templates);
 
 	$table = (new CTableInfo())
@@ -495,7 +495,7 @@ if ($admin) {
 	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
 		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
 		->setHeader(_('Templates'), [], false, 'search.php')
-		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
+		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overallCount)]));
 }
 
 (new CWidget())
