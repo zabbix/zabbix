@@ -8705,7 +8705,7 @@ Changes for 1.1alpha12:
 
 Changes for 1.1alpha11:
 
- - new configuration optio --enable-server (Alexei)
+ - new configuration option --enable-server (Alexei)
  - new XML based protocol between hosts and agents. Backward compatible. (Alexei)
  - WIN32 agent: support of active checks (Alexei)
  - fixed addition of complex triggers for linked hosts (Alexei)
