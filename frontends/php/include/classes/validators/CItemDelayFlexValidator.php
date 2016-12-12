@@ -175,7 +175,7 @@ class CItemDelayFlexValidator extends CValidator {
 				elseif ($month_day['step'] !== '') {
 					$month_day_step = (int) $month_day['step'];
 
-					// If month day is ommited, month day step is mandatory.
+					// If month day is omitted, month day step is mandatory.
 					if ($month_day_step < 1 || $month_day_step > 30) {
 						$this->setError(_s('Invalid interval "%1$s": invalid month day step "%2$s".',
 							$interval['interval'],
@@ -246,7 +246,7 @@ class CItemDelayFlexValidator extends CValidator {
 				elseif ($week_day['step'] !== '') {
 					$week_day_step = (int) $week_day['step'];
 
-					// If week day is ommited, week day step is mandatory.
+					// If week day is omitted, week day step is mandatory.
 					if ($week_day_step < 1 || $week_day_step > 6) {
 						$this->setError(_s('Invalid interval "%1$s": invalid week day step "%2$s".',
 							$interval['interval'],
@@ -316,7 +316,7 @@ class CItemDelayFlexValidator extends CValidator {
 				elseif ($hours['step'] !== '') {
 					$hour_step = (int) $hours['step'];
 
-					// If hour is ommited, hour step is mandatory.
+					// If hour is omitted, hour step is mandatory.
 					if ($hour_step < 1 || $hour_step > 23) {
 						$this->setError(_s('Invalid interval "%1$s": invalid hour step "%2$s".', $interval['interval'],
 							$hours['step']
@@ -385,7 +385,7 @@ class CItemDelayFlexValidator extends CValidator {
 				elseif ($minutes['step'] !== '') {
 					$minute_step = (int) $minutes['step'];
 
-					// If minute is ommited, minute step is mandatory.
+					// If minute is omitted, minute step is mandatory.
 					if ($minute_step < 1 || $minute_step > 59) {
 						$this->setError(_s('Invalid interval "%1$s": invalid minute step "%2$s".',
 							$interval['interval'],
@@ -456,7 +456,7 @@ class CItemDelayFlexValidator extends CValidator {
 				elseif ($seconds['step'] !== '') {
 					$second_step = (int) $seconds['step'];
 
-					// If second is ommited, second step is mandatory.
+					// If second is omitted, second step is mandatory.
 					if ($second_step < 1 || $second_step > 59) {
 						$this->setError(_s('Invalid interval "%1$s": invalid second step "%2$s".',
 							$interval['interval'],

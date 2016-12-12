@@ -101,7 +101,7 @@ class CItemDelayFlexParser {
 		$i = 0;
 
 		/*
-		 * Empty string means value is ommited (not entered yet). Some values are not allowed to be empty or too large.
+		 * Empty string means value is omitted (not entered yet). Some values are not allowed to be empty or too large.
 		 * For example week days can only be one character. Months, hours, minutes are either one or two characters.
 		 * If more are entered, parser will raise and error.
 		 */
@@ -445,7 +445,7 @@ class CItemDelayFlexParser {
 							break;
 
 						case '/':
-							// Step can be entered of first month day is ommited.
+							// Step can be entered of first month day is omitted.
 							if (strlen($month_day_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
@@ -601,7 +601,7 @@ class CItemDelayFlexParser {
 							break;
 
 						case '/':
-							// Step can be entered of first week day is ommited.
+							// Step can be entered of first week day is omitted.
 							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
@@ -1172,7 +1172,7 @@ class CItemDelayFlexParser {
 							break;
 
 						case '/':
-							// Step can be entered of first hour is ommited.
+							// Step can be entered of first hour is omitted.
 							if (strlen($hours_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
