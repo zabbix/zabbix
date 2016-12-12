@@ -374,7 +374,7 @@ class CItemKey extends CParser {
 	 *
 	 * @param string $param   Item key parameter.
 	 * @param bool   $forced  true - enclose parameter in " even if it does not contain any special characters.
-	 *                        false - do nothing if the paramter does not contain any special characters.
+	 *                        false - do nothing if the parameter does not contain any special characters.
 	 *
 	 * @return string|bool  false - if parameter ends with backslash (cannot be quoted), string - otherwice.
 	 */

@@ -56,7 +56,7 @@ class CActionButtonList extends CObject {
 
 	/**
 	 * @param string		$actionName				name of submit buttons
-	 * @param string		$checkboxesName			Name of paramerer into which checked checkboxes will be put in.
+	 * @param string		$checkboxesName			Name of parameter into which checked checkboxes will be put in.
 	 * @param array			$buttonsData			buttons data array
 	 * @param string		$buttonsData['name']	button caption
 	 * @param string		$buttonsData['confirm']	confirmation text (optional)
