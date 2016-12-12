@@ -50,6 +50,7 @@ static zbx_vmcheck_t	vmchecks[] =
 
 	{"hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
 	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)},
+	{"hv.datacenter.name", VMCHECK_FUNC(check_vcenter_hv_datacenter_name)},
 	{"hv.datastore.discovery", VMCHECK_FUNC(check_vcenter_hv_datastore_discovery)},
 	{"hv.datastore.read", VMCHECK_FUNC(check_vcenter_hv_datastore_read)},
 	{"hv.datastore.size", VMCHECK_FUNC(check_vcenter_hv_datastore_size)},
@@ -78,6 +79,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
 	{"vm.cpu.ready", VMCHECK_FUNC(check_vcenter_vm_cpu_ready)},
 	{"vm.cpu.usage", VMCHECK_FUNC(check_vcenter_vm_cpu_usage)},
+	{"vm.datacenter.name", VMCHECK_FUNC(check_vcenter_vm_datacenter_name)},
 	{"vm.discovery", VMCHECK_FUNC(check_vcenter_vm_discovery)},
 	{"vm.hv.name", VMCHECK_FUNC(check_vcenter_vm_hv_name)},
 	{"vm.memory.size", VMCHECK_FUNC(check_vcenter_vm_memory_size)},

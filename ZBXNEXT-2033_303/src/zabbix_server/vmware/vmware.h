@@ -115,6 +115,7 @@ typedef struct
 	char			*id;
 	char			*details;
 	char			*clusterid;
+	char			*datacenter_name;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
 }

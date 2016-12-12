@@ -39,6 +39,8 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
@@ -93,6 +95,8 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
