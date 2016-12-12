@@ -473,8 +473,8 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['main']			Is this the default interface to use.
 	 * @param string $hosts[]['interfaces']['ip']			Interface IP (optional).
 	 * @param int    $hosts[]['interfaces']['port']			Interface port (optional).
-	 * @param int    $hosts[]['interfaces']['useip']		Interface shoud use IP (optional).
-	 * @param string $hosts[]['interfaces']['dns']			Interface shoud use DNS (optional).
+	 * @param int    $hosts[]['interfaces']['useip']		Interface should use IP (optional).
+	 * @param string $hosts[]['interfaces']['dns']			Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['bulk']			Use bulk requests for interface (optional).
 	 * @param int    $hosts[]['proxy_hostid']				ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']				IPMI authentication type (optional).
@@ -596,8 +596,8 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['main']					Is this the default interface to use.
 	 * @param string $hosts[]['interfaces']['ip']					Interface IP (optional).
 	 * @param int    $hosts[]['interfaces']['port']					Interface port (optional).
-	 * @param int    $hosts[]['interfaces']['useip']				Interface shoud use IP (optional).
-	 * @param string $hosts[]['interfaces']['dns']					Interface shoud use DNS (optional).
+	 * @param int    $hosts[]['interfaces']['useip']				Interface should use IP (optional).
+	 * @param string $hosts[]['interfaces']['dns']					Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['bulk']					Use bulk requests for interface (optional).
 	 * @param int    $hosts[]['proxy_hostid']						ID of the proxy that is used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']						IPMI authentication type (optional).
