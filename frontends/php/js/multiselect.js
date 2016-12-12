@@ -84,7 +84,7 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Rezise multiselect selected text
+		 * Resize multiselect selected text
 		 *
 		 * @return jQuery
 		 */
