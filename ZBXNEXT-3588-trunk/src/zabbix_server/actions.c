@@ -169,7 +169,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"select t.triggerid"
+		"select distinct t.triggerid"
 		" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 		" where hg.hostid=h.hostid"
 			" and h.hostid=i.hostid"
@@ -237,7 +237,7 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
 	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.triggerid"
+			"select distinct t.triggerid"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and h.maintenance_status=%d"
@@ -303,7 +303,7 @@ static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CO
 	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.triggerid"
+			"select distinct t.triggerid"
 			" from items i,functions f,triggers t"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -323,6 +323,92 @@ static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CO
 
 		ZBX_STR2UINT64(objectid, row[0]);
 		zbx_vector_uint64_append(&condition->objectids, objectid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_application_condition                                      *
+ *                                                                            *
+ * Purpose: check application condition                                       *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_application_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t		objectid;
+
+	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_LIKE &&
+			condition->operator != CONDITION_OPERATOR_NOT_LIKE)
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+
+	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct t.triggerid,a.name"
+			" from applications a,items_applications i,functions f,triggers t"
+			" where a.applicationid=i.applicationid"
+			" and i.itemid=f.itemid"
+			" and f.triggerid=t.triggerid"
+			" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+					objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	switch (condition->operator)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (0 == strcmp(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					zbx_vector_uint64_append(&condition->objectids, objectid);
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL != strstr(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					zbx_vector_uint64_append(&condition->objectids, objectid);
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL == strstr(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					zbx_vector_uint64_append(&condition->objectids, objectid);
+				}
+			}
+			break;
 	}
 	DBfree_result(result);
 
@@ -578,52 +664,8 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
 		}
 		else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
 		{
-			result = DBselect(
-					"select distinct a.name"
-					" from applications a,items_applications i,functions f,triggers t"
-					" where a.applicationid=i.applicationid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64,
-					event->objectid);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (0 == strcmp(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_LIKE:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_NOT_LIKE:
-					ret = SUCCEED;
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = FAIL;
-							break;
-						}
-					}
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
+			check_application_condition(events, events_num, condition);
+			break;
 		}
 		else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
 		{
