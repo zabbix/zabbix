@@ -285,7 +285,7 @@ var colorPalette = (function() {
 /**
  * Used for php ctweenbox object.
  * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
- * Moving perserves alphabetical order.
+ * Moving preserves alphabetical order.
  *
  * @formname string	form name where hidden fields will be added
  * @objname string	unique name for hidden field naming
