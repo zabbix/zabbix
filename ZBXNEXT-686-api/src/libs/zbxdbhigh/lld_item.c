@@ -844,8 +844,8 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 {
 	const char	*__function_name = "substitute_formula_macros";
 
-	char		*exp, *tmp, *e, *p, *param = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r, sep_pos;
+	char		*exp, *tmp, *e;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -871,63 +871,13 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 		/* substitute LLD macros in function parameters */
 
-		for (p = e + par_l + 1; p < e + par_r; p += sep_pos + 1)
+		if (SUCCEED != substitute_function_lld_param(e + par_l + 1, par_r - (par_l + 1), 1,
+				&exp, &exp_alloc, &exp_offset, jp_row, error, max_error_len))
 		{
-			size_t	param_pos, param_len;
-			int	quoted;
-
-			e[par_r] = '\0';
-			zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
-			e[par_r] = ')';
-
-			/* copy what was before the parameter */
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p, param_pos);
-
-			/* prepare the parameter (macro substitutions and quoting) */
-
-			zbx_free(param);
-			param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
-
-			if (p == e + par_l + 1)
-			{
-				char	*key = NULL, *host = NULL;
-
-				if (SUCCEED != parse_host_key(param, &host, &key) ||
-						SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
-								MACRO_TYPE_ITEM_KEY, NULL, 0))
-				{
-					zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
-					zbx_free(host);
-					zbx_free(key);
-					goto out;
-				}
-
-				zbx_free(param);
-				if (NULL != host)
-				{
-					param = zbx_dsprintf(NULL, "%s:%s", host, key);
-					zbx_free(host);
-					zbx_free(key);
-				}
-				else
-					param = key;
-			}
-			else
-				substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
-
-			if (SUCCEED != zbx_function_param_quote(&param, quoted))
-			{
-				zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
-				goto out;
-			}
-
-			/* copy the parameter */
-			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, param);
-
-			/* copy what was after the parameter (including separator) */
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, p + param_pos + param_len,
-					sep_pos - param_pos - param_len + 1);
+			goto out;
 		}
+
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
 	}
 
 	/* substitute LLD macros in the remaining part */
@@ -940,7 +890,6 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 
 	ret = SUCCEED;
 out:
-	zbx_free(param);
 	zbx_free(tmp);
 
 	if (SUCCEED == ret)

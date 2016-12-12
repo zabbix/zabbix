@@ -385,6 +385,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/createMissing": a boolean is expected.'
 			],
 			[
+				['type' => API_FLAG],
+				true,
+				'/1/userData',
+				true
+			],
+			[
+				['type' => API_FLAG],
+				false,
+				'/1/userData',
+				false
+			],
+			[
 				['type' => API_OBJECT, 'fields' => []],
 				[],
 				'/',
@@ -791,6 +803,116 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/Latvia/Riga',
 				'/1/name',
 				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'Detect operating system',
+				'/1/name',
+				'Detect operating system'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'folder1/folder2\/',
+				'/1/name',
+				'folder1/folder2\/'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'Detect operating system+',
+				'/1/name',
+				'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/b/c/',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/'.'/c',
+				'/1/name',
+				'Invalid parameter "/1/name": directory or script name cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				null,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				// broken UTF-8 byte sequence
+				'Detect '."\xd1".'perating system',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_USER_MACRO, 'length' => 8],
+				'{$MACRO}',
+				'/1/macro',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_USER_MACRO, 'length' => 19],
+				'{$MACRO: "context"}',
+				'/1/macro',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_USER_MACRO, 'length' => 18],
+				'{$MACRO: "context"}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": value is too long.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRo}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRO} ',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				'{$MACRO: "context"',
+				'/1/macro',
+				'Invalid parameter "/1/macro": an user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				[],
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				null,
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: '."\xd1".'ontext}',
+				'/1/macro',
+				'Invalid parameter "/1/macro": invalid byte sequence in UTF-8.'
 			],
 			[
 				['type' => API_TIME_PERIOD, 'length' => 16],

@@ -72,32 +72,24 @@ class CControllerScriptUpdate extends CController {
 	protected function doAction() {
 		$script = [];
 
-		$this->getInputs($script, ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
-			'groupid', 'host_access'
-		]);
+		$this->getInputs($script, ['scriptid', 'command', 'description', 'usrgrpid', 'groupid', 'host_access']);
+		$script['name'] = trimPath($this->getInput('name', ''));
+		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+		$script['execute_on'] = $this->getInput('type', ZBX_SCRIPT_EXECUTE_ON_SERVER);
 		$script['confirmation'] = $this->getInput('confirmation', '');
 
-		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
-				&& $this->hasInput('commandipmi')) {
-			$script['command'] = $this->getInput('commandipmi');
+		if ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
+			if ($this->hasInput('commandipmi')) {
+				$script['command'] = $this->getInput('commandipmi');
+			}
+			$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_SERVER;
 		}
 
 		if ($this->getInput('hgstype', 1) == 0) {
 			$script['groupid'] = 0;
 		}
 
-		DBstart();
-
-		$result = API::Script()->update($script);
-
-		if ($result) {
-			$scriptId = reset($result['scriptids']);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT,
-				'Name ['.$this->getInput('name', '').'] id ['.$scriptId.']'
-			);
-		}
-
-		$result = DBend($result);
+		$result = (bool) API::Script()->update($script);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');

@@ -107,9 +107,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 		/* extract the first function parameter and <host:>key reference from it */
 
-		e[par_r] = '\0';
 		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
-		e[par_r] = ')';
 
 		zbx_free(buf);
 		buf = zbx_function_param_unquote_dyn(e + par_l + 1 + param_pos, param_len, &quoted);

@@ -728,8 +728,17 @@ class CTrigger extends CTriggerGeneral {
 			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
 
-		if (!$this->isReadable($depTtriggerIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($depTtriggerIds) {
+			$count = $this->get([
+				'countOutput' => true,
+				'triggerids' => $depTtriggerIds
+			]);
+
+			if ($count != count($depTtriggerIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$this->checkDependencies($triggers);
@@ -1131,49 +1140,6 @@ class CTrigger extends CTriggerGeneral {
 		}
 	}
 
-	/**
-	 * Check if user has read permissions for triggers.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'triggerids' => $ids,
-			'countOutput' => true
-		]);
-
-		return count($ids) == $count;
-	}
-
-	/**
-	 *  Check if user has write permissions for triggers.
-	 *
-	 * @param $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'triggerids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return count($ids) == $count;
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
@@ -1347,11 +1313,23 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @throws APIException     if a trigger is not writable or does not exist or is not normal
 	 *
-	 * @param array $triggerIds
+	 * @param array $triggerids
 	 */
-	protected function checkPermissions(array $triggerIds) {
-		if (!$this->isWritable($triggerIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkPermissions(array $triggerids) {
+		if ($triggerids) {
+			$triggerids = array_unique($triggerids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids,
+				'editable' => true
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 

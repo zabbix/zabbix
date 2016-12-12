@@ -119,7 +119,7 @@ class CValueMap extends CApiService {
 
 		DB::insertBatch('mappings', $mappings);
 
-		add_audit_bulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemaps);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemaps);
 
 		return ['valuemapids' => $valuemapids];
 	}
@@ -208,7 +208,7 @@ class CValueMap extends CApiService {
 			}
 		}
 
-		add_audit_bulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
 
 		return ['valuemapids' => zbx_objectValues($valuemaps, 'valuemapid')];
 	}
@@ -253,7 +253,7 @@ class CValueMap extends CApiService {
 			$this->deleteByIds($valuemapids);
 		}
 
-		add_audit_bulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemaps);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemaps);
 
 		return ['valuemapids' => $valuemapids];
 	}

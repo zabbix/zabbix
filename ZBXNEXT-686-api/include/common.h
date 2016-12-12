@@ -195,6 +195,7 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTO_REGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
+#define EVENT_SOURCE_COUNT		4
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -1217,6 +1218,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
+int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
 void	zbx_alarm_flag_set(void);
@@ -1278,6 +1280,8 @@ typedef struct
 	zbx_strloc_t	macro;
 	/* function + parameters, for example: regsub("([0-9]+)", \1) */
 	zbx_strloc_t	func;
+	/* parameters, for example: ("([0-9]+)", \1) */
+	zbx_strloc_t	func_param;
 }
 zbx_token_func_macro_t;
 
@@ -1321,4 +1325,9 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
+#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+
 #endif
+
