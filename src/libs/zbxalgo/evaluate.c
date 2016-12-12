@@ -378,7 +378,7 @@ static double	evaluate_term5(int *unknown_idx)
 	{
 		op = *ptr++;
 
-		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		if (ZBX_INFINITY == (operand = evaluate_term6(&oper_idx)))
 			return ZBX_INFINITY;
@@ -447,7 +447,7 @@ static double	evaluate_term4(int *unknown_idx)
 		else
 			break;
 
-		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		if (ZBX_INFINITY == (operand = evaluate_term5(&oper_idx)))
 			return ZBX_INFINITY;
@@ -518,7 +518,7 @@ static double	evaluate_term3(int *unknown_idx)
 		else
 			break;
 
-		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurrs */
+		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		if (ZBX_INFINITY == (operand = evaluate_term4(&oper_idx)))
 			return ZBX_INFINITY;
