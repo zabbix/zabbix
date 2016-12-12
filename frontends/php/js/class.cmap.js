@@ -1063,7 +1063,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Updates element icon and height/witdh in case element is area type.
+			 * Updates element icon and height/width in case element is area type.
 			 */
 			updateIcon: function() {
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
