@@ -158,7 +158,8 @@ zbx_vmware_counter_t;
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
 #define ZBX_XPATH_DATASTORE(property)									\
-	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='" property "']"
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
+	"/*[local-name()='val']"
 
 #define ZBX_XPATH_DATASTORE_MOUNT()									\
 	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
@@ -171,6 +172,10 @@ zbx_vmware_counter_t;
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
+
+#define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='" property "']"
 
 typedef struct
 {
@@ -641,6 +646,10 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
+
+	datastore->capacity = src->capacity;
+	datastore->free_space = src->free_space;
+	datastore->uncommitted = src->uncommitted;
 
 	return datastore;
 }
@@ -1680,8 +1689,9 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value;
 	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __function_name, id);
 
@@ -1698,7 +1708,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
-	name = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE("name"));
+	name = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("name"));
 
 	if (NULL != (path = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_MOUNT())))
 	{
@@ -1712,7 +1722,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 			if ('/' == path[len - 1])
 				path[len - 1] = '\0';
 
-			for (ptr = path + len - 2; ptr > path && *ptr != '/'; ptr--)
+			for (ptr = path + len - 2; ptr > path && (*ptr != '/' && *ptr != ':'); ptr--)
 				;
 
 			uuid = zbx_strdup(NULL, ptr + 1);
@@ -1720,11 +1730,31 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		zbx_free(path);
 	}
 
-out:
+	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
+	{
+		is_uint64(value, &capacity);
+		zbx_free(value);
+	}
+
+	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
+	{
+		is_uint64(value, &free_space);
+		zbx_free(value);
+	}
+
+	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
+	{
+		is_uint64(value, &uncommitted);
+		zbx_free(value);
+	}
+
 	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
 	datastore->uuid = uuid;
-
+	datastore->capacity = capacity;
+	datastore->free_space = free_space;
+	datastore->uncommitted = uncommitted;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return datastore;
@@ -3245,6 +3275,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 		error = zbx_strdup(error, curl_easy_strerror(err));
+
 clean:
 	zbx_free(tmp);
 
@@ -3261,6 +3292,8 @@ out:
 	}
 	else
 	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
 		vmware_entities_shared_clean_stats(&service->entities);
 		vmware_service_parse_perf_data(service, page.data);
 	}
