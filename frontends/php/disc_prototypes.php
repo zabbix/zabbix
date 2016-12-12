@@ -206,13 +206,13 @@ if (!$discoveryRule) {
 
 $itemPrototypeId = getRequest('itemid');
 if ($itemPrototypeId) {
-	$item_prorotypes = API::ItemPrototype()->get([
+	$item_prototypes = API::ItemPrototype()->get([
 		'output' => [],
 		'itemids' => $itemPrototypeId,
 		'editable' => true
 	]);
 
-	if (!$item_prorotypes) {
+	if (!$item_prototypes) {
 		access_deny();
 	}
 }

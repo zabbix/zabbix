@@ -362,8 +362,8 @@ class CHostPrototype extends CHostBase {
 			'selectParentHost' => ['host'],
 			'nopermissions' => true
 		]);
-		foreach ($createdHostPrototypes as $hostProtototype) {
-			info(_s('Created: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
+		foreach ($createdHostPrototypes as $hostPrototype) {
+			info(_s('Created: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parentHost']['host']));
 		}
 
 		return $hostPrototypes;
@@ -620,8 +620,8 @@ class CHostPrototype extends CHostBase {
 			'selectParentHost' => ['host'],
 			'nopermissions' => true
 		]);
-		foreach ($updatedHostPrototypes as $hostProtototype) {
-			info(_s('Updated: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
+		foreach ($updatedHostPrototypes as $hostPrototype) {
+			info(_s('Updated: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parentHost']['host']));
 		}
 
 		return $hostPrototypes;
@@ -974,8 +974,8 @@ class CHostPrototype extends CHostBase {
 		DB::delete($this->tableName(), ['hostid' => $hostPrototypeIds]);
 
 		// TODO: REMOVE info
-		foreach ($deleteHostPrototypes as $hostProtototype) {
-			info(_s('Deleted: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
+		foreach ($deleteHostPrototypes as $hostPrototype) {
+			info(_s('Deleted: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parentHost']['host']));
 		}
 
 		return ['hostids' => $hostPrototypeIds];

@@ -956,7 +956,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['comments']                [IN]
 	 * @param int    $db_triggers[<tnum>]['type']                    [IN]
 	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
-	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prorotypes only.
+	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prototypes only.
 	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
@@ -1177,7 +1177,7 @@ abstract class CTriggerGeneral extends CApiService {
 		 *                 'key' => <key>,
 		 *                 'value_type' => <value_type>,
 		 *                 'flags' => <flags>,
-		 *                 'lld_ruleid' => <itemid> (CTriggerProrotype only)
+		 *                 'lld_ruleid' => <itemid> (CTriggerPrototype only)
 		 *             ]
 		 *         ]
 		 *     ]
@@ -1595,7 +1595,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Adds triggers and trigger prorotypes from template to hosts.
+	 * Adds triggers and trigger prototypes from template to hosts.
 	 *
 	 * @param array $data
 	 */
