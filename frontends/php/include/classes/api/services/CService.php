@@ -543,7 +543,7 @@ class CService extends CApiService {
 
 		$rs = [];
 		if ($services) {
-			$usedSeviceIds = [];
+			$usedServiceIds = [];
 
 			$problemServiceIds = [];
 			foreach ($services as &$service) {
@@ -551,7 +551,7 @@ class CService extends CApiService {
 
 				// don't calculate SLA for services with disabled status calculation
 				if ($this->isStatusEnabled($service)) {
-					$usedSeviceIds[$service['serviceid']] = $service['serviceid'];
+					$usedServiceIds[$service['serviceid']] = $service['serviceid'];
 
 					if ($service['status'] > 0) {
 						$problemServiceIds[] = $service['serviceid'];
@@ -569,7 +569,7 @@ class CService extends CApiService {
 				];
 			}
 
-			if ($usedSeviceIds) {
+			if ($usedServiceIds) {
 				// add service alarms
 				if ($intervals) {
 					$intervalConditions = [];
@@ -579,7 +579,7 @@ class CService extends CApiService {
 					$query = DBselect(
 						'SELECT *'.
 						' FROM service_alarms sa'.
-						' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
+						' WHERE '.dbConditionInt('sa.serviceid', $usedServiceIds).
 							' AND ('.implode(' OR ', $intervalConditions).')'.
 						' ORDER BY sa.clock,sa.servicealarmid'
 					);
@@ -598,13 +598,13 @@ class CService extends CApiService {
 
 				// calculate SLAs
 				foreach ($intervals as $interval) {
-					$latestValues = $this->fetchLatestValues($usedSeviceIds, $interval['from']);
+					$latestValues = $this->fetchLatestValues($usedServiceIds, $interval['from']);
 
 					foreach ($services as $service) {
 						$serviceId = $service['serviceid'];
 
 						// only calculate the sla for services which require it
-						if (isset($usedSeviceIds[$serviceId])) {
+						if (isset($usedServiceIds[$serviceId])) {
 							$latestValue = (isset($latestValues[$serviceId])) ? $latestValues[$serviceId] : 0;
 							$intervalSla = $slaCalculator->calculateSla($service['alarms'], $service['times'],
 								$interval['from'], $interval['to'], $latestValue
