@@ -47,7 +47,7 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
  * Function: parse_db_monitor_item_params                                        *
  *                                                                               *
  * Purpose: parse database monitor item params string "user=<user> password=     *
- *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *          <password> DSN=<dsn> sql=<sql>" into parameter values.               *
  *                                                                               *
  * Parameters:  params     - [IN] the params string                              *
  *              dsn        - [OUT] the ODBC DSN output buffer                    *
