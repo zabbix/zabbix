@@ -4236,7 +4236,7 @@ A.F....... [ZBX-5409] changed item value macros for items without data to be res
 ..F....... [ZBX-5389] fixed broken Monitoring->Graph when used with Oracle (Toms)
 ..F....... [ZBX-5422] fixed the outdated browser warning page not being displayed when magic quotes are enabled (Pavels)
 ..F....... [ZBX-5422] disabled switching to compatibility mode for IE (Pavels)
-..F....... [ZBX-5392] fixed the "no permission" error when repeatingly deleting items from the item list (Pavels)
+..F....... [ZBX-5392] fixed the "no permission" error when repeatedly deleting items from the item list (Pavels)
 ...G...... [ZBX-5358] fixed converting to UTF8 of interface name in net.if.discovery check (Sasha)
 ....I..... [ZBX-5359] improved performance of MySQL patches for migrating to the 2.0 schema (Sasha)
 .......PS. [ZBX-5397] fixed resolving of {HOST.IP}, {HOST.DNS} and {HOST.CONN} macros in item key parameters (Sasha)
