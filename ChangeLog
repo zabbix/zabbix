@@ -2966,7 +2966,7 @@ Bug fixes:
 ..F....... [ZBX-6978] fixed leading and trailing spaces for translatable strings (Ivo)
 ..F....... [ZBX-7033] replaced HTML special characters with corresponding entity names and unicode characters (Ivo)
 ........S. [ZBX-7013] strndup function was replaced to avoid compilation error when non-gnu compilers are used (igors)
-........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content whithin the same escalation step when notification is sent to multiple recipients (igors)
+........S. [ZBX-6904] now ESC.HISTORY macro creates the same message content within the same escalation step when notification is sent to multiple recipients (igors)
 ........S. [ZBX-6987] fixed possible crash in value cache when freeing items with out of order values (wiper)
 ..F....... [ZBX-7024] fixed filtering by application name "0" in Monitoring > Overview dropdown (Ivo)
 A.F....... [ZBX-7026] removed automatic changing of "error" field when trigger and trigger prototype expression is changed (Ivo)
