@@ -67,7 +67,7 @@
 			$('#description').focus();
 		});
 
-		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
+		// Trim spaces on submit. Spaces for script parameters should not be trimmed.
 		$('#media_type_form').submit(function() {
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
