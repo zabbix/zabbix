@@ -9730,7 +9730,7 @@ Changes for 1.0alpha11:
  - if item.history==0, not values will be added to table history for this item (Alexei)
  - added directory upgrades/dbpatches/1.0alpha10_to_1.0alpha11/ (Alexei)
  - added set of keys proc_cnt[*] (Alexei)
- - when pressing Active in list of items, [all] selected unstead of [Server]. Fixed. (Alexei)
+ - when pressing Active in list of items, [all] selected instead of [Server]. Fixed. (Alexei)
  - some triggers have incorrect status. Fixed. (Alexei)
  - global variable $ERROR_MSG will show details of operation failure (Alexei)
  - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers (Alexei)
