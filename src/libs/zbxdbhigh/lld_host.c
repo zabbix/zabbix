@@ -1791,7 +1791,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		/* select already linked temlates */
+		/* select already linked templates */
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hostid,templateid"
