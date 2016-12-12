@@ -622,8 +622,8 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException if same name on some host is found.
 	 *
-	 * @param array $httpTests		array of web screnarios
-	 * @param array $dbHttpTests	array of DB web screnarios
+	 * @param array $httpTests		array of web scenarios
+	 * @param array $dbHttpTests	array of DB web scenarios
 	 */
 	protected function checkDuplicates(array $httpTests, array $dbHttpTests = []) {
 		$httpTestNames = [];

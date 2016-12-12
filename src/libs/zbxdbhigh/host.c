@@ -1672,7 +1672,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
  *                                                                            *
  * Function: DBdelete_template_httptests                                      *
  *                                                                            *
- * Purpose: delete template web scenatios from host                           *
+ * Purpose: delete template web scenarios from host                           *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *

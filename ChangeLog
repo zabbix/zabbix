@@ -2165,7 +2165,7 @@ Bug fixes:
 .......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
 .......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
 ........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
-........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarious (igors)
+........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarios (igors)
 ........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
 ........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
