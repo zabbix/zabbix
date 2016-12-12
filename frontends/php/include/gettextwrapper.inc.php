@@ -180,7 +180,7 @@ function _xn($message, $messagePlural, $num, $context) {
 /**
  * Returns a formatted string.
  *
- * @param string $format		receives already stranlated string with format
+ * @param string $format		receives already translated string with format
  * @param array  $arguments		arguments to replace according to given format
  *
  * @return string
