@@ -6653,7 +6653,7 @@ Changes for 1.8.1
  - [ZBX-1475] improved elements status checks (Aly)
  - [ZBX-1598] fixed empty application list when mass update template items (Vedmak)
  - [ZBX-1612] fixed "API access" and "Disabled" group permissions; patch by Kodai (Richlv)
- - [ZBX-1606] fixed showing icon errors with qoutes in error text (Vedmak)
+ - [ZBX-1606] fixed showing icon errors with quotes in error text (Vedmak)
  - [ZBX-1571] fixed errors when adding proxy (Vedmak)
  - [ZBX-1585] fixed editing time in calendar popup in ie6/7 (Vedmak)
  - [ZBX-1564] fixed processing of performance counters which are represented as number alternatives (Dmitry)
