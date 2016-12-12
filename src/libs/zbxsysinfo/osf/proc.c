@@ -90,26 +90,26 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			proc = open(filename, O_RDONLY);
 			if (-1 == proc)
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			/* Self process information. It leads to incorrect results for proc.mem[zabbix_agentd]. */
 			if (psinfo.pr_pid == curr_pid)
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			if (NULL != procname && '\0' != *procname)
 				if (0 == strcmp(procname, psinfo.pr_fname))
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			if (NULL != usrinfo)
 				if (usrinfo->pw_uid != psinfo.pr_uid)
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			if (NULL != proccomm && '\0' != *proccomm)
 				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			proccount++;
 
@@ -126,7 +126,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				else	/* SUM */
 					memsize += (double)(psinfo.pr_rssize * pgsize);
 			}
-lbl_skip_procces:
+lbl_skip_process:
 			if (-1 != proc)
 				close(proc);
 		}
@@ -214,33 +214,33 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			proc = open(filename, O_RDONLY);
 			if (-1 == proc)
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			/* Self process information. It leads to incorrect results for proc.num[zabbix_agentd]. */
 			if (psinfo.pr_pid == curr_pid)
-				goto lbl_skip_procces;
+				goto lbl_skip_process;
 
 			if (NULL != procname && '\0' != *procname)
 				if (0 != strcmp(procname, psinfo.pr_fname))
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			if (NULL != usrinfo)
 				if (usrinfo->pw_uid != psinfo.pr_uid)
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			if (-1 != zbx_proc_stat)
 				if (psinfo.pr_sname != zbx_proc_stat)
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			if (NULL != proccomm && '\0' != *proccomm)
 				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-					goto lbl_skip_procces;
+					goto lbl_skip_process;
 
 			proccount++;
-lbl_skip_procces:
+lbl_skip_process:
 			if (-1 != proc)
 				close(proc);
 		}
