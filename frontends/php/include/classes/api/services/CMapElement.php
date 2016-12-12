@@ -468,12 +468,12 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkLinkInput($links, __FUNCTION__);
 
-		$udpateLinks = [];
+		$updateLinks = [];
 		foreach ($links as $link) {
-			$udpateLinks[] = ['values' => $link, 'where' => ['linkid' => $link['linkid']]];
+			$updateLinks[] = ['values' => $link, 'where' => ['linkid' => $link['linkid']]];
 		}
 
-		DB::update('sysmaps_links', $udpateLinks);
+		DB::update('sysmaps_links', $updateLinks);
 
 		return ['linkids' => zbx_objectValues($links, 'linkid')];
 	}

@@ -755,7 +755,7 @@ ZABBIX.apps.map = (function($) {
 
 		Link.prototype = {
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {Object} data
 			 */

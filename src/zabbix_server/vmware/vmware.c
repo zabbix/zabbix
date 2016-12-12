@@ -3813,7 +3813,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	zbx_vmware_lock();
 
-	/* udpate entity refresh rate */
+	/* update entity refresh rate */
 	for (i = 0; i < entities.values_num; i++)
 	{
 		if (NULL != (entity = zbx_hashset_search(&service->entities, entities.values[i])))
