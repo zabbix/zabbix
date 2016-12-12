@@ -408,7 +408,7 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, className, styles) {
+	HintWrapper: function(e, target, hintText, className, styles) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {

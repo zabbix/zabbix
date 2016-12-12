@@ -178,7 +178,7 @@ class CTag extends CObject {
 		);
 
 		$this->onMouseover(
-			'hintBox.HintWraper(event, this, jQuery("#'.$id.'").html(), "'.$span_class.'", "'.$styles.'");'
+			'hintBox.HintWrapper(event, this, jQuery("#'.$id.'").html(), "'.$span_class.'", "'.$styles.'");'
 		);
 
 		if ($freeze_on_click) {
