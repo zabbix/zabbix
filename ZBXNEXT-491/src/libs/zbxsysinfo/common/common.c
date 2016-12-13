@@ -23,6 +23,7 @@
 #include "log.h"
 
 #include "file.h"
+#include "dir.h"
 #include "http.h"
 #include "net.h"
 #include "system.h"
@@ -31,9 +32,11 @@
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"
 #	define VFS_TEST_REGEXP "root"
+#       define VFS_TEST_DIR  "/var/log"
 #else
 #	define VFS_TEST_FILE "c:\\windows\\win.ini"
 #	define VFS_TEST_REGEXP "fonts"
+#       define VFS_TEST_DIR  "c:\\windows"
 #endif
 
 extern int	CONFIG_TIMEOUT;
@@ -59,6 +62,8 @@ ZBX_METRIC	parameters_common[] =
 	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH, 	VFS_TEST_FILE "," VFS_TEST_REGEXP},
 	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
+
+	{"vfs.dir.size",        CF_HAVEPARAMS,  VFS_DIR_SIZE,           VFS_TEST_DIR},
 
 	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
 	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
