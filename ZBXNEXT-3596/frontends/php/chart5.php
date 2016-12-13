@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['file'] = 'chart5.php';
-$page['type'] = PAGE_TYPE_IMAGE;
+$page['type'] = PAGE_TYPE_SVG;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -220,7 +220,12 @@ $str = sprintf('%0.2f', microtime(true) - $start_time);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
 imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $grey, $str);
-imageOut($im);
-imagedestroy($im);
+//imageOut($im);
+//imagedestroy($im);
+
+//$graph = new CBarGraphDraw(1000, 400, 'Header');
+$data = [45,34,78,99,32,34,45,67,89];
+$graph = new CBarGraphDraw(1000, 400, 'Header', $data);
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
