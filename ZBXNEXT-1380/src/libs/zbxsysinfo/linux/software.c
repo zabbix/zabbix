@@ -217,10 +217,11 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT, EXECUTE_CHECK_CODE) &&
 				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT))
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+					EXECUTE_CHECK_CODE))
 				continue;
 
 			ret = SYSINFO_RET_OK;

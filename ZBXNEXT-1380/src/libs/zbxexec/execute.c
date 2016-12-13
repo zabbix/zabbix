@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxexec.h"
 #include "threads.h"
 #include "log.h"
 
@@ -191,6 +192,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
  * Purpose: this function waits for process to change state                   *
  *                                                                            *
  * Parameters: pid     - [IN] child process PID                               *
+ *             status  - [OUT] process status
  *                                                                            *
  * Return value: on success, PID is returned. On error,                       *
  *               -1 is returned, and errno is set appropriately               *
@@ -198,10 +200,10 @@ static int	zbx_popen(pid_t *pid, const char *command)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_waitpid(pid_t pid)
+static int	zbx_waitpid(pid_t pid, int *status)
 {
 	const char	*__function_name = "zbx_waitpid";
-	int		rc, status;
+	int		rc, result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -210,7 +212,7 @@ static int	zbx_waitpid(pid_t pid)
 #ifdef WCONTINUED
 		static int	wcontinued = WCONTINUED;
 retry:
-		if (-1 == (rc = waitpid(pid, &status, WUNTRACED | wcontinued)))
+		if (-1 == (rc = waitpid(pid, &result, WUNTRACED | wcontinued)))
 		{
 			if (EINVAL == errno && 0 != wcontinued)
 			{
@@ -218,26 +220,30 @@ retry:
 				goto retry;
 			}
 #else
-		if (-1 == (rc = waitpid(pid, &status, WUNTRACED)))
+		if (-1 == (rc = waitpid(pid, &result, WUNTRACED)))
 		{
 #endif
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, zbx_strerror(errno));
 			goto exit;
 		}
 
-		if (WIFEXITED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() exited, status:%d", __function_name, WEXITSTATUS(status));
-		else if (WIFSIGNALED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __function_name, WTERMSIG(status));
-		else if (WIFSTOPPED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(status));
+		if (WIFEXITED(result))
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() exited, status:%d", __function_name, WEXITSTATUS(result));
+		else if (WIFSIGNALED(result))
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __function_name, WTERMSIG(result));
+		else if (WIFSTOPPED(result))
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(result));
 #ifdef WIFCONTINUED
-		else if (WIFCONTINUED(status))
+		else if (WIFCONTINUED(result))
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __function_name);
 #endif
 	}
-	while (!WIFEXITED(status) && !WIFSIGNALED(status));
+	while (!WIFEXITED(result) && !WIFSIGNALED(result));
 exit:
+	if(NULL != status)
+	{
+		*status = result;
+	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
@@ -255,6 +261,9 @@ exit:
  *             buffer        - [OUT] buffer for output, if NULL - ignored     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
+ *             timeout       - [IN] execution timeout                         *
+ *             check         - [IN] EXECUTE_CHECK_NONE / EXECUTE_CHECK_CODE   *
+ *                                  if result code should be checked or not   *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -262,10 +271,10 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout, int check)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
-	int			ret = FAIL;
+	int			ret = FAIL, status = 0;
 #ifdef _WINDOWS
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
@@ -274,6 +283,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	char			*cmd = NULL;
 	wchar_t			*wcmd = NULL;
 	struct _timeb		start_time, current_time;
+	DWORD			code;
 #else
 	pid_t			pid;
 	int			fd;
@@ -366,6 +376,16 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		{
 			ret = TIMEOUT_ERROR;
 		}
+		else if (0 != (EXECUTE_CHECK_CODE & check) &&
+				WAIT_OBJECT_0 == WaitForSingleObject(pi.hProcess, 0) &&
+				GetExitCodeProcess(pi.hProcess, &code) && 0 != code)
+		{
+			ret = FAIL;
+			if (NULL != buffer && '\0' != **buffer)
+				zbx_strlcpy(error, *buffer, max_error_len);
+			else
+				zbx_snprintf(error, max_error_len, "process exited with code: %d", code);
+		}
 	}
 
 	CloseHandle(pi.hProcess);
@@ -408,7 +428,7 @@ close:
 
 		close(fd);
 
-		if (-1 == rc || -1 == zbx_waitpid(pid))
+		if (-1 == rc || -1 == zbx_waitpid(pid, &status))
 		{
 			if (EINTR == errno)
 				ret = TIMEOUT_ERROR;
@@ -419,12 +439,19 @@ close:
 			if (-1 == kill(-pid, SIGTERM))
 				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s]: %s", command, zbx_strerror(errno));
 
-			zbx_waitpid(pid);
+			zbx_waitpid(pid, NULL);
 		}
 		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		}
+		else if (0 != (EXECUTE_CHECK_CODE & check) && WIFEXITED(status) && 0 != WEXITSTATUS(status))
+		{
+			if (NULL != buffer && '\0' != **buffer)
+				zbx_strlcpy(error, *buffer, max_error_len);
+			else
+				zbx_snprintf(error, max_error_len, "process exited with code: %d", WEXITSTATUS(status));
 		}
 		else
 			ret = SUCCEED;

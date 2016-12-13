@@ -825,6 +825,8 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 		if (SUCCEED == rc)
 		{
+			char	*output = NULL;
+
 			switch (script.type)
 			{
 				case ZBX_SCRIPT_TYPE_SSH:
@@ -842,7 +844,11 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 					break;
 			}
 
-			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+			if (SUCCEED == (rc = zbx_execute_script(&host, &script, &output, error, sizeof(error))))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", script.command, error);
+				zbx_free(output);
+			}
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);

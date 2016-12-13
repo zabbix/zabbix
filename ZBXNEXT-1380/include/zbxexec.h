@@ -20,7 +20,10 @@
 #ifndef ZABBIX_ZBXEXEC_H
 #define ZABBIX_ZBXEXEC_H
 
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
+#define EXECUTE_CHECK_NONE		0
+#define EXECUTE_CHECK_CODE		1
+
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout, int check);
 int	zbx_execute_nowait(const char *command);
 
 #endif

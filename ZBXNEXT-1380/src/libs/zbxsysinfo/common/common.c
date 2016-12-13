@@ -86,31 +86,16 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int EXECUTE_COMMAND(const char *command, int check, AGENT_RESULT *result)
 {
-	char	*command;
-
-	if (1 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	command = get_rparam(request, 0);
-
-	return EXECUTE_STR(command, result);
-}
-
-int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
-{
-	const char	*__function_name = "EXECUTE_STR";
+	const char	*__function_name = "EXECUTE_COMMAND";
 
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
 	init_result(result);
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT, check))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto out;
@@ -128,6 +113,26 @@ out:
 	zbx_free(cmd_result);
 
 	return ret;
+}
+
+int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char	*command;
+
+	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	command = get_rparam(request, 0);
+
+	return EXECUTE_STR(command, result);
+}
+
+int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
+{
+	return EXECUTE_COMMAND(command, EXECUTE_CHECK_CODE, result);
 }
 
 int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
@@ -189,6 +194,10 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+	{
+		return EXECUTE_COMMAND(command, EXECUTE_CHECK_NONE, result);
+	}
+	else if (0 == strcmp(flag, "check"))
 	{
 		return EXECUTE_STR(command, result);
 	}

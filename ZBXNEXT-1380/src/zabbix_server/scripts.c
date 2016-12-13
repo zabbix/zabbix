@@ -69,7 +69,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "wait");
+	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "check");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 
 	init_result(&agent_result);
@@ -370,7 +370,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT);
+							CONFIG_TRAPPER_TIMEOUT, EXECUTE_CHECK_CODE);
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]",
