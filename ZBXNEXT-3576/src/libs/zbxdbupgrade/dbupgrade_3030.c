@@ -141,7 +141,7 @@ static int	DBpatch_3030012(void)
 
 static int	DBpatch_3030013(void)
 {
-	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("media", &field);
 }
