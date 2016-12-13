@@ -1737,6 +1737,427 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
 	return ret;
 }
 
+static int	is_supported_event_object(const DB_EVENT *event)
+{
+	if (EVENT_OBJECT_TRIGGER != event->object && EVENT_OBJECT_ITEM != event->object &&
+					EVENT_OBJECT_LLDRULE != event->object)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	check_intern_event_type_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	int		ret, i;
+	zbx_uint64_t	condition_value;
+
+	condition_value = atoi(condition->value);
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event = &events[i];
+
+		ret = FAIL;
+
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
+					event->object, condition->conditionid);
+			continue;
+		}
+		switch (condition_value)
+		{
+			case EVENT_TYPE_ITEM_NOTSUPPORTED:
+				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
+					ret = SUCCEED;
+				break;
+			case EVENT_TYPE_TRIGGER_UNKNOWN:
+				if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_UNKNOWN == event->value)
+					ret = SUCCEED;
+				break;
+			case EVENT_TYPE_LLDRULE_NOTSUPPORTED:
+				if (EVENT_OBJECT_LLDRULE == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
+					ret = SUCCEED;
+				break;
+			default:
+				return NOTSUPPORTED;
+		}
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+	}
+
+	return SUCCEED;
+}
+static int	check_intern_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	DB_RESULT	result;
+	zbx_uint64_t	condition_value;
+	int		ret, i;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	for (i = 0; i < events_num; i++)
+	{
+		zbx_vector_uint64_t	groupids;
+		char			*sqlcond = NULL;
+		size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
+		const DB_EVENT		*event = &events[i];
+
+		ret = FAIL;
+
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
+					event->object, condition->conditionid);
+			continue;
+		}
+
+		zbx_vector_uint64_create(&groupids);
+		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
+
+		switch (event->object)
+		{
+		case EVENT_OBJECT_TRIGGER:
+			zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
+					"select null"
+					" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+					" where hg.hostid=h.hostid"
+						" and h.hostid=i.hostid"
+						" and i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64
+						" and",
+					event->objectid);
+			break;
+		default:
+			zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
+					"select null"
+					" from hosts_groups hg,hosts h,items i"
+					" where hg.hostid=h.hostid"
+						" and h.hostid=i.hostid"
+						" and i.itemid=" ZBX_FS_UI64
+						" and",
+					event->objectid);
+		}
+
+		DBadd_condition_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselectN(sqlcond, 1);
+
+		zbx_free(sqlcond);
+		zbx_vector_uint64_destroy(&groupids);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			ret = NOTSUPPORTED;
+		}
+		DBfree_result(result);
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+		else if (NOTSUPPORTED == ret)
+			return NOTSUPPORTED;
+	}
+
+	return SUCCEED;
+}
+
+static int	check_intern_host_template_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	condition_value;
+	int		ret, i;
+
+	zbx_uint64_t	hostid, objectid;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event = &events[i];
+
+		ret = FAIL;
+
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
+					event->object, condition->conditionid);
+			continue;
+		}
+
+		switch (condition->operator)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				objectid = event->objectid;
+
+				/* use parent object ID for generated objects */
+				switch (event->object)
+				{
+					case EVENT_OBJECT_TRIGGER:
+						result = DBselect(
+								"select parent_triggerid"
+								" from trigger_discovery"
+								" where triggerid=" ZBX_FS_UI64,
+								objectid);
+						break;
+					default:
+						result = DBselect(
+								"select id.parent_itemid"
+								" from item_discovery id,items i"
+								" where id.itemid=i.itemid"
+									" and i.itemid=" ZBX_FS_UI64
+									" and i.flags=%d",
+								objectid, ZBX_FLAG_DISCOVERY_CREATED);
+				}
+
+				if (NULL != (row = DBfetch(result)))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+
+					zabbix_log(LOG_LEVEL_DEBUG, "check host template condition,"
+							" selecting parent objectid:" ZBX_FS_UI64, objectid);
+				}
+				DBfree_result(result);
+
+				do
+				{
+					switch (event->object)
+					{
+						case EVENT_OBJECT_TRIGGER:
+							result = DBselect(
+									"select distinct i.hostid,t.templateid"
+									" from items i,functions f,triggers t"
+									" where i.itemid=f.itemid"
+										" and f.triggerid=t.templateid"
+										" and t.triggerid=" ZBX_FS_UI64,
+									objectid);
+							break;
+						default:
+							result = DBselect(
+									"select t.hostid,t.itemid"
+									" from items t,items h"
+									" where t.itemid=h.templateid"
+										" and h.itemid=" ZBX_FS_UI64,
+									objectid);
+					}
+
+					objectid = 0;
+
+					while (NULL != (row = DBfetch(result)))
+					{
+						ZBX_STR2UINT64(hostid, row[0]);
+						ZBX_STR2UINT64(objectid, row[1]);
+
+						if (hostid == condition_value)
+						{
+							ret = SUCCEED;
+							break;
+						}
+					}
+					DBfree_result(result);
+				}
+				while (SUCCEED != ret && 0 != objectid);
+
+				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
+				break;
+			default:
+				return NOTSUPPORTED;
+		}
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+	}
+
+	return SUCCEED;
+}
+
+static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	DB_RESULT	result;
+	zbx_uint64_t	condition_value;
+	int		ret, i;
+	char		sql[256];
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event = &events[i];
+
+		ret = FAIL;
+
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
+					event->object, condition->conditionid);
+			continue;
+		}
+
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				zbx_snprintf(sql, sizeof(sql),
+						"select null"
+						" from items i,functions f,triggers t"
+						" where i.itemid=f.itemid"
+							" and f.triggerid=t.triggerid"
+							" and t.triggerid=" ZBX_FS_UI64
+							" and i.hostid=" ZBX_FS_UI64,
+						event->objectid, condition_value);
+				break;
+			default:
+				zbx_snprintf(sql, sizeof(sql),
+						"select null"
+						" from items"
+						" where itemid=" ZBX_FS_UI64
+							" and hostid=" ZBX_FS_UI64,
+						event->objectid, condition_value);
+		}
+
+		result = DBselectN(sql, 1);
+
+		switch (condition->operator)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				if (NULL != DBfetch(result))
+					ret = SUCCEED;
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (NULL == DBfetch(result))
+					ret = SUCCEED;
+				break;
+			default:
+				ret = NOTSUPPORTED;
+		}
+		DBfree_result(result);
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+		else if (NOTSUPPORTED == ret)
+			return NOTSUPPORTED;
+	}
+
+	return SUCCEED;
+}
+
+static int	check_intern_application_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret, i;
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event = &events[i];
+
+		ret = FAIL;
+
+		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
+			continue;
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
+					event->object, condition->conditionid);
+			continue;
+		}
+
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				result = DBselect(
+						"select distinct a.name"
+						" from applications a,items_applications i,functions f,triggers t"
+						" where a.applicationid=i.applicationid"
+							" and i.itemid=f.itemid"
+							" and f.triggerid=t.triggerid"
+							" and t.triggerid=" ZBX_FS_UI64,
+						event->objectid);
+				break;
+			default:
+				result = DBselect(
+						"select distinct a.name"
+						" from applications a,items_applications i"
+						" where a.applicationid=i.applicationid"
+							" and i.itemid=" ZBX_FS_UI64,
+						event->objectid);
+		}
+
+		switch (condition->operator)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				while (NULL != (row = DBfetch(result)))
+				{
+					if (0 == strcmp(row[0], condition->value))
+					{
+						ret = SUCCEED;
+						break;
+					}
+				}
+				break;
+			case CONDITION_OPERATOR_LIKE:
+				while (NULL != (row = DBfetch(result)))
+				{
+					if (NULL != strstr(row[0], condition->value))
+					{
+						ret = SUCCEED;
+						break;
+					}
+				}
+				break;
+			case CONDITION_OPERATOR_NOT_LIKE:
+				ret = SUCCEED;
+				while (NULL != (row = DBfetch(result)))
+				{
+					if (NULL != strstr(row[0], condition->value))
+					{
+						ret = FAIL;
+						break;
+					}
+				}
+				break;
+			default:
+				ret = NOTSUPPORTED;
+		}
+		DBfree_result(result);
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+		else if (NOTSUPPORTED == ret)
+			return NOTSUPPORTED;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_internal_condition                                         *
@@ -1754,318 +2175,42 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
 static int	check_internal_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_internal_condition";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
-	char		sql[256];
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (i = 0; i < events_num; i++)
+	if (CONDITION_TYPE_EVENT_TYPE == condition->conditiontype)
 	{
-		const DB_EVENT	*event = &events[i];
-
+		ret = check_intern_event_type_condition(events, events_num, condition);
+	}
+	else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
+	{
+		ret = check_intern_host_group_condition(events, events_num, condition);
+	}
+	else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
+	{
+		ret = check_intern_host_template_condition(events, events_num, condition);
+	}
+	else if (CONDITION_TYPE_HOST == condition->conditiontype)
+	{
+		ret = check_intern_host_condition(events, events_num, condition);
+	}
+	else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
+	{
+		ret = check_intern_application_condition(events, events_num, condition);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+				(int)condition->conditiontype, condition->conditionid);
 		ret = FAIL;
+	}
 
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
-
-		if (EVENT_OBJECT_TRIGGER != event->object && EVENT_OBJECT_ITEM != event->object &&
-				EVENT_OBJECT_LLDRULE != event->object)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
-					event->object, condition->conditionid);
-			continue;
-		}
-
-		if (CONDITION_TYPE_EVENT_TYPE == condition->conditiontype)
-		{
-			condition_value = atoi(condition->value);
-
-			switch (condition_value)
-			{
-				case EVENT_TYPE_ITEM_NOTSUPPORTED:
-					if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
-						ret = SUCCEED;
-					break;
-				case EVENT_TYPE_TRIGGER_UNKNOWN:
-					if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_UNKNOWN == event->value)
-						ret = SUCCEED;
-					break;
-				case EVENT_TYPE_LLDRULE_NOTSUPPORTED:
-					if (EVENT_OBJECT_LLDRULE == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-		}
-		else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
-		{
-			zbx_vector_uint64_t	groupids;
-			char			*sqlcond = NULL;
-			size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
-
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			zbx_vector_uint64_create(&groupids);
-			zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
-
-			switch (event->object)
-			{
-			case EVENT_OBJECT_TRIGGER:
-				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
-						"select null"
-						" from hosts_groups hg,hosts h,items i,functions f,triggers t"
-						" where hg.hostid=h.hostid"
-							" and h.hostid=i.hostid"
-							" and i.itemid=f.itemid"
-							" and f.triggerid=t.triggerid"
-							" and t.triggerid=" ZBX_FS_UI64
-							" and",
-						event->objectid);
-				break;
-			default:
-				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
-						"select null"
-						" from hosts_groups hg,hosts h,items i"
-						" where hg.hostid=h.hostid"
-							" and h.hostid=i.hostid"
-							" and i.itemid=" ZBX_FS_UI64
-							" and",
-						event->objectid);
-			}
-
-			DBadd_condition_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset, "hg.groupid", groupids.values,
-					groupids.values_num);
-
-			result = DBselectN(sqlcond, 1);
-
-			zbx_free(sqlcond);
-			zbx_vector_uint64_destroy(&groupids);
-
-			switch (condition->operator)
-			{
-			case CONDITION_OPERATOR_EQUAL:
-				if (NULL != DBfetch(result))
-					ret = SUCCEED;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (NULL == DBfetch(result))
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
-		{
-			zbx_uint64_t	hostid, objectid;
-
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					objectid = event->objectid;
-
-					/* use parent object ID for generated objects */
-					switch (event->object)
-					{
-						case EVENT_OBJECT_TRIGGER:
-							result = DBselect(
-									"select parent_triggerid"
-									" from trigger_discovery"
-									" where triggerid=" ZBX_FS_UI64,
-									objectid);
-							break;
-						default:
-							result = DBselect(
-									"select id.parent_itemid"
-									" from item_discovery id,items i"
-									" where id.itemid=i.itemid"
-										" and i.itemid=" ZBX_FS_UI64
-										" and i.flags=%d",
-									objectid, ZBX_FLAG_DISCOVERY_CREATED);
-					}
-
-					if (NULL != (row = DBfetch(result)))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-
-						zabbix_log(LOG_LEVEL_DEBUG, "%s() check host template condition,"
-								" selecting parent objectid:" ZBX_FS_UI64,
-								__function_name, objectid);
-					}
-					DBfree_result(result);
-
-					do
-					{
-						switch (event->object)
-						{
-							case EVENT_OBJECT_TRIGGER:
-								result = DBselect(
-										"select distinct i.hostid,t.templateid"
-										" from items i,functions f,triggers t"
-										" where i.itemid=f.itemid"
-											" and f.triggerid=t.templateid"
-											" and t.triggerid=" ZBX_FS_UI64,
-										objectid);
-								break;
-							default:
-								result = DBselect(
-										"select t.hostid,t.itemid"
-										" from items t,items h"
-										" where t.itemid=h.templateid"
-											" and h.itemid=" ZBX_FS_UI64,
-										objectid);
-						}
-
-						objectid = 0;
-
-						while (NULL != (row = DBfetch(result)))
-						{
-							ZBX_STR2UINT64(hostid, row[0]);
-							ZBX_STR2UINT64(objectid, row[1]);
-
-							if (hostid == condition_value)
-							{
-								ret = SUCCEED;
-								break;
-							}
-						}
-						DBfree_result(result);
-					}
-					while (SUCCEED != ret && 0 != objectid);
-
-					if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
-						ret = (SUCCEED == ret) ? FAIL : SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-		}
-		else if (CONDITION_TYPE_HOST == condition->conditiontype)
-		{
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			switch (event->object)
-			{
-				case EVENT_OBJECT_TRIGGER:
-					zbx_snprintf(sql, sizeof(sql),
-							"select null"
-							" from items i,functions f,triggers t"
-							" where i.itemid=f.itemid"
-								" and f.triggerid=t.triggerid"
-								" and t.triggerid=" ZBX_FS_UI64
-								" and i.hostid=" ZBX_FS_UI64,
-							event->objectid, condition_value);
-					break;
-				default:
-					zbx_snprintf(sql, sizeof(sql),
-							"select null"
-							" from items"
-							" where itemid=" ZBX_FS_UI64
-								" and hostid=" ZBX_FS_UI64,
-							event->objectid, condition_value);
-			}
-
-			result = DBselectN(sql, 1);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (NULL != DBfetch(result))
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (NULL == DBfetch(result))
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
-		{
-			switch (event->object)
-			{
-				case EVENT_OBJECT_TRIGGER:
-					result = DBselect(
-							"select distinct a.name"
-							" from applications a,items_applications i,functions f,triggers t"
-							" where a.applicationid=i.applicationid"
-								" and i.itemid=f.itemid"
-								" and f.triggerid=t.triggerid"
-								" and t.triggerid=" ZBX_FS_UI64,
-							event->objectid);
-					break;
-				default:
-					result = DBselect(
-							"select distinct a.name"
-							" from applications a,items_applications i"
-							" where a.applicationid=i.applicationid"
-								" and i.itemid=" ZBX_FS_UI64,
-							event->objectid);
-			}
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (0 == strcmp(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_LIKE:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_NOT_LIKE:
-					ret = SUCCEED;
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = FAIL;
-							break;
-						}
-					}
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
-					(int)condition->conditiontype, condition->conditionid);
-		}
-
-		if (NOTSUPPORTED == ret)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					(int)condition->operator, condition->conditionid);
-			ret = FAIL;
-		}
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+	if (NOTSUPPORTED == ret)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				(int)condition->operator, condition->conditionid);
+		ret = FAIL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
