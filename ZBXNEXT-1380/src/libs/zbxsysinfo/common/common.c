@@ -86,35 +86,6 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-static int EXECUTE_COMMAND(const char *command, int check, AGENT_RESULT *result)
-{
-	const char	*__function_name = "EXECUTE_COMMAND";
-
-	int		ret = SYSINFO_RET_FAIL;
-	char		*cmd_result = NULL, error[MAX_STRING_LEN];
-
-	init_result(result);
-
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT, check))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		goto out;
-	}
-
-	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() command:'%s' len:" ZBX_FS_SIZE_T " cmd_result:'%.20s'",
-			__function_name, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
-
-	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
-
-	ret = SYSINFO_RET_OK;
-out:
-	zbx_free(cmd_result);
-
-	return ret;
-}
-
 int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*command;
@@ -132,7 +103,31 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
-	return EXECUTE_COMMAND(command, EXECUTE_CHECK_CODE, result);
+	const char	*__function_name = "EXECUTE_STR";
+
+	int		ret = SYSINFO_RET_FAIL;
+	char		*cmd_result = NULL, error[MAX_STRING_LEN];
+
+	init_result(result);
+
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		goto out;
+	}
+
+	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() command:'%s' len:" ZBX_FS_SIZE_T " cmd_result:'%.20s'",
+			__function_name, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
+
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
+
+	ret = SYSINFO_RET_OK;
+out:
+	zbx_free(cmd_result);
+
+	return ret;
 }
 
 int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
@@ -194,10 +189,6 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
-	{
-		return EXECUTE_COMMAND(command, EXECUTE_CHECK_NONE, result);
-	}
-	else if (0 == strcmp(flag, "check"))
 	{
 		return EXECUTE_STR(command, result);
 	}

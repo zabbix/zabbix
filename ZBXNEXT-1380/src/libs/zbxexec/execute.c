@@ -262,8 +262,6 @@ exit:
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *             timeout       - [IN] execution timeout                         *
- *             check         - [IN] EXECUTE_CHECK_NONE / EXECUTE_CHECK_CODE   *
- *                                  if result code should be checked or not   *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -271,7 +269,7 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout, int check)
+int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int			ret = FAIL, status = 0;
@@ -376,8 +374,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		{
 			ret = TIMEOUT_ERROR;
 		}
-		else if (0 != (EXECUTE_CHECK_CODE & check) &&
-				WAIT_OBJECT_0 == WaitForSingleObject(pi.hProcess, 0) &&
+		else if (WAIT_OBJECT_0 == WaitForSingleObject(pi.hProcess, 0) &&
 				GetExitCodeProcess(pi.hProcess, &code) && 0 != code)
 		{
 			ret = FAIL;
@@ -446,7 +443,7 @@ close:
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
-		else if (0 != (EXECUTE_CHECK_CODE & check) && WIFEXITED(status) && 0 != WEXITSTATUS(status))
+		else if (WIFEXITED(status) && 0 != WEXITSTATUS(status))
 		{
 			if (NULL != buffer && '\0' != **buffer)
 				zbx_strlcpy(error, *buffer, max_error_len);

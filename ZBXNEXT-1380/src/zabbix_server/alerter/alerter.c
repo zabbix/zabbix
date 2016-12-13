@@ -121,8 +121,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 			zbx_free(param);
 
-			if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT,
-					EXECUTE_CHECK_CODE)))
+			if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
 				zbx_free(output);
