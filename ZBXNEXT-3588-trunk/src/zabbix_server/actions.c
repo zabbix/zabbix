@@ -140,9 +140,6 @@ static int	check_condition_event_tag_value(const DB_EVENT *events, size_t events
  *             source     [IN]  - source of events to add                     *
  *             objectids  [OUT] - event objectids to be used in condition     *
  *                                allocation                                  *
- * Return value: SUCCEED - at least one match                                 *
- *               NOTSUPPORTED - not supported condition                       *
- *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static void	get_object_ids(const DB_EVENT *events, size_t events_num, unsigned char source,
@@ -161,6 +158,21 @@ static void	get_object_ids(const DB_EVENT *events, size_t events_num, unsigned c
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_escalation_present                                            *
+ *                                                                            *
+ * Purpose: it's possible that there are events without escalations if it is  *
+ *          so then don't run through conditions                              *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             source     [IN] - source to check                              *
+ *                                                                            *
+ * Return value: SUCCEED - at least one escalation event is present           *
+ *               FAIL - no escalations                                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	is_escalation_present(const DB_EVENT *events, size_t events_num, unsigned char source)
 {
 	int	i;
@@ -959,6 +971,21 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_drule_condition                                            *
+ *                                                                            *
+ * Purpose: check discovery rule condition                                    *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_drule_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1022,6 +1049,21 @@ static int	check_drule_condition(const DB_EVENT *events, size_t events_num, DB_C
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dcheck_condition                                           *
+ *                                                                            *
+ * Purpose: check discovery check condition                                   *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dcheck_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1074,6 +1116,21 @@ static int	check_dcheck_condition(const DB_EVENT *events, size_t events_num, DB_
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dobject_condition                                          *
+ *                                                                            *
+ * Purpose: check discovery object condition                                  *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dobject_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	int	ret, i, condition_value_i = atoi(condition->value);;
@@ -1103,7 +1160,21 @@ static int	check_dobject_condition(const DB_EVENT *events, size_t events_num, DB
 
 	return SUCCEED;
 }
-
+/******************************************************************************
+ *                                                                            *
+ * Function: check_proxy_condition                                            *
+ *                                                                            *
+ * Purpose: check discovered proxy condition                                  *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1169,6 +1240,21 @@ static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_C
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dvalue_condition                                           *
+ *                                                                            *
+ * Purpose: check discovery value condition                                   *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dvalue_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1236,6 +1322,21 @@ static int	check_dvalue_condition(const DB_EVENT *events, size_t events_num, DB_
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dhost_ip_condition                                         *
+ *                                                                            *
+ * Purpose: check discovered host ip condition                                *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dhost_ip_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1295,6 +1396,21 @@ static int	check_dhost_ip_condition(const DB_EVENT *events, size_t events_num, D
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dservice_type_condition                                    *
+ *                                                                            *
+ * Purpose: check discovered service type condition                           *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dservice_type_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1351,6 +1467,21 @@ static int	check_dservice_type_condition(const DB_EVENT *events, size_t events_n
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dservice_type_condition                                    *
+ *                                                                            *
+ * Purpose: check discovery service type condition                            *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dstatus_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	int	ret, i, condition_value_i = atoi(condition->value);
@@ -1385,6 +1516,21 @@ static int	check_dstatus_condition(const DB_EVENT *events, size_t events_num, DB
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dservice_type_condition                                    *
+ *                                                                            *
+ * Purpose: check uptime condition for discovery                              *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_duptime_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1449,6 +1595,21 @@ static int	check_duptime_condition(const DB_EVENT *events, size_t events_num, DB
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dservice_port_condition                                    *
+ *                                                                            *
+ * Purpose: check service port condition for discovery                        *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dservice_port_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1580,6 +1741,22 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_hostname_metadata_condition                                *
+ *                                                                            *
+ * Purpose: check metadata or host condition for auto registration            *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1634,6 +1811,21 @@ static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t even
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_areg_proxy_condition                                       *
+ *                                                                            *
+ * Purpose: check proxy condition for auto registration                       *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_areg_proxy_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1737,6 +1929,21 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_supported_event_object                                        *
+ *                                                                            *
+ * Purpose: not all event objects are supported for internal events           *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported                                          *
+ *               NOTSUPPORTED - not supported                                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	is_supported_event_object(const DB_EVENT *event)
 {
 	if (EVENT_OBJECT_TRIGGER != event->object && EVENT_OBJECT_ITEM != event->object &&
@@ -1748,6 +1955,21 @@ static int	is_supported_event_object(const DB_EVENT *event)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_intern_event_type_condition                                *
+ *                                                                            *
+ * Purpose: check event type condition for internal events                    *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_intern_event_type_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	int		ret, i;
@@ -1794,6 +2016,22 @@ static int	check_intern_event_type_condition(const DB_EVENT *events, size_t even
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_intern_host_group_condition                                *
+ *                                                                            *
+ * Purpose: check host group condition for internal events                    *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_intern_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1881,6 +2119,21 @@ static int	check_intern_host_group_condition(const DB_EVENT *events, size_t even
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_intern_host_template_condition                             *
+ *                                                                            *
+ * Purpose: check host template condition for internal events                 *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_intern_host_template_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -1996,6 +2249,21 @@ static int	check_intern_host_template_condition(const DB_EVENT *events, size_t e
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_intern_host_condition                                      *
+ *                                                                            *
+ * Purpose: check host condition for internal events                          *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -2068,6 +2336,21 @@ static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_intern_application_condition                               *
+ *                                                                            *
+ * Purpose: check application condition for internal events                   *
+ *                                                                            *
+ * Parameters: events     [IN]  - events to check                             *
+ *             events_num [IN]  - events count to check                       *
+ *             condition  [IN/OUT] - condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_intern_application_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
@@ -2164,7 +2447,7 @@ static int	check_intern_application_condition(const DB_EVENT *events, size_t eve
  *                                                                            *
  * Purpose: check if internal events match single condition                   *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                              *
+ * Parameters: events     [IN]  - events to check                             *
  *             events_num [IN]  - event count to check                        *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
