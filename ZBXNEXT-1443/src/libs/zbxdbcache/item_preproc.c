@@ -380,6 +380,45 @@ static int	item_preproc_delta_speed(const DC_ITEM *item, zbx_variant_t *value, c
 
 /******************************************************************************
  *                                                                            *
+ * Function: unescape_trim_params                                             *
+ *                                                                            *
+ * Purpose: unescapes string used for trim operation parameter                *
+ *                                                                            *
+ * Parameters: in  - [IN] the string to unescape                              *
+ *             out - [OUT] the unescaped string                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	unescape_trim_params(const char *in, char *out)
+{
+	for (; '\0' != *in; in++, out++)
+	{
+		if ('\\' == *in)
+		{
+			switch (*(++in))
+			{
+				case 's':
+					*out = ' ';
+					break;
+				case 'r':
+					*out = '\r';
+					break;
+				case 'n':
+					*out = '\n';
+					break;
+				case 't':
+					*out = '\t';
+					break;
+			}
+		}
+		else
+			*out = *in;
+	}
+
+	*out = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_trim                                                *
  *                                                                            *
  * Purpose: execute trim type preprocessing operation                         *
@@ -395,14 +434,18 @@ static int	item_preproc_delta_speed(const DC_ITEM *item, zbx_variant_t *value, c
  ******************************************************************************/
 static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg)
 {
+	char	params_raw[ITEM_PREPROC_PARAMS_LEN * 4 + 1];
+
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
+	unescape_trim_params(params, params_raw);
+
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
-		zbx_ltrim(value->data.str, params);
+		zbx_ltrim(value->data.str, params_raw);
 
 	if (ZBX_PREPROC_RTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
-		zbx_rtrim(value->data.str, params);
+		zbx_rtrim(value->data.str, params_raw);
 
 	return SUCCEED;
 }
