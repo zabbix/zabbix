@@ -35,6 +35,7 @@ frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
+m4/libevent.m4 -text
 misc/images/png_classic/Hub.png -text svneol=unset#image/png
 misc/images/png_classic/Hub_small.png -text svneol=unset#image/png
 misc/images/png_classic/Network.png -text svneol=unset#image/png
