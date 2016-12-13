@@ -1325,7 +1325,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
 	AC_SUBST(SSH2_CFLAGS)
-
+	
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
@@ -1343,6 +1343,19 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
+	
+	dnl Check for libevent
+	LIBEVENT_CHECK_CONFIG([no])
+	if test "x$found_libevent" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
+	fi
+	SERVER_LDFLAGS="$LDFLAGS $LIBEVENT_LDFLAGS"
+	SERVER_LIBS="$LIBS $LIBEVENT_LIBS"
+	
+	PROXY_LDFLAGS="$LDFLAGS $LIBEVENT_LDFLAGS"
+	PROXY_LIBS="$LIBS $LIBEVENT_LIBS"
+	
+	AC_SUBST(LIBEVENET_CFLAGS)
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
