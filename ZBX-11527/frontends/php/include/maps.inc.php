@@ -1180,7 +1180,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($monitored_hostids)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
-			'selectHosts' => array('hostid'),
+			'selectHosts' => array('hostid', 'maintenance_status', 'maintenanceid'),
 			'selectLastEvent' => array('acknowledged'),
 			'hostids' => $monitored_hostids,
 			'nopermissions' => true,
@@ -1192,6 +1192,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		);
 
 		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1235,16 +1236,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $all_triggers[$triggerId];
-
-				foreach ($trigger['hosts'] as $host) {
-					if (array_key_exists('maintenance_status', $host)
-							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-						$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
-						$i['maintenance_title'] = $maintenance['name'];
-
-						break;
-					}
-				}
 
 			if ($options['severity_min'] <= $trigger['priority']) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
@@ -1305,7 +1296,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
-				if ($i['maintenance'] > 0) {
+				if ($i['maintenance'] == 1) {
 					$mnt = get_maintenance_by_maintenanceid($all_hosts[$last_hostid]['maintenanceid']);
 					$i['maintenance_title'] = $mnt['name'];
 				}
@@ -1317,6 +1308,16 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				foreach ($trigger['hosts'] as $host) {
+					if (array_key_exists('maintenance_status', $host)
+							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+						$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
+						$i['maintenance_title'] = $maintenance['name'];
+
+						break;
+					}
+				}
+
 				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
 				break;
 
