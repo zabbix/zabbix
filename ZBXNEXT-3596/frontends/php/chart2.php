@@ -124,6 +124,7 @@ $graph->showWorkPeriod($dbGraph['show_work_period']);
 $graph->showTriggers($dbGraph['show_triggers']);
 $graph->setWidth($width);
 $graph->setHeight($height);
+$graph->setHeight(300);
 $graph->setYMinAxisType($dbGraph['ymin_type']);
 $graph->setYMaxAxisType($dbGraph['ymax_type']);
 $graph->setYAxisMin($dbGraph['yaxismin']);
@@ -132,8 +133,6 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
-$graph->setHeight(300);
-$graph->setAttribute('style', 'background:white');
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -1060,7 +1060,7 @@ class CLineGraphDraw extends CGraphDraw {
 					->setWidth(1)
 					->setStrokeColor('#'.$this->graphtheme['gridbordercolor'])
 					->setFillColor('white')]
-			);
+				);
 		}
 		else {
 			$this->addItem(
@@ -1092,7 +1092,7 @@ class CLineGraphDraw extends CGraphDraw {
 					->setWidth(1)
 					->setStrokeColor('#'.$this->graphtheme['gridbordercolor'])
 					->setFillColor('white')]
-			);
+				);
 		}
 		else {
 			$this->addItem(
@@ -1122,7 +1122,7 @@ class CLineGraphDraw extends CGraphDraw {
 				->setWidth(1)
 				->setStrokeColor('#'.$this->graphtheme['gridbordercolor'])
 				->setFillColor('white')]
-		);
+			);
 	}
 
 	/**
@@ -1890,13 +1890,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$y = $this->sizeY - (($percentile['value'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
 				$this->addItem(
-					new CLine(
+					(new CLine(
 						$this->shiftXleft,
 						$y,
 						$this->sizeX + $this->shiftXleft,
 						$y,
 						'#'.$color
-					)
+					))->setWidth(2)
 				);
 			}
 		}
@@ -1926,6 +1926,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$this->sizeX + $this->shiftXleft,
 					$trigger['y'] + 1,
 					'#'.$trigger['color']))
+				->setWidth(2)
 				->setDashed()]
 			);
 		}
@@ -1950,9 +1951,9 @@ class CLineGraphDraw extends CGraphDraw {
 			);
 
 			$text = $trigger['description'];
-			$this->addItem(new CText($x + 20, $y + 9 + 14 * $rowNum, $text, 0, '#'.$text_color));
+			$this->addItem(new CText($x + 20, $y + 9 + 14 * $rowNum, $text, '#'.$text_color));
 			$text = $trigger['constant'];
-			$this->addItem(new CText($x + 380, $y + 9 + 14 * $rowNum, $text, 0, '#'.$text_color));
+			$this->addItem(new CText($x + 380, $y + 9 + 14 * $rowNum, $text, '#'.$text_color));
 
 			$rowNum++;
 		}
@@ -1978,7 +1979,7 @@ class CLineGraphDraw extends CGraphDraw {
 					]);
 					$text = $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side.')';
 
-					$this->addItem(new CText($x + 20, $y + 9 + 14 * $rowNum, $text, 0, '#'.$text_color));
+					$this->addItem(new CText($x + 20, $y + 9 + 14 * $rowNum, $text, '#'.$text_color));
 
 					if ($side == 'left') {
 						$color = $this->graphtheme['leftpercentilecolor'];
@@ -2009,13 +2010,13 @@ class CLineGraphDraw extends CGraphDraw {
 		$units = ['left' => 0, 'right' => 0];
 
 		$this->addItem([
-			(new CText($x + 320, $y - 5, _('last'), 0, '#'.$text_color))
+			(new CText($x + 320, $y - 5, _('last'), '#'.$text_color))
 				->setAttribute('text-anchor', 'end'),
-			(new CText($x + 380, $y - 5, _('min'), 0, '#'.$text_color))
+			(new CText($x + 380, $y - 5, _('min'), '#'.$text_color))
 				->setAttribute('text-anchor', 'end'),
-			(new CText($x + 440, $y - 5, _('avg'), 0, '#'.$text_color))
+			(new CText($x + 440, $y - 5, _('avg'), '#'.$text_color))
 				->setAttribute('text-anchor', 'end'),
-			(new CText($x + 500, $y - 5, _('max'), 0, '#'.$text_color))
+			(new CText($x + 500, $y - 5, _('max'), '#'.$text_color))
 				->setAttribute('text-anchor', 'end')]
 		);
 
@@ -2061,8 +2062,8 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 
 				$this->addItem([
-					new CText($x + 20, $y + 9 + 14 * $i, $itemCaption, 0, '#'.$text_color),
-					new CText($x + 240, $y + 9 + 14 * $i, '['.$fncRealName.']', 0, '#'.$text_color)]
+					new CText($x + 20, $y + 9 + 14 * $i, $itemCaption, '#'.$text_color),
+					new CText($x + 240, $y + 9 + 14 * $i, '['.$fncRealName.']', '#'.$text_color)]
 				);
 				$text = convert_units([
 					'value' => $this->getLastValue($i),
@@ -2071,7 +2072,7 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 
 				$this->addItem(
-					(new CText($x + 320, $y + 9 +  14 * $i, $text, 0, '#'.$text_color))
+					(new CText($x + 320, $y + 9 +  14 * $i, $text, '#'.$text_color))
 						->setAttribute('text-anchor', 'end')
 				);
 
@@ -2082,7 +2083,7 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 
 				$this->addItem(
-					(new CText($x + 380, $y + 9 + 14 * $i, $text, 0, '#'.$text_color))
+					(new CText($x + 380, $y + 9 + 14 * $i, $text, '#'.$text_color))
 						->setAttribute('text-anchor', 'end')
 				);
 
@@ -2093,7 +2094,7 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 
 				$this->addItem(
-					(new CText($x + 440, $y + 9 + 14 * $i, $text, 0, '#'.$text_color))
+					(new CText($x + 440, $y + 9 + 14 * $i, $text, '#'.$text_color))
 						->setAttribute('text-anchor', 'end')
 				);
 
@@ -2104,7 +2105,7 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 
 				$this->addItem(
-					(new CText($x + 500, $y + 9 + 14 * $i, $text, 0, '#'.$text_color))
+					(new CText($x + 500, $y + 9 + 14 * $i, $text, '#'.$text_color))
 						->setAttribute('text-anchor', 'end')
 				);
 			}
@@ -2112,8 +2113,8 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$text = '['._('no data').']';
 
-				$this->addItem(new CText($x + 20, $y + 9 + 14 * $i, $itemCaption, 0, '#'.$text_color));
-				$this->addItem(new CText($x + 240, $y + 9 + 14 * $i, $text, 0, '#'.$text_color));
+				$this->addItem(new CText($x + 20, $y + 9 + 14 * $i, $itemCaption, '#'.$text_color));
+				$this->addItem(new CText($x + 240, $y + 9 + 14 * $i, $text, '#'.$text_color));
 			}
 
 			$rowNum++;
@@ -2206,7 +2207,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$avg_from = $data['avg'][$from] + $shift_avg_from;
 		$avg_to = $data['avg'][$to] + $shift_avg_to;
 
-		$x1 = $from + $this->shiftXleft - 1;
+		$x1 = $from + $this->shiftXleft;
 		$x2 = $to + $this->shiftXleft;
 
 		$y1min = $zero - ($min_from - $oxy) / $unit2px;
@@ -2382,8 +2383,8 @@ class CLineGraphDraw extends CGraphDraw {
 						$y2,
 						'#'.$avg_color_hex
 					))
-						->setWidth(4)
-						->setAttribute('opacity', 0.5)
+						->setWidth(1)
+//						->setAttribute('opacity', 0.5)
 				);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
@@ -2404,8 +2405,9 @@ class CLineGraphDraw extends CGraphDraw {
 					(new CTag('ellipse', true))
 						->setAttribute('cx', $x1)
 						->setAttribute('cy', $y1)
-						->setAttribute('rx', 4)
-						->setAttribute('ry', 4)
+						->setAttribute('rx', 3)
+						->setAttribute('ry', 3)
+						->setAttribute('opacity', '0.5')
 						->setAttribute('stroke', '#'.$avg_color_hex)
 				);
 				break;
@@ -2547,6 +2549,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->im = imagecreate($this->fullSizeX, $this->fullSizeY);
 
+		$this->drawBackground();
 		$this->drawHeader();
 		$this->drawWorkPeriod();
 		$this->drawTimeGrid();
@@ -2649,7 +2652,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$str = sprintf('%0.2f', microtime(true) - $start_time);
 		$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
 		$this->addItem(
-			(new CText($this->fullSizeX - 5, $this->fullSizeY - 5, $str, 0, 'Gray'))
+			(new CText($this->fullSizeX - 5, $this->fullSizeY - 5, $str, 'Gray'))
 				->setAttribute('text-anchor', 'end')
 				->setAttribute('opacity', '0.2')
 		);

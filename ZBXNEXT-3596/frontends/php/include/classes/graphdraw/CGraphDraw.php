@@ -194,6 +194,10 @@ class CGraphDraw extends CSvg {
 		return 0;
 	}
 
+	public function drawBackground() {
+		$this->setAttribute('style', 'background:#'.$this->graphtheme['backgroundcolor']);
+	}
+
 	public function drawRectangle() {
 		imagefilledrectangle($this->im, 0, 0,
 			$this->fullSizeX,
@@ -224,8 +228,7 @@ class CGraphDraw extends CSvg {
 				$this->fullSizeX/2,
 				24,
 				$str,
-				0,
-				$this->graphtheme['textcolor']))
+				'#'.$this->graphtheme['textcolor']))
 			->setAttribute('text-anchor', 'middle')
 		);
 	}

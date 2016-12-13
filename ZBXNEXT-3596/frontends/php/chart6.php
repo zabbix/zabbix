@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'chart6.php';
-$page['type'] = PAGE_TYPE_IMAGE;
+$page['type'] = PAGE_TYPE_SVG;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -122,6 +122,7 @@ if ($dbGraph['show_3d']) {
 	$graph->switchPie3D();
 }
 $graph->showLegend($dbGraph['show_legend']);
+$graph->setAttribute('style', 'background:white');
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
