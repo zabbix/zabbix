@@ -219,10 +219,6 @@ class CGraphDraw extends CSvg {
 			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->graph_items);
 		}
 
-		if ($this->period) {
-			$str .= $this->period2str($this->period);
-		}
-
 		$this->addItem(
 			(new CText(
 				$this->fullSizeX/2,
