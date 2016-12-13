@@ -20,18 +20,17 @@
 #include "common.h"
 
 /******************************************************************************
- *									      *
- * Function: get_cluster_size						      *
- *									      *
- * Purpose: gets file system cluster size (sector count * bytes per sector)   *
- *	  from specified path (for situations when file system is mounted     *
- *	  to empty NTFS directory)					      *
- *									      *
- * Parameters: path       - [IN] file system path			      *
- *									      *
- * Return value: On success, nonzero cluster size returned		      *
- *	         On error, 0 is returned.				      *
- *									      *
+ *                                                                            *
+ * Function: get_cluster_size                                                 *
+ *                                                                            *
+ * Purpose: get file system cluster size for specified path (for cases when   *
+ *          the file system is mounted on empty NTFS directory)               *
+ *                                                                            *
+ * Parameters: path - [IN] file system path                                   *
+ *                                                                            *
+ * Return value: On success, nonzero cluster size is returned                 *
+ *               On error, 0 is returned.                                     *
+ *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	get_cluster_size(const char *path)
 {
@@ -44,12 +43,13 @@ zbx_uint64_t	get_cluster_size(const char *path)
 	disk = (wchar_t *)zbx_malloc(NULL, path_length * sizeof(wchar_t));
 
 	if (0 == GetVolumePathName(wpath, disk, path_length) ||
-		0 == GetDiskFreeSpace(disk, &sectors_per_cluster, &bytes_per_sector, NULL, NULL))
+			0 == GetDiskFreeSpace(disk, &sectors_per_cluster, &bytes_per_sector, NULL, NULL))
 	{
 		sectors_per_cluster = 0;
 	}
 
 	zbx_free(wpath);
 	zbx_free(disk);
+
 	return (zbx_uint64_t)sectors_per_cluster * bytes_per_sector;
 }

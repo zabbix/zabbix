@@ -21,9 +21,9 @@
 #define ZABBIX_DISK_H
 
 #ifndef _WINDOWS
-#       error "This module is only available for Windows OS"
+#	error "This module is only available for Windows OS"
 #endif
 
-zbx_uint64_t        get_cluster_size(const char *path);
+zbx_uint64_t	get_cluster_size(const char *path);
 
 #endif /* ZABBIX_DISK_H */
