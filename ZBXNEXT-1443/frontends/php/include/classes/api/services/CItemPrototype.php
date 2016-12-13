@@ -1107,6 +1107,27 @@ class CItemPrototype extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
+		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
+			$db_item_preproc = API::getApiService()->select('item_preproc', [
+				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid']),
+				'filter' => ['itemid' => array_keys($result)],
+			]);
+
+			CArrayHelper::sort($db_item_preproc, ['step']);
+
+			foreach ($result as &$item) {
+				$item['preprocessing'] = [];
+			}
+			unset($item);
+
+			foreach ($db_item_preproc as $step) {
+				$itemid = $step['itemid'];
+				unset($step['item_preprocid'], $step['itemid'], $step['step']);
+
+				$result[$itemid]['preprocessing'][] = $step;
+			}
+		}
+
 		return $result;
 	}
 }
