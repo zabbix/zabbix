@@ -35,8 +35,7 @@ static int	is_escalation_event(const DB_EVENT *event);
  *                                                                            *
  * Purpose: check condition event tag                                         *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -44,18 +43,15 @@ static int	is_escalation_event(const DB_EVENT *event);
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	i, ret, ret_continue;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-					continue;
 
 		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator ||
 				CONDITION_OPERATOR_NOT_LIKE == condition->operator)
@@ -85,8 +81,7 @@ static int	check_condition_event_tag(const DB_EVENT *events, size_t events_num, 
  *                                                                            *
  * Purpose: check condition event tag                                         *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -94,18 +89,15 @@ static int	check_condition_event_tag(const DB_EVENT *events, size_t events_num, 
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag_value(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	i, ret, ret_continue;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-					continue;
 
 		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
 			ret_continue = SUCCEED;
@@ -135,59 +127,21 @@ static int	check_condition_event_tag_value(const DB_EVENT *events, size_t events
  *                                                                            *
  * Purpose: to get objectids of escalation events with specific source        *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
- *             source     [IN]  - source of events to add                     *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             objectids  [OUT] - event objectids to be used in condition     *
  *                                allocation                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_object_ids(const DB_EVENT *events, size_t events_num, unsigned char source,
-		zbx_vector_uint64_t *objectids)
+static void	get_object_ids(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids)
 {
 	int	i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
-
-		if (FAIL == is_escalation_event(event) || source != event->source)
-			continue;
+		const DB_EVENT	*event = esc_events->values[i];
 
 		zbx_vector_uint64_append(objectids, event->objectid);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: is_escalation_present                                            *
- *                                                                            *
- * Purpose: it's possible that there are events without escalations if it is  *
- *          so then don't run through conditions                              *
- *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
- *             source     [IN] - source to check                              *
- *                                                                            *
- * Return value: SUCCEED - at least one escalation event is present           *
- *               FAIL - no escalations                                        *
- *                                                                            *
- ******************************************************************************/
-static int	is_escalation_present(const DB_EVENT *events, size_t events_num, unsigned char source)
-{
-	int	i;
-
-	for (i = 0; i < events_num; i++)
-	{
-		const DB_EVENT	*event = &events[i];
-
-		if (FAIL == is_escalation_event(event) || source != event->source)
-			continue;
-
-		return SUCCEED;
-	}
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -196,8 +150,7 @@ static int	is_escalation_present(const DB_EVENT *events, size_t events_num, unsi
  *                                                                            *
  * Purpose: check host group condition                                        *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -205,7 +158,7 @@ static int	is_escalation_present(const DB_EVENT *events, size_t events_num, unsi
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char			*sql = NULL, *operation;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -226,7 +179,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
 	zbx_vector_uint64_create(&objectids);
 	zbx_vector_uint64_create(&groupids);
 
-	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+	get_object_ids(esc_events, &objectids);
 
 	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
@@ -270,8 +223,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
  *                                                                            *
  * Purpose: check maintenance condition                                       *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -279,7 +231,7 @@ static int	check_host_group_condition(const DB_EVENT *events, size_t events_num,
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_maintenance_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -296,7 +248,7 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
-	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid"
@@ -333,8 +285,7 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
  *                                                                            *
  * Purpose: check host condition                                              *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -342,7 +293,7 @@ static int	check_maintenance_condition(const DB_EVENT *events, size_t events_num
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char			*sql = NULL, *operation;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -362,7 +313,7 @@ static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CO
 
 	zbx_vector_uint64_create(&objectids);
 
-	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid"
@@ -400,8 +351,7 @@ static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CO
  *                                                                            *
  * Purpose: check application condition                                       *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -409,7 +359,7 @@ static int	check_host_condition(const DB_EVENT *events, size_t events_num, DB_CO
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_application_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_application_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -424,7 +374,7 @@ static int	check_application_condition(const DB_EVENT *events, size_t events_num
 
 	zbx_vector_uint64_create(&objectids);
 
-	get_object_ids(events, events_num, EVENT_SOURCE_TRIGGERS, &objectids);
+	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,a.name"
@@ -486,8 +436,7 @@ static int	check_application_condition(const DB_EVENT *events, size_t events_num
  *                                                                            *
  * Purpose: check host template condition                                     *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -495,7 +444,7 @@ static int	check_application_condition(const DB_EVENT *events, size_t events_num
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_template_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -505,14 +454,11 @@ static int	check_host_template_condition(const DB_EVENT *events, size_t events_n
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-					continue;
 
 		switch (condition->operator)
 		{
@@ -583,8 +529,7 @@ static int	check_host_template_condition(const DB_EVENT *events, size_t events_n
  *                                                                            *
  * Purpose: check trigger type condition                                      *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -592,7 +537,7 @@ static int	check_host_template_condition(const DB_EVENT *events, size_t events_n
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_id_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -602,14 +547,11 @@ static int	check_trigger_id_condition(const DB_EVENT *events, size_t events_num,
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		switch (condition->operator)
 		{
@@ -663,8 +605,7 @@ static int	check_trigger_id_condition(const DB_EVENT *events, size_t events_num,
  *                                                                            *
  * Purpose: check trigger name condition                                     *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -672,19 +613,16 @@ static int	check_trigger_id_condition(const DB_EVENT *events, size_t events_num,
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_name_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_trigger_name_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char	*tmp_str = NULL;
 	int	ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
@@ -721,8 +659,7 @@ static int	check_trigger_name_condition(const DB_EVENT *events, size_t events_nu
  *                                                                            *
  * Purpose: check trigger severity condition                                  *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -730,21 +667,18 @@ static int	check_trigger_name_condition(const DB_EVENT *events, size_t events_nu
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_severity_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_trigger_severity_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	zbx_uint64_t	condition_value;
 	int		ret, i;
 
 	condition_value = atoi(condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		switch (condition->operator)
 		{
@@ -781,8 +715,7 @@ static int	check_trigger_severity_condition(const DB_EVENT *events, size_t event
  *                                                                            *
  * Purpose: check time period condition                                       *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -790,18 +723,15 @@ static int	check_trigger_severity_condition(const DB_EVENT *events, size_t event
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_time_period_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_time_period_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		switch (condition->operator)
 		{
@@ -830,8 +760,7 @@ static int	check_time_period_condition(const DB_EVENT *events, size_t events_num
  *                                                                            *
  * Purpose: check acknowledged condition                                      *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -839,20 +768,17 @@ static int	check_time_period_condition(const DB_EVENT *events, size_t events_num
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_acknowledged_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_acknowledged_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		result = DBselect(
 				"select acknowledged"
@@ -888,8 +814,7 @@ static int	check_acknowledged_condition(const DB_EVENT *events, size_t events_nu
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - event count to check                        *
+ * Parameters: esc_events [IN]     - events to check                          *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -898,7 +823,7 @@ static int	check_acknowledged_condition(const DB_EVENT *events, size_t events_nu
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_trigger_condition";
 	int		ret;
@@ -907,51 +832,51 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
 
 	if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
-		ret = check_host_group_condition(events, events_num, condition);
+		ret = check_host_group_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
 	{
-		ret = check_host_template_condition(events, events_num, condition);
+		ret = check_host_template_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_HOST == condition->conditiontype)
 	{
-		ret = check_host_condition(events, events_num, condition);
+		ret = check_host_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_TRIGGER == condition->conditiontype)
 	{
-		ret = check_trigger_id_condition(events, events_num, condition);
+		ret = check_trigger_id_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_TRIGGER_NAME == condition->conditiontype)
 	{
-		ret = check_trigger_name_condition(events, events_num, condition);
+		ret = check_trigger_name_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_TRIGGER_SEVERITY == condition->conditiontype)
 	{
-		ret = check_trigger_severity_condition(events, events_num, condition);
+		ret = check_trigger_severity_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
 	{
-		ret = check_time_period_condition(events, events_num, condition);
+		ret = check_time_period_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{
-		ret = check_maintenance_condition(events, events_num, condition);
+		ret = check_maintenance_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_EVENT_ACKNOWLEDGED == condition->conditiontype)
 	{
-		ret = check_acknowledged_condition(events, events_num, condition);
+		ret = check_acknowledged_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
 	{
-		ret = check_application_condition(events, events_num, condition);
+		ret = check_application_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
 	{
-		ret = check_condition_event_tag(events, events_num, condition);
+		ret = check_condition_event_tag(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_EVENT_TAG_VALUE == condition->conditiontype)
 	{
-		ret = check_condition_event_tag_value(events, events_num, condition);
+		ret = check_condition_event_tag_value(esc_events, condition);
 	}
 	else
 	{
@@ -977,8 +902,7 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
  *                                                                            *
  * Purpose: check discovery rule condition                                    *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -986,20 +910,17 @@ static int	check_trigger_condition(const DB_EVENT *events, size_t events_num, DB
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_drule_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_drule_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	condition_value;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		ZBX_STR2UINT64(condition_value, condition->value);
 
@@ -1055,8 +976,7 @@ static int	check_drule_condition(const DB_EVENT *events, size_t events_num, DB_C
  *                                                                            *
  * Purpose: check discovery check condition                                   *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1064,20 +984,17 @@ static int	check_drule_condition(const DB_EVENT *events, size_t events_num, DB_C
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dcheck_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dcheck_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	condition_value;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
@@ -1122,8 +1039,7 @@ static int	check_dcheck_condition(const DB_EVENT *events, size_t events_num, DB_
  *                                                                            *
  * Purpose: check discovery object condition                                  *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1131,18 +1047,15 @@ static int	check_dcheck_condition(const DB_EVENT *events, size_t events_num, DB_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dobject_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dobject_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	ret, i, condition_value_i = atoi(condition->value);;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		switch (condition->operator)
 		{
@@ -1166,8 +1079,7 @@ static int	check_dobject_condition(const DB_EVENT *events, size_t events_num, DB
  *                                                                            *
  * Purpose: check discovered proxy condition                                  *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1175,7 +1087,7 @@ static int	check_dobject_condition(const DB_EVENT *events, size_t events_num, DB
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	condition_value;
@@ -1183,14 +1095,11 @@ static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_C
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
@@ -1246,8 +1155,7 @@ static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_C
  *                                                                            *
  * Purpose: check discovery value condition                                   *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1255,20 +1163,17 @@ static int	check_proxy_condition(const DB_EVENT *events, size_t events_num, DB_C
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dvalue_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dvalue_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
@@ -1328,8 +1233,7 @@ static int	check_dvalue_condition(const DB_EVENT *events, size_t events_num, DB_
  *                                                                            *
  * Purpose: check discovered host ip condition                                *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1337,20 +1241,17 @@ static int	check_dvalue_condition(const DB_EVENT *events, size_t events_num, DB_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dhost_ip_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dhost_ip_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
@@ -1402,8 +1303,7 @@ static int	check_dhost_ip_condition(const DB_EVENT *events, size_t events_num, D
  *                                                                            *
  * Purpose: check discovered service type condition                           *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1411,20 +1311,17 @@ static int	check_dhost_ip_condition(const DB_EVENT *events, size_t events_num, D
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dservice_type_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dservice_type_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i, tmp_int;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
@@ -1473,8 +1370,7 @@ static int	check_dservice_type_condition(const DB_EVENT *events, size_t events_n
  *                                                                            *
  * Purpose: check discovery service type condition                            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1482,18 +1378,15 @@ static int	check_dservice_type_condition(const DB_EVENT *events, size_t events_n
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dstatus_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dstatus_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	ret, i, condition_value_i = atoi(condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		switch (condition->operator)
 		{
@@ -1522,8 +1415,7 @@ static int	check_dstatus_condition(const DB_EVENT *events, size_t events_num, DB
  *                                                                            *
  * Purpose: check uptime condition for discovery                              *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1531,20 +1423,17 @@ static int	check_dstatus_condition(const DB_EVENT *events, size_t events_num, DB
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_duptime_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_duptime_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i, tmp_int, condition_value_i = atoi(condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
@@ -1601,8 +1490,7 @@ static int	check_duptime_condition(const DB_EVENT *events, size_t events_num, DB
  *                                                                            *
  * Purpose: check service port condition for discovery                        *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1610,20 +1498,17 @@ static int	check_duptime_condition(const DB_EVENT *events, size_t events_num, DB
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dservice_port_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_dservice_port_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_DISCOVERY != event->source)
-			continue;
 
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
@@ -1667,8 +1552,7 @@ static int	check_dservice_port_condition(const DB_EVENT *events, size_t events_n
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                              *
- *             events_num [IN]  - event count to check                        *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1677,7 +1561,7 @@ static int	check_dservice_port_condition(const DB_EVENT *events, size_t events_n
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_discovery_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_discovery_condition";
 	int		ret;
@@ -1686,43 +1570,43 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
 
 	if (CONDITION_TYPE_DRULE == condition->conditiontype)
 	{
-		ret = check_drule_condition(events, events_num, condition);
+		ret = check_drule_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DCHECK == condition->conditiontype)
 	{
-		ret = check_dcheck_condition(events, events_num, condition);
+		ret = check_dcheck_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DOBJECT == condition->conditiontype)
 	{
-		ret = check_dobject_condition(events, events_num, condition);
+		ret = check_dobject_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_PROXY == condition->conditiontype)
 	{
-		ret = check_proxy_condition(events, events_num, condition);
+		ret = check_proxy_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DVALUE == condition->conditiontype)
 	{
-		ret = check_dvalue_condition(events, events_num, condition);
+		ret = check_dvalue_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DHOST_IP == condition->conditiontype)
 	{
-		ret = check_dhost_ip_condition(events, events_num, condition);
+		ret = check_dhost_ip_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DSERVICE_TYPE == condition->conditiontype)
 	{
-		ret = check_dservice_type_condition(events, events_num, condition);
+		ret = check_dservice_type_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DSTATUS == condition->conditiontype)
 	{
-		ret = check_dstatus_condition(events, events_num, condition);
+		ret = check_dstatus_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DUPTIME == condition->conditiontype)
 	{
-		ret = check_duptime_condition(events, events_num, condition);
+		ret = check_duptime_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_DSERVICE_PORT == condition->conditiontype)
 	{
-		ret = check_dservice_port_condition(events, events_num, condition);
+		ret = check_dservice_port_condition(esc_events, condition);
 	}
 	else
 	{
@@ -1748,8 +1632,7 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
  *                                                                            *
  * Purpose: check metadata or host condition for auto registration            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1757,7 +1640,7 @@ static int	check_discovery_condition(const DB_EVENT *events, size_t events_num, 
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_hostname_metadata_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1769,14 +1652,11 @@ static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t even
 	else
 		condition_field = "host_metadata";
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_AUTO_REGISTRATION != event->source)
-			continue;
 
 		result = DBselect(
 				"select %s"
@@ -1817,8 +1697,7 @@ static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t even
  *                                                                            *
  * Purpose: check proxy condition for auto registration                       *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1826,7 +1705,7 @@ static int	check_hostname_metadata_condition(const DB_EVENT *events, size_t even
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_areg_proxy_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_areg_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1835,14 +1714,11 @@ static int	check_areg_proxy_condition(const DB_EVENT *events, size_t events_num,
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_AUTO_REGISTRATION != event->source)
-			continue;
 
 		result = DBselect(
 				"select proxy_hostid"
@@ -1885,8 +1761,7 @@ static int	check_areg_proxy_condition(const DB_EVENT *events, size_t events_num,
  *                                                                            *
  * Purpose: check if events match single condition                            *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - event count to check                        *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1895,7 +1770,7 @@ static int	check_areg_proxy_condition(const DB_EVENT *events, size_t events_num,
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_auto_registration_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_auto_registration_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_auto_registration_condition";
 	int		ret;
@@ -1906,10 +1781,10 @@ static int	check_auto_registration_condition(const DB_EVENT *events, size_t even
 	{
 		case CONDITION_TYPE_HOST_NAME:
 		case CONDITION_TYPE_HOST_METADATA:
-			ret = check_hostname_metadata_condition(events, events_num, condition);
+			ret = check_hostname_metadata_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_PROXY:
-			ret = check_areg_proxy_condition(events, events_num, condition);
+			ret = check_areg_proxy_condition(esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -1961,8 +1836,7 @@ static int	is_supported_event_object(const DB_EVENT *event)
  *                                                                            *
  * Purpose: check event type condition for internal events                    *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -1970,21 +1844,18 @@ static int	is_supported_event_object(const DB_EVENT *event)
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_event_type_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_intern_event_type_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int		ret, i;
 	zbx_uint64_t	condition_value;
 
 	condition_value = atoi(condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -1992,6 +1863,7 @@ static int	check_intern_event_type_condition(const DB_EVENT *events, size_t even
 					event->object, condition->conditionid);
 			continue;
 		}
+
 		switch (condition_value)
 		{
 			case EVENT_TYPE_ITEM_NOTSUPPORTED:
@@ -2023,8 +1895,7 @@ static int	check_intern_event_type_condition(const DB_EVENT *events, size_t even
  *                                                                            *
  * Purpose: check host group condition for internal events                    *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -2032,7 +1903,7 @@ static int	check_intern_event_type_condition(const DB_EVENT *events, size_t even
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_group_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	condition_value;
@@ -2040,17 +1911,14 @@ static int	check_intern_host_group_condition(const DB_EVENT *events, size_t even
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
 		zbx_vector_uint64_t	groupids;
 		char			*sqlcond = NULL;
 		size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
-		const DB_EVENT		*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -2125,8 +1993,7 @@ static int	check_intern_host_group_condition(const DB_EVENT *events, size_t even
  *                                                                            *
  * Purpose: check host template condition for internal events                 *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -2134,7 +2001,7 @@ static int	check_intern_host_group_condition(const DB_EVENT *events, size_t even
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_template_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2145,14 +2012,11 @@ static int	check_intern_host_template_condition(const DB_EVENT *events, size_t e
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -2255,8 +2119,7 @@ static int	check_intern_host_template_condition(const DB_EVENT *events, size_t e
  *                                                                            *
  * Purpose: check host condition for internal events                          *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -2264,7 +2127,7 @@ static int	check_intern_host_template_condition(const DB_EVENT *events, size_t e
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_intern_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	condition_value;
@@ -2273,14 +2136,11 @@ static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -2342,8 +2202,7 @@ static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num
  *                                                                            *
  * Purpose: check application condition for internal events                   *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -2351,20 +2210,17 @@ static int	check_intern_host_condition(const DB_EVENT *events, size_t events_num
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_application_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_intern_application_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret, i;
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = &events[i];
+		const DB_EVENT	*event = esc_events->values[i];
 
 		ret = FAIL;
-
-		if (FAIL == is_escalation_event(event) || EVENT_SOURCE_INTERNAL != event->source)
-			continue;
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -2447,15 +2303,14 @@ static int	check_intern_application_condition(const DB_EVENT *events, size_t eve
  *                                                                            *
  * Purpose: check if internal events match single condition                   *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - event count to check                        *
+ * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - at least one match, FAIL - otherwise               *
  *                                                                            *
  ******************************************************************************/
-static int	check_internal_condition(const DB_EVENT *events, size_t events_num, DB_CONDITION *condition)
+static int	check_internal_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_internal_condition";
 	int		ret;
@@ -2464,23 +2319,23 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, D
 
 	if (CONDITION_TYPE_EVENT_TYPE == condition->conditiontype)
 	{
-		ret = check_intern_event_type_condition(events, events_num, condition);
+		ret = check_intern_event_type_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
-		ret = check_intern_host_group_condition(events, events_num, condition);
+		ret = check_intern_host_group_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
 	{
-		ret = check_intern_host_template_condition(events, events_num, condition);
+		ret = check_intern_host_template_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_HOST == condition->conditiontype)
 	{
-		ret = check_intern_host_condition(events, events_num, condition);
+		ret = check_intern_host_condition(esc_events, condition);
 	}
 	else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
 	{
-		ret = check_intern_application_condition(events, events_num, condition);
+		ret = check_intern_application_condition(esc_events, condition);
 	}
 	else
 	{
@@ -2507,17 +2362,15 @@ static int	check_internal_condition(const DB_EVENT *events, size_t events_num, D
  *                                                                            *
  * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
- * Parameters: events     [IN]  - trigger events to check                      *
- *             events_num [IN]  - event count to check                        *
- *             source     [IN] - specific event source that need checking     *
+ * Parameters: esc_events [IN]  - events to check                             *
+ *             source     [IN]  - specific event source that need checking    *
  *             condition  [IN/OUT] - condition for matching, outputs          *
  *                                  event ids that match condition            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_condition(const DB_EVENT *events, size_t events_num, unsigned char source,
-		DB_CONDITION *condition)
+static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char source, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_action_condition";
 
@@ -2528,16 +2381,16 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			check_trigger_condition(events, events_num, condition);
+			check_trigger_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			check_discovery_condition(events, events_num, condition);
+			check_discovery_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_AUTO_REGISTRATION:
-			check_auto_registration_condition(events, events_num, condition);
+			check_auto_registration_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			check_internal_condition(events, events_num, condition);
+			check_internal_condition(esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -2554,21 +2407,20 @@ static void	check_events_condition(const DB_EVENT *events, size_t events_num, un
  * Purpose: check if multiple events matches multiple conditions              *
  *                                                                            *
  *                                                                            *
- * Parameters: events [IN] - events to check                                  *
- *             events_num [IN] - events count                                 *
- *             source [IN] - specific event source that need checking         *
+ * Parameters: esc_events [IN]  - events to check                             *
+ *             source     [IN] - specific event source that need checking     *
  *                                                                            *
- *             condition [IN/OUT] - condition for matching, outputs event ids *
- *                                  that match condition                      *
+ *             condition  [IN/OUT] - condition for matching, outputs event ids*
+ *                                   that match condition                     *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_conditions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *uniq_conditions)
+static void	check_events_conditions(zbx_vector_ptr_t *esc_events, zbx_hashset_t *uniq_conditions)
 {
 	int	i;
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
-		if (SUCCEED == is_escalation_present(events, events_num, i))
+		if (0 != esc_events[i].values_num)
 		{
 			zbx_hashset_iter_t	iter;
 			DB_CONDITION		*condition;
@@ -2576,7 +2428,7 @@ static void	check_events_conditions(const DB_EVENT *events, size_t events_num, z
 			zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
 
 			while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-				check_events_condition(events, events_num, i, condition);
+				check_events_condition(&esc_events[i], i, condition);
 		}
 	}
 }
@@ -2646,16 +2498,21 @@ static void	conditions_vectors_destroy(zbx_hashset_t *uniq_conditions)
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	int	ret = FAIL;
+	int			ret = FAIL;
+	zbx_vector_ptr_t	esc_events;
 
 	zbx_vector_uint64_create(&condition->objectids);
+	zbx_vector_ptr_create(&esc_events);
 
-	check_events_condition(event, 1, event->source, condition);
+	zbx_vector_ptr_append(&esc_events, (void*)event);
+
+	check_events_condition(&esc_events, event->source, condition);
 
 	if (1 == condition->objectids.values_num && condition->objectids.values[0] == event->objectid)
 		ret = SUCCEED;
 
 	zbx_vector_uint64_destroy(&condition->objectids);
+	zbx_vector_ptr_destroy(&esc_events);
 
 	return ret;
 }
@@ -3047,6 +2904,33 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_escalation_events                                            *
+ *                                                                            *
+ * Purpose: to add events that have escalation possible and skip others, also *
+ *          adds according to source                                          *
+ *                                                                            *
+ * Parameters: events       - [IN] events to apply actions for                *
+ *             events_num   - [IN] number of events                           *
+ *             esc_events   - [OUT] events that need condition checks         *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_escalation_events(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t *esc_events)
+{
+	int	i;
+
+	for (i = 0; i < events_num; i++)
+	{
+		const DB_EVENT	*event;
+
+		event = &events[i];
+
+		if (SUCCEED == is_escalation_event(event) && EVENT_SOURCE_COUNT > (size_t)event->source)
+			zbx_vector_ptr_append(&esc_events[event->source], (void*)event);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -3059,13 +2943,14 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
  ******************************************************************************/
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events)
 {
-	const char			*__function_name = "process_actions";
+	const char		*__function_name = "process_actions";
 
-	size_t				i;
-	zbx_vector_ptr_t		actions;
-	zbx_vector_ptr_t 		new_escalations;
-	zbx_hashset_t			rec_escalations;
-	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
+	size_t			i;
+	zbx_vector_ptr_t	actions;
+	zbx_vector_ptr_t 	new_escalations;
+	zbx_vector_ptr_t	esc_events[EVENT_SOURCE_COUNT];
+	zbx_hashset_t		rec_escalations;
+	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -3074,13 +2959,18 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_vector_ptr_create(&esc_events[i]);
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+	}
 
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions, uniq_conditions);
 	conditions_vectors_create(uniq_conditions);
 
-	check_events_conditions(events, events_num, uniq_conditions);
+	get_escalation_events(events, events_num, esc_events);
+
+	check_events_conditions(esc_events, uniq_conditions);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
@@ -3126,6 +3016,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
+		zbx_vector_ptr_destroy(&esc_events[i]);
 		zbx_conditions_eval_clean(&uniq_conditions[i]);
 		zbx_hashset_destroy(&uniq_conditions[i]);
 	}
