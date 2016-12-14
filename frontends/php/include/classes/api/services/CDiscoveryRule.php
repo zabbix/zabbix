@@ -1010,12 +1010,24 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 	}
 
-	protected function checkSpecificFields(array $item) {
+	/**
+	 * Check discovery rule specific fields.
+	 *
+	 * @param array  $item			An array of single discovery rule data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
 		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
 					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
 			);
+		}
+
+		if (array_key_exists('preprocessing', $item)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Item pre-processing is not allowed for discovery rules.'));
 		}
 	}
 
