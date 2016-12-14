@@ -1390,3 +1390,26 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (9, 50011, '', 50014, NULL);
 INSERT INTO groups (groupid,name,internal,flags) VALUES (50015,'Api discovery group {#HV.NAME}',0,4);
 INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 8, 'Api discovery group {#HV.NAME}');
+
+-- user group
+INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Api user group for update');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Api user group for update with user and rights');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Api user group with one user');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (16, 'Api user group delete');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (17, 'Api user group delete1');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (18, 'Api user group delete2');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (19, 'Api user group delete3');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'Api user group in actions');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'Api user group in scripts');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'Api user group in configuration');
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'one-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'two-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 14, 3);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 5);
+INSERT INTO rights (rightid, groupid, permission, id) VALUES (2, 14, 3, 50012);
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata) VALUES (16,'Api action',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}');
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (31, 16, 0, 0, 1, 1, 0);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Api script','test',2,21,NULL,'api script description');
+UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
