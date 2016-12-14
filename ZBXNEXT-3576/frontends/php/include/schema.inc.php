@@ -1451,7 +1451,7 @@ return [
 			'delay_flex' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 1024,
 				'default' => '',
 			],
 			'params' => [

@@ -319,7 +319,7 @@ FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
 FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
-FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|delay_flex	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -1450,4 +1450,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030013	|3030013
+ROW		|3030014	|3030014

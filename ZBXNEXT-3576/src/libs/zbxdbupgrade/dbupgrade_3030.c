@@ -146,6 +146,13 @@ static int	DBpatch_3030013(void)
 	return DBmodify_field_type("media", &field);
 }
 
+static int	DBpatch_3030014(void)
+{
+	const ZBX_FIELD field = {"delay_flex", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -166,5 +173,6 @@ DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
 DBPATCH_ADD(3030013, 0, 1)
+DBPATCH_ADD(3030014, 0, 1)
 
 DBPATCH_END()
