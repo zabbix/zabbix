@@ -202,8 +202,7 @@ static int	regex_compile(const char *pattern, regex_t **expression, char **error
 		{
 			char	buffer[MAX_STRING_LEN];
 			regerror(reg_error, regex, buffer, sizeof(buffer));
-			*error = zbx_dsprintf(NULL, "Cannot compile a regular expression describing "
-							"filename pattern: %s", buffer);
+			*error = zbx_strdup(*error, buffer);
 		}
 #ifdef _WINDOWS
 		/* the Windows gnuregex implementation does not correctly clean up */
@@ -230,7 +229,7 @@ ret:
 
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*dir, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str, *error;
+	char			*dir, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str, *error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
@@ -271,13 +270,17 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == regex_compile(regex_incl_str, &regex_incl, &error))
 	{
-		SET_MSG_RESULT(result, error);
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression describing "
+								"regex_incl filename pattern: %s", error));
+		zbx_free(error);
 		goto err;
 	}
 
 	if (0 == regex_compile(regex_excl_str, &regex_excl, &error))
 	{
-		SET_MSG_RESULT(result, error);
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression describing "
+								"regex_excl filename pattern: %s", error));
+		zbx_free(error);
 		goto err;
 	}
 
