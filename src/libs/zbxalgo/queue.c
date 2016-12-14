@@ -141,10 +141,10 @@ void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue)
  *             elem  - [IN] the value                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *elem)
+void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value)
 {
 	zbx_queue_ptr_reserve(queue, 1);
-	queue->values[queue->head_pos++] = elem;
+	queue->values[queue->head_pos++] = value;
 
 	if (queue->head_pos == queue->alloc_num)
 		queue->head_pos = 0;
@@ -163,19 +163,68 @@ void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *elem)
  ******************************************************************************/
 void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
 {
-	void	*elem;
+	void	*value;
 
 	if (queue->tail_pos != queue->head_pos)
 	{
-		elem = queue->values[queue->tail_pos++];
+		value = queue->values[queue->tail_pos++];
 
 		if (queue->tail_pos == queue->alloc_num)
 			queue->tail_pos = 0;
 	}
 	else
-		elem = NULL;
+		value = NULL;
 
-	return elem;
+	return value;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_queue_ptr_remove_value                                       *
+ *                                                                            *
+ * Purpose: removes specified value from queue                                *
+ *                                                                            *
+ * Parameters: queue - [IN] the queue                                         *
+ *             value - [IN] the value to remove                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
+{
+	int	i, start_pos;
+
+	if (queue->tail_pos == queue->head_pos)
+		return;
+
+	if (queue->tail_pos < queue->head_pos)
+		start_pos = queue->tail_pos;
+	else
+		start_pos = 0;
+
+	for (i = start_pos; i < queue->head_pos; i++)
+	{
+		if (queue->values[i] == value)
+		{
+			for (; i < queue->head_pos - 1; i++)
+				queue->values[i] = queue->values[i + 1];
+
+			queue->head_pos--;
+			return;
+		}
+	}
+
+	if (queue->tail_pos <= queue->head_pos)
+		return;
+
+	for (i = queue->alloc_num - 1; i >= queue->tail_pos; i--)
+	{
+		if (queue->values[i] == value)
+		{
+			for (; i > queue->tail_pos; i--)
+				queue->values[i] = queue->values[i - 1];
+
+			queue->tail_pos++;
+			return;
+		}
+	}
+}
 
