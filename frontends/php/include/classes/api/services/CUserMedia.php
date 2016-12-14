@@ -31,6 +31,8 @@ class CUserMedia extends CApiService {
 	/**
 	 * Get users data.
 	 *
+	 * @deprecated	As of version 3.4, use user.get() method instead.
+	 *
 	 * @param array  $options
 	 * @param array  $options['usrgrpids']	filter by UserGroup IDs
 	 * @param array  $options['userids']	filter by User IDs
@@ -45,6 +47,8 @@ class CUserMedia extends CApiService {
 	 * @return array
 	 */
 	public function get($options = []) {
+		$this->deprecated('usermedia.get method is deprecated.');
+
 		$result = [];
 
 		$sqlParts = [
