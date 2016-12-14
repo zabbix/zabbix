@@ -374,4 +374,25 @@ int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
 double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
 
+
+/* fifo queue of pointers */
+
+typedef struct
+{
+	void	**values;
+	int	alloc_num;
+	int	head_pos;
+	int	tail_pos;
+}
+zbx_queue_ptr_t;
+
+int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num);
+void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *elem);
+void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
+
+
 #endif
