@@ -15,7 +15,6 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
 A......... [ZBX-5116] prevented escaping forward slashes while encoding API response to JSON text (Cemeris)
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
@@ -26,6 +25,11 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
+.......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
@@ -292,6 +296,11 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
+.......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 ....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
 
@@ -1857,6 +1866,9 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 
 --------------------------------------------------------------------------------
@@ -3367,6 +3379,7 @@ Changes for 2.0.21rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.20
