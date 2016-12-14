@@ -77,9 +77,9 @@ static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION 
 
 /******************************************************************************
  *                                                                            *
- * Function: check_condition_event_tag                                        *
+ * Function: check_condition_event_tag_value                                  *
  *                                                                            *
- * Purpose: check condition event tag                                         *
+ * Purpose: check condition event tag value                                   *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
@@ -125,7 +125,7 @@ static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_COND
  *                                                                            *
  * Function: get_object_ids                                                   *
  *                                                                            *
- * Purpose: to get objectids of escalation events with specific source        *
+ * Purpose: to get objectids of escalation events                             *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             objectids  [OUT] - event objectids to be used in condition     *
@@ -525,7 +525,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 
 /******************************************************************************
  *                                                                            *
- * Function: check_trigger_type_condition                                     *
+ * Function: check_trigger_id_condition                                       *
  *                                                                            *
  * Purpose: check trigger type condition                                      *
  *                                                                            *
@@ -1366,9 +1366,9 @@ static int	check_dservice_type_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 
 /******************************************************************************
  *                                                                            *
- * Function: check_dservice_type_condition                                    *
+ * Function: check_dstatus_condition                                          *
  *                                                                            *
- * Purpose: check discovery service type condition                            *
+ * Purpose: check discovery status condition                                  *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             condition  [IN/OUT] - condition for matching, outputs          *
@@ -1411,7 +1411,7 @@ static int	check_dstatus_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
 
 /******************************************************************************
  *                                                                            *
- * Function: check_dservice_type_condition                                    *
+ * Function: check_duptime_condition                                          *
  *                                                                            *
  * Purpose: check uptime condition for discovery                              *
  *                                                                            *
