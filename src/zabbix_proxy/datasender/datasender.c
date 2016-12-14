@@ -98,6 +98,8 @@ static int	proxy_data_sender(int *more)
 		disconnect_server(&sock);
 	}
 
+	zbx_json_free(&j);
+
 	if (SUCCEED == ret)
 	{
 		*more = more_history | more_discovery | more_areg;
