@@ -65,6 +65,14 @@
 #define ZBX_PROTO_TAG_USERNAME		"username"
 #define ZBX_PROTO_TAG_PASSWORD		"password"
 #define ZBX_PROTO_TAG_SID		"sid"
+#define ZBX_PROTO_TAG_TTL		"ttl"
+#define ZBX_PROTO_TAG_COMMANDTYPE	"commandtype"
+#define ZBX_PROTO_TAG_COMMAND		"command"
+#define ZBX_PROTO_TAG_EXECUTE_ON	"execute_on"
+#define ZBX_PROTO_TAG_AUTHTYPE		"authtype"
+#define ZBX_PROTO_TAG_PUBLICKEY		"publickey"
+#define ZBX_PROTO_TAG_PRIVATEKEY	"privatekey"
+#define ZBX_PROTO_TAG_PARENT_TASKID	"parent_taskid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -75,6 +83,7 @@
 #define ZBX_PROTO_VALUE_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_VALUE_HOST_AVAILABILITY	"host availability"
 #define ZBX_PROTO_VALUE_HISTORY_DATA		"history data"
+#define ZBX_PROTO_VALUE_TASK_DATA		"task data"
 #define ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA	"auto registration"
 #define ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
@@ -133,6 +142,7 @@ void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
+void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);

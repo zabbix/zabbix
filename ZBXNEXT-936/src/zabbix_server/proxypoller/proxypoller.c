@@ -21,6 +21,7 @@
 #include "daemon.h"
 #include "comms.h"
 #include "zbxself.h"
+#include "zbxtasks.h"
 
 #include "proxypoller.h"
 #include "zbxserver.h"
@@ -211,6 +212,7 @@ static int	process_proxy(void)
 			goto network_error;
 		}
 
+		/* config */
 		if (proxy.proxy_config_nextcheck <= now)
 		{
 			zbx_json_clean(&j);
@@ -247,6 +249,82 @@ static int	process_proxy(void)
 
 			if (SUCCEED != ret)
 				goto network_error;
+		}
+
+		/* task data */
+		if (proxy.proxy_data_nextcheck <= now)
+		{
+			struct zbx_task_remote_command_set	*cmd_set = NULL;
+
+			zbx_json_clean(&j);
+
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST,
+					ZBX_PROTO_VALUE_TASK_DATA, ZBX_JSON_TYPE_STRING);
+
+			cmd_set = zbx_task_remote_command_set_new();
+			zbx_task_remote_command_set_init_from_db(cmd_set, ZBX_TM_STATUS_NEW);
+			zbx_task_remote_command_set_serialize_json(cmd_set, &j);
+
+			/* send empty data as well */
+			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+			{
+				struct zbx_task_remote_command_result_set	*res_set = NULL;
+
+				res_set = zbx_task_remote_command_result_set_new();
+
+				zabbix_log(LOG_LEVEL_WARNING, "sending task data to proxy \"%s\" at \"%s\","
+						" datalen " ZBX_FS_SIZE_T,
+						proxy.host, s.peer, (zbx_fs_size_t)j.buffer_size);
+
+				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
+				{
+					/* see zbx_recv_response() */
+					ret = zbx_tcp_recv_to(&s, 0);
+					if (SUCCEED != ret)
+					{
+						/* since we have successfully sent data earlier, we assume the other */
+						/* side is just too busy processing our data if there is no response */
+						error = zbx_strdup(error, zbx_socket_strerror());
+						goto err;
+					}
+
+					/* deal with empty string here because zbx_json_open() does not produce an error message in this case */
+					if ('\0' == s.buffer)
+					{
+						error = zbx_strdup(error, "empty string received");
+						goto err;
+					}
+
+					/* receive results */
+					if (SUCCEED != zbx_json_open(s.buffer, &jp))
+					{
+						error = zbx_strdup(error, zbx_json_strerror());
+						goto err;
+					}
+
+					if (SUCCEED != (ret = zbx_task_remote_command_result_set_init_from_json(res_set, &jp)))
+						goto err;
+
+					zbx_task_remote_command_result_set_insert_into_db(res_set);
+				}
+err:
+				zbx_task_remote_command_result_set_clear(res_set);
+				zbx_task_remote_command_result_set_free(res_set);
+
+				if (SUCCEED != ret) {
+					zabbix_log(LOG_LEVEL_WARNING, "cannot send task data to proxy"
+							" \"%s\" at \"%s\": %s", proxy.host, s.peer, error);
+				}
+
+				disconnect_proxy(&s);
+			}
+
+			zbx_task_remote_command_set_clear(cmd_set);
+			zbx_task_remote_command_set_free(cmd_set);
+
+			if (SUCCEED != ret) {
+				goto network_error;
+			}
 		}
 
 		if (proxy.proxy_data_nextcheck <= now)

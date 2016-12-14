@@ -26,6 +26,7 @@
 #include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
+#include "zbxtasks.h"
 
 #include "trapper.h"
 #include "active.h"
@@ -533,13 +534,65 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					active_passive_misconfig(sock);
 				}
 			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_TASK_DATA))
 			{
-				recv_agenthistory(sock, &jp, ts);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
-			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+				{
+					{ /* receive new tasks */
+						struct zbx_task_remote_command_set	*set;
+
+						set = zbx_task_remote_command_set_new();
+
+						if (SUCCEED != zbx_task_remote_command_set_init_from_json(set, &jp))
+							goto parsing_err;
+
+						zbx_task_remote_command_set_insert_into_db(set);
+
+						zbx_task_remote_command_set_clear(set);
+						zbx_task_remote_command_set_free(set);
+					}
+
+					{ /* send completed tasks */
+						struct zbx_task_remote_command_result_set	*set;
+						struct zbx_json					json;
+
+						set = zbx_task_remote_command_result_set_new();
+
+						zbx_task_remote_command_result_set_init_from_db(set, ZBX_TM_STATUS_NEW);
+
+						zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+						zbx_task_remote_command_result_set_serialize_json(set, &json);
+
+						zbx_json_close(&json);
+
+						zbx_task_remote_command_result_set_clear(set);
+						zbx_task_remote_command_result_set_free(set);
+
+						if (SUCCEED != zbx_tcp_send_to(sock, json.buffer, CONFIG_TIMEOUT))
+							goto socket_err;
+					}
+parsing_err:
+socket_err:
+					; /* do nothing for now */
+
+					}
+					else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+					}
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
+						0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+				{
+					recv_agenthistory(sock, &jp, ts);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
+				{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_proxyhistory(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))

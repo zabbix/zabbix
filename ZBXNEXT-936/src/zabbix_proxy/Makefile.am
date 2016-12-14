@@ -4,7 +4,8 @@ SUBDIRS = \
 	heart \
 	housekeeper \
 	proxyconfig \
-	datasender
+	datasender \
+	taskmanager
 
 sbin_PROGRAMS = zabbix_proxy
 
@@ -26,6 +27,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
+	taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
@@ -52,7 +54,8 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
 
 zabbix_proxy_LDADD += @PROXY_LIBS@
 

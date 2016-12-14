@@ -1572,6 +1572,7 @@ AC_OUTPUT([
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxregexp/Makefile
+	src/libs/zbxtasks/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
@@ -1598,6 +1599,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/datasender/Makefile
+	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	upgrades/Makefile
 	man/Makefile
