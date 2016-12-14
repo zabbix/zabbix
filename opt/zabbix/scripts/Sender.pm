@@ -116,14 +116,25 @@ sub _decode_answer {
     $ident = substr( $data, 0, 4 ) if length($data) > 3;
     $answer = substr( $data, 13 ) if length($data) > 12;
 
+    my $expected_ident = 'ZBXD';
     if ( $ident && $answer ) {
-        if ( $ident eq 'ZBXD' ) {
+        if ( $ident eq $expected_ident ) {
             my $ref = $self->_json()->decode($answer);
             if ( $ref->{'response'} eq 'success' ) {
                 return 1;
             }
+
+            $self->_sender_err("cannot decode JSON answer");
+        }
+        else {
+            $self->_sender_err("invalid answer: answer header is missing \"$expected_ident\"");
         }
     }
+    else
+    {
+        $self->_sender_err("invalid answer: expected header and body");
+    }
+
     return;
 }
 
@@ -148,8 +159,6 @@ sub send_arrref {
     }
 
     return 1 if ($status == 1);
-
-    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempts attempts)");
 
     return;
 }
@@ -188,6 +197,7 @@ sub _send {
     $self->_disconnect() unless $self->keepalive();
 
     return $status if ($status == 1);
+
     return;
 }
 
