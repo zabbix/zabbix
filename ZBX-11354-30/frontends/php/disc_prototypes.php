@@ -390,16 +390,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
 
+			$dbItem['applications'] = zbx_objectValues($dbItem['applications'], 'applicationid');
+
 			// compare applications
 			natsort($dbItem['applications']);
 			natsort($applications);
+
 			if (array_values($dbItem['applications']) !== array_values($applications)) {
 				$item['applications'] = $applications;
 			}
 
-			natsort($dbItem['applicationPrototypes']);
-			natsort($application_prototypes);
-			if (array_values($dbItem['applicationPrototypes']) !== array_values($application_prototypes)) {
+			// compare application prototypes
+			$db_application_prototype_names = zbx_objectValues($dbItem['applicationPrototypes'], 'name');
+			natsort($db_application_prototype_names);
+
+			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			natsort($application_prototype_names);
+
+			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
 				$item['applicationPrototypes'] = $application_prototypes;
 			}
 
