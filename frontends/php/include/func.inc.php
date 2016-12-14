@@ -2232,7 +2232,6 @@ function trimPath($name) {
 function splitPath($path) {
 	$path_items = [];
 	$path_item = '';
-	$l = 0;
 
 	for ($i = 0; isset($path[$i]); $i++) {
 		switch ($path[$i]) {
