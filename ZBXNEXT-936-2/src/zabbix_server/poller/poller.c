@@ -370,9 +370,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
 	const char		*__function_name = "get_values";
-	DC_ITEM			items[MAX_POLLER_ITEMS];
-	AGENT_RESULT		results[MAX_POLLER_ITEMS];
-	int			errcodes[MAX_POLLER_ITEMS];
+	static DC_ITEM			items[MAX_POLLER_ITEMS];
+	static AGENT_RESULT		results[MAX_POLLER_ITEMS];
+	static int			errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
 	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
 	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
