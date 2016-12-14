@@ -19,7 +19,7 @@ AC_DEFUN([LIBEVENT_TRY_LINK],
 AC_TRY_LINK(
 [
 #include <stdlib.h>
-#include <event2/event.h>
+#include <event.h>
 ],
 [
 	event_init();
