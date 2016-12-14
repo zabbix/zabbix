@@ -270,16 +270,16 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == regex_compile(regex_incl_str, &regex_incl, &error))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression describing "
-								"regex_incl filename pattern: %s", error));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression in \"regex_incl\""
+				" parameter: %s", error));
 		zbx_free(error);
 		goto err;
 	}
 
 	if (0 == regex_compile(regex_excl_str, &regex_excl, &error))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression describing "
-								"regex_excl filename pattern: %s", error));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression in \"regex_excl\""
+				" parameter: %s", error));
 		zbx_free(error);
 		goto err;
 	}
