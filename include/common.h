@@ -672,8 +672,16 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* task manager task types  */
-#define ZBX_TM_TASK_CLOSE_PROBLEM	1
+/* task manager task types */
+#define ZBX_TM_TASK_CLOSE_PROBLEM		1
+#define ZBX_TM_TASK_SEND_REMOTE_COMMAND		2
+#define ZBX_TM_TASK_SEND_REMOTE_COMMAND_RESULT	3
+
+/* task manager task states */
+#define ZBX_TM_STATUS_NEW			1
+#define ZBX_TM_STATUS_INPROGRESS		2
+#define ZBX_TM_STATUS_DONE			3
+#define ZBX_TM_STATUS_EXPIRED			4
 
 /* acknowledgment actions (flags) */
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000

@@ -181,7 +181,7 @@ static int	tm_process_tasks()
 	int		type, ret, processed_num = 0;
 	zbx_uint64_t	taskid;
 
-	result = DBselect("select taskid,type from task order by taskid");
+	result = DBselect("select taskid,type from task where type=%d order by taskid", ZBX_TM_TASK_CLOSE_PROBLEM);
 
 	while (NULL != (row = DBfetch(result)))
 	{
