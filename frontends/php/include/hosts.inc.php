@@ -560,20 +560,6 @@ function updateHostStatus($hostids, $status) {
 	]);
 }
 
-function get_application_by_applicationid($applicationid, $no_error_message = 0) {
-	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.zbx_dbstr($applicationid)));
-
-	if ($row) {
-		return $row;
-	}
-
-	if ($no_error_message == 0) {
-		error(_s('No application with ID "%1$s".', $applicationid));
-	}
-
-	return false;
-}
-
 /**
  * Returns the farthest application ancestor for each given application.
  *
