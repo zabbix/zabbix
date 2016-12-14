@@ -19,4 +19,5 @@ libzbxalgo_a_SOURCES = \
 	int128.c \
 	prediction.c \
 	vector.c \
-	vectorimpl.h
+	vectorimpl.h \
+	queue.c
