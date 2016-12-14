@@ -357,10 +357,10 @@ if ($config['event_ack_enable']) {
 		}
 	}
 
-	$problem_events = getTriggerLastProblem($triggerIds);
+	$problems = getTriggerLastProblems($triggerIds, ['eventid', 'objectid']);
 
-	foreach ($problem_events as $problem_event) {
-		$triggers[$problem_event['objectid']]['last_problem_eventid'] = $problem_event['eventid'];
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['last_problem_eventid'] = $problem['eventid'];
 	}
 }
 

@@ -2163,25 +2163,30 @@ function makeTriggersHostsList(array $triggers_hosts) {
 }
 
 /**
- * Get last problem event for each trigger.
+ * Get last problems by given trigger IDs.
  *
  * @param array $triggerids
+ * @param array $output         list of output fields.
  *
  * @return array
  */
-function getTriggerLastProblem(array $triggerids) {
-	$problem_events = DBfetchArray(DBselect(
-		'SELECT e1.eventid,e1.objectid,e1.clock,e1.acknowledged,e1.ns'.
-		' FROM events e1,'.
-			' (SELECT e2.objectid,MAX(e2.eventid) AS eventid'.
+function getTriggerLastProblems(array $triggerids, array $output) {
+	$problems = DBfetchArray(DBselect(
+		'SELECT '.implode(',e.', $output).
+		' FROM events e'.
+		' JOIN ('.
+			'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
 			' FROM events e2'.
-			' WHERE '.dbConditionInt('e2.objectid', $triggerids).
-				' AND e2.source='.EVENT_SOURCE_TRIGGERS.
+			' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e2.object='.EVENT_OBJECT_TRIGGER.
 				' AND e2.value='.TRIGGER_VALUE_TRUE.
-			' GROUP BY e2.objectid) e3'.
-		' WHERE e1.eventid=e3.eventid'
+				' AND '.dbConditionInt('e2.objectid', $triggerids).
+			' GROUP BY e2.source,e2.object,e2.objectid'.
+		') e3 ON e3.source=e.source'.
+			' AND e3.object=e.object'.
+			' AND e3.objectid=e.objectid'.
+			' AND e3.clock=e.clock'
 	));
 
-	return $problem_events;
+	return $problems;
 }

@@ -738,7 +738,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 			// Display event acknowledgement.
 			$config = select_config();
 			if ($config['event_ack_enable']) {
-				$ack = getTriggerLastProblem([$item['triggerid']]);
+				$ack = getTriggerLastProblems([$item['triggerid']], ['acknowledged']);
 
 				if ($ack) {
 					$ack = reset($ack);

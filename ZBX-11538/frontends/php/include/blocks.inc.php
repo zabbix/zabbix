@@ -332,12 +332,12 @@ function make_system_status($filter, $backurl) {
 		'preservekeys' => true
 	]);
 
-	$problem_events = getTriggerLastProblem(array_keys($triggers));
+	$problems = getTriggerLastProblems(array_keys($triggers), ['eventid', 'objectid', 'clock', 'acknowledged', 'ns']);
 
 	$events = [];
-	foreach ($problem_events as $problem_event) {
-		$triggers[$problem_event['objectid']]['event'] = $problem_event;
-		$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['event'] = $problem;
+		$events[$problem['eventid']] = ['eventid' => $problem['eventid']];
 	}
 
 	// get acknowledges
@@ -582,12 +582,12 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'countOutput' => true
 	]));
 
-	$problem_events = getTriggerLastProblem(array_keys($triggers));
+	$problems = getTriggerLastProblems(array_keys($triggers), ['eventid', 'objectid', 'clock', 'acknowledged', 'ns']);
 
 	$events = [];
-	foreach ($problem_events as $problem_event) {
-		$triggers[$problem_event['objectid']]['lastEvent'] = $problem_event;
-		$events[$problem_event['eventid']] = ['eventid' => $problem_event['eventid']];
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['lastEvent'] = $problem;
+		$events[$problem['eventid']] = ['eventid' => $problem['eventid']];
 	}
 
 	// get acknowledges
