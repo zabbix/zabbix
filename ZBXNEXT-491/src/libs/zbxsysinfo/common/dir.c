@@ -305,7 +305,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		max_depth = atoi(max_depth_str);
-		if (-1 < max_depth)
+		if (-1 > max_depth)
 		{
 			max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 		}
