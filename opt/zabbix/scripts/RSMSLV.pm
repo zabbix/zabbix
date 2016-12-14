@@ -1322,7 +1322,7 @@ sub send_values
 
 	if (scalar(@_sender_values) == 0)
 	{
-		wrn("will not send values, nothing to send");
+		wrn("no values to push to the server, is server up and running?");
 		return;
 	}
 
