@@ -391,8 +391,8 @@ void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num);
 void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *elem);
+void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value);
 void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
-
+void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value);
 
 #endif
