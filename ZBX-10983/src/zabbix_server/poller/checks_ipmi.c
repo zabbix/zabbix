@@ -863,7 +863,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 {
 	const char	*__function_name = "zbx_read_ipmi_control";
 	int		ret;
-	char		control_name[128];
+	char		control_name[128];	/* internally defined CONTROL_ID_LEN is 32 in OpenIPMI 2.0.22 */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __function_name, c->c_name, h->ip, h->port);
 
@@ -899,6 +899,7 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 {
 	const char	*__function_name = "zbx_set_ipmi_control";
 	int		ret;
+	char		control_name[128];	/* internally defined CONTROL_ID_LEN is 32 in OpenIPMI 2.0.22 */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d' value:%d",
 			__function_name, c->c_name, h->ip, h->port, value);
@@ -919,14 +920,19 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 		goto out;
 	}
 
+	/* copy control name - it can go away and we won't be able to make an error message */
+	zbx_strlcpy(control_name, c->c_name, sizeof(control_name));
+
 	c->val[0] = value;
 	h->ret = SUCCEED;
 	h->done = 0;
 
 	if (0 != (ret = ipmi_control_set_val(c->control, c->val, zbx_got_control_setting_cb, h)))
 	{
+		/* do not use pointer to control here - the control may have disappeared during */
+		/* ipmi_control_set_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_set_val() return error: 0x%x",
-				c->c_name, ret);
+				control_name, ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
