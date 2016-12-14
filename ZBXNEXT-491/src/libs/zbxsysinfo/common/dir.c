@@ -307,7 +307,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		max_depth = atoi(max_depth_str);
 		if (-1 > max_depth)
 		{
-			max_depth = TRAVERSAL_DEPTH_UNLIMITED;
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+			goto err;
 		}
 	}
 
