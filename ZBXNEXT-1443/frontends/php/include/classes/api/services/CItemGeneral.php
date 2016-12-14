@@ -61,8 +61,6 @@ abstract class CItemGeneral extends CApiService {
 			'value_type'			=> ['template' => 1],
 			'trapper_hosts'			=> [],
 			'units'					=> ['template' => 1],
-			'multiplier'			=> ['template' => 1],
-			'delta'					=> ['template' => 1],
 			'snmpv3_contextname'	=> [],
 			'snmpv3_securityname'	=> [],
 			'snmpv3_securitylevel'	=> [],
@@ -79,7 +77,6 @@ abstract class CItemGeneral extends CApiService {
 			'delay_flex'			=> [],
 			'params'				=> [],
 			'ipmi_sensor'			=> ['template' => 1],
-			'data_type'				=> ['template' => 1],
 			'authtype'				=> [],
 			'username'				=> [],
 			'password'				=> [],
@@ -91,7 +88,8 @@ abstract class CItemGeneral extends CApiService {
 			'interfaceid'			=> ['host' => 1],
 			'port'					=> [],
 			'inventory_link'		=> [],
-			'lifetime'				=> []
+			'lifetime'				=> [],
+			'preprocessing'			=> ['template' => 1]
 		];
 
 		$this->errorMessages = array_merge($this->errorMessages, [
@@ -258,12 +256,6 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
 				$fullItem['delay_flex'] = '';
-			}
-			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
-				$item['delta'] = 0;
-			}
-			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-				$item['data_type'] = 0;
 			}
 
 			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
@@ -477,14 +469,23 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$this->checkSpecificFields($fullItem);
+			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 		}
 		unset($item);
 
 		$this->checkExistingItems($items);
 	}
 
-	protected function checkSpecificFields(array $item) {
+	/**
+	 * Check item specific fields. Each API like Item, Itemprototype and Discovery rule may inherit different fields
+	 * to validate.
+	 *
+	 * @param array  $item			An array of single item data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @return bool
+	 */
+	protected function checkSpecificFields(array $item, $method) {
 		return true;
 	}
 
@@ -829,6 +830,17 @@ abstract class CItemGeneral extends CApiService {
 					$newItem['applications'] = get_same_applications_for_host($parentItem['applications'], $host['hostid']);
 				}
 
+				if (array_key_exists('preprocessing', $newItem)) {
+					foreach ($newItem['preprocessing'] as $preprocessing) {
+						if ($exItem) {
+							$preprocessing['itemid'] = $exItem['itemid'];
+						}
+						else {
+							unset($preprocessing['itemid']);
+						}
+					}
+				}
+
 				if ($parentItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 						&& array_key_exists('applicationPrototypes', $parentItem)) {
 
@@ -874,6 +886,238 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $newItems;
+	}
+
+	/**
+	 * Validate item pre-processing.
+	 *
+	 * @param array  $item									An array of single item data.
+	 * @param array  $item['preprocessing']					An array of item pre-processing data.
+	 * @param string $item['preprocessing'][]['type']		The preprocessing option type. Possible values:
+	 *															1 - ZBX_PREPROC_MULTIPLIER;
+	 *															2 - ZBX_PREPROC_RTRIM;
+	 *															3 - ZBX_PREPROC_LTRIM;
+	 *															4 - ZBX_PREPROC_TRIM;
+	 *															5 - ZBX_PREPROC_REGSUB;
+	 *															6 - ZBX_PREPROC_BOOL2DEC;
+	 *															7 - ZBX_PREPROC_OCT2DEC;
+	 *															8 - ZBX_PREPROC_HEX2DEC;
+	 *															9 - ZBX_PREPROC_DELTA_VALUE;
+	 *															10 - ZBX_PREPROC_DELTA_SPEED.
+	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
+	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
+	 *														parameters are separated by LF (\n)character.
+	 * @param string $method								A string of "create" or "update" method.
+	 */
+	protected function validateItemPreProcessing(array $item, $method) {
+		if (array_key_exists('preprocessing', $item)) {
+			if (!is_array($item['preprocessing'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
+			if ($method === 'create' && !$item['preprocessing']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'preprocessing', _('cannot be empty'))
+				);
+			}
+			elseif ($method === 'update' && !$item['preprocessing']) {
+				// In case we want do delete item pre-processing by giving an empty array for update method.
+				return;
+			}
+
+			$type_validator = new CLimitedSetValidator([
+				'values' => [ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM,
+					ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
+					ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED
+				]
+			]);
+
+			$required_fields = ['type', 'params'];
+			$delta = false;
+
+			foreach ($item['preprocessing'] as $preprocessing) {
+				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
+
+				if ($missing_keys) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Item pre-processing is missing parameters: %1$s', implode(', ', $missing_keys))
+					);
+				}
+
+				if (is_array($preprocessing['type'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($preprocessing['type'] === '' || $preprocessing['type'] === null
+						|| $preprocessing['type'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'type', _('cannot be empty'))
+					);
+				}
+
+				if (!$type_validator->validate($preprocessing['type'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'type',
+							_s('unexpected value "%1$s"', $preprocessing['type'])
+						)
+					);
+				}
+				switch ($preprocessing['type']) {
+					case ZBX_PREPROC_MULTIPLIER:
+						// Check if custom multiplier is a valid number.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						if (!is_numeric($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('a numeric value is expected')
+							));
+						}
+						break;
+
+					case ZBX_PREPROC_RTRIM:
+					case ZBX_PREPROC_LTRIM:
+					case ZBX_PREPROC_TRIM:
+						// Check 'params' if not empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+						break;
+
+					case ZBX_PREPROC_REGSUB:
+						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						$params = explode("\n", $preprocessing['params']);
+						if (!array_key_exists(1, $params) || trim($params[1]) === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('a second parameter is expected')
+							));
+						}
+						break;
+
+					case ZBX_PREPROC_BOOL2DEC:
+					case ZBX_PREPROC_OCT2DEC:
+					case ZBX_PREPROC_HEX2DEC:
+						// Check if 'params' is empty, because it must be empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
+								&& $preprocessing['params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
+							);
+						}
+						break;
+
+					case ZBX_PREPROC_DELTA_VALUE:
+					case ZBX_PREPROC_DELTA_SPEED:
+						// Check if 'params' is empty, because it must be empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
+								&& $preprocessing['params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
+							);
+						}
+
+						// Check if one of the deltas (Delta per second or Delta value) already exists.
+						if ($delta) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one "Delta" step is allowed.'));
+						}
+						else {
+							$delta = true;
+						}
+						break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Insert item pre-processing data into DB.
+	 *
+	 * @param array $items							An array of items.
+	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
+	 */
+	protected function createItemPreProcessing(array $items) {
+		$item_preproc = [];
+		$step = 1;
+
+		foreach ($items as $item) {
+			if (array_key_exists('preprocessing', $item)) {
+				foreach ($item['preprocessing'] as $preprocessing) {
+					$item_preproc[] = [
+						'itemid' => $item['itemid'],
+						'step' => $step++,
+						'type' => $preprocessing['type'],
+						'params' => $preprocessing['params']
+					];
+				}
+			}
+		}
+
+		if ($item_preproc) {
+			DB::insert('item_preproc', $item_preproc);
+		}
+	}
+
+	/**
+	 * Update item pre-processing data in DB. Delete old records and create new ones.
+	 *
+	 * @param array $items							An array of items.
+	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
+	 */
+	protected function updateItemPreProcessing(array $items) {
+		$item_preproc = [];
+		$item_preprocids = [];
+		$step = 1;
+
+		foreach ($items as $item) {
+			if (array_key_exists('preprocessing', $item)) {
+				$item_preprocids[] = $item['itemid'];
+
+				foreach ($item['preprocessing'] as $preprocessing) {
+					$item_preproc[] = [
+						'itemid' => $item['itemid'],
+						'step' => $step++,
+						'type' => $preprocessing['type'],
+						'params' => $preprocessing['params']
+					];
+				}
+			}
+		}
+
+		if ($item_preprocids) {
+			DB::delete('item_preproc', ['itemid' => $item_preprocids]);
+		}
+
+		if ($item_preproc) {
+			DB::insert('item_preproc', $item_preproc);
+		}
 	}
 
 	/**

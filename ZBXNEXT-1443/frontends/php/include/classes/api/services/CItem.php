@@ -445,6 +445,8 @@ class CItem extends CItemGeneral {
 			DB::insert('items_applications', $itemApplications);
 		}
 
+		$this->createItemPreProcessing($items);
+
 		$itemHosts = $this->get([
 			'output' => ['name'],
 			'itemids' => $itemids,
@@ -494,6 +496,8 @@ class CItem extends CItemGeneral {
 			DB::delete('items_applications', ['itemid' => $applicationids]);
 			DB::insert('items_applications', $itemApplications);
 		}
+
+		$this->updateItemPreProcessing($items);
 
 		$itemHosts = $this->get([
 			'output' => ['name'],
@@ -689,6 +693,7 @@ class CItem extends CItemGeneral {
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => ['applicationid'],
+			'selectPreprocessing' => ['type', 'params'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
@@ -699,6 +704,18 @@ class CItem extends CItemGeneral {
 		$this->inherit($items, $data['hostids']);
 
 		return true;
+	}
+
+	/**
+	 * Check item specific fields.
+	 *
+	 * @param array  $item			An array of single item data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
+		$this->validateItemPreProcessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {

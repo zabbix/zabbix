@@ -420,6 +420,8 @@ class CItemPrototype extends CItemGeneral {
 			DB::insert('item_application_prototype', $item_application_prototypes);
 		}
 
+		$this->createItemPreProcessing($items);
+
 // TODO: REMOVE info
 		$itemHosts = $this->get([
 			'itemids' => $itemids,
@@ -660,6 +662,8 @@ class CItemPrototype extends CItemGeneral {
 			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
+		$this->updateItemPreProcessing($items);
+
 // TODO: REMOVE info
 		$itemHosts = $this->get([
 			'itemids' => $itemids,
@@ -896,6 +900,7 @@ class CItemPrototype extends CItemGeneral {
 			'output' => $selectFields,
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
+			'selectPreprocessing' => ['type', 'params'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
@@ -907,6 +912,18 @@ class CItemPrototype extends CItemGeneral {
 		$this->inherit($items, $data['hostids']);
 
 		return true;
+	}
+
+	/**
+	 * Check item prototype specific fields.
+	 *
+	 * @param array  $item			An array of single item prototype data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
+		$this->validateItemPreProcessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {

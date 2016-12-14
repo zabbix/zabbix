@@ -440,6 +440,18 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 define('ITEM_DELAY_FLEX_TYPE_FLEXIBLE',		0);
 define('ITEM_DELAY_FLEX_TYPE_SCHEDULING',	1);
 
+// item pre-processing
+define ('ZBX_PREPROC_MULTIPLIER',	1);
+define ('ZBX_PREPROC_RTRIM',		2);
+define ('ZBX_PREPROC_LTRIM',		3);
+define ('ZBX_PREPROC_TRIM',			4);
+define ('ZBX_PREPROC_REGSUB',		5);
+define ('ZBX_PREPROC_BOOL2DEC',		6);
+define ('ZBX_PREPROC_OCT2DEC',		7);
+define ('ZBX_PREPROC_HEX2DEC',		8);
+define ('ZBX_PREPROC_DELTA_VALUE',	9);
+define ('ZBX_PREPROC_DELTA_SPEED',	10);
+
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
