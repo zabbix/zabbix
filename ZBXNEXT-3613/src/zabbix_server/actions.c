@@ -540,7 +540,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
  *             condition_value [IN] - expected trigger id or template id      *
  *                                                                            *
  ******************************************************************************/
-static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
+static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
 		zbx_uint64_t condition_value)
 {
 	int				i;
@@ -701,7 +701,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	}
 
 	if (0 != objectids.values_num)
-		check_trigger_ids_condition_hierarchy(&objectids, condition, condition_value);
+		check_trigger_hierarchy(&objectids, condition, condition_value);
 
 	zbx_vector_uint64_destroy(&objectids);
 
