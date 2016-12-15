@@ -523,6 +523,128 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	return SUCCEED;
 }
 
+static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
+		zbx_uint64_t condition_value)
+{
+	int				i;
+	zbx_vector_uint64_t		objectids_parents;
+	zbx_vector_uint64_pair_t	triggerids, triggerids_tmp;
+
+	zbx_vector_uint64_pair_create(&triggerids);
+	zbx_vector_uint64_pair_create(&triggerids_tmp);
+	zbx_vector_uint64_create(&objectids_parents);
+
+	for (i = 0; i < objectids->values_num; i++)	/* initialize trigger ids to resolve parents */
+	{
+		zbx_uint64_pair_t	trigger_pair = {objectids->values[i], objectids->values[i]};
+
+		zbx_vector_uint64_pair_append(&triggerids, trigger_pair);
+	}
+
+	while (0 != triggerids.values_num)	/* while there is something to resolve */
+	{
+		char				*sql = NULL;
+		size_t				sql_alloc = 0, sql_offset = 0;
+		DB_RESULT			result;
+		DB_ROW				row;
+
+		for (i = 0; i < triggerids.values_num; i++)
+		{
+			zbx_vector_uint64_append(&objectids_parents, triggerids.values[i].second);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select triggerid,templateid"
+				" from triggers"
+				" where");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
+				objectids_parents.values, objectids_parents.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	objectid;
+			zbx_uint64_t	templateid;
+
+			if (DBis_null(row[1]) == SUCCEED)	/* no template id to resolve */
+				continue;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			ZBX_STR2UINT64(templateid, row[1]);
+
+			if (templateid == condition_value)
+			{
+				for (i = 0; i < triggerids.values_num; i++)
+				{
+					/* template that match condition found, then use original trigger id */
+					if (triggerids.values[i].second == objectid)
+					{
+						if (CONDITION_OPERATOR_EQUAL == condition->operator)
+						{
+							zbx_vector_uint64_append(&condition->objectids,
+									triggerids.values[i].first);
+						}
+						else
+						{
+							int j;
+
+							for (j = 0; j < objectids->values_num; j++)
+							{
+								/* remove those that are equal */
+								if (objectids->values[j] == triggerids.values[i].first)
+								{
+									zbx_vector_uint64_remove(objectids, j);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				for (i = 0; i < triggerids.values_num; i++)
+				{
+					/* update template id and resolve further */
+					if (triggerids.values[i].second == objectid)
+					{
+						triggerids.values[i].second = templateid;
+						zbx_vector_uint64_pair_append(&triggerids_tmp, triggerids.values[i]);
+					}
+
+				}
+			}
+		}
+		DBfree_result(result);
+
+		zbx_vector_uint64_pair_clear(&triggerids);
+
+		for (i = 0; i < triggerids_tmp.values_num; i++)
+		{
+			zbx_vector_uint64_pair_append(&triggerids, triggerids_tmp.values[i]);
+		}
+
+		zbx_vector_uint64_pair_clear(&triggerids_tmp);
+		zbx_vector_uint64_clear(&objectids_parents);
+
+		zbx_free(sql);
+	}
+
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+	{
+		for (i = 0; i < objectids->values_num; i++)
+		{
+			zbx_vector_uint64_append(&condition->objectids, objectids->values[i]);
+		}
+	}
+
+	zbx_vector_uint64_pair_destroy(&triggerids_tmp);
+	zbx_vector_uint64_destroy(&objectids_parents);
+	zbx_vector_uint64_pair_destroy(&triggerids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_trigger_id_condition                                       *
@@ -539,66 +661,37 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
  ******************************************************************************/
 static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+	zbx_uint64_t		condition_value;
+	int			i;
+	zbx_vector_uint64_t	objectids;
+
+	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
+		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
+
+	zbx_vector_uint64_create(&objectids);
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
 
-		ret = FAIL;
-
-		switch (condition->operator)
+		if (event->objectid == condition_value)
 		{
-			case CONDITION_OPERATOR_EQUAL:
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (event->objectid == condition_value)
-				{
-					ret = SUCCEED;
-				}
-				else
-				{
-					/* processing of templated triggers */
-
-					for (triggerid = event->objectid; 0 != triggerid && FAIL == ret;)
-					{
-						result = DBselect(
-								"select templateid"
-								" from triggers"
-								" where triggerid=" ZBX_FS_UI64,
-								triggerid);
-
-						if (NULL == (row = DBfetch(result)))
-							triggerid = 0;
-						else
-						{
-							ZBX_DBROW2UINT64(triggerid, row[0]);
-							if (triggerid == condition_value)
-								ret = SUCCEED;
-						}
-						DBfree_result(result);
-					}
-				}
-
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
-					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
-				break;
-			default:
-				return NOTSUPPORTED;
+			if (condition->operator == CONDITION_OPERATOR_EQUAL)
+				zbx_vector_uint64_append(&condition->objectids, event->objectid);
 		}
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+		else
+			zbx_vector_uint64_append(&objectids, event->objectid);
 	}
+
+	if (0 != objectids.values_num)
+		check_trigger_ids_condition_hierarchy(&objectids, condition, condition_value);
+
+	zbx_vector_uint64_destroy(&objectids);
 
 	return SUCCEED;
 }
-
 /******************************************************************************
  *                                                                            *
  * Function: check_trigger_name_condition                                     *
