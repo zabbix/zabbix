@@ -139,13 +139,6 @@ static int	DBpatch_3030012(void)
 	return DBmodify_field_type("globalvars", &field);
 }
 
-static int	DBpatch_3030013(void)
-{
-	const ZBX_FIELD	field = {"snmp_lastsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
-
-	return DBset_default("globalvars", &field);
-}
-
 #endif
 
 DBPATCH_START(3030)
@@ -165,6 +158,5 @@ DBPATCH_ADD(3030009, 0, 1)
 DBPATCH_ADD(3030010, 0, 1)
 DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
-DBPATCH_ADD(3030013, 0, 1)
 
 DBPATCH_END()
