@@ -96,13 +96,14 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 
 			$ifTab->addRow([
 				(new CDiv($interface['main'] ? bold($interface['ip']) : $interface['ip']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+					->setWidth(175),
 				(new CDiv($interface['main'] ? bold($interface['dns']) : $interface['dns']))
-					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_INTERFACE_DNS_WIDTH.'px;'),
+					->setWidth(295)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 				(new CDiv($interface['main'] ? bold($connect_to) : $connect_to))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH),
+					->setWidth(80),
 				(new CDiv($interface['main'] ? bold($interface['port']) : $interface['port']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->setWidth(50)
 			]);
 		}
 
