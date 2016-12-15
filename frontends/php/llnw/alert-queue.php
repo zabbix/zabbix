@@ -159,7 +159,7 @@ if ($json['method'] == 'alertqueue.size') {
     print $results->count;
   }
   else {
-        sendErrorResponse('500', "DB Error", "Query returned no results");
+    sendErrorResponse('500', "DB Error", "Query returned no results");
   }
 
 }
@@ -173,7 +173,7 @@ if ($json['method'] == 'alertqueue.old') {
     print $results->count;
   }
   else {
-        sendErrorResponse('500', "DB Error", "Query returned no results");
+    sendErrorResponse('500', "DB Error", "Query returned no results");
   }
 
 }
