@@ -570,6 +570,9 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 			zbx_vector_uint64_append(&objectids_tmp, triggerids.values[i].second);
 		}
 
+		zbx_vector_uint64_sort(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select triggerid,templateid"
 				" from triggers"
