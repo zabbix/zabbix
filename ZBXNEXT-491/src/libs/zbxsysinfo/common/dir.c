@@ -284,7 +284,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* default parameter */
+	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
 		mode = SIZE_MODE_APPARENT;
 	}
@@ -298,19 +298,14 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (NULL == max_depth_str || '\0' == *max_depth_str)	/* default parameter */
+	if (NULL == max_depth_str || '\0' == *max_depth_str)		/* <max_depth> default value */
 	{
 		max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 	}
-	else
+	else if (-1 > (max_depth = atoi(max_depth_str)))
 	{
-		max_depth = atoi(max_depth_str);
-
-		if (-1 > max_depth)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-			goto err;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		goto err;
 	}
 
 	dir = zbx_strdup(NULL, dir);
