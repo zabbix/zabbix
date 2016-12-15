@@ -1188,7 +1188,7 @@ lbl_exec:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	if (ZBX_DB_FAIL == ret && 0 < txn_level && 0 != strcmp(sql, "commit;"))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
