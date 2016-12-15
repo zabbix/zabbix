@@ -150,6 +150,34 @@ if ($json['method'] == 'alertqueue.create') {
   sendErrorResponse('500', "DB Error", $ldb->last_error);
 }
 
+if ($json['method'] == 'alertqueue.size') {
+  // incomplete items in the alert queue
+  $query = 'SELECT count(id) AS count FROM alert_queue WHERE completed=0 and item_id=0;';
+  $results = $ldb->get_row($query);
+
+  if (property_exists($results, count)) {
+    print $results->count;
+  }
+  else {
+        sendErrorResponse('500', "DB Error", "Query returned no results");
+  }
+
+}
+
+if ($json['method'] == 'alertqueue.old') {
+  // incomplete items over 1 day old
+  $query = 'SELECT count(id) AS count  FROM alert_queue WHERE completed=0 and (UNIX_TIMESTAMP() - item_created) > 86400;';
+  $results = $ldb->get_row($query);
+
+  if (property_exists($results, count)) {
+    print $results->count;
+  }
+  else {
+        sendErrorResponse('500', "DB Error", "Query returned no results");
+  }
+
+}
+
 function Copy_DB_Results(&$resp, $results) {
   $resp['result'][0]["id"] = $results->id;
   $resp['result'][0]["created"] = $results->created;
