@@ -200,7 +200,7 @@ $itemId = getRequest('itemid');
 if ($itemId) {
 	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['status'],
+		'selectHosts' => ['hostid', 'status'],
 		'itemids' => $itemId,
 		'editable' => true
 	]);
@@ -213,7 +213,7 @@ else {
 	$hostId = getRequest('hostid');
 	if ($hostId) {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
+			'output' => ['hostid', 'status'],
 			'hostids' => $hostId,
 			'templated_hosts' => true,
 			'editable' => true
@@ -230,7 +230,7 @@ if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_gr
 
 if (getRequest('filter_hostid')) {
 	$hosts = API::Host()->get([
-		'output' => [],
+		'output' => ['hostid', 'status'],
 		'hostids' => getRequest('filter_hostid'),
 		'editable' => true
 	]);
