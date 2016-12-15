@@ -609,13 +609,11 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 						{
 							int j;
 
-							for (j = 0; j < objectids->values_num; j++)
+							if (FAIL != (j = zbx_vector_uint64_search(objectids,
+									triggerids.values[i].first,
+									ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 							{
-								if (objectids->values[j] == triggerids.values[i].first)
-								{
-									zbx_vector_uint64_remove(objectids, j);
-									break;
-								}
+								zbx_vector_uint64_remove(objectids, j);
 							}
 						}
 					}
