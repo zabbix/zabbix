@@ -2325,10 +2325,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		return FAIL;
 
 	/* empty values are only allowed for meta information update packets */
-	if (NULL == value->value && 0 == value->meta)
+	if (NULL == value->value)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", item->key_orig);
-		return FAIL;
+		if (0 == value->meta || ITEM_STATE_NOTSUPPORTED == value->state)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
 	}
 
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
@@ -3156,11 +3159,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_t
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
-		*value = '\0';
-		*dns = '\0';
-		port = 0;
-		status = 0;
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
@@ -3184,12 +3182,19 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_t
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
+		else
+			port = 0;
 
-		zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc);
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
+			*value = '\0';
+
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+			*dns = '\0';
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
+		else
+			status = 0;
 
 		if (0 == last_druleid || drule.druleid != last_druleid)
 		{

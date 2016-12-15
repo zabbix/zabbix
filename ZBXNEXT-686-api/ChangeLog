@@ -1,6 +1,9 @@
 Changes for 3.3.0
 
 New features:
+A......... [ZBX-3783] added support of user_medias parameter by user.update() method (Sasha)
+A......... [ZBX-3783] prohibited deleting users and user groups which are used in actions (Sasha)
+A......... [ZBX-3783] deprecated user.addmedia(), user.updatemedia(), user.deletemedia(), user.updateprofile(), usergroup.massadd(), usergroup.massupdate() and usermedia.get() API methods (Sasha)
 .......PS. [ZBXNEXT-1804] reduced the number of connections required for proxy-server data exchange by adding new 'proxy data' request and increasing the size of data sent (wiper)
 ........S. [ZBXNEXT-3086] improved performance of action condition evaluation by ensuring that equivalent conditions are only checked once, thus there will be less queries to database (vso)
 A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" methods as well as the "proxy.interfaces" parameter (Sasha)
@@ -25,11 +28,13 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
+....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.2
@@ -294,11 +299,13 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
+....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.6
@@ -1862,6 +1869,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)

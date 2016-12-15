@@ -235,7 +235,7 @@ class CScript extends CApiService {
 		$scripts = $this->checkExecutionType($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
-		$this->checkDuplicates(zbx_objectValues($scripts, 'name'));
+		$this->checkDuplicates($scripts);
 	}
 
 	/**
@@ -322,7 +322,7 @@ class CScript extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$names = [];
+		$new_name_scripts = [];
 
 		foreach ($scripts as $script) {
 			if (!array_key_exists($script['scriptid'], $db_scripts)) {
@@ -334,15 +334,15 @@ class CScript extends CApiService {
 			$db_script = $db_scripts[$script['scriptid']];
 
 			if (array_key_exists('name', $script) && trimPath($script['name']) !== trimPath($db_script['name'])) {
-				$names[] = $script['name'];
+				$new_name_scripts[] = $script;
 			}
 		}
 
 		$scripts = $this->checkExecutionType($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
-		if ($names) {
-			$this->checkDuplicates($names);
+		if ($new_name_scripts) {
+			$this->checkDuplicates($new_name_scripts);
 		}
 	}
 
@@ -444,55 +444,51 @@ class CScript extends CApiService {
 	/**
 	 * Check for duplicated scripts.
 	 *
-	 * @param array  $names
+	 * @param array  $scripts
+	 * @param string $scripts['scriptid']
+	 * @param string $scripts['name']
 	 *
 	 * @throws APIException  if global script already exists.
 	 */
-	private function checkDuplicates(array $names) {
+	private function checkDuplicates(array $scripts) {
 		$db_scripts = API::getApiService()->select('scripts', [
-			'output' => ['name']
+			'output' => ['scriptid', 'name']
 		]);
-
-		foreach ($db_scripts as &$db_script) {
-			$db_script['name_orig'] = $db_script['name'];
-			$db_script['name'] = implode('/', array_map('trim', splitPath($db_script['name'])));
-		}
-		unset($db_script);
 
 		$uniq_names = [];
 
-		foreach ($names as $name) {
-			$name_orig = $name;
+		foreach ($db_scripts as &$db_script) {
+			$db_script['folders'] = array_map('trim', splitPath($db_script['name']));
+			$uniq_names[implode('/', $db_script['folders'])] = true;
+		}
+		unset($db_script);
 
-			$folders = array_map('trim', splitPath($name));
-			$name = implode('/', $folders);
-			array_pop($folders);
-			$path = implode('/', $folders);
+		foreach ($scripts as $script) {
+			$folders = array_map('trim', splitPath($script['name']));
+			$uniq_name = implode('/', $folders);
 
-			if (array_key_exists($name, $uniq_names)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $name));
+			if (array_key_exists($uniq_name, $uniq_names)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 			}
-			$uniq_names[$name] = true;
+			$uniq_names[$uniq_name] = true;
 
 			foreach ($db_scripts as $db_script) {
-				// check duplicate script names in same menu path
-				if ($name === $db_script['name']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $name_orig));
+				if (array_key_exists('scriptid', $script) && bccomp($script['scriptid'], $db_script['scriptid']) == 0) {
+					continue;
 				}
 
-				if ($path === $db_script['name']) {
+				if (array_slice($folders, 0, count($db_script['folders'])) === $db_script['folders']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script menu path "%1$s" already used in script name "%2$s".',
-							$name_orig, $db_script['name_orig']
+						_s('Script menu path "%1$s" already used in script name "%2$s".', $script['name'],
+							$db_script['name']
 						)
 					);
 				}
 
-				$len = strlen($name) + 1;
-				if (strncmp($name.'/', $db_script['name'], $len) == 0) {
+				if (array_slice($db_script['folders'], 0, count($folders)) === $folders) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script name "%1$s" already used in menu path for script "%2$s".',
-							$name_orig, $db_script['name_orig']
+						_s('Script name "%1$s" already used in menu path for script "%2$s".', $script['name'],
+							$db_script['name']
 						)
 					);
 				}
