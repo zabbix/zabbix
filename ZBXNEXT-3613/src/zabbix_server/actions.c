@@ -551,6 +551,9 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 	zbx_vector_uint64_pair_create(&triggerids_tmp);
 	zbx_vector_uint64_create(&objectids_tmp);
 
+	zbx_vector_uint64_pair_reserve(&triggerids, objectids->values_num);
+	zbx_vector_uint64_reserve(&objectids_tmp, objectids->values_num);
+
 	for (i = 0; i < objectids->values_num; i++)
 	{
 		zbx_uint64_pair_t	trigger_pair = {objectids->values[i], objectids->values[i]};
