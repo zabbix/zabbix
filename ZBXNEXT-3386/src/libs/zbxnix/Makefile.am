@@ -11,4 +11,5 @@ libzbxnix_a_SOURCES = \
 	sigcommon.h \
 	control.c control.h \
 	dshm.c \
-	coredump.c
+	coredump.c \
+	ipcservice.c

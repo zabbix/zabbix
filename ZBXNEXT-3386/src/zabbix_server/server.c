@@ -59,6 +59,7 @@
 #include "valuecache.h"
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
+#include "zbxipcservice.h"
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_server.conf"
 
@@ -239,6 +240,8 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
+char	*CONFIG_SOCKET_PATH		= NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -409,6 +412,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_LOG_TYPE_STR)
 		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+
+	if (NULL == CONFIG_SOCKET_PATH)
+		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
 }
 
 /******************************************************************************
@@ -639,6 +645,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -681,7 +689,7 @@ static void	zbx_free_config(void)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch;
+	char		ch, *error = NULL;
 	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
@@ -759,6 +767,13 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 	zbx_initialize_events();
+
+	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+	{
+		zbx_error("Cannot initialize IPC services: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -1066,6 +1081,8 @@ void	zbx_on_exit(void)
 	free_metrics();
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
+
+	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
