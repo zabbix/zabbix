@@ -56,35 +56,29 @@
 	<div class="<?= ZBX_STYLE_TABLE_FORMS_TD_LEFT ?>"></div>
 	<div class="<?= ZBX_STYLE_TABLE_FORMS_TD_RIGHT ?>">
 		<div id="opcmdEditForm" class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
-			<table style="width: 100%;">
-				<tbody>
-				<tr>
-					<?= (new CCol([
-							_('Target'),
-							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							new CComboBox('opCmdTarget', null, null, [
-								'current' => _('Current host'),
-								'host' => _('Host'),
-								'hostGroup' => _('Host group')
-							]),
-							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							new CVar('opCmdId', '#{opcmdid}')
-						]))->toString()
-					?>
-				</tr>
-				<tr>
-					<?= (new CCol(
-							new CHorList([
-								(new CButton('save', '#{operationName}'))->addClass(ZBX_STYLE_BTN_LINK),
-								(new CButton('cancel', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
-							])
-						))
-							->setColSpan(3)
-							->toString()
-					?>
-				</tr>
-				</tbody>
-			</table>
+			<?= (new CTable())
+				->addRow([
+					[
+						_('Target'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('opCmdTarget', null, null, [
+							'current' => _('Current host'),
+							'host' => _('Host'),
+							'hostGroup' => _('Host group')
+						]),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CVar('opCmdId', '#{opcmdid}')
+					]
+				])
+				->addRow([
+					new CHorList([
+						(new CButton('save', '#{operationName}'))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CButton('cancel', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+					])
+				])
+				->setAttribute('style', 'width: 100%;')
+				->toString()
+			?>
 		</div>
 	</div>
 </li>
@@ -348,7 +342,10 @@
 		if (opCmdTargetVal != 'current') {
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
-				'class': 'multiselect'
+				'class': 'multiselect',
+				css: {
+					width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
+				}
 			});
 
 			opCmdTarget.parent().append(opCmdTargetObject);
