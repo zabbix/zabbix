@@ -523,34 +523,51 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_trigger_hierarchy                                          *
+ *                                                                            *
+ * Purpose: trigger can be down in multiple levels of templates, that need    *
+ *          resolving in order to compare to condition                        *
+ *                                                                            *
+ * Parameters: objectids  [IN/OUT]  - event id's to check                     *
+ *                                    in case of not equal condition will     *
+ *                                    delete objectids that match condition   *
+ *                                                                            *
+ *             condition  [IN/OUT]  - condition for matching, outputs         *
+ *                                    event ids that match condition          *
+ *                                                                            *
+ *             condition_value [IN] - expected trigger id or template id      *
+ *                                                                            *
+ ******************************************************************************/
 static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
 		zbx_uint64_t condition_value)
 {
 	int				i;
-	zbx_vector_uint64_t		objectids_parents;
+	zbx_vector_uint64_t		objectids_tmp;
 	zbx_vector_uint64_pair_t	triggerids, triggerids_tmp;
 
 	zbx_vector_uint64_pair_create(&triggerids);
 	zbx_vector_uint64_pair_create(&triggerids_tmp);
-	zbx_vector_uint64_create(&objectids_parents);
+	zbx_vector_uint64_create(&objectids_tmp);
 
-	for (i = 0; i < objectids->values_num; i++)	/* initialize trigger ids to resolve parents */
+	for (i = 0; i < objectids->values_num; i++)
 	{
 		zbx_uint64_pair_t	trigger_pair = {objectids->values[i], objectids->values[i]};
 
 		zbx_vector_uint64_pair_append(&triggerids, trigger_pair);
 	}
 
-	while (0 != triggerids.values_num)	/* while there is something to resolve */
+	while (0 != triggerids.values_num)
 	{
-		char				*sql = NULL;
-		size_t				sql_alloc = 0, sql_offset = 0;
-		DB_RESULT			result;
-		DB_ROW				row;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+		DB_RESULT	result;
+		DB_ROW		row;
 
 		for (i = 0; i < triggerids.values_num; i++)
 		{
-			zbx_vector_uint64_append(&objectids_parents, triggerids.values[i].second);
+			zbx_vector_uint64_append(&objectids_tmp, triggerids.values[i].second);
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -559,7 +576,7 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 				" where");
 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
-				objectids_parents.values, objectids_parents.values_num);
+				objectids_tmp.values, objectids_tmp.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -568,7 +585,7 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 			zbx_uint64_t	objectid;
 			zbx_uint64_t	templateid;
 
-			if (DBis_null(row[1]) == SUCCEED)	/* no template id to resolve */
+			if (DBis_null(row[1]) == SUCCEED)
 				continue;
 
 			ZBX_STR2UINT64(objectid, row[0]);
@@ -578,7 +595,6 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 			{
 				for (i = 0; i < triggerids.values_num; i++)
 				{
-					/* template that match condition found, then use original trigger id */
 					if (triggerids.values[i].second == objectid)
 					{
 						if (CONDITION_OPERATOR_EQUAL == condition->operator)
@@ -592,7 +608,6 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 
 							for (j = 0; j < objectids->values_num; j++)
 							{
-								/* remove those that are equal */
 								if (objectids->values[j] == triggerids.values[i].first)
 								{
 									zbx_vector_uint64_remove(objectids, j);
@@ -607,7 +622,6 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 			{
 				for (i = 0; i < triggerids.values_num; i++)
 				{
-					/* update template id and resolve further */
 					if (triggerids.values[i].second == objectid)
 					{
 						triggerids.values[i].second = templateid;
@@ -627,7 +641,7 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 		}
 
 		zbx_vector_uint64_pair_clear(&triggerids_tmp);
-		zbx_vector_uint64_clear(&objectids_parents);
+		zbx_vector_uint64_clear(&objectids_tmp);
 
 		zbx_free(sql);
 	}
@@ -641,7 +655,7 @@ static void	check_trigger_ids_condition_hierarchy(zbx_vector_uint64_t *objectids
 	}
 
 	zbx_vector_uint64_pair_destroy(&triggerids_tmp);
-	zbx_vector_uint64_destroy(&objectids_parents);
+	zbx_vector_uint64_destroy(&objectids_tmp);
 	zbx_vector_uint64_pair_destroy(&triggerids);
 }
 
