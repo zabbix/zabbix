@@ -309,16 +309,19 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	dir = zbx_strdup(NULL, dir);
-	/* removes directory suffix '/' or '\\' (if any) as stat fails on Windows for directories that end with slash */
+
+	/* remove directory suffix '/' or '\\' (if any) as stat() fails on Windows for directories ending with slash */
 	zbx_rtrim(dir, "/\\");
+
 	if (0 != zbx_stat(dir, &status))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain directory information: %s",
-			zbx_strerror(errno)));
+				zbx_strerror(errno)));
 		zbx_free(dir);
 		goto err;
 	}
-	else if (0 == S_ISDIR(status.st_mode))
+
+	if (0 == S_ISDIR(status.st_mode))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "First parameter is not a directory."));
 		zbx_free(dir);
