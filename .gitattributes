@@ -35,6 +35,7 @@ frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
+include/zbxipcservice.h -text
 m4/libevent.m4 -text
 misc/images/png_classic/Hub.png -text svneol=unset#image/png
 misc/images/png_classic/Hub_small.png -text svneol=unset#image/png
@@ -303,6 +304,7 @@ sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
 src/libs/zbxdbhigh/trigger.c -text
+src/libs/zbxnix/ipcservice.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive
