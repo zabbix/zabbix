@@ -27,12 +27,12 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-int	init_ipmi_handler(void);
-void	free_ipmi_handler(void);
+int	zbx_init_ipmi_handler(void);
+void	zbx_free_ipmi_handler(void);
 int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value);
-int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
-int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
-void	delete_inactive_ipmi_hosts(time_t last_check);
+int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
+int	zbx_set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
+void	zbx_delete_inactive_ipmi_hosts(time_t last_check);
 
 #endif	/* HAVE_OPENIPMI */
 #endif	/* ZABBIX_CHECKS_IPMI_H */
