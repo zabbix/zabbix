@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:08+0200\n"
-"PO-Revision-Date: 2016-12-04 11:02+0300\n"
+"PO-Revision-Date: 2016-12-16 19:20+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1480842122.000000\n"
+"X-POOTLE-MTIME: 1481908827.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -6974,7 +6974,7 @@ msgstr "Icons"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:539
 msgid "Identification of the system. Returns string"
-msgstr ""
+msgstr "Identification of the system. Returns string"
 
 #: include/func.inc.php:1684 include/func.inc.php:1703
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -15566,7 +15566,7 @@ msgstr "VMware virtual machine private memory size, <url> - VMware service URL, 
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15765,7 +15765,7 @@ msgstr "View is not rendered."
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:603
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 
 #: include/views/configuration.host.edit.php:69
 #: include/views/configuration.host.prototype.edit.php:72

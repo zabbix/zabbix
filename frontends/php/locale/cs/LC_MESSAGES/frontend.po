@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:08+0200\n"
-"PO-Revision-Date: 2016-05-10 13:26+0300\n"
+"PO-Revision-Date: 2016-12-14 13:45+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1462879606.000000\n"
+"X-POOTLE-MTIME: 1481715929.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -2574,7 +2574,7 @@ msgstr "Není možné aktualizovat prezentaci"
 #: include/classes/api/services/CHttpTest.php:531
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Nelze aktualizovat název kroku u web šablonuy scénáře \"%1$s\"."
 
 #: templates.php:174
 msgid "Cannot update template"
@@ -6420,7 +6420,7 @@ msgstr "Host \"%1$s\" již existuje."
 #: include/classes/api/services/CHost.php:1788
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Host \"%1$s\" nemůže být bez hostitelské skupiny."
 
 #: include/classes/api/services/CProxy.php:550
 #, c-format
@@ -6599,7 +6599,7 @@ msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\"."
 #: include/classes/api/services/CHostPrototype.php:187
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Host prototyp \"%1$s\" nemůže být bez hostitelské skupiny."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7888,7 +7888,7 @@ msgstr "Neplatné ID šablony obrazovky."
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Nesprávný počet kroků šablony web scénáře."
 
 #: include/classes/api/services/CUser.php:314
 #, c-format
@@ -8275,7 +8275,7 @@ msgstr "Neplatný datum \"%s\"."
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "Neplatný pátý parametr."
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -13895,7 +13895,7 @@ msgstr "Šablona \"%1$s\" již existuje."
 #: include/classes/api/services/CTemplate.php:949
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Šablona \"%1$s\" nemůže být bez hostitelské skupiny."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15262,7 +15262,7 @@ msgstr "Uživatel"
 #: include/classes/api/services/CUser.php:289
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "Uživatel \"%1$s\" nemůže být bez skupiny uživatelů."
 
 #: include/classes/api/services/CUser.php:548
 #, c-format
@@ -15505,7 +15505,7 @@ msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno 
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procentech z celkového počtu. Vrací celé číslo, v bytech; float v procentech"
 
 #: include/classes/items/CHelpItems.php:663
 msgid "VMware event log, <url> - VMware service URL"
@@ -15978,7 +15978,7 @@ msgstr "URL web scénáře nemůže být prázdná."
 #: include/classes/api/services/CHttpTest.php:525
 #, c-format
 msgid "Web scenario step is missing parameters: %1$s"
-msgstr ""
+msgstr "Chybí parametry v kroku web scénáře: %1$s"
 
 #: include/classes/api/services/CHttpTest.php:717
 msgid "Web scenario step name cannot be empty."

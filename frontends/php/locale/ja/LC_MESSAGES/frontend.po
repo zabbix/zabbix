@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:08+0200\n"
-"PO-Revision-Date: 2016-05-28 09:35+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"PO-Revision-Date: 2016-12-06 01:45+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1464420943.000000\n"
+"X-POOTLE-MTIME: 1480981505.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -2472,7 +2472,7 @@ msgstr "スライドショーを更新できません"
 #: include/classes/api/services/CHttpTest.php:531
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "テンプレートのWebシナリオ\"%1$s\"のステップの名前を更新できません。"
 
 #: templates.php:174
 msgid "Cannot update template"
@@ -6302,7 +6302,7 @@ msgstr "ホスト\"%1$s\"はすでに存在しています。"
 #: include/classes/api/services/CHost.php:1788
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "ホスト\"%1$s\"にホストグループを設定してください。"
 
 #: include/classes/api/services/CProxy.php:550
 #, c-format
@@ -6477,7 +6477,7 @@ msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在し�
 #: include/classes/api/services/CHostPrototype.php:187
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "ホストのプロトタイプ\"%1$s\"にホストグループを設定してください。"
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7762,7 +7762,7 @@ msgstr "テンプレートスクリーンIDが正しくありません。"
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "テンプレートのWebシナリオのステップ数が正しくありません。"
 
 #: include/classes/api/services/CUser.php:314
 #, c-format
@@ -8149,7 +8149,7 @@ msgstr "日付\"%s\"が正しくありません。"
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "5番目のパラメータが正しくありません。"
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -13735,7 +13735,7 @@ msgstr "テンプレート\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CTemplate.php:949
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "テンプレート\"%1$s\"にホストグループを設定してください。"
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15086,7 +15086,7 @@ msgstr "ユーザー"
 #: include/classes/api/services/CUser.php:289
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "ユーザー\"%1$s\"にユーザーグループを設定してください。"
 
 #: include/classes/api/services/CUser.php:548
 #, c-format
@@ -15325,7 +15325,7 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMwareデータストアのバイト単位かトータルからのパーセンテージによる容量の統計値。バイト単位なら整数、パーセンテージなら浮動小数で返却。"
 
 #: include/classes/items/CHelpItems.php:663
 msgid "VMware event log, <url> - VMware service URL"
@@ -15792,7 +15792,7 @@ msgstr "WebシナリオのステップのURLは必須項目です。"
 #: include/classes/api/services/CHttpTest.php:525
 #, c-format
 msgid "Web scenario step is missing parameters: %1$s"
-msgstr ""
+msgstr "Webシナリオのステップの引数が不足しています：%1$s"
 
 #: include/classes/api/services/CHttpTest.php:717
 msgid "Web scenario step name cannot be empty."
