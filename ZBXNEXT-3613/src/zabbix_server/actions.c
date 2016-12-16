@@ -567,7 +567,6 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 
 	while (0 != triggerids.values_num)
 	{
-
 		size_t		sql_offset = 0;
 		DB_RESULT	result;
 		DB_ROW		row;
