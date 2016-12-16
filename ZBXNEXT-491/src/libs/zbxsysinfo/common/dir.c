@@ -229,7 +229,7 @@ ret:
 
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*dir, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str, *error = NULL;
+	char			*dir, *path, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str, *error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
@@ -254,7 +254,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	dir = get_rparam(request, 0);
+	path = get_rparam(request, 0);
 	regex_incl_str = get_rparam(request, 1);
 	regex_excl_str = get_rparam(request, 2);
 	mode_str = get_rparam(request, 3);
@@ -262,7 +262,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&list);
 
-	if (NULL == dir || '\0' == *dir)
+	if (NULL == path || '\0' == *path)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
@@ -308,7 +308,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	dir = zbx_strdup(NULL, dir);
+	dir = zbx_strdup(NULL, path);
 
 	/* remove directory suffix '/' or '\\' (if any) as stat() fails on Windows for directories ending with slash */
 	zbx_rtrim(dir, "/\\");
@@ -419,7 +419,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		while (NULL != (entry = readdir(directory)))
 		{
 			size += process_directory_entry(&list, item, entry->d_name, mode, max_depth,
-							(DT_DIR == entry->d_type), regex_incl, regex_excl);
+					(DT_DIR == entry->d_type), regex_incl, regex_excl);
 		}
 
 		closedir(directory);
@@ -455,7 +455,7 @@ err:
 	return ret;
 }
 
-int		VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_dir_size, request, result);
 }
