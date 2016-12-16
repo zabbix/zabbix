@@ -129,9 +129,9 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 		goto fail;
 	}
 
-	if (SUCCEED == (ret = parse_ipmi_command(command, item.ipmi_sensor, &val, error, max_error_len)))
+	if (SUCCEED == (ret = zbx_parse_ipmi_command(command, item.ipmi_sensor, &val, error, max_error_len)))
 	{
-		if (SUCCEED != (ret = set_ipmi_control_value(&item, val, error, max_error_len)))
+		if (SUCCEED != (ret = zbx_set_ipmi_control_value(&item, val, error, max_error_len)))
 			ret = FAIL;
 	}
 fail:
