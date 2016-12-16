@@ -854,10 +854,11 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
 #ifdef HAVE_OPENIPMI
-		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
+		if ((ZBX_POLLER_TYPE_IPMI == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
 		{
 			last_ipmi_host_check = time(NULL);
-			delete_inactive_ipmi_hosts(last_ipmi_host_check);
+			zbx_delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
 #endif
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
