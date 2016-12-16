@@ -223,7 +223,7 @@ class CUserGroup extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps);
+		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
 	}
 
@@ -332,7 +332,7 @@ class CUserGroup extends CApiService {
 			$this->checkDuplicates($names);
 		}
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps, $db_usrgrps);
+		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 	}
@@ -433,28 +433,71 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
+	 * Auxiliary function for checkHimself().
+	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
+	 *
+	 * @param array  $usrgrp
+	 * @param string $method
+	 * @param array  $db_usrgrps
+	 *
+	 * @return bool
+	 */
+	private static function userGroupDisabled(array $usrgrp, $method, array $db_usrgrps = null) {
+		$gui_access = array_key_exists('gui_access', $usrgrp)
+			? $usrgrp['gui_access']
+			: ($method === 'validateCreate' ? GROUP_GUI_ACCESS_SYSTEM : $db_usrgrps[$usrgrp['usrgrpid']]['gui_access']);
+		$users_status = array_key_exists('users_status', $usrgrp)
+			? $usrgrp['users_status']
+			: ($method === 'validateCreate' ? GROUP_STATUS_ENABLED : $db_usrgrps[$usrgrp['usrgrpid']]['users_status']);
+
+		return ($gui_access == GROUP_GUI_ACCESS_DISABLED || $users_status == GROUP_STATUS_DISABLED);
+	}
+
+	/**
 	 * Additional check to exclude an opportunity to deactivate himself.
 	 *
 	 * @param array  $usrgrps
+	 * @param string $method
 	 * @param array  $db_usrgrps
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $usrgrps, array $db_usrgrps = null) {
-		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('userids', $usrgrp) && uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
-				$gui_access = array_key_exists('gui_access', $usrgrp)
-					? $usrgrp['gui_access']
-					: ($db_usrgrps === null ? GROUP_GUI_ACCESS_SYSTEM : $db_usrgrps[$usrgrp['usrgrpid']]['gui_access']);
-				$users_status = array_key_exists('users_status', $usrgrp)
-					? $usrgrp['users_status']
-					: ($db_usrgrps === null ? GROUP_STATUS_ENABLED : $db_usrgrps[$usrgrp['usrgrpid']]['users_status']);
+	private function checkHimself(array $usrgrps, $method, array $db_usrgrps = null) {
+		if ($method === 'validateUpdate') {
+			$groups_users = [];
 
-				if ($gui_access == GROUP_GUI_ACCESS_DISABLED || $users_status == GROUP_STATUS_DISABLED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('User cannot add himself to a disabled group or a group with disabled GUI access.')
-					);
+			foreach ($usrgrps as $usrgrp) {
+				if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && !array_key_exists('userids', $usrgrp)) {
+					$groups_users[$usrgrp['usrgrpid']] = [];
 				}
+			}
+
+			if ($groups_users) {
+				$db_users_groups = API::getApiService()->select('users_groups', [
+					'output' => ['usrgrpid', 'userid'],
+					'filter' => ['usrgrpid' => array_keys($groups_users)]
+				]);
+
+				foreach ($db_users_groups as $db_user_group) {
+					$groups_users[$db_user_group['usrgrpid']][] = $db_user_group['userid'];
+				}
+
+				foreach ($usrgrps as &$usrgrp) {
+					if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+							&& !array_key_exists('userids', $usrgrp)) {
+						$usrgrp['userids'] = $groups_users[$usrgrp['usrgrpid']];
+					}
+				}
+				unset($usrgrp);
+			}
+		}
+
+		foreach ($usrgrps as $usrgrp) {
+			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+				);
 			}
 		}
 	}
