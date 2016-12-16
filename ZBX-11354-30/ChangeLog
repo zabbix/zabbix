@@ -3,9 +3,13 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
+....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.6
@@ -1569,6 +1573,10 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
 
 --------------------------------------------------------------------------------
@@ -3079,6 +3087,7 @@ Changes for 2.0.21rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.20
