@@ -711,7 +711,7 @@ class CApiService {
 
 	/**
 	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
-	 * object from from the source object.
+	 * object from the source object.
 	 *
 	 * Matching objects in both arrays must have the same keys.
 	 *
@@ -726,6 +726,30 @@ class CApiService {
 		foreach ($objects as $key => &$object) {
 			if (isset($sourceObjects[$key])) {
 				$object += array_intersect_key($sourceObjects[$key], $fields);
+			}
+		}
+		unset($object);
+
+		return $objects;
+	}
+
+	/**
+	 * For each object in $objects the method copies fields listed in $fields that are not present in the target
+	 * object from the source object.
+	 *
+	 * @param array  $objects
+	 * @param array  $source
+	 * @param string $field_name
+	 * @param array  $fields
+	 *
+	 * @return array
+	 */
+	protected function extendObjectsByKey(array $objects, array $source, $field_name, array $fields) {
+		$fields = array_flip($fields);
+
+		foreach ($objects as &$object) {
+			if (array_key_exists($object[$field_name], $source)) {
+				$object += array_intersect_key($source[$object[$field_name]], $fields);
 			}
 		}
 		unset($object);
@@ -1052,5 +1076,37 @@ class CApiService {
 		// must be implemented in each API separately
 
 		return $elements;
+	}
+
+	/**
+	 * Add simple audit record.
+	 *
+	 * @param int    $action        AUDIT_ACTION_*
+	 * @param int    $resourcetype  AUDIT_RESOURCE_*
+	 * @param string $details
+	 * @param string $userid
+	 * @param string $ip
+	 */
+	protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
+		if ($userid === null) {
+			$userid = self::$userData['userid'];
+			$ip = self::$userData['userip'];
+		}
+
+		CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
+	}
+
+	/**
+	 * Add audit records.
+	 *
+	 * @param int    $action        AUDIT_ACTION_*
+	 * @param int    $resourcetype  AUDIT_RESOURCE_*
+	 * @param array  $objects
+	 * @param array  $objects_old
+	 */
+	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
+		CAudit::addBulk(self::$userData['userid'], self::$userData['userip'], $action, $resourcetype, $objects,
+			$objects_old
+		);
 	}
 }

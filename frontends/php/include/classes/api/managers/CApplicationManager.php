@@ -25,27 +25,20 @@
 class CApplicationManager {
 
 	/**
-	 * Create new application.
-	 * If $batch is true it performs batch insert, in this case all applications must have same fields in same order.
+	 * Create new applications.
 	 *
 	 * @param array $applications
-	 * @param bool  $batch
 	 *
 	 * @return array
 	 */
-	public function create(array $applications, $batch = false) {
+	public function create(array $applications) {
 		$insertApplications = $applications;
 		foreach ($insertApplications as &$app) {
 			unset($app['applicationTemplates']);
 		}
 		unset($app);
 
-		if ($batch) {
-			$applicationids = DB::insertBatch('applications', $insertApplications);
-		}
-		else {
-			$applicationids = DB::insert('applications', $insertApplications);
-		}
+		$applicationids = DB::insertBatch('applications', $insertApplications);
 
 		$applicationTemplates = [];
 		foreach ($applications as $anum => &$application) {
@@ -64,15 +57,6 @@ class CApplicationManager {
 
 		// link inherited apps
 		DB::insertBatch('application_template', $applicationTemplates);
-
-		// TODO: REMOVE info
-		$dbCursor = DBselect('SELECT a.name, h.name as hostname'.
-				' FROM applications a'.
-				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-				' WHERE '.dbConditionInt('a.applicationid', $applicationids));
-		while ($app = DBfetch($dbCursor)) {
-			info(_s('Created: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
-		}
 
 		return $applications;
 	}
@@ -110,17 +94,6 @@ class CApplicationManager {
 				' WHERE '.dbConditionInt('at.applicationid', zbx_objectValues($applications, 'applicationid'))
 			));
 			DB::replace('application_template', $dbApplicationTemplates, $applicationTemplates);
-		}
-
-		// TODO: REMOVE info
-		$dbCursor = DBselect(
-			'SELECT a.name,h.name AS hostname'.
-			' FROM applications a'.
-				' INNER JOIN hosts h ON h.hostid=a.hostid'.
-			' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applications, 'applicationid'))
-		);
-		while ($app = DBfetch($dbCursor)) {
-			info(_s('Updated: Application "%1$s" on "%2$s".', $app['name'], $app['hostname']));
 		}
 
 		return $applications;
@@ -575,7 +548,7 @@ class CApplicationManager {
 		}
 
 		if (!empty($appsCreate)) {
-			$newApps = $this->create($appsCreate, true);
+			$newApps = $this->create($appsCreate);
 			foreach ($newApps as $key => $newApp) {
 				$applications[$key]['applicationid'] = $newApp['applicationid'];
 			}

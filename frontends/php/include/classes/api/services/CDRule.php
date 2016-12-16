@@ -73,7 +73,7 @@ class CDRule extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			return [];
 		}
 

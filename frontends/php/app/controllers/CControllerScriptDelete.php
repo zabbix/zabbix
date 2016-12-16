@@ -52,17 +52,7 @@ class CControllerScriptDelete extends CController {
 	protected function doAction() {
 		$scriptids = $this->getInput('scriptids');
 
-		DBstart();
-
-		$result = API::Script()->delete($scriptids);
-
-		if ($result) {
-			foreach ($scriptids as $scriptid) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
-			}
-		}
-
-		$result = DBend($result);
+		$result = (bool) API::Script()->delete($scriptids);
 
 		$deleted = count($scriptids);
 

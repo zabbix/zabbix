@@ -1,6 +1,9 @@
 Changes for 3.3.0
 
 New features:
+A......... [ZBX-3783] added support of user_medias parameter by user.update() method (Sasha)
+A......... [ZBX-3783] prohibited deleting users and user groups which are used in actions (Sasha)
+A......... [ZBX-3783] deprecated user.addmedia(), user.updatemedia(), user.deletemedia(), user.updateprofile(), usergroup.massadd(), usergroup.massupdate() and usermedia.get() API methods (Sasha)
 .......PS. [ZBXNEXT-1804] reduced the number of connections required for proxy-server data exchange by adding new 'proxy data' request and increasing the size of data sent (wiper)
 ........S. [ZBXNEXT-3086] improved performance of action condition evaluation by ensuring that equivalent conditions are only checked once, thus there will be less queries to database (vso)
 A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" methods as well as the "proxy.interfaces" parameter (Sasha)
@@ -31,7 +34,7 @@ Bug fixes:
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
+....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.2
@@ -233,7 +236,8 @@ Bug fixes:
 Changes for 3.2.0alpha2
 
 New features:
-A.F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view, improved event.get() and problem.get() methods (Sasha)
+..F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view (Sasha)
+A......... [ZBXNEXT-3201] added new filtering options in event.get() and problem.get() methods (Sasha)
 ..F....... [ZBXNEXT-3201] dropped Monitoring->Events view (Sasha)
 A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars, Ivo, wiper)
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
@@ -302,7 +306,7 @@ Bug fixes:
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
 .......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
 ...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] Changed vmware.vm.cpu.ready item units and description (wiper)
+....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.6
