@@ -3,6 +3,8 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
+..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated item prototypes when modifying its parent (Ivo)
 ..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
@@ -211,7 +213,8 @@ Bug fixes:
 Changes for 3.2.0alpha2
 
 New features:
-A.F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view, improved event.get() and problem.get() methods (Sasha)
+..F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view (Sasha)
+A......... [ZBXNEXT-3201] added new filtering options in event.get() and problem.get() methods (Sasha)
 ..F....... [ZBXNEXT-3201] dropped Monitoring->Events view (Sasha)
 A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars, Ivo, wiper)
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
@@ -274,6 +277,8 @@ Changes for 3.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
+..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated items and item prototypes when modifying its parent (Ivo)
 ..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
@@ -1844,6 +1849,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
