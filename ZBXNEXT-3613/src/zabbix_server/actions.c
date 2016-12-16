@@ -560,6 +560,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 
 	for (i = 0; i < objectids->values_num; i++)
 	{
+		/* first is original trigger id, second is next id in hierarchy which will be updated per level */
 		zbx_uint64_pair_t	trigger_pair = {objectids->values[i], objectids->values[i]};
 
 		zbx_vector_uint64_pair_append(&triggerids, trigger_pair);
@@ -577,6 +578,8 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 		}
 
 		zbx_vector_uint64_sort(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		/* multiple hosts can share trigger from same template, don't allocate duplicate ids */
 		zbx_vector_uint64_uniq(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -594,6 +597,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 			zbx_uint64_t	objectid;
 			zbx_uint64_t	templateid;
 
+			/* skip those triggers that don't have template id (last level) */
 			if (DBis_null(row[1]) == SUCCEED)
 				continue;
 
@@ -602,8 +606,11 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 
 			if (templateid == condition_value)
 			{
+				/* find all templates or trigger id's that match our condition and get original id */
 				for (i = 0; i < triggerids.values_num; i++)
 				{
+					/* objectid is id that has template id, that match condition */
+					/* second are those that we did select on */
 					if (triggerids.values[i].second == objectid)
 					{
 						if (CONDITION_OPERATOR_EQUAL == condition->operator)
@@ -615,11 +622,12 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 						{
 							int j;
 
+							/* remove equals from result set, leaving only not equals */
 							if (FAIL != (j = zbx_vector_uint64_search(objectids,
 									triggerids.values[i].first,
 									ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 							{
-								zbx_vector_uint64_remove(objectids, j);
+								zbx_vector_uint64_remove_noorder(objectids, j);
 							}
 						}
 					}
@@ -627,6 +635,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 			}
 			else
 			{
+				/* update template id to next level, to compare to condition in next select */
 				for (i = 0; i < triggerids.values_num; i++)
 				{
 					if (triggerids.values[i].second == objectid)
@@ -639,6 +648,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 		}
 		DBfree_result(result);
 
+		/* resolve in next select only those triggerids that have template id and not equal to condition */
 		zbx_vector_uint64_pair_clear(&triggerids);
 
 		for (i = 0; i < triggerids_tmp.values_num; i++)
@@ -650,6 +660,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 		zbx_vector_uint64_clear(&objectids_tmp);
 	}
 
+	/* equals are deleted so copy to result those that are left (not equals)  */
 	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 	{
 		for (i = 0; i < objectids->values_num; i++)
