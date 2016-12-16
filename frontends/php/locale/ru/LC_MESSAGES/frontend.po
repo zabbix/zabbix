@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:09+0200\n"
-"PO-Revision-Date: 2016-09-07 21:05+0300\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"PO-Revision-Date: 2016-12-11 11:17+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1473275105.000000\n"
+"X-POOTLE-MTIME: 1481447821.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -712,7 +712,7 @@ msgstr "Все"
 #: include/views/administration.users.edit.php:402
 #: include/views/administration.users.edit.php:408
 msgid "All groups"
-msgstr ""
+msgstr "Все группы"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -734,7 +734,7 @@ msgstr "Все проблемы"
 #: include/views/configuration.trigger.prototype.edit.php:459
 #: include/views/configuration.triggers.edit.php:479
 msgid "All problems if tag values match"
-msgstr "Все проблемы если значения тэгов совпадают"
+msgstr "Все проблемы если значения тегов совпадают"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -2655,7 +2655,7 @@ msgstr "Не удалось обновить слайд-шоу"
 #: include/classes/api/services/CHttpTest.php:529
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить имя шага для шаблонного веб-сценария \"%1$s\"."
 
 #: templates.php:178
 msgid "Cannot update template"
@@ -5606,7 +5606,7 @@ msgstr "Детали источника события"
 
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr "Пара тэгов событий"
+msgstr "Пара тегов событий"
 
 #: include/actions.inc.php:60
 msgid "Event type"
@@ -6697,7 +6697,7 @@ msgstr "Узел сети \"%1$s\" уже существует."
 #: include/classes/api/services/CHost.php:1784
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Узел сети \"%1$s\" не может быть без группы узлов сети."
 
 #: include/classes/api/services/CProxy.php:548
 #, c-format
@@ -6884,7 +6884,7 @@ msgstr "Прототип узлов сети \"%1$s\" уже существуе�
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Прототип узлов сети \"%1$s\" не может быть без группы узлов сети."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7436,7 +7436,7 @@ msgstr "Включено"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "Включая подгруппы"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:391
@@ -8171,7 +8171,7 @@ msgstr "Некорректный ID шаблонного комплексног�
 
 #: include/classes/api/services/CHttpTest.php:708
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Некорректное количество шагов у шаблонного веб-сценария."
 
 #: include/classes/api/services/CUser.php:312
 #, c-format
@@ -8636,7 +8636,7 @@ msgstr "Ошибочная дата \"%s\"."
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "Ошибочный пятый параметр."
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -8838,7 +8838,7 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/CXmlValidator.php:64
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr "Ошибочный тэг \"%1$s\": %2$s."
+msgstr "Ошибочный тег \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid third parameter."
@@ -9412,7 +9412,7 @@ msgstr "Длина в символах последнего (самого нов
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
 msgid "Limit for search and filter results"
-msgstr "Лимит элементов в поиске/фильтре"
+msgstr "Лимит элементов в результатах поиска и фильтрах"
 
 #: include/graphs.inc.php:55 include/views/js/monitoring.sysmaps.js.php:344
 #: include/views/js/monitoring.sysmaps.js.php:424
@@ -10270,7 +10270,7 @@ msgstr "Mozilla Firefox"
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:472
 msgid "Multiple"
-msgstr "Многократные"
+msgstr "Множественный"
 
 #: include/triggers.inc.php:1113
 msgid "Multiple PROBLEM events"
@@ -10482,11 +10482,11 @@ msgstr "Группа узлов нового события"
 #: include/correlation.inc.php:50 include/correlation.inc.php:199
 #: include/correlation.inc.php:223
 msgid "New event tag"
-msgstr "Тэг нового события"
+msgstr "Тег нового события"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr "Значение тэга нового события"
+msgstr "Значение тега нового события"
 
 #: include/views/configuration.host.edit.php:92
 #: include/views/configuration.template.edit.php:122
@@ -11457,11 +11457,11 @@ msgstr "Ok"
 #: include/correlation.inc.php:49 include/correlation.inc.php:194
 #: include/correlation.inc.php:209 include/correlation.inc.php:216
 msgid "Old event tag"
-msgstr "Тэг старого события"
+msgstr "Тег старого события"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr "Значение тэга старого события"
+msgstr "Значение тега старого события"
 
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47 jsLoader.php:137
@@ -12945,7 +12945,7 @@ msgstr "Решено"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "Решено"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
@@ -14478,16 +14478,16 @@ msgstr "Этикетка"
 #: include/classes/api/services/CTriggerGeneral.php:267
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr "Тэг \"%1$s\" со значением \"%2$s\" уже существует."
+msgstr "Тег \"%1$s\" со значением \"%2$s\" уже существует."
 
 #: include/views/configuration.trigger.prototype.edit.php:464
 #: include/views/configuration.triggers.edit.php:484
 msgid "Tag for matching"
-msgstr "Тэги для совпадения"
+msgstr "Теги для совпадения"
 
 #: include/actions.inc.php:63
 msgid "Tag value"
-msgstr "Значение тэга"
+msgstr "Значение тега"
 
 #: app/views/monitoring.problem.view.php:227
 #: include/classes/screens/CScreenProblem.php:681
@@ -14495,7 +14495,7 @@ msgstr "Значение тэга"
 #: include/views/configuration.trigger.prototype.edit.php:494
 #: include/views/configuration.triggers.edit.php:522
 msgid "Tags"
-msgstr "Тэги"
+msgstr "Теги"
 
 #: include/views/configuration.action.edit.php:812
 #: include/views/configuration.action.edit.php:1521
@@ -14546,7 +14546,7 @@ msgstr "Шаблон \"%1$s\" уже существует."
 #: include/classes/api/services/CTemplate.php:947
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Шаблон \"%1$s\" не может быть без группы узлов сети."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15896,7 +15896,7 @@ msgstr "Пользователь"
 #: include/classes/api/services/CUser.php:287
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "Пользователь \"%1$s\" не может быть без группы пользователей."
 
 #: include/classes/api/services/CUser.php:546
 #, c-format
@@ -16147,7 +16147,7 @@ msgstr "Состояние кластера VMware, <url> - URL службы VMw
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Статистика пространства на VMware хранилище в байтах или в процентах от общего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware event log, <url> - VMware service URL"
@@ -16627,7 +16627,7 @@ msgstr "URL шага веб-сценария не может быть пусты
 #: include/classes/api/services/CHttpTest.php:523
 #, c-format
 msgid "Web scenario step is missing parameters: %1$s"
-msgstr ""
+msgstr "У шага веб-сценария отсутствуют параметры: %1$s"
 
 #: include/classes/api/services/CHttpTest.php:715
 msgid "Web scenario step name cannot be empty."
@@ -17332,7 +17332,7 @@ msgstr "в"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:409
 msgid "including subgroups"
-msgstr ""
+msgstr "включая подгруппы"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2212
 #: include/classes/parsers/CItemKey.php:80
@@ -17475,7 +17475,7 @@ msgstr "новый"
 #: include/correlation.inc.php:211
 #: include/views/configuration.correlation.edit.php:135
 msgid "new event tag"
-msgstr "тэг нового события"
+msgstr "тег нового события"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2101
 #: include/classes/graphdraw/CPieGraphDraw.php:316
@@ -17533,7 +17533,7 @@ msgstr "выкл"
 
 #: include/views/configuration.correlation.edit.php:138
 msgid "old event tag"
-msgstr "тэг старого события"
+msgstr "тег старого события"
 
 #: include/classes/setup/CFrontendSetup.php:312
 #: include/classes/setup/CFrontendSetup.php:329
@@ -17635,7 +17635,7 @@ msgstr "показать преобразования значений"
 #: include/views/configuration.triggers.massupdate.php:112
 #: include/views/js/configuration.triggers.edit.js.php:6
 msgid "tag"
-msgstr "тэг"
+msgstr "тег"
 
 #: include/classes/api/services/CHostBase.php:50
 #, c-format
@@ -17646,7 +17646,7 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:125
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr "тэг \"%1$s\" пропущен"
+msgstr "тег \"%1$s\" пропущен"
 
 #: include/classes/api/services/CMap.php:622
 #: include/classes/api/services/CMap.php:1044 include/events.inc.php:34
@@ -17686,7 +17686,7 @@ msgstr "неожиданное завершение макроса"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:151
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr "неожиданный тэг \"%1$s\""
+msgstr "неожиданный тег \"%1$s\""
 
 #: include/classes/import/readers/CXmlImportReader.php:78
 #: include/classes/import/readers/CXmlImportReader.php:117
