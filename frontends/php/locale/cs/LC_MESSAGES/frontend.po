@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:11+0200\n"
+"POT-Creation-Date: 2016-12-16 21:08+0200\n"
 "PO-Revision-Date: 2016-05-10 13:26+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -649,7 +649,7 @@ msgstr "Agentova rozhraní"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Agent nebo SNMP nebo JMX nebo IPMI rozhraní"
 
-#: include/classes/items/CHelpItems.php:621
+#: include/classes/items/CHelpItems.php:625
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "Agregované kontroly nevyžadují spuštění agenta na monitorovaném hostovi. Zabbix server shromažďuje agregované informace přímími databázovými dotazy. Podivej se do Zabbix manuálu."
 
@@ -1308,7 +1308,7 @@ msgstr "Není možné přidat prototyp hosta"
 msgid "Cannot add image"
 msgstr "Nelze přidat obrázek"
 
-#: items.php:523
+#: items.php:531
 msgid "Cannot add item"
 msgstr "Nelze přidat položku"
 
@@ -1317,7 +1317,7 @@ msgstr "Nelze přidat položku"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Není možné přidat položku \"%1$s\" z \"%2$s\" k aplikaci \"%3$s\" z \"%4$s\"."
 
-#: disc_prototypes.php:393
+#: disc_prototypes.php:427
 msgid "Cannot add item prototype"
 msgstr "Není možné přidat prototyp položky"
 
@@ -1432,7 +1432,7 @@ msgstr "Není možné změnit metodu přihlašování na LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Není možné změnit metodu přihlašování na Zabbix-internal"
 
-#: httpconf.php:191 httpconf.php:452 items.php:561 items.php:866
+#: httpconf.php:191 httpconf.php:452 items.php:569 items.php:874
 msgid "Cannot clear history"
 msgstr "Nelze smazat historii"
 
@@ -1463,7 +1463,7 @@ msgstr[0] "Nelze kopírovat graf"
 msgstr[1] "Nelze kopírovat grafy"
 msgstr[2] "Nelze kopírovat grafy"
 
-#: items.php:822
+#: items.php:830
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "Není možné kopírovat položku"
@@ -1643,11 +1643,11 @@ msgstr "Nelze smazat položku"
 msgid "Cannot delete item prototype"
 msgstr "Není možné smazat prototyp položky"
 
-#: disc_prototypes.php:435
+#: disc_prototypes.php:469
 msgid "Cannot delete item prototypes"
 msgstr "Není možné smazat prototypy položek"
 
-#: items.php:896
+#: items.php:904
 msgid "Cannot delete items"
 msgstr "Nelze smazat položky"
 
@@ -1821,14 +1821,14 @@ msgstr[0] "Není možné vypnout prototyp hosta"
 msgstr[1] "Není možné vypnout prototypy hostů"
 msgstr[2] "Není možné vypnout prototypy hostů"
 
-#: applications.php:248 items.php:783
+#: applications.php:248 items.php:791
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Není možné vypnout položku"
 msgstr[1] "Není možné vypnout položky"
 msgstr[2] "Není možné vypnout položky"
 
-#: disc_prototypes.php:419
+#: disc_prototypes.php:453
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Není možné vypnout prototyp položky"
@@ -1907,14 +1907,14 @@ msgstr[0] "Není možné povolit prototyp hosta"
 msgstr[1] "Není možné povolit prototypy hostů"
 msgstr[2] "Není možné povolit prototypy hostů"
 
-#: applications.php:247 items.php:782
+#: applications.php:247 items.php:790
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Není možné povolit položku"
 msgstr[1] "Není možné povolit položky"
 msgstr[2] "Není možné povolit položky"
 
-#: disc_prototypes.php:418
+#: disc_prototypes.php:452
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Není možné povolit prototyp položky"
@@ -2510,15 +2510,15 @@ msgstr "Nelze upravit obrázek"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Nelze aktualizovat rozhraní pro zjištěného hosta \"%1$s\"."
 
-#: items.php:520
+#: items.php:528
 msgid "Cannot update item"
 msgstr "Nelze upravit položku"
 
-#: disc_prototypes.php:396
+#: disc_prototypes.php:430
 msgid "Cannot update item prototype"
 msgstr "Nelze aktualizovat prototyp položky"
 
-#: items.php:762
+#: items.php:770
 msgid "Cannot update items"
 msgstr "Nelze aktualizovat položky"
 
@@ -2630,11 +2630,11 @@ msgstr "Není možné zkontrolovat objevovací kontrolu: neplatný požadavek ne
 msgid "Case sensitive"
 msgstr "Rozlišovat velikost"
 
-#: include/classes/items/CHelpItems.php:865
+#: include/classes/items/CHelpItems.php:869
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Všechny zachycené SNMP trapy odpovídají regex. Pokud regexp je nespecifikovaný, zachytí se jakýkoliv trap."
 
-#: include/classes/items/CHelpItems.php:861
+#: include/classes/items/CHelpItems.php:865
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Všechny zachycené SNMP trapy, které nebyly chyceny z snmptrap[] items."
 
@@ -2730,7 +2730,7 @@ msgstr "Kontroly"
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovídá nebo DNS překlad selhal), 1 - DNS je dostupné"
 
-#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:567
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
 msgstr "Kontrola existence souboru. Vráti 0 - nenalezený, 1 - soubor nebo link (symbolický nebo hard) k souboru existuje"
@@ -2740,19 +2740,19 @@ msgstr "Kontrola existence souboru. Vráti 0 - nenalezený, 1 - soubor nebo link
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Kontrola úspěšného TCP spojení na zadaný port. Vráti 0 - neúspěšné, 1 - úspěšné"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:631
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "Kontroluje, jestli je server dostupný pomocí ICMP ping. 0 - ICMP ping nezdařen. 1 - ICMP úspěšný."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:407
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:643
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Kontrola, nebo služba akceptuje TCP spojení. 0 - služba je nedostupná, 1 - služba je dostupná"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:419
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:651
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Kontrola, zda služba akceptuje UDP žádosti. 0 - služba je nedostupná, 1 - služba je dostupná"
 
@@ -2768,13 +2768,13 @@ msgstr "Kontrola, zda UDP port je v LISTEN stavu. 0 - Není v LISTEN stavu; 1 - 
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:411
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:647
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Kontroly výkonnosti služby TCP. 0 - služba je nedostupná; sekund - počet sekund strávených při připojování se ke službě"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:423
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:655
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Kontroly výkonnosti služby UDP. 0 - služba je nedostupná; sekund - počet sekund strávených při připojování se ke službě"
 
@@ -2983,7 +2983,7 @@ msgstr "Podmínky"
 msgid "Configuration"
 msgstr "Nastavení"
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:947
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Nastavení cache statistik. Cache - buffer (mod: pfree, total, used, free)."
 
@@ -3352,7 +3352,7 @@ msgstr "Vytvořit ikonu"
 msgid "Create icon map"
 msgstr "Vytvořit mapu ikon"
 
-#: include/views/configuration.item.list.php:27 items.php:902
+#: include/views/configuration.item.list.php:27 items.php:910
 msgid "Create item"
 msgstr "Vytvořit položku"
 
@@ -3661,7 +3661,7 @@ msgstr "Čárkovaná čára"
 msgid "Data"
 msgstr "Data"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:983
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Cache statistiky. Cache - jedna z hodnot (mody: all, float, uint, str, log, text), historie (mody: pfree, total, used, free), trend (mody: pfree, total, used, free), text (mody: pfree, total, used, free)."
 
@@ -4330,11 +4330,6 @@ msgstr "Poznámka pro \"%s\"."
 msgid "Description updated"
 msgstr "Poznámka aktualizována"
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:539
-msgid "Detailed host information. Returns string"
-msgstr "Detailní informace o hostovi. Vrátí řetězec"
-
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1185
 #: include/blocks.inc.php:468 include/func.inc.php:1750
 #: include/views/administration.auditlogs.list.php:66
@@ -4669,17 +4664,17 @@ msgstr "Pravidla pro průzkum byla smazána"
 msgid "Discovery status"
 msgstr "Stav průzkumu"
 
-#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:551
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Čítače statistiky disku. Vrátí celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
 
-#: include/classes/items/CHelpItems.php:313
+#: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:595
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Volné místo na disku v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
 
-#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:555
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Zapisovaní statistiky disku. Vráti celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
@@ -5375,7 +5370,7 @@ msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "SQL chyba při spuštění [%1$s] v [%2$s]."
 
 #: include/classes/items/CHelpItems.php:333
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:619
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Spustí WMI dotaz a vrátí první vybraný objekt. Vráti celé, desetinné číslo, řetězec nebo text (závisí od dotazu)"
 
@@ -5632,7 +5627,7 @@ msgstr "Pole \"host\" je vyžadované."
 msgid "Field \"name\" is required."
 msgstr "Pole \"name\" je vyžadované."
 
-#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:559
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Kontrolní součet souboru kalkulovaný UNIX cksum algoritmem. Vráti celé číslo"
@@ -5651,12 +5646,12 @@ msgstr "Soubor je příliš velký, maximální velikost je %1$s bytů."
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Soubor poskytnutý pro náhled neexistuje. \"%s\" nebylo nalezeno."
 
-#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:583
 msgid "File size (in bytes). Returns integer"
 msgstr "Velikost souboru (v bytech). Vráti celé číslo"
 
-#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:587
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Informace o čase souboru. Vráti celé číslo (Unix timestamp)"
@@ -5705,18 +5700,18 @@ msgstr "Najdi řetězec V v poslední hodnotě. N = 1 - když se najde, 0 - jina
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "Najdi řetězec V v poslední hodnotě. N NOT 1 - když se najde, 0 - jinak"
 
-#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:579
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Najdi řetězec v souboru. Vráti 0 - nenalezený, 1 - nalezený"
 
-#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:575
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Najdi řetězec v souboru. Vráti řádek obsahující vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
 #: include/classes/items/CHelpItems.php:329
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:615
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Najdi řetězec ve web stránce. Vráti vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
@@ -5881,7 +5876,7 @@ msgid "German (de_DE)"
 msgstr "Německy (de_DE)"
 
 #: include/classes/items/CHelpItems.php:321
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:607
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Získat obsah web stránky. Vráti zdrojový kód web stránky jako text"
 
@@ -6324,7 +6319,7 @@ msgid "History (in days)"
 msgstr "Historie (ve dnech)"
 
 #: httpconf.php:184 httpconf.php:191 httpconf.php:440 httpconf.php:452
-#: items.php:554 items.php:561 items.php:854 items.php:866
+#: items.php:562 items.php:569 items.php:862 items.php:874
 msgid "History cleared"
 msgstr "Historie byla pročištěna"
 
@@ -6403,8 +6398,8 @@ msgstr "Vodorovné zarovnání"
 #: include/views/monitoring.screen.constructor.edit.php:422
 #: include/views/monitoring.screen.php:75
 #: include/views/monitoring.slides.php:79
-#: include/views/reports.toptriggers.php:118 items.php:554 items.php:853
-#: items.php:886 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:489
+#: include/views/reports.toptriggers.php:118 items.php:562 items.php:861
+#: items.php:894 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:489
 #: popup.php:526 popup.php:1221 queue.php:248 report2.php:346 report2.php:371
 #: search.php:125 tr_status.php:202 tr_status.php:282
 msgid "Host"
@@ -7039,6 +7034,11 @@ msgstr "Mapování ikon \"%1$s\" na \"%2$s\" již existuje."
 #: include/views/js/monitoring.sysmaps.js.php:128
 msgid "Icons"
 msgstr "Ikony"
+
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:539
+msgid "Identification of the system. Returns string"
+msgstr ""
 
 #: include/func.inc.php:1684 include/func.inc.php:1703
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8297,8 +8297,8 @@ msgstr "Neplatné hostid pro makro \"%1$s\"."
 
 #: disc_prototypes.php:271 disc_prototypes.php:276 disc_prototypes.php:289
 #: host_discovery.php:190 host_discovery.php:195 host_discovery.php:208
-#: items.php:418 items.php:423 items.php:436 items.php:582 items.php:587
-#: items.php:600
+#: items.php:418 items.php:423 items.php:436 items.php:590 items.php:595
+#: items.php:608
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Neplatný interval \"%1$s\"."
@@ -8540,8 +8540,8 @@ msgstr "Italsky (it_IT)"
 #: include/views/configuration.triggers.expression.php:60
 #: include/views/monitoring.screen.constructor.edit.php:235
 #: include/views/monitoring.screen.constructor.edit.php:364
-#: include/views/monitoring.screen.constructor.edit.php:637 items.php:553
-#: items.php:853 items.php:886 tr_logform.php:244
+#: include/views/monitoring.screen.constructor.edit.php:637 items.php:561
+#: items.php:861 items.php:894 tr_logform.php:244
 msgid "Item"
 msgstr "Položka"
 
@@ -8581,11 +8581,11 @@ msgstr "Položka \"%1$s\" na \"%2$s\": aplikaci \"%3$s\" neexistuje."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
 
-#: items.php:523
+#: items.php:531
 msgid "Item added"
 msgstr "Položka byla přidána"
 
-#: items.php:821
+#: items.php:829
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] "Položka zkopírována"
@@ -8600,14 +8600,14 @@ msgstr "Počet položek"
 msgid "Item deleted"
 msgstr "Položka byla smazána"
 
-#: applications.php:245 items.php:780
+#: applications.php:245 items.php:788
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Položka vypnutá"
 msgstr[1] "Položky vypnuté"
 msgstr[2] "Položky vypnuté"
 
-#: applications.php:244 items.php:779
+#: applications.php:244 items.php:787
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Položka povolená"
@@ -8641,7 +8641,7 @@ msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\", zděděný z jiné 
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\"."
 
-#: disc_prototypes.php:393
+#: disc_prototypes.php:427
 msgid "Item prototype added"
 msgstr "Prototyp položky přidaný"
 
@@ -8649,21 +8649,21 @@ msgstr "Prototyp položky přidaný"
 msgid "Item prototype deleted"
 msgstr "Není možné smazat prototyp položky"
 
-#: disc_prototypes.php:416
+#: disc_prototypes.php:450
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Prototyp položky vypnutý"
 msgstr[1] "Prototypy položky vypnuté"
 msgstr[2] "Prototypy položky vypnuté"
 
-#: disc_prototypes.php:415
+#: disc_prototypes.php:449
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Prototyp položky povolený"
 msgstr[1] "Prototypy položky povolené"
 msgstr[2] "Prototypy položky povolené"
 
-#: disc_prototypes.php:396
+#: disc_prototypes.php:430
 msgid "Item prototype updated"
 msgstr "Prototyp položky aktualizovaný"
 
@@ -8676,11 +8676,11 @@ msgstr "Prototyp položky aktualizovaný"
 msgid "Item prototypes"
 msgstr "Prototypy položky"
 
-#: disc_prototypes.php:435
+#: disc_prototypes.php:469
 msgid "Item prototypes deleted"
 msgstr "Prototypy položek smazané"
 
-#: items.php:520
+#: items.php:528
 msgid "Item updated"
 msgstr "Položka byla aktualizována"
 
@@ -8744,7 +8744,7 @@ msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
 #: include/views/configuration.item.massupdate.php:22
 #: include/views/configuration.template.edit.php:207
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:158
-#: include/views/inventory.host.view.php:169 items.php:1071 popup.php:75
+#: include/views/inventory.host.view.php:169 items.php:1079 popup.php:75
 #: queue.php:103 search.php:135 search.php:164 search.php:193 search.php:400
 #: search.php:428 search.php:457 templates.php:599 templates.php:732
 msgid "Items"
@@ -8754,7 +8754,7 @@ msgstr "Položky"
 msgid "Items (m/d/n)"
 msgstr "Položky (sl/nesl/nep)[šab]"
 
-#: items.php:896
+#: items.php:904
 msgid "Items deleted"
 msgstr "Položky byly smazány"
 
@@ -8762,7 +8762,7 @@ msgstr "Položky byly smazány"
 msgid "Items list"
 msgstr "Seznam položek"
 
-#: items.php:762
+#: items.php:770
 msgid "Items updated"
 msgstr "Položky byly aktualizovány"
 
@@ -9175,7 +9175,7 @@ msgid "Lithuanian (lt_LT)"
 msgstr "Litevsky (lt_LT)"
 
 #: include/classes/items/CHelpItems.php:325
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:611
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Načítání celé web stránky (v sekundách). Vrátí desetinné číslo"
 
@@ -9330,7 +9330,7 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:571
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 kontrolní součet souboru. Vráti řetězec (MD5 hash souboru)"
@@ -9704,7 +9704,7 @@ msgstr "Členové"
 msgid "Memory limit: %1$s"
 msgstr "Limit paměti: %1$s"
 
-#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:599
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Velikost paměti v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
@@ -10633,7 +10633,7 @@ msgstr "Žádný stav pro proxy."
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
-#: graphs.php:379 items.php:826
+#: graphs.php:379 items.php:834
 msgid "No target selected."
 msgstr "Není vybraný cíl."
 
@@ -10765,7 +10765,7 @@ msgstr "Nyní"
 msgid "Number of CPUs. Returns integer"
 msgstr "Počet procesorů. Vráti celé číslo"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:899
 msgid "Number of enabled items on the host."
 msgstr "Počet povolených položek na hostitele."
 
@@ -10777,19 +10777,19 @@ msgstr "Počet hostů (povolených/zakázaných/šablony)"
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Počet položek (povolených/zakázaných/nepodporovaných)"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:919
 msgid "Number of items in Zabbix database."
 msgstr "Počet položek v Zabbix databázi."
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:939
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Počet položek v historii proxy, které ještě nebyli odeslané serveru"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:943
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Počet položek ve frontě, které jsou zpožděné od do sekund včetně."
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:915
 msgid "Number of monitored hosts"
 msgstr "Počet monitorovaných hostů"
 
@@ -10798,15 +10798,15 @@ msgstr "Počet monitorovaných hostů"
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Počet out-of-window kolízí. Vráti celé číslo"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:703
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových jader na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:707
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových vláken na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:771
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Počet procesorů na virtuálním stroji VMware, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
@@ -10859,15 +10859,15 @@ msgstr "Počet úspěšně načtených hodnot V (které splňuje operátor O) pr
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Počet spouštěčů (povolených/zakázaných [problémových/ok])"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of triggers in Zabbix database."
 msgstr "Počet spouštěčů v Zabbix databázi."
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:923
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Počet nepodporovaných položek v Zabbix databázi."
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:903
 msgid "Number of unsupported items on the host."
 msgstr "Počet nepodporovaných položek na hostitele."
 
@@ -10875,44 +10875,44 @@ msgstr "Počet nepodporovaných položek na hostitele."
 msgid "Number of users (online)"
 msgstr "Počet uživatelů (přihlášených)"
 
-#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:547
 msgid "Number of users logged in. Returns integer"
 msgstr "Počet přihlášení uživatelů. Návratová hodnota celé číslo"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of values stored in table HISTORY."
 msgstr "Počet hodnot uložených v tabulce HISTORY."
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:883
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Počet hodnot uložených v tabulce HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:887
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Počet hodnot uložených v tabulce HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Počet hodnot uložených v tabulce HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Počet hodnot uložených v tabulce HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of values stored in table TRENDS."
 msgstr "Počet hodnot uložených v tabulce TRENDS."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Počet hodnot uložených v tabulce TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:759
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet virtuálních serverů na VMware hypervizorovi, <url> - URL VMware služby, <uuid> - VMware hypervizor host jméno"
 
-#: include/classes/items/CHelpItems.php:309
+#: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:591
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Počet nebo procentní podíl uzlů. návratová hodnota celé číslo pro počet; plovoucí číslo pro procento"
@@ -12323,7 +12323,7 @@ msgstr "Požadované oprávnění na hosta"
 msgid "Required performance (vps)"
 msgstr "Požadovaný výkon (hodnoty/sekundu)"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:951
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Požadovaný výkon Zabbix serveru, očekávaná hodnota v nových údajích za sekundu."
 
@@ -12409,7 +12409,7 @@ msgstr "Zbývá pokusů"
 msgid "Retrieve only headers"
 msgstr "Stahovat jen hlavičky"
 
-#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:563
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Načítání obsahu souboru. Návratová hodnota text"
@@ -12418,27 +12418,27 @@ msgstr "Načítání obsahu souboru. Návratová hodnota text"
 msgid "Retry"
 msgstr "Znovu zkusit"
 
-#: include/classes/items/CHelpItems.php:985
+#: include/classes/items/CHelpItems.php:989
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Vrátí první sloupec z prvního řádku výsledku dotazu SQL."
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:639
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Vráti ICMP ping čas v sekundách. Příklad: 0.02"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:911
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Vráti dostupnost konkrétního typu kontroly na hostu. Hodnoty položky odpovídají ikonám dostupnosti v seznamu hostů. Platné typy jsou: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:907
 msgid "Returns current maintenance status of the host."
 msgstr "Vrátí aktuální stav odstávky pro hosta."
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:927
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Vrátí informace příslušné k Zabbix Java gateway. Platné parametry jsou: ping, version."
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:635
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí procento ztracených ICMP ping paketů."
 
@@ -13555,7 +13555,7 @@ msgstr "Standardní položky"
 msgid "Start in"
 msgstr "Začátek v"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:875
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Čas startu Zabbix serveru, Unix timestamp."
 
@@ -13806,7 +13806,7 @@ msgstr "Stav systému"
 msgid "System time. Returns integer with type as utc; string - with type as local"
 msgstr "Systémový čas. Návratová hodnota celé číslo s typem jako UTC; řetězec - s typem jako lokální"
 
-#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:543
 msgid "System uptime in seconds. Returns integer"
 msgstr "Systém uptime v sekundách. Vráti celé číslo"
@@ -14220,11 +14220,11 @@ msgstr "Čas (vzestupně)"
 msgid "Time (descending)"
 msgstr "Čas (vzestupně)"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:931
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "Čas určitého Zabbix procesu nebo skupiny procesů (identifikované <type> a <num>) strávené v <state> v procentech."
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:935
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Poslední čas přístupu proxy. Name - jméno proxy. Param - poslední přístup. Unix timestamp."
 
@@ -14314,7 +14314,7 @@ msgstr "Celkový čas: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Operace nebyla ukončená. Ukončuji ji..."
 
-#: include/classes/items/CHelpItems.php:989
+#: include/classes/items/CHelpItems.php:993
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Změň výstup SQL dotazu na JSON objekt pro nízko úrovňové objevování."
 
@@ -15216,7 +15216,7 @@ msgstr "Mapa nejvyšší úrovně"
 msgid "Uptime"
 msgstr "Doba provozu"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:967
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Doba provozu Zabbix server procesů v sekundách."
 
@@ -15495,195 +15495,195 @@ msgstr "Uživatelé (online)"
 msgid "Users unblocked"
 msgstr "Uživatelé odblokováni"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware statistiky cache. Platné módy jsou: total, free, pfree, used a pused."
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno klastru"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "VMware protokol událostí, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware BIOS uuid, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost balloned paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware klastr jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika čtení datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore , <mode> - latence"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika zápisů datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore, <mode> - latence"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:715
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware vstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware výstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware performance counter, <url> - VMware servisní URL, <uuid> - VMware jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware frekvence procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využití procesoru v Hz, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware celková velikost paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware provozní čas, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost použité paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno výrobce, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware verze, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware plné jméno služby, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verze, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost balloned paměti virtuálního stroje <url> - URL VMware služby, <uuid> - VMware jméno hosta virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware použitý úložný prostor virtuálním strojem, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost komprimované paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika čtení disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika zápisů disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware statistika souborového systému virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <fsname> - jméno souborového systému, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostitelské paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostovy paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno hypervizor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika vstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika výstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware VM performance counter, <url> - VMware service URL, <uuid> - VMware VM jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware stav napájení virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost privátní paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:771
-msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine jméno hosta"
-
 #: include/classes/items/CHelpItems.php:775
+msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití procesoru virtuálního stroje v Hz, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost zdílené paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware celková velikost paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nevyužitý prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nezdílený prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware čas provozu virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
@@ -15748,11 +15748,11 @@ msgstr "Hodnota \"%2$s\" z \"%1$s\" má příliš mnoho číslic před desetinno
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Hodnota \"%2$s\" z \"%1$s\" je příliš dlouhá: nemůže mít víc jak %3$s číslic před desetinnou čárkou a víc jak %4$s číslic za desetinnou čárkou."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:975
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Využití cache hodnot. Platné parametry jsou: requests, hits a misses."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:971
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statistiky cache hodnot. Platné mody jsou: total, free, pfree, used a pused."
 
@@ -15854,8 +15854,9 @@ msgstr "Vietnamsky (vi_VN)"
 msgid "View is not rendered."
 msgstr "Pohled není vykreslovaný."
 
-#: include/classes/items/CHelpItems.php:253
-msgid "Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
+#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:603
+msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
 #: include/views/configuration.host.edit.php:69

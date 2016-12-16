@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:11+0200\n"
+"POT-Creation-Date: 2016-12-16 21:08+0200\n"
 "PO-Revision-Date: 2016-09-14 09:48+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -649,7 +649,7 @@ msgstr "Интерфейсы агента"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Интерфейс Агента или SNMP или JMX или IPMI"
 
-#: include/classes/items/CHelpItems.php:621
+#: include/classes/items/CHelpItems.php:625
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "Агрегативные проверки не требуют наличия агента на наблюдаемом узле сети. Zabbix сервер собирает агрегативную информацию с помощью прямых запросов в базу данных. Смотрите документацию по Zabbix."
 
@@ -1308,7 +1308,7 @@ msgstr "Не удалось добавить прототип узлов сет�
 msgid "Cannot add image"
 msgstr "Не удалось добавить изображение"
 
-#: items.php:523
+#: items.php:531
 msgid "Cannot add item"
 msgstr "Не удалось добавить элемент данных"
 
@@ -1317,7 +1317,7 @@ msgstr "Не удалось добавить элемент данных"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\"."
 
-#: disc_prototypes.php:393
+#: disc_prototypes.php:427
 msgid "Cannot add item prototype"
 msgstr "Не удалось добавить прототип элементов данных"
 
@@ -1432,7 +1432,7 @@ msgstr "Не удалось изменить метод аутентификац
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не удалось изменить метод аутентификации на внутренний Zabbix"
 
-#: httpconf.php:191 httpconf.php:452 items.php:561 items.php:866
+#: httpconf.php:191 httpconf.php:452 items.php:569 items.php:874
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
@@ -1463,7 +1463,7 @@ msgstr[0] "Не удалось скопировать график"
 msgstr[1] "Не удалось скопировать графики"
 msgstr[2] "Не удалось скопировать графики"
 
-#: items.php:822
+#: items.php:830
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "Не удалось скопировать элемент даных"
@@ -1643,11 +1643,11 @@ msgstr "Не удалось удалить элемент данных"
 msgid "Cannot delete item prototype"
 msgstr "Не удалось удалить прототип элементов данных"
 
-#: disc_prototypes.php:435
+#: disc_prototypes.php:469
 msgid "Cannot delete item prototypes"
 msgstr "Не удалось удалить прототипы элементов данных"
 
-#: items.php:896
+#: items.php:904
 msgid "Cannot delete items"
 msgstr "Не удалось удалить элементы данных"
 
@@ -1821,14 +1821,14 @@ msgstr[0] "Не удалось деактивировать прототип у�
 msgstr[1] "Не удалось деактивировать прототипы узлов сети"
 msgstr[2] "Не удалось деактивировать прототипы узлов сети"
 
-#: applications.php:248 items.php:783
+#: applications.php:248 items.php:791
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Не удалось деактивировать элемент данных"
 msgstr[1] "Не удалось деактивировать элементы данных"
 msgstr[2] "Не удалось деактивировать элементы данных"
 
-#: disc_prototypes.php:419
+#: disc_prototypes.php:453
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Не удалось деактивировать прототип элементов данных"
@@ -1907,14 +1907,14 @@ msgstr[0] "Не удалось активировать прототип узл�
 msgstr[1] "Не удалось активировать прототипы узлов сети"
 msgstr[2] "Не удалось активировать прототипы узлов сети"
 
-#: applications.php:247 items.php:782
+#: applications.php:247 items.php:790
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Не удалось активировать элемент данных"
 msgstr[1] "Не удалось активировать элементы данных"
 msgstr[2] "Не удалось активировать элементы данных"
 
-#: disc_prototypes.php:418
+#: disc_prototypes.php:452
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Не удалось активировать прототип элементов данных"
@@ -2510,15 +2510,15 @@ msgstr "Не удалось обновить изображение"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не удалось обновить интерфейс для обнаруженного узла сети \"%1$s\"."
 
-#: items.php:520
+#: items.php:528
 msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
-#: disc_prototypes.php:396
+#: disc_prototypes.php:430
 msgid "Cannot update item prototype"
 msgstr "Не удалось обновить прототип элементов данных"
 
-#: items.php:762
+#: items.php:770
 msgid "Cannot update items"
 msgstr "Не удалось обновить элементы данных"
 
@@ -2630,11 +2630,11 @@ msgstr "Не удалось проверить проверку обнаруже
 msgid "Case sensitive"
 msgstr "Регистрозависимое"
 
-#: include/classes/items/CHelpItems.php:865
+#: include/classes/items/CHelpItems.php:869
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Отлов всех SNMP трапов, которые совпадают с регулярным выражением. Если регулярное выражение не задано, под условие попадают все трапы."
 
-#: include/classes/items/CHelpItems.php:861
+#: include/classes/items/CHelpItems.php:865
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[]."
 
@@ -2730,7 +2730,7 @@ msgstr "Проверки"
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Проверка доступности DNS сервиса. Возвращает 0 - DNS недоступен (сервер не отвечает или DNS запрос не выполнен); 1 - DNS доступен"
 
-#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:567
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
 msgstr "Проверка существования файла. Возвращает 0 - файл не найден; 1 - обычный файл или ссылка (жеская или символическая) на существующий обычный файл"
@@ -2740,19 +2740,19 @@ msgstr "Проверка существования файла. Возвраща
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Проверяет есть ли возможность создать TCP соединение к определенному порту. Возвращается 0 - не возможно подключиться; 1 - можно подключиться"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:631
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "Проверка, доступен ли сервер по ICMP ping. 0 - ICMP ping не успешен. 1 - ICMP ping успешен."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:407
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:643
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Проверяется запущен ли сервис и принимает ли TCP соединения. Возвращает 0 - если сервис недоступен; 1 - сервис запущен"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:419
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:651
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Проверяется запущен ли сервис и принимает ли UDP запросы. Возвращает 0 - если сервис недоступен; 1 - сервис запущен"
 
@@ -2768,13 +2768,13 @@ msgstr "Проверяется находится ли требуемый UDP п
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:411
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:647
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Проверяется производительность TCP сервиса. Возвращает 0 - сервис недоступен; секунды - количество секунд потраченных в процессе подключения к сервису"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:423
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:655
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Проверяется производительность UDP сервиса. Возвращает 0 - сервис недоступен; секунды - количество секунд потраченных в процессе подключения к сервису"
 
@@ -2983,7 +2983,7 @@ msgstr "Условия"
 msgid "Configuration"
 msgstr "Настройка"
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:947
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
@@ -3352,7 +3352,7 @@ msgstr "Создать иконку"
 msgid "Create icon map"
 msgstr "Создать соответствие иконок"
 
-#: include/views/configuration.item.list.php:27 items.php:902
+#: include/views/configuration.item.list.php:27 items.php:910
 msgid "Create item"
 msgstr "Создать элемент данных"
 
@@ -3661,7 +3661,7 @@ msgstr "Пунктирная линия"
 msgid "Data"
 msgstr "Данные"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:983
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trends (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
@@ -4330,11 +4330,6 @@ msgstr "Описание для \"%s\"."
 msgid "Description updated"
 msgstr "Описание обновлено"
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:539
-msgid "Detailed host information. Returns string"
-msgstr "Подробная информация о узле сети. Возвращает строку"
-
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1185
 #: include/blocks.inc.php:468 include/func.inc.php:1750
 #: include/views/administration.auditlogs.list.php:66
@@ -4669,17 +4664,17 @@ msgstr "Правила обнаружения удалены"
 msgid "Discovery status"
 msgstr "Состояние обнаружения"
 
-#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:551
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Статистика чтения диска. Возвращает целое число в режиме секторов, операций, байт; число с плавающей точкой в режиме sps, ops, bps"
 
-#: include/classes/items/CHelpItems.php:313
+#: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:595
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Размер дискового пространства в байтах или процентах от общего. Возвращает целое число в байтах; число с плавающей точкой в процентах"
 
-#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:555
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Статистика записи на диск. Возвращает целое число в режиме секторов, операции, байт; число с плавающей точкой в sps, ops, bps"
@@ -5375,7 +5370,7 @@ msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 
 #: include/classes/items/CHelpItems.php:333
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:619
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Выполнение запроса WMI и получение первого выбранного объекта. Возвращает целое число, число с плавающей точкой или текст (в зависимости от запроса)"
 
@@ -5632,7 +5627,7 @@ msgstr "Поле \"host\" является обязательным."
 msgid "Field \"name\" is required."
 msgstr "Поле \"name\" является обязательным."
 
-#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:559
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Контрольная сумма файла, вычисляется алгоритмом UNIX cksum. Возвращает целое число"
@@ -5651,12 +5646,12 @@ msgstr "Файл слишком большой, максимальный раз�
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Файл указанный как представление не существует. Была попытка найти \"%s\"."
 
-#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:583
 msgid "File size (in bytes). Returns integer"
 msgstr "Размер файла (в байтах). Возвращает целое число"
 
-#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:587
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Информация времени файла. Возвращает целое число (Unix timestamp)"
@@ -5705,18 +5700,18 @@ msgstr "Поиск строки V в последнем (самом новом) 
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "Поиск строки V в последнем (самом новом) значении. N NOT 1 - если найдено, 0 - в противном случае"
 
-#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:579
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Поиск строки в файле. Возвращает 0 - совпадений не найдено; 1 - найдено"
 
-#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:575
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Поиск строки в файле. Возвращается строка содержащая совпадающую строку, или как определено в дополнительном параметре output"
 
 #: include/classes/items/CHelpItems.php:329
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:615
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Поиск строки на веб странице. Возвращает подходящую строку, или как определено в дополнительном параметре output"
 
@@ -5881,7 +5876,7 @@ msgid "German (de_DE)"
 msgstr "Немецкий (de_DE)"
 
 #: include/classes/items/CHelpItems.php:321
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:607
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Получение содержимого веб страницы. Возвращает исходный код веб страницы в виде текста"
 
@@ -6324,7 +6319,7 @@ msgid "History (in days)"
 msgstr "История (в днях)"
 
 #: httpconf.php:184 httpconf.php:191 httpconf.php:440 httpconf.php:452
-#: items.php:554 items.php:561 items.php:854 items.php:866
+#: items.php:562 items.php:569 items.php:862 items.php:874
 msgid "History cleared"
 msgstr "История очищена"
 
@@ -6403,8 +6398,8 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/monitoring.screen.constructor.edit.php:422
 #: include/views/monitoring.screen.php:75
 #: include/views/monitoring.slides.php:79
-#: include/views/reports.toptriggers.php:118 items.php:554 items.php:853
-#: items.php:886 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:489
+#: include/views/reports.toptriggers.php:118 items.php:562 items.php:861
+#: items.php:894 jsLoader.php:141 latest.php:397 latest.php:417 popup.php:489
 #: popup.php:526 popup.php:1221 queue.php:248 report2.php:346 report2.php:371
 #: search.php:125 tr_status.php:202 tr_status.php:282
 msgid "Host"
@@ -7039,6 +7034,11 @@ msgstr "В соответствии иконок запись \"%1$s\" для \"
 #: include/views/js/monitoring.sysmaps.js.php:128
 msgid "Icons"
 msgstr "Иконки"
+
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:539
+msgid "Identification of the system. Returns string"
+msgstr ""
 
 #: include/func.inc.php:1684 include/func.inc.php:1703
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8297,8 +8297,8 @@ msgstr "Ошибочный hostid для макроса \"%1$s\"."
 
 #: disc_prototypes.php:271 disc_prototypes.php:276 disc_prototypes.php:289
 #: host_discovery.php:190 host_discovery.php:195 host_discovery.php:208
-#: items.php:418 items.php:423 items.php:436 items.php:582 items.php:587
-#: items.php:600
+#: items.php:418 items.php:423 items.php:436 items.php:590 items.php:595
+#: items.php:608
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Некорректный интервал \"%1$s\"."
@@ -8540,8 +8540,8 @@ msgstr "Итальянский (it_IT)"
 #: include/views/configuration.triggers.expression.php:60
 #: include/views/monitoring.screen.constructor.edit.php:235
 #: include/views/monitoring.screen.constructor.edit.php:364
-#: include/views/monitoring.screen.constructor.edit.php:637 items.php:553
-#: items.php:853 items.php:886 tr_logform.php:244
+#: include/views/monitoring.screen.constructor.edit.php:637 items.php:561
+#: items.php:861 items.php:894 tr_logform.php:244
 msgid "Item"
 msgstr "Элемент данных"
 
@@ -8581,11 +8581,11 @@ msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элем�
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
 
-#: items.php:523
+#: items.php:531
 msgid "Item added"
 msgstr "Элемент данных добавлен"
 
-#: items.php:821
+#: items.php:829
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] "Элемент даных скопирован"
@@ -8600,14 +8600,14 @@ msgstr "Количество элементов данных"
 msgid "Item deleted"
 msgstr "Элемент данных удален"
 
-#: applications.php:245 items.php:780
+#: applications.php:245 items.php:788
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Элемент данных деактивирован"
 msgstr[1] "Элементы данных деактивированы"
 msgstr[2] "Элементы данных деактивированы"
 
-#: applications.php:244 items.php:779
+#: applications.php:244 items.php:787
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Элемент данных активирован"
@@ -8641,7 +8641,7 @@ msgstr "Прототип элемента данных \"%1$s\" уже суще�
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип элементов данных \"%1$s\" уже существует у \"%2$s\"."
 
-#: disc_prototypes.php:393
+#: disc_prototypes.php:427
 msgid "Item prototype added"
 msgstr "Прототип элементов данных добавлен"
 
@@ -8649,21 +8649,21 @@ msgstr "Прототип элементов данных добавлен"
 msgid "Item prototype deleted"
 msgstr "Прототип элементов данных удален"
 
-#: disc_prototypes.php:416
+#: disc_prototypes.php:450
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Прототип элементов данных деактивирован"
 msgstr[1] "Прототипы элементов данных деактивированы"
 msgstr[2] "Прототипы элементов данных деактивированы"
 
-#: disc_prototypes.php:415
+#: disc_prototypes.php:449
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Прототип элементов данных активирован"
 msgstr[1] "Прототипы элементов данных активированы"
 msgstr[2] "Прототипы элементов данных активированы"
 
-#: disc_prototypes.php:396
+#: disc_prototypes.php:430
 msgid "Item prototype updated"
 msgstr "Прототип элементов данных обновлен"
 
@@ -8676,11 +8676,11 @@ msgstr "Прототип элементов данных обновлен"
 msgid "Item prototypes"
 msgstr "Прототипы элементов данных"
 
-#: disc_prototypes.php:435
+#: disc_prototypes.php:469
 msgid "Item prototypes deleted"
 msgstr "Прототип элементов данных удален"
 
-#: items.php:520
+#: items.php:528
 msgid "Item updated"
 msgstr "Элемент данных обновлен"
 
@@ -8744,7 +8744,7 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.item.massupdate.php:22
 #: include/views/configuration.template.edit.php:207
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:158
-#: include/views/inventory.host.view.php:169 items.php:1071 popup.php:75
+#: include/views/inventory.host.view.php:169 items.php:1079 popup.php:75
 #: queue.php:103 search.php:135 search.php:164 search.php:193 search.php:400
 #: search.php:428 search.php:457 templates.php:599 templates.php:732
 msgid "Items"
@@ -8754,7 +8754,7 @@ msgstr "Элементы данных"
 msgid "Items (m/d/n)"
 msgstr "Элементы данных (а/д/нп)"
 
-#: items.php:896
+#: items.php:904
 msgid "Items deleted"
 msgstr "Элементы данных удалены"
 
@@ -8762,7 +8762,7 @@ msgstr "Элементы данных удалены"
 msgid "Items list"
 msgstr "Список элементов данных"
 
-#: items.php:762
+#: items.php:770
 msgid "Items updated"
 msgstr "Элементы данных обновлены"
 
@@ -9175,7 +9175,7 @@ msgid "Lithuanian (lt_LT)"
 msgstr "Литовский (lt_LT)"
 
 #: include/classes/items/CHelpItems.php:325
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:611
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Полное время загрузки веб страницы (в секундах). Возвращает число с плавающей точкой"
 
@@ -9330,7 +9330,7 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:571
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Сумма MD5 файла. Возвращает символьную строку (MD5 хеш файла)"
@@ -9704,7 +9704,7 @@ msgstr "Члены группы"
 msgid "Memory limit: %1$s"
 msgstr "Лимит памяти: %1$s"
 
-#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:599
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Размер памяти в байтах или в процентах от общей. Возвращает целое число в байтах; целое с плавающей точкой для процетнов"
@@ -10633,7 +10633,7 @@ msgstr "Нет состояния для прокси."
 msgid "No target selected"
 msgstr "Цель не выбрана"
 
-#: graphs.php:379 items.php:826
+#: graphs.php:379 items.php:834
 msgid "No target selected."
 msgstr "Цель не выбрана."
 
@@ -10765,7 +10765,7 @@ msgstr "Сейчас"
 msgid "Number of CPUs. Returns integer"
 msgstr "Количество CPU. Возвращает целое число"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:899
 msgid "Number of enabled items on the host."
 msgstr "Количество активированных элементов данных у узла сети."
 
@@ -10777,19 +10777,19 @@ msgstr "Количество узлов сети (активированных/�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Количество элементов данных (активированных/деактивированных/неподдерживаемых)"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:919
 msgid "Number of items in Zabbix database."
 msgstr "Количество элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:939
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые еще не были отправлены на сервер"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:943
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Количество элементов данных в очереди, которые задерживаются от и до секунд, включительно."
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:915
 msgid "Number of monitored hosts"
 msgstr "Количество наблюдаемых узлов сети"
 
@@ -10798,15 +10798,15 @@ msgstr "Количество наблюдаемых узлов сети"
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Количество коллизий out-of-window. Возвращает целое число"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:703
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество ядер процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:707
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество потоков процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:771
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Количество процессоров виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -10859,15 +10859,15 @@ msgstr "Количество успешно полученных значени�
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Количество триггеров (активированных/деактивированных [проблема/ок])"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of triggers in Zabbix database."
 msgstr "Количество триггеров в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:923
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Количество неподдерживаемых элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:903
 msgid "Number of unsupported items on the host."
 msgstr "Количество неподдерживаемых элементов данных у узла сети."
 
@@ -10875,44 +10875,44 @@ msgstr "Количество неподдерживаемых элементов
 msgid "Number of users (online)"
 msgstr "Количество пользователей (в сети)"
 
-#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:547
 msgid "Number of users logged in. Returns integer"
 msgstr "Количество пользователей в системе. Возвращает число"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of values stored in table HISTORY."
 msgstr "Количество значений записанных в таблице HISTORY."
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:883
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Количество значений записанных в таблице HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:887
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Количество значений записанных в таблице HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Количество значений записанных в таблице HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Количество значений записанных в таблице HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of values stored in table TRENDS."
 msgstr "Количество значений записанных в таблице TRENDS."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:759
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:309
+#: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:591
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Количество inode в процентах. Возвращает целое число для количества; дробное - для процентов"
@@ -12324,7 +12324,7 @@ msgstr "Требуемые права доступа к узлам сети"
 msgid "Required performance (vps)"
 msgstr "Требуемое быстродействие (знч/сек)"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:951
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемая производительность Zabbix сервера, в ожидаемом количестве новых значений в секунду."
 
@@ -12410,7 +12410,7 @@ msgstr "Осталось попыток"
 msgid "Retrieve only headers"
 msgstr "Загружать только заголовки"
 
-#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:563
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Получение содержимого файла. Возвращает текст"
@@ -12419,27 +12419,27 @@ msgstr "Получение содержимого файла. Возвращае
 msgid "Retry"
 msgstr "Повтор"
 
-#: include/classes/items/CHelpItems.php:985
+#: include/classes/items/CHelpItems.php:989
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Возвращает первую колонку первой строки результата SQL запрос."
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:639
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Получение времени ответа на ICMP ping в секундах. Например: 0.02"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:911
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Получение доступности определенного типа проверок на узле сети. Значение этого элемента данных соответствует иконкам доступности в списке узлов сети. Допустимые типы: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:907
 msgid "Returns current maintenance status of the host."
 msgstr "Получение текущего состояния обслуживания узла сети."
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:927
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Возвращает информацию относящуюся к Zabbix Java gateway. Допустимые параметры: ping, version."
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:635
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Возвращает процент потерянных ICMP ping пакетов."
 
@@ -13556,7 +13556,7 @@ msgstr "Стандартные элементы данных"
 msgid "Start in"
 msgstr "Начинать в"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:875
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Время запуска Zabbix сервера, Unix timestamp."
 
@@ -13807,7 +13807,7 @@ msgstr "Состояние системы"
 msgid "System time. Returns integer with type as utc; string - with type as local"
 msgstr "Системное время. Возвращает целое число с типом как utc; строка - с типом как local"
 
-#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:543
 msgid "System uptime in seconds. Returns integer"
 msgstr "Системное время в секундах. Возвращает число"
@@ -14221,11 +14221,11 @@ msgstr "Время (в порядке возрастания)"
 msgid "Time (descending)"
 msgstr "Время (в порядке убывания)"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:931
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "Время конкретного процесса Zabbix или группы процессов (указывается через <type> и <num>), потраченное на <state> в процентах."
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:935
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Время последнего доступа к прокси. Имя - имя прокси. Параметр - lastaccess. Unix timestamp."
 
@@ -14315,7 +14315,7 @@ msgstr "Всего затрачено времени: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакция не была закрыта. Откат..."
 
-#: include/classes/items/CHelpItems.php:989
+#: include/classes/items/CHelpItems.php:993
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Преобразование результата SQL запроса в объект JSON для низкоуровневого обнаружения."
 
@@ -15217,7 +15217,7 @@ msgstr "Карты верхнего уровня"
 msgid "Uptime"
 msgstr "Доступен"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:967
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Время работы процесса Zabbix сервера в секундах."
 
@@ -15496,195 +15496,195 @@ msgstr "Пользователи (в сети)"
 msgid "Users unblocked"
 msgstr "Разблокированные пользователи"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кэша. Возможные режимы: total, free, pfree, used и pused."
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Состояние кластера VMware, <url> - URL службы VMware, <name> - имя кластера VMware"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "Журнал событий VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Uuid BIOS гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер ballooned памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя кластера VMware гипервизора, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика чтения из хранилища данных гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <datastore> - имя хранилища данных, <mode> - задержка"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика записи в хранилище данных гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <datastore> - имя хранилища данных, <mode> - задержка"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:715
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика входящего трафика сетевого интервейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика исходящего трафика сетевого интерфейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Частота процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Использование процессора гипервизора VMware в Гц, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Состояние гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Общий размер памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Время работы гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер памяти используемой гипервизором VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя поставщика гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Версия гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Полное имя сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Версия сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер ballooned памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер сжатой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика чтения дискового устройства виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика записи на дисковое устройство виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Статистика файловой системы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <fsname> - имя файловой системы, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти гостевой виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртуальной машины гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртульной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика входящего трафика сетевого интерфейса витруальной машниы VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика исходящего трафика сетевого интерфейса виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Состояние питания витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер частной памяти витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:771
-msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Время готовности процессора виртуальной машины VMware в %, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
-
 #: include/classes/items/CHelpItems.php:775
+msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование процессора виртуальной машины VMware в Гц , <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер разделяемой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер памяти выгруженной в файл подкачки витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Общий размер памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем не записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер неразделяемого пространства хранилища виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Время работы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -15749,11 +15749,11 @@ msgstr "Значение \"%2$s\" \"%1$s\" содержит слишком мн�
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Значение \"%2$s\" \"%1$s\" слишком длинное: оно не может содержать более чем %3$s цифр до дробного разделителя и более чем %4$s цифр после дробного разделителя."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:975
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Эффективность кэша значений. Допустимые параметры: requests, hits и misses."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:971
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кэша значений. Допустимые значения: total, free, pfree, used и pused."
 
@@ -15855,8 +15855,9 @@ msgstr "Вьетнамский (vi_VN)"
 msgid "View is not rendered."
 msgstr "Вид не отображается."
 
-#: include/classes/items/CHelpItems.php:253
-msgid "Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
+#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:603
+msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
 #: include/views/configuration.host.edit.php:69
