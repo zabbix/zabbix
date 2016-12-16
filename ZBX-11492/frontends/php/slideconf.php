@@ -99,9 +99,8 @@ if (hasRequest('action')) {
  * Actions
  */
 if (hasRequest('clone') && hasRequest('slideshowid')) {
-	unset($_REQUEST['slideshowid'], $_REQUEST['users'], $_REQUEST['userGroups']);
+	unset($_REQUEST['slideshowid']);
 	$_REQUEST['form'] = 'clone';
-	$_REQUEST['private'] = PRIVATE_SHARING;
 	$_REQUEST['userid'] = CWebUser::$data['userid'];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
