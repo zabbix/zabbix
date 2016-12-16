@@ -63,9 +63,9 @@ AC_HELP_STRING([--with-libevent=@<:@DIR@:>@], [use libevent from given base inst
 
 	LIBEVENT_LIBS="-levent"
 
-	if test -n "$_libevent_dir_set" -o -f /usr/include/event2/event.h; then
+	if test -n "$_libevent_dir_set" -o -f /usr/include/event.h; then
 		found_libevent="yes"
-	elif test -f /usr/local/include/event2/event.h; then
+	elif test -f /usr/local/include/event.h; then
 		LIBEVENT_CFLAGS="-I/usr/local/include"
 		LIBEVENT_LDFLAGS="-L/usr/local/lib"
 		found_libevent="yes"
