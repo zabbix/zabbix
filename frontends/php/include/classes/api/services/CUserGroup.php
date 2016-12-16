@@ -462,7 +462,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $usrgrps, string $method, array $db_usrgrps = null) {
+	private function checkHimself(array $usrgrps, $method, array $db_usrgrps = null) {
 		if ($method === 'validateUpdate') {
 			$groups_users = [];
 
