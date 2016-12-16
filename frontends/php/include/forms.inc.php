@@ -40,6 +40,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 			'output' => ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
 				'rows_per_page', 'type'
 			],
+			'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 			'userids' => $userId
 		]);
 		$user = reset($users);
@@ -66,14 +67,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 		$data['user_groups']	= zbx_toHash($userGroup);
 
-		$data['user_medias'] = [];
-		$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
-				' FROM media m'.
-				' WHERE m.userid='.zbx_dbstr($userId)
-		);
-		while ($dbMedium = DBfetch($dbMedia)) {
-			$data['user_medias'][] = $dbMedium;
-		}
+		$data['user_medias'] = $user['medias'];
 
 		if ($data['autologout'] > 0) {
 			$_REQUEST['autologout'] = $data['autologout'];

@@ -38,7 +38,14 @@ abstract class CHostBase extends CApiService {
 		}
 
 		// permission check
-		if (!API::Template()->isReadable($templateIds)) {
+		$templateIds = array_unique($templateIds);
+
+		$count = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateIds
+		]);
+
+		if ($count != count($templateIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 

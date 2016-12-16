@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
@@ -121,11 +122,19 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
-	access_deny();
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+
+	if (!$hosts) {
+		access_deny();
+	}
 }
 
 $hostIds = getRequest('hosts', []);
