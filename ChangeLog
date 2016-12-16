@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+A.F....PS. [ZBXNEXT-3576] increased user media periods and item flexible intervals to 1024 characters (Sasha, wiper)
 A......... [ZBX-3783] added support of user_medias parameter by user.update() method (Sasha)
 A......... [ZBX-3783] prohibited deleting users and user groups which are used in actions (Sasha)
 A......... [ZBX-3783] deprecated user.addmedia(), user.updatemedia(), user.deletemedia(), user.updateprofile(), usergroup.massadd(), usergroup.massupdate() and usermedia.get() API methods (Sasha)
