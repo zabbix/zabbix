@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -95,7 +96,7 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
  * Permissions
  */
 $groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable([$groupId])) {
+if ($groupId && !isWritableHostGroups([$groupId])) {
 	access_deny();
 }
 
@@ -138,17 +139,8 @@ elseif (hasRequest('graphid')) {
 		access_deny();
 	}
 }
-elseif ($hostId) {
-	// check whether host is editable by user
-	$host = (bool) API::Host()->get([
-		'output' => [],
-		'hostids' => $hostId,
-		'templated_hosts' => true,
-		'editable' => true
-	]);
-	if (!$host) {
-		access_deny();
-	}
+elseif ($hostId && !isWritableHostTemplates([$hostId])) {
+	access_deny();
 }
 
 /*
