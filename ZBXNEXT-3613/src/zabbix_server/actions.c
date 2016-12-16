@@ -546,10 +546,14 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 	int				i;
 	zbx_vector_uint64_t		objectids_tmp;
 	zbx_vector_uint64_pair_t	triggerids, triggerids_tmp;
+	char				*sql = NULL;
+	size_t				sql_alloc = 256;
 
 	zbx_vector_uint64_pair_create(&triggerids);
 	zbx_vector_uint64_pair_create(&triggerids_tmp);
 	zbx_vector_uint64_create(&objectids_tmp);
+
+	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_pair_reserve(&triggerids, objectids->values_num);
 	zbx_vector_uint64_reserve(&objectids_tmp, objectids->values_num);
@@ -563,8 +567,8 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 
 	while (0 != triggerids.values_num)
 	{
-		char		*sql = NULL;
-		size_t		sql_alloc = 0, sql_offset = 0;
+
+		size_t		sql_offset = 0;
 		DB_RESULT	result;
 		DB_ROW		row;
 
@@ -646,8 +650,6 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 
 		zbx_vector_uint64_pair_clear(&triggerids_tmp);
 		zbx_vector_uint64_clear(&objectids_tmp);
-
-		zbx_free(sql);
 	}
 
 	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
@@ -658,9 +660,11 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 		}
 	}
 
+	zbx_vector_uint64_pair_destroy(&triggerids);
 	zbx_vector_uint64_pair_destroy(&triggerids_tmp);
 	zbx_vector_uint64_destroy(&objectids_tmp);
-	zbx_vector_uint64_pair_destroy(&triggerids);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
