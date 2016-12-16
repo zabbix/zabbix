@@ -628,7 +628,7 @@ else {
 		'groupid' => getRequest('groupid'),
 		'hostid' => getRequest('hostid')
 	]);
-	$data['groupid'] = $data['pageFilter']->groupids;
+	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	// get triggers
