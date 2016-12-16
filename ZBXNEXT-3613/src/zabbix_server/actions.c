@@ -634,7 +634,6 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 						triggerids.values[i].second = templateid;
 						zbx_vector_uint64_pair_append(&triggerids_tmp, triggerids.values[i]);
 					}
-
 				}
 			}
 		}
