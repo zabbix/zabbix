@@ -1127,8 +1127,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 
 	// get triggers data, triggers from current map, select all
-	$all_triggers = array();
-
 	if (!empty($triggers_map)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
@@ -1142,11 +1140,9 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		$triggers = API::Trigger()->get($triggerOptions);
 
-		$all_triggers = array_merge($all_triggers, $triggers);
-
 		foreach ($triggers as $trigger) {
 			foreach ($triggers_map[$trigger['triggerid']] as $belongs_to_sel) {
-				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
 	}
@@ -1155,7 +1151,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($triggers_map_submaps)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
-			'selectHosts' => array('maintenance_status', 'maintenanceid'),
 			'selectLastEvent' => array('acknowledged'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
@@ -1167,11 +1162,9 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		$triggers = API::Trigger()->get($triggerOptions);
 
-		$all_triggers = array_merge($all_triggers, $triggers);
-
 		foreach ($triggers as $trigger) {
 			foreach ($triggers_map_submaps[$trigger['triggerid']] as $belongs_to_sel) {
-				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
 	}
@@ -1180,7 +1173,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($monitored_hostids)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
-			'selectHosts' => array('hostid', 'maintenance_status', 'maintenanceid'),
+			'selectHosts' => array('hostid'),
 			'selectLastEvent' => array('acknowledged'),
 			'hostids' => $monitored_hostids,
 			'nopermissions' => true,
@@ -1193,19 +1186,16 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		$triggers = API::Trigger()->get($triggerOptions);
 
-		$all_triggers = array_merge($all_triggers, $triggers);
-
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				if (isset($hosts_map[$host['hostid']])) {
 					foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
-						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 					}
 				}
 			}
 		}
 	}
-	$all_triggers = zbx_toHash($all_triggers, 'triggerid');
 
 	$info = array();
 	foreach ($selements as $selementId => $selement) {
@@ -1234,9 +1224,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		$last_event = false;
 
-		foreach ($selement['triggers'] as $triggerId) {
-			$trigger = $all_triggers[$triggerId];
-
+		foreach ($selement['triggers'] as $triggerId => $trigger) {
 			if ($options['severity_min'] <= $trigger['priority']) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
 					$i['trigger_disabled']++;
@@ -1268,11 +1256,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
 		if ($sysmap['expandproblem'] && $i['problem'] == 1) {
-			if (!isset($lastProblemId)) {
-				$lastProblemId = null;
-			}
-
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($all_triggers[$lastProblemId]);
+			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
 		}
 
 		// replace default icons
@@ -1365,8 +1349,9 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 
 	if (!empty($elems['triggers']) && $tlabel) {
-		foreach ($elems['triggers'] as $elem) {
-			$info[$elem['selementid']]['name'] = CMacrosResolverHelper::resolveTriggerName($all_triggers[$elem['elementid']]);
+		foreach ($elems['triggers'] as $selementid => $elem) {
+			$trigger = $selements[$selementid]['triggers'][$elem['elementid']];
+			$info[$elem['selementid']]['name'] = CMacrosResolverHelper::resolveTriggerName($trigger);
 		}
 	}
 	if (!empty($elems['hosts']) && $hlabel) {
