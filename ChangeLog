@@ -1,7 +1,5 @@
 Changes for 3.0.7rc1
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
 ..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated items and item prototypes when modifying its parent (Ivo)
