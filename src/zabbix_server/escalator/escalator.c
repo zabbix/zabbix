@@ -23,6 +23,7 @@
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
+#include "zbxtasks.h"
 
 #include "escalator.h"
 #include "../operations.h"
@@ -479,28 +480,29 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, DB_ESCALATION *escalation, c
 	}
 }
 
-static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const DC_HOST *host, zbx_uint64_t eventid,
+static void	add_command_alert(zbx_uint64_t alertid, const DC_HOST *host, zbx_uint64_t eventid,
 		zbx_uint64_t actionid, int esc_step, const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
 	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
 	char		*tmp = NULL;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 == alerts_num)
-	{
-		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
-				"status", "error", "esc_step", "alerttype", NULL);
-	}
+	zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
+			"status", "error", "esc_step", "alerttype", NULL);
 
 	now = (int)time(NULL);
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
 
-	zbx_db_insert_add_values(db_insert, __UINT64_C(0), actionid, eventid, now, tmp, alert_status, error, esc_step,
+	zbx_db_insert_add_values(&db_insert, alertid, actionid, eventid, now, tmp, alert_status, error, esc_step,
 			(int)alerttype);
 
 	zbx_free(tmp);
+
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -523,7 +525,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.host,h.tls_connect");
+	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxy_hostid,h.host,h.tls_connect");
 #ifdef HAVE_OPENIPMI
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
@@ -601,20 +603,25 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 			ret = FAIL;
 			break;
 		}
+
 		ZBX_STR2UINT64(host->hostid, row[0]);
-		strscpy(host->host, row[1]);
+
+		if (NULL != row[1])
+			ZBX_STR2UINT64(host->proxy_hostid, row[1]);
+
+		strscpy(host->host, row[2]);
 #ifdef HAVE_OPENIPMI
-		host->ipmi_authtype = (signed char)atoi(row[3]);
-		host->ipmi_privilege = (unsigned char)atoi(row[4]);
-		strscpy(host->ipmi_username, row[5]);
-		strscpy(host->ipmi_password, row[6]);
+		host->ipmi_authtype = (signed char)atoi(row[4]);
+		host->ipmi_privilege = (unsigned char)atoi(row[5]);
+		strscpy(host->ipmi_username, row[6]);
+		strscpy(host->ipmi_password, row[7]);
 #endif
 		host->tls_connect = (unsigned char)atoi(row[2]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(host->tls_issuer, row[3 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_subject, row[4 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk_identity, row[5 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk, row[6 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 	}
 	DBfree_result(result);
@@ -671,8 +678,6 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 	const char		*__function_name = "execute_commands";
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_db_insert_t		db_insert;
-	int			alerts_num = 0;
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
@@ -690,7 +695,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 	{
 		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				/* the 1st 'select' works if remote command target is "Host group" */
-				"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+				"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
 					",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
@@ -719,7 +724,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
-			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+			"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
 				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -736,7 +741,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				" and h.status=%d"
 			" union "
 			/* the 3rd 'select' works if remote command target is "Current host" */
-			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
+			"select distinct 0,0,null,o.type,o.scriptid,o.execute_on,o.port"
 				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
 #ifdef HAVE_OPENIPMI
@@ -766,27 +771,31 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		DC_HOST			host;
 		zbx_script_t		script;
 		zbx_alert_status_t	status;
+		zbx_uint64_t		alertid;
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
 
-		script.type = (unsigned char)atoi(row[2]);
+		script.type = (unsigned char)atoi(row[3]);
 
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
-			script.command = zbx_strdup(script.command, row[11]);
+			script.command = zbx_strdup(script.command, row[12]);
 			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
-			script.execute_on = (unsigned char)atoi(row[4]);
+			script.execute_on = (unsigned char)atoi(row[5]);
+
+		ZBX_STR2UINT64(host.hostid, row[0]);
+
+		if (NULL != row[1])
+			ZBX_STR2UINT64(host.proxy_hostid, row[1]);
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT != script.type || ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
-			ZBX_STR2UINT64(host.hostid, row[0]);
-
 			if (0 != host.hostid)
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
@@ -796,19 +805,19 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				}
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-				strscpy(host.host, row[1]);
-				host.tls_connect = (unsigned char)atoi(row[12]);
+				strscpy(host.host, row[2]);
+				host.tls_connect = (unsigned char)atoi(row[13]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[13]);
-				host.ipmi_privilege = (unsigned char)atoi(row[14]);
-				strscpy(host.ipmi_username, row[15]);
-				strscpy(host.ipmi_password, row[16]);
+				host.ipmi_authtype = (signed char)atoi(row[14]);
+				host.ipmi_privilege = (unsigned char)atoi(row[15]);
+				strscpy(host.ipmi_username, row[16]);
+				strscpy(host.ipmi_password, row[17]);
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[14 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[15 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[16 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[17 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
@@ -823,44 +832,42 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 			}
 		}
 
+		alertid = DBget_maxid("alerts");
+
 		if (SUCCEED == rc)
 		{
 			switch (script.type)
 			{
 				case ZBX_SCRIPT_TYPE_SSH:
-					script.authtype = (unsigned char)atoi(row[6]);
-					script.publickey = zbx_strdup(script.publickey, row[9]);
-					script.privatekey = zbx_strdup(script.privatekey, row[10]);
+					script.authtype = (unsigned char)atoi(row[7]);
+					script.publickey = zbx_strdup(script.publickey, row[10]);
+					script.privatekey = zbx_strdup(script.privatekey, row[11]);
 					/* break; is not missing here */
 				case ZBX_SCRIPT_TYPE_TELNET:
-					script.port = zbx_strdup(script.port, row[5]);
-					script.username = zbx_strdup(script.username, row[7]);
-					script.password = zbx_strdup(script.password, row[8]);
+					script.port = zbx_strdup(script.port, row[6]);
+					script.username = zbx_strdup(script.username, row[8]);
+					script.password = zbx_strdup(script.password, row[9]);
 					break;
 				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					ZBX_DBROW2UINT64(script.scriptid, row[3]);
+					ZBX_DBROW2UINT64(script.scriptid, row[4]);
 					break;
 			}
 
 			rc = zbx_execute_script(&host, &script, NULL, NULL, error, sizeof(error));
 		}
 
-		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
+		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+			status = (SUCCEED == rc ? ALERT_STATUS_SENT : ALERT_STATUS_FAILED);
+		else
+			status = (SUCCEED == rc ? ALERT_STATUS_NOT_SENT : ALERT_STATUS_FAILED);
 
-		add_command_alert(&db_insert, alerts_num++, &host, event->eventid, actionid, esc_step, script.command,
+		add_command_alert(alertid, &host, event->eventid, actionid, esc_step, script.command,
 				status, error);
 skip:
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
 	zbx_vector_uint64_destroy(&executed_on_hosts);
-
-	if (0 < alerts_num)
-	{
-		zbx_db_insert_autoincrement(&db_insert, "alertid");
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
