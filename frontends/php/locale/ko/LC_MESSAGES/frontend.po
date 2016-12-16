@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:09+0200\n"
-"PO-Revision-Date: 2016-09-08 13:54+0300\n"
+"PO-Revision-Date: 2016-12-14 02:49+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1473335672.000000\n"
+"X-POOTLE-MTIME: 1481676598.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -686,7 +686,7 @@ msgstr "모두"
 #: include/views/administration.users.edit.php:402
 #: include/views/administration.users.edit.php:408
 msgid "All groups"
-msgstr ""
+msgstr "모든 그룹"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -2557,7 +2557,7 @@ msgstr "슬라이드쇼를 갱신할 수 없습니다"
 #: include/classes/api/services/CHttpTest.php:529
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "템플릿의 Web시나리오 \"%1$s\"의 스텝 명을 갱신할 수 없습니다."
 
 #: templates.php:178
 msgid "Cannot update template"
@@ -6578,7 +6578,7 @@ msgstr "호스트 \"%1$s\"는 이미 존재합니다."
 #: include/classes/api/services/CHost.php:1784
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "호스트\"%1$s\"에 호스트 그룹을 설정해 주세요."
 
 #: include/classes/api/services/CProxy.php:548
 #, c-format
@@ -6761,7 +6761,7 @@ msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 �
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "호스트의 프로토타입 \"%1$s\"에 호스트 그룹을 설정해주세요."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7311,7 +7311,7 @@ msgstr "포함"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "서브 그룹을 포함"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:391
@@ -8046,7 +8046,7 @@ msgstr "템플릿 스크린ID가 올바르지 않습니다."
 
 #: include/classes/api/services/CHttpTest.php:708
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "템플릿의 웹 시나리오의 스텝 카운트가 올바르지 않습니다."
 
 #: include/classes/api/services/CUser.php:312
 #, c-format
@@ -8511,7 +8511,7 @@ msgstr "날짜 \"%s\"가 올바르지 않습니다."
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "5번째의 파라미터가 올바르지 않습니다."
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -12793,7 +12793,7 @@ msgstr "해결됨"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "해결 이유"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
@@ -14388,7 +14388,7 @@ msgstr "템플릿\"%1$s\"은 이미 존재합니다."
 #: include/classes/api/services/CTemplate.php:947
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "템플릿 \"%1$s\"에 호스트그룹을 설정해주세요."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -15724,7 +15724,7 @@ msgstr "유저"
 #: include/classes/api/services/CUser.php:287
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "유저 \"%1$s\"에 유저 그룹을 설정해주세요."
 
 #: include/classes/api/services/CUser.php:546
 #, c-format
@@ -15971,7 +15971,7 @@ msgstr "VMware 클래스터의 상태, <url> - VMware서비스URL, <name> - VMwa
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용량에서의 통계치. 바이트 단위라면 integer, 퍼센트라면 float 로 리턴"
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware event log, <url> - VMware service URL"
@@ -16445,7 +16445,7 @@ msgstr "Web시나리오의 스텝 URL은 필수항목입니다."
 #: include/classes/api/services/CHttpTest.php:523
 #, c-format
 msgid "Web scenario step is missing parameters: %1$s"
-msgstr ""
+msgstr "Web 시나리오 스텝의 파라미터가 부족합니다：%1$s"
 
 #: include/classes/api/services/CHttpTest.php:715
 msgid "Web scenario step name cannot be empty."
@@ -17151,7 +17151,7 @@ msgstr "범위 내"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:409
 msgid "including subgroups"
-msgstr ""
+msgstr "서브 그룹을 포함"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2212
 #: include/classes/parsers/CItemKey.php:80

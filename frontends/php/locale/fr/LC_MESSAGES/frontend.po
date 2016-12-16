@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-16 21:09+0200\n"
-"PO-Revision-Date: 2016-09-18 16:09+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2016-12-08 21:14+0300\n"
+"Last-Translator: Sébastien <sebastien@maccagnoni.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1474207775.000000\n"
+"X-POOTLE-MTIME: 1481224475.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -699,7 +699,7 @@ msgstr "Tous"
 #: include/views/administration.users.edit.php:402
 #: include/views/administration.users.edit.php:408
 msgid "All groups"
-msgstr ""
+msgstr "Tous les groupes"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -2607,7 +2607,7 @@ msgstr "Impossible de mettre à jour le diaporama"
 #: include/classes/api/services/CHttpTest.php:529
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Impossible de mettre à jour le nom d'étape pour le scénario web de modèle \"%1$s\"."
 
 #: templates.php:178
 msgid "Cannot update template"
@@ -6638,7 +6638,7 @@ msgstr "L'hôte \"%1$s\" existe déjà."
 #: include/classes/api/services/CHost.php:1784
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "L'hôte \"%1$s\" ne peut pas ne pas avoir de groupe d'hôte."
 
 #: include/classes/api/services/CProxy.php:548
 #, c-format
@@ -6823,7 +6823,7 @@ msgstr "Le prototype d'hôte \"%1$s\" existe déjà sur \"%2$s\"."
 #: include/classes/api/services/CHostPrototype.php:191
 #, c-format
 msgid "Host prototype \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Le prototype d'hôte \"%1$s\" ne peut pas ne pas avoir de groupe d'hôte."
 
 #: host_prototypes.php:206
 msgid "Host prototype added"
@@ -7374,7 +7374,7 @@ msgstr "Inclure"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "Inclure les sous-groupes"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:391
@@ -8109,7 +8109,7 @@ msgstr "Identifiant d'écran de modèle incorrect."
 
 #: include/classes/api/services/CHttpTest.php:708
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Compte d'étapes de scénario web de template incorrect."
 
 #: include/classes/api/services/CUser.php:312
 #, c-format
@@ -8574,7 +8574,7 @@ msgstr "Date invalide \"%s\"."
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "Cinquième paramètre invalide."
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -12869,7 +12869,7 @@ msgstr "Résolu"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "Résolu par"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
@@ -14467,7 +14467,7 @@ msgstr "Le modèle \"%1$s\" existe déjà."
 #: include/classes/api/services/CTemplate.php:947
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "Le modèle \"%1$s\" ne peut pas ne pas avoir de groupe d'hôte."
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -14795,7 +14795,7 @@ msgstr "Temps (décroissant)"
 
 #: include/classes/items/CHelpItems.php:939
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
-msgstr "Temps qu'un processus Zabbix particulier ou qu'un groupe de processus (identifiés par <type> et <nom>) a passé dans l'état <state>, en pourcentage."
+msgstr "Temps qu'un processus Zabbix particulier ou qu'un groupe de processus (identifiés par <type> et <num>) a passé dans l'état <state>, en pourcentage."
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
@@ -15810,7 +15810,7 @@ msgstr "Utilisateur"
 #: include/classes/api/services/CUser.php:287
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
-msgstr ""
+msgstr "L'utilisateur \"%1$s\" ne peut pas ne pas avoir de groupe d'utilisateurs."
 
 #: include/classes/api/services/CUser.php:546
 #, c-format
@@ -16059,7 +16059,7 @@ msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du 
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentage du total. Retourne un entier pour les octets; un flottant pour le pourcentage."
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware event log, <url> - VMware service URL"
@@ -16536,7 +16536,7 @@ msgstr "L'URL d'une étape d'un scénario ne peut pas être vide."
 #: include/classes/api/services/CHttpTest.php:523
 #, c-format
 msgid "Web scenario step is missing parameters: %1$s"
-msgstr ""
+msgstr "L'étape de scénario web a un paramètre manquant : %1$s"
 
 #: include/classes/api/services/CHttpTest.php:715
 msgid "Web scenario step name cannot be empty."
@@ -17241,7 +17241,7 @@ msgstr "dans"
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.users.edit.php:409
 msgid "including subgroups"
-msgstr ""
+msgstr "sous-groupes inclus"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2212
 #: include/classes/parsers/CItemKey.php:80
