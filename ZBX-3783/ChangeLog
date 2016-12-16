@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+A.F....PS. [ZBXNEXT-3576] increased user media periods and item flexible intervals to 1024 characters (Sasha, wiper)
 A......... [ZBX-3783] added support of user_medias parameter by user.update() method (Sasha)
 A......... [ZBX-3783] prohibited deleting users and user groups which are used in actions (Sasha)
 A......... [ZBX-3783] deprecated user.addmedia(), user.updatemedia(), user.deletemedia(), user.updateprofile(), usergroup.massadd(), usergroup.massupdate() and usermedia.get() API methods (Sasha)
@@ -23,11 +24,18 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
-Changes for 3.2.3rc1
+Changes for 3.2.3
 
 New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators
+
+--------------------------------------------------------------------------------
+Changes for 3.2.3rc1
 
 Bug fixes:
+..F....... [ZBX-11596] fixed paging error in Configuration->Triggers and Monitoring->Web (Gunars)
+.......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
+..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated item prototypes when modifying its parent (Ivo)
 ..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
@@ -236,7 +244,8 @@ Bug fixes:
 Changes for 3.2.0alpha2
 
 New features:
-A.F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view, improved event.get() and problem.get() methods (Sasha)
+..F.I...S. [ZBXNEXT-3201] added history of events in Monitoring->Problems view (Sasha)
+A......... [ZBXNEXT-3201] added new filtering options in event.get() and problem.get() methods (Sasha)
 ..F....... [ZBXNEXT-3201] dropped Monitoring->Events view (Sasha)
 A.F.I...S. [ZBXNEXT-104] implemented ability to manually close problems (Gunars, Ivo, wiper)
 ..F....... [ZBXNEXT-3358] added a beautiful favorites icon (Pavel)
@@ -294,11 +303,17 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.7rc1
+Changes for 3.0.7
 
 New features:
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators
+
+--------------------------------------------------------------------------------
+Changes for 3.0.7rc1
 
 Bug fixes:
+.......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
+..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated items and item prototypes when modifying its parent (Ivo)
 ..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
@@ -1869,6 +1884,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
 ...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
 ........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
