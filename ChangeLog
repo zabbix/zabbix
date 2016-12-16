@@ -26,8 +26,6 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 --------------------------------------------------------------------------------
 Changes for 3.2.3rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-11596] fixed paging error in Configuration->Triggers and Monitoring->Web (Gunars)
 .......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
@@ -300,8 +298,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.7rc1
-
-New features:
 
 Bug fixes:
 .......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
