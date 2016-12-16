@@ -82,24 +82,21 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -172,8 +169,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -181,8 +177,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -190,8 +185,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -256,8 +250,7 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix internal',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -314,8 +307,7 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -366,24 +358,21 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -456,8 +445,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -465,8 +453,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -474,8 +461,7 @@ class testFormItemPrototype extends CWebTest {
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -540,8 +526,7 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix internal',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -598,8 +583,7 @@ class testFormItemPrototype extends CWebTest {
 				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
@@ -830,19 +814,6 @@ class testFormItemPrototype extends CWebTest {
 		}
 		else {
 			$value_type = $this->zbxTestGetSelectedLabel('value_type');
-		}
-
-		if ($value_type == 'Numeric (unsigned)') {
-			if (isset($data['data_type'])) {
-				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
-				$data_type = $data['data_type'];
-			}
-			elseif (isset($templateid)) {
-				$data_type = $this->zbxTestGetValue("//input[@id='data_type_name']");
-			}
-			else {
-				$data_type = $this->zbxTestGetSelectedLabel('data_type');
-			}
 		}
 
 		if ($type == 'SSH agent') {
@@ -1106,35 +1077,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (float)']");
 		}
 
-		if ($value_type == 'Numeric (unsigned)' && !isset($templateid)) {
-			$this->zbxTestTextPresent('Data type');
-			$this->zbxTestAssertVisibleId('data_type');
-			$this->zbxTestDropdownHasOptions('data_type', ['Boolean', 'Octal', 'Decimal', 'Hexadecimal']);
-			$this->zbxTestDropdownAssertSelected('data_type', 'Decimal');
-			$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Decimal']");
-
-			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
-				$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Boolean']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Octal']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Hexadecimal']", 'disabled');
-			}
-			else {
-				$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Boolean']");
-				$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Octal']");
-				$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Hexadecimal']");
-			}
-		}
-		elseif (isset($templateid)) {
-			$this->zbxTestTextPresent('Data type');
-			$this->zbxTestAssertVisibleId('data_type_name');
-			$this->zbxTestAssertAttribute("//input[@id='data_type_name']", 'readonly');
-		}
-		else {
-			$this->zbxTestTextNotVisibleOnPage('Data type');
-			$this->zbxTestAssertNotVisibleId('data_type');
-		}
-
-		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
+		if ($value_type === 'Numeric (float)') {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
@@ -1142,36 +1085,10 @@ class testFormItemPrototype extends CWebTest {
 			if(isset($templateid)) {
 				$this->zbxTestAssertAttribute("//input[@id='units']", 'readonly');
 			}
-
-			$this->zbxTestTextPresent('Use custom multiplier');
-			if (!isset($templateid)) {
-				$this->zbxTestAssertElementPresentId('multiplier');
-				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier']");
-			}
-			else {
-				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
-			}
-
-			$this->zbxTestAssertVisibleId('formula');
-			$this->zbxTestAssertAttribute("//input[@id='formula']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='formula']", 'size', 20);
-			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('formula', 1);
-			}
-			if (!isset($templateid)) {
-				$this->zbxTestAssertElementPresentXpath("//input[@id='formula'][@disabled]");
-			}
-			else {
-				$this->zbxTestAssertAttribute("//input[@id='formula']", 'readonly');
-			}
 		}
 		else {
 			$this->zbxTestTextNotVisibleOnPage('Units');
 			$this->zbxTestAssertNotVisibleId('units');
-
-			$this->zbxTestTextNotVisibleOnPage('Use custom multiplier');
-			$this->zbxTestAssertNotVisibleId('multiplier');
-			$this->zbxTestAssertNotVisibleId('formula');
 		}
 
 		switch ($type) {
@@ -1235,24 +1152,6 @@ class testFormItemPrototype extends CWebTest {
 		else {
 			$this->zbxTestTextNotVisibleOnPage('Trend storage period (in days)');
 			$this->zbxTestAssertNotVisibleId('trends');
-		}
-
-		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
-			$this->zbxTestTextPresent('Store value');
-			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('delta');
-				$this->zbxTestDropdownHasOptions('delta', ['As is', 'Delta (speed per second)', 'Delta (simple change)']);
-				$this->zbxTestDropdownAssertSelected('delta', 'As is');
-			}
-			else {
-				$this->zbxTestAssertVisibleId('delta_name');
-				$this->zbxTestAssertAttribute("//input[@id='delta_name']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delta_name']", 'readonly');
-			}
-		}
-		else {
-			$this->zbxTestTextNotVisibleOnPage('Store value');
-			$this->zbxTestAssertNotVisibleId('delta');
 		}
 
 		$this->zbxTestTextPresent(['Show value', 'show value mappings']);
@@ -1412,58 +1311,6 @@ class testFormItemPrototype extends CWebTest {
 					'errors' => [
 						'Incorrect value for field "Key": cannot be empty.'
 					]
-				]
-			],
-			// Empty formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' ',
-					'formulaValue' => '',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			// Incorrect formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' value ',
-					'formulaValue' => 'value',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "value" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			// Incorrect formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => '321abc',
-					'formulaValue' => '321abc',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "321abc" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item formula1',
-					'key' => 'item-formula-test',
-					'formula' => '5',
-					'dbCheck' => true,
-					'formCheck' => true
 				]
 			],
 			// Empty timedelay
@@ -2386,11 +2233,6 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestInputTypeWait('params_f', $data['params_f']);
 		}
 
-		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelect('multiplier');
-			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
-		}
-
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
@@ -2444,7 +2286,6 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		$value_type = $this->zbxTestGetSelectedLabel('value_type');
-		$data_type = $this->zbxTestGetSelectedLabel('data_type');
 
 		if ($itemFlexFlag == true) {
 			$this->zbxTestClickWait('add');
@@ -2509,7 +2350,6 @@ class testFormItemPrototype extends CWebTest {
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='data_type']/option[text()='$data_type']");
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");

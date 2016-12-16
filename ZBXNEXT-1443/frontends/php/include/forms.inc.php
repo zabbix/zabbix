@@ -245,7 +245,6 @@ function getItemFilterForm(&$items) {
 	$filter_snmp_oid			= $_REQUEST['filter_snmp_oid'];
 	$filter_port				= $_REQUEST['filter_port'];
 	$filter_value_type			= $_REQUEST['filter_value_type'];
-	$filter_data_type			= $_REQUEST['filter_data_type'];
 	$filter_delay				= $_REQUEST['filter_delay'];
 	$filter_history				= $_REQUEST['filter_history'];
 	$filter_trends				= $_REQUEST['filter_trends'];
@@ -315,13 +314,6 @@ function getItemFilterForm(&$items) {
 	}
 
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
-
-	// type of information select
-	$fVTypeVisibility = [];
-
-	zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'filter_data_type_row');
-
-	zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).');');
 
 	// row 1
 	$groupFilter = null;
@@ -411,12 +403,6 @@ function getItemFilterForm(&$items) {
 	$filterColumn2->addRow(_('Update interval (in sec)'),
 		(new CNumericBox('filter_delay', $filter_delay, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'filter_delay_row'
-	);
-	$filterColumn3->addRow(_('Data type'),
-		(new CComboBox('filter_data_type', $filter_data_type))
-			->addItem(-1, _('all'))
-			->addItems(item_data_type2str()),
-		'filter_data_type_row'
 	);
 	$filterColumn4->addRow(_('Status'),
 		new CComboBox('filter_status', $filter_status, null, [
@@ -849,13 +835,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		'snmp_oid' => getRequest('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
 		'port' => getRequest('port', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
-		'data_type' => getRequest('data_type', ITEM_DATA_TYPE_DECIMAL),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
-		'multiplier' => getRequest('multiplier', 0),
-		'delta' => getRequest('delta', 0),
 		'trends' => getRequest('trends', DAY_IN_YEAR),
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
@@ -873,7 +856,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'password' => getRequest('password', ''),
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
-		'formula' => getRequest('formula', 1),
 		'logtimefmt' => getRequest('logtimefmt', ''),
 		'valuemaps' => null,
 		'possibleHostInventories' => null,
@@ -1007,11 +989,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['snmp_oid'] = $data['item']['snmp_oid'];
 		$data['port'] = $data['item']['port'];
 		$data['value_type'] = $data['item']['value_type'];
-		$data['data_type'] = $data['item']['data_type'];
 		$data['trapper_hosts'] = $data['item']['trapper_hosts'];
 		$data['units'] = $data['item']['units'];
 		$data['valuemapid'] = $data['item']['valuemapid'];
-		$data['multiplier'] = $data['item']['multiplier'];
 		$data['hostid'] = $data['item']['hostid'];
 		$data['params'] = $data['item']['params'];
 		$data['snmpv3_contextname'] = $data['item']['snmpv3_contextname'];
@@ -1034,10 +1014,6 @@ function getItemFormData(array $item = [], array $options = []) {
 			$data['new_application_prototype'] = getRequest('new_application_prototype', '');
 		}
 
-		if (!$data['is_discovery_rule']) {
-			$data['formula'] = $data['item']['formula'];
-		}
-
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
 			if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $data['delay'] == 0) {
@@ -1045,7 +1021,6 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 			$data['history'] = $data['item']['history'];
 			$data['status'] = $data['item']['status'];
-			$data['delta'] = $data['item']['delta'];
 			$data['trends'] = $data['item']['trends'];
 
 			$parser = new CItemDelayFlexParser($data['item']['delay_flex']);

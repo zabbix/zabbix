@@ -303,47 +303,10 @@ else {
 	]));
 }
 
-// Append data type to form list.
-if ($readonly) {
-	$itemForm->addVar('data_type', $data['data_type']);
-	$dataType = (new CTextBox('data_type_name', item_data_type2str($data['data_type']), true))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-}
-else {
-	$dataType = new CComboBox('data_type', $data['data_type'], null, item_data_type2str());
-}
-$itemFormList->addRow(_('Data type'), $dataType, 'row_data_type');
 $itemFormList->addRow(_('Units'),
 	(new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_units'
 );
-
-// Append multiplier to form list.
-if ($readonly) {
-	$itemForm->addVar('multiplier', $data['multiplier']);
-
-	$multiplier = [
-		(new CCheckBox('multiplier'))
-			->setChecked($data['multiplier'] == 1)
-			->setAttribute('disabled', 'disabled'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('formula', $data['formula'], true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('style', 'text-align: right;')
-	];
-}
-else {
-	$multiplier = [
-		(new CCheckBox('multiplier'))
-			->setChecked($data['multiplier'] == 1)
-			->onClick('var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('style', 'text-align: right;')
-	];
-}
-$itemFormList->addRow(_('Use custom multiplier'), $multiplier, 'row_multiplier');
 
 $itemFormList->addRow(_('Update interval (in sec)'),
 	(new CNumericBox('delay', $data['delay'], 5, $discovered_item))
@@ -466,22 +429,6 @@ $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_logtimefmt'
 );
-
-// Append delta to form list.
-$deltaOptions = [
-	0 => _('As is'),
-	1 => _('Delta (speed per second)'),
-	2 => _('Delta (simple change)')
-];
-if ($readonly) {
-	$itemForm->addVar('delta', $data['delta']);
-	$deltaComboBox = (new CTextBox('delta_name', $deltaOptions[$data['delta']], true))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-}
-else {
-	$deltaComboBox = new CComboBox('delta', $data['delta'], null, $deltaOptions);
-}
-$itemFormList->addRow(_('Store value'), $deltaComboBox, 'row_delta');
 
 // Append valuemap to form list.
 if ($readonly) {

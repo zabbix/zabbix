@@ -25,11 +25,6 @@
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
-		var multpStat = document.getElementById('multiplier');
-		if (multpStat && multpStat.onclick) {
-			multpStat.onclick();
-		}
-
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
