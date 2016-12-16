@@ -53,7 +53,8 @@ $this->addJsFile('flickerfreescreen.js');
 				'hosts_selected' => $data['pageFilter']->hostsSelected,
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
-				'sortorder' => $data['sortorder']
+				'sortorder' => $data['sortorder'],
+				'groupid' => $data['pageFilter']->groupid
 			]
 		])->get()
 	)

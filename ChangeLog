@@ -3,6 +3,7 @@ Changes for 3.2.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11596] fixed paging error in Configuration->Triggers and Monitoring->Web (Gunars)
 .......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
 ..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated item prototypes when modifying its parent (Ivo)
 ..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
