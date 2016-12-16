@@ -156,10 +156,9 @@ class CScreenHttpTest extends CScreenBase {
 					$status = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
 				}
 			}
-			// no history data exists
 			else {
-				$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
-				$status = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_GREY);
+				$lastcheck = '';
+				$status = '';
 			}
 
 			$table->addRow(new CRow([
