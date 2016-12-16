@@ -130,7 +130,7 @@ int	zbx_task_remote_command_set_init_from_db(struct zbx_task_remote_command_set 
 		ZBX_STR2UINT64(parent_taskid, row[14]);
 		ZBX_STR2UINT64(hostid, row[15]);
 
-		zbx_task_remote_command_init(cmd,
+		ret = zbx_task_remote_command_init(cmd,
 			/* t.taskid */		taskid,
 			/* t.type */		ZBX_TM_TASK_SEND_REMOTE_COMMAND,
 			/* t.status */		atoi(row[1]),

@@ -467,7 +467,6 @@ void	zbx_task_remote_command_serialize_json(const struct zbx_task_remote_command
 	zbx_json_close(json);
 }
 
-
 static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_command *cmd)
 {
 	zbx_uint64_t				taskid;
@@ -476,6 +475,7 @@ static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_comm
 	zbx_db_insert_t				db_task_remote_command_insert;
 	int					status = SUCCEED;
 	char					*error = "";
+	int					ret = FAIL;
 
 	assert(NULL != cmd);
 	assert(NULL != cmd->command); /* cmd is initialized */
@@ -483,6 +483,8 @@ static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_comm
 	assert(NULL != cmd->password);
 	assert(NULL != cmd->publickey);
 	assert(NULL != cmd->privatekey);
+
+	/* TODO: not finished yet */
 
 	/* task in progress */
 	DBexecute("update tasks set status=%d where taskid=" ZBX_FS_UI64,
@@ -496,7 +498,7 @@ static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_comm
 
 	res = zbx_task_remote_command_result_new();
 
-	zbx_task_remote_command_result_init(res,
+	ret = zbx_task_remote_command_result_init(res,
 		/* t.taskid */		taskid,
 		/* t.type */		ZBX_TM_TASK_SEND_REMOTE_COMMAND_RESULT,
 		/* t.status */		ZBX_TM_STATUS_NEW,
@@ -506,13 +508,13 @@ static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_comm
 		/* r.error */		error,
 		/* r.parent_taskid */	cmd->parent_taskid);
 
+	if (SUCCEED != ret)
+		goto err;
+
 	zbx_task_remote_command_result_db_insert_prepare(&db_task_insert,
 		&db_task_remote_command_insert);
 	zbx_task_remote_command_result_db_insert_add_values(res,
 		&db_task_insert, &db_task_remote_command_insert);
-
-	zbx_task_remote_command_result_clear(res);
-	zbx_task_remote_command_result_free(res);
 
 	DBbegin();
 	zbx_db_insert_execute(&db_task_insert);
@@ -522,10 +524,16 @@ static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_comm
 	/* task is done */
 	DBexecute("update tasks set status=%d where taskid=" ZBX_FS_UI64,
 			ZBX_TM_STATUS_DONE, cmd->task.taskid);
+
+err:
+	zbx_task_remote_command_result_clear(res);
+	zbx_task_remote_command_result_free(res);
 }
 
 void	zbx_task_remote_command_process_task(struct zbx_task_remote_command *cmd)
 {
+	/* TODO: not finished yet */
+
 	switch (cmd->task.status) {
 		case ZBX_TM_STATUS_NEW:
 			zbx_task_remote_command_process_new_task(cmd);
