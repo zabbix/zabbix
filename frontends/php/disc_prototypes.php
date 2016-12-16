@@ -60,10 +60,6 @@ $fields = [
 		'isset({add}) || isset({update})'
 	],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'data_type' =>					[T_ZBX_INT, O_OPT, null,
-		IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
-		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == '.ITEM_VALUE_TYPE_UINT64.'))'
-	],
 	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
 		'(isset({add}) || isset({update})) && isset({value_type})'.
 			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
@@ -139,17 +135,7 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({type}) && ({type} == 2)'
 	],
 	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type})'.
-			' && '.IN('0,3', 'value_type').' (isset({data_type}) && ({data_type} != '.ITEM_DATA_TYPE_BOOLEAN.'))'
-	],
-	'multiplier' =>					[T_ZBX_INT, O_OPT, null,	null,		null],
-	'delta' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-		'(isset({add}) || isset({update})) && isset({value_type})'.
-			' && '.IN('0,3', 'value_type').' (isset({data_type}) && ({data_type} != '.ITEM_DATA_TYPE_BOOLEAN.'))'
-	],
-	'formula' =>					[T_ZBX_DBL_STR, O_OPT, null,
-		'({value_type} == 0 && {} != 0) || ({value_type} == 3 && {} > 0)',
-		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')
+		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 0'
 	],
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'
@@ -336,8 +322,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'history'		=> getRequest('history'),
 			'trends'		=> getRequest('trends'),
 			'units'			=> getRequest('units'),
-			'multiplier'	=> getRequest('multiplier', 0),
-			'delta'			=> getRequest('delta'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
 			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
@@ -345,7 +329,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula'		=> getRequest('formula', '1'),
 			'logtimefmt'	=> getRequest('logtimefmt'),
 			'valuemapid'	=> getRequest('valuemapid'),
 			'authtype'		=> getRequest('authtype'),
@@ -355,7 +338,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey'	=> getRequest('privatekey'),
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
-			'data_type'		=> getRequest('data_type'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
 			'delay_flex'	=> $delay_flex,
 			'applications'	=> $applications,
@@ -445,11 +427,11 @@ if (isset($_REQUEST['form'])) {
 			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port',
-				'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
+				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+				'snmpv3_contextname'
 			]
 		]);
 		$itemPrototype = reset($itemPrototype);

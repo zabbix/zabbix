@@ -203,9 +203,6 @@ foreach ($this->data['types'] as $type => $label) {
 foreach ([ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE] as $type) {
 	// set to disable character, log and text items in value type
 	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
-
-	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
-	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN], 'data_type');
 }
 
 $this->data['securityLevelVisibility'] = [];

@@ -387,11 +387,6 @@ define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
 
-define('ITEM_DATA_TYPE_DECIMAL',		0);
-define('ITEM_DATA_TYPE_OCTAL',			1);
-define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
-define('ITEM_DATA_TYPE_BOOLEAN',		3);
-
 define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');

@@ -187,14 +187,6 @@ $itemFormList->addRow(
 	])
 );
 
-// append data type to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[data_type]', 'data_type', _('Original')))
-		->setLabel(_('Data type'))
-		->setChecked(isset($this->data['visible']['data_type'])),
-	new CComboBox('data_type', $this->data['data_type'], null, item_data_type2str())
-);
-
 // append units to form list
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[units]', 'units', _('Original')))
@@ -244,16 +236,6 @@ $itemFormList->addRow(
 		->setLabel(_('Password'))
 		->setChecked(isset($this->data['visible']['password'])),
 	(new CTextBox('password', $this->data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-);
-
-// append formula to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[formula]', 'formula', _('Original')))
-		->setLabel(_('Custom multiplier').' (0 - '._('Disabled').')')
-		->setChecked(isset($this->data['visible']['formula'])),
-	(new CTextBox('formula', $this->data['formula']))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('style', 'text-align: right;')
 );
 
 // append delay to form list
@@ -347,18 +329,6 @@ $itemFormList->addRow(
 		->setLabel(_('Log time format'))
 		->setChecked(isset($this->data['visible']['logtimefmt'])),
 	(new CTextBox('logtimefmt', $this->data['logtimefmt']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-// append delta to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[delta]', 'delta', _('Original')))
-		->setLabel(_('Store value'))
-		->setChecked(isset($this->data['visible']['delta'])),
-	new CComboBox('delta', $this->data['delta'], null, [
-		0 => _('As is'),
-		1 => _('Delta (speed per second)'),
-		2 => _('Delta (simple change)')
-	])
 );
 
 // append valuemap to form list
