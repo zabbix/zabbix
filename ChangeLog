@@ -27,7 +27,7 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 Changes for 3.2.3rc2
 
 New features:
-A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 
@@ -308,7 +308,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.7rc2
 
 New features:
-A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 
