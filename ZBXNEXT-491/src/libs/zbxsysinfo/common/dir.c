@@ -135,6 +135,31 @@ static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth,
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Function: compare_descriptors                                              *
+ *                                                                            *
+ * Purpose: compares two zbx_file_descriptor_t values to perform search       *
+ *          within descriptor vector                                          *
+ *                                                                            *
+ * Parameters: file_a    - [IN] file descriptor A                             *
+ * Parameters: file_b    - [IN] file descriptor A                             *
+ *                                                                            *
+ * Return value: If file descriptor values are the same, 0 is returned        *
+ *               If file descriptor values are not the same, nonzero value is *
+ *               returned.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_descriptors(const void *file_a, const void *file_b)
+{
+	const zbx_file_descriptor_t *fa, *fb;
+
+	fa = *((zbx_file_descriptor_t**)file_a);
+	fb = *((zbx_file_descriptor_t**)file_b);
+
+	return (fa->st_ino != fb->st_ino || fa->st_dev != fb->st_dev);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -152,7 +177,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char 			*error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
-	zbx_vector_ptr_t	list;
+	zbx_vector_ptr_t	list, descriptors;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
 	int			ret = SYSINFO_RET_FAIL;
@@ -168,7 +193,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	DIR 			*directory;
 	struct dirent 		*entry;
+	zbx_file_descriptor_t	*file;
 #endif
+	zbx_vector_ptr_create(&list);
+	zbx_vector_ptr_create(&descriptors);
+
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -180,8 +209,6 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	regex_excl_str = get_rparam(request, 2);
 	mode_str = get_rparam(request, 3);
 	max_depth_str = get_rparam(request, 4);
-
-	zbx_vector_ptr_create(&list);
 
 	if (NULL == path || '\0' == *path)
 	{
@@ -380,6 +407,25 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISDIR(status.st_mode)) &&
 						0 != filename_matches(entry->d_name, regex_incl, regex_excl))
 				{
+					if (0 != S_ISREG(status.st_mode) && 1 < status.st_nlink)
+					{
+						/* skip file if inode was already processed (multiple hardlinks) */
+						file = (zbx_file_descriptor_t*)zbx_malloc(NULL,
+								sizeof(zbx_file_descriptor_t));
+
+						file->st_dev = status.st_dev;
+						file->st_ino = status.st_ino;
+
+						if (FAIL != zbx_vector_ptr_search(&descriptors, file,
+								compare_descriptors) )
+						{
+							zbx_free(file);
+							continue;
+						}
+
+						zbx_vector_ptr_append(&descriptors, file);
+					}
+
 					if (SIZE_MODE_APPARENT == mode)
 					{
 						size += status.st_size;
@@ -433,7 +479,15 @@ err:
 		zbx_free(item->path);
 		zbx_free(item);
 	}
+
+	while (0 < descriptors.values_num)
+	{
+		file = descriptors.values[--descriptors.values_num];
+		zbx_free(file);
+	}
+
 	zbx_vector_ptr_destroy(&list);
+	zbx_vector_ptr_destroy(&descriptors);
 
 	return ret;
 }
