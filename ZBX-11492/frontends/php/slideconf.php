@@ -42,7 +42,6 @@ $fields = [
 	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null],
-	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -98,12 +97,7 @@ if (hasRequest('action')) {
 /*
  * Actions
  */
-if (hasRequest('clone') && hasRequest('slideshowid')) {
-	unset($_REQUEST['slideshowid']);
-	$_REQUEST['form'] = 'clone';
-	$_REQUEST['userid'] = CWebUser::$data['userid'];
-}
-elseif (hasRequest('add') || hasRequest('update')) {
+if (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {

@@ -85,6 +85,30 @@
 </script>
 
 <script type="text/javascript">
+	jQuery(function($) {
+		$('#clone').click(function() {
+			$('#slideshowid, #delete, #clone, #inaccessible_user').remove();
+			$('#update')
+				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.attr({id: 'add', name: 'add'});
+
+			$('#form').val('clone');
+
+			// Switch to first tab so multiselect is visible and only then add data and resize.
+			$('#slideTab').trigger('click');
+
+			$('#multiselect_userid_wrapper').show();
+
+			// Set current user as owner.
+			$('#userid').multiSelect('addData', {
+				'id': $('#current_user_userid').val(),
+				'name': $('#current_user_fullname').val()
+			});
+
+			$('#name').focus();
+		});
+	});
+
 	function removeSlide(obj) {
 		var step = obj.getAttribute('remove_slide');
 
