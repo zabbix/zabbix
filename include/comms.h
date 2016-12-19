@@ -139,7 +139,7 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
-int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_empty);
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_empty);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout);
