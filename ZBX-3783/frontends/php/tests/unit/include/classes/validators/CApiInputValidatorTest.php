@@ -962,7 +962,68 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'1-7'."\xd1".',00:00-24:00',
 				'/1/period',
 				'Invalid parameter "/1/period": invalid byte sequence in UTF-8.'
-			]
+			],
+			[
+				['type' => API_REGEX, 'length' => 7],
+				'^[a-z]$',
+				'/1/expression',
+				'^[a-z]$'
+			],
+			[
+				['type' => API_REGEX, 'length' => 6],
+				'^[a-z]$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_NOT_EMPTY],
+				'^[a-z]$',
+				'/1/expression',
+				'^[a-z]$'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_REGEX],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_REGEX],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				// broken UTF-8 byte sequence
+				'^'."\xd1".'$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_REGEX],
+				'^[a-z$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@^[a-z$',
+				'/1/expression',
+				'@^[a-z$'
+			],
 		];
 	}
 
