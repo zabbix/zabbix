@@ -185,34 +185,35 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: extract_number                                                   *
+ * Function: zbx_number_find                                                  *
  *                                                                            *
- * Purpose: Extract from string number with prefix (A-Z)                      *
+ * Purpose: finds number inside expression starting at specified position     *
  *                                                                            *
- * Parameters: str - [IN/OUT] null terminated trigger expression              *
- *                            will set pointer after number                   *
- *             len - [OUT]    length of number at returned position           *
+ * Parameters: expression - [IN] the expression                               *
+ *             pos        - [IN] the starting position                        *
+ *             number_loc - [OUT] the number location                         *
  *                                                                            *
- * Return value: pointer to number position                                   *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - expression does not contain number     .           *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
  *                                                                            *
  ******************************************************************************/
-static const char	*extract_number(const char **str, size_t *len)
+static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
-	const char	*s, *e, *number_pos = NULL;
+	const char	*s, *e;
 	int		dot_found;
 
-	*len = 0;
-
-	for (s = *str; '\0' != *s; s++)	/* find start of number */
+	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
 		if (!isdigit(*s))
 			continue;
 
-		if (s != *str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 		{
 			/* skip functions '{65432}' */
 			s = e;
@@ -239,57 +240,66 @@ static const char	*extract_number(const char **str, size_t *len)
 		}
 
 		/* number found */
-		number_pos = s;
-		*len = e - s;
-		s = e;
+		number_loc->l = s - str;
+		number_loc->r = e - s + number_loc->l - 1;
 
-		break;
-
+		return SUCCEED;
 	}
 
-	*str = s;
-
-	return number_pos;
+	return FAIL;
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: expand_trigger_description_constants                             *
  *                                                                            *
- * Purpose: substitute simple macros in data string with real values          *
+ * Purpose: substitute constant macros in data string with real values from   *
+ *          expression                                                        *
  *                                                                            *
- * Parameters: data - trigger description                                     *
+ * Parameters: data       - trigger description                               *
+ *             expression - expression from where to take constant values     *
  *                                                                            *
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char		*number, replace[3] = "$0";
-	const char	*number_pos;
-	int		numbers_cnt = 0, i = 0;
-	size_t		len;
+	char		*number = NULL, replace[3] = "$0";
+	int		number_cnt = 0, i, ret = SUCCEED;
+	size_t		number_alloc = 0, number_offset, pos = 0;
 
-	for (i = 0; i < 9; i++)
+	for (i = 1; i <= 9; i++)
 	{
-		replace[1] = '0' + i + 1;
+		replace[1] = '0' + i;
 
 		if (NULL != strstr(*data, replace))	/* at least one occurrence */
 		{
-			while (i >= numbers_cnt && NULL != (number_pos = extract_number(&expression, &len)))
-				numbers_cnt++;
+			char		*old_data = *data;
+			zbx_strloc_t	number_loc;
 
-			if (i < numbers_cnt)
+			while (SUCCEED == ret && i > number_cnt)
 			{
-				number = zbx_malloc(NULL, len + 1);
-				memcpy(number, number_pos, len);
-				number[len] = '\0';
+				if (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)))
+				{
+					number_cnt++;
+					pos = number_loc.r + 1;
+				}
+			}
 
-				zbx_string_replace_realloc(data, replace, number);
-				zbx_free(number);
+			if (i == number_cnt)
+			{
+				number_offset = 0;
+				zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
+						number_loc.r - number_loc.l + 1);
+
+				*data = string_replace(*data, replace, number);
 			}
 			else
-				zbx_string_replace_realloc(data, replace, "");
+				*data = string_replace(*data, replace, "");
+
+			zbx_free(old_data);
 		}
 	}
+
+	zbx_free(number);
 }
 
 static void	DCexpand_trigger_expression(char **expression)
