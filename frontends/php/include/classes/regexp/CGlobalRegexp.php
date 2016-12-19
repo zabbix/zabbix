@@ -28,8 +28,7 @@
  */
 class CGlobalRegexp {
 
-	const ERROR_REGEXP_EMPTY = 1;
-	const ERROR_REGEXP_NOT_EXISTS = 2;
+	const ERROR_REGEXP_NOT_EXISTS = 1;
 
 	/**
 	 * Determine if it's Zabbix expression.
@@ -52,35 +51,6 @@ class CGlobalRegexp {
 	 * @var array
 	 */
 	private static $_cachedExpressions = [];
-
-	/**
-	 * Checks if expression is valid.
-	 *
-	 * @static
-	 *
-	 * @param $regExp
-	 *
-	 * @throws Exception
-	 * @return bool
-	 */
-	public static function isValid($regExp) {
-		if (zbx_empty($regExp)) {
-			throw new Exception('Empty expression', self::ERROR_REGEXP_EMPTY);
-		}
-
-		if ($regExp[0] == '@') {
-			$regExp = substr($regExp, 1);
-
-			$sql = 'SELECT r.regexpid'.
-					' FROM regexps r'.
-					' WHERE r.name='.zbx_dbstr($regExp);
-			if (!DBfetch(DBselect($sql))) {
-				throw new Exception(_('Global expression does not exist.'), self::ERROR_REGEXP_NOT_EXISTS);
-			}
-		}
-
-		return true;
-	}
 
 	/**
 	 * Initialize expression, gets data from db for Zabbix expressions.

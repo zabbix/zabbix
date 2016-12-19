@@ -104,6 +104,9 @@ class CApiInputValidator {
 
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
+
+			case API_REGEX:
+				return self::validateRegex($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -134,6 +137,7 @@ class CApiInputValidator {
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
+			case API_REGEX:
 				return true;
 
 			case API_IDS:
@@ -333,7 +337,7 @@ class CApiInputValidator {
 		/**
 		 * @deprecated  As of version 3.4, use boolean flags only.
 		 */
-		trigger_error('Non-boolean flags are deprecated.', E_USER_NOTICE);
+		trigger_error(_('Non-boolean flags are deprecated.'), E_USER_NOTICE);
 
 		$data = !is_null($data);
 
@@ -345,7 +349,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED
+	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED, API_DEPRECATED
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -368,13 +372,18 @@ class CApiInputValidator {
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
+			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
+
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
 				}
+				if ($flags & API_DEPRECATED) {
+					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_NOTICE);
+				}
 			}
-			elseif (array_key_exists('flags', $field_rule) && ($field_rule['flags'] & API_REQUIRED)) {
+			elseif ($flags & API_REQUIRED) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 					_s('the parameter "%1$s" is missing', $field_name)
 				);
@@ -645,6 +654,53 @@ class CApiInputValidator {
 
 		if (!$time_period_validator->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time period is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Regular expression validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateRegex($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (!is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		if (mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && $data === '') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($data !== '' && $data[0] === '@') {
+			return true;
+		}
+
+		if (false === @preg_match('/'.$data.'/', '')) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
 			return false;
 		}
 
