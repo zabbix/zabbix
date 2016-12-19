@@ -4,14 +4,15 @@
 #include "common.h"
 #include "zbxalgo.h"
 
-#define ZBX_IPC_SOCKET_MESSAGE_SIZE	4096
+#define ZBX_IPC_SOCKET_BUFFER_SIZE	4096
+
+#define ZBX_IPC_MESSAGE_CODE	0
+#define ZBX_IPC_MESSAGE_SIZE	1
 
 typedef struct
 {
-	/* the message code */
-	zbx_uint32_t	code;
-	/* the data size */
-	zbx_uint32_t	size;
+	/* the message header containing code and data */
+	zbx_uint32_t	header[2];
 	/* the data */
 	unsigned char	*data;
 }
@@ -53,9 +54,11 @@ zbx_ipc_service_t;
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env();
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
-void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_socket_t **csocket, zbx_ipc_message_t **message);
-void	zbx_ipc_service_close_socket(zbx_ipc_service_t *service, zbx_ipc_socket_t *csocket);
+void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_client_t **client, zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
+
+int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const char *data, zbx_uint32_t size);
+void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 
 int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);

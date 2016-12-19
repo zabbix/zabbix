@@ -28,15 +28,17 @@ static size_t	ipc_path_root_len = 0;
 struct zbx_ipc_client
 {
 	zbx_ipc_socket_t	csocket;
-
-	zbx_queue_ptr_t		messages;
-
-	zbx_ipc_message_t	*message;
-	zbx_uint32_t		header[2];
-	zbx_uint32_t		read_num;
-
 	zbx_ipc_service_t	*service;
-	struct event		*ev_read;
+
+	zbx_ipc_message_t	*rx_message;
+	zbx_uint32_t		rx_bytes;
+	zbx_queue_ptr_t		rx_queue;
+	struct event		*rx_event;
+
+	zbx_ipc_message_t	*tx_message;
+	zbx_uint32_t		tx_bytes;
+	zbx_queue_ptr_t		tx_queue;
+	struct event		*tx_event;
 
 	zbx_uint64_t		id;
 	unsigned char		state;
@@ -74,6 +76,7 @@ static void	event_free(struct event *event)
 #endif
 
 static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg);
+static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg);
 
 static const char	*ipc_get_path()
 {
@@ -128,12 +131,18 @@ static const char	*ipc_make_path(const char *service)
  * Parameters: client - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	ipc_client_free_event(zbx_ipc_client_t *client)
+static void	ipc_client_free_events(zbx_ipc_client_t *client)
 {
-	if (NULL != client->ev_read)
+	if (NULL != client->rx_event)
 	{
-		event_free(client->ev_read);
-		client->ev_read = NULL;
+		event_free(client->rx_event);
+		client->rx_event = NULL;
+	}
+
+	if (NULL != client->tx_event)
+	{
+		event_free(client->tx_event);
+		client->tx_event = NULL;
 	}
 }
 
@@ -150,15 +159,21 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 {
 	zbx_ipc_message_t	*message;
 
-	while (NULL != (message = zbx_queue_ptr_pop(&client->messages)))
+	zbx_ipc_socket_close(&client->csocket);
+
+	while (NULL != (message = zbx_queue_ptr_pop(&client->rx_queue)))
 		zbx_ipc_message_free(message);
 
-	zbx_queue_ptr_destroy(&client->messages);
+	zbx_queue_ptr_destroy(&client->rx_queue);
+	zbx_ipc_message_free(client->rx_message);
 
-	zbx_ipc_message_free(client->message);
-	zbx_ipc_socket_close(&client->csocket);
-	ipc_client_free_event(client);
+	while (NULL != (message = zbx_queue_ptr_pop(&client->tx_queue)))
+		zbx_ipc_message_free(message);
 
+	zbx_queue_ptr_destroy(&client->tx_queue);
+	zbx_ipc_message_free(client->tx_message);
+
+	ipc_client_free_events(client);
 
 	zbx_free(client);
 }
@@ -169,18 +184,20 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
  *                                                                            *
  * Purpose: writes data to a socket                                           *
  *                                                                            *
- * Parameters: fd   - [IN] the socket file descriptor                         *
- *             data - [IN] the data                                           *
- *             size - [IN] the data size                                      *
+ * Parameters: fd        - [IN] the socket file descriptor                    *
+ *             data      - [IN] the data                                      *
+ *             size      - [IN] the data size                                 *
+ *             size_sent - [IN] the actual size written to socket             *
  *                                                                            *
  * Return value: SUCCEED - the data was successfully written                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	ipc_write(int fd, const char *data, zbx_uint32_t size)
+static int	ipc_write(int fd, const char *data, zbx_uint32_t size, zbx_uint32_t *size_sent)
 {
 	zbx_uint32_t	offset = 0;
-	int		n;
+	int		n, ret = SUCCEED;
+	static zbx_uint64_t	write_num = 0;
 
 	while (offset != size)
 	{
@@ -191,14 +208,138 @@ static int	ipc_write(int fd, const char *data, zbx_uint32_t size)
 			if (EINTR == errno)
 				continue;
 
-			zabbix_log(LOG_LEVEL_WARNING, "cannot write to IPC socket: %s", strerror(errno));
-			return FAIL;
-		}
+			if (EWOULDBLOCK == errno || EAGAIN == errno)
+				break;
 
+			zabbix_log(LOG_LEVEL_WARNING, "cannot write to IPC socket: %s", strerror(errno));
+			ret = FAIL;
+			break;
+		}
+		write_num += n;
 		offset += n;
 	}
 
-	return SUCCEED;
+	*size_sent = offset;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_socket_write                                                 *
+ *                                                                            *
+ * Purpose: writes IPC message to socket                                      *
+ *                                                                            *
+ * Parameters: socket  - [IN] the IPC socket                                  *
+ *             code    - [IN] the message code                                *
+ *             data    - [IN] the data                                        *
+ *             size    - [IN] the data size                                   *
+ *             tx_size - [IN] the actual size written to socket               *
+ *                                                                            *
+ * Return value: SUCCEED - the data was successfully written                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const char *data, zbx_uint32_t size,
+		zbx_uint32_t *tx_size)
+{
+	int		ret;
+	zbx_uint32_t	size_data, buffer[ZBX_IPC_SOCKET_BUFFER_SIZE / sizeof(zbx_uint32_t)];
+
+
+	buffer[0] = code;
+	buffer[1] = size;
+
+	if (ZBX_IPC_SOCKET_BUFFER_SIZE - ZBX_IPC_HEADER_SIZE >= size)
+	{
+		memcpy(buffer + 2, data, size);
+		return ipc_write(csocket->fd, (char *)buffer, size + ZBX_IPC_HEADER_SIZE, tx_size);
+	}
+
+	if (FAIL == ipc_write(csocket->fd, (char *)buffer, ZBX_IPC_HEADER_SIZE, tx_size))
+		return FAIL;
+
+	ret = ipc_write(csocket->fd, data, size, &size_data);
+	*tx_size += size_data;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_client_push_rx_message                                       *
+ *                                                                            *
+ * Purpose: adds message to received messages queue                           *
+ *                                                                            *
+ * Parameters: client - [IN] the client to read                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipc_client_push_rx_message(zbx_ipc_client_t *client)
+{
+	zbx_queue_ptr_push(&client->rx_queue, client->rx_message);
+	client->rx_message = NULL;
+	client->rx_bytes = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_client_parse_buffer                                          *
+ *                                                                            *
+ * Purpose: parses data into IPC messages                                     *
+ *                                                                            *
+ * Parameters: client - [IN] the client                                       *
+ *             buffer - [IN] the buffer to parse                              *
+ *             size   - [IN] the number of bytes to parse                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipc_client_parse_buffer(zbx_ipc_client_t *client, const unsigned char *buffer, zbx_uint32_t size)
+{
+	zbx_uint32_t	offset = 0, copy_size, data_size, data_offset;
+
+	while (offset < size)
+	{
+		if (NULL == client->rx_message)
+			client->rx_message = zbx_malloc(NULL, sizeof(zbx_ipc_message_t));
+
+		if (ZBX_IPC_HEADER_SIZE > client->rx_bytes)
+		{
+			copy_size = MIN(ZBX_IPC_HEADER_SIZE - client->rx_bytes, size - offset);
+			data_offset = client->rx_bytes;
+
+			memcpy((char *)client->rx_message->header + data_offset, buffer + offset, copy_size);
+
+			client->rx_bytes += copy_size;
+			offset += copy_size;
+
+			if (ZBX_IPC_HEADER_SIZE > client->rx_bytes)
+				return;
+
+			data_size = client->rx_message->header[ZBX_IPC_MESSAGE_SIZE];
+
+			if (0 == data_size)
+			{
+				client->rx_message->data = NULL;
+				ipc_client_push_rx_message(client);
+				continue;
+			}
+
+			client->rx_message->data = zbx_malloc(NULL, data_size);
+		}
+
+		data_size = client->rx_message->header[ZBX_IPC_MESSAGE_SIZE];
+		data_offset = client->rx_bytes - ZBX_IPC_HEADER_SIZE;
+		copy_size = MIN(data_size - data_offset, size - offset);
+
+		memcpy(client->rx_message->data + data_offset, buffer + offset, copy_size);
+
+		client->rx_bytes += copy_size;
+		offset += copy_size;
+
+		if (client->rx_bytes != data_size + ZBX_IPC_HEADER_SIZE)
+			break;
+
+		ipc_client_push_rx_message(client);
+	}
 }
 
 /******************************************************************************
@@ -209,70 +350,116 @@ static int	ipc_write(int fd, const char *data, zbx_uint32_t size)
  *                                                                            *
  * Parameters: client - [IN] the client to read                               *
  *                                                                            *
- * Return value:                                                              *
+ * Return value:  FAIL - read error/connection was closed                     *
+ *                                                                            *
+ * Comments: This function reads data from socket, parses it and adds         *
+ *           parsed messages to received messages queue.                      *
  *                                                                            *
  ******************************************************************************/
 static int	ipc_client_read(zbx_ipc_client_t *client)
 {
-	int		n, count;
-	zbx_uint32_t	size_data, size_sock;
+	int		n;
+	zbx_uint32_t	data_size, data_offset, read_size = ZBX_IPC_SOCKET_BUFFER_SIZE;
+	unsigned char	buffer[ZBX_IPC_SOCKET_BUFFER_SIZE], *pbuffer = buffer;
 
-	if (ZBX_IPC_HEADER_SIZE > client->read_num)
+	for (;;)
 	{
-		int	offset = client->read_num;
-
-		if (0 >= (n = read(client->csocket.fd, (char *)&client->header + offset, ZBX_IPC_HEADER_SIZE - offset)))
-			return FAIL;
-
-		client->read_num += n;
-
-		if (ZBX_IPC_HEADER_SIZE > client->read_num)
-			return SUCCEED;
-
-		if (ZBX_IPC_HEADER_SIZE == client->read_num)
+		if (ZBX_IPC_HEADER_SIZE < client->rx_bytes)
 		{
-			client->message = zbx_malloc(NULL, sizeof(zbx_ipc_message_t));
-			client->message->code = client->header[0];
-			client->message->size = client->header[1];
+			data_size = client->rx_message->header[ZBX_IPC_MESSAGE_SIZE];
+			data_offset = client->rx_bytes - ZBX_IPC_HEADER_SIZE;
 
-			if (0 == client->message->size)
+			/* long messages read directly into message buffer */
+			if (ZBX_IPC_SOCKET_BUFFER_SIZE * 0.75 < data_size - data_offset)
 			{
-				client->message->data = NULL;
-				zbx_queue_ptr_push(&client->messages, client->message);
-				client->message = NULL;
-				client->read_num = 0;
-				return SUCCEED;
+				pbuffer = client->rx_message->data + data_offset;
+				read_size = data_size - data_offset;
 			}
-			else
-				client->message->data = zbx_malloc(NULL, client->message->size);
 		}
-	}
 
-	if (0 != ioctl(client->csocket.fd, FIONREAD, &count))
-		return FAIL;
+		if (-1 == (n = read(client->csocket.fd, pbuffer, read_size)))
+		{
+			if (EWOULDBLOCK == errno || EAGAIN == errno)
+				break;
+		}
 
-	if (0 == count)
-		return SUCCEED;
-
-	size_data = client->read_num - ZBX_IPC_HEADER_SIZE;
-	size_sock = MIN(client->message->size - size_data, count);
-
-	while (0 < size_sock)
-	{
-		if (0 >= (n = read(client->csocket.fd, client->message->data + size_data, size_sock)))
+		if (0 >= n)
+		{
+			zbx_free(client->rx_message);
+			client->rx_bytes = 0;
 			return FAIL;
+		}
 
-		size_sock -= n;
+		if (pbuffer != buffer)
+		{
+			client->rx_bytes += n;
 
-		client->read_num += n;
-		size_data = client->read_num - ZBX_IPC_HEADER_SIZE;
+			if (client->rx_bytes == data_size + ZBX_IPC_HEADER_SIZE)
+				ipc_client_push_rx_message(client);
+
+			pbuffer = buffer;
+			read_size = ZBX_IPC_SOCKET_BUFFER_SIZE;
+
+			continue;
+		}
+
+		ipc_client_parse_buffer(client, buffer, n);
 	}
 
-	if (client->read_num - ZBX_IPC_HEADER_SIZE == client->message->size)
+	return SUCCEED;
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_client_write                                                 *
+ *                                                                            *
+ * Purpose: writes queued data to IPC service client                          *
+ *                                                                            *
+ * Parameters: client - [IN] the client                                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	ipc_client_write(zbx_ipc_client_t *client)
+{
+	int		n;
+	zbx_uint32_t	data_offset, data_size;
+
+	if (ZBX_IPC_HEADER_SIZE > client->tx_bytes)
 	{
-		zbx_queue_ptr_push(&client->messages, client->message);
-		client->message = NULL;
-		client->read_num = 0;
+		int	offset = client->tx_bytes;
+
+		if (0 > (n = write(client->csocket.fd, (char *)client->tx_message->header + offset,
+				ZBX_IPC_HEADER_SIZE - offset)))
+		{
+			return FAIL;
+		}
+
+		client->tx_bytes += n;
+
+		if (ZBX_IPC_HEADER_SIZE > client->tx_bytes)
+			return SUCCEED;
+	}
+
+	data_size = client->tx_message->header[ZBX_IPC_MESSAGE_SIZE];
+	data_offset = client->tx_bytes - ZBX_IPC_HEADER_SIZE;
+
+	while (data_offset < data_size)
+	{
+		if (0 > (n = write(client->csocket.fd, client->tx_message->data + data_offset,
+				data_size - data_offset)))
+		{
+			return (EWOULDBLOCK == errno || EAGAIN == errno ? SUCCEED : FAIL);
+		}
+
+		data_offset += n;
+		client->tx_bytes += n;
+	}
+
+	if (client->tx_bytes - ZBX_IPC_HEADER_SIZE == data_size)
+	{
+		zbx_ipc_message_free(client->tx_message);
+		client->tx_message = zbx_queue_ptr_pop(&client->tx_queue);
+		client->tx_bytes = 0;
 	}
 
 	return SUCCEED;
@@ -321,7 +508,7 @@ static void	ipc_service_push_client(zbx_ipc_service_t *service, zbx_ipc_client_t
 	if (ZBX_IPC_CLIENT_STATE_QUEUED == client->state)
 		return;
 
-	if (0 == zbx_queue_ptr_values_num(&client->messages) && NULL != client->ev_read)
+	if (0 == zbx_queue_ptr_values_num(&client->rx_queue) && NULL != client->rx_event)
 		return;
 
 	client->state = ZBX_IPC_CLIENT_STATE_QUEUED;
@@ -349,16 +536,18 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(client, 0, sizeof(zbx_ipc_client_t));
 
+	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
 	client->csocket.fd = fd;
 	client->id = next_clientid++;
 	client->state = ZBX_IPC_CLIENT_STATE_NONE;
 
-	zbx_queue_ptr_create(&client->messages);
-	client->message = NULL;
+	zbx_queue_ptr_create(&client->rx_queue);
+	zbx_queue_ptr_create(&client->tx_queue);
 
 	client->service = service;
-	client->ev_read = event_new(service->ev, fd, EV_READ | EV_PERSIST, ipc_client_read_event_cb, (void *)client);
-	event_add(client->ev_read, NULL);
+	client->rx_event = event_new(service->ev, fd, EV_READ | EV_PERSIST, ipc_client_read_event_cb, (void *)client);
+	client->tx_event = event_new(service->ev, fd, EV_WRITE | EV_PERSIST, ipc_client_write_event_cb, (void *)client);
+	event_add(client->rx_event, NULL);
 
 	zbx_vector_ptr_append(&service->clients, client);
 
@@ -399,7 +588,7 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_client_event_cb                                              *
+ * Function: ipc_client_read_event_cb                                         *
  *                                                                            *
  * Purpose: client read event libevent callback                               *
  *                                                                            *
@@ -409,11 +598,33 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
 
 	if (SUCCEED != ipc_client_read(client))
-		ipc_client_free_event(client);
+		ipc_client_free_events(client);
+
+	/*
+	if (SUCCEED != ipc_client_read(client))
+		ipc_client_free_events(client);
+		*/
 
 	ipc_service_push_client(client->service, client);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_client_write_event_cb                                        *
+ *                                                                            *
+ * Purpose: client write event libevent callback                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
+{
+	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
+
+	if (SUCCEED != ipc_client_write(client))
+		ipc_client_free_events(client);
+
+	if (NULL == client->tx_message)
+		event_del(client->tx_event);
+}
 /******************************************************************************
  *                                                                            *
  * Function: ipc_service_accept                                               *
@@ -444,6 +655,39 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: ipc_message_create                                               *
+ *                                                                            *
+ * Purpose: creates IPC message                                               *
+ *                                                                            *
+ * Parameters: code    - [IN] the message code                                *
+ *             data    - [IN] the data                                        *
+ *             size    - [IN] the data size                                   *
+ *                                                                            *
+ * Return value: The created message.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipc_message_t	*ipc_message_create(zbx_uint32_t code, const char *data, zbx_uint32_t size)
+{
+	zbx_ipc_message_t	*message;
+
+	message = (zbx_ipc_message_t *)zbx_malloc(NULL, sizeof(zbx_ipc_message_t));
+
+	message->header[ZBX_IPC_MESSAGE_CODE] = code;
+	message->header[ZBX_IPC_MESSAGE_SIZE] = size;
+
+	if (0 != size)
+	{
+		message->data = zbx_malloc(NULL, size);
+		memcpy(message->data, data, size);
+	}
+	else
+		message->data = NULL;
+
+	return message;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ipc_message_format                                               *
  *                                                                            *
  * Purpose: formats message to readable format for debug messages             *
@@ -454,7 +698,7 @@ out:
 static void	ipc_message_format(zbx_ipc_message_t *message, char **data)
 {
 	size_t		data_alloc = ZBX_IPC_DATA_DUMP_SIZE * 4 + 32, data_offset = 0;
-	zbx_uint32_t	i, data_num = message->size;
+	zbx_uint32_t	i, data_num = message->header[ZBX_IPC_MESSAGE_SIZE];
 
 	if (NULL == message)
 		return;
@@ -463,7 +707,8 @@ static void	ipc_message_format(zbx_ipc_message_t *message, char **data)
 		data_num = ZBX_IPC_DATA_DUMP_SIZE;
 
 	*data = zbx_malloc(*data, data_alloc);
-	zbx_snprintf_alloc(data, &data_alloc, &data_offset, "code:%u size:%u data:", message->code, message->size);
+	zbx_snprintf_alloc(data, &data_alloc, &data_offset, "code:%u size:%u data:",
+			message->header[ZBX_IPC_MESSAGE_CODE], message->header[ZBX_IPC_MESSAGE_SIZE]);
 
 	for (i = 0; i < data_num; i++)
 	{
@@ -647,24 +892,17 @@ int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const cha
 {
 	const char	*__function_name = "zbx_ipc_socket_write";
 	int		ret;
-	char		buffer[ZBX_IPC_SOCKET_MESSAGE_SIZE];
+	zbx_uint32_t	size_sent;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	memcpy(buffer, &code, sizeof(code));
-	memcpy(buffer + sizeof(code), &size, sizeof(size));
-
-	if (ZBX_IPC_SOCKET_MESSAGE_SIZE - ZBX_IPC_HEADER_SIZE > size)
+	if (SUCCEED == ipc_socket_write_message(csocket, code, data, size, &size_sent) &&
+			size_sent == size + ZBX_IPC_HEADER_SIZE)
 	{
-		memcpy(buffer + ZBX_IPC_HEADER_SIZE, data, size);
-
-		ret = ipc_write(csocket->fd, buffer, size + ZBX_IPC_HEADER_SIZE);
+		ret = SUCCEED;
 	}
 	else
-	{
-		if (SUCCEED == (ret = ipc_write(csocket->fd, buffer, ZBX_IPC_HEADER_SIZE)))
-			ret = ipc_write(csocket->fd, data, size);
-	}
+		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -688,13 +926,13 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 {
 	const char	*__function_name = "zbx_ipc_socket_read";
 	int		n, ret = FAIL;
-	zbx_uint32_t	offset, header[2];
+	zbx_uint32_t	data_offset = 0, data_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	while (ZBX_IPC_HEADER_SIZE > (size_t)offset)
+	while (ZBX_IPC_HEADER_SIZE > data_offset)
 	{
-		n = read(csocket->fd, (char *)header + offset, ZBX_IPC_HEADER_SIZE - offset);
+		n = read(csocket->fd, (char *)message->header + data_offset, ZBX_IPC_HEADER_SIZE - data_offset);
 
 		if (0 == n)
 			goto out;
@@ -707,17 +945,16 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 			goto out;
 		}
 
-		offset += n;
+		data_offset += n;
 	}
 
-	message->code = header[0];
-	message->size = header[1];
-	offset = 0;
-	message->data = zbx_malloc(message->data, message->size);
+	data_offset = 0;
+	data_size = message->header[ZBX_IPC_MESSAGE_SIZE];
+	message->data = zbx_malloc(message->data, data_size);
 
-	while (message->size > offset)
+	while (data_size > data_offset)
 	{
-		n = read(csocket->fd, message->data + offset, message->size - offset);
+		n = read(csocket->fd, message->data + data_offset, data_size - data_offset);
 
 		if (0 == n)
 			goto out;
@@ -730,7 +967,7 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 			goto out;
 		}
 
-		offset += n;
+		data_offset += n;
 	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
@@ -989,12 +1226,11 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *                            ipc_message_free() function.                    *
  *                                                                            *
  *****************************************************************************/
-void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_socket_t **csocket, zbx_ipc_message_t **message)
+void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_client_t **client, zbx_ipc_message_t **message)
 {
 	const char	*__function_name = "zbx_ipc_service_recv";
 
 	int			ret = SUCCEED;
-	zbx_ipc_client_t	*client;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1006,13 +1242,9 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_socket_t **csocket
 
 	event_base_loop(service->ev, EVLOOP_NONBLOCK);
 
-	if (NULL != (client = ipc_service_pop_client(service)))
+	if (NULL != (*client = ipc_service_pop_client(service)))
 	{
-		*csocket = &client->csocket;
-
-		*message = zbx_queue_ptr_pop(&client->messages);
-
-		if (NULL != *message)
+		if (NULL != (*message = zbx_queue_ptr_pop(&(*client)->rx_queue)))
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 			{
@@ -1025,17 +1257,54 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_socket_t **csocket
 			}
 		}
 		else
-			service->client_remove = client;
+			service->client_remove = *client;
 
-		ipc_service_push_client(service, client);
+		ipc_service_push_client(service, *client);
 	}
 	else
 	{
-		*csocket = NULL;
+		*client = NULL;
 		*message = NULL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipc_client_send                                              *
+ *                                                                            *
+ * Purpose: Sends IPC message to client                                       *
+ *                                                                            *
+ * Parameters: client - [IN] the IPC client                                   *
+ *             code   - [IN] the message code                                 *
+ *             data   - [IN] the data                                         *
+ *             size   - [IN] the data size                                    *
+ *                                                                            *
+ *****************************************************************************/
+int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const char *data, zbx_uint32_t size)
+{
+	zbx_uint32_t		tx_size = 0;
+	zbx_ipc_message_t	*message;
+
+	if (NULL != client->tx_message)
+	{
+		message = ipc_message_create(code, data, size);
+		zbx_queue_ptr_push(&client->tx_queue, message);
+		return SUCCEED;
+	}
+
+	if (FAIL == ipc_socket_write_message(&client->csocket, code, data, size, &tx_size))
+		return FAIL;
+
+	if (tx_size == ZBX_IPC_HEADER_SIZE + size)
+		return SUCCEED;
+
+	client->tx_message = ipc_message_create(code, data, size);
+	client->tx_bytes = tx_size;
+	event_add(client->tx_event, NULL);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1048,23 +1317,13 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_socket_t **csocket
  *             csocket - [IN] the client socket.                              *
  *                                                                            *
  *****************************************************************************/
-void	zbx_ipc_service_close_socket(zbx_ipc_service_t *service, zbx_ipc_socket_t *csocket)
+void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 {
-	const char	*__function_name = "zbx_ipc_service_close_socket";
-	int		i;
+	const char	*__function_name = "zbx_ipc_client_close";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (i = 0; i < service->clients.values_num; i++)
-	{
-		zbx_ipc_client_t	*client = (zbx_ipc_client_t *)service->clients.values[i];
-
-		if (&client->csocket == csocket)
-		{
-			ipc_service_remove_client(service, client);
-			break;
-		}
-	}
+	ipc_service_remove_client(client->service, client);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
