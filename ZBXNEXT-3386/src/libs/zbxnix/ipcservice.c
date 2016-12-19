@@ -793,6 +793,17 @@ void	ipc_service_client_connected_cb(evutil_socket_t fd, short what, void *arg)
 	ipc_service_accept(service);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_service_timer_cb                                             *
+ *                                                                            *
+ * Purpose: timer callback                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
+{
+}
+
 /*
  * Public client API
  */
@@ -1021,6 +1032,20 @@ void	zbx_ipc_message_clean(zbx_ipc_message_t *message)
 	zbx_free(message->data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipc_message_init                                             *
+ *                                                                            *
+ * Purpose: initializes IPC message                                           *
+ *                                                                            *
+ * Parameters: message - [IN] the message to initialize                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ipc_message_init(zbx_ipc_message_t *message)
+{
+	memset(message, 0, sizeof(zbx_ipc_message_t));
+}
+
 /*
  * Public service API
  */
@@ -1169,6 +1194,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 			ipc_service_client_connected_cb, service);
 	event_add(service->ev_listener, NULL);
 
+	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
+
 	service->client_remove = NULL;
 
 	ret = SUCCEED;
@@ -1204,6 +1231,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	zbx_vector_ptr_destroy(&service->clients);
 	zbx_queue_ptr_destroy(&service->clients_recv);
 
+	event_free(service->ev_timer);
 	event_free(service->ev_listener);
 	event_base_free(service->ev);
 
@@ -1217,6 +1245,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  * Purpose: receives ipc message from a connected client                      *
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
+ *             timeout - [IN] the timeout                                     *
  *             csocket - [IN] the client socket. Used to send response back   *
  *                            to the client. NULL if there are no new         *
  *                            messages.                                       *
@@ -1226,11 +1255,12 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *                            ipc_message_free() function.                    *
  *                                                                            *
  *****************************************************************************/
-void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_client_t **client, zbx_ipc_message_t **message)
+void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+		zbx_ipc_message_t **message)
 {
 	const char	*__function_name = "zbx_ipc_service_recv";
 
-	int			ret = SUCCEED;
+	int		ret = SUCCEED, flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1240,7 +1270,17 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_client_t **client,
 		service->client_remove = NULL;
 	}
 
-	event_base_loop(service->ev, EVLOOP_NONBLOCK);
+	if (timeout != 0 && SUCCEED == zbx_queue_ptr_empty(&service->clients_recv))
+	{
+		struct timeval	tv = {timeout, 0};
+
+		evtimer_add(service->ev_timer, &tv);
+		flags = EVLOOP_ONCE;
+	}
+	else
+		flags = EVLOOP_NONBLOCK;
+
+	event_base_loop(service->ev, flags);
 
 	if (NULL != (*client = ipc_service_pop_client(service)))
 	{
@@ -1327,3 +1367,4 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+

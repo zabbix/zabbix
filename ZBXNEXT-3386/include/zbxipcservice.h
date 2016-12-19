@@ -36,6 +36,7 @@ typedef struct
 
 	struct event_base	*ev;
 	struct event		*ev_listener;
+	struct event		*ev_timer;
 
 	/* the unix socket path */
 	char			*path;
@@ -54,7 +55,8 @@ zbx_ipc_service_t;
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env();
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
-void	zbx_ipc_service_recv(zbx_ipc_service_t *service, zbx_ipc_client_t **client, zbx_ipc_message_t **message);
+void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const char *data, zbx_uint32_t size);
@@ -67,6 +69,7 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message);
 
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
+void	zbx_ipc_message_init(zbx_ipc_message_t *message);
 
 #endif
 
