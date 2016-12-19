@@ -5054,7 +5054,7 @@ out1:
 #	define ZBX_TLS_WANT_WRITE(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
 #	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
 #elif defined(HAVE_OPENSSL)
-#	define ZBX_TLS_WRITE(ctx, buf, len)	SSL_write(ctx, buf, (int)len)
+#	define ZBX_TLS_WRITE(ctx, buf, len)	SSL_write(ctx, buf, (int)(len))
 #	define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
 #	define ZBX_TLS_WRITE_FUNC_NAME		"SSL_write"
 #	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
