@@ -5418,7 +5418,7 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 #elif defined(HAVE_OPENSSL)
 	if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, SSL_get_peer_cert() returned NULL");
+		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, SSL_get_peer_certificate() returned NULL");
 		return FAIL;
 	}
 
@@ -5432,7 +5432,7 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	if (SUCCEED != zbx_x509_dn_gets(X509_get_subject_name(peer_cert), attr->subject, sizeof(attr->subject), &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while getting issuer name: \"%s\"", error);
+		zabbix_log(LOG_LEVEL_WARNING, "error while getting subject name: \"%s\"", error);
 		zbx_free(error);
 		X509_free(peer_cert);
 		return FAIL;
