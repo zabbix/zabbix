@@ -758,20 +758,20 @@ static int	check_template_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_
  ******************************************************************************/
 static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		condition_value;
-	int			i;
-	zbx_vector_uint64_t	objectids;
-
-
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_t			condition_value;
+	int				i;
+	zbx_vector_uint64_t		objectids;
+	zbx_vector_uint64_pair_t	dtriggers;
 
 	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
+	zbx_vector_uint64_pair_create(&dtriggers);
 
 	get_object_ids(esc_events, &objectids);
 
@@ -795,7 +795,13 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 		ZBX_STR2UINT64(parent_triggerid, row[1]);
 
 		if (FAIL != (i = zbx_vector_uint64_search(&objectids, objectid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			zbx_uint64_pair_t	trigger_pair = {objectids.values[i], parent_triggerid};
+
+			zbx_vector_uint64_pair_append(&dtriggers, trigger_pair);
+
 			objectids.values[i] = parent_triggerid;
+		}
 	}
 	DBfree_result(result);
 
@@ -803,6 +809,21 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 			check_template_id_sql_alloc,
 			check_template_id_row);
 
+	for (i = 0; i < dtriggers.values_num; i++)
+	{
+		int j;
+
+		/* return original event id instead of parent */
+		for (j = 0; j < condition->objectids.values_num; j++)
+		{
+			if (dtriggers.values[i].second == condition->objectids.values[j])
+			{
+				condition->objectids.values[j] = dtriggers.values[i].first;
+			}
+		}
+	}
+
+	zbx_vector_uint64_pair_destroy(&dtriggers);
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
 
