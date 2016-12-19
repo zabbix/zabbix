@@ -1024,7 +1024,7 @@ class CHttpTestManager {
 	 * - lastfailedstep - number of the last failed step
 	 * - error          - error message
 	 *
-	 * If a HTTP test has never been executed, no value will be returned.
+	 * If a HTTP test has not been executed in last ZBX_HISTORY_PERIOD, no value will be returned.
 	 *
 	 * @param array $httpTestIds
 	 *
