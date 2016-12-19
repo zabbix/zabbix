@@ -29,161 +29,18 @@
 #endif
 
 /******************************************************************************
- *									      *
- * Function: get_file_size						      *
- *									      *
- * Purpose: gets file or directory size				              *
- *									      *
- * Parameters: path       - [IN] absolute file or directory path	      *
- *	       mode       - [IN] SIZE_MODE_APPARENT for apparent file size    *
- *			         SIZE_MODE_DISK for disk space used	      *
- *									      *
- * Return value: On success, nonzero file size returned		              *
- *	         On error, 0 is returned.	                              *
- *									      *
- * Comments: Different approach is used for Windows implementation as	      *
- *	   Windows is not taking size of a directory record in account        *
- *	   when calculating size of directory contents. Implementation for    *
- *	   Windows ignores mode as it is handled directly in VFS_DIR_SIZE.    *
- *	   Current implementation ignores special file types (symlinks,       *
- *	   pipes, sockets, etc.).					      *
- *									      *
- ******************************************************************************/
-zbx_uint64_t	get_file_size(const char *path, int mode)
-{
-	zbx_uint64_t	size = 0;
-
-#ifdef _WINDOWS
-	unsigned long	size_high, size_low;
-	wchar_t		*wpath;
-
-	wpath = zbx_utf8_to_unicode(path);
-	/* GetCompressedFileSize gives more accurate result than zbx_stat for compressed files */
-	size_low = GetCompressedFileSize(wpath, &size_high);
-	size = ((zbx_uint64_t)size_high << 32) | size_low;
-	zbx_free(wpath);
-#else
-	zbx_stat_t status;
-
-	if (0 == zbx_stat(path, &status))
-	{
-		if (S_ISREG(status.st_mode) || S_ISDIR(status.st_mode))
-		{
-			if (SIZE_MODE_APPARENT == mode)
-			{
-				size += status.st_size;
-			}
-			else if (SIZE_MODE_DISK == mode)
-			{
-				size += status.st_blocks * DISK_BLOCK_SIZE;
-			}
-			else
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
-			}
-		}
-
-	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot process directory entry '%s': %s", path, zbx_strerror(errno));
-#endif
-
-	return size;
-}
-
-/******************************************************************************
- *									      *
- * Function: process_directory_entry					      *
- *									      *
- * Purpose: processes directory entry (file or a directory), checks depth and *
- *	  regexp, adds subdirectories to a vector so they can be processed    *
- *	  later							              *
- *									      *
- * Parameters: list	    - [IN/OUT] vector used to replace reccursion      *
- *				       with iterative approach		      *
- *	       parent       - [IN] parent directory			      *
- *	       name	    - [IN] file or direcotry name		      *
- *	       mode	    - [IN] mode used for size calculations (see       *
- *				   get_file_size)			      *
- *	       max_depth    - [IN] maximal traversal depth allowed (use -1    *
- *				 for unlimited directory traversal)	      *
- *	       is_directory - [IN] 0/1 is directory			      *
- *	       regex_incl   - [IN] file name pattern for inclusion	      *
- *	       regex_excl   - [IN] file name pattern for exclusion	      *
- *									      *
- * Return value: directory entry (file or directory) size or 0 for ignored    *
- *	         enties			                                      *
- *									      *
- ******************************************************************************/
-zbx_uint64_t	process_directory_entry(zbx_vector_ptr_t *list, zbx_directory_item_t *parent, const char *name,
-					int mode, int max_depth, int is_directory, regex_t *regex_incl,
-					regex_t *regex_excl)
-{
-	zbx_uint64_t		size = 0;
-	char			*path = NULL;
-	zbx_directory_item_t	*item;
-
-	/* "du" adds size of a directory to the total size */
-	if (0 == strcmp(name, "."))
-	{
-		/* directory record size is added only for empty regex_incl expression */
-		if (NULL == regex_incl)
-		{
-			size += get_file_size(parent->path, mode);
-		}
-		goto ret;
-	}
-
-	if (0 == strcmp(name, ".."))
-	{
-		goto ret;
-	}
-
-	path = zbx_dsprintf(path, "%s/%s", parent->path, name);
-
-	if (is_directory)
-	{
-		if (TRAVERSAL_DEPTH_UNLIMITED == max_depth || parent->depth < max_depth)
-		{
-			item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
-			item->depth = parent->depth + 1;
-			item->path = path;
-
-			zbx_vector_ptr_append(list, item);
-			return 0;
-		}
-		else
-		{
-			goto ret;
-		}
-	}
-
-	if ((regex_incl == NULL || 0 == regexec(regex_incl, name, (size_t)0, NULL, 0)) &&
-		(regex_excl == NULL || 0 != regexec(regex_excl, name, (size_t)0, NULL, 0)))
-	{
-		size += get_file_size(path, mode);
-	}
-
-ret:
-	zbx_free(path);
-	return size;
-}
-
-
-/******************************************************************************
- *									      *
- * Function: regex_compile						      *
- *									      *
+ *                                                                            *
+ * Function: regex_compile                                                    *
+ *                                                                            *
  * Purpose: creates compiled regex from pattern, checks for errors in pattern *
- *									      *
- * Parameters: pattern    - [IN] pattern				      *
- *	       expression - [OUT] compiled regex			      *
- *	       error      - [OUT] error message if any			      *
- *									      *
- * Return value: On success, nonzero value is returned			      *
- *	       On error, 0 is returned.				              *
- *									      *
+ *                                                                            *
+ * Parameters: pattern    - [IN] pattern                                      *
+ *             expression - [OUT] compiled regex                              *
+ *             error      - [OUT] error message if any                        *
+ *                                                                            *
+ * Return value: On success, 0 value is returned                              *
+ *               On error, nonzero value is returned.                         *
+ *                                                                            *
  ******************************************************************************/
 static int	regex_compile(const char *pattern, regex_t **expression, char **error)
 {
@@ -191,16 +48,16 @@ static int	regex_compile(const char *pattern, regex_t **expression, char **error
 	regex_t		*regex = NULL;
 
 	if (NULL == pattern || '\0' == *pattern)
-	{
 		goto ret;
-	}
 
 	regex = (regex_t*)zbx_malloc(regex, sizeof(regex_t));
+
 	if (0 != (reg_error = regcomp(regex, pattern, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
 	{
 		if (NULL != error)
 		{
 			char	buffer[MAX_STRING_LEN];
+
 			regerror(reg_error, regex, buffer, sizeof(buffer));
 			*error = zbx_strdup(*error, buffer);
 		}
@@ -215,21 +72,84 @@ static int	regex_compile(const char *pattern, regex_t **expression, char **error
 
 ret:
 	if (NULL != expression)
-	{
 		*expression = regex;
-	}
 	else
-	{
 		zbx_free(regex);
-	}
 
-	return (reg_error == 0);
+	return reg_error;
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Function: filename_matches                                                 *
+ *                                                                            *
+ * Purpose: checks if filename matches regexp pattern for filenames to be     *
+ *          included (regex_incl) and doesn't match regexp pattern for        *
+ *          filenames to be excluded (regex_excl)                             *
+ *                                                                            *
+ * Parameters: name       - [IN] filename to be checked                       *
+ *             regex_incl - [IN] regexp for filenames to include (NULL for    *
+ *                               none)                                        *
+ *             regex_excl - [IN] regexp for filenames to exclude (NULL for    *
+ *                               none)                                        *
+ *                                                                            *
+ * Return value: If filename passes both checks, nonzero value is returned    *
+ *               If filename fails to pass, 0 is returned.                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	filename_matches(const char *name, regex_t *regex_incl, regex_t *regex_excl)
+{
+	return ((regex_incl == NULL || 0 == regexec(regex_incl, name, (size_t)0, NULL, 0)) &&
+			(regex_excl == NULL || 0 != regexec(regex_excl, name, (size_t)0, NULL, 0)));
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: queue_directory                                                  *
+ *                                                                            *
+ * Purpose: adds directory to processing queue after checking if current      *
+ *          depth is less than max_depth                                      *
+ *                                                                            *
+ * Parameters: list      - [IN/OUT] vector used to replace reccursion         *
+ *                                  with iterative approach		      *
+ *	       path      - [IN] directory path		                      *
+ *             depth     - [IN] current traversal depth of directory          *
+ *             max_depth - [IN] maximal traversal depth allowed (use -1       *
+ *                              for unlimited directory traversal)	      *
+ *                                                                            *
+ ******************************************************************************/
+static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth, int max_depth)
+{
+	zbx_directory_item_t	*item;
+
+	if (TRAVERSAL_DEPTH_UNLIMITED == max_depth || depth < max_depth)
+	{
+		item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
+		item->depth = depth + 1;
+		item->path = zbx_strdup(NULL, path);
+
+		zbx_vector_ptr_append(list, item);
+	}
+}
+
+
+
+/******************************************************************************
+ *                                                                            *
+ * Different approach is used for Windows implementation as Windows is not    *
+ * taking size of a directory record in account when calculating size of      *
+ * directory contents.                                                        *
+ *                                                                            *
+ * Current implementation ignores special file types (symlinks, pipes,        *
+ * sockets, etc.).                                                            *
+ *                                                                            *
+ *****************************************************************************/
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*dir, *path, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str, *error = NULL;
+	char			*dir, *path = NULL, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str;
+	char 			*error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
@@ -244,6 +164,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	intptr_t		handle;
 	struct _wfinddata_t	data;
 	zbx_uint64_t		file_size, cluster_size, mod;
+	DWORD			size_high, size_low;
 #else
 	DIR 			*directory;
 	struct dirent 		*entry;
@@ -268,7 +189,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 == regex_compile(regex_incl_str, &regex_incl, &error))
+	if (0 != regex_compile(regex_incl_str, &regex_incl, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression in second parameter: %s",
 				error));
@@ -276,7 +197,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 == regex_compile(regex_excl_str, &regex_excl, &error))
+	if (0 != regex_compile(regex_excl_str, &regex_excl, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile a regular expression in third parameter: %s",
 				error));
@@ -309,6 +230,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	dir = zbx_strdup(NULL, path);
+	path = NULL;
 
 	/* remove directory suffix '/' or '\\' (if any) as stat() fails on Windows for directories ending with slash */
 	zbx_rtrim(dir, "/\\");
@@ -333,6 +255,22 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	item->path = dir;
 	zbx_vector_ptr_append(&list, item);
 
+#ifndef _WINDOWS
+	if (SIZE_MODE_APPARENT == mode)
+	{
+		size += status.st_size;
+	}
+	else if (SIZE_MODE_DISK == mode)
+	{
+		size += status.st_blocks * DISK_BLOCK_SIZE;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+#endif /* not _WINDOWS */
+
 	while (0 < list.values_num)
 	{
 		item = list.values[--list.values_num];
@@ -342,27 +280,27 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		wpath = zbx_utf8_to_unicode(name);
 		zbx_free(name);
 
-		if (-1 == (handle = _wfindfirst(wpath, &data)))
-		{
-			zbx_free(wpath);
+		handle = _wfindfirst(wpath, &data);
+		zbx_free(wpath);
 
+		if (-1 == handle)
+		{
 			if (item->depth > 0)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot open directory listing '%s': %s", item->path,
 					zbx_strerror(errno));
 				goto skip;
 			}
-			else
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain directory listing."));
-				list.values_num++;
-				goto err;
-			}
+
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain directory listing."));
+			list.values_num++;
+			goto err;
 		}
 
 		if (SIZE_MODE_DISK == mode)
 		{
 			cluster_size = get_cluster_size(item->path);
+
 			if (0 == cluster_size)
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file system cluster size."));
@@ -373,21 +311,40 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		do
 		{
-			name = zbx_unicode_to_utf8(data.name);
-			file_size = process_directory_entry(&list, item, name, mode, max_depth,
-				(data.attrib & _A_SUBDIR), regex_incl, regex_excl);
-			zbx_free(name);
+			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
+				continue;
 
-			if (SIZE_MODE_DISK == mode)
+			name = zbx_unicode_to_utf8(data.name);
+			path = zbx_dsprintf(path, "%s/%s", item->path, name);
+
+			if (0 == (data.attrib & _A_SUBDIR))
 			{
-				mod = size % cluster_size;
-				if (0 != mod)
+				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
-					size += cluster_size - mod;
+					wpath = zbx_utf8_to_unicode(path);
+					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
+					/* compressed files */
+					size_low = GetCompressedFileSize(wpath, &size_high);
+
+					if (size_low != INVALID_FILE_SIZE || NO_ERROR == GetLastError())
+					{
+						file_size = ((zbx_uint64_t)size_high << 32) | size_low;
+
+						if (SIZE_MODE_DISK == mode)
+						{
+							if (0 != (mod = size % cluster_size))
+								file_size += cluster_size - mod;
+						}
+
+						size += file_size;
+					}
+					zbx_free(wpath);
 				}
 			}
+			else
+				queue_directory(&list, path, item->depth, max_depth);
 
-			size += file_size;
+			zbx_free(name);
 
 		} while (0 == _wfindnext(handle, &data));
 
@@ -396,11 +353,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot close directory listing '%s': %s", item->path,
 				zbx_strerror(errno));
 		}
-
-		zbx_free(wpath);
 #else /* not _WINDOWS */
-		directory = opendir(item->path);
-		if (NULL == directory)
+		if (NULL == (directory = opendir(item->path)))
 		{
 			if (item->depth > 0)
 			{
@@ -408,18 +362,45 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					zbx_strerror(errno));
 				goto skip;
 			}
-			else
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain directory listing."));
-				list.values_num++;
-				goto err;
-			}
+
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain directory listing."));
+			list.values_num++;
+			goto err;
 		}
 
 		while (NULL != (entry = readdir(directory)))
 		{
-			size += process_directory_entry(&list, item, entry->d_name, mode, max_depth,
-					(DT_DIR == entry->d_type), regex_incl, regex_excl);
+			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
+				continue;
+
+			path = zbx_dsprintf(path, "%s/%s", item->path, entry->d_name);
+
+			if (0 == zbx_stat(path, &status))
+			{
+				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISDIR(status.st_mode)) &&
+						0 != filename_matches(entry->d_name, regex_incl, regex_excl))
+				{
+					if (SIZE_MODE_APPARENT == mode)
+					{
+						size += status.st_size;
+					}
+					else if (SIZE_MODE_DISK == mode)
+					{
+						size += status.st_blocks * DISK_BLOCK_SIZE;
+					}
+					else
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+						exit(EXIT_FAILURE);
+					}
+				}
+
+				if (0 != S_ISDIR(status.st_mode))
+					queue_directory(&list, path, item->depth, max_depth);
+			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot process directory entry '%s': %s", path,
+						zbx_strerror(errno));
 		}
 
 		closedir(directory);
@@ -432,6 +413,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_UI64_RESULT(result, size);
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(path);
+
 	if (NULL != regex_incl)
 	{
 		regfree(regex_incl);
