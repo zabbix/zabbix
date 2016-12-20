@@ -283,7 +283,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (!is_scalar($data) || is_double($data) || !ctype_digit(strval($data))) {
+		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
 		}

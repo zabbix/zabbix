@@ -61,6 +61,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_STRING_UTF8],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_STRING_UTF8],
 				null,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
@@ -159,6 +165,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_INT32],
 				[],
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32],
+				true,
 				'/1/int',
 				'Invalid parameter "/1/int": a number is expected.'
 			],
@@ -314,6 +326,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_ID],
+				true,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID],
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
@@ -404,6 +422,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => []],
+				true,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => []],
+				null,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => []],
 				'',
 				'/',
 				'Invalid parameter "/": an array is expected.'
@@ -466,6 +496,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_IDS],
 				'',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_IDS],
+				true,
 				'/',
 				'Invalid parameter "/": an array is expected.'
 			],
@@ -546,6 +582,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '03'],
 				'/',
 				'Invalid parameter "/10": value (3) already exists.'
+			],
+			[
+				['type' => API_OBJECTS],
+				true,
+				'/',
+				'Invalid parameter "/": an array is expected.'
 			],
 			[
 				['type' => API_OBJECTS],
@@ -781,6 +823,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_HG_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_HG_NAME],
 				null,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
@@ -848,6 +896,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_SCRIPT_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
 				null,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
@@ -897,6 +951,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_USER_MACRO],
+				true,
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
 				[],
 				'/1/macro',
 				'Invalid parameter "/1/macro": a character string is expected.'
@@ -941,6 +1001,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_TIME_PERIOD],
 				[],
+				'/1/period',
+				'Invalid parameter "/1/period": a character string is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
+				true,
 				'/1/period',
 				'Invalid parameter "/1/period": a character string is expected.'
 			],
@@ -996,6 +1062,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_REGEX],
 				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				true,
 				'/1/expression',
 				'Invalid parameter "/1/expression": a character string is expected.'
 			],
