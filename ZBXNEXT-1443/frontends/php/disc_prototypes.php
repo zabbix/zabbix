@@ -140,6 +140,7 @@ $fields = [
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'
 	],
+	'preprocessing' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'applications' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -305,6 +306,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$application_prototypes[] = ['name' => $new_application_prototype];
 		}
 
+		$preprocessing = getRequest('preprocessing', []);
+
+		foreach ($preprocessing as &$step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_RTRIM:
+				case ZBX_PREPROC_LTRIM:
+				case ZBX_PREPROC_TRIM:
+					$step['params'] = $step['params'][0];
+					break;
+
+				case ZBX_PREPROC_REGSUB:
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				default:
+					$step['params'] = '';
+					break;
+			}
+		}
+		unset($step);
+
 		$item = [
 			'name'			=> getRequest('name'),
 			'description'	=> getRequest('description'),
@@ -347,8 +370,21 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
 
-			$dbItem = get_item_by_itemid_limited($itemId);
-			$dbItem['applications'] = get_applications_by_itemid($itemId);
+			$db_item = API::ItemPrototype()->get([
+				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+					'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+					'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',	'interfaceid', 'port',
+					'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				],
+				'selectApplications' => ['applicationid'],
+				'selectApplicationPrototypes' => ['name'],
+				'selectPreprocessing' => ['type', 'params'],
+				'itemids' => [$itemId]
+			]);
+
+			$db_item = $db_item[0];
 
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -359,12 +395,38 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
-			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+			$item = CArrayHelper::unsetEqualValues($item, $db_item);
 			$item['itemid'] = $itemId;
+
+			// Check the order of pre-processing steps.
+			if (array_diff_key($preprocessing,
+					array_intersect_assoc(array_keys($db_item['preprocessing']), array_keys($preprocessing)))) {
+				$item['preprocessing'] = $preprocessing;
+			}
+			// Same order, but different values or simply all fields are removed.
+			else {
+				$preprocessing_changed = false;
+
+				foreach ($preprocessing as $key => $step) {
+					foreach ($db_item['preprocessing'] as $db_key => $db_step) {
+						if ($key == $db_key
+								&& ($step['type'] !== $db_step['type'] || $step['params'] !== $db_step['params'])) {
+							$preprocessing_changed = true;
+							break;
+						}
+					}
+				}
+
+				if ($preprocessing_changed || !$preprocessing) {
+					$item['preprocessing'] = $preprocessing;
+				}
+			}
 
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			$item['preprocessing'] = $preprocessing;
+
 			$result = API::ItemPrototype()->create($item);
 		}
 	}
@@ -432,9 +494,14 @@ if (isset($_REQUEST['form'])) {
 				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
 				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
 				'snmpv3_contextname'
-			]
+			],
+			'selectPreprocessing' => ['type', 'params']
 		]);
 		$itemPrototype = reset($itemPrototype);
+		foreach ($itemPrototype['preprocessing'] as &$step) {
+			$step['params'] = explode("\n", $step['params']);
+		}
+		unset($step);
 	}
 
 	$data = getItemFormData($itemPrototype);

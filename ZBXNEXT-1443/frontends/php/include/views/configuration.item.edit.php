@@ -524,8 +524,104 @@ $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))
 	->setChecked($data['status'] == ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
+$preprocessing = (new CTable())
+	->setId('preprocessing')
+	->setHeader([
+		$readonly ? null : '',
+		new CColHeader(_('Name')),
+		new CColHeader(_('Parameters')),
+		new CColHeader(null),
+		$readonly ? null : (new CColHeader(_('Action')))->setWidth(50)
+	]);
+
+foreach ($data['preprocessing'] as $i => $step) {
+	// Depeding on preprocessing type, display corresponding params field and placeholders.
+	$params = [];
+
+	// Use numeric box for multiplier, otherwise use text box.
+	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
+		$params[] = (new CNumericBox('preprocessing['.$i.'][params][0]',
+						array_key_exists('params', $step) ? $step['params'][0] : ''
+					))->setAttribute('placeholder', _('number'));
+	}
+	else {
+		$params[] = new CTextBox('preprocessing['.$i.'][params][0]',
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		);
+	}
+
+	// Create a secondary param text box, so it can be hidden if necessary.
+	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
+					(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+						? $step['params'][1]
+						: '')
+				)->setAttribute('placeholder', _('output'));
+
+	// Add corresponding placeholders and show or hide text boxes.
+	switch ($step['type']) {
+		case ZBX_PREPROC_MULTIPLIER:
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_RTRIM:
+		case ZBX_PREPROC_LTRIM:
+		case ZBX_PREPROC_TRIM:
+			$params[0]->setAttribute('placeholder', _('list of characters'));
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_REGSUB:
+			$params[0]->setAttribute('placeholder', _('pattern'));
+				break;
+
+		case ZBX_PREPROC_BOOL2DEC:
+		case ZBX_PREPROC_OCT2DEC:
+		case ZBX_PREPROC_HEX2DEC:
+		case ZBX_PREPROC_DELTA_VALUE:
+		case ZBX_PREPROC_DELTA_SPEED:
+			$params[0]->addStyle('display: none;');
+			$params[1]->addStyle('display: none;');
+			break;
+	}
+
+	$preprocessing->addRow(
+		(new CRow([
+			$readonly
+				? null
+				: (new CCol(
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$params[0],
+			$params[1],
+			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))->addClass('sortable')
+	);
+}
+
+$preprocessing->addRow(
+	$readonly
+		? null
+		: (new CCol(
+			(new CButton('param_add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-add')
+		))->setColSpan(5)
+);
+
+$item_preproc_list = (new CFormList('item_preproc_list'))
+	->addRow(_('Preprocessing'), $preprocessing);
+
 // Append tabs to form.
-$itemTab = (new CTabView())->addTab('itemTab', $data['caption'], $itemFormList);
+$itemTab = (new CTabView())
+	->addTab('itemTab', $data['caption'], $itemFormList)
+	->addTab('preprocTab', _('Preprocessing'), $item_preproc_list);
+
+if (!hasRequest('form_refresh')) {
+	$itemTab->setSelected(0);
+}
 
 // Append buttons to form.
 if ($data['itemid'] != 0) {

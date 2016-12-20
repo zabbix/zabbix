@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -103,11 +104,12 @@ $fields = [
 	],
 	'logtimefmt' =>				[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'],
+	'preprocessing' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_itemid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetid' =>		    [T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_groupid' =>		    [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
 	'new_application' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'visible' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
+	'visible' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_applications' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -172,6 +174,7 @@ $fields = [
 								],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
+
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -402,7 +405,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif (strpos($interval['period'], ';')  !== false) {
+				elseif (strpos($interval['period'], ';') !== false) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -431,6 +434,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
+		$preprocessing = getRequest('preprocessing', []);
+
+		foreach ($preprocessing as &$step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_RTRIM:
+				case ZBX_PREPROC_LTRIM:
+				case ZBX_PREPROC_TRIM:
+					$step['params'] = $step['params'][0];
+					break;
+
+				case ZBX_PREPROC_REGSUB:
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				default:
+					$step['params'] = '';
+					break;
+			}
+		}
+		unset($step);
+
 		if (hasRequest('add')) {
 			$item = [
 				'hostid' => getRequest('hostid'),
@@ -467,7 +492,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'preprocessing' => $preprocessing
 			];
 
 			$result = (bool) API::Item()->create($item);
@@ -482,6 +508,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'status', 'templateid', 'flags'
 				],
 				'selectApplications' => ['applicationid'],
+				'selectPreprocessing' => ['type', 'params'],
 				'itemids' => getRequest('itemid')
 			]);
 			$db_item = reset($db_items);
@@ -605,6 +632,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
 				$item['status'] = getRequest('status', ITEM_STATUS_DISABLED);
+			}
+
+			// Check the order of pre-processing steps.
+			if (array_diff_key($preprocessing,
+					array_intersect_assoc(array_keys($db_item['preprocessing']), array_keys($preprocessing)))) {
+				$item['preprocessing'] = $preprocessing;
+			}
+			// Same order, but different values or simply all fields are removed.
+			else {
+				$preprocessing_changed = false;
+
+				foreach ($preprocessing as $key => $step) {
+					foreach ($db_item['preprocessing'] as $db_key => $db_step) {
+						if ($key == $db_key
+								&& ($step['type'] !== $db_step['type'] || $step['params'] !== $db_step['params'])) {
+							$preprocessing_changed = true;
+							break;
+						}
+					}
+				}
+
+				if ($preprocessing_changed || !$preprocessing) {
+					$item['preprocessing'] = $preprocessing;
+				}
 			}
 
 			if ($item) {
@@ -1025,11 +1076,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectPreprocessing' => ['type', 'params'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
 		$host = $item['hosts'][0];
 		unset($item['hosts']);
+
+		foreach ($item['preprocessing'] as &$step) {
+			$step['params'] = explode("\n", $step['params']);
+		}
+		unset($step);
 	}
 	else {
 		$hosts = API::Host()->get([

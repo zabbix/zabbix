@@ -881,6 +881,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['hostid'] = getRequest('hostid', 0);
 	}
 
+	if (!$data['is_discovery_rule']) {
+		$data['preprocessing'] = getRequest('preprocessing', []);
+	}
+
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
@@ -1009,6 +1013,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['privatekey'] = $data['item']['privatekey'];
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['new_application'] = getRequest('new_application', '');
+
+		if (!$data['is_discovery_rule']) {
+			$data['preprocessing'] = $data['item']['preprocessing'];
+		}
 
 		if ($data['parent_discoveryid'] != 0) {
 			$data['new_application_prototype'] = getRequest('new_application_prototype', '');
