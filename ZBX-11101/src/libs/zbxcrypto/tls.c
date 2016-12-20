@@ -2100,6 +2100,7 @@ static int	zbx_x509_dn_gets(X509_NAME *dn, char *buf, size_t size, char **error)
 {
 	BIO		*bio;
 	const char	*data;
+	size_t		len;
 	int		ret = FAIL;
 
 	if (NULL == (bio = BIO_new(BIO_s_mem())))
@@ -2113,17 +2114,17 @@ static int	zbx_x509_dn_gets(X509_NAME *dn, char *buf, size_t size, char **error)
 
 	if (0 > X509_NAME_print_ex(bio, dn, 0, XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
 	{
-		*error = zbx_strdup(*error, "cannot print distinguished name (out of memory)");
+		*error = zbx_strdup(*error, "cannot print distinguished name");
 		goto out;
 	}
 
-	if (size <= (size_t)BIO_get_mem_data(bio, &data))
+	if (size <= (len = (size_t)BIO_get_mem_data(bio, &data)))
 	{
 		*error = zbx_strdup(*error, "output buffer too small");
 		goto out;
 	}
 
-	zbx_strlcpy(buf, data, size);
+	zbx_strlcpy(buf, data, len + 1);
 	ret = SUCCEED;
 out:
 	if (NULL != bio)
