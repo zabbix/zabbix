@@ -507,12 +507,11 @@ static int	check_trigger_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t
  *             condition  [IN/OUT]  - condition for matching, outputs         *
  *                                    event ids that match condition          *
  *                                                                            *
- *             hierarchy_sql_allocate [IN] - will be compared to custom value *
- *                                           retrieved by hierarchy_row_check *
+ *             hierarchy_sql_allocate [IN] - custom sql query, must obtain    *
+ *                                           trigger id, template id and value*
  *                                                                            *
- *             condition_allocate [IN] function used to allocate sql query    *
- *                                                                            *
- *             hierarchy_row_check [IN] function used to check fetched row    *
+ *             hierarchy_row_check [IN] - custom function to fetch trigger id,*
+ *                                        template id and value               *
  *                                                                            *
  ******************************************************************************/
 static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
@@ -794,6 +793,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 		ZBX_STR2UINT64(objectid, row[0]);
 		ZBX_STR2UINT64(parent_triggerid, row[1]);
 
+		/* for each trigger id fetched, replace trigger id to parent trigger id */
 		if (FAIL != (i = zbx_vector_uint64_search(&objectids, objectid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			zbx_uint64_pair_t	trigger_pair = {objectids.values[i], parent_triggerid};
@@ -813,13 +813,11 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	{
 		int j;
 
-		/* return original event id instead of parent */
-		for (j = 0; j < condition->objectids.values_num; j++)
+		/* for each trigger id in result revert parent id to original trigger id */
+		if (FAIL != (j = zbx_vector_uint64_search(&condition->objectids, dtriggers.values[i].second,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
-			if (dtriggers.values[i].second == condition->objectids.values[j])
-			{
-				condition->objectids.values[j] = dtriggers.values[i].first;
-			}
+			condition->objectids.values[j] = dtriggers.values[i].first;
 		}
 	}
 
