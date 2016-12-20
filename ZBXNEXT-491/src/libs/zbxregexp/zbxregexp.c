@@ -30,9 +30,10 @@
  *                                                                            *
  * Purpose: checks for errors in regexp pattern                               *
  *                                                                            *
- * Parameters: pattern    - [IN] pattern                                      *
- *             flags      - [IN] regexp compilation params passed to regcomp  *
- *             error      - [OUT] error message if any                        *
+ * Parameters: pattern - [IN] pattern                                         *
+ *             flags   - [IN] regexp compilation params passed to regcomp     *
+ *             error   - [OUT] error message if any (can be NULL if the error *
+ *                       message is not required)                             *
  *                                                                            *
  * Return value: On success, 0 value is returned                              *
  *               On error, nonzero value is returned.                         *
@@ -56,7 +57,6 @@ int	zbx_regexp_check(const char *pattern, int flags, char **error)
 
 	regfree(&regex);
 ret:
-
 	return reg_error;
 }
 
