@@ -95,7 +95,7 @@
 			$('#form').val('clone');
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
-			$('#slideTab').trigger('click');
+			$('#tab_slideTab').trigger('click');
 
 			$('#multiselect_userid_wrapper').show();
 
