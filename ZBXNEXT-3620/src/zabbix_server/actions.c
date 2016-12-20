@@ -2120,6 +2120,39 @@ static int	check_intern_event_type_condition(zbx_vector_ptr_t *esc_events, DB_CO
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_object_ids_internal                                          *
+ *                                                                            *
+ * Purpose: to get objectids of escalation internal events                    *
+ *                                                                            *
+ * Parameters: esc_events [IN]  - events to check                             *
+ *             objectids  [OUT] - event objectids to be used in condition     *
+ *                                allocation 2 vectors where first one is     *
+ *                                trigger object ids, second is rest          *
+*                                                                            *
+ ******************************************************************************/
+static void	get_object_ids_internal(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids)
+{
+	int	i;
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+
+		if (FAIL == is_supported_event_object(event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d]", event->object);
+			continue;
+		}
+
+		if (event->object == EVENT_OBJECT_TRIGGER)
+			zbx_vector_uint64_append(&objectids[0], event->objectid);
+		else
+			zbx_vector_uint64_append(&objectids[1], event->objectid);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_intern_host_group_condition                                *
  *                                                                            *
  * Purpose: check host group condition for internal events                    *
@@ -2134,84 +2167,85 @@ static int	check_intern_event_type_condition(zbx_vector_ptr_t *esc_events, DB_CO
  ******************************************************************************/
 static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+
+	char			*sql = NULL, *operation;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids[2], groupids;
+	zbx_uint64_t		condition_value;
+
+	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+		operation = " and";
+	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		operation = " and not";
+	else
+		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < esc_events->values_num; i++)
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+	zbx_vector_uint64_create(&groupids);
+
+	get_object_ids_internal(esc_events, objectids);
+
+	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
+
+	for (i = 0; i < 2; i++)
 	{
-		zbx_vector_uint64_t	groupids;
-		char			*sqlcond = NULL;
-		size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
-		const DB_EVENT	*event = esc_events->values[i];
+		size_t	sql_offset = 0;
 
-		ret = FAIL;
-
-		if (FAIL == is_supported_event_object(event))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
-					event->object, condition->conditionid);
+		if (0 == objectids[i].values_num)
 			continue;
-		}
 
-		zbx_vector_uint64_create(&groupids);
-		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
-
-		switch (event->object)
+		if (0 == i)
 		{
-		case EVENT_OBJECT_TRIGGER:
-			zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
-					"select null"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select distinct t.triggerid"
 					" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 					" where hg.hostid=h.hostid"
 						" and h.hostid=i.hostid"
 						" and i.itemid=f.itemid"
 						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and",
-					event->objectid);
-			break;
-		default:
-			zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
-					"select null"
+						" and");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+					objectids[i].values, objectids[i].values_num);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select distinct i.itemid"
 					" from hosts_groups hg,hosts h,items i"
 					" where hg.hostid=h.hostid"
 						" and h.hostid=i.hostid"
-						" and i.itemid=" ZBX_FS_UI64
-						" and",
-					event->objectid);
+						" and");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		DBadd_condition_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset, "hg.groupid", groupids.values,
-				groupids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+					groupids.values_num);
 
-		result = DBselectN(sqlcond, 1);
+		result = DBselect("%s", sql);
 
-		zbx_free(sqlcond);
-		zbx_vector_uint64_destroy(&groupids);
-
-		switch (condition->operator)
+		while (NULL != (row = DBfetch(result)))
 		{
-		case CONDITION_OPERATOR_EQUAL:
-			if (NULL != DBfetch(result))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (NULL == DBfetch(result))
-				ret = SUCCEED;
-			break;
-		default:
-			ret = NOTSUPPORTED;
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			zbx_vector_uint64_append(&condition->objectids, objectid);
 		}
 		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_vector_uint64_destroy(&groupids);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
