@@ -1273,6 +1273,26 @@ function getParamFieldLabelByType($itemType) {
 	}
 }
 
+/**
+ * Get item pre-processing types.
+ *
+ * @return array
+ */
+function get_preprocessing_types() {
+	return [
+		ZBX_PREPROC_MULTIPLIER => _('Custom multiplier'),
+		ZBX_PREPROC_RTRIM => _('Right trim'),
+		ZBX_PREPROC_LTRIM => _('Left trim '),
+		ZBX_PREPROC_TRIM => _('Trim'),
+		ZBX_PREPROC_REGSUB => _('Regular expression'),
+		ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
+		ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
+		ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal'),
+		ZBX_PREPROC_DELTA_VALUE => _('Delta per second'),
+		ZBX_PREPROC_DELTA_SPEED => _('Delta')
+	];
+}
+
 /*
  * Quoting $param if it contain special characters.
  *

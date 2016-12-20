@@ -925,12 +925,7 @@ abstract class CItemGeneral extends CApiService {
 				return;
 			}
 
-			$type_validator = new CLimitedSetValidator([
-				'values' => [ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM,
-					ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
-					ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED
-				]
-			]);
+			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types())]);
 
 			$required_fields = ['type', 'params'];
 			$delta = false;

@@ -83,6 +83,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectPreprocessing'			=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
@@ -1126,7 +1127,7 @@ class CItemPrototype extends CItemGeneral {
 
 		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
 			$db_item_preproc = API::getApiService()->select('item_preproc', [
-				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid']),
+				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
 				'filter' => ['itemid' => array_keys($result)],
 			]);
 
