@@ -173,8 +173,8 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
  *****************************************************************************/
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*dir, *path = NULL, *mode_str, *max_depth_str, *regex_incl_str, *regex_excl_str;
-	char 			*error = NULL;
+	char			*dir, *dir_param, *path = NULL, *mode_str, *max_depth_str;
+	char 			*regex_incl_str, *regex_excl_str, *error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list, descriptors;
@@ -194,9 +194,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_file_descriptor_t	*file;
+
+	zbx_vector_ptr_create(&descriptors);
 #endif
 	zbx_vector_ptr_create(&list);
-	zbx_vector_ptr_create(&descriptors);
 
 	if (5 < request->nparam)
 	{
@@ -204,13 +205,13 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	path = get_rparam(request, 0);
+	dir_param = get_rparam(request, 0);
 	regex_incl_str = get_rparam(request, 1);
 	regex_excl_str = get_rparam(request, 2);
 	mode_str = get_rparam(request, 3);
 	max_depth_str = get_rparam(request, 4);
 
-	if (NULL == path || '\0' == *path)
+	if (NULL == dir_param || '\0' == *dir_param)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
@@ -256,8 +257,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	dir = zbx_strdup(NULL, path);
-	path = NULL;
+	dir = zbx_strdup(NULL, dir_param);
 
 	/* remove directory suffix '/' or '\\' (if any) as stat() fails on Windows for directories ending with slash */
 	zbx_rtrim(dir, "/\\");
@@ -480,14 +480,17 @@ err:
 		zbx_free(item);
 	}
 
+#ifndef _WINDOWS
 	while (0 < descriptors.values_num)
 	{
 		file = descriptors.values[--descriptors.values_num];
 		zbx_free(file);
 	}
 
-	zbx_vector_ptr_destroy(&list);
 	zbx_vector_ptr_destroy(&descriptors);
+#endif
+
+	zbx_vector_ptr_destroy(&list);
 
 	return ret;
 }
