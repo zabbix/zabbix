@@ -24,6 +24,42 @@
 #	include "gnuregex.h"
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_regexp_check                                                 *
+ *                                                                            *
+ * Purpose: checks for errors in regexp pattern                               *
+ *                                                                            *
+ * Parameters: pattern    - [IN] pattern                                      *
+ *             flags      - [IN] regexp compilation params passed to regcomp  *
+ *             error      - [OUT] error message if any                        *
+ *                                                                            *
+ * Return value: On success, 0 value is returned                              *
+ *               On error, nonzero value is returned.                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_regexp_check(const char *pattern, int flags, char **error)
+{
+	regex_t		regex;
+	int		reg_error = 0;
+
+	if (NULL == pattern || '\0' == *pattern)
+		goto ret;
+
+	if (0 != (reg_error = regcomp(&regex, pattern, flags)) && NULL != error)
+	{
+		char	buffer[MAX_STRING_LEN];
+
+		regerror(reg_error, &regex, buffer, sizeof(buffer));
+		*error = zbx_strdup(*error, buffer);
+	}
+
+	regfree(&regex);
+ret:
+
+	return reg_error;
+}
+
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
 	ZBX_THREAD_LOCAL static char	*old_pattern = NULL;

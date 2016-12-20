@@ -35,6 +35,7 @@ typedef struct
 zbx_expression_t;
 
 /* regular expressions */
+int	zbx_regexp_check(const char *pattern, int flags, char **error);
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
