@@ -37,6 +37,7 @@ typedef long	ssize_t;
 #	define ZBX_PROTO_AGAIN		WSAEINTR
 #	define ZBX_PROTO_ERROR		SOCKET_ERROR
 #	define ZBX_SOCKET_ERROR		INVALID_SOCKET
+#	define ZBX_SOCKET_TO_INT(x)	((int)(x))
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
@@ -46,6 +47,7 @@ typedef long	ssize_t;
 #	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
 #	define ZBX_SOCKET_ERROR		-1
+#	define ZBX_SOCKET_TO_INT(x)	(x)
 #endif
 
 #if defined(SOCKET) || defined(_WINDOWS)

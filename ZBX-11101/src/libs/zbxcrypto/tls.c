@@ -3969,8 +3969,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	/* set our own callback function to log issues into Zabbix log */
 	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
 
-	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
-	gnutls_transport_set_ptr(s->tls_ctx->ctx, (gnutls_transport_ptr_t)s->socket);
+	gnutls_transport_set_int(s->tls_ctx->ctx, ZBX_SOCKET_TO_INT(s->socket));
 
 	/* TLS handshake */
 
@@ -4683,8 +4682,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	/* set our own callback function to log issues into Zabbix log */
 	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
 
-	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
-	gnutls_transport_set_ptr(s->tls_ctx->ctx, (gnutls_transport_ptr_t)s->socket);
+	gnutls_transport_set_int(s->tls_ctx->ctx, ZBX_SOCKET_TO_INT(s->socket));
 
 	/* TLS handshake */
 
