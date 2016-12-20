@@ -4632,6 +4632,25 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 	return MAX(max_snmp_succeed - 2, min_snmp_fail - 1);
 }
 
+static int	DCget_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
+{
+	int			res = FAIL;
+	const ZBX_DC_INTERFACE	*dc_interface;
+	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
+
+	interface_ht_local.hostid = hostid;
+	interface_ht_local.type = type;
+
+	if (NULL != (interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local)))
+	{
+		dc_interface = interface_ht->interface_ptr;
+		DCget_interface(interface, dc_interface);
+		res = SUCCEED;
+	}
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_interface_by_type                                   *
@@ -4644,28 +4663,69 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
 {
-	int			res = FAIL;
-	const ZBX_DC_INTERFACE	*dc_interface;
-	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-
-	interface_ht_local.hostid = hostid;
-	interface_ht_local.type = type;
+	int	res;
 
 	LOCK_CACHE;
 
-	if (NULL == (interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local)))
-		goto unlock;
+	res = DCget_interface_by_type(interface, hostid, type);
 
-	dc_interface = interface_ht->interface_ptr;
+	UNLOCK_CACHE;
+
+	return res;
+}
+
+static int	DCconfig_get_interface_by_itemid(DC_INTERFACE *interface, zbx_uint64_t itemid)
+{
+	ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_INTERFACE	*dc_interface;
+
+	if (0 >= itemid)
+		return FAIL;
+
+	if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
+		return FAIL;
+
+	if (0 == dc_item->interfaceid ||
+			NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid)))
+	{
+		return FAIL;
+	}
 
 	DCget_interface(interface, dc_interface);
 
-	res = SUCCEED;
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_interface                                           *
+ *                                                                            *
+ * Purpose: Locate interface in configuration cache                           *
+ *                                                                            *
+ * Parameters: interface - [OUT] pointer to DC_INTERFACE structure            *
+ *             hostid - [IN] host ID                                          *
+ *             type - [IN] interface type                                     *
+ *                                                                            *
+ * Return value: SUCCEED if record located and FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uint64_t itemid)
+{
+	int		res = FAIL, i;
+
+	LOCK_CACHE;
+
+	if (SUCCEED == (res = DCconfig_get_interface_by_itemid(interface, itemid)))
+		goto unlock;
+
+	for (i = 0; i < (int)ARRSIZE(INTERFACE_TYPE_PRIORITY); i++)
+	{
+		if (SUCCEED == (res = DCget_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
+			break;
+	}
 unlock:
 	UNLOCK_CACHE;
 
