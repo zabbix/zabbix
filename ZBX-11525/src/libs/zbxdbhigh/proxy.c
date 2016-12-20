@@ -2403,7 +2403,8 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 			}
 			else
 			{
-				/* ensure unique value timestamp (closk, ns) if only clock is available */
+				/* ensure unique value timestamp (clock, ns) if only clock is available */
+
 				av->ts.ns = client_timediff.ns++;
 
 				if (client_timediff.ns > 999999999)
