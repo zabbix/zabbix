@@ -28,7 +28,6 @@
 #	include "gnuregex.h"
 #endif
 
-
 /******************************************************************************
  *                                                                            *
  * Function: filename_matches                                                 *
@@ -172,7 +171,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 != zbx_regexp_check(regex_incl, REG_EXTENDED | REG_NEWLINE, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-					"Cannot use a regular expression in second parameter: %s", error));
+					"Invalid regular expression in second parameter: %s", error));
 			zbx_free(error);
 			goto err;
 		}
@@ -186,15 +185,13 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 != zbx_regexp_check(regex_excl, REG_EXTENDED | REG_NEWLINE, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-					"Cannot use a regular expression in third parameter: %s", error));
+					"Invalid regular expression in third parameter: %s", error));
 			zbx_free(error);
 			goto err;
 		}
 	}
 	else
 		regex_excl = NULL;
-
-	printf( "patterns: %s %s", regex_incl, regex_excl );
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
@@ -248,18 +245,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 #ifndef _WINDOWS
 	if (SIZE_MODE_APPARENT == mode)
-	{
 		size += status.st_size;
-	}
-	else if (SIZE_MODE_DISK == mode)
-	{
+	else		/* SIZE_MODE_DISK */
 		size += status.st_blocks * DISK_BLOCK_SIZE;
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 #endif /* not _WINDOWS */
 
 	while (0 < list.values_num)
@@ -441,7 +429,6 @@ err:
 
 	zbx_vector_ptr_destroy(&descriptors);
 #endif
-
 	zbx_vector_ptr_destroy(&list);
 
 	return ret;
