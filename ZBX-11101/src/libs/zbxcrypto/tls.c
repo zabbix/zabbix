@@ -4287,6 +4287,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	{
 		long	verify_result;
 
+		/* log peer certificate information for debugging */
+		zbx_log_peer_cert(__function_name, s->tls_ctx);
+
 		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx->ctx)))
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
@@ -4294,9 +4297,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			zbx_tls_close(s);
 			goto out1;
 		}
-
-		/* log peer certificate information for debugging */
-		zbx_log_peer_cert(__function_name, s->tls_ctx);
 
 		/* basic verification of peer certificate is done during handshake with OpenSSL built-in procedures */
 
