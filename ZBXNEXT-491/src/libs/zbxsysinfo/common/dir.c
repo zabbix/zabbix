@@ -246,7 +246,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifndef _WINDOWS
 	if (SIZE_MODE_APPARENT == mode)
 		size += status.st_size;
-	else		/* SIZE_MODE_DISK */
+	else		/* must be SIZE_MODE_DISK */
 		size += status.st_blocks * DISK_BLOCK_SIZE;
 #endif /* not _WINDOWS */
 

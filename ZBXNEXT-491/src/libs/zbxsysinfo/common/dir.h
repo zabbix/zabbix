@@ -24,10 +24,10 @@
 
 #define DISK_BLOCK_SIZE			512	/* 512-byte blocks */
 
-#define SIZE_MODE_APPARENT		0	/* Bytes in file */
-#define SIZE_MODE_DISK			1	/* Size on disk */
+#define SIZE_MODE_APPARENT		0	/* bytes in file */
+#define SIZE_MODE_DISK			1	/* size on disk */
 
-#define TRAVERSAL_DEPTH_UNLIMITED	-1	/* Directory traversal depth is not limited */
+#define TRAVERSAL_DEPTH_UNLIMITED	-1	/* directory traversal depth is not limited */
 
 typedef struct
 {
@@ -37,7 +37,7 @@ typedef struct
 
 typedef struct
 {
-	zbx_uint64_t st_dev;			/* Device. */
+	zbx_uint64_t st_dev;			/* device */
 	zbx_uint64_t st_ino;			/* File serial number.*/
 } zbx_file_descriptor_t;
 
