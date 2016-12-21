@@ -192,8 +192,16 @@ if (!$discoveryRule) {
 }
 
 $itemPrototypeId = getRequest('itemid');
-if ($itemPrototypeId && !API::ItemPrototype()->isWritable([$itemPrototypeId])) {
-	access_deny();
+if ($itemPrototypeId) {
+	$item_prorotypes = API::ItemPrototype()->get([
+		'output' => [],
+		'itemids' => $itemPrototypeId,
+		'editable' => true
+	]);
+
+	if (!$item_prorotypes) {
+		access_deny();
+	}
 }
 
 /*
@@ -362,9 +370,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex,
-			'applications'	=> $applications,
-			'applicationPrototypes' => $application_prototypes
+			'delay_flex'	=> $delay_flex
 		];
 
 		if (hasRequest('update')) {
@@ -384,8 +390,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'itemids' => [$itemId]
 			]);
 
-			$db_item = $db_item[0];
-
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 				$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
@@ -395,8 +399,31 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
+			$db_item = $db_item[0];
+
 			$item = CArrayHelper::unsetEqualValues($item, $db_item);
 			$item['itemid'] = $itemId;
+
+			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
+
+			// compare applications
+			natsort($db_item['applications']);
+			natsort($applications);
+
+			if (array_values($db_item['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
+			// compare application prototypes
+			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
+			natsort($db_application_prototype_names);
+
+			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			natsort($application_prototype_names);
+
+			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
+				$item['applicationPrototypes'] = $application_prototypes;
+			}
 
 			// Check the order of pre-processing steps.
 			if (array_diff_key($preprocessing,
@@ -425,6 +452,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+			$item['applicationPrototypes'] = $application_prototypes;
 			$item['preprocessing'] = $preprocessing;
 
 			$result = API::ItemPrototype()->create($item);
