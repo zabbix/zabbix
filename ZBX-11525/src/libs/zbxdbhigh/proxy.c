@@ -2447,7 +2447,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 
 			if (0 == av->meta)
 			{
-				/* only meta information update packets can have empty value*/
+				/* only meta information update packets can have empty value */
 				continue;
 			}
 		}
