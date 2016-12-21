@@ -514,8 +514,8 @@ static int	check_trigger_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t
  *                                        template id and value               *
  *                                                                            *
  ******************************************************************************/
-static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION *condition,
-		zbx_uint64_t condition_value, hierarchy_sql_allocate_func_t hierarchy_sql_allocate,
+static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_uint64_t *objectids_match,
+		unsigned char op, zbx_uint64_t condition_value, hierarchy_sql_allocate_func_t hierarchy_sql_allocate,
 		hierarchy_row_check_func_t hierarchy_row_check)
 {
 	int				i;
@@ -571,9 +571,9 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 					/* second are those that we did select on */
 					if (triggerids.values[i].second == objectid)
 					{
-						if (CONDITION_OPERATOR_EQUAL == condition->operator)
+						if (CONDITION_OPERATOR_EQUAL == op)
 						{
-							zbx_vector_uint64_append(&condition->objectids,
+							zbx_vector_uint64_append(objectids_match,
 									triggerids.values[i].first);
 						}
 						else
@@ -619,11 +619,11 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, DB_CONDITION
 	}
 
 	/* equals are deleted so copy to result those that are left (not equals)  */
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+	if (CONDITION_OPERATOR_NOT_EQUAL == op)
 	{
 		for (i = 0; i < objectids->values_num; i++)
 		{
-			zbx_vector_uint64_append(&condition->objectids, objectids->values[i]);
+			zbx_vector_uint64_append(objectids_match, objectids->values[i]);
 		}
 	}
 
@@ -675,7 +675,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	}
 
 	if (0 != objectids.values_num)
-		check_trigger_hierarchy(&objectids, condition, condition_value,
+		check_trigger_hierarchy(&objectids, &condition->objectids, condition->operator, condition_value,
 				check_trigger_id_sql_alloc,
 				check_trigger_id_row);
 
@@ -805,7 +805,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	}
 	DBfree_result(result);
 
-	check_trigger_hierarchy(&objectids, condition, condition_value,
+	check_trigger_hierarchy(&objectids, &condition->objectids, condition->operator, condition_value,
 			check_template_id_sql_alloc,
 			check_template_id_row);
 
@@ -2251,6 +2251,38 @@ static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CO
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_template_id_sql_alloc                                      *
+ *                                                                            *
+ * Purpose: to allocate sql query for template id condition                   *
+ *                                                                            *
+ * Parameters: sql           [IN/OUT] - allocated sql query                   *
+ *             sql_alloc     [IN/OUT] - how much bytes allocated              *
+ *             objectids_tmp [IN/OUT] - uses to allocate query, removes       *
+ *                                      duplicates                            *
+ *                                                                            *
+ ******************************************************************************/
+
+static void	check_template_id_item_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp)
+{
+	size_t	sql_offset = 0;
+
+	zbx_vector_uint64_sort(objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* multiple hosts can share trigger from same template, don't allocate duplicate ids */
+	zbx_vector_uint64_uniq(objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
+			"select distinct h.itemid,t.itemid,t.hostid"
+			" from items t,items h"
+			" where t.itemid=h.templateid"
+				" and");
+
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "h.itemid",
+			objectids_tmp->values, objectids_tmp->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_intern_host_template_condition                             *
  *                                                                            *
  * Purpose: check host template condition for internal events                 *
@@ -2265,112 +2297,119 @@ static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CO
  ******************************************************************************/
 static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, values_num;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_t			condition_value;
+	int				i, j, k;
+	zbx_vector_uint64_t		objectids[2], objectids_match[2];
+	zbx_vector_uint64_pair_t	dtriggers;
 
-	zbx_uint64_t	hostid, objectid;
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
+		return NOTSUPPORTED;
+
+	for (i = 0; i < 2; i++)
+	{
+		zbx_vector_uint64_create(&objectids[i]);
+		zbx_vector_uint64_create(&objectids_match[i]);
+	}
+
+	zbx_vector_uint64_pair_create(&dtriggers);
+
+	get_object_ids_internal(esc_events, objectids);
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < esc_events->values_num; i++)
+	for (i = 0; i < 2; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		size_t	sql_offset = 0;
 
-		ret = FAIL;
-
-		if (FAIL == is_supported_event_object(event))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d] for condition id [" ZBX_FS_UI64 "]",
-					event->object, condition->conditionid);
+		if (0 == objectids[i].values_num)
 			continue;
-		}
 
-		switch (condition->operator)
+		if (0 == i)
 		{
-			case CONDITION_OPERATOR_EQUAL:
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				objectid = event->objectid;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select triggerid,parent_triggerid"
+					" from trigger_discovery"
+					" where");
 
-				/* use parent object ID for generated objects */
-				switch (event->object)
-				{
-					case EVENT_OBJECT_TRIGGER:
-						result = DBselect(
-								"select parent_triggerid"
-								" from trigger_discovery"
-								" where triggerid=" ZBX_FS_UI64,
-								objectid);
-						break;
-					default:
-						result = DBselect(
-								"select id.parent_itemid"
-								" from item_discovery id,items i"
-								" where id.itemid=i.itemid"
-									" and i.itemid=" ZBX_FS_UI64
-									" and i.flags=%d",
-								objectid, ZBX_FLAG_DISCOVERY_CREATED);
-				}
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
+					objectids[i].values, objectids[i].values_num);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select i.itemid,id.parent_itemid"
+					" from item_discovery id,items i"
+					" where id.itemid=i.itemid"
+						" and i.flags=%d"
+						" and",
+					ZBX_FLAG_DISCOVERY_CREATED);
 
-				if (NULL != (row = DBfetch(result)))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
-
-					zabbix_log(LOG_LEVEL_DEBUG, "check host template condition,"
-							" selecting parent objectid:" ZBX_FS_UI64, objectid);
-				}
-				DBfree_result(result);
-
-				do
-				{
-					switch (event->object)
-					{
-						case EVENT_OBJECT_TRIGGER:
-							result = DBselect(
-									"select distinct i.hostid,t.templateid"
-									" from items i,functions f,triggers t"
-									" where i.itemid=f.itemid"
-										" and f.triggerid=t.templateid"
-										" and t.triggerid=" ZBX_FS_UI64,
-									objectid);
-							break;
-						default:
-							result = DBselect(
-									"select t.hostid,t.itemid"
-									" from items t,items h"
-									" where t.itemid=h.templateid"
-										" and h.itemid=" ZBX_FS_UI64,
-									objectid);
-					}
-
-					objectid = 0;
-
-					while (NULL != (row = DBfetch(result)))
-					{
-						ZBX_STR2UINT64(hostid, row[0]);
-						ZBX_STR2UINT64(objectid, row[1]);
-
-						if (hostid == condition_value)
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					DBfree_result(result);
-				}
-				while (SUCCEED != ret && 0 != objectid);
-
-				if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
-					ret = (SUCCEED == ret) ? FAIL : SUCCEED;
-				break;
-			default:
-				return NOTSUPPORTED;
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	objectid, parent_triggerid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			ZBX_STR2UINT64(parent_triggerid, row[1]);
+
+			/* for each trigger id fetched, replace trigger id to parent trigger id */
+			if (FAIL != (j = zbx_vector_uint64_search(&objectids[i], objectid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_uint64_pair_t	trigger_pair = {objectids[i].values[j], parent_triggerid};
+
+				zbx_vector_uint64_pair_append(&dtriggers, trigger_pair);
+
+				objectids[i].values[j] = parent_triggerid;
+			}
+		}
+		DBfree_result(result);
+
+		check_trigger_hierarchy(&objectids[i], &objectids_match[i], condition->operator, condition_value,
+				i == 0 ? check_template_id_sql_alloc : check_template_id_item_sql_alloc,
+				check_template_id_row);
+
+		for (k = 0; k < dtriggers.values_num; k++)
+		{
+			/* for each trigger id in result revert parent id to original trigger id */
+			if (FAIL != (j = zbx_vector_uint64_search(&objectids_match[i],
+					dtriggers.values[k].second, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				objectids_match[i].values[j] = dtriggers.values[k].first;
+			}
+		}
+
+		zbx_vector_uint64_pair_clear(&dtriggers);
 	}
+
+	if (0 != (values_num = objectids_match[0].values_num + objectids_match[1].values_num))
+	{
+		zbx_vector_uint64_reserve(&condition->objectids, values_num);
+
+		for (i = 0; i < 2; i++)
+		{
+			for (j = 0; j < objectids_match[i].values_num; j++)
+			{
+				zbx_vector_uint64_append(&condition->objectids, objectids_match[i].values[j]);
+			}
+		}
+	}
+
+	for (i = 0; i < 2; i++)
+	{
+		zbx_vector_uint64_destroy(&objectids[i]);
+		zbx_vector_uint64_destroy(&objectids_match[i]);
+	}
+	zbx_free(sql);
 
 	return SUCCEED;
 }
