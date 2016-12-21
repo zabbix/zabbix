@@ -1274,12 +1274,14 @@ function getParamFieldLabelByType($itemType) {
 }
 
 /**
- * Get item pre-processing types.
+ * Get either one or all item pre-processing types.
+ *
+ * @param int $type
  *
  * @return array
  */
-function get_preprocessing_types() {
-	return [
+function get_preprocessing_types($type = null) {
+	$types = [
 		ZBX_PREPROC_MULTIPLIER => _('Custom multiplier'),
 		ZBX_PREPROC_RTRIM => _('Right trim'),
 		ZBX_PREPROC_LTRIM => _('Left trim '),
@@ -1291,6 +1293,13 @@ function get_preprocessing_types() {
 		ZBX_PREPROC_DELTA_VALUE => _('Delta per second'),
 		ZBX_PREPROC_DELTA_SPEED => _('Delta')
 	];
+
+	if ($type !== null && array_key_exists($type, $types)) {
+		return $types[$type];
+	}
+	else {
+		return $types;
+	}
 }
 
 /*
