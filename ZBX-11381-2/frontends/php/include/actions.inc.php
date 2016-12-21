@@ -1552,7 +1552,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 	}
 
 	$result = DBselect(
-		'SELECT a.eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
+		'SELECT a.eventid,a.p_eventid,a.mediatypeid,a.userid,a.esc_step,a.clock,a.status,a.alerttype,a.error'.
 		' FROM alerts a'.
 		' WHERE '.dbConditionInt('a.eventid', array_keys($eventids)).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
@@ -1571,7 +1571,8 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			'clock' => $row['clock'],
 			'status' => $row['status'],
 			'alerttype' => $row['alerttype'],
-			'error' => $row['error']
+			'error' => $row['error'],
+			'p_eventid' => $row['p_eventid']
 		];
 
 		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
@@ -1611,9 +1612,14 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 
 	foreach ($problems as $index => $problem) {
 		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']] : [];
-		$r_event_alerts = (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0)
-			? (array_key_exists($problem['r_eventid'], $alerts) ? $alerts[$problem['r_eventid']] : [])
-			: [];
+		$r_event_alerts = [];
+		if (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0 && array_key_exists($problem['r_eventid'], $alerts)) {
+			foreach ($alerts[$problem['r_eventid']] as $r) {
+				if ($r['p_eventid'] == $problem['eventid']) {
+					$r_event_alerts[] = $r;
+				}
+			}
+		}
 
 		if ($event_alerts || $r_event_alerts) {
 			$status = ALERT_STATUS_SENT;

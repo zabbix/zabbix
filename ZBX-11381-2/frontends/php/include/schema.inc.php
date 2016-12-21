@@ -4371,6 +4371,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'p_eventid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'history' => [

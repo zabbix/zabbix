@@ -964,12 +964,14 @@ FIELD		|retries	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|alerttype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|p_eventid	|t_id		|		|NULL		|0			|5|events	|eventid
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
 INDEX		|4		|status,retries
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
+INDEX		|7		|p_eventid
 
 TABLE|history||0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items

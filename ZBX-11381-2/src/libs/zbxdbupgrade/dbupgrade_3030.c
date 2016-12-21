@@ -153,6 +153,67 @@ static int	DBpatch_3030014(void)
 	return DBmodify_field_type("items", &field);
 }
 
+static int	DBpatch_3030015(void)
+{
+	const ZBX_FIELD field = {"p_eventid", NULL, "events", NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("alerts", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030016(void)
+{
+	int			ret = FAIL;
+	DB_ROW			row;
+	DB_RESULT		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		prev_eventid = 0, curr_eventid;
+
+	/* This procedure fills in field 'p_eventid' for all recovery actions. 'p_eventid' value is defined as per last
+	problematic event, that was closed by currect recovery event. This is done because the relation beetwen
+	recovery alerts and problem events is partially missing and this method is most successful for updating
+	zabbix 3.0 to latest versions. */
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select eventid, r_eventid"
+			" from event_recovery "
+			" order by r_eventid, eventid desc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(curr_eventid, row[1]);
+		if (prev_eventid == curr_eventid)
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update alerts set p_eventid=%s where eventid=%s;\n",
+				row[0], row[1]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+
+		prev_eventid = curr_eventid;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -174,5 +235,7 @@ DBPATCH_ADD(3030011, 0, 1)
 DBPATCH_ADD(3030012, 0, 1)
 DBPATCH_ADD(3030013, 0, 1)
 DBPATCH_ADD(3030014, 0, 1)
+DBPATCH_ADD(3030015, 0, 1)
+DBPATCH_ADD(3030016, 0, 1)
 
 DBPATCH_END()

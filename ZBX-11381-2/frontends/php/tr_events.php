@@ -74,7 +74,7 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
-	'clock', 'subject', 'message'
+	'clock', 'subject', 'message', 'p_eventid'
 ];
 $options = [
 	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'value'],
@@ -122,8 +122,12 @@ if ($event['r_eventid'] != 0) {
 		$event['userid'] = $r_event['userid'];
 
 		if ($r_event['alerts']) {
-			$r_alerts = $r_event['alerts'];
 			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => SORT_DESC]]);
+			foreach ($r_event['alerts'] as $alert) {
+				if($alert['p_eventid'] == $event['eventid']) {
+					$r_alerts[] = $alert;
+				}
+			}
 		}
 	}
 }
