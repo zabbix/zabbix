@@ -1947,7 +1947,6 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
 		}
 
 		$this->zbxTestDoubleClickBeforeMessage('add', 'all_items');
