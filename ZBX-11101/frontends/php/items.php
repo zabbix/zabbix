@@ -485,7 +485,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'params' => getRequest('params'),
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
 			'data_type' => getRequest('data_type'),
-			'applications' => $applications,
 			'inventory_link' => getRequest('inventory_link')
 		];
 
@@ -507,9 +506,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
 
+			// compare applications
+			natsort($dbItem['applications']);
+			natsort($applications);
+			if (array_values($dbItem['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
 			$result = API::Item()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+
 			$result = API::Item()->create($item);
 		}
 	}
@@ -991,7 +999,6 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['itemids'],
-		'selectItems' => ['itemid'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	]);
 	$hostCount = count($data['hosts']);
@@ -1034,7 +1041,7 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 
 			// set the initial chosen interface to one of the interfaces the items use
 			$items = API::Item()->get([
-				'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+				'itemids' => $data['itemids'],
 				'output' => ['itemid', 'type']
 			]);
 			$usedInterfacesTypes = [];

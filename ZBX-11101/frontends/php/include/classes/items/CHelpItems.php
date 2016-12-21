@@ -249,12 +249,8 @@ class CHelpItems {
 					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
-					'key' => 'vm.vmemory.size[<type>]',
-					'description' => _('Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
-				],
-				[
 					'key' => 'system.uname',
-					'description' => _('Detailed host information. Returns string')
+					'description' => _('Identification of the system. Returns string')
 				],
 				[
 					'key' => 'system.uptime',
@@ -315,6 +311,10 @@ class CHelpItems {
 				[
 					'key' => 'vm.memory.size[<mode>]',
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
 					'key' => 'web.page.get[host,<path>,<port>]',
@@ -536,7 +536,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.uname',
-					'description' => _('Detailed host information. Returns string')
+					'description' => _('Identification of the system. Returns string')
 				],
 				[
 					'key' => 'system.uptime',
@@ -597,6 +597,10 @@ class CHelpItems {
 				[
 					'key' => 'vm.memory.size[<mode>]',
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
 					'key' => 'web.page.get[host,<path>,<port>]',
@@ -768,7 +772,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
-					'description' => _('VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'description' => _('VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',
