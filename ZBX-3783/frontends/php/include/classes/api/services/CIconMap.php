@@ -169,8 +169,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -242,8 +240,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -498,8 +494,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @param array $iconmapids
 	 * @param array $db_iconmaps
 	 *

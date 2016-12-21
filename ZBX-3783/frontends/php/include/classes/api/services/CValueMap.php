@@ -91,8 +91,6 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * Add value maps.
-	 *
 	 * @param array  $valuemaps
 	 *
 	 * @return array
@@ -125,8 +123,6 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * Update value maps.
-	 *
 	 * @param array $valuemap
 	 *
 	 * @return array
@@ -214,8 +210,6 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * Delete value maps.
-	 *
 	 * @param array $valuemapids
 	 *
 	 * @return array
@@ -280,8 +274,6 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $valuemaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -306,8 +298,6 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $valuemaps
 	 * @param array $db_valuemaps
 	 *

@@ -195,8 +195,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $usrgrps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -276,8 +274,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $usrgrps
 	 * @param array $db_usrgrps
 	 *
@@ -1009,8 +1005,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Delete user groups.
-	 *
 	 * @param array $usrgrpids
 	 *
 	 * @return array
@@ -1028,8 +1022,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @throws APIException
 	 *
 	 * @param array $usrgrpids
