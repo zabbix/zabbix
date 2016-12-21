@@ -189,7 +189,7 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
  *                                                                            *
  * Purpose: finds number inside expression starting at specified position     *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
+ * Parameters: str        - [IN] the expression                               *
  *             pos        - [IN] the starting position                        *
  *             number_loc - [OUT] the number location                         *
  *                                                                            *
