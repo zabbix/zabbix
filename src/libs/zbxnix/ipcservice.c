@@ -1057,9 +1057,8 @@ int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const uns
  * Return value: SUCCEED - the message was successfully received              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: This function frees memory referred by message->data. This       *
- *           allows to call zbx_ipc_socket_read() un loop without clearing    *
- *           message, but also requires passing initialized message.          *
+ * Comments: If this function succeeds the message must be cleaned/freed by   *
+ *           the caller.                                                      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
@@ -1468,7 +1467,7 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	zbx_ipc_message_t	*message;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() client:" ZBX_FS_UI64, __function_name, client, client->id);
 
 	if (NULL != client->tx_message)
 	{
