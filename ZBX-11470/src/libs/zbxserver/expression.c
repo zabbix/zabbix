@@ -206,7 +206,6 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
 	const char	*s, *e;
-	int		dot_found;
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
@@ -220,10 +219,10 @@ static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc
 			continue;
 		}
 
-		dot_found = 0;
-
 		for (e = s; '\0' != *e; e++)	/* find end of number */
 		{
+			int	dot_found = 0;
+
 			if (isdigit(*e))
 				continue;
 
@@ -241,7 +240,7 @@ static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc
 
 		/* number found */
 		number_loc->l = s - str;
-		number_loc->r = e - s + number_loc->l - 1;
+		number_loc->r = e - str - 1;
 
 		return SUCCEED;
 	}
