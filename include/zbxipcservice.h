@@ -18,6 +18,9 @@ typedef struct
 }
 zbx_ipc_message_t;
 
+#define zbx_ipc_message_code(message) (message)->header[ZBX_IPC_MESSAGE_CODE]
+#define zbx_ipc_message_size(message) (message)->header[ZBX_IPC_MESSAGE_SIZE]
+
 /* messaging socket */
 typedef struct
 {

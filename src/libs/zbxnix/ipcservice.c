@@ -322,7 +322,7 @@ static int	ipc_message_read_buffer(zbx_ipc_message_t *message, zbx_uint32_t rx_b
 		if (ZBX_IPC_HEADER_SIZE > rx_bytes + copy_size)
 			return FAIL;
 
-		data_size = message->header[ZBX_IPC_MESSAGE_SIZE];
+		data_size = zbx_ipc_message_size(message);
 
 		if (0 == data_size)
 		{
@@ -335,7 +335,7 @@ static int	ipc_message_read_buffer(zbx_ipc_message_t *message, zbx_uint32_t rx_b
 	}
 	else
 	{
-		data_size = message->header[ZBX_IPC_MESSAGE_SIZE];
+		data_size = zbx_ipc_message_size(message);
 		data_offset = rx_bytes - ZBX_IPC_HEADER_SIZE;
 	}
 
@@ -365,7 +365,7 @@ static int	ipc_message_is_completed(const zbx_ipc_message_t *message, zbx_uint32
 	if (ZBX_IPC_HEADER_SIZE > rx_bytes)
 		return FAIL;
 
-	if (message->header[ZBX_IPC_MESSAGE_SIZE] + ZBX_IPC_HEADER_SIZE != rx_bytes)
+	if (zbx_ipc_message_size(message) + ZBX_IPC_HEADER_SIZE != rx_bytes)
 		return FAIL;
 
 	return SUCCEED;
@@ -414,7 +414,7 @@ static int	ipc_socket_read_message(zbx_ipc_socket_t *csocket, zbx_ipc_message_t 
 		if (ZBX_IPC_HEADER_SIZE < *rx_bytes)
 		{
 			offset = *rx_bytes - ZBX_IPC_HEADER_SIZE;
-			data_size = message->header[ZBX_IPC_MESSAGE_SIZE] - offset;
+			data_size = zbx_ipc_message_size(message) - offset;
 
 			/* long messages will be read directly into message buffer */
 			if (ZBX_IPC_SOCKET_BUFFER_SIZE * 0.75 < data_size)
@@ -592,7 +592,7 @@ static int	ipc_client_write(zbx_ipc_client_t *client)
 			return SUCCEED;
 	}
 
-	data_size = client->tx_message->header[ZBX_IPC_MESSAGE_SIZE];
+	data_size = zbx_ipc_message_size(client->tx_message);
 	data_offset = client->tx_bytes - ZBX_IPC_HEADER_SIZE;
 
 	while (data_offset < data_size)
@@ -1156,24 +1156,24 @@ void	zbx_ipc_message_init(zbx_ipc_message_t *message)
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 {
 	size_t		data_alloc = ZBX_IPC_DATA_DUMP_SIZE * 4 + 32, data_offset = 0;
-	zbx_uint32_t	i, data_num = message->header[ZBX_IPC_MESSAGE_SIZE];
+	zbx_uint32_t	i, data_num;
 
 	if (NULL == message)
 		return;
+
+	data_num = zbx_ipc_message_size(message);
 
 	if (ZBX_IPC_DATA_DUMP_SIZE < data_num)
 		data_num = ZBX_IPC_DATA_DUMP_SIZE;
 
 	*data = zbx_malloc(*data, data_alloc);
 	zbx_snprintf_alloc(data, &data_alloc, &data_offset, "code:%u size:%u data:",
-			message->header[ZBX_IPC_MESSAGE_CODE], message->header[ZBX_IPC_MESSAGE_SIZE]);
+			zbx_ipc_message_code(message), zbx_ipc_message_size(message));
 
 	for (i = 0; i < data_num; i++)
 	{
 		if (0 != i)
-		{
 			zbx_strcpy_alloc(data, &data_alloc, &data_offset, (0 == (i & 7) ? " | " : " "));
-		}
 
 		zbx_snprintf_alloc(data, &data_alloc, &data_offset, "%02x", (int)message->data[i]);
 	}
