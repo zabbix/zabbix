@@ -435,6 +435,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 
 	zbx_free(args);
+#ifdef _AIX
+	/* Initialize collecting of vmstat data early. This helps getting the real values on the */
+	/* first request. Also on the first request collector is starting to update vmstat data. */
+	collect_vmstat_data(&collector->vmstat);
+#endif
 
 	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));

@@ -2209,69 +2209,51 @@ function uncheckTableRows($cookieId = null) {
 }
 
 /**
+ * Trim each element of the script path. For example, " a / b / c d " => "a/b/c d"
+ *
+ * @param string $name
+ *
+ * @return string
+ */
+function trimPath($name) {
+	$path = splitPath($name);
+	$path = array_map('trim', $path);
+	$path = str_replace(['\\', '/'], ['\\\\', '\\/'], $path);
+	return implode('/', $path);
+}
+
+/**
  * Splitting string using slashes with escape backslash support and non-pair backslash cleanup.
  *
- * @param string $path					String path to parse.
- * @param bool   $stripSlashes			Remove escaped slashes from the path pieces.
- * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations.
+ * @param string $path
  *
  * @return array
  */
-function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
-	$position = 0;
-	$escapeCharacters = '';
-	$pathItemsArray = [];
-	$pathItemString = '';
+function splitPath($path) {
+	$path_items = [];
+	$path_item = '';
 
-	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {
-		// Determine how many escape characters we already have in the backlog.
-		$escapeCharacterCount = strlen($escapeCharacters);
+	for ($i = 0; isset($path[$i]); $i++) {
+		switch ($path[$i]) {
+			case '/':
+				$path_items[] = $path_item;
+				$path_item = '';
+				break;
 
-		if ($path[$position] === '/') {
-			// If we have no escape chars previously - save item into the array and move on.
-			if ($escapeCharacterCount == 0) {
-				$pathItemsArray[] = $pathItemString;
-				$escapeCharacters = '';
-				$pathItemString = '';
-				continue;
-			}
+			case '\\':
+				if (isset($path[++$i])) {
+					$path_item .= $path[$i];
+				}
+				break;
 
-			// We have a backslash before the / - keep it as part of the item and clean escape char buffer.
-			$pathItemString .= $escapeCharacters.$path[$position];
-			$escapeCharacters = '';
-		}
-		elseif ($cleanupBackslashes && $path[$position] === '\\') {
-
-			/*
-			 * If we had a backslash before - this is an escaped backslash, keep it and empty char backlog. This way
-			 * we save only paired backslashes.
-			 */
-			if ($escapeCharacterCount == 1) {
-				$pathItemString .= $escapeCharacters.$path[$position];
-				$escapeCharacters = '';
-			}
-			else {
-				// It is a first backslash - add it to the backlog.
-				$escapeCharacters .= $path[$position];
-			}
-		}
-		else {
-			// A regular character - save it and move on. If previous char was a backslash - it is dropped.
-			$pathItemString .= $path[$position];
-			$escapeCharacters = '';
+			default:
+				$path_item .= $path[$i];
 		}
 	}
 
-	// Save the path tail.
-	if (strlen($pathItemString) != 0) {
-		$pathItemsArray[] = $pathItemString;
-	}
+	$path_items[] = $path_item;
 
-	if ($stripSlashes) {
-		$pathItemsArray = array_map('stripslashes', $pathItemsArray);
-	}
-
-	return $pathItemsArray;
+	return $path_items;
 }
 
 /**

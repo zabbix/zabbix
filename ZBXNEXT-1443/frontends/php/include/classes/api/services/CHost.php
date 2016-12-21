@@ -734,10 +734,7 @@ class CHost extends CHostGeneral {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
 		$hostIds = zbx_objectValues($hosts, 'hostid');
 
-		// check permissions
-		if (!$this->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($hostIds, _('You do not have permission to perform this operation.'));
 
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
@@ -1146,7 +1143,7 @@ class CHost extends CHostGeneral {
 	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		$this->checkPermissions($hostids);
+		$this->checkPermissions($hostids, _('No permissions to referred object or it does not exist!'));
 
 		if (isset($data['interfaces'])) {
 			$options = [
@@ -1181,7 +1178,7 @@ class CHost extends CHostGeneral {
 		}
 
 		if (!$nopermissions) {
-			$this->checkPermissions($hostIds);
+			$this->checkPermissions($hostIds, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -1339,59 +1336,6 @@ class CHost extends CHostGeneral {
 		return ['hostids' => $hostIds];
 	}
 
-	/**
-	 * Check if user has read permissions for host.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'templated_hosts' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
-	 * Check if user has write permissions for host.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'editable' => true,
-			'templated_hosts' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1518,11 +1462,22 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException     if a host is not writable or does not exist
 	 *
-	 * @param array $hostIds
+	 * @param array  $hostids
+	 * @param string $error
 	 */
-	protected function checkPermissions(array $hostIds) {
-		if (!$this->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkPermissions(array $hostids, $error) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 	}
 

@@ -27,21 +27,27 @@ class CConfiguration extends CApiService {
 	/**
 	 * Export configuration data.
 	 *
-	 * $params structure:
-	 * array(
-	 * 	'options' => array(
-	 * 		'hosts' => array with host ids,
-	 * 		'templates' => array with templateids,
-	 *		 ...
-	 * 	),
-	 * 	'format' => 'json'|'xml'
-	 * )
-	 *
 	 * @param array $params
 	 *
 	 * @return string
 	 */
 	public function export(array $params) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::XML, CExportWriterFactory::JSON])],
+			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'groups' =>		['type' => API_IDS],
+				'hosts' =>		['type' => API_IDS],
+				'images' =>		['type' => API_IDS],
+				'maps' =>		['type' => API_IDS],
+				'screens' =>	['type' => API_IDS],
+				'templates' =>	['type' => API_IDS],
+				'valueMaps' =>	['type' => API_IDS]
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$export = new CConfigurationExport($params['options']);
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
@@ -54,22 +60,85 @@ class CConfiguration extends CApiService {
 	/**
 	 * Import configuration data.
 	 *
-	 * $params structure:
-	 * array(
-	 * 	'format' => 'json'|'xml'
-	 * 	'source' => configuration data in specified format,
-	 * 	'rules' => array(
-	 * 		'hosts' => array('createMissing' => true, 'updateExisting' => false),
-	 * 		'templates' => array('createMissing' => true, 'updateExisting' => true),
-	 * 		...
-	 * 	)
-	 * )
-	 *
-	 * @param $params
+	 * @param array $params
 	 *
 	 * @return bool
 	 */
 	public function import($params) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::XML, CImportReaderFactory::JSON])],
+			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'applications' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'graphs' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'groups' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'hosts' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]],
+				'httptests' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'images' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]],
+				'items' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'maps' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]],
+				'screens' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]],
+				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'templates' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]],
+				'templateScreens' =>	['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'triggers' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
+				]],
+				'valueMaps' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
+				]]
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$data = $importReader->read($params['source']);
 
