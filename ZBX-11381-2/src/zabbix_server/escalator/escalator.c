@@ -492,7 +492,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const 
 	if (0 == alerts_num)
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
-				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_problem" : NULL),
+				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL),
 				NULL);
 	}
 
@@ -786,8 +786,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
-					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+			substitute_simple_macros(&actionid, (NULL != r_event ? r_event : event), NULL, NULL, NULL,
+					NULL, NULL, NULL, &script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -821,7 +821,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx
 				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+			else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
+					sizeof(error))))
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -887,7 +888,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 	DB_ROW		row;
 	int		now, severity, medias_num = 0, status;
 	char		error[MAX_STRING_LEN], *perror;
-	const DB_EVENT	*c_event;
 	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
