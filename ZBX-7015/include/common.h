@@ -195,6 +195,7 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTO_REGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
+#define EVENT_SOURCE_COUNT		4
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -984,8 +985,6 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
-#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
-
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
@@ -1174,7 +1173,6 @@ int	get_item_key(char **exp, char **key);
 
 int	parse_host(char **exp, char **host);
 int	parse_key(char **exp);
-int	parse_function(char **exp, char **func, char **params);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
@@ -1216,22 +1214,22 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 #define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
 
-typedef struct
-{
-	char	*name;
-	char	**params;
-	int	nparam;
-}
-zbx_function_t;
+void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
+int	zbx_function_param_quote(char **param, int forced);
+int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
+int	zbx_function_validate_parameters(const char *expr, size_t *length);
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
-void	zbx_function_clean(zbx_function_t *func);
-int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
-int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+void	zbx_alarm_flag_set(void);
+void	zbx_alarm_flag_clear(void);
 
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
 #endif
+
+int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
@@ -1282,6 +1280,8 @@ typedef struct
 	zbx_strloc_t	macro;
 	/* function + parameters, for example: regsub("([0-9]+)", \1) */
 	zbx_strloc_t	func;
+	/* parameters, for example: ("([0-9]+)", \1) */
+	zbx_strloc_t	func_param;
 }
 zbx_token_func_macro_t;
 
@@ -1325,4 +1325,9 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
+#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+
 #endif
+

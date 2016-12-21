@@ -769,17 +769,22 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setModern(true)
 			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 	)
-	->addRow(_('Connections from host'), [
-		new CLabel([(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-			_('No encryption')
-		]),
-		BR(),
-		new CLabel([(new CCheckBox('tls_in_psk'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('PSK')]),
-		BR(),
-		new CLabel([(new CCheckBox('tls_in_cert'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-			_('Certificate')
-		])
-	])
+	->addRow(_('Connections from host'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('tls_in_none'))
+				->setLabel(_('No encryption'))
+				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+			)
+			->addItem((new CCheckBox('tls_in_psk'))
+				->setLabel(_('PSK'))
+				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+			)
+			->addItem((new CCheckBox('tls_in_cert'))
+				->setLabel(_('Certificate'))
+				->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+			)
+	)
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

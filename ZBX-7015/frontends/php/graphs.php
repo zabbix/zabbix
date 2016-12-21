@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -95,7 +96,7 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
  * Permissions
  */
 $groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable([$groupId])) {
+if ($groupId && !isWritableHostGroups([$groupId])) {
 	access_deny();
 }
 
@@ -138,17 +139,8 @@ elseif (hasRequest('graphid')) {
 		access_deny();
 	}
 }
-elseif ($hostId) {
-	// check whether host is editable by user
-	$host = (bool) API::Host()->get([
-		'output' => [],
-		'hostids' => $hostId,
-		'templated_hosts' => true,
-		'editable' => true
-	]);
-	if (!$host) {
-		access_deny();
-	}
+elseif ($hostId && !isWritableHostTemplates([$hostId])) {
+	access_deny();
 }
 
 /*
@@ -399,7 +391,7 @@ $pageFilter = new CPageFilter([
 
 if (empty($_REQUEST['parent_discoveryid'])) {
 	if ($pageFilter->groupid > 0) {
-		$groupId = $pageFilter->groupid;
+		$groupId = $pageFilter->groupids;
 	}
 	if ($pageFilter->hostid > 0) {
 		$hostId = $pageFilter->hostid;
@@ -645,7 +637,7 @@ else {
 	// get graphs
 	$options = [
 		'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
-		'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+		'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupids : null,
 		'discoveryids' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'editable' => true,
 		'output' => ['graphid', 'name', 'graphtype'],

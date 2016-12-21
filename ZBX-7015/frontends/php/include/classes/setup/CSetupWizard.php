@@ -92,7 +92,7 @@ class CSetupWizard extends CForm {
 		return false;
 	}
 
-	function bodyToString($destroy = true) {
+	protected function bodyToString($destroy = true) {
 		$setup_left = (new CDiv([
 			(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO), $this->getList()
 		]))->addClass(ZBX_STYLE_SETUP_LEFT);
@@ -131,7 +131,7 @@ class CSetupWizard extends CForm {
 
 		$setup_container = (new CDiv([$setup_left, $setup_right, $setup_footer]))->addClass(ZBX_STYLE_SETUP_CONTAINER);
 
-		return parent::bodyToString($destroy).$setup_container->ToString();
+		return parent::bodyToString($destroy).$setup_container->toString();
 	}
 
 	function getList() {

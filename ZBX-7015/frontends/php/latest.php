@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/groups.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -38,7 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groupids_subgroupids' => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -56,10 +55,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupids') && !API::HostGroup()->isReadable(getRequest('groupids'))) {
+if (getRequest('groupids') && !isReadableHostGroups(getRequest('groupids'))) {
 	access_deny();
 }
-if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
+if (getRequest('hostids') && !isReadableHosts(getRequest('hostids'))) {
 	access_deny();
 }
 
@@ -79,7 +78,6 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.application', getRequest('application', ''), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.latest.filter.subgroupids', getRequest('groupids_subgroupids', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
@@ -89,7 +87,6 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.latest.filter.show_details');
 	CProfile::delete('web.latest.filter.application');
 	CProfile::deleteIdx('web.latest.filter.groupids');
-	CProfile::deleteIdx('web.latest.filter.subgroupids');
 	CProfile::deleteIdx('web.latest.filter.hostids');
 	DBend();
 }
@@ -100,7 +97,6 @@ $filter = [
 	'showDetails' => CProfile::get('web.latest.filter.show_details'),
 	'application' => CProfile::get('web.latest.filter.application', ''),
 	'groupids' => CProfile::getArray('web.latest.filter.groupids'),
-	'subgroupids' => CProfile::getArray('web.latest.filter.subgroupids', []),
 	'hostids' => CProfile::getArray('web.latest.filter.hostids')
 ];
 
@@ -113,15 +109,46 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-$applications = $items = $hostScripts = [];
+$applications = [];
+$items = [];
+$hostScripts = [];
+$child_groups = [];
+
+// multiselect host groups
+$multiSelectHostGroupData = [];
+if ($filter['groupids'] !== null) {
+	$filterGroups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groupids'],
+		'preservekeys' => true
+	]);
+
+	foreach ($filterGroups as $group) {
+		$multiSelectHostGroupData[] = [
+			'id' => $group['groupid'],
+			'name' => $group['name']
+		];
+
+		$child_groups[] = $group['name'].'/';
+	}
+}
 
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
-	$groupids = $filter['groupids'];
-
-	if ($filter['subgroupids']) {
-		$groupids = getMultiselectGroupIds($groupids, $filter['subgroupids']);
+	$groupids = null;
+	if ($child_groups) {
+		$groups = $filterGroups;
+		foreach ($child_groups as $child_group) {
+			$child_groups = API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $child_group],
+				'startSearch' => true,
+				'preservekeys' => true
+			]);
+			$groups = array_replace($groups, $child_groups);
+		}
+		$groupids = array_keys($groups);
 	}
 
 	$hosts = API::Host()->get([
@@ -289,29 +316,6 @@ if ($filter['hostids']) {
 	}
 }
 
-// multiselect host groups
-$multiSelectHostGroupData = [];
-if ($filter['groupids'] !== null) {
-	$filterGroups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groupids'],
-		'preservekeys' => true
-	]);
-
-	foreach ($filter['subgroupids'] as $subgroup) {
-		if (array_key_exists($subgroup, $filterGroups)) {
-			$filterGroups[$subgroup]['name'] .= '/*';
-		}
-	}
-
-	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = [
-			'id' => $group['groupid'],
-			'name' => $group['name']
-		];
-	}
-}
-
 /*
  * Display
  */
@@ -331,7 +335,6 @@ $filterColumn1 = (new CFormList())
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $multiSelectHostGroupData,
-			'nested' => true,
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
@@ -485,8 +488,7 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-		->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -662,8 +664,7 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
-		->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink

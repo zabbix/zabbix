@@ -63,12 +63,12 @@ class CJsonRpc {
 	public function execute() {
 		if ($this->json->hasError()) {
 			$this->jsonError(null, '-32700', null, null, true);
-			return $this->json->encode($this->_response[0]);
+			return $this->json->encode($this->_response[0], [], false, false);
 		}
 
-		if ($this->_jsonDecoded === null || $this->_jsonDecoded == []) {
+		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded == []) {
 			$this->jsonError(null, '-32600', null, null, true);
-			return $this->json->encode($this->_response[0]);
+			return $this->json->encode($this->_response[0], [], false, false);
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -92,10 +92,10 @@ class CJsonRpc {
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return $this->json->encode($this->_response);
+			return $this->json->encode($this->_response, [], false, false);
 		}
 
-		return $this->json->encode($this->_response[0]);
+		return $this->json->encode($this->_response[0], [], false, false);
 	}
 
 	public function validate($call) {

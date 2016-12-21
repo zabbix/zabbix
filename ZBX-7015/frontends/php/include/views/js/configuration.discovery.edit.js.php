@@ -17,16 +17,12 @@
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
-	<?=	(new CListItem(
-			(new CLabel(
-				[
-					(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
-						->setId('uniqueness_criteria_#{dcheckid}'),
-					'#{name}'
-				],
-				'uniqueness_criteria_#{dcheckid}'
-			))
-		))
+	<?=	(new CListItem([
+			(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
+				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->setId('uniqueness_criteria_#{dcheckid}'),
+			new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}')
+		]))
 			->setId('uniqueness_criteria_row_#{dcheckid}')
 			->toString()
 	?>
@@ -636,7 +632,9 @@
 				error: function() {
 					overlayDialogue({
 						'title': '<?= _('Discovery check error') ?>',
-						'content': jQuery('<span>').text('<?= _('Cannot validate discovery check: invalid request or connection to Zabbix server failed.') ?>'),
+						'content': jQuery('<span>').text(<?= CJs::encodeJson(
+							_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')
+						) ?>),
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',

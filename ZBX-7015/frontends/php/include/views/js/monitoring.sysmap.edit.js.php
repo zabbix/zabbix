@@ -18,7 +18,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass('radio-segmented')
+				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -51,7 +51,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass('radio-segmented')
+				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -84,17 +84,11 @@
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
 
-		// clone button
 		$('#clone').click(function() {
-			// Remove buttons, sharing options and inaccessible user message.
-			$('#sysmapid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
+			$('#sysmapid, #delete, #clone, #inaccessible_user').remove();
 			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
-			$('#name').focus();
-
-			// Set map to private.
-			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
 			$('#tab_sysmap_tab').trigger('click');
@@ -106,6 +100,8 @@
 				'id': $('#current_user_userid').val(),
 				'name': $('#current_user_fullname').val()
 			});
+
+			$('#name').focus();
 		});
 
 		$('#label_format').triggerHandler('click');

@@ -275,11 +275,14 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
+
+typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 typedef struct
 {
@@ -287,6 +290,8 @@ typedef struct
 	int		(*function)();
 }
 MODE_FUNCTION;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000

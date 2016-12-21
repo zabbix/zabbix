@@ -734,10 +734,7 @@ class CHost extends CHostGeneral {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
 		$hostIds = zbx_objectValues($hosts, 'hostid');
 
-		// check permissions
-		if (!$this->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		$this->checkPermissions($hostIds, _('You do not have permission to perform this operation.'));
 
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
@@ -780,6 +777,10 @@ class CHost extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
+		if (!array_key_exists('hosts', $data) || !is_array($data['hosts'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'hosts'));
+		}
+
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
@@ -787,9 +788,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
-			],
+			'output' => ['hostid', 'host'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
@@ -829,9 +828,12 @@ class CHost extends CHostGeneral {
 			$data['tls_subject'] = '';
 		}
 
-		// check if hosts have at least 1 group
-		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
+		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
+			$host = reset($db_hosts);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host "%1$s" cannot be without host group.', $host['host'])
+			);
 		}
 
 		/*
@@ -1141,7 +1143,7 @@ class CHost extends CHostGeneral {
 	public function massRemove(array $data) {
 		$hostids = zbx_toArray($data['hostids']);
 
-		$this->checkPermissions($hostids);
+		$this->checkPermissions($hostids, _('No permissions to referred object or it does not exist!'));
 
 		if (isset($data['interfaces'])) {
 			$options = [
@@ -1176,7 +1178,7 @@ class CHost extends CHostGeneral {
 		}
 
 		if (!$nopermissions) {
-			$this->checkPermissions($hostIds);
+			$this->checkPermissions($hostIds, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -1334,59 +1336,6 @@ class CHost extends CHostGeneral {
 		return ['hostids' => $hostIds];
 	}
 
-	/**
-	 * Check if user has read permissions for host.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'templated_hosts' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
-	 * Check if user has write permissions for host.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'hostids' => $ids,
-			'editable' => true,
-			'templated_hosts' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1513,11 +1462,22 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException     if a host is not writable or does not exist
 	 *
-	 * @param array $hostIds
+	 * @param array  $hostids
+	 * @param string $error
 	 */
-	protected function checkPermissions(array $hostIds) {
-		if (!$this->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkPermissions(array $hostids, $error) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 	}
 
@@ -1615,7 +1575,9 @@ class CHost extends CHostGeneral {
 
 			// Validate "groups" field.
 			if (!array_key_exists('groups', $host) || !is_array($host['groups']) || !$host['groups']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".', $host['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host "%1$s" cannot be without host group.', $host['host'])
+				);
 			}
 
 			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
@@ -1773,8 +1735,8 @@ class CHost extends CHostGeneral {
 
 			// Validate "groups" field.
 			if (array_key_exists('groups', $host) && (!is_array($host['groups']) || !$host['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".',
-					$db_hosts[$host['hostid']]['host'])
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host "%1$s" cannot be without host group.', $db_hosts[$host['hostid']]['host'])
 				);
 			}
 

@@ -59,7 +59,7 @@ $fields = [
 	'add_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'new_permission' =>		[T_ZBX_STR, O_OPT, null,		 null,	null],
 	'groupids' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
-	'groupids_subgroupids' => [T_ZBX_STR, O_OPT, null,		 null,	null],
+	'subgroups' =>			[T_ZBX_STR, O_OPT, null,		 null,	null],
 	// form
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		 null,	null],
@@ -111,7 +111,7 @@ elseif (hasRequest('action')) {
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	$userGroup = [
+	$user_group = [
 		'name' => getRequest('gname'),
 		'users_status' => getRequest('users_status'),
 		'gui_access' => getRequest('gui_access'),
@@ -124,210 +124,121 @@ if (hasRequest('add') || hasRequest('update')) {
 
 	foreach ($groups_rights as $groupid => $group_rights) {
 		if ($groupid != 0 && $group_rights['permission'] != PERM_NONE) {
-			$userGroup['rights'][] = [
+			$user_group['rights'][] = [
 				'id' => $groupid,
 				'permission' => $group_rights['permission']
 			];
 		}
 	}
 
-	DBstart();
-
 	if (hasRequest('update')) {
-		$userGroup['usrgrpid'] = getRequest('usrgrpid');
-		$result = API::UserGroup()->update($userGroup);
+		$user_group['usrgrpid'] = getRequest('usrgrpid');
+		$result = (bool) API::UserGroup()->update($user_group);
 
-		$messageSuccess = _('Group updated');
-		$messageFailed = _('Cannot update group');
-		$action = AUDIT_ACTION_UPDATE;
+		show_messages($result, _('Group updated'), _('Cannot update group'));
 	}
 	else {
-		$result = API::UserGroup()->create($userGroup);
+		$result = (bool) API::UserGroup()->create($user_group);
 
-		$messageSuccess = _('Group added');
-		$messageFailed = _('Cannot add group');
-		$action = AUDIT_ACTION_ADD;
+		show_messages($result, _('Group added'), _('Cannot add group'));
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$userGroup['name'].']');
 		unset($_REQUEST['form']);
-	}
-
-	$result = DBend($result);
-
-	if ($result) {
 		uncheckTableRows();
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete'])) {
-	DBstart();
-
-	$result = API::UserGroup()->delete([$_REQUEST['usrgrpid']]);
+	$result = (bool) API::UserGroup()->delete([$_REQUEST['usrgrpid']]);
 
 	if ($result) {
-		$group = reset($dbUserGroup);
-
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$group['name'].']');
 		unset($_REQUEST['usrgrpid'], $_REQUEST['form']);
+		uncheckTableRows();
 	}
-
-	$result = DBend($result);
+	show_messages($result, _('Group deleted'), _('Cannot delete group'));
+}
+elseif (hasRequest('action') && getRequest('action') === 'usergroup.massdelete' && hasRequest('group_groupid')) {
+	$result = (bool) API::UserGroup()->delete(getRequest('group_groupid'));
 
 	if ($result) {
 		uncheckTableRows();
 	}
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 }
-elseif (hasRequest('action') && getRequest('action') === 'usergroup.massdelete' && hasRequest('group_groupid')) {
-	$groupIds = getRequest('group_groupid');
-	$groups = [];
-
-	$dbGroups = DBselect(
-		'SELECT ug.usrgrpid,ug.name'.
-		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
-	);
-	while ($group = DBfetch($dbGroups)) {
-		$groups[$group['usrgrpid']] = $group;
-	}
-
-	if ($groups) {
-		DBstart();
-
-		$result = API::UserGroup()->delete($groupIds);
-
-		if ($result) {
-			foreach ($groups as $groupId => $group) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$group['name'].']');
-			}
-		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows();
-		}
-		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-	}
-}
 elseif (hasRequest('action') && getRequest('action') === 'usergroup.set_gui_access') {
-	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
-	zbx_value2array($groupIds);
+	$usrgrpids = getRequest('group_groupid', getRequest('usrgrpid'));
+	zbx_value2array($usrgrpids);
 
-	$groups = [];
-	$dbGroups = DBselect(
-		'SELECT ug.usrgrpid,ug.name'.
-		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
-	);
-	while ($group = DBfetch($dbGroups)) {
-		$groups[$group['usrgrpid']] = $group;
+	$usrgrps = [];
+
+	foreach ($usrgrpids as $usrgrpid) {
+		$usrgrps[] = [
+			'usrgrpid' => $usrgrpid,
+			'gui_access' => getRequest('set_gui_access')
+		];
 	}
 
-	if ($groups) {
-		DBstart();
+	$result = (bool) API::UserGroup()->update($usrgrps);
 
-		$result = change_group_gui_access($groupIds, getRequest('set_gui_access'));
-
-		if ($result) {
-			$auditAction = (getRequest('set_gui_access') == GROUP_GUI_ACCESS_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
-
-			foreach ($groups as $groupId => $group) {
-				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'GUI access for group name ['.$group['name'].']');
-			}
-		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows();
-		}
-		show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
+	if ($result) {
+		uncheckTableRows();
 	}
+	show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.massenabledebug', 'usergroup.massdisabledebug'])) {
-	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
-	zbx_value2array($groupIds);
+	$usrgrpids = getRequest('group_groupid', getRequest('usrgrpid'));
+	zbx_value2array($usrgrpids);
 
-	$setDebugMode = (getRequest('action') == 'usergroup.massenabledebug') ? GROUP_DEBUG_MODE_ENABLED : GROUP_DEBUG_MODE_DISABLED;
+	$debug_mode = (getRequest('action') == 'usergroup.massenabledebug')
+		? GROUP_DEBUG_MODE_ENABLED
+		: GROUP_DEBUG_MODE_DISABLED;
 
-	$groups = [];
-	$dbGroup = DBselect(
-		'SELECT ug.usrgrpid,ug.name'.
-		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
-	);
-	while ($group = DBfetch($dbGroup)) {
-		$groups[$group['usrgrpid']] = $group;
+	$usrgrps = [];
+
+	foreach ($usrgrpids as $usrgrpid) {
+		$usrgrps[] = [
+			'usrgrpid' => $usrgrpid,
+			'debug_mode' => $debug_mode
+		];
 	}
 
-	if ($groups) {
-		DBstart();
+	$result = (bool) API::UserGroup()->update($usrgrps);
 
-		$result = change_group_debug_mode($groupIds, $setDebugMode);
-
-		if ($result) {
-			$auditAction = ($setDebugMode == GROUP_DEBUG_MODE_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
-
-			foreach ($groups as $groupId => $group) {
-				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'Debug mode for group name ['.$group['name'].']');
-			}
-		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows();
-		}
-		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
+	if ($result) {
+		uncheckTableRows();
 	}
+	show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.massenable', 'usergroup.massdisable'])) {
-	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
-	zbx_value2array($groupIds);
+	$usrgrpids = getRequest('group_groupid', getRequest('usrgrpid'));
+	zbx_value2array($usrgrpids);
 
-	$enable = (getRequest('action') == 'usergroup.massenable');
-	$status = $enable ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
-	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
-	$groups = [];
+	$users_status = (getRequest('action') == 'usergroup.massenable')
+		? GROUP_STATUS_ENABLED
+		: GROUP_STATUS_DISABLED;
 
-	$dbGroups = DBselect(
-		'SELECT ug.usrgrpid,ug.name'.
-		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
-	);
-	while ($group = DBfetch($dbGroups)) {
-		$groups[$group['usrgrpid']] = $group;
+	$usrgrps = [];
+
+	foreach ($usrgrpids as $usrgrpid) {
+		$usrgrps[] = [
+			'usrgrpid' => $usrgrpid,
+			'users_status' => $users_status
+		];
 	}
-	$updated = count($groups);
 
-	if ($groups) {
-		DBstart();
+	$result = (bool) API::UserGroup()->update($usrgrps);
 
-		$result = change_group_status($groupIds, $status);
+	$messageSuccess = (getRequest('action') == 'usergroup.massenable')
+		? _n('User group enabled', 'User groups enabled', count($usrgrps))
+		: _n('User group disabled', 'User groups disabled', count($usrgrps));
+	$messageFailed = (getRequest('action') == 'usergroup.massenable')
+		? _n('Cannot enable user group', 'Cannot enable user groups', count($usrgrps))
+		: _n('Cannot disable user group', 'Cannot disable user groups', count($usrgrps));
 
-		if ($result) {
-			foreach ($groups as $group) {
-				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'User status for group name ['.$group['name'].']');
-			}
-		}
-
-		$messageSuccess = $enable
-			? _n('User group enabled', 'User groups enabled', $updated)
-			: _n('User group disabled', 'User groups disabled', $updated);
-		$messageFailed = $enable
-			? _n('Cannot enable user group', 'Cannot enable user groups', $updated)
-			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows();
-		}
-		show_messages($result, $messageSuccess, $messageFailed);
+	if ($result) {
+		uncheckTableRows();
 	}
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
@@ -374,9 +285,15 @@ if (hasRequest('form')) {
 
 	if (hasRequest('add_permission')) {
 		// Add new permission with submit().
+		if (hasRequest('subgroups')) {
+			$groupids = [];
+			$groupids_subgroupids = getRequest('groupids', []);
+		}
+		else {
+			$groupids = getRequest('groupids', []);
+			$groupids_subgroupids = [];
+		}
 
-		$groupids = getRequest('groupids', []);
-		$groupids_subgroupids = getRequest('groupids_subgroupids', []);
 		$new_permission = getRequest('new_permission', PERM_NONE);
 
 		$data['groups_rights'] = collapseHostGroupRights(

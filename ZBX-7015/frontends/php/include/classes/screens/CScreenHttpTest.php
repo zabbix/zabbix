@@ -72,8 +72,8 @@ class CScreenHttpTest extends CScreenBase {
 			if ($this->hostid != 0) {
 				$options['hostids'] = [$this->hostid];
 			}
-			elseif ($this->groupid != 0) {
-				$options['groupids'] = [$this->groupid];
+			elseif ($this->groupid) {
+				$options['groupids'] = zbx_toArray($this->groupid);
 			}
 
 			$httptests = API::HttpTest()->get($options);
@@ -89,7 +89,7 @@ class CScreenHttpTest extends CScreenBase {
 
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'web.view')
-				->setArgument('groupid', $this->groupid)
+				->setArgument('groupid', $this->data['groupid'])
 				->setArgument('hostid', $this->hostid)
 				->setArgument('fullscreen', $this->data['fullscreen']);
 

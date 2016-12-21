@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -47,7 +48,7 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
+if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
 
@@ -116,10 +117,9 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	$options = [
 		'output' => ['hostid', 'name'],
 		'selectInventory' => [$_REQUEST['groupby']], // only one field is required
-		'withInventory' => true
+		'withInventory' => true,
+		'groupids' => $pageFilter->groupids
 	];
-	if($pageFilter->groupid > 0)
-		$options['groupids'] = $pageFilter->groupid;
 
 	$hosts = API::Host()->get($options);
 

@@ -88,14 +88,17 @@ AC_DEFUN([AX_LIB_MYSQL],
 
             for i in $_full_libmysql_libs; do
                 case $i in
-		    -lmysqlclient)
-		        _client_lib_name="mysqlclient"
-	     ;;
-		    -lperconaserverclient)
-		        _client_lib_name="perconaserverclient"
+                    -lmysqlclient)
+                        _client_lib_name="mysqlclient"
+                ;;
+                    -lperconaserverclient)
+                        _client_lib_name="perconaserverclient"
 
-             ;;
-                   -L*)
+                ;;
+                    -lmariadbclient)
+                        _client_lib_name="mariadbclient"
+                ;;
+                    -L*)
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
                 ;;
                 esac
@@ -104,7 +107,7 @@ AC_DEFUN([AX_LIB_MYSQL],
             if test "x$enable_static" = "xyes"; then
                for i in $_full_libmysql_libs; do
                    case $i in
-           	      -lmysqlclient|-lperconaserverclient)
+           	      -lmysqlclient|-lperconaserverclient|-lmariadbclient)
            	    ;;
                       -l*)
 				_lib_name="`echo "$i" | cut -b3-`"
