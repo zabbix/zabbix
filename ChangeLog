@@ -361,48 +361,6 @@ New features:
 ..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 ........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
-Changes for 3.0.7
-
-3.0.7rc2 was released as 3.0.7 without any changes
-
---------------------------------------------------------------------------------
-Changes for 3.0.7rc2
-
-New features:
-A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
-
-Bug fixes:
-..F....... [ZBX-11613] fixed "Response time" graph on "Details of web scenario" page (Sasha)
-
---------------------------------------------------------------------------------
-Changes for 3.0.7rc1
-
-Bug fixes:
-.......PS. [ZBX-10983] fixed crash in IPMI poller, added deleting of inactive IPMI hosts in 'unreachable poller', improved code correctness and debug logging (Andris)
-..F....... [ZBX-11354] fixed applications and application prototypes being reset in templated items and item prototypes when modifying its parent (Ivo)
-..F....... [ZBXNEXT-3487] added vm.vmemory.size to active item helper, updated descriptions and sorted; thanks richlv for patch (vso)
-...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
-...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
-........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
-.......PS. [ZBX-11573] fixed possible crash when polling vmware.hv.health.status (wiper)
-...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
-....I..... [ZBX-10979] changed vmware.vm.cpu.ready item units and description (wiper)
-
---------------------------------------------------------------------------------
-Changes for 3.0.6
-
-New features:
-A.F....... [ZBX-1357] updated English (United States), Persian, Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
-
---------------------------------------------------------------------------------
-Changes for 3.0.6rc1
-
-New features:
-.......PS. [ZBXNEXT-2010] added vmware.hv.datastore.size keys for VMware datastore capacity monitoring (wiper)
-........S. [ZBXNEXT-1859] improved performance by not inserting events of auto registration if no such action was enabled, insert/update/select in a bulk on auto registration data from proxy (Sasha, vso)
-..FG.....T [ZBXNEXT-3487] added new key for virtual memory monitoring on Windows (vso, wiper)
-........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
-........S. [ZBXNEXT-2969] added support for suffixed and negative trigger function parameters (gleb)
 
 Bug fixes:
 ........S. [ZBX-11509] fixed system.run command parameter to be quoted only if it contains special characters (vso)
