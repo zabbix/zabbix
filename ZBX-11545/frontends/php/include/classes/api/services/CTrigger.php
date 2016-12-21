@@ -534,6 +534,28 @@ class CTrigger extends CTriggerGeneral {
 		$db_triggers = [];
 
 		$this->validateUpdate($triggers, $db_triggers);
+
+		$validate_dependencies = [];
+		foreach ($triggers as $tnum => $trigger) {
+			$db_trigger = $db_triggers[$tnum];
+
+			$expressions_changed = ($trigger['expression'] !== $db_trigger['expression']
+				|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']);
+
+			if ($expressions_changed && $db_trigger['dependencies'] && !array_key_exists('dependencies', $trigger)) {
+				foreach ($db_trigger['dependencies'] as $dep) {
+					$validate_dependencies[] = [
+						'triggerid' => $trigger['triggerid'],
+						'dependsOnTriggerid' => $dep['triggerid']
+					];
+				}
+			}
+		}
+
+		if ($validate_dependencies) {
+			$this->validateAddDependencies($validate_dependencies);
+		}
+
 		$this->updateReal($triggers, $db_triggers);
 
 		foreach ($triggers as $trigger) {
