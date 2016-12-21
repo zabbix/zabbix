@@ -5609,7 +5609,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tls_connection_type_name(sock->connection_type), host);
+				zbx_tcp_connection_type_name(sock->connection_type), host);
 		return FAIL;
 	}
 
