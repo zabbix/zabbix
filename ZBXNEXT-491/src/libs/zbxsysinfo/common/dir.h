@@ -38,7 +38,7 @@ typedef struct
 typedef struct
 {
 	zbx_uint64_t st_dev;			/* device */
-	zbx_uint64_t st_ino;			/* File serial number.*/
+	zbx_uint64_t st_ino;			/* file serial number */
 } zbx_file_descriptor_t;
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
