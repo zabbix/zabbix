@@ -214,8 +214,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Create user.
-	 *
 	 * @param array $users
 	 *
 	 * @return array
@@ -245,8 +243,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $users
 	 *
 	 * @throws APIException if the input is invalid.
@@ -299,8 +295,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update user.
-	 *
 	 * @param array $users
 	 *
 	 * @return array
@@ -349,8 +343,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $users
 	 * @param array $db_users
 	 *
@@ -785,8 +777,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Delete user.
-	 *
 	 * @param array $userids
 	 *
 	 * @return array
@@ -805,8 +795,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @param array $userids
 	 * @param array $db_users
 	 *
@@ -1327,8 +1315,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Login user.
-	 *
 	 * @param array $user
 	 *
 	 * @return string|array

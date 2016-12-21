@@ -401,8 +401,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Create host groups.
-	 *
 	 * @param array  $groups
 	 *
 	 * @return array
@@ -425,8 +423,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Update host groups.
-	 *
 	 * @param array  $groups
 	 *
 	 * @return array
@@ -455,8 +451,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Delete host groups.
-	 *
 	 * @param array $groupids
 	 * @param bool 	$nopermissions
 	 *
@@ -691,8 +685,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $groups
 	 *
 	 * @throws APIException if the input is invalid.
@@ -713,8 +705,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $groups
 	 * @param array $db_groups
 	 *

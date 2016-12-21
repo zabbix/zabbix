@@ -184,8 +184,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Add scripts.
-	 *
 	 * @param array $scripts
 	 *
 	 * @return array
@@ -206,8 +204,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $scripts
 	 *
 	 * @throws APIException if the input is invalid
@@ -239,8 +235,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Update scripts.
-	 *
 	 * @param array $scripts
 	 *
 	 * @return array
@@ -286,8 +280,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $scripts
 	 * @param array $db_scripts
 	 *
@@ -497,8 +489,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Delete scripts.
-	 *
 	 * @param array $scriptids
 	 *
 	 * @return array
@@ -514,8 +504,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @param array $scriptids
 	 * @param array $db_scripts
 	 *
@@ -565,8 +553,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Execute script.
-	 *
 	 * @param array $data
 	 *
 	 * @return array
