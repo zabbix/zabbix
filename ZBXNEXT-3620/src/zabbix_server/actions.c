@@ -493,6 +493,20 @@ static int	check_trigger_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t
 	return SUCCEED;
 }
 
+static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair)
+{
+	int	i;
+
+	zbx_vector_uint64_pair_reserve(objectids_pair, objectids->values_num);
+
+	for (i = 0; i < objectids->values_num; i++)
+	{
+		zbx_uint64_pair_t	pair = {objectids->values[i], objectids->values[i]};
+
+		zbx_vector_uint64_pair_append(objectids_pair, pair);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_trigger_hierarchy                                          *
@@ -514,42 +528,32 @@ static int	check_trigger_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t
  *                                        template id and value               *
  *                                                                            *
  ******************************************************************************/
-static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_vector_uint64_t *objectids_second,
+static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair,
 		DB_CONDITION *condition, zbx_uint64_t condition_value,
 		hierarchy_sql_allocate_func_t hierarchy_sql_allocate,
 		hierarchy_row_check_func_t hierarchy_row_check)
 {
 	int				i;
 	zbx_vector_uint64_t		objectids_tmp;
-	zbx_vector_uint64_pair_t	triggerids, triggerids_tmp;
+	zbx_vector_uint64_pair_t	triggerids_tmp;
 	char				*sql = NULL;
 	size_t				sql_alloc = 256;
 
-	zbx_vector_uint64_pair_create(&triggerids);
 	zbx_vector_uint64_pair_create(&triggerids_tmp);
 	zbx_vector_uint64_create(&objectids_tmp);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_vector_uint64_pair_reserve(&triggerids, objectids_first->values_num);
-	zbx_vector_uint64_reserve(&objectids_tmp, objectids_first->values_num);
+	zbx_vector_uint64_reserve(&objectids_tmp, objectids_pair->values_num);
 
-	for (i = 0; i < objectids_first->values_num; i++)
-	{
-		/* first is original trigger id, second is next id in hierarchy which will be updated per level */
-		zbx_uint64_pair_t	trigger_pair = {objectids_first->values[i], objectids_second->values[i]};
-
-		zbx_vector_uint64_pair_append(&triggerids, trigger_pair);
-	}
-
-	while (0 != triggerids.values_num)
+	while (0 != objectids_pair->values_num)
 	{
 		DB_RESULT	result;
 		DB_ROW		row;
 
-		for (i = 0; i < triggerids.values_num; i++)
+		for (i = 0; i < objectids_pair->values_num; i++)
 		{
-			zbx_vector_uint64_append(&objectids_tmp, triggerids.values[i].second);
+			zbx_vector_uint64_append(&objectids_tmp, objectids_pair->values[i].second);
 		}
 
 		hierarchy_sql_allocate(&sql, &sql_alloc, &objectids_tmp);
@@ -566,27 +570,27 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_ve
 			if (value == condition_value)
 			{
 				/* find all templates or trigger id's that match our condition and get original id */
-				for (i = 0; i < triggerids.values_num; i++)
+				for (i = 0; i < objectids_pair->values_num; i++)
 				{
 					/* objectid is id that has template id, that match condition */
 					/* second are those that we did select on */
-					if (triggerids.values[i].second == objectid)
+					if (objectids_pair->values[i].second == objectid)
 					{
 						if (CONDITION_OPERATOR_EQUAL == condition->operator)
 						{
 							zbx_vector_uint64_append(&condition->objectids,
-									triggerids.values[i].first);
+									objectids_pair->values[i].first);
 						}
 						else
 						{
 							int j;
 
 							/* remove equals from result set, leaving only not equals */
-							if (FAIL != (j = zbx_vector_uint64_search(objectids_first,
-									triggerids.values[i].first,
+							if (FAIL != (j = zbx_vector_uint64_search(objectids,
+									objectids_pair->values[i].first,
 									ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 							{
-								zbx_vector_uint64_remove_noorder(objectids_first, j);
+								zbx_vector_uint64_remove_noorder(objectids, j);
 							}
 						}
 					}
@@ -595,12 +599,13 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_ve
 			else
 			{
 				/* update template id to next level, to compare to condition in next select */
-				for (i = 0; i < triggerids.values_num; i++)
+				for (i = 0; i < objectids_pair->values_num; i++)
 				{
-					if (triggerids.values[i].second == objectid)
+					if (objectids_pair->values[i].second == objectid)
 					{
-						triggerids.values[i].second = templateid;
-						zbx_vector_uint64_pair_append(&triggerids_tmp, triggerids.values[i]);
+						objectids_pair->values[i].second = templateid;
+						zbx_vector_uint64_pair_append(&triggerids_tmp,
+								objectids_pair->values[i]);
 					}
 				}
 			}
@@ -608,11 +613,11 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_ve
 		DBfree_result(result);
 
 		/* resolve in next select only those triggerids that have template id and not equal to condition */
-		zbx_vector_uint64_pair_clear(&triggerids);
+		zbx_vector_uint64_pair_clear(objectids_pair);
 
 		for (i = 0; i < triggerids_tmp.values_num; i++)
 		{
-			zbx_vector_uint64_pair_append(&triggerids, triggerids_tmp.values[i]);
+			zbx_vector_uint64_pair_append(objectids_pair, triggerids_tmp.values[i]);
 		}
 
 		zbx_vector_uint64_pair_clear(&triggerids_tmp);
@@ -622,13 +627,12 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_ve
 	/* equals are deleted so copy to result those that are left (not equals)  */
 	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 	{
-		for (i = 0; i < objectids_first->values_num; i++)
+		for (i = 0; i < objectids->values_num; i++)
 		{
-			zbx_vector_uint64_append(&condition->objectids, objectids_first->values[i]);
+			zbx_vector_uint64_append(&condition->objectids, objectids->values[i]);
 		}
 	}
 
-	zbx_vector_uint64_pair_destroy(&triggerids);
 	zbx_vector_uint64_pair_destroy(&triggerids_tmp);
 	zbx_vector_uint64_destroy(&objectids_tmp);
 
@@ -651,9 +655,10 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids_first, zbx_ve
  ******************************************************************************/
 static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	zbx_uint64_t		condition_value;
-	int			i;
-	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t			condition_value;
+	int				i;
+	zbx_vector_uint64_t		objectids;
+	zbx_vector_uint64_pair_t	objectids_pair;
 
 	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
 		return NOTSUPPORTED;
@@ -661,6 +666,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	ZBX_STR2UINT64(condition_value, condition->value);
 
 	zbx_vector_uint64_create(&objectids);
+	zbx_vector_uint64_pair_create(&objectids_pair);
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
@@ -676,11 +682,16 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	}
 
 	if (0 != objectids.values_num)
-		check_trigger_hierarchy(&objectids, &objectids, condition, condition_value,
+	{
+		objectids_to_pair(&objectids, &objectids_pair);
+
+		check_trigger_hierarchy(&objectids, &objectids_pair, condition, condition_value,
 				check_trigger_id_sql_alloc,
 				check_trigger_id_row);
+	}
 
 	zbx_vector_uint64_destroy(&objectids);
+	zbx_vector_uint64_pair_destroy(&objectids_pair);
 
 	return SUCCEED;
 }
@@ -789,50 +800,47 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	DB_ROW				row;
 	zbx_uint64_t			condition_value;
 	int				i;
-	zbx_vector_uint64_t		objectids_first, objectids_second;
+	zbx_vector_uint64_t		objectids;
+	zbx_vector_uint64_pair_t	objectids_pair;
 
 	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
 		return NOTSUPPORTED;
 
-	zbx_vector_uint64_create(&objectids_first);
-	zbx_vector_uint64_create(&objectids_second);
+	zbx_vector_uint64_create(&objectids);
+	zbx_vector_uint64_pair_create(&objectids_pair);
 
-	get_object_ids(esc_events, &objectids_first);
+	get_object_ids(esc_events, &objectids);
 
-	zbx_vector_uint64_reserve(&objectids_second, objectids_first.values_num);
-
-	for (i = 0; i < objectids_first.values_num; i++)
-	{
-		zbx_vector_uint64_append(&objectids_second, objectids_first.values[i]);
-	}
+	objectids_to_pair(&objectids, &objectids_pair);
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids_first);
+	trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	objectid, parent_triggerid;
+		zbx_uint64_t		parent_triggerid;
+		zbx_uint64_pair_t	pair;
 
-		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_STR2UINT64(pair.first, row[0]);
 		ZBX_STR2UINT64(parent_triggerid, row[1]);
 
-		if (FAIL != (i = zbx_vector_uint64_search(&objectids_second, objectid,
+		if (FAIL != (i = zbx_vector_uint64_pair_search(&objectids_pair, pair,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
-			objectids_second.values[i] = parent_triggerid;
+			objectids_pair.values[i].second = parent_triggerid;
 		}
 	}
 	DBfree_result(result);
 
-	check_trigger_hierarchy(&objectids_first, &objectids_second, condition, condition_value,
+	check_trigger_hierarchy(&objectids, &objectids_pair, condition, condition_value,
 			check_template_id_sql_alloc,
 			check_template_id_row);
 
-	zbx_vector_uint64_destroy(&objectids_first);
-	zbx_vector_uint64_destroy(&objectids_second);
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_vector_uint64_pair_destroy(&objectids_pair);
 	zbx_free(sql);
 
 	return SUCCEED;
@@ -2343,64 +2351,64 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 	DB_ROW				row;
 	zbx_uint64_t			condition_value;
 	int				i, j;
-	zbx_vector_uint64_t		objectids_first[2], objectids_second[2];
+	zbx_vector_uint64_t		objectids[2];
+	zbx_vector_uint64_pair_t	objectids_pair[2];
 
 	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
 		return NOTSUPPORTED;
 
 	for (i = 0; i < 2; i++)
 	{
-		zbx_vector_uint64_create(&objectids_first[i]);
-		zbx_vector_uint64_create(&objectids_second[i]);
+		zbx_vector_uint64_create(&objectids[i]);
+		zbx_vector_uint64_pair_create(&objectids_pair[i]);
 	}
 
-	get_object_ids_internal(esc_events, objectids_first);
+	get_object_ids_internal(esc_events, objectids);
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
 	for (i = 0; i < 2; i++)
 	{
-		if (0 == objectids_first[i].values_num)
+		zbx_vector_uint64_t		*objectids_ptr = &objectids[i];
+		zbx_vector_uint64_pair_t	*objectids_pair_ptr = &objectids_pair[i];
+
+		if (0 == objectids_ptr->values_num)
 			continue;
 
-		zbx_vector_uint64_reserve(&objectids_second[i], objectids_first[i].values_num);
-
-		for (j = 0; j < objectids_first[i].values_num; j++)
-		{
-			zbx_vector_uint64_append(&objectids_second[i], objectids_first[i].values[j]);
-		}
+		objectids_to_pair(objectids_ptr, objectids_pair_ptr);
 
 		if (0 == i)
-			trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids_first[i]);
+			trigger_parents_sql_alloc(&sql, &sql_alloc, objectids_ptr);
 		else
-			item_parents_sql_alloc(&sql, &sql_alloc, &objectids_first[i]);
+			item_parents_sql_alloc(&sql, &sql_alloc, objectids_ptr);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t	objectid, parent_triggerid;
+			zbx_uint64_t		parent_triggerid;
+			zbx_uint64_pair_t	pair;
 
-			ZBX_STR2UINT64(objectid, row[0]);
+			ZBX_STR2UINT64(pair.first, row[0]);
 			ZBX_STR2UINT64(parent_triggerid, row[1]);
 
-			if (FAIL != (j = zbx_vector_uint64_search(&objectids_second[i], objectid,
+			if (FAIL != (j = zbx_vector_uint64_pair_search(objectids_pair_ptr, pair,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				objectids_second[i].values[j] = parent_triggerid;
+				objectids_pair_ptr->values[j].second = parent_triggerid;
 			}
 		}
 		DBfree_result(result);
 
-		check_trigger_hierarchy(&objectids_first[i], &objectids_second[i], condition, condition_value,
+		check_trigger_hierarchy(objectids_ptr, objectids_pair_ptr, condition, condition_value,
 				i == 0 ? check_template_id_sql_alloc : check_template_id_item_sql_alloc,
 				check_template_id_row);
 	}
 
 	for (i = 0; i < 2; i++)
 	{
-		zbx_vector_uint64_destroy(&objectids_first[i]);
-		zbx_vector_uint64_destroy(&objectids_second[i]);
+		zbx_vector_uint64_destroy(&objectids[i]);
+		zbx_vector_uint64_pair_destroy(&objectids_pair[i]);
 	}
 	zbx_free(sql);
 
