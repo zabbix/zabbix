@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
 #	else
@@ -28,7 +28,7 @@ typedef long	ssize_t;
 #	endif
 #endif
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
 #	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
@@ -37,6 +37,7 @@ typedef long	ssize_t;
 #	define ZBX_PROTO_AGAIN		WSAEINTR
 #	define ZBX_PROTO_ERROR		SOCKET_ERROR
 #	define ZBX_SOCKET_ERROR		INVALID_SOCKET
+#	define ZBX_SOCKET_TO_INT(s)	((int)(s))
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
@@ -46,9 +47,10 @@ typedef long	ssize_t;
 #	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
 #	define ZBX_SOCKET_ERROR		-1
+#	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
 
-#if defined(SOCKET) || defined(_WINDOWS)
+#ifdef _WINDOWS
 typedef SOCKET	ZBX_SOCKET;
 #else
 typedef int	ZBX_SOCKET;
@@ -96,7 +98,7 @@ zbx_socket_t;
 
 const char	*zbx_socket_strerror(void);
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
 
@@ -113,6 +115,8 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 #define ZBX_TCP_SEC_TLS_PSK_TXT		"psk"
 #define ZBX_TCP_SEC_TLS_CERT_TXT	"cert"
 
+const char	*zbx_tcp_connection_type_name(unsigned int type);
+
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)
 #define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, ZBX_TCP_PROTOCOL, timeout)
@@ -122,7 +126,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
@@ -178,10 +182,12 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int 
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 
-#if defined(HAVE_IPV6)
-#define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)						\
-	getnameinfo(sa, AF_INET == (sa)->sa_family ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),	\
-		host, hostlen, serv, servlen, flags)
+#ifdef HAVE_IPV6
+#	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\
+			getnameinfo(sa, AF_INET == (sa)->sa_family ?		\
+					sizeof(struct sockaddr_in) :		\
+					sizeof(struct sockaddr_in6),		\
+					host, hostlen, serv, servlen, flags)
 #endif
 
 #endif

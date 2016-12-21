@@ -30,6 +30,10 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-11101] fixed potential crash in case of failure in zbx_tls_connect() with mbed TLS (gleb)
+...G...PS. [ZBX-11101] fixed compilation warnings regarding gnutls_transport_set_ptr() with GnuTLS (asaveljevs, gleb)
+...G...PS. [ZBX-11101] fixed certificates with empty issuer and subject fields being rejected with OpenSSL (asaveljevs, gleb)
+...G...PS. [ZBX-11101] fixed daemon behavior being affected by logging level when processing TLS connections (asaveljevs, gleb)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.3
@@ -324,6 +328,10 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-11101] fixed potential crash in case of failure in zbx_tls_connect() with mbed TLS (gleb)
+...G...PS. [ZBX-11101] fixed compilation warnings regarding gnutls_transport_set_ptr() with GnuTLS (asaveljevs, gleb)
+...G...PS. [ZBX-11101] fixed certificates with empty issuer and subject fields being rejected with OpenSSL (asaveljevs, gleb)
+...G...PS. [ZBX-11101] fixed daemon behavior being affected by logging level when processing TLS connections (asaveljevs, gleb)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.7
