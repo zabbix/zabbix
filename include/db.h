@@ -124,7 +124,7 @@ struct	_DC_TRIGGER;
 #define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_DELAY_FLEX_LEN		255
+#define ITEM_DELAY_FLEX_LEN		1024
 #define ITEM_DELAY_FLEX_LEN_MAX		(ITEM_DELAY_FLEX_LEN + 1)
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
@@ -344,6 +344,7 @@ typedef struct
 	zbx_uint64_t	actionid;
 	char		*value;
 	char		*value2;
+	int		condition_result;
 	unsigned char	conditiontype;
 	unsigned char	operator;
 }

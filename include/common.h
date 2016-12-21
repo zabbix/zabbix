@@ -195,6 +195,7 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTO_REGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
+#define EVENT_SOURCE_COUNT		4
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -1324,6 +1325,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
+#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+
 #define ZBX_PREPROC_MULTIPLIER		1
 #define ZBX_PREPROC_RTRIM		2
 #define ZBX_PREPROC_LTRIM		3
@@ -1334,7 +1339,6 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_HEX2DEC		8
 #define ZBX_PREPROC_DELTA_VALUE		9
 #define ZBX_PREPROC_DELTA_SPEED 	10
-
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
@@ -1373,3 +1377,4 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 int	zbx_validate_value_dbl(double value);
 
 #endif
+

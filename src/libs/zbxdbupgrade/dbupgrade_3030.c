@@ -141,6 +141,20 @@ static int	DBpatch_3030012(void)
 
 static int	DBpatch_3030013(void)
 {
+	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field);
+}
+
+static int	DBpatch_3030014(void)
+{
+	const ZBX_FIELD field = {"delay_flex", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
+static int	DBpatch_3030015(void)
+{
 	const ZBX_TABLE table =
 			{"item_preproc", "item_preprocid", 0,
 				{
@@ -157,19 +171,19 @@ static int	DBpatch_3030013(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3030014(void)
+static int	DBpatch_3030016(void)
 {
 	return DBcreate_index("item_preproc", "item_preproc_1", "itemid, step", 0);
 }
 
-static int	DBpatch_3030015(void)
+static int	DBpatch_3030017(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
 
-static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
+static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
 {
 	int	step = 1;
@@ -202,7 +216,7 @@ static void	DBpatch_3030016_add_numeric_preproc_steps(zbx_db_insert_t *db_insert
 
 }
 
-static int	DBpatch_3030016(void)
+static int	DBpatch_3030018(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -228,7 +242,7 @@ static int	DBpatch_3030016(void)
 				ZBX_STR2UCHAR(data_type, row[2]);
 				formula = (1 == atoi(row[3]) ? row[4] : NULL);
 				ZBX_STR2UCHAR(delta, row[5]);
-				DBpatch_3030016_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
+				DBpatch_3030018_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
 						formula, delta);
 				break;
 		}
@@ -243,17 +257,17 @@ static int	DBpatch_3030016(void)
 	return ret;
 }
 
-static int	DBpatch_3030017(void)
+static int	DBpatch_3030019(void)
 {
 	return DBdrop_field("items", "multiplier");
 }
 
-static int	DBpatch_3030018(void)
+static int	DBpatch_3030020(void)
 {
 	return DBdrop_field("items", "data_type");
 }
 
-static int	DBpatch_3030019(void)
+static int	DBpatch_3030021(void)
 {
 	return DBdrop_field("items", "delta");
 }
@@ -284,5 +298,7 @@ DBPATCH_ADD(3030016, 0, 1)
 DBPATCH_ADD(3030017, 0, 1)
 DBPATCH_ADD(3030018, 0, 1)
 DBPATCH_ADD(3030019, 0, 1)
+DBPATCH_ADD(3030020, 0, 1)
+DBPATCH_ADD(3030021, 0, 1)
 
 DBPATCH_END()
