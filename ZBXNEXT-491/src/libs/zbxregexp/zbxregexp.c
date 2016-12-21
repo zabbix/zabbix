@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxregexp.h"
 
 #if defined(_WINDOWS)
@@ -27,18 +26,20 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: regex_compile                                                    *
+ * Function: zbx_regexp_compile                                               *
  *                                                                            *
  * Purpose: creates compiled regex from pattern, checks for errors in pattern *
  *                                                                            *
- * Parameters: pattern    - [IN] pattern                                      *
- *             flags      - [IN] regexp compilation params passed to regcomp  *
+ * Parameters: pattern    - [IN] regular expression as a text string          *
+ *             flags      - [IN] regexp compilation params passed to regcomp. *
+ *                          See "man regcomp" for description of              *
+ *                          REG_EXTENDED, REG_ICASE, REG_NOSUB, REG_NEWLINE.  *
  *             expression - [OUT] compiled regex (can be NULL if compiled     *
  *                          regexp is not required)                           *
  *             error      - [OUT] error message if any (can be NULL if the    *
  *                          error message is not required)                    *
  *                                                                            *
- * Return value: On success, 0 value is returned                              *
+ * Return value: On success, 0 is returned                                    *
  *               On error, nonzero value is returned.                         *
  *                                                                            *
  ******************************************************************************/
@@ -50,14 +51,13 @@ int	zbx_regexp_compile(const char *pattern, int flags, regex_t *expression, char
 	if (NULL == pattern || '\0' == *pattern)
 		goto ret;
 
-	if (0 != (reg_error = regcomp(&regex, pattern, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
+	if (0 != (reg_error = regcomp(&regex, pattern, flags)))
 	{
 		if (NULL != error)
 		{
 			char	buffer[MAX_STRING_LEN];
 
 			regerror(reg_error, &regex, buffer, sizeof(buffer));
-			zabbix_log(LOG_LEVEL_DEBUG, "zbx_regexp_compile failed for pattern '%s': %s", pattern, buffer);
 			*error = zbx_strdup(*error, buffer);
 		}
 #ifdef _WINDOWS
@@ -68,14 +68,12 @@ int	zbx_regexp_compile(const char *pattern, int flags, regex_t *expression, char
 	}
 	else if (NULL == expression)
 		regfree(&regex);
-
 ret:
 	if (NULL != expression)
 		*expression = regex;
 
 	return reg_error;
 }
-
 
 /******************************************************************************
  *                                                                            *
