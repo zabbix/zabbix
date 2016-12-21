@@ -352,7 +352,7 @@ class testUserGroup extends CZabbixTest {
 						'id' => '50012',
 						'permission' => '3',
 					],
-					'userids' => ['2', '6']
+					'userids' => ['2', '8']
 				];
 		$result = $this->api_acall('usergroup.create', $group, $debug);
 
@@ -541,6 +541,24 @@ class testUserGroup extends CZabbixTest {
 			],
 			[
 				'group' => [
+					'name' => 'Disable group with admin',
+					'usrgrpid' => '7',
+					'users_status' => 1,
+				],
+				'success_expected' => false,
+				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+			],
+			[
+				'group' => [
+					'name' => 'Disable group GUI access with admin',
+					'usrgrpid' => '7',
+					'gui_access' => 2,
+				],
+				'success_expected' => false,
+				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+			],
+			[
+				'group' => [
 					'usrgrpid' => '14',
 					'name' => 'Admin in group with disabled GUI access',
 					'gui_access' => 2,
@@ -566,7 +584,7 @@ class testUserGroup extends CZabbixTest {
 					'userids' => 1
 				],
 				'success_expected' => false,
-				'expected_error' => 'User "one-user" cannot be without user group.'
+				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
 			],
 			// Check user group rights, host group id.
 			[
@@ -888,7 +906,12 @@ class testUserGroup extends CZabbixTest {
 			[
 				'usergroup' => ['15'],
 				'success_expected' => false,
-				'expected_error' => 'User "one-user" cannot be without user group.'
+				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
+			],
+			[
+				'usergroup' => ['16','17'],
+				'success_expected' => false,
+				'expected_error' => 'User "user-in-two-groups" cannot be without user group.'
 			],
 			// Check user group used in actions
 			[
@@ -910,17 +933,12 @@ class testUserGroup extends CZabbixTest {
 			],
 			// Check successfully delete of user group.
 			[
-				'usergroup' => [
-					'17'
-				],
+				'usergroup' => ['17'],
 				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
-				'usergroup' => [
-					'18',
-					'19'
-				],
+				'usergroup' => ['18', '19'],
 				'success_expected' => true,
 				'expected_error' => null
 			]
@@ -930,7 +948,7 @@ class testUserGroup extends CZabbixTest {
 	/**
 	* @dataProvider usergroup_delete
 	*/
-	public function testUserGroup_delete($group, $success_expected, $expected_error) {
+	public function testUserGroup_Delete($group, $success_expected, $expected_error) {
 		$result = $this->api_acall('usergroup.delete', $group, $debug);
 
 		if ($success_expected) {
@@ -954,13 +972,13 @@ class testUserGroup extends CZabbixTest {
 		return [
 			[
 				'method' => 'usergroup.create',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => ['name' => 'Api user group create as admin user'],
 				'expected_error' => 'Only Super Admins can create user groups.'
 			],
 			[
 				'method' => 'usergroup.update',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
 					'name' => 'Api user group update as admin user without peremissions'
@@ -969,19 +987,19 @@ class testUserGroup extends CZabbixTest {
 			],
 			[
 				'method' => 'usergroup.delete',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => ['16'],
 				'expected_error' => 'Only Super Admins can delete user groups.'
 			],
 			[
 				'method' => 'usergroup.create',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => ['name' => 'Api host group create as zabbix user'],
 				'expected_error' => 'Only Super Admins can create user groups.'
 			],
 			[
 				'method' => 'usergroup.update',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
 					'name' => 'Api user group update as zabbix user without peremissions'
@@ -990,7 +1008,7 @@ class testUserGroup extends CZabbixTest {
 			],
 			[
 				'method' => 'usergroup.delete',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => ['16'],
 				'expected_error' => 'Only Super Admins can delete user groups.'
 			],

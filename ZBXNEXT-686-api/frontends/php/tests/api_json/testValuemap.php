@@ -242,7 +242,7 @@ class testValuemap extends CZabbixTest {
 	/**
 	* @dataProvider valuemap_create_data
 	*/
-	public function testValuemap_create($valuemap, $success_expected, $expected_error) {
+	public function testValuemap_Create($valuemap, $success_expected, $expected_error) {
 		$result = $this->api_acall('valuemap.create', $valuemap, $debug);
 
 		if ($success_expected) {
@@ -519,7 +519,7 @@ class testValuemap extends CZabbixTest {
 	/**
 	* @dataProvider valuemap_update_data
 	*/
-	public function testValuemap_update($valuemap, $success_expected, $expected_error) {
+	public function testValuemap_Update($valuemap, $success_expected, $expected_error) {
 		$result = $this->api_acall('valuemap.update', $valuemap, $debug);
 
 		if ($success_expected) {
@@ -636,7 +636,7 @@ class testValuemap extends CZabbixTest {
 	/**
 	* @dataProvider valuemap_delete_data
 	*/
-	public function testValuemap_delete($valuemap, $success_expected, $expected_error) {
+	public function testValuemap_Delete($valuemap, $success_expected, $expected_error) {
 		$result = $this->api_acall('valuemap.delete', $valuemap, $debug);
 
 		if ($success_expected) {
@@ -662,7 +662,7 @@ class testValuemap extends CZabbixTest {
 		return [
 			[
 				'method' => 'valuemap.create',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'name' => 'Api value create as admin user',
 					'mappings' =>[
@@ -676,7 +676,7 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'method' => 'valuemap.update',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
 					'name' => 'Api value update as admin user',
@@ -685,7 +685,7 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'method' => 'valuemap.delete',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'20'
 				],
@@ -693,7 +693,7 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'method' => 'valuemap.create',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'name' => 'Api value create as zabbix user',
 					'mappings' =>[
@@ -707,7 +707,7 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'method' => 'valuemap.update',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
 					'name' => 'Api value update as zabbix user',
@@ -716,7 +716,7 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'method' => 'valuemap.delete',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'20'
 				],
@@ -728,7 +728,7 @@ class testValuemap extends CZabbixTest {
 	/**
 	* @dataProvider valuemap_user_data
 	*/
-	public function testValuemap_user_permissions($method, $user, $valuemap, $expected_error) {
+	public function testValuemap_UserPermissions($method, $user, $valuemap, $expected_error) {
 		$result = $this->api_call_with_user($method, $user, $valuemap, $debug);
 
 		$this->assertFalse(array_key_exists('result', $result));

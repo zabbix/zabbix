@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
+require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 
 class ApiJsonTests {
@@ -33,13 +34,13 @@ class ApiJsonTests {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
 		$suite->addTestSuite('API_JSON_APIInfo');
-		$suite->addTestSuite('API_JSON_User');
 		$suite->addTestSuite('API_JSON_Host');
 		$suite->addTestSuite('API_JSON_Item');
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testUserGroup');
+		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 
 		return $suite;

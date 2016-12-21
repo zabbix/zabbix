@@ -122,7 +122,7 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_create_data
 	*/
-	public function testHostGroup_create($hostgroup, $success_expected, $expected_error) {
+	public function testHostGroup_Create($hostgroup, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.create', $hostgroup, $debug);
 
 		if ($success_expected) {
@@ -286,7 +286,7 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_update_data
 	*/
-	public function testHostGroup_update($hostgroups, $success_expected, $expected_error) {
+	public function testHostGroup_Update($hostgroups, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.update', $hostgroups, $debug);
 
 		if ($success_expected) {
@@ -427,7 +427,7 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_delete_data
 	*/
-	public function testHostGroup_delete($hostgroups, $success_expected, $expected_error) {
+	public function testHostGroup_Delete($hostgroups, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.delete', $hostgroups, $debug);
 
 		if ($success_expected) {
@@ -451,7 +451,7 @@ class testHostGroup extends CZabbixTest {
 		return [
 			[
 				'method' => 'hostgroup.create',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'name' => 'Api host group create as admin user'
 				],
@@ -459,7 +459,7 @@ class testHostGroup extends CZabbixTest {
 			],
 			[
 				'method' => 'hostgroup.update',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
 					'name' => 'Api host group update as admin user without peremissions'
@@ -468,7 +468,7 @@ class testHostGroup extends CZabbixTest {
 			],
 			[
 				'method' => 'hostgroup.delete',
-				'user' => ['user' => 'test-admin', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'50008'
 				],
@@ -476,7 +476,7 @@ class testHostGroup extends CZabbixTest {
 			],
 			[
 				'method' => 'hostgroup.create',
-				'user' => ['user' => 'test-user', 'password' => 'zabbix'],
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'name' => 'Api host group create as zabbix user'
 				],
@@ -488,7 +488,7 @@ class testHostGroup extends CZabbixTest {
 	/**
 	* @dataProvider hostgroup_user_data
 	*/
-	public function testHostGroup_user_permissions($method, $user, $hostgroups, $expected_error) {
+	public function testHostGroup_UserPermissions($method, $user, $hostgroups, $expected_error) {
 		$result = $this->api_call_with_user($method, $user, $hostgroups, $debug);
 
 		$this->assertFalse(array_key_exists('result', $result));
