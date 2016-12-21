@@ -2349,26 +2349,43 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 
 		if (NULL != value->value)
 		{
-			if (ITEM_VALUE_TYPE_LOG == item->value_type && NULL != value->value)
+			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				result.log->timestamp = value->timestamp;
+				zbx_log_t	*log;
+
+				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
+				log->value = zbx_strdup(NULL, value->value);
+
+				if (0 == value->timestamp)
+				{
+					log->timestamp = 0;
+					calc_timestamp(log->value, &log->timestamp, item->logtimefmt);
+				}
+				else
+					log->timestamp = value->timestamp;
+
+				log->logeventid = value->logeventid;
+				log->severity = value->severity;
+
 				if (NULL != value->source)
 				{
-					zbx_replace_invalid_utf8(value->source);
-					result.log->source = zbx_strdup(result.log->source, value->source);
+					log->source = zbx_strdup(NULL, value->source);
+					zbx_replace_invalid_utf8(log->source);
 				}
-				result.log->severity = value->severity;
-				result.log->logeventid = value->logeventid;
+				else
+					log->source = NULL;
 
-				calc_timestamp(result.log->value, &result.log->timestamp, item->logtimefmt);
+				SET_LOG_RESULT(&result, log);
 			}
+			else
+				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
 
 			if (0 != value->meta)
 				set_result_meta(&result, value->lastlogsize, value->mtime);
 
 			item->state = ITEM_STATE_NORMAL;
-			dc_add_history(item->itemid, item->value_type, item->flags, &result,
-					&value->ts, item->state, NULL);
+			dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts,
+					item->state, NULL);
 		}
 		else if (ISSET_MSG(&result))
 		{
