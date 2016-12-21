@@ -593,6 +593,8 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_u
 								zbx_vector_uint64_remove_noorder(objectids, j);
 							}
 						}
+
+						objectids_pair->values[i].second = 0;
 					}
 				}
 			}
@@ -606,6 +608,8 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_u
 						objectids_pair->values[i].second = templateid;
 						zbx_vector_uint64_pair_append(&triggerids_tmp,
 								objectids_pair->values[i]);
+
+						objectids_pair->values[i].second = 0;
 					}
 				}
 			}
