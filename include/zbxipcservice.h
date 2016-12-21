@@ -23,6 +23,10 @@ typedef struct
 {
 	/* socket descriptor */
 	int		fd;
+
+	unsigned char	rx_buffer[ZBX_IPC_SOCKET_BUFFER_SIZE];
+	zbx_uint32_t	rx_buffer_bytes;
+	zbx_uint32_t	rx_buffer_offset;
 }
 zbx_ipc_socket_t;
 
@@ -59,17 +63,19 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_clien
 		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 
-int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const char *data, zbx_uint32_t size);
+int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
 void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 
 int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
-int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const char *data, zbx_uint32_t size);
+int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const unsigned char *data,
+		zbx_uint32_t size);
 int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message);
 
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
+void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
 
 #endif
 
