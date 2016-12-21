@@ -157,7 +157,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 	if (0 == ((unsigned int)proxy->tls_accept & sock->connection_type))
 	{
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tls_connection_type_name(sock->connection_type), proxy->host);
+				zbx_tcp_connection_type_name(sock->connection_type), proxy->host);
 		return FAIL;
 	}
 
@@ -240,7 +240,7 @@ int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, ch
 	if (0 == ((unsigned int)host->tls_accept & sock->connection_type))
 	{
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
-				zbx_tls_connection_type_name(sock->connection_type), host->host);
+				zbx_tcp_connection_type_name(sock->connection_type), host->host);
 		return FAIL;
 	}
 
@@ -346,7 +346,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
-				zbx_tls_connection_type_name(sock->connection_type));
+				zbx_tcp_connection_type_name(sock->connection_type));
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
 

@@ -44,7 +44,7 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 	else
 		writefd = &fd;
 
-	rc = select((int)(socket_fd + 1), readfd, writefd, NULL, &tv);
+	rc = select(ZBX_SOCKET_TO_INT(socket_fd) + 1, readfd, writefd, NULL, &tv);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
