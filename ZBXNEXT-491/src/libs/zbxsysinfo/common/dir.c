@@ -46,12 +46,12 @@
  *               If filename fails to pass, 0 is returned.                    *
  *                                                                            *
  ******************************************************************************/
-static int	filename_matches(const char *name, const char *regex_incl, const char *regex_excl)
+static int	filename_matches(const char *name, regex_t *regex_incl, regex_t *regex_excl)
 {
 	return ((regex_incl == NULL ||
-			NULL != zbx_regexp_match(name, regex_incl, NULL)) &&
+			0 == zbx_regexp_check(regex_incl, name)) &&
 			(regex_excl == NULL ||
-			NULL == zbx_regexp_match(name, regex_excl, NULL)));
+			0 != zbx_regexp_check(regex_excl, name)));
 }
 
 
@@ -124,12 +124,13 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*dir, *dir_param, *path = NULL, *mode_str, *max_depth_str;
-	char 			*regex_incl, *regex_excl, *error = NULL;
+	char 			*regex_incl_str, *regex_excl_str, *error = NULL;
 	int			mode, max_depth;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list, descriptors;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
+	regex_t			*regex_incl = NULL, *regex_excl = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 
 #ifdef _WINDOWS
@@ -155,8 +156,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	dir_param = get_rparam(request, 0);
-	regex_incl = get_rparam(request, 1);
-	regex_excl = get_rparam(request, 2);
+	regex_incl_str = get_rparam(request, 1);
+	regex_excl_str = get_rparam(request, 2);
 	mode_str = get_rparam(request, 3);
 	max_depth_str = get_rparam(request, 4);
 
@@ -166,9 +167,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (NULL != regex_incl && '\0' != *regex_incl)
+	if (NULL != regex_incl_str && '\0' != *regex_incl_str)
 	{
-		if (0 != zbx_regexp_check(regex_incl, REG_EXTENDED | REG_NEWLINE, &error))
+		regex_incl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
+		if (0 != zbx_regexp_compile(regex_incl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_incl, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
@@ -176,13 +178,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 	}
-	else
-		regex_incl = NULL;
 
-
-	if (NULL != regex_excl && '\0' != *regex_excl)
+	if (NULL != regex_excl_str && '\0' != *regex_excl_str)
 	{
-		if (0 != zbx_regexp_check(regex_excl, REG_EXTENDED | REG_NEWLINE, &error))
+		regex_excl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
+		if (0 != zbx_regexp_compile(regex_excl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_excl, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
@@ -190,8 +190,6 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 	}
-	else
-		regex_excl = NULL;
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
@@ -207,7 +205,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (NULL == max_depth_str || '\0' == *max_depth_str)		/* <max_depth> default value */
+	if (NULL == max_depth_str || '\0' == *max_depth_str)	/* <max_depth> default value */
 	{
 		max_depth = TRAVERSAL_DEPTH_UNLIMITED;
 	}
@@ -244,10 +242,13 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_append(&list, item);
 
 #ifndef _WINDOWS
-	if (SIZE_MODE_APPARENT == mode)
-		size += status.st_size;
-	else		/* must be SIZE_MODE_DISK */
-		size += status.st_blocks * DISK_BLOCK_SIZE;
+	if (0 != filename_matches(dir, regex_incl, regex_excl))
+	{
+		if (SIZE_MODE_APPARENT == mode)
+			size += status.st_size;
+		else		/* must be SIZE_MODE_DISK */
+			size += status.st_blocks * DISK_BLOCK_SIZE;
+	}
 #endif /* not _WINDOWS */
 
 	while (0 < list.values_num)
@@ -412,6 +413,18 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 err:
 	zbx_free(path);
+
+	if (NULL != regex_incl)
+	{
+		regfree(regex_incl);
+		zbx_free(regex_incl);
+	}
+
+	if (NULL != regex_excl)
+	{
+		regfree(regex_excl);
+		zbx_free(regex_excl);
+	}
 
 	while (0 < list.values_num)
 	{
