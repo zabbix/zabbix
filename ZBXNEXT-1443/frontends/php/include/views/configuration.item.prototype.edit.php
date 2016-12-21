@@ -374,21 +374,25 @@ foreach ($data['preprocessing'] as $i => $step) {
 	// Use numeric box for multiplier, otherwise use text box.
 	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
 		$params[] = (new CNumericBox('preprocessing['.$i.'][params][0]',
-						array_key_exists('params', $step) ? $step['params'][0] : ''
-					))->setAttribute('placeholder', _('number'));
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		))
+			->setAttribute('placeholder', _('number'))
+			->setReadonly($readonly);
 	}
 	else {
-		$params[] = new CTextBox('preprocessing['.$i.'][params][0]',
+		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
 			array_key_exists('params', $step) ? $step['params'][0] : ''
-		);
+		))->setReadonly($readonly);
 	}
 
 	// Create a secondary param text box, so it can be hidden if necessary.
 	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
-					(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-						? $step['params'][1]
-						: '')
-				)->setAttribute('placeholder', _('output'));
+		(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+			? $step['params'][1]
+			: ''
+	))
+		->setAttribute('placeholder', _('output'))
+		->setReadonly($readonly);
 
 	// Add corresponding placeholders and show or hide text boxes.
 	switch ($step['type']) {
@@ -417,6 +421,10 @@ foreach ($data['preprocessing'] as $i => $step) {
 			break;
 	}
 
+	if ($readonly) {
+		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			$readonly
@@ -424,12 +432,17 @@ foreach ($data['preprocessing'] as $i => $step) {
 				: (new CCol(
 					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$readonly
+				? (new CTextBox('preprocessing['.$i.'][type_name]', get_preprocessing_types($step['type'])))
+					->setReadonly(true)
+				: (new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
 			$params[0],
 			$params[1],
-			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			$readonly
+				? null
+				: (new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
 		]))->addClass('sortable')
 	);
 }
