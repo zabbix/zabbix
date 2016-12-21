@@ -1057,6 +1057,10 @@ int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const uns
  * Return value: SUCCEED - the message was successfully received              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comments: This function frees memory referred by message->data. This       *
+ *           allows to call zbx_ipc_socket_read() un loop without clearing    *
+ *           message, but also requires passing initialized message.          *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 {
@@ -1377,10 +1381,10 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
  *             timeout - [IN] the timeout                                     *
- *             csocket - [IN] the client socket. Used to send response back   *
- *                            to the client. NULL if there are no new         *
- *                            messages.                                       *
- *             message - [IN] the received message or NULL if the client      *
+ *             client  - [OUT] the client that sent the message or            *
+ *                             NULL if there are no messages and the          *
+ *                             specified timeout passed.                      *
+ *             message - [OUT] the received message or NULL if the client     *
  *                            connection was closed.                          *
  *                            The message must be freed by caller with        *
  *                            ipc_message_free() function.                    *
@@ -1451,6 +1455,10 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_clien
  *             code   - [IN] the message code                                 *
  *             data   - [IN] the data                                         *
  *             size   - [IN] the data size                                    *
+ *                                                                            *
+ * Comments: If data can't be written directly to socket (buffer full) then   *
+ *           the message is queued and sent during zbx_ipc_service_recv()     *
+ *           messaging loop whenever socket becomes ready.                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size)
