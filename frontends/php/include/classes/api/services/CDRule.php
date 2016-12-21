@@ -73,7 +73,7 @@ class CDRule extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			return [];
 		}
 
@@ -837,51 +837,6 @@ class CDRule extends CApiService {
 		}
 	}
 
-	/**
-	 * Check if user has read permissions for discovery rule.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'druleids' => $ids,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
-	/**
-	 * Check if user has write permissions for discovery rule.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get([
-			'druleids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		]);
-
-		return (count($ids) == $count);
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -957,11 +912,23 @@ class CDRule extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for discovery rules.
 	 *
-	 * @param array $druleIds
+	 * @param array $druleids
 	 */
-	protected function checkDrulePermissions(array $druleIds) {
-		if (!$this->isWritable($druleIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+	protected function checkDrulePermissions(array $druleids) {
+		if ($druleids) {
+			$druleids = array_unique($druleids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'druleids' => $druleids,
+				'editable' => true
+			]);
+
+			if ($count != count($druleids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 }

@@ -33,24 +33,33 @@
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
+void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "recv_areg_data";
 
 	int		ret;
-	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse autoregistration data from active proxy at \"%s\": %s",
 				sock->peer, error);
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_areg_data(jp, proxy_hostid, &error)))
+	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto out;
+	}
+
+	zbx_proxy_update_version(&proxy, jp);
+
+	if (SUCCEED != (ret = process_auto_registration(jp, proxy.hostid, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, error);
@@ -74,51 +83,11 @@ void	send_areg_data(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_areg_data";
 
-	struct zbx_json	j;
-	zbx_uint64_t	lastid;
-	int		ret = FAIL;
-	char		*error = NULL;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "auto registration data request"))
-	{
-		/* do not send any reply to server in this case as the server expects auto registration data */
-		goto out1;
-	}
+	/* do not send any reply to server in this case as the server expects auto registration data */
+	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "auto registration data request"))
+		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-
-	proxy_get_areg_data(&j, &lastid);
-
-	zbx_json_close(&j);
-
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
-	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
-	{
-		error = zbx_strdup(error, zbx_socket_strerror());
-		goto out;
-	}
-
-	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
-		goto out;
-
-	if (0 != lastid)
-		proxy_set_areg_lastid(lastid);
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send auto registration data to server at \"%s\": %s",
-				sock->peer, error);
-	}
-
-	zbx_json_free(&j);
-	zbx_free(error);
-out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

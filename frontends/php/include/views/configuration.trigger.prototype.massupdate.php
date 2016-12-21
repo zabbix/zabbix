@@ -36,10 +36,10 @@ foreach ($data['g_triggerid'] as $triggerid) {
 }
 
 $triggersFormList = (new CFormList('triggersFormList'))
-	->addRow([_('Severity'), SPACE,
-			(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
-				->setChecked(isset($data['visible']['priority']))
-		],
+	->addRow(
+		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+			->setLabel(_('Severity'))
+			->setChecked(isset($data['visible']['priority'])),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
@@ -102,10 +102,10 @@ $dependenciesDiv = (new CDiv([
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setId('dependencies_div');
 
-$triggersFormList->addRow([_('Replace dependencies'), SPACE,
-		(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
-			->setChecked(isset($data['visible']['dependencies']))
-	],
+$triggersFormList->addRow(
+	(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
+		->setLabel(_('Replace dependencies'))
+		->setChecked(isset($data['visible']['dependencies'])),
 	$dependenciesDiv
 );
 
@@ -134,19 +134,19 @@ $tags_table->setFooter(new CCol(
 ));
 
 $triggersFormList
-	->addRow([_('Replace tags'), SPACE,
-			(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
-				->setChecked(isset($data['visible']['tags']))
-		],
+	->addRow(
+		(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
+			->setLabel(_('Replace tags'))
+			->setChecked(isset($data['visible']['tags'])),
 		(new CDiv([$tags_table]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 			->setId('tags_div')
 	)
-	->addRow([_('Allow manual close'), SPACE,
-			(new CVisibilityBox('visible[manual_close]', 'manual_close_div', _('Original')))
-				->setChecked(isset($data['visible']['manual_close']))
-		],
+	->addRow(
+		(new CVisibilityBox('visible[manual_close]', 'manual_close_div', _('Original')))
+			->setLabel(_('Allow manual close'))
+			->setChecked(isset($data['visible']['manual_close'])),
 		(new CDiv(
 			(new CRadioButtonList('manual_close', (int) $data['manual_close']))
 				->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)

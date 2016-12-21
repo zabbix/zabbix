@@ -37,7 +37,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	const char	*__function_name = "zbx_execute_script_on_agent";
 	int		ret;
 	AGENT_RESULT	agent_result;
-	char		*param, *port = NULL;
+	char		*param = NULL, *port = NULL;
 	DC_ITEM		item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -62,10 +62,15 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	param = zbx_dyn_escape_string(command, "\"");
-	item.key = zbx_dsprintf(item.key, "system.run[\"%s\",\"%s\"]", param, NULL == result ? "nowait" : "wait");
+	param = zbx_strdup(param, command);
+	if (SUCCEED != (ret = quote_key_param(&param, 0)))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid param [%s]", param);
+		goto fail;
+	}
+
+	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "wait");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
-	zbx_free(param);
 
 	init_result(&agent_result);
 
@@ -87,6 +92,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	zbx_free(item.key);
 fail:
 	zbx_free(port);
+	zbx_free(param);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -123,9 +129,9 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 		goto fail;
 	}
 
-	if (SUCCEED == (ret = parse_ipmi_command(command, item.ipmi_sensor, &val, error, max_error_len)))
+	if (SUCCEED == (ret = zbx_parse_ipmi_command(command, item.ipmi_sensor, &val, error, max_error_len)))
 	{
-		if (SUCCEED != (ret = set_ipmi_control_value(&item, val, error, max_error_len)))
+		if (SUCCEED != (ret = zbx_set_ipmi_control_value(&item, val, error, max_error_len)))
 			ret = FAIL;
 	}
 fail:
@@ -270,9 +276,12 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 
 static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
-	const char	*__function_name = "check_script_permissions";
-	DB_RESULT	result;
-	int		ret = SUCCEED;
+	const char		*__function_name = "check_script_permissions";
+	DB_RESULT		result;
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	groupids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64,
 			__function_name, groupid, hostid);
@@ -280,12 +289,23 @@ static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 	if (0 == groupid)
 		goto exit;
 
-	result = DBselect(
+	zbx_vector_uint64_create(&groupids);
+	zbx_dc_get_nested_hostgroupids(&groupid, 1, &groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid"
 			" from hosts_groups"
 			" where hostid=" ZBX_FS_UI64
-				" and groupid=" ZBX_FS_UI64,
-			hostid, groupid);
+				" and",
+			hostid);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+			groupids.values_num);
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&groupids);
 
 	if (NULL == DBfetch(result))
 		ret = FAIL;

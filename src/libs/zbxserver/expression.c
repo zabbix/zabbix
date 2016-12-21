@@ -2284,7 +2284,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
  *                                                                            *
- * Parameters: triggerid  - [IN] the trigger identificator from a database    *
+ * Parameters: expression - [IN] string to parse                              *
  *             replace_to - [IN] the pointer to a result buffer               *
  *             bl         - [IN] the pointer to a left curly bracket          *
  *             br         - [OUT] the pointer to a next char, after a right   *
@@ -2305,9 +2305,9 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  ******************************************************************************/
 static void	get_trigger_function_value(const char *expression, char **replace_to, char *bl, char **br)
 {
-	char	*p, *host = NULL, *key = NULL, *function = NULL, *parameter = NULL;
+	char	*p, *host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
-	size_t	sz;
+	size_t	sz, par_l, par_r;
 
 	p = bl + 1;
 
@@ -2343,22 +2343,28 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || '.' != *p++)
 		goto fail;
 
-	if (SUCCEED != parse_function(&p, &function, &parameter) || '}' != *p++)
+	if (SUCCEED != zbx_function_validate(p, &par_l, &par_r) || '}' != p[par_r + 1])
 		goto fail;
+
+	p[par_l] = '\0';
+	p[par_r] = '\0';
 
 	/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
 	*replace_to = zbx_realloc(*replace_to, MAX_BUFFER_LEN);
 
 	if (NULL == host || NULL == key ||
-			SUCCEED != evaluate_macro_function(*replace_to, host, key, function, parameter))
+			SUCCEED != evaluate_macro_function(*replace_to, host, key, p, p + par_l + 1))
+	{
 		zbx_strlcpy(*replace_to, STR_UNKNOWN_VARIABLE, MAX_BUFFER_LEN);
+	}
 
-	*br = p;
+	p[par_l] = '(';
+	p[par_r] = ')';
+
+	*br = p + par_r + 2;	/* point to the character after '}' */
 fail:
 	zbx_free(host);
 	zbx_free(key);
-	zbx_free(function);
-	zbx_free(parameter);
 }
 
 /******************************************************************************
@@ -3600,23 +3606,38 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_IP, 0);
+				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.dns_orig);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_DNS, 0);
+				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+				{
 					replace_to = zbx_strdup(replace_to, dc_item->interface.addr);
+				}
 				else
-					ret = FAIL;
+				{
+					ret = DBget_interface_value(dc_item->host.hostid, &replace_to,
+							ZBX_REQUEST_HOST_CONN, 0);
+				}
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
@@ -3765,27 +3786,29 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 		}
 
-		if (1 == require_numeric && NULL != replace_to)
-		{
-			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
-				wrap_negative_double_suffix(&replace_to, NULL);
-			else if (NULL != error)
-				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
-		}
-
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (0 != func_macro)
 			{
-				ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
-						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
-						&replace_to);
+				if (SUCCEED != (ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
+						&replace_to)))
+				{
+					zbx_free(replace_to);
+				}
 			}
 			else
 			{
 				/* ignore functions with macros not supporting them */
 				zbx_free(replace_to);
 			}
+		}
+
+		if (1 == require_numeric && NULL != replace_to)
+		{
+			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+				wrap_negative_double_suffix(&replace_to, NULL);
+			else if (NULL != error)
+				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
 
 		if (FAIL == ret)
@@ -4471,14 +4494,15 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *           structure host, key, func fields.                                *
  *                                                                            *
  ******************************************************************************/
-static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
+static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
 {
 	char	*pl, *pr, *key = NULL, *replace_to = NULL;
-	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0;
+	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0, par_l, par_r;
+	int	ret = FAIL;
 
 	pl = pr = *data + token->token.l;
-	if ('{' != *pr++)
-		return FAIL;
+	pr++;	/* skip '{' */
 
 	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
 	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
@@ -4500,7 +4524,7 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	/* an item key */
 	if (SUCCEED != get_item_key(&pr, &key))
-		return FAIL;
+		goto clean;
 
 	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
@@ -4509,18 +4533,33 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 
 	pl = pr;
 
+	if ('.' != *pr++)
+		goto clean;
+
 	/* a trigger function with parameters */
-	if ('.' != *pr++ || SUCCEED != parse_function(&pr, NULL, NULL) || '}' != *pr++)
-		return FAIL;
+	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
+		goto clean;
+
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
+
+	ret = substitute_function_lld_param(pr + par_l + 1, par_r - (par_l + 1), 0,
+			&replace_to, &replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len);
+
+	pl = pr + par_r;
+	pr += par_r + 1;
+
+	if (FAIL == ret || '}' != *pr++)
+		goto clean;
 
 	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	token->token.r = pr - *data - 1;
 	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
-
+	ret = SUCCEED;
+clean:
 	zbx_free(replace_to);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -4674,6 +4713,45 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
 
 /******************************************************************************
  *                                                                            *
+ * Function: substitute_func_macro                                            *
+ *                                                                            *
+ * Purpose: substitute lld macros in function macro parameters                *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer                          *
+ *             token  - [IN/OUT] the token with funciton macro location data  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	int	ret;
+	char	*exp = NULL;
+	size_t	exp_alloc = 0, exp_offset = 0;
+	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
+
+	ret = substitute_function_lld_param(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset,
+			jp_row, error, max_error_len);
+
+	if (SUCCEED == ret)
+	{
+		/* copy what is left including closing parenthesis and replace function parameters */
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + par_r, token->token.r - (par_r - 1));
+		zbx_replace_string(data, par_l + 1, &token->token.r, exp);
+	}
+
+	zbx_free(exp);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_lld_macros                                            *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
@@ -4697,7 +4775,7 @@ int	validate_func_macro(const char *expression, zbx_token_t *token, const char *
  *                            if a function macro is supported.               *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
- *             max_erro_len - [IN] the size of error buffer                   *
+ *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
@@ -4732,23 +4810,15 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
-					process_simple_macro_token(data, &token, jp_row);
+					process_simple_macro_token(data, &token, jp_row, error, max_error_len);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					/* LLD macros must be ignored inside supported function macros.       */
-					/* For example when expanding lld macro {#LLDMACRO} with value "ABC"  */
-					/* {{ITEM.VALUE}.regsub({#LLDMACRO})} should be translated to         */
-					/*     {{ITEM.VALUE}.regsub({#LLDMACRO})}, but                        */
-					/* {{ITEM.KEY}.regsub({#LLDMACRO})} should be translated to           */
-					/*     {{ITEM.KEY}.regsub(ABC)}                                       */
-					/* In the first case the expression contains valid function macro and */
-					/* lld macros are not supported inside function macro parameters.     */
-					/* In the second case {ITEM.KEY} macro does not support functions, so */
-					/* it is not a valid function macro and is processed as a plain text, */
-					/* expanding lld macros inside it.                                    */
 					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
+					{
+						ret = substitute_func_macro(data, &token, jp_row, error, max_error_len);
 						pos = token.token.r;
+					}
 					break;
 			}
 		}
@@ -4820,17 +4890,33 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key and OID    *
  *                                                                            *
- * Example:  key                     | macro       | result                   *
- *          -------------------------+-------------+-----------------         *
- *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
- *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
- *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
- *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}]        *
- *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
- *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
- *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
- *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
- *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
+ * Example:  key                     | macro  | result            | return    *
+ *          -------------------------+--------+-------------------+---------  *
+ *           echo.sh[{$MACRO}]       | a      | echo.sh[a]        | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a\     | echo.sh[a\]       | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a      | echo.sh["a"]      | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a\     | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       |  a     | echo.sh[" a"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       |  a\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     |  a     | echo.sh[" a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     |  a\    | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | "a"\   | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | "a"    | echo.sh["\"a\""]  | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | "a"\   | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a,b\   | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | a,b    | echo.sh["a,b"]    | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a,b\   | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | a]     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | a]\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | a]     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | a]\    | undefined         | FAIL      *
+ *           echo.sh[{$MACRO}]       | [a     | echo.sh["a]"]     | SUCCEED   *
+ *           echo.sh[{$MACRO}]       | [a\    | undefined         | FAIL      *
+ *           echo.sh["{$MACRO}"]     | [a     | echo.sh["[a"]     | SUCCEED   *
+ *           echo.sh["{$MACRO}"]     | [a\    | undefined         | FAIL      *
+ *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
@@ -4863,6 +4949,113 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_function_lld_param                                    *
+ *                                                                            *
+ * Purpose: substitute lld macros in function parameters                      *
+ *                                                                            *
+ * Parameters: e            - [IN] the function parameter list without        *
+ *                                 enclosing parentheses:                     *
+ *                                       <p1>, <p2>, ...<pN>                  *
+ *             len          - [IN] the length of function parameter list      *
+ *             key_in_param - [IN] 1 - the first parameter must be host:key   *
+ *                                 0 - otherwise                              *
+ *             exp          - [IN/OUT] output buffer                          *
+ *             exp_alloc    - [IN/OUT] the size of output buffer              *
+ *             exp_offset   - [IN/OUT] the current position in output buffer  *
+ *             jp_row - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macros were resolved successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
+		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
+		char *error, size_t max_error_len)
+{
+	const char	*__function_name = "substitute_function_lld_param";
+	int		ret = SUCCEED;
+	size_t		sep_pos;
+	char		*param = NULL;
+	const char	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == len)
+	{
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, "");
+		goto out;
+	}
+
+	for (p = e; p < len + e ; p += sep_pos + 1)
+	{
+		size_t	param_pos, param_len, rel_len = len - (p - e);
+		int	quoted;
+
+		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+
+		/* copy what was before the parameter */
+		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
+
+		/* prepare the parameter (macro substitutions and quoting) */
+
+		zbx_free(param);
+		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
+
+		if (1 == key_in_param && p == e)
+		{
+			char	*key = NULL, *host = NULL;
+
+			if (SUCCEED != parse_host_key(param, &host, &key) ||
+					SUCCEED != substitute_key_macros(&key, NULL, NULL, jp_row,
+							MACRO_TYPE_ITEM_KEY, NULL, 0))
+			{
+				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
+				zbx_free(host);
+				zbx_free(key);
+				ret = FAIL;
+				goto out;
+			}
+
+			zbx_free(param);
+			if (NULL != host)
+			{
+				param = zbx_dsprintf(NULL, "%s:%s", host, key);
+				zbx_free(host);
+				zbx_free(key);
+			}
+			else
+				param = key;
+		}
+		else
+			substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+
+		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		{
+			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
+			ret = FAIL;
+			goto out;
+		}
+
+		/* copy the parameter */
+		zbx_strcpy_alloc(exp, exp_alloc, exp_offset, param);
+
+		/* copy what was after the parameter (including separator) */
+		if (sep_pos < rel_len)
+			zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
+					sep_pos - param_pos - param_len + 1);
+	}
+out:
+	zbx_free(param);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }

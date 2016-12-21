@@ -27,7 +27,7 @@ class ZabbixItem
 	private String keyId = null;
 	private ArrayList<String> args = null;
 
-	public ZabbixItem(String key)
+	ZabbixItem(String key)
 	{
 		if (null == key)
 			throw new IllegalArgumentException("key must not be null");
@@ -55,17 +55,17 @@ class ZabbixItem
 		this.key = key;
 	}
 
-	public String getKey()
+	String getKey()
 	{
 		return key;
 	}
 
-	public String getKeyId()
+	String getKeyId()
 	{
 		return keyId;
 	}
 
-	public String getArgument(int index)
+	String getArgument(int index)
 	{
 		if (null == args || 1 > index || index > args.size())
 			throw new IndexOutOfBoundsException("bad argument index for key '" + key + "': " + index);
@@ -73,7 +73,7 @@ class ZabbixItem
 			return args.get(index - 1);
 	}
 
-	public int getArgumentCount()
+	int getArgumentCount()
 	{
 		return null == args ? 0 : args.size();
 	}

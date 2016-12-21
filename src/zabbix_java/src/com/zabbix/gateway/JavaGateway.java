@@ -47,6 +47,7 @@ public class JavaGateway
 
 		Thread shutdownHook = new Thread()
 		{
+			@Override
 			public void run()
 			{
 				logger.info("Zabbix Java Gateway {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);

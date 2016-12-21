@@ -56,7 +56,6 @@ class CControllerScriptCreate extends CController {
 		return $ret;
 	}
 
-
 	protected function checkPermissions() {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
@@ -64,31 +63,23 @@ class CControllerScriptCreate extends CController {
 	protected function doAction() {
 		$script = [];
 
-		$this->getInputs($script, ['name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid',
-			'host_access', 'confirmation'
-		]);
+		$this->getInputs($script, ['command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation']);
+		$script['name'] = trimPath($this->getInput('name', ''));
+		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+		$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
 
-		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
-				&& $this->hasInput('commandipmi')) {
-			$script['command'] = $this->getInput('commandipmi');
+		if ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
+			if ($this->hasInput('commandipmi')) {
+				$script['command'] = $this->getInput('commandipmi');
+			}
+			$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_SERVER;
 		}
 
 		if ($this->getInput('hgstype', 1) == 0) {
 			$script['groupid'] = 0;
 		}
 
-		DBstart();
-
-		$result = API::Script()->create($script);
-
-		if ($result) {
-			$scriptId = reset($result['scriptids']);
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCRIPT,
-				'Name ['.$this->getInput('name', '').'] id ['.$scriptId.']'
-			);
-		}
-
-		$result = DBend($result);
+		$result = (bool) API::Script()->create($script);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');

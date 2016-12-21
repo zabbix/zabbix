@@ -216,13 +216,13 @@ class testFormAdministrationDMProxies extends CWebTest {
 						break;
 
 					case 'PSK':
-						$this->zbxTestClickWait('tls_in_psk');
+						$this->zbxTestCheckboxSelect('tls_in_psk');
 						$this->zbxTestInputTypeWait('tls_psk_identity', 'test identity');
 						$this->zbxTestInputTypeWait('tls_psk', '12345678901234567890123456789012');
 						break;
 
 					case 'Certificate':
-						$this->zbxTestClickWait('tls_in_cert');
+						$this->zbxTestCheckboxSelect('tls_in_cert');
 						$this->zbxTestAssertElementPresentId('tls_issuer');
 						$this->zbxTestAssertElementPresentId('tls_subject');
 						break;
@@ -263,6 +263,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestClickButton('proxy.create');
 		switch ($expected) {
 			case PROXY_GOOD:
+				$this->zbxTestTextNotPresent('Cannot add proxy');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy added');
 				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestCheckHeader('Proxies');

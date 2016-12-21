@@ -124,7 +124,7 @@ struct	_DC_TRIGGER;
 #define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_DELAY_FLEX_LEN		255
+#define ITEM_DELAY_FLEX_LEN		1024
 #define ITEM_DELAY_FLEX_LEN_MAX		(ITEM_DELAY_FLEX_LEN + 1)
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
@@ -287,6 +287,7 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
+#define ZBX_FLAGS_DB_EVENT_LINKED	0x0004
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
@@ -341,6 +342,7 @@ typedef struct
 	zbx_uint64_t	actionid;
 	char		*value;
 	char		*value2;
+	int		condition_result;
 	unsigned char	conditiontype;
 	unsigned char	operator;
 }
@@ -499,12 +501,11 @@ typedef struct
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE		0x0002
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE			0x0004
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR			0x0008
-#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT		0x0010
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE										\
 		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE | 		\
-		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR |			\
-		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT)
-#define ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT	0x1000
+		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR)
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT		0x1000
+#define ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT	0x2000
 	zbx_uint64_t			flags;
 }
 zbx_trigger_diff_t;
@@ -561,6 +562,11 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
+void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now);
+void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
+void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
+
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);

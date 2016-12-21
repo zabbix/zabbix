@@ -40,9 +40,16 @@
  ******************************************************************************/
 static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *condition)
 {
-	int	i, ret = FAIL;
+	int	i, ret, ret_continue;
 
-	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		ret_continue = SUCCEED;
+	else
+		ret_continue = FAIL;
+
+	ret = ret_continue;
+
+	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
@@ -66,9 +73,16 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
  ******************************************************************************/
 static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	int	i, ret = FAIL;
+	int	i, ret, ret_continue;
 
-	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		ret_continue = SUCCEED;
+	else
+		ret_continue = FAIL;
+
+	ret = ret_continue;
+
+	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
@@ -107,9 +121,16 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 	if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
+		zbx_vector_uint64_t	groupids;
+		char			*sql = NULL;
+		size_t			sql_alloc = 0, sql_offset = 0;
+
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		result = DBselect(
+		zbx_vector_uint64_create(&groupids);
+		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct hg.groupid"
 				" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 				" where hg.hostid=h.hostid"
@@ -117,9 +138,15 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 					" and i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
 					" and t.triggerid=" ZBX_FS_UI64
-					" and hg.groupid=" ZBX_FS_UI64,
-				event->objectid,
-				condition_value);
+					" and",
+				event->objectid);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselect("%s", sql);
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&groupids);
 
 		switch (condition->operator)
 		{
@@ -1013,12 +1040,19 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 	}
 	else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
+		zbx_vector_uint64_t	groupids;
+		char			*sqlcond = NULL;
+		size_t			sqlcond_alloc = 0, sqlcond_offset = 0;
+
 		ZBX_STR2UINT64(condition_value, condition->value);
+
+		zbx_vector_uint64_create(&groupids);
+		zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				zbx_snprintf(sql, sizeof(sql),
+				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
 						"select null"
 						" from hosts_groups hg,hosts h,items i,functions f,triggers t"
 						" where hg.hostid=h.hostid"
@@ -1026,21 +1060,27 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 							" and i.itemid=f.itemid"
 							" and f.triggerid=t.triggerid"
 							" and t.triggerid=" ZBX_FS_UI64
-							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, condition_value);
+							" and",
+						event->objectid);
 				break;
 			default:
-				zbx_snprintf(sql, sizeof(sql),
+				zbx_snprintf_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset,
 						"select null"
 						" from hosts_groups hg,hosts h,items i"
 						" where hg.hostid=h.hostid"
 							" and h.hostid=i.hostid"
 							" and i.itemid=" ZBX_FS_UI64
-							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, condition_value);
+							" and",
+						event->objectid);
 		}
 
-		result = DBselectN(sql, 1);
+		DBadd_condition_alloc(&sqlcond, &sqlcond_alloc, &sqlcond_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselectN(sqlcond, 1);
+
+		zbx_free(sqlcond);
+		zbx_vector_uint64_destroy(&groupids);
 
 		switch (condition->operator)
 		{
@@ -1320,15 +1360,14 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  * Purpose: check if actions have to be processed for the event               *
  *          (check all conditions of the action)                              *
  *                                                                            *
- * Parameters: event - event to check                                         *
- *             actionid - action ID for matching                              *
+ * Parameters: actionid - action ID for matching                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *action)
+static int	check_action_conditions(zbx_action_eval_t *action)
 {
 	const char	*__function_name = "check_action_conditions";
 
@@ -1353,7 +1392,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
 
-		condition_result = check_action_condition(event, condition);
+		condition_result = condition->condition_result;
 
 		switch (action->evaltype)
 		{
@@ -1606,6 +1645,90 @@ int	is_recovery_event(const DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
+ * Function: uniq_conditions_compare_func                                     *
+ *                                                                            *
+ * Purpose: compare to find equal conditions                                  *
+ *                                                                            *
+ * Parameters: d1 - [IN] condition structure to compare to d2                 *
+ *             d2 - [IN] condition structure to compare to d1                 *
+ *                                                                            *
+ * Return value: 0 - equal                                                    *
+ *               not 0 - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	uniq_conditions_compare_func(const void *d1, const void *d2)
+{
+	const DB_CONDITION	*condition1 = d1, *condition2 = d2;
+	int			ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->conditiontype, condition2->conditiontype);
+	ZBX_RETURN_IF_NOT_EQUAL(condition1->operator, condition2->operator);
+
+	if (0 != (ret = strcmp(condition1->value, condition2->value)))
+		return ret;
+
+	if (0 != (ret = strcmp(condition1->value2, condition2->value2)))
+		return ret;
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uniq_conditions_hash_func                                        *
+ *                                                                            *
+ * Purpose: generate hash based on condition values                           *
+ *                                                                            *
+ * Parameters: data - [IN] condition structure                                *
+ *                                                                            *
+ *                                                                            *
+ * Return value: hash is generated                                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hash_t	uniq_conditions_hash_func(const void *data)
+{
+	const DB_CONDITION	*condition = data;
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value, strlen(condition->value), ZBX_DEFAULT_HASH_SEED);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(condition->value2, strlen(condition->value2), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->conditiontype, 1, hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&condition->operator, 1, hash);
+
+	return hash;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_event_conditions                                           *
+ *                                                                            *
+ * Purpose: check all unique conditions for given event and source            *
+ *                                                                            *
+ * Parameters: event           - [IN]     event that need conditions checking *
+ *             uniq_conditions - [IN/OUT] conditions that will be checked and *
+ *                                        updated with result                 *
+ *                                                                            *
+ * Return value: SICCESS if valid event source, otherwise FAIL                *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_conditions)
+{
+	zbx_hashset_iter_t	iter;
+	DB_CONDITION		*condition;
+
+	if (EVENT_SOURCE_COUNT <= (unsigned char)event->source)
+		return FAIL;
+
+	zbx_hashset_iter_reset(&uniq_conditions[event->source], &iter);
+
+	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
+		condition->condition_result = check_action_condition(event, condition);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -1624,6 +1747,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_vector_ptr_t		actions;
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_hashset_t			rec_escalations;
+	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -1631,8 +1755,11 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_hashset_create(&rec_escalations, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions);
+	zbx_dc_get_actions_eval(&actions, uniq_conditions);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
@@ -1654,31 +1781,40 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			continue;
 		}
 
-		for (j = 0; j < actions.values_num; j++)
+		if (SUCCEED == check_event_conditions(event, uniq_conditions))
 		{
-			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
-
-			if (action->eventsource != event->source)
-				continue;
-
-			if (SUCCEED == check_action_conditions(event, action))
+			for (j = 0; j < actions.values_num; j++)
 			{
-				zbx_escalation_new_t	*new_escalation;
+				zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
 
-				/* command and message operations handled by escalators even for    */
-				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
-				new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
-				new_escalation->actionid = action->actionid;
-				new_escalation->event = event;
-				zbx_vector_ptr_append(&new_escalations, new_escalation);
+				if (action->eventsource != event->source)
+					continue;
 
-				if (EVENT_SOURCE_DISCOVERY == event->source ||
-						EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+				if (SUCCEED == check_action_conditions(action))
 				{
-					execute_operations(event, action->actionid);
+					zbx_escalation_new_t	*new_escalation;
+
+					/* command and message operations handled by escalators even for    */
+					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
+					new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+					new_escalation->actionid = action->actionid;
+					new_escalation->event = event;
+					zbx_vector_ptr_append(&new_escalations, new_escalation);
+
+					if (EVENT_SOURCE_DISCOVERY == event->source ||
+							EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+					{
+						execute_operations(event, action->actionid);
+					}
 				}
 			}
 		}
+	}
+
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		zbx_conditions_eval_clean(&uniq_conditions[i]);
+		zbx_hashset_destroy(&uniq_conditions[i]);
 	}
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);

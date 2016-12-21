@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.3.0');
 define('ZABBIX_API_VERSION',	'3.3.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3030011);
+define('ZABBIX_DB_VERSION',		3030014);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -979,6 +979,30 @@ define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
+// API validation
+// scalar data types
+define('API_STRING_UTF8',	1);
+define('API_INT32',			2);
+define('API_ID',			3);
+define('API_BOOLEAN',		4);
+define('API_FLAG',			5);
+// arrays
+define('API_OBJECT',		6);
+define('API_IDS',			7);
+define('API_OBJECTS',		8);
+// specific types
+define('API_HG_NAME',		9);
+define('API_SCRIPT_NAME',	10);
+define('API_USER_MACRO',	11);
+define('API_TIME_PERIOD',	12);
+
+// flags
+define('API_REQUIRED',		0x01);
+define('API_NOT_EMPTY',		0x02);
+define('API_ALLOW_NULL',	0x04);
+define('API_NORMALIZE',		0x08);
+define('API_MULTIPLE',		0x10);
+
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
 	define('JSON_ERROR_NONE', 0);
@@ -1151,6 +1175,7 @@ define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
+define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');

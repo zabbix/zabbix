@@ -103,50 +103,67 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	static long	pagesize = 0;
 	static int	smbios_status = SMBIOS_STATUS_UNKNOWN;
 	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
+	zbx_stat_t	file_buf;
 
-	if (-1 == (fd = open(DEV_MEM, O_RDONLY)))
-		return ret;
-
-	if (SMBIOS_STATUS_UNKNOWN == smbios_status)	/* look for SMBIOS table only once */
+	if (-1 != (fd = open(SYS_TABLE_FILE, O_RDONLY)))
 	{
-		pagesize = sysconf(_SC_PAGESIZE);
+		if (-1 == fstat(fd, &file_buf))
+			goto close;
 
-		/* find smbios entry point - located between 0xF0000 and 0xFFFFF (according to the specs) */
-		for (fp = 0xf0000; 0xfffff > fp; fp += 16)
+		smbuf = zbx_malloc(NULL, file_buf.st_size);
+
+		if (-1 == (ssize_t)(smbios_len = read(fd, smbuf, file_buf.st_size)))
+			goto clean;
+	}
+	else if (-1 != (fd = open(DEV_MEM, O_RDONLY)))
+	{
+		if (SMBIOS_STATUS_UNKNOWN == smbios_status)	/* look for SMBIOS table only once */
 		{
-			memset(membuf, 0, sizeof(membuf));
+			pagesize = sysconf(_SC_PAGESIZE);
 
-			len = fp % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
-			if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED, fd, fp - len)))
-				goto close;
-
-			memcpy(membuf, (char *)mmp + len, sizeof(membuf));
-			munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
-
-			if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
+			/* find smbios entry point - located between 0xF0000 and 0xFFFFF (according to the specs) */
+			for (fp = 0xf0000; 0xfffff > fp; fp += 16)
 			{
-				smbios_len = membuf[7] << 8 | membuf[6];
-				smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 | (size_t)membuf[9] << 8 | membuf[8];
-				smbios_status = SMBIOS_STATUS_OK;
-				break;
+				memset(membuf, 0, sizeof(membuf));
+
+				len = fp % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
+				if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED,
+						fd, fp - len)))
+				{
+					goto close;
+				}
+
+				memcpy(membuf, (char *)mmp + len, sizeof(membuf));
+				munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
+
+				if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
+				{
+					smbios_len = membuf[7] << 8 | membuf[6];
+					smbios = (size_t)membuf[11] << 24 | (size_t)membuf[10] << 16 |
+							(size_t)membuf[9] << 8 | membuf[8];
+					smbios_status = SMBIOS_STATUS_OK;
+					break;
+				}
 			}
 		}
+
+		if (SMBIOS_STATUS_OK != smbios_status)
+		{
+			smbios_status = SMBIOS_STATUS_ERROR;
+			goto close;
+		}
+
+		smbuf = zbx_malloc(smbuf, smbios_len);
+
+		len = smbios % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
+		if (MAP_FAILED == (mmp = mmap(0, len + smbios_len, PROT_READ, MAP_SHARED, fd, smbios - len)))
+			goto clean;
+
+		memcpy(smbuf, (char *)mmp + len, smbios_len);
+		munmap(mmp, len + smbios_len);
 	}
-
-	if (SMBIOS_STATUS_OK != smbios_status)
-	{
-		smbios_status = SMBIOS_STATUS_ERROR;
-		goto close;
-	}
-
-	smbuf = zbx_malloc(smbuf, smbios_len);
-
-	len = smbios % pagesize;	/* mmp needs to be a multiple of pagesize for munmap */
-	if (MAP_FAILED == (mmp = mmap(0, len + smbios_len, PROT_READ, MAP_SHARED, fd, smbios - len)))
-		goto clean;
-
-	memcpy(smbuf, (char *)mmp + len, smbios_len);
-	munmap(mmp, len + smbios_len);
+	else
+		return ret;
 
 	data = smbuf;
 	while (data + DMI_HEADER_SIZE <= smbuf + smbios_len)
@@ -263,14 +280,14 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 {
 	size_t	offset = 0;
 
-	if (HW_CPU_SHOW_MAXFREQ == filter && FAIL != maxfreq)
+	if (HW_CPU_SHOW_MAXFREQ == filter && FAIL != (int)maxfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", maxfreq / 1000);
 		else
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64, maxfreq * 1000);
 	}
-	else if (HW_CPU_SHOW_CURFREQ == filter && FAIL != curfreq)
+	else if (HW_CPU_SHOW_CURFREQ == filter && FAIL != (int)curfreq)
 	{
 		if (HW_CPU_ALL_CPUS == cpu)
 			offset += zbx_snprintf(buffer + offset, size - offset, " " ZBX_FS_UI64 "MHz", curfreq);
@@ -279,10 +296,10 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	}
 	else if (HW_CPU_SHOW_ALL == filter)
 	{
-		if (FAIL != curfreq)
+		if (FAIL != (int)curfreq)
 			offset += zbx_snprintf(buffer + offset, size - offset, " working at " ZBX_FS_UI64 "MHz", curfreq);
 
-		if (FAIL != maxfreq)
+		if (FAIL != (int)maxfreq)
 			offset += zbx_snprintf(buffer + offset, size - offset, " (maximum " ZBX_FS_UI64 "MHz)", maxfreq / 1000);
 	}
 
@@ -358,7 +375,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\nprocessor %d:", cur_cpu);
 
 			if ((HW_CPU_SHOW_ALL == filter || HW_CPU_SHOW_MAXFREQ == filter) &&
-					FAIL != (maxfreq = get_cpu_max_freq(cur_cpu)))
+					FAIL != (int)(maxfreq = get_cpu_max_freq(cur_cpu)))
 			{
 				ret = SYSINFO_RET_OK;
 			}

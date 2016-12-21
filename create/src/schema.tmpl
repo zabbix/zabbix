@@ -319,7 +319,7 @@ FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
 FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
-FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|delay_flex	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -727,7 +727,7 @@ FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|2|media_type
 FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|active		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'63'	|NOT NULL	|0
-FIELD		|period		|t_varchar(100)	|'1-7,00:00-24:00'|NOT NULL|0
+FIELD		|period		|t_varchar(1024)|'1-7,00:00-24:00'|NOT NULL|0
 INDEX		|1		|userid
 INDEX		|2		|mediatypeid
 
@@ -1165,7 +1165,7 @@ UNIQUE		|1		|actionid,triggerid,itemid,escalationid
 
 TABLE|globalvars|globalvarid|0
 FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
-FIELD		|snmp_lastsize	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|snmp_lastsize	|t_bigint	|'0'	|NOT NULL	|0
 
 TABLE|graph_discovery|graphid|0
 FIELD		|graphid	|t_id		|	|NOT NULL	|0			|1|graphs
@@ -1450,4 +1450,4 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030011	|3030011
+ROW		|3030014	|3030014

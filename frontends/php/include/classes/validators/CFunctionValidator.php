@@ -42,7 +42,24 @@ class CFunctionValidator extends CValidator {
 	 */
 	private $allowed;
 
+	/**
+	 * If set to true, LLD macros can be uses inside functions and are properly validated using LLD macro parser.
+	 *
+	 * @var bool
+	 */
+	private $lldmacros = true;
+
 	public function __construct(array $options = []) {
+		/*
+		 * CValidator is an abstract class, so no specific functionallity should be bound to it. Thus putting
+		 * an option "lldmacros" (or class variable $lldmacros) in it, is not preferred. Without it, class
+		 * initialization would fail due to __set(). So instead we create a local variable in this extended class
+		 * and remove the option "lldmacros" before calling the parent constructor.
+		 */
+		if (array_key_exists('lldmacros', $options)) {
+			$this->lldmacros = $options['lldmacros'];
+			unset($options['lldmacros']);
+		}
 		parent::__construct($options);
 
 		$valueTypesAll = [
@@ -188,7 +205,7 @@ class CFunctionValidator extends CValidator {
 			],
 			'nodata'=> [
 				'args' => [
-					['type' => 'sec_zero', 'mandat' => true]
+					['type' => 'sec', 'mandat' => true]
 				],
 				'value_types' => $valueTypesAll
 			],
@@ -299,6 +316,9 @@ class CFunctionValidator extends CValidator {
 		];
 
 		$user_macro_parser = new CUserMacroParser();
+		if ($this->lldmacros) {
+			$lld_macro_parser = new CLLDMacroParser();
+		}
 
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
@@ -318,6 +338,11 @@ class CFunctionValidator extends CValidator {
 
 			// user macro
 			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CParser::PARSE_SUCCESS) {
+				continue;
+			}
+
+			if ($this->lldmacros
+					&& $lld_macro_parser->parse($value['functionParamList'][$aNum]) == CParser::PARSE_SUCCESS) {
 				continue;
 			}
 
@@ -342,6 +367,9 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateParameter($param, $type) {
 		switch ($type) {
+			case 'sec':
+				return $this->validateSec($param);
+
 			case 'sec_zero':
 				return $this->validateSecZero($param);
 
@@ -385,6 +413,18 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateSecValue($param) {
 		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain only seconds.
+	 * Examples: 1, 5w
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSec($param) {
+		return ($this->validateSecValue($param) && $param > 0);
 	}
 
 	/**
