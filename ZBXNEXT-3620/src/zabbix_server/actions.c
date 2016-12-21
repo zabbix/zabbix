@@ -743,6 +743,65 @@ static int	check_template_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_
 
 /******************************************************************************
  *                                                                            *
+ * Function: trigger_parents_sql_alloc                                        *
+ *                                                                            *
+ * Purpose: mapping between discovered triggers and their prototypes          *
+ *                                                                            *
+ * Parameters: sql           [IN/OUT] - allocated sql query                   *
+ *             sql_alloc     [IN/OUT] - how much bytes allocated              *
+ *             objectids_tmp [IN/OUT] - uses to allocate query                *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	trigger_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp)
+{
+	size_t	sql_offset = 0;
+
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
+			"select triggerid,parent_triggerid"
+			" from trigger_discovery"
+			" where");
+
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "triggerid",
+			objectids_tmp->values, objectids_tmp->values_num);
+}
+
+static void	replace_id_to_parentid(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *dtriggers,
+		zbx_uint64_t objectid, zbx_uint64_t parent_triggerid)
+{
+	int i;
+
+	/* for each id fetched, replace id to parent id */
+	if (FAIL != (i = zbx_vector_uint64_search(objectids, objectid,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		zbx_uint64_pair_t	trigger_pair = {objectids->values[i], parent_triggerid};
+
+		zbx_vector_uint64_pair_append(dtriggers, trigger_pair);
+
+		objectids->values[i] = parent_triggerid;
+	}
+}
+
+static void	replace_parentid_to_id(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *dtriggers)
+{
+	int	i;
+
+	for (i = 0; i < dtriggers->values_num; i++)
+	{
+		int j;
+
+		/* for each trigger id in result revert parent id to original trigger id */
+		if (FAIL != (j = zbx_vector_uint64_search(objectids, dtriggers->values[i].second,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			objectids->values[j] = dtriggers->values[i].first;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_host_template_condition                                    *
  *                                                                            *
  * Purpose: check host template condition                                     *
@@ -758,11 +817,10 @@ static int	check_template_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_
 static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
+	size_t				sql_alloc = 0;
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_uint64_t			condition_value;
-	int				i;
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	dtriggers;
 
@@ -776,13 +834,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select triggerid,parent_triggerid"
-			" from trigger_discovery"
-			" where");
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
-			objectids.values, objectids.values_num);
+	trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids);
 
 	result = DBselect("%s", sql);
 
@@ -793,15 +845,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 		ZBX_STR2UINT64(objectid, row[0]);
 		ZBX_STR2UINT64(parent_triggerid, row[1]);
 
-		/* for each trigger id fetched, replace trigger id to parent trigger id */
-		if (FAIL != (i = zbx_vector_uint64_search(&objectids, objectid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			zbx_uint64_pair_t	trigger_pair = {objectids.values[i], parent_triggerid};
-
-			zbx_vector_uint64_pair_append(&dtriggers, trigger_pair);
-
-			objectids.values[i] = parent_triggerid;
-		}
+		replace_id_to_parentid(&objectids, &dtriggers, objectid, parent_triggerid);
 	}
 	DBfree_result(result);
 
@@ -809,17 +853,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 			check_template_id_sql_alloc,
 			check_template_id_row);
 
-	for (i = 0; i < dtriggers.values_num; i++)
-	{
-		int j;
-
-		/* for each trigger id in result revert parent id to original trigger id */
-		if (FAIL != (j = zbx_vector_uint64_search(&condition->objectids, dtriggers.values[i].second,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			condition->objectids.values[j] = dtriggers.values[i].first;
-		}
-	}
+	replace_parentid_to_id(&condition->objectids, &dtriggers);
 
 	zbx_vector_uint64_pair_destroy(&dtriggers);
 	zbx_vector_uint64_destroy(&objectids);
@@ -2283,6 +2317,36 @@ static void	check_template_id_item_sql_alloc(char **sql, size_t *sql_alloc, zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Function: trigger_parents_sql_alloc                                        *
+ *                                                                            *
+ * Purpose: to get parent id from trigger discovery                           *
+ *                                                                            *
+ * Parameters: sql           [IN/OUT] - allocated sql query                   *
+ *             sql_alloc     [IN/OUT] - how much bytes allocated              *
+ *             objectids_tmp [IN/OUT] - uses to allocate query, removes       *
+ *                                      duplicates                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp)
+{
+	size_t	sql_offset = 0;
+
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
+			"select i.itemid,id.parent_itemid"
+			" from item_discovery id,items i"
+			" where id.itemid=i.itemid"
+				" and i.flags=%d"
+				" and",
+			ZBX_FLAG_DISCOVERY_CREATED);
+
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "i.itemid",
+			objectids_tmp->values, objectids_tmp->values_num);
+}
+
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_intern_host_template_condition                             *
  *                                                                            *
  * Purpose: check host template condition for internal events                 *
@@ -2302,7 +2366,7 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_uint64_t			condition_value;
-	int				i, j, k;
+	int				i, j;
 	zbx_vector_uint64_t		objectids[2], objectids_match[2];
 	zbx_vector_uint64_pair_t	dtriggers;
 
@@ -2323,34 +2387,13 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 
 	for (i = 0; i < 2; i++)
 	{
-		size_t	sql_offset = 0;
-
 		if (0 == objectids[i].values_num)
 			continue;
 
 		if (0 == i)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select triggerid,parent_triggerid"
-					" from trigger_discovery"
-					" where");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
-					objectids[i].values, objectids[i].values_num);
-		}
+			trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids[i]);
 		else
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select i.itemid,id.parent_itemid"
-					" from item_discovery id,items i"
-					" where id.itemid=i.itemid"
-						" and i.flags=%d"
-						" and",
-					ZBX_FLAG_DISCOVERY_CREATED);
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
-					objectids[i].values, objectids[i].values_num);
-		}
+			item_parents_sql_alloc(&sql, &sql_alloc, &objectids[i]);
 
 		result = DBselect("%s", sql);
 
@@ -2361,16 +2404,7 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 			ZBX_STR2UINT64(objectid, row[0]);
 			ZBX_STR2UINT64(parent_triggerid, row[1]);
 
-			/* for each trigger id fetched, replace trigger id to parent trigger id */
-			if (FAIL != (j = zbx_vector_uint64_search(&objectids[i], objectid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				zbx_uint64_pair_t	trigger_pair = {objectids[i].values[j], parent_triggerid};
-
-				zbx_vector_uint64_pair_append(&dtriggers, trigger_pair);
-
-				objectids[i].values[j] = parent_triggerid;
-			}
+			replace_id_to_parentid(&objectids[i], &dtriggers, objectid, parent_triggerid);
 		}
 		DBfree_result(result);
 
@@ -2378,15 +2412,7 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 				i == 0 ? check_template_id_sql_alloc : check_template_id_item_sql_alloc,
 				check_template_id_row);
 
-		for (k = 0; k < dtriggers.values_num; k++)
-		{
-			/* for each trigger id in result revert parent id to original trigger id */
-			if (FAIL != (j = zbx_vector_uint64_search(&objectids_match[i],
-					dtriggers.values[k].second, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				objectids_match[i].values[j] = dtriggers.values[k].first;
-			}
-		}
+		replace_parentid_to_id(&objectids_match[i], &dtriggers);
 
 		zbx_vector_uint64_pair_clear(&dtriggers);
 	}
