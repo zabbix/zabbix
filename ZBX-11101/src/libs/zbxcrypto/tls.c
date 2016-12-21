@@ -3782,7 +3782,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 		/* basic verification of peer certificate was done during handshake */
 
-		/* if required validate peer certificate Issuer and Subject */
+		/* if required verify peer certificate Issuer and Subject */
 		if (SUCCEED != zbx_verify_issuer_subject(s->tls_ctx, tls_arg1, tls_arg2, error))
 		{
 			zbx_tls_close(s);
@@ -4288,6 +4288,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		/* log peer certificate information for debugging */
 		zbx_log_peer_cert(__function_name, s->tls_ctx);
 
+		/* perform basic verification of peer certificate */
 		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx->ctx)))
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
@@ -4295,8 +4296,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			zbx_tls_close(s);
 			goto out1;
 		}
-
-		/* basic verification of peer certificate was done during handshake with OpenSSL built-in procedures */
 
 		/* if required verify peer certificate Issuer and Subject */
 		if (SUCCEED != zbx_verify_issuer_subject(s->tls_ctx, tls_arg1, tls_arg2, error))
@@ -4522,8 +4521,9 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		/* log peer certificate information for debugging */
 		zbx_log_peer_cert(__function_name, s->tls_ctx);
 
-		/* Basic verification of peer certificate was done during handshake. Issuer and Subject have to be */
-		/* verified later, after data have been received and sender type and host name are known. */
+		/* basic verification of peer certificate was done during handshake */
+
+		/* Issuer and Subject will be verified later, after receiving sender type and host name */
 	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
@@ -4767,8 +4767,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			goto out1;
 		}
 
-		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified */
-		/* later, after data have been received and sender type and host name are known. */
+		/* Issuer and Subject will be verified later, after receiving sender type and host name */
 	}
 	else if (GNUTLS_CRD_PSK == creds)
 	{
@@ -4997,6 +4996,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		/* log peer certificate information for debugging */
 		zbx_log_peer_cert(__function_name, s->tls_ctx);
 
+		/* perform basic verification of peer certificate */
 		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx->ctx)))
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
@@ -5005,8 +5005,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			goto out1;
 		}
 
-		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified */
-		/* later, after data have been received and sender type and host name are known. */
+		/* Issuer and Subject will be verified later, after receiving sender type and host name */
 	}
 	else
 	{
