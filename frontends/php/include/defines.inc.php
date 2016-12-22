@@ -983,7 +983,6 @@ define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
 define('ZBX_TEXTAREA_4DIGITS_WIDTH',			50);	// please use for date selector only
 define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
-define('ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH',	100);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 
