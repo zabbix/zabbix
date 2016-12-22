@@ -217,8 +217,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	dir = zbx_strdup(NULL, dir_param);
 
-	/* remove directory suffix '/' or '\\' (if any) as stat() fails on Windows for directories ending with slash */
-	if ('\0' != dir[1])
+	/* remove directory suffix '/' or '\\' (if any, except for paths like "/" or "C:\\") as stat() fails on */
+	/* Windows for directories ending with slash */
+	if ('\0' != dir[1] && ':' != dir[strlen(dir) - 2])
 		zbx_rtrim(dir, "/\\");
 
 	if (0 != zbx_stat(dir, &status))
