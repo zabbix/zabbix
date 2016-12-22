@@ -360,16 +360,17 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 function copyItems($srcHostId, $dstHostId) {
 	$srcItems = API::Item()->get([
-		'hostids' => $srcHostId,
 		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
 			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
 			'publickey', 'privatekey', 'flags', 'port',	'description', 'inventory_link'
 		],
+		'selectApplications' => ['applicationid'],
+		'selectPreprocessing' => ['type', 'params'],
+		'hostids' => $srcHostId,
 		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-		'selectApplications' => ['applicationid']
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
@@ -397,6 +398,10 @@ function copyItems($srcHostId, $dstHostId) {
 		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
+
+		if (!$srcItem['preprocessing']) {
+			unset($srcItem['preprocessing']);
+		}
 	}
 	unset($srcItem);
 
