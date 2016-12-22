@@ -20,12 +20,12 @@
 
 
 /**
- * Converter for converting import data from 3.0 to 3.4.
+ * Converter for converting import data from 3.0 to 3.2
  */
 class C30ImportConverter extends CConverter {
 
 	public function convert($data) {
-		$data['zabbix_export']['version'] = '3.4';
+		$data['zabbix_export']['version'] = '3.2';
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = $this->convertHosts($data['zabbix_export']['hosts']);
@@ -186,5 +186,4 @@ class C30ImportConverter extends CConverter {
 
 		return $linktriggers;
 	}
-
 }
