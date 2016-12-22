@@ -255,15 +255,15 @@ static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc
  * Purpose: substitute constant macros in data string with real values from   *
  *          expression                                                        *
  *                                                                            *
- * Parameters: data       - trigger description                               *
- *             expression - expression from where to take constant values     *
+ * Parameters: data       - [IN/OUT] trigger description                      *
+ *             expression - [IN] trigger expression, source of constants      *
  *                                                                            *
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char		*number = NULL, replace[3] = "$0";
-	int		number_cnt = 0, i, ret = SUCCEED;
-	size_t		number_alloc = 0, number_offset, pos = 0;
+	char	*number = NULL, replace[3] = "$0";
+	int	number_cnt = 0, i, ret = SUCCEED;
+	size_t	number_alloc = 0, number_offset, pos = 0;
 
 	for (i = 1; i <= 9; i++)
 	{
