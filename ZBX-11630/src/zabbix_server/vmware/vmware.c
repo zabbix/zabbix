@@ -1307,7 +1307,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_authenticate";
-	char		xml[MAX_STRING_LEN], *error_object = NULL;
+	char		xml[MAX_STRING_LEN], *error_object = NULL, *username_esc = NULL, *password_esc = NULL;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
@@ -1336,12 +1336,15 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		}
 	}
 
+	username_esc = xml_escape_dyn(service->username);
+	password_esc = xml_escape_dyn(service->password);
+
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
 		/* try to detect the service type first using vCenter service manager object */
 		zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
 				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
-				service->username, service->password);
+				username_esc, password_esc);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 		{
@@ -1383,8 +1386,9 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		zbx_free(*error);
 	}
 
-	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
-			service->username, service->password);
+	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
+			vmware_service_objects[service->type].session_manager,
+			username_esc, password_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -1408,6 +1412,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	ret = SUCCEED;
 out:
 	zbx_free(error_object);
+	zbx_free(username_esc);
+	zbx_free(password_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1500,13 +1506,17 @@ static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_
 
 	const char	*__function_name = "vmware_service_get_perfcounter_refreshrate";
 
-	char		tmp[MAX_STRING_LEN], *value = NULL;
+	char		tmp[MAX_STRING_LEN], *value = NULL, *id_esc = NULL;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	id_esc  = xml_escape_dyn(id);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
-			vmware_service_objects[service->type].performance_manager, type, id);
+			vmware_service_objects[service->type].performance_manager, type, id_esc);
+
+	zbx_free(id_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -1609,7 +1619,6 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
 		goto out;
-
 
 	if (NULL == (doc = xmlReadMemory(page.data, page.offset, ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 	{
@@ -1989,13 +1998,17 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	const char	*__function_name = "vmware_service_get_vm_data";
 
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *vmid_esc = NULL;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
 
+	vmid_esc = xml_escape_dyn(vmid);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
-			vmware_service_objects[service->type].property_collector, vmid);
+			vmware_service_objects[service->type].property_collector, vmid_esc);
+
+	zbx_free(vmid_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -2123,14 +2136,18 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value, *id_esc = NULL;
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __function_name, id);
 
+	id_esc = xml_escape_dyn(id);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATASTORE_GET,
-			vmware_service_objects[service->type].property_collector, id);
+			vmware_service_objects[service->type].property_collector, id_esc);
+
+	zbx_free(id_esc);
 
 	if (CURLE_OK != curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, tmp))
 		goto out;
@@ -2240,13 +2257,17 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_data";
 
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *hvid_esc = NULL;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
 
+	hvid_esc = xml_escape_dyn(hvid);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_hv_DETAILS,
-			vmware_service_objects[service->type].property_collector, hvid);
+			vmware_service_objects[service->type].property_collector, hvid_esc);
+
+	zbx_free(hvid_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -2519,7 +2540,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_list";
 
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *token_esc = NULL;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2562,8 +2583,11 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'",
 					__function_name, token);
 
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_LIST_CONTINUE, token);
+			token_esc = xml_escape_dyn(token);
 			zbx_free(token);
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_LIST_CONTINUE, token_esc);
+			zbx_free(token_esc);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 			{
@@ -2682,11 +2706,15 @@ static int	vmware_service_destroy_event_session(const zbx_vmware_service_t *serv
 	const char	*__function_name = "vmware_service_destroy_event_session";
 
 	int		err, opt, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *event_session_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session);
+	event_session_esc = xml_escape_dyn(event_session);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session_esc);
+
+	zbx_free(event_session_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -2750,7 +2778,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	const char	*__function_name = "vmware_service_get_event_data";
 
-	char		tmp[MAX_STRING_LEN], *event_session = NULL;
+	char		tmp[MAX_STRING_LEN], *event_session = NULL, *event_session_esc = NULL;
 	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event_session:'%s'", __function_name, event_session);
@@ -2758,8 +2786,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_get_event_session(service, easyhandle, &event_session, error))
 		goto out;
 
+	event_session_esc = xml_escape_dyn(event_session);
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_EVENTS_GET,
-			vmware_service_objects[service->type].property_collector, event_session);
+			vmware_service_objects[service->type].property_collector, event_session_esc);
+
+	zbx_free(event_session_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -3006,12 +3038,16 @@ static int	vmware_service_get_cluster_status(const zbx_vmware_service_t *service
 
 	const char	*__function_name = "vmware_service_get_cluster_status";
 
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *clusterid_esc = NULL;
 	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __function_name, clusterid);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid);
+	clusterid_esc = xml_escape_dyn(clusterid);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid_esc);
+
+	zbx_free(clusterid_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -3695,7 +3731,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	zbx_vmware_lock();
 
-	/* udpate entity refresh rate */
+	/* update entity refresh rate */
 	for (i = 0; i < entities.values_num; i++)
 	{
 		if (NULL != (entity = zbx_hashset_search(&service->entities, entities.values[i])))
@@ -3706,6 +3742,8 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_hashset_iter_reset(&service->entities, &iter);
 	while (NULL != (entity = zbx_hashset_iter_next(&iter)))
 	{
+		char *id_esc = NULL;
+
 		if (0 == entity->refresh)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "skipping performance entity with zero refresh rate "
@@ -3713,10 +3751,14 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 			continue;
 		}
 
+		id_esc = xml_escape_dyn(entity->id);
+
 		/* add entity performance counter request */
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"
 				"<ns0:entity type=\"%s\">%s</ns0:entity><ns0:maxSample>1</ns0:maxSample>",
-				entity->type, entity->id);
+				entity->type, id_esc);
+
+		zbx_free(id_esc);
 
 		for (j = 0; j < entity->counters.values_num; j++)
 		{

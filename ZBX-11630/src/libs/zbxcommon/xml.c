@@ -64,3 +64,98 @@ void	xml_free_data_dyn(char **data)
 	else
 		zbx_free(*data);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: xml_escape_dyn                                                   *
+ *                                                                            *
+ * Purpose: replace <> symbols in string with &lt;&gt; so the resulting       *
+ *          string can be written into xml field                              *
+ *                                                                            *
+ * Parameters: in     - [IN] the input string                                 *
+ *                                                                            *
+ * Return value: An allocated string containing escaped input string          *
+ *                                                                            *
+ * Comments: The caller must free the returned string after it has been used. *
+ *                                                                            *
+ ******************************************************************************/
+char	*xml_escape_dyn(const char *in)
+{
+	char		*out, *ptr_out;
+	const char	*ptr_in;
+	int		size = 0;
+
+	if (NULL == in)
+		return zbx_strdup(NULL, "");
+
+	for (ptr_in = in; '\0' != *ptr_in; ptr_in++)
+	{
+		switch (*ptr_in)
+		{
+			case '<':
+			case '>':
+				size += 4;
+				break;
+			case '&':
+				size += 5;
+				break;
+			case '"':
+			case '\'':
+				size += 6;
+				break;
+			default:
+				size++;
+		}
+	}
+	size++;
+
+	out = zbx_malloc(NULL, size);
+
+	for (ptr_out = out, ptr_in = in; '\0' != *ptr_in; ptr_in++)
+	{
+		switch (*ptr_in)
+		{
+			case '<':
+				*ptr_out++ = '&';
+				*ptr_out++ = 'l';
+				*ptr_out++ = 't';
+				*ptr_out++ = ';';
+				break;
+			case '>':
+				*ptr_out++ = '&';
+				*ptr_out++ = 'g';
+				*ptr_out++ = 't';
+				*ptr_out++ = ';';
+				break;
+			case '&':
+				*ptr_out++ = '&';
+				*ptr_out++ = 'a';
+				*ptr_out++ = 'm';
+				*ptr_out++ = 'p';
+				*ptr_out++ = ';';
+				break;
+			case '"':
+				*ptr_out++ = '&';
+				*ptr_out++ = 'q';
+				*ptr_out++ = 'u';
+				*ptr_out++ = 'o';
+				*ptr_out++ = 't';
+				*ptr_out++ = ';';
+				break;
+			case '\'':
+				*ptr_out++ = '&';
+				*ptr_out++ = 'a';
+				*ptr_out++ = 'p';
+				*ptr_out++ = 'o';
+				*ptr_out++ = 's';
+				*ptr_out++ = ';';
+				break;
+			default:
+				*ptr_out++ = *ptr_in;
+		}
+
+	}
+	*ptr_out = '\0';
+
+	return out;
+}
