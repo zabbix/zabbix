@@ -493,6 +493,16 @@ static int	check_trigger_id_row(DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: objectids_to_pair                                                *
+ *                                                                            *
+ * Purpose: copy objects to pair, for hierarchy checks                        *
+ *                                                                            *
+ * Parameters: objectids       [IN]  - objects                                *
+ *             objectids_pair  [OUT] - objectids will be copied here          *
+ *                                                                            *
+ ******************************************************************************/
 static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair)
 {
 	int	i;
