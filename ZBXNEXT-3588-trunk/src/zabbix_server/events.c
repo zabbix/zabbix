@@ -523,7 +523,7 @@ static void	correlate_events_by_default_rules(void)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", trigger_triggerids.values,
 				trigger_triggerids.values_num);
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
-		separator=" or";
+		separator = " or";
 	}
 
 	if (0 != internal_triggerids.values_num)
@@ -533,7 +533,7 @@ static void	correlate_events_by_default_rules(void)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", internal_triggerids.values,
 				internal_triggerids.values_num);
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
-		separator=" or";
+		separator = " or";
 	}
 
 	if (0 != internal_itemids.values_num)
@@ -543,7 +543,7 @@ static void	correlate_events_by_default_rules(void)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", internal_itemids.values,
 				internal_itemids.values_num);
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
-		separator=" or";
+		separator = " or";
 	}
 
 	if (0 != internal_lldruleids.values_num)

@@ -2856,8 +2856,9 @@ void	zbx_vc_destroy(void)
  *             value      - [IN] the value to add                             *
  *                                                                            *
  * Return value:  SUCCEED - the item value was added successfully             *
- *                FAIL    - failed to add item value to cache (not fatal      *
- *                          failure - cache might be in low memory mode)      *
+ *                FAIL    - the value was not added to cache because the item *
+ *                          is not cached (either not requested yet or cache  *
+ *                          is in low memory mode)                            *
  *                                                                            *
  * Comments: This function must be called whenever item receives a new        *
  *           value(s) to keep the value cache updated.                        *
