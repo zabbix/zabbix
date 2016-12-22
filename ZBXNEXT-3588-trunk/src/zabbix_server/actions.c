@@ -26,9 +26,6 @@
 #include "operations.h"
 #include "events.h"
 
-static int	is_recovery_event(const DB_EVENT *event);
-static int	is_escalation_event(const DB_EVENT *event);
-
 /******************************************************************************
  *                                                                            *
  * Function: check_condition_event_tag                                        *
@@ -2791,21 +2788,6 @@ typedef struct
 }
 zbx_escalation_rec_t;
 
-static int	is_escalation_event(const DB_EVENT *event)
-{
-	/* OK events can't start escalations - skip them */
-	if (SUCCEED == is_recovery_event(event))
-		return FAIL;
-
-	if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION) ||
-			0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: is_recovery_event                                                *
@@ -2845,6 +2827,21 @@ static int	is_recovery_event(const DB_EVENT *event)
 	}
 
 	return FAIL;
+}
+
+static int	is_escalation_event(const DB_EVENT *event)
+{
+	/* OK events can't start escalations - skip them */
+	if (SUCCEED == is_recovery_event(event))
+		return FAIL;
+
+	if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION) ||
+			0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
