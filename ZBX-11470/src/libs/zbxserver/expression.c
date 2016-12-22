@@ -261,41 +261,39 @@ static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char	*number = NULL, replace[3] = "$0";
-	int	number_cnt = 0, i, ret = SUCCEED;
-	size_t	number_alloc = 0, number_offset, pos = 0;
+	char		*number = NULL, replace[3] = "$0", *old_data;
+	int		number_cnt = 0, i, ret = SUCCEED;
+	size_t		number_alloc = 0, number_offset, pos = 0;
+	zbx_strloc_t	number_loc;
 
 	for (i = 1; i <= 9; i++)
 	{
 		replace[1] = '0' + i;
 
-		if (NULL != strstr(*data, replace))	/* at least one occurrence */
+		if (NULL == strstr(*data, replace))	/* no occurrences of the reference in string */
+			continue;
+
+		if (SUCCEED != ret)	/* ran out of numbers on the previous loop iteration */
 		{
-			char		*old_data = *data;
-			zbx_strloc_t	number_loc;
-
-			while (SUCCEED == ret && i > number_cnt)
-			{
-				if (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)))
-				{
-					number_cnt++;
-					pos = number_loc.r + 1;
-				}
-			}
-
-			if (i == number_cnt)
-			{
-				number_offset = 0;
-				zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
-						number_loc.r - number_loc.l + 1);
-
-				*data = string_replace(*data, replace, number);
-			}
-			else
-				*data = string_replace(*data, replace, "");
-
+			old_data = *data;
+			*data = string_replace(*data, replace, "");
 			zbx_free(old_data);
+			continue;
 		}
+
+		while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < i)
+			pos = number_loc.r + 1;
+
+		if (SUCCEED == ret)
+		{
+			number_offset = 0;
+			zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
+					number_loc.r - number_loc.l + 1);
+		}
+
+		old_data = *data;
+		*data = string_replace(*data, replace, (SUCCEED == ret ? number : ""));
+		zbx_free(old_data);
 	}
 
 	zbx_free(number);
