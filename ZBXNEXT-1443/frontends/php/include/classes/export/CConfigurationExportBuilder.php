@@ -692,7 +692,8 @@ class CConfigurationExportBuilder {
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
-				'logtimefmt' => $item['logtimefmt']
+				'logtimefmt' => $item['logtimefmt'],
+				'preprocessing' => $item['preprocessing']
 			];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

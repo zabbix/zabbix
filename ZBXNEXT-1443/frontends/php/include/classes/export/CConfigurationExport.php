@@ -417,6 +417,7 @@ class CConfigurationExport {
 		$items = API::Item()->get([
 			'output' => $this->dataFields['item'],
 			'selectApplications' => ['name', 'flags'],
+			'selectPreprocessing' => ['type', 'params'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
@@ -544,6 +545,7 @@ class CConfigurationExport {
 			'selectApplications' => ['name'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectPreprocessing' => ['type', 'params'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true

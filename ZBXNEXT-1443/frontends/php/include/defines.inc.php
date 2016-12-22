@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',		'3.3.0');
 define('ZABBIX_API_VERSION',	'3.3.0');
-define('ZABBIX_EXPORT_VERSION',	'3.2');
+define('ZABBIX_EXPORT_VERSION',	'3.4');
 define('ZABBIX_DB_VERSION',		3030021);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
@@ -386,6 +386,11 @@ define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
+
+define('ITEM_DATA_TYPE_DECIMAL',		0);
+define('ITEM_DATA_TYPE_OCTAL',			1);
+define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
+define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
 define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>]');
 define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>]');
