@@ -840,6 +840,28 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			API::Application()->massAdd($linkApp);
 		}
 
+		$preprocessing = getRequest('preprocessing', []);
+
+		foreach ($preprocessing as &$step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_RTRIM:
+				case ZBX_PREPROC_LTRIM:
+				case ZBX_PREPROC_TRIM:
+					$step['params'] = $step['params'][0];
+					break;
+
+				case ZBX_PREPROC_REGSUB:
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				default:
+					$step['params'] = '';
+					break;
+			}
+		}
+		unset($step);
+
 		$items = API::Item()->get([
 			'output' => ['itemid', 'flags'],
 			'itemids' => $itemids,
@@ -878,7 +900,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'privatekey' => getRequest('privatekey'),
 				'ipmi_sensor' => getRequest('ipmi_sensor'),
 				'applications' => $applications,
-				'status' => getRequest('status')
+				'status' => getRequest('status'),
+				'preprocessing' => $preprocessing
 			];
 			foreach ($item as $key => $field) {
 				if ($field === null) {
@@ -1148,6 +1171,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
 		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
 		'logtimefmt' => getRequest('logtimefmt', ''),
+		'preprocessing' => getRequest('preprocessing', []),
 		'initial_item_type' => null,
 		'multiple_interface_types' => false,
 		'visible' => getRequest('visible', [])

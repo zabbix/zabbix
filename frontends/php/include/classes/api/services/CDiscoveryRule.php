@@ -1168,6 +1168,7 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
+			'selectPreprocessing' => ['type', 'params'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
@@ -1200,6 +1201,10 @@ class CDiscoveryRule extends CItemGeneral {
 					zbx_objectValues($prototype['applications'], 'applicationid'),
 					$dstHost['hostid']
 				);
+
+				if (!$prototype['preprocessing']) {
+					unset($prototype['preprocessing']);
+				}
 
 				$prototypes[$key] = $prototype;
 			}
