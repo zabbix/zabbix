@@ -2475,34 +2475,6 @@ static void	DCsync_hmacros(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: interface_compare_func                                           *
- *                                                                            *
- * Purpose: compares two host interfaces by hostid, where main agent          *
- *          interface should be the first                                     *
- *                                                                            *
- * Parameters: p1   - [IN] the first interface                                *
- *             p2   - [IN] the second interface                               *
- *                                                                            *
- ******************************************************************************/
-static int	interface_compare_func(const void *p1, const void *p2)
-{
-	const ZBX_DC_INTERFACE	*i1 = *(const ZBX_DC_INTERFACE **)p1;
-	const ZBX_DC_INTERFACE	*i2 = *(const ZBX_DC_INTERFACE **)p2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(i1->hostid, i2->hostid);
-
-	if (1 == i1->main && INTERFACE_TYPE_AGENT == i1->type)
-		return -1;
-	else if (1 == i2->main && INTERFACE_TYPE_AGENT == i2->type)
-		return +1;
-
-	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
-
-	return 0;
-}
-
 static void	DCsync_interfaces(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_interfaces";
@@ -2513,7 +2485,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 
-	int			found, update_index, idx;
+	int			found, update_index, idx, i;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
 	unsigned char		reset_snmp_stats;
@@ -2639,21 +2611,20 @@ static void	DCsync_interfaces(DB_RESULT result)
 		}
 	}
 
-	/* Remove deleted interfaces from buffer and resolve macros for ip and dns fields. Firsly macros should be */
-	/* resolve for main agent interface, because it may contain user marcos and it help substitute {HOST.IP}   */
-	/* and {HOST.DNS} marcos for secondary host interfaces correctly.                                          */
+	zbx_hashset_iter_reset(&config->interfaces, &iter);
 
-	zbx_vector_ptr_sort(&interfaces, (zbx_compare_func_t)interface_compare_func);
-
-	for (idx = 0; idx < interfaces.values_num; idx++)
+	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
 	{
-		interface = DCfind_id(&config->interfaces, ((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid,
-				sizeof(ZBX_DC_INTERFACE), &found);
-
-		if (0 == found)
+		for (idx = 0; idx < interfaces.values_num; idx++)
 		{
-			/* remove from buffer */
+			if (((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid == interface->interfaceid)
+				break;
+		}
 
+		/* remove deleted interface from cache */
+
+		if (idx == interfaces.values_num)
+		{
 			if (1 == interface->main)
 			{
 				interface_ht_local.hostid = interface->hostid;
@@ -2671,14 +2642,30 @@ static void	DCsync_interfaces(DB_RESULT result)
 			zbx_strpool_release(interface->dns);
 			zbx_strpool_release(interface->port);
 
-			zbx_hashset_remove(&config->interfaces,
-					&((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid);
+			zbx_hashset_iter_remove(&iter);
 		}
-		else
+	}
+
+	/* Resolve macros for ip and dns fields. First iteration macros should be resolve for main agent interface,
+	because it may contain user marcos and in next iteration it help substitute {HOST.IP} and {HOST.DNS} marcos
+	for secondary host interfaces correctly. */
+
+	for (i = 0; i < 2; i++)
+	{
+		for (idx = 0; idx < interfaces.values_num; idx++)
 		{
 			int	macros;
 			char	*addr;
 			DC_HOST	host;
+
+			interface = DCfind_id(&config->interfaces, ((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid,
+					sizeof(ZBX_DC_INTERFACE), &found);
+
+			if (0 == found || NULL == interface)
+				continue;
+
+			if (0 == i && (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type))
+				continue;
 
 			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
 			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
@@ -4632,7 +4619,7 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 	return MAX(max_snmp_succeed - 2, min_snmp_fail - 1);
 }
 
-static int	DCget_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
+static int	dc_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
 {
 	int			res = FAIL;
 	const ZBX_DC_INTERFACE	*dc_interface;
@@ -4670,14 +4657,14 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 
 	LOCK_CACHE;
 
-	res = DCget_interface_by_type(interface, hostid, type);
+	res = dc_get_interface_by_type(interface, hostid, type);
 
 	UNLOCK_CACHE;
 
 	return res;
 }
 
-static int	DCconfig_get_interface_by_itemid(DC_INTERFACE *interface, zbx_uint64_t itemid)
+static int	dc_get_interface_by_itemid(DC_INTERFACE *interface, zbx_uint64_t itemid)
 {
 	ZBX_DC_ITEM		*dc_item;
 	const ZBX_DC_INTERFACE	*dc_interface;
@@ -4718,12 +4705,12 @@ int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uin
 
 	LOCK_CACHE;
 
-	if (SUCCEED == (res = DCconfig_get_interface_by_itemid(interface, itemid)))
+	if (SUCCEED == (res = dc_get_interface_by_itemid(interface, itemid)))
 		goto unlock;
 
 	for (i = 0; i < (int)ARRSIZE(INTERFACE_TYPE_PRIORITY); i++)
 	{
-		if (SUCCEED == (res = DCget_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
+		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
 			break;
 	}
 unlock:
