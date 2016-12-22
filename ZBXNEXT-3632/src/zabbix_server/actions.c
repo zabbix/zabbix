@@ -1164,12 +1164,38 @@ static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_object_ids_discovery                                         *
+ *                                                                            *
+ * Purpose: to get objectids for dhost                                        *
+ *                                                                            *
+ * Parameters: esc_events [IN]  - events to check                             *
+ *             objectids  [OUT] - event objectids to be used in condition     *
+ *                                allocation 2 vectors where first one is     *
+ *                                dhost ids, second is dservice               *
+*                                                                             *
+ ******************************************************************************/
+static void	get_object_ids_discovery(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids)
+{
+	int	i;
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+
+		if (event->object == EVENT_OBJECT_DHOST)
+			zbx_vector_uint64_append(&objectids[0], event->objectid);
+		else
+			zbx_vector_uint64_append(&objectids[1], event->objectid);
+	}
+}
+/******************************************************************************
+ *                                                                            *
  * Function: check_drule_condition                                            *
  *                                                                            *
  * Purpose: check discovery rule condition                                    *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1178,60 +1204,83 @@ static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  ******************************************************************************/
 static int	check_drule_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+	char			*sql = NULL, *operation_and, *operation_where;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids[2];
+	zbx_uint64_t		condition_value;
 
-	for (i = 0; i < esc_events->values_num; i++)
+	if (CONDITION_OPERATOR_EQUAL == condition->operator)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		operation_and = " and";
+		operation_where = " where";
+	}
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+	{
+		operation_and = " and not";
+		operation_where = " where not";
+	}
+	else
+		return NOTSUPPORTED;
 
-		ret = FAIL;
+	ZBX_STR2UINT64(condition_value, condition->value);
 
-		ZBX_STR2UINT64(condition_value, condition->value);
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
 
-		if (EVENT_OBJECT_DHOST == event->object)
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (i = 0; i < 2; i++)
+	{
+		size_t	sql_offset = 0;
+
+		if (0 == objectids[i].values_num)
+			continue;
+
+		if (0 == i)	/* EVENT_OBJECT_DHOST */
 		{
-			result = DBselect(
-					"select druleid"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dhostid"
 					" from dhosts"
-					" where druleid=" ZBX_FS_UI64
-						" and dhostid=" ZBX_FS_UI64,
-					condition_value,
-					event->objectid);
+					"%s druleid=" ZBX_FS_UI64
+					" and",
+					operation_where,
+					condition_value);
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					objectids[i].values, objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_DSERVICE */
 		{
-			result = DBselect(
-					"select h.druleid"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select s.dserviceid"
 					" from dhosts h,dservices s"
 					" where h.dhostid=s.dhostid"
-						" and h.druleid=" ZBX_FS_UI64
-						" and s.dserviceid=" ZBX_FS_UI64,
-					condition_value,
-					event->objectid);
+						"%s h.druleid=" ZBX_FS_UI64
+						" and",
+					operation_and,
+					condition_value);
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "s.dserviceid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		switch (condition->operator)
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
 		{
-			case CONDITION_OPERATOR_EQUAL:
-				if (NULL != DBfetch(result))
-					ret = SUCCEED;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (NULL == DBfetch(result))
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			zbx_vector_uint64_append(&condition->objectids, objectid);
 		}
 		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
