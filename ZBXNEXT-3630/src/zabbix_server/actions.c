@@ -140,6 +140,8 @@ static void	get_object_ids(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *ob
 {
 	int	i;
 
+	zbx_vector_uint64_reserve(objectids, esc_events->values_num);
+
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
@@ -1912,7 +1914,6 @@ static int	check_hostname_metadata_condition(zbx_vector_ptr_t *esc_events, DB_CO
 	DB_ROW			row;
 	zbx_vector_uint64_t	objectids;
 	const char		*condition_field;
-	zbx_uint64_t		objectid;
 
 	if (CONDITION_OPERATOR_LIKE != condition->operator && CONDITION_OPERATOR_NOT_LIKE != condition->operator)
 		return NOTSUPPORTED;
@@ -1936,28 +1937,23 @@ static int	check_hostname_metadata_condition(zbx_vector_ptr_t *esc_events, DB_CO
 
 	result = DBselect("%s", sql);
 
-	switch (condition->operator)
+	while (NULL != (row = DBfetch(result)))
 	{
-		case CONDITION_OPERATOR_LIKE:
-			while (NULL != (row = DBfetch(result)))
-			{
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+
+		switch (condition->operator)
+		{
+			case CONDITION_OPERATOR_LIKE:
 				if (NULL != strstr(row[1], condition->value))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
 					zbx_vector_uint64_append(&condition->objectids, objectid);
-				}
-			}
-			break;
-		case CONDITION_OPERATOR_NOT_LIKE:
-			while (NULL != (row = DBfetch(result)))
-			{
+				break;
+			case CONDITION_OPERATOR_NOT_LIKE:
 				if (NULL == strstr(row[1], condition->value))
-				{
-					ZBX_STR2UINT64(objectid, row[0]);
 					zbx_vector_uint64_append(&condition->objectids, objectid);
-				}
-			}
-			break;
+				break;
+		}
 	}
 	DBfree_result(result);
 
@@ -1983,50 +1979,55 @@ static int	check_hostname_metadata_condition(zbx_vector_ptr_t *esc_events, DB_CO
  ******************************************************************************/
 static int	check_areg_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret, i;
-	zbx_uint64_t	condition_value, id;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t		condition_value;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < esc_events->values_num; i++)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+	get_object_ids(esc_events, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select autoreg_hostid,proxy_hostid"
+			" from autoreg_host"
+			" where");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
+			objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		zbx_uint64_t	id;
+		zbx_uint64_t	objectid;
 
-		ret = FAIL;
+		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_DBROW2UINT64(id, row[1]);
 
-		result = DBselect(
-				"select proxy_hostid"
-				" from autoreg_host"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
-
-		if (NULL != (row = DBfetch(result)))
+		switch (condition->operator)
 		{
-			ZBX_DBROW2UINT64(id, row[0]);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (id == condition_value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (id != condition_value)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
+			case CONDITION_OPERATOR_EQUAL:
+				if (id == condition_value)
+					zbx_vector_uint64_append(&condition->objectids, objectid);
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (id != condition_value)
+					zbx_vector_uint64_append(&condition->objectids, objectid);
+				break;
 		}
-		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
