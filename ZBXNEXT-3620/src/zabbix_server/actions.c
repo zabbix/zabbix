@@ -509,37 +509,40 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
 
 /******************************************************************************
  *                                                                            *
- * Function: check_trigger_hierarchy                                          *
+ * Function: check_object_hierarchy                                           *
  *                                                                            *
  * Purpose: there can be multiple levels of templates, that need              *
  *          resolving in order to compare to condition                        *
  *                                                                            *
- * Parameters: objectids  [IN/OUT]  - event id's to check                     *
- *                                    in case of not equal condition will     *
- *                                    delete objectids that match condition   *
- *                                                                            *
- *             condition  [IN/OUT]  - condition for matching, outputs         *
- *                                    event ids that match condition          *
+ * Parameters: objectids      [IN] -     event id's to check                  *
+ *                                       in case of not equal condition will  *
+ *                                       delete objectids that match          *
+ *                                       condition for internal usage         *
+ *             objectids_pair [IN] -     first is original trigger id, second *
+ *                                       is parent trigger id and will be     *
+ *                                       updated for internal usage           *
+ *             condition      [IN/OUT] - condition for matching, outputs      *
+ *                                       event ids that match condition       *
  *                                                                            *
  *             hierarchy_sql_allocate [IN] - custom sql query, must obtain    *
- *                                           trigger id, template id and value*
+ *                                           object, template id and value    *
  *                                                                            *
  *             hierarchy_row_check [IN] - custom function to fetch trigger id,*
- *                                        template id and value               *
+ *                                        object id and value                 *
  *                                                                            *
  ******************************************************************************/
-static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair,
+static void	check_object_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair,
 		DB_CONDITION *condition, zbx_uint64_t condition_value,
 		hierarchy_sql_allocate_func_t hierarchy_sql_allocate,
 		hierarchy_row_check_func_t hierarchy_row_check)
 {
 	int				i;
 	zbx_vector_uint64_t		objectids_tmp;
-	zbx_vector_uint64_pair_t	triggerids_tmp;
+	zbx_vector_uint64_pair_t	objectids_pair_tmp;
 	char				*sql = NULL;
 	size_t				sql_alloc = 256;
 
-	zbx_vector_uint64_pair_create(&triggerids_tmp);
+	zbx_vector_uint64_pair_create(&objectids_pair_tmp);
 	zbx_vector_uint64_create(&objectids_tmp);
 
 	sql = zbx_malloc(sql, sql_alloc);
@@ -606,7 +609,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_u
 					if (objectids_pair->values[i].second == objectid)
 					{
 						objectids_pair->values[i].second = templateid;
-						zbx_vector_uint64_pair_append(&triggerids_tmp,
+						zbx_vector_uint64_pair_append(&objectids_pair_tmp,
 								objectids_pair->values[i]);
 
 						objectids_pair->values[i].second = 0;
@@ -619,12 +622,12 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_u
 		/* resolve in next select only those triggerids that have template id and not equal to condition */
 		zbx_vector_uint64_pair_clear(objectids_pair);
 
-		for (i = 0; i < triggerids_tmp.values_num; i++)
+		for (i = 0; i < objectids_pair_tmp.values_num; i++)
 		{
-			zbx_vector_uint64_pair_append(objectids_pair, triggerids_tmp.values[i]);
+			zbx_vector_uint64_pair_append(objectids_pair, objectids_pair_tmp.values[i]);
 		}
 
-		zbx_vector_uint64_pair_clear(&triggerids_tmp);
+		zbx_vector_uint64_pair_clear(&objectids_pair_tmp);
 		zbx_vector_uint64_clear(&objectids_tmp);
 	}
 
@@ -637,7 +640,7 @@ static void	check_trigger_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_u
 		}
 	}
 
-	zbx_vector_uint64_pair_destroy(&triggerids_tmp);
+	zbx_vector_uint64_pair_destroy(&objectids_pair_tmp);
 	zbx_vector_uint64_destroy(&objectids_tmp);
 
 	zbx_free(sql);
@@ -689,7 +692,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	{
 		objectids_to_pair(&objectids, &objectids_pair);
 
-		check_trigger_hierarchy(&objectids, &objectids_pair, condition, condition_value,
+		check_object_hierarchy(&objectids, &objectids_pair, condition, condition_value,
 				check_trigger_id_sql_alloc,
 				check_trigger_id_row);
 	}
@@ -839,7 +842,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	}
 	DBfree_result(result);
 
-	check_trigger_hierarchy(&objectids, &objectids_pair, condition, condition_value,
+	check_object_hierarchy(&objectids, &objectids_pair, condition, condition_value,
 			check_template_id_sql_alloc,
 			check_template_id_row);
 
@@ -2404,7 +2407,7 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 		}
 		DBfree_result(result);
 
-		check_trigger_hierarchy(objectids_ptr, objectids_pair_ptr, condition, condition_value,
+		check_object_hierarchy(objectids_ptr, objectids_pair_ptr, condition, condition_value,
 				i == 0 ? check_template_id_sql_alloc : check_template_id_item_sql_alloc,
 				check_template_id_row);
 	}
