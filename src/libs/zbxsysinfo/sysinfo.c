@@ -1311,7 +1311,7 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  *               FAIL    - less than n bytes are written                      *
  *                                                                            *
  ******************************************************************************/
-static int	write_all(int fd, const void *buf, size_t n)
+static int	write_all(int fd, const char *buf, size_t n)
 {
 	ssize_t	ret;
 
