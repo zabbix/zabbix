@@ -55,6 +55,8 @@
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
+#include "../zabbix_server/ipmi/ipmi_manager.h"
+#include "../zabbix_server/ipmi/ipmi_poller.h"
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
 
@@ -147,6 +149,7 @@ int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 0;
+int	CONFIG_IPMIMANAGER_FORKS	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -269,25 +272,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_DATASENDER;
 		*local_process_num = local_server_num - server_count + CONFIG_DATASENDER_FORKS;
 	}
-	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_IPMIMANAGER_FORKS))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
-		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_IPMIMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
@@ -333,6 +321,26 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
 		*local_process_num = local_server_num - server_count + CONFIG_VMWARE_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
+		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
 	}
 	else
 		return FAIL;
@@ -937,12 +945,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	DCsync_configuration();
 	DBclose();
 
+	if (0 != CONFIG_IPMIPOLLER_FORKS)
+		CONFIG_IPMIMANAGER_FORKS = 1;
+
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_IPMIMANAGER_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -1014,9 +1025,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads[i] = zbx_thread_start(dbsyncer_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				poller_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-				thread_args.args = &poller_type;
-				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
@@ -1031,6 +1040,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_IPMIMANAGER:
+				threads[i] = zbx_thread_start(ipmi_manager_thread, &thread_args);
 				break;
 		}
 	}

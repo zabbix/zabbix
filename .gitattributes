@@ -36,6 +36,7 @@ frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
 include/zbxipcservice.h -text
+include/zbxserialize.h -text
 m4/libevent.m4 -text
 misc/images/png_classic/Hub.png -text svneol=unset#image/png
 misc/images/png_classic/Hub_small.png -text svneol=unset#image/png
@@ -312,6 +313,13 @@ src/zabbix_java/lib/logback-classic-0.9.27.jar -text svneol=unset#application/ja
 src/zabbix_java/lib/logback-core-0.9.27.jar -text svneol=unset#application/java-archive
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text svneol=unset#application/java-archive
 src/zabbix_java/tests/junit-4.8.2.jar -text svneol=unset#application/java-archive
+src/zabbix_server/ipmi/Makefile.am -text
+src/zabbix_server/ipmi/ipmi_manager.c -text
+src/zabbix_server/ipmi/ipmi_manager.h -text
+src/zabbix_server/ipmi/ipmi_poller.c -text
+src/zabbix_server/ipmi/ipmi_poller.h -text
+src/zabbix_server/ipmi/ipmi_protocol.c -text
+src/zabbix_server/ipmi/ipmi_protocol.h -text
 src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text

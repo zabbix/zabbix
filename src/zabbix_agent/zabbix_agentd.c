@@ -219,6 +219,7 @@ int	CONFIG_COLLECTOR_FORKS		= 1;
 int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 0;
+int	CONFIG_IPMIMANAGER_FORKS	= 0;
 
 char	*opt = NULL;
 

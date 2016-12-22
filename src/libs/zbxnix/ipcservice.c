@@ -1396,7 +1396,7 @@ void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_clien
 
 	int		ret = SUCCEED, flags;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%d", __function_name, timeout);
 
 	if (NULL != service->client_remove)
 	{
