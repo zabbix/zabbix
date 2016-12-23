@@ -499,7 +499,8 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 			case ZBX_DB_MYSQL:
 			case ZBX_DB_POSTGRESQL:
 			case ZBX_DB_SQLITE3:
-				$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
+				$query .= ' LIMIT '.intval($limit);
+				$query .= $offset != 0 ? ' OFFSET '.intval($offset) : '';
 				break;
 			case ZBX_DB_ORACLE:
 			case ZBX_DB_DB2:
