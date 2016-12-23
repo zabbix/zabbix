@@ -882,7 +882,8 @@ class DB {
 		];
 
 		if ($array_diff = array_diff_key($options, $defaults)) {
-			if (count($array_diff) > 1 || !array_key_exists(self::getPk($table_name).'s', $array_diff)) {
+			unset($array_diff[self::getPk($table_name).'s']);
+			if ($array_diff) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: unsupported option "%s".', [__FUNCTION__, key($array_diff)])
 				);
