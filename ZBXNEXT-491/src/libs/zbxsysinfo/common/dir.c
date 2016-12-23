@@ -46,12 +46,12 @@
  *               If filename fails to pass, 0 is returned.                    *
  *                                                                            *
  ******************************************************************************/
-static int	filename_matches(const char *name, regex_t *regex_incl, regex_t *regex_excl)
+static int	filename_matches(const char *name, const regex_t *regex_incl, const regex_t *regex_excl)
 {
 	return ((regex_incl == NULL ||
-			0 == zbx_regexp_check(regex_incl, name)) &&
+			0 == zbx_regexp_match_precompiled(name, regex_incl)) &&
 			(regex_excl == NULL ||
-			0 != zbx_regexp_check(regex_excl, name)));
+			0 != zbx_regexp_match_precompiled(name, regex_excl)));
 }
 
 

@@ -98,22 +98,24 @@ int	zbx_regexp_exec(const regex_t *regex, const char *string, size_t count, regm
 	return regexec(regex, string, (size_t)count, matches, flags);
 }
 
-
 /******************************************************************************
  *                                                                            *
- * Function: zbx_regexp_check                                                 *
+ * Function: zbx_regexp_match_precompiled                                     *
  *                                                                            *
  * Purpose: checks if string matches pattern without returning matching       *
  *          groups                                                            *
  *                                                                            *
- * Parameters: regex   - [IN] pattern                                         *
- *             string  - [IN] string to be matched against pattern            *
+ * Parameters: string - [IN] string to be matched against pattern             *
+ *             regex  - [IN] precompiled pattern                              *
  *                                                                            *
- * Return value: On success (match found), 0 is returned                      *
- *               On error (no match), nonzero value is returned.              *
+ * Return value: 0 - successful match                                         *
+ *               nonzero - no match                                           *
+ *                                                                            *
+ * Comments: use this function for better performance if many strings need to *
+ *           be matched against the same pattern                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_check(regex_t *regex, const char *string)
+int	zbx_regexp_match_precompiled(const char *string, const regex_t *regex)
 {
 	return zbx_regexp_exec(regex, string, (size_t)0, NULL, 0);
 }
@@ -168,10 +170,28 @@ out:
 	return c;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_regexp_match                                                 *
+ *                                                                            *
+ * Purpose: checks if a string matches pattern                                *
+ *                                                                            *
+ * Parameters: see comments on 'zbx_regexp' function                          *
+ *                                                                            *
+ * Return value: see comments on 'zbx_regexp' function                        *
+ *                                                                            *
+ * Comments: this function compiles pattern (regular expression) every time   *
+ *           which is expensive. Uee it only for checking few strings with    *
+ *           the same pattern. If many strings need to be matched against the *
+ *           same pattern use zbx_regexp_match_precompiled().                 *
+ *                                                                            *
+ ******************************************************************************/
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_NEWLINE);
 }
+
+/* case insensitive variant of zbx_regexp_match() */
 
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
 {
