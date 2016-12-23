@@ -360,7 +360,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro', 'value'],
 			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
@@ -398,7 +398,7 @@ class CUserMacro extends CApiService {
 	private function checkDuplicates(array $macros) {
 		$user_macro_parser = new CUserMacroParser();
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['macro']
 		]);
 
@@ -449,7 +449,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro'],
 			'globalmacroids' => $globalmacroids,
 			'preservekeys' => true

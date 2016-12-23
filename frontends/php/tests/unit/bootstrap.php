@@ -29,6 +29,7 @@ require_once __DIR__.'/../../include/discovery.inc.php';
 require_once __DIR__.'/../../include/actions.inc.php';
 require_once __DIR__.'/../../include/validate.inc.php';
 require_once __DIR__.'/../../include/services.inc.php';
+require_once __DIR__.'/../../include/db.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
@@ -59,6 +60,7 @@ $autoloader = new CAutoloader([
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
 	__DIR__.'/../../include/classes/html/interfaces',
+	__DIR__.'/include/classes/db',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
