@@ -2894,7 +2894,7 @@ static int	check_internal_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *
  ******************************************************************************/
 static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char source, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_action_condition";
+	const char	*__function_name = "check_events_condition";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
@@ -3053,15 +3053,25 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  ******************************************************************************/
 static int	event_match_condition(const DB_EVENT *event, const DB_CONDITION *condition)
 {
-	int	i = 0;
+	int		i, ret = FAIL;
+	const char	*__function_name = "event_match_condition";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
 
 	for (i = 0; i < condition->objectids.values_num; i++)
 	{
 		if (condition->objectids.values[i] == event->objectid)
-			return SUCCEED;
+		{
+			ret = SUCCEED;
+			break;
+		}
 	}
 
-	return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
