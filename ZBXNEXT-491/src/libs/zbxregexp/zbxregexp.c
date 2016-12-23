@@ -28,51 +28,51 @@
  *                                                                            *
  * Function: zbx_regexp_compile                                               *
  *                                                                            *
- * Purpose: creates compiled regex from pattern, checks for errors in pattern *
+ * Purpose: creates compiled regex from pattern                               *
  *                                                                            *
- * Parameters: pattern    - [IN] regular expression as a text string          *
+ * Parameters: pattern    - [IN] regular expression as a text string.         *
+ *                          Empty string ("") is allowed, it will match       *
+ *                          everything. NULL is not allowed.                  *
  *             flags      - [IN] regexp compilation params passed to regcomp. *
  *                          See "man regcomp" for description of              *
  *                          REG_EXTENDED, REG_ICASE, REG_NOSUB, REG_NEWLINE.  *
- *             expression - [OUT] compiled regex (can be NULL if compiled     *
- *                          regexp is not required)                           *
- *             error      - [OUT] error message if any (can be NULL if the    *
- *                          error message is not required)                    *
+ *             expression - [OUT] compiled regex. Can be NULL if the purpose  *
+ *                          is only to test that regexp compiles.             *
+ *             error      - [OUT] error message if any. Can be NULL.          *
  *                                                                            *
- * Return value: On success, 0 is returned                                    *
- *               On error, nonzero value is returned.                         *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_regexp_compile(const char *pattern, int flags, regex_t *expression, char **error)
 {
-	int	reg_error = 0;
-	regex_t	regex;
+	int	re_error = 0;
+	regex_t	re;
 
-	if (NULL == pattern || '\0' == *pattern)
-		goto ret;
-
-	if (0 != (reg_error = regcomp(&regex, pattern, flags)))
+	if (0 == (re_error = regcomp(&re, pattern, flags)))
 	{
-		if (NULL != error)
-		{
-			char	buffer[MAX_STRING_LEN];
+		if (NULL != expression)
+			*expression = re;	/* copy a 64-byte (on x86_64) structure */
+		else
+			regfree(&re);
 
-			regerror(reg_error, &regex, buffer, sizeof(buffer));
-			*error = zbx_strdup(*error, buffer);
-		}
-#ifdef _WINDOWS
-		/* the Windows gnuregex implementation does not correctly clean up */
-		/* allocated memory after regcomp() failure */
-		regfree(&regex);
-#endif
+		return SUCCEED;
 	}
-	else if (NULL == expression)
-		regfree(&regex);
-ret:
-	if (NULL != expression)
-		*expression = regex;
 
-	return reg_error;
+	/* compilation failed */
+
+	if (NULL != error)
+	{
+		char	buf[MAX_STRING_LEN];
+
+		regerror(re_error, &re, buf, sizeof(buf));
+		*error = zbx_strdup(*error, buf);
+	}
+#ifdef _WINDOWS
+	/* the Windows gnuregex implementation does not correctly clean up */
+	/* allocated memory after regcomp() failure */
+	regfree(&re);
+#endif
+	return FAIL;
 }
 
 /******************************************************************************
@@ -118,18 +118,40 @@ int	zbx_regexp_check(regex_t *regex, const char *string)
 	return zbx_regexp_exec(regex, string, (size_t)0, NULL, 0);
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_regexp                                                       *
+ *                                                                            *
+ * Purpose: matches a string against pattern                                  *
+ *                                                                            *
+ * Parameters: string  - [IN] string to match                                 *
+ *             pattern - [IN] regular expression as a text string.            *
+ *                       Empty string ("") is allowed, it will match          *
+ *                       everything. NULL is not allowed.                     *
+ *             len       [OUT] on successful match - matching length. If      *
+ *                       'string' is NULL or 'pattern' is invalid then FAIL.  *
+ *                       If there is no match then SUCCEED. Can be NULL.      *
+ *             flags   - [IN] regexp compilation params passed to regcomp.    *
+ *                       See "man regcomp" for description of                 *
+ *                       REG_EXTENDED, REG_ICASE, REG_NOSUB, REG_NEWLINE.     *
+ *                                                                            *
+ * Return value: on successful match - a pointer where the matching part      *
+ *               starts in the 'string'. If 'string' is NULL or 'pattern' is  *
+ *               invalid or there is no match then NULL is returned.          *
+ *                                                                            *
+ ******************************************************************************/
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
 	char		*c = NULL;
 	regex_t		re;
 	regmatch_t	match;
 
-	if (NULL != len)
-		*len = FAIL;
-
-	if (NULL == string || 0 != zbx_regexp_compile(pattern, flags, &re, NULL))
+	if (NULL == string || SUCCEED != zbx_regexp_compile(pattern, flags, &re, NULL))
+	{
+		if (NULL != len)
+			*len = FAIL;
 		goto out;
+	}
 
 	if (0 == zbx_regexp_exec(&re, string, (size_t)1, &match, 0))	/* matched */
 	{
@@ -138,7 +160,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 		if (NULL != len)
 			*len = match.rm_eo - match.rm_so;
 	}
-	else if (NULL != len)
+	else if (NULL != len)		/* no match */
 	{
 		*len = SUCCEED;
 	}

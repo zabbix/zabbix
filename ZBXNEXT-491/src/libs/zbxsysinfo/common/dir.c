@@ -170,7 +170,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != regex_incl_str && '\0' != *regex_incl_str)
 	{
 		regex_incl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
-		if (0 != zbx_regexp_compile(regex_incl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_incl, &error))
+
+		if (SUCCEED != zbx_regexp_compile(regex_incl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_incl,
+				&error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
@@ -182,7 +184,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != regex_excl_str && '\0' != *regex_excl_str)
 	{
 		regex_excl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
-		if (0 != zbx_regexp_compile(regex_excl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_excl, &error))
+
+		if (SUCCEED != zbx_regexp_compile(regex_excl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_excl,
+				&error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
