@@ -19,7 +19,7 @@
 **/
 
 
-$this->addJsFile('class.pmaster.js');
+//$this->addJsFile('class.pmaster.js');
 
 /*
  * Dashboard grid
@@ -162,6 +162,9 @@ foreach ($dashboardGrid as $key => $val) {
 		)
 	)
 	->addItem(
+		(new CDiv())->addClass('dashbrd-grid-container')
+	)
+	->addItem(
 		(new CDiv(
 			(new CDiv([
 				(new CDiv($dashboardGrid[0]))->addClass(ZBX_STYLE_CELL),
@@ -179,12 +182,252 @@ foreach ($dashboardGrid as $key => $val) {
  * Javascript
  */
 // start refresh process
-$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
+//$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
 
 // activating blinking
-$this->addPostJS('jqBlink.blink();');
+//$this->addPostJS('jqBlink.blink();');
 
+/*
+	*/
 ?>
+
+<style>
+.dashbrd-grid-container {
+	width: 100%;
+	position: relative; }
+	.dashbrd-grid-widget {
+		background-color: #3b3b3b;
+		position: absolute; }
+		.dashbrd-grid-widget-dragging {
+			opacity: 0.8;
+			z-index: 1000 }
+		.ui-resizable-handle {
+			position: absolute; }
+		.ui-resizable-n {
+			cursor: n-resize;
+			height: 7px;
+			top: -5px;
+			left: 2px;
+		right: 2px; }
+		.ui-resizable-e {
+			cursor: e-resize;
+			width: 7px;
+			right: -5px;
+			top: 2px;
+		bottom: 2px; }
+		.ui-resizable-s {
+			cursor: s-resize;
+			height: 7px;
+			bottom: -5px;
+			left: 2px;
+		right: 2px; }
+		.ui-resizable-w {
+			cursor: w-resize;
+			width: 7px;
+			left: -5px;
+			top: 2px;
+		bottom: 2px; }
+		.ui-resizable-ne {
+			cursor: ne-resize;
+			height: 7px;
+			width: 7px;
+			top: -5px;
+			right: -5px; }
+		.ui-resizable-nw {
+			cursor: nw-resize;
+			width: 7px;
+			height: 7px;
+			top: -5px;
+			left: -5px; }
+		.ui-resizable-se {
+			cursor: se-resize;
+			height: 7px;
+			width: 7px;
+			bottom: -5px;
+			right: -5px; }
+		.ui-resizable-sw {
+			cursor: sw-resize;
+			width: 7px;
+			height: 7px;
+			bottom: -5px;
+			left: -5px; }
+	.dashbrd-grid-placeholder {
+		border: 1px dashed #505050;
+		background-color: #1b1b1b;
+		position: absolute;
+		z-index: 999 }
+</style>
+
+<script type="text/javascript">
+	(function($) {
+		"use strict"
+
+		function resizeDashboardGrid(obj, $data, min_rows) {
+			$data['options']['rows'] = 0;
+
+			$.each($data['widgets'], function() {
+				if (this['row'] + this['height'] > $data['options']['rows']) {
+					$data['options']['rows'] = this['row'] + this['height'];
+				}
+			});
+
+			if (min_rows !== undefined && $data['options']['rows'] < min_rows) {
+				$data['options']['rows'] = min_rows;
+			}
+
+			obj.css({
+				'height': '' + ($data['options']['widget-height'] * $data['options']['rows']) + 'px'
+			});
+		}
+
+		function getWidgetByTarget(widgets, target) {
+			return widgets[$.data(target, 'widget-id')];
+		}
+
+		function getWidgetPosition(obj, $data, widget, target) {
+			var	widget_pos = $(target).position(),
+				widget_width_px = Math.floor(obj.width() / $data['options']['columns']),
+				row = (widget_pos.top - (widget_pos.top % $data['options']['widget-height'])) / $data['options']['widget-height'],
+				col = (widget_pos.left - (widget_pos.left % widget_width_px)) / widget_width_px;
+
+			if (row < 0) {
+				row = 0;
+			}
+
+			if (col < 0) {
+				col = 0;
+			}
+			else if (col > $data['options']['columns'] - widget['width']) {
+				col = $data['options']['columns'] - widget['width'];
+			}
+
+			return {'row': row, 'col': col};
+		}
+
+		var methods = {
+			init: function(options) {
+				options = $.extend({}, {columns: 12}, options);
+				options['widget-height'] = 60;
+				options['widget-width'] = 100 / options['columns'];
+				options['rows'] = 0;
+
+				return this.each(function() {
+					var	$this = $(this),
+						$placeholder = $('<div>', {'class': 'dashbrd-grid-placeholder'});
+
+					$this.data('dashboardGrid', {
+						options: options,
+						widgets: [],
+						placeholder: $placeholder
+					});
+
+					$this.append($placeholder.hide());
+				});
+			},
+
+			addWidget: function(params) {
+				params = $.extend({}, {'row': 0, 'col': 0, 'height': 1, 'width': 1}, params);
+
+				return this.each(function() {
+					var	$this = $(this),
+						$data = $this.data('dashboardGrid'),
+						$widget = $('<div>', {
+							'class': 'dashbrd-grid-widget'
+						})
+							.data('widget-id', $data['widgets'].length)
+							.css({
+								'top': '' + ($data['options']['widget-height'] * params['row']) + 'px',
+								'left': '' + ($data['options']['widget-width'] * params['col']) + '%',
+								'height': '' + ($data['options']['widget-height'] * params['height']) + 'px',
+								'width': '' + ($data['options']['widget-width'] * params['width']) + '%'
+							});
+
+					$data['widgets'].push(params);
+
+					resizeDashboardGrid($this, $data);
+
+					$this.append($widget);
+
+					$widget.draggable({
+						start: function(event, ui) {
+							var	widget = getWidgetByTarget($data['widgets'], event.target);
+
+							$data['placeholder']
+								.css({
+									'height': '' + ($data['options']['widget-height'] * widget['height']) + 'px',
+									'width': '' + ($data['options']['widget-width'] * widget['width']) + '%'
+								})
+								.show();
+
+							$(event.target).addClass('dashbrd-grid-widget-dragging');
+						},
+						drag: function(event, ui) {
+							var	widget = getWidgetByTarget($data['widgets'], event.target),
+								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+
+							$data['placeholder'].css({
+								'top': '' + ($data['options']['widget-height'] * widget_pos.row) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget_pos.col) + '%'
+							});
+
+							if ($data['options']['rows'] < widget_pos.row + widget.height) {
+								resizeDashboardGrid($this, $data, widget_pos.row + widget.height);
+							}
+						},
+						stop: function(event, ui) {
+							var	widget = getWidgetByTarget($data['widgets'], event.target),
+								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+
+							widget['row'] = widget_pos['row'];
+							widget['col'] = widget_pos['col'];
+
+							$(event.target).css({
+								'top': '' + ($data['options']['widget-height'] * widget_pos.row) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget_pos.col) + '%'
+							});
+
+							$data['placeholder'].hide();
+
+							$(event.target).removeClass('dashbrd-grid-widget-dragging');
+
+							resizeDashboardGrid($this, $data);
+						}
+					});
+
+					$widget.resizable({
+						handles: 'all',
+						start: function(event, ui) {
+							$(event.target).addClass('dashbrd-grid-widget-dragging');
+						},
+						resize: function(event, ui) {
+						},
+						stop: function(event, ui) {
+							$(event.target).removeClass('dashbrd-grid-widget-dragging');
+						}
+					});
+				});
+			}
+		}
+
+		$.fn.dashboardGrid = function(method) {
+			if (methods[method]) {
+				return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+			} else if (typeof method === 'object' || !method) {
+				return methods.init.apply(this, arguments);
+			} else {
+				$.error('Invalid method "' +  method + '".');
+			}
+		}
+
+		$('.dashbrd-grid-container')
+			.dashboardGrid()
+			.dashboardGrid('addWidget', {'row': 1, 'col': 5, 'height': 1, 'width': 1})
+			.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2})
+			.dashboardGrid('addWidget', {'row': 2, 'col': 6, 'height': 3, 'width': 6})
+			.dashboardGrid('addWidget', {'row': 1, 'col': 2, 'height': 2, 'width': 1});
+		//	.addWidget(1, 1, 1, 1);
+	}(jQuery));
+</script>
 
 <script type="text/javascript">
 	/**
@@ -205,7 +448,7 @@ $this->addPostJS('jqBlink.blink();');
 					object: list.object,
 					'objectids[]': favouriteIds
 				}
-			});
+		});
 		}
 	}
 </script>
