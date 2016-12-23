@@ -1608,56 +1608,76 @@ static int	check_dvalue_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *co
  ******************************************************************************/
 static int	check_dhost_ip_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret, i;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids[2];
+	zbx_uint64_t		condition_value;
 
-	for (i = 0; i < esc_events->values_num; i++)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
+		return NOTSUPPORTED;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (i = 0; i < 2; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		size_t	sql_offset = 0;
 
-		ret = FAIL;
+		if (0 == objectids[i].values_num)
+			continue;
 
-		if (EVENT_OBJECT_DHOST == event->object)
+		if (0 == i)	/* EVENT_OBJECT_DHOST */
 		{
-			result = DBselect(
-					"select distinct ip"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select distinct dhostid,ip"
 					" from dservices"
-					" where dhostid=" ZBX_FS_UI64,
-					event->objectid);
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					objectids[i].values, objectids[i].values_num);
 		}
-		else
+		else	/* EVENT_OBJECT_DSERVICE */
 		{
-			result = DBselect(
-					"select ip"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select distinct dserviceid,ip"
 					" from dservices"
-					" where dserviceid=" ZBX_FS_UI64,
-					event->objectid);
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		while (NULL != (row = DBfetch(result)) && FAIL == ret)
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
 			switch (condition->operator)
 			{
 				case CONDITION_OPERATOR_EQUAL:
-					if (SUCCEED == ip_in_list(condition->value, row[0]))
-						ret = SUCCEED;
+					if (SUCCEED == ip_in_list(condition->value, row[1]))
+						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
 				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (SUCCEED != ip_in_list(condition->value, row[0]))
-						ret = SUCCEED;
+					if (SUCCEED != ip_in_list(condition->value, row[1]))
+						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
-				default:
-					ret = NOTSUPPORTED;
 			}
 		}
 		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
