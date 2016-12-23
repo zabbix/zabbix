@@ -29,10 +29,6 @@
 static int	is_recovery_event(const DB_EVENT *event);
 static int	is_escalation_event(const DB_EVENT *event);
 
-typedef void (*hierarchy_sql_allocate_func_t) (char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp);
-typedef int (*hierarchy_row_check_func_t) (DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t *templateid,
-		zbx_uint64_t *value);
-
 /******************************************************************************
  *                                                                            *
  * Function: check_condition_event_tag                                        *
@@ -103,7 +99,8 @@ static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_COND
 
 		ret = FAIL;
 
-		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator || CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator ||
+				CONDITION_OPERATOR_NOT_LIKE == condition->operator)
 			ret_continue = SUCCEED;
 		else
 			ret_continue = FAIL;
@@ -173,9 +170,9 @@ static int	check_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
 
-	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+	if (CONDITION_OPERATOR_EQUAL == condition->operator)
 		operation = " and";
-	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 		operation = " and not";
 	else
 		return NOTSUPPORTED;
@@ -246,9 +243,9 @@ static int	check_maintenance_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
 	zbx_vector_uint64_t	objectids;
 	int			condition_value;
 
-	if (condition->operator == CONDITION_OPERATOR_IN)
+	if (CONDITION_OPERATOR_IN == condition->operator)
 		condition_value = HOST_MAINTENANCE_STATUS_ON;
-	else if (condition->operator == CONDITION_OPERATOR_NOT_IN)
+	else if (CONDITION_OPERATOR_NOT_IN == condition->operator)
 		condition_value = HOST_MAINTENANCE_STATUS_OFF;
 	else
 		return NOTSUPPORTED;
@@ -308,9 +305,9 @@ static int	check_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *cond
 	zbx_vector_uint64_t	objectids;
 	int			condition_value;
 
-	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+	if (CONDITION_OPERATOR_EQUAL == condition->operator)
 		operation = " and";
-	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 		operation = " and not";
 	else
 		return NOTSUPPORTED;
@@ -374,8 +371,8 @@ static int	check_application_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		objectid;
 
-	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_LIKE &&
-			condition->operator != CONDITION_OPERATOR_NOT_LIKE)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_LIKE != condition->operator &&
+			CONDITION_OPERATOR_NOT_LIKE != condition->operator)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -518,6 +515,10 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
 		zbx_vector_uint64_pair_append(objectids_pair, pair);
 	}
 }
+
+typedef void (*hierarchy_sql_allocate_func_t) (char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp);
+typedef int (*hierarchy_row_check_func_t) (DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t *templateid,
+		zbx_uint64_t *value);
 
 /******************************************************************************
  *                                                                            *
@@ -679,7 +680,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	objectids_pair;
 
-	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator  && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -822,7 +823,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	objectids_pair;
 
-	if (condition->operator != CONDITION_OPERATOR_EQUAL && condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -1308,9 +1309,9 @@ static int	check_dcheck_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *co
 	zbx_vector_uint64_t	objectids;
 	int			condition_value, i;
 
-	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+	if (CONDITION_OPERATOR_EQUAL == condition->operator)
 		operation_where = " where";
-	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 		operation_where = " where not";
 	else
 		return NOTSUPPORTED;
