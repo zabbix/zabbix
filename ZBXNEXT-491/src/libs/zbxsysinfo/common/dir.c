@@ -54,7 +54,6 @@ static int	filename_matches(const char *name, const regex_t *regex_incl, const r
 			0 != zbx_regexp_match_precompiled(name, regex_excl)));
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: queue_directory                                                  *
@@ -84,7 +83,6 @@ static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth,
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: compare_descriptors                                              *
@@ -110,7 +108,6 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 	return (fa->st_ino != fb->st_ino || fa->st_dev != fb->st_dev);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Different approach is used for Windows implementation as Windows is not    *
@@ -125,12 +122,12 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*dir, *dir_param, *path = NULL, *mode_str, *max_depth_str;
 	char 			*regex_incl_str, *regex_excl_str, *error = NULL;
-	int			mode, max_depth;
+	int			mode, max_depth, regex_incl_used = 0, regex_excl_used = 0;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list, descriptors;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
-	regex_t			*regex_incl = NULL, *regex_excl = NULL;
+	regex_t			regex_incl, regex_excl;
 	int			ret = SYSINFO_RET_FAIL;
 
 #ifdef _WINDOWS
@@ -169,9 +166,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != regex_incl_str && '\0' != *regex_incl_str)
 	{
-		regex_incl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
-
-		if (SUCCEED != zbx_regexp_compile(regex_incl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_incl,
+		if (SUCCEED != zbx_regexp_compile(regex_incl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, &regex_incl,
 				&error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
@@ -179,13 +174,13 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(error);
 			goto err;
 		}
+		else
+			regex_incl_used = 1;
 	}
 
 	if (NULL != regex_excl_str && '\0' != *regex_excl_str)
 	{
-		regex_excl = (regex_t*)zbx_malloc(NULL, sizeof(regex_t));
-
-		if (SUCCEED != zbx_regexp_compile(regex_excl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, regex_excl,
+		if (SUCCEED != zbx_regexp_compile(regex_excl_str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, &regex_excl,
 				&error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
@@ -193,6 +188,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(error);
 			goto err;
 		}
+		else
+			regex_excl_used = 1;
 	}
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
@@ -247,7 +244,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_append(&list, item);
 
 #ifndef _WINDOWS
-	if (0 != filename_matches(dir, regex_incl, regex_excl))
+	if (0 != filename_matches(dir, &regex_incl, &regex_excl))
 	{
 		if (SIZE_MODE_APPARENT == mode)
 			size += status.st_size;
@@ -304,7 +301,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == (data.attrib & _A_SUBDIR))
 			{
-				if (0 != filename_matches(name, regex_incl, regex_excl))
+				if (0 != filename_matches(name, &regex_incl, &regex_excl))
 				{
 					wpath = zbx_utf8_to_unicode(path);
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
@@ -363,7 +360,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == zbx_stat(path, &status))
 			{
 				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISDIR(status.st_mode)) &&
-						0 != filename_matches(entry->d_name, regex_incl, regex_excl))
+						0 != filename_matches(entry->d_name, &regex_incl, &regex_excl))
 				{
 					if (0 != S_ISREG(status.st_mode) && 1 < status.st_nlink)
 					{
@@ -419,17 +416,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 err:
 	zbx_free(path);
 
-	if (NULL != regex_incl)
-	{
-		regfree(regex_incl);
-		zbx_free(regex_incl);
-	}
+	if (0 != regex_incl_used)
+		regfree(&regex_incl);
 
-	if (NULL != regex_excl)
-	{
-		regfree(regex_excl);
-		zbx_free(regex_excl);
-	}
+	if (0 != regex_excl_used)
+		regfree(&regex_excl);
 
 	while (0 < list.values_num)
 	{
