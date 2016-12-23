@@ -797,7 +797,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			$ack = null;
 
 			if ($config['event_ack_enable']) {
-				$event = getTriggerLastProblem([$trigger['triggerid']]);
+				$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
 
 				if ($event) {
 					$event = reset($event);
