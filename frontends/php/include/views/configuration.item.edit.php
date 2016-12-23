@@ -541,7 +541,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 	// Use numeric box for multiplier, otherwise use text box.
 	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
 		$params[] = (new CNumericBox('preprocessing['.$i.'][params][0]',
-			array_key_exists('params', $step) ? $step['params'][0] : ''
+			array_key_exists('params', $step) ? $step['params'][0] : '', 255, false, true
 		))
 			->setAttribute('placeholder', _('number'))
 			->setReadonly($readonly);
