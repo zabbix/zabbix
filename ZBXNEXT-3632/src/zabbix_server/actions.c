@@ -1301,49 +1301,59 @@ static int	check_drule_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *con
  ******************************************************************************/
 static int	check_dcheck_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+	char			*sql = NULL, *operation_where;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	int			condition_value, i;
+
+	if (condition->operator == CONDITION_OPERATOR_EQUAL)
+		operation_where = " where";
+	else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		operation_where = " where not";
+	else
+		return NOTSUPPORTED;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	zbx_vector_uint64_create(&objectids);
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
 
-		ret = FAIL;
-
 		if (EVENT_OBJECT_DSERVICE == event->object)
-		{
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			result = DBselect(
-					"select dcheckid"
-					" from dservices"
-					" where dcheckid=" ZBX_FS_UI64
-						" and dserviceid=" ZBX_FS_UI64,
-					condition_value,
-					event->objectid);
-
-			switch (condition->operator)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (NULL != DBfetch(result))
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (NULL == DBfetch(result))
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
+			zbx_vector_uint64_append(&objectids, event->objectid);
 	}
+
+	if (0 != objectids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select dserviceid"
+				" from dservices"
+				"%s dcheckid=" ZBX_FS_UI64
+					" and",
+				operation_where,
+				condition_value);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+					objectids.values, objectids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			zbx_vector_uint64_append(&condition->objectids, objectid);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
