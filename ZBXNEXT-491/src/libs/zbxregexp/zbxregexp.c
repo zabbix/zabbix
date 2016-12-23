@@ -80,20 +80,20 @@ int	zbx_regexp_compile(const char *pattern, int flags, regex_t *expression, char
  * Function: zbx_regexp_exec                                                  *
  *                                                                            *
  * Purpose: wrapper for regexec, searches for a given pattern, specified by   *
- *          regex, in the string string                                       *
+ *          regex, in the string                                              *
  *                                                                            *
- * Parameters: regex   - [IN] pattern                                         *
+ * Parameters: regex   - [IN] precompiled pattern                             *
  *             string  - [IN] string to be matched against pattern            *
  *             count   - [IN] count of elements in matches array              *
  *             matches - [OUT] matches (can be NULL if matching results are   *
  *                       not required)                                        *
  *             flags   - [IN] execution flags for matching                    *
  *                                                                            *
- * Return value: On success (match found), 0 is returned                      *
- *               On error (no match), nonzero value is returned.              *
+ * Return value: 0 - successful match                                         *
+ *               nonzero - no match                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_exec(regex_t *regex, const char *string, size_t count, regmatch_t *matches, int flags)
+int	zbx_regexp_exec(const regex_t *regex, const char *string, size_t count, regmatch_t *matches, int flags)
 {
 	return regexec(regex, string, (size_t)count, matches, flags);
 }

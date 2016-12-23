@@ -36,7 +36,7 @@ zbx_expression_t;
 
 /* regular expressions */
 int	zbx_regexp_compile(const char *pattern, int flags, regex_t *expression, char **error);
-int	zbx_regexp_exec(regex_t *regex, const char *string, size_t count, regmatch_t *matches, int flags);
+int	zbx_regexp_exec(const regex_t *regex, const char *string, size_t count, regmatch_t *matches, int flags);
 int	zbx_regexp_check(regex_t *regex, const char *string);
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
