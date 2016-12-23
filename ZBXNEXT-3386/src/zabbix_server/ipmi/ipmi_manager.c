@@ -190,6 +190,8 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 		poller->state = ZBX_IPMI_POLLER_INIT;
 		poller->client = NULL;
+		poller->hosts_num = 0;
+
 		zbx_queue_ptr_create(&poller->requests);
 
 		zbx_vector_ptr_append(&manager->pollers, poller);
@@ -275,7 +277,6 @@ static void	ipmi_manager_register_poller(zbx_ipmi_manager_t *manager, zbx_ipc_cl
 
 	poller->state = ZBX_IPMI_POLLER_READY;
 	poller->client = client;
-	poller->hosts_num = 0;
 
 	zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(poller));
 
