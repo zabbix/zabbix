@@ -2534,7 +2534,7 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.dashbrd-widget-placeholder {
+/*.dashbrd-widget-placeholder {
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
 }
@@ -2543,13 +2543,40 @@ $form-icon-btn: (
 	border-color: $action-border-color !important;
 	border-bottom-color: darken($action-border-color, 1%) !important;
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+}*/
+
+.dashbrd-widget-container {
+	position: relative;
+	margin: 0 -.25rem;
+}
+
+.dashbrd-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+	position: absolute;
+	z-index: 999;
+}
+
+.dashbrd-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+	z-index: 1000;
+}
+
+.dashbrd-widget-content {
+	padding: .5rem;
+	margin: .25rem;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
 }
 
 .dashbrd-widget {
-	min-width: 250px;
-	margin: 0 10px 10px 0;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
+	position: absolute;
+	//min-width: 250px;
+	//margin: 0 10px 10px 0;
+	//background-color: $ui-bg-color;
+	//border: 1px solid $ui-border-color;
 
 	.list-table {
 		border: none;
