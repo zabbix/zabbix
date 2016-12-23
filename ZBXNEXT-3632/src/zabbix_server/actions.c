@@ -1414,62 +1414,79 @@ static int	check_dobject_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  ******************************************************************************/
 static int	check_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	zbx_uint64_t	condition_value;
-	int		ret, i;
+	char			*sql = NULL, *operation_and;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids[2];
+	zbx_uint64_t		condition_value;
+
+	if (CONDITION_OPERATOR_EQUAL == condition->operator)
+		operation_and = " and";
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+		operation_and = " and not";
+	else
+		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (i = 0; i < esc_events->values_num; i++)
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (i = 0; i < 2; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		size_t	sql_offset = 0;
 
-		ret = FAIL;
+		if (0 == objectids[i].values_num)
+			continue;
 
-		if (EVENT_OBJECT_DHOST == event->object)
+		if (0 == i)	/* EVENT_OBJECT_DHOST */
 		{
-			result = DBselect(
-					"select r.proxy_hostid"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dhostid"
 					" from drules r,dhosts h"
 					" where r.druleid=h.druleid"
-						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and h.dhostid=" ZBX_FS_UI64,
-					condition_value,
-					event->objectid);
+						"%s r.proxy_hostid=" ZBX_FS_UI64
+						" and",
+					operation_and,
+					condition_value);
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					objectids[i].values, objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_DSERVICE */
 		{
-			result = DBselect(
-					"select r.proxy_hostid"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select s.dserviceid"
 					" from drules r,dhosts h,dservices s"
 					" where r.druleid=h.druleid"
 						" and h.dhostid=s.dhostid"
-						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and s.dserviceid=" ZBX_FS_UI64,
-					condition_value,
-					event->objectid);
+						"%s r.proxy_hostid=" ZBX_FS_UI64
+						" and",
+					operation_and,
+					condition_value);
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "s.dserviceid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		switch (condition->operator)
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
 		{
-			case CONDITION_OPERATOR_EQUAL:
-				if (NULL != DBfetch(result))
-					ret = SUCCEED;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (NULL == DBfetch(result))
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			zbx_vector_uint64_append(&condition->objectids, objectid);
 		}
 		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
