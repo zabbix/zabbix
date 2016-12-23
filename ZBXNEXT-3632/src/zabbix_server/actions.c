@@ -1824,61 +1824,82 @@ static int	check_dstatus_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  ******************************************************************************/
 static int	check_duptime_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret, i, tmp_int, condition_value_i = atoi(condition->value);
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids[2];
+	int			condition_value_i;
 
-	for (i = 0; i < esc_events->values_num; i++)
+	if (CONDITION_OPERATOR_LESS_EQUAL != condition->operator &&
+			CONDITION_OPERATOR_MORE_EQUAL != condition->operator)
+		return NOTSUPPORTED;
+
+	condition_value_i = atoi(condition->value);
+
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (i = 0; i < 2; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		size_t	sql_offset = 0;
 
-		ret = FAIL;
+		if (0 == objectids[i].values_num)
+			continue;
 
-		if (EVENT_OBJECT_DHOST == event->object)
+		if (0 == i)	/* EVENT_OBJECT_DHOST */
 		{
-			result = DBselect(
-					"select status,lastup,lastdown"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dhostid,status,lastup,lastdown"
 					" from dhosts"
-					" where dhostid=" ZBX_FS_UI64,
-					event->objectid);
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					objectids[i].values, objectids[i].values_num);
 		}
-		else
+		else	/* EVENT_OBJECT_DSERVICE */
 		{
-			result = DBselect(
-					"select status,lastup,lastdown"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dserviceid,status,lastup,lastdown"
 					" from dservices"
-					" where dserviceid=" ZBX_FS_UI64,
-					event->objectid);
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+					objectids[i].values, objectids[i].values_num);
 		}
 
-		if (NULL != (row = DBfetch(result)))
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
 		{
-			int	now;
+			zbx_uint64_t	objectid;
+			int		now, tmp_int;
+
+			ZBX_STR2UINT64(objectid, row[0]);
 
 			now = time(NULL);
-			tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
+			tmp_int = DOBJECT_STATUS_UP == atoi(row[1]) ? atoi(row[2]) : atoi(row[3]);
 
 			switch (condition->operator)
 			{
 				case CONDITION_OPERATOR_LESS_EQUAL:
 					if (0 != tmp_int && (now - tmp_int) <= condition_value_i)
-						ret = SUCCEED;
+						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
 				case CONDITION_OPERATOR_MORE_EQUAL:
 					if (0 != tmp_int && (now - tmp_int) >= condition_value_i)
-						ret = SUCCEED;
+						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
-				default:
-					ret = NOTSUPPORTED;
 			}
 		}
 		DBfree_result(result);
-
-		if (SUCCEED == ret)
-			zbx_vector_uint64_append(&condition->objectids, event->objectid);
-		else if (NOTSUPPORTED == ret)
-			return NOTSUPPORTED;
 	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
 
 	return SUCCEED;
 }
