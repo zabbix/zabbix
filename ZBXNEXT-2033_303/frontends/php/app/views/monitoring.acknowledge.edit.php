@@ -29,8 +29,8 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-if (CRemedyService::$enabled && ((!$data['ticket'] && $data['event']['value'] == TRIGGER_VALUE_TRUE)
-		|| $data['ticket'])) {
+if (CRemedyService::$enabled && (CRemedyService::$severity & (1 << $data['event']['triggerSeverity']))
+		&& $data['event']['value'] == TRIGGER_VALUE_TRUE) {
 	$ticket_status_message = (!$data['ticket'] || $data['ticket']['status'] === 'Closed'
 			|| $data['ticket']['status'] === 'Cancelled'
 	)

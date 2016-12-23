@@ -43,13 +43,21 @@ class CRemedyService {
 	protected static $webFormUrl;
 
 	/**
+	 * Media severity.
+	 *
+	 * @var string
+	 */
+	public static $severity;
+
+	/**
 	 * Initialize the Remedy service. First check if event trigger severity corresponds to minimum required severity to
 	 * create, update or request a ticket. Then check if current user has Remedy service as media type.
 	 * If everything so far is ok, in next step check if Zabbix server is online. In case it's not possible to connect
 	 * to Zabbix server, it's not possibe to start the Remedy Service and return false with error message from
 	 * Zabbix server.
 	 *
-	 * @param string $event['triggerSeverity']		current event trigger severity
+	 * @param array  $event							An array of event data.
+	 * @param string $event['triggerSeverity']		Current event trigger severity.
 	 *
 	 * @return bool
 	 */
@@ -59,7 +67,7 @@ class CRemedyService {
 		if (array_key_exists('triggerSeverity', $event) && $event['triggerSeverity'] >= self::minTriggerSeverity) {
 			$mediatype = API::MediaType()->get([
 				'output' => ['mediatypeid', 'smtp_server'],
-				'selectMedia' => ['mediaid', 'userid', 'active'],
+				'selectMedia' => ['mediaid', 'userid', 'active', 'severity'],
 				'userids' => [CWebUser::$data['userid']],
 				'filter' => [
 					'type' => MEDIA_TYPE_REMEDY,
@@ -85,6 +93,7 @@ class CRemedyService {
 			foreach ($mediatype['media'] as $media) {
 				if ($media['userid'] == CWebUser::$data['userid'] && $media['active'] == MEDIA_TYPE_STATUS_ACTIVE) {
 					$media_active = true;
+					self::$severity = $media['severity'];
 					break;
 				}
 			}

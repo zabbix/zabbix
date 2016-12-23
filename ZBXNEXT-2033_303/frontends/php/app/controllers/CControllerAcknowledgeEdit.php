@@ -97,11 +97,12 @@ class CControllerAcknowledgeEdit extends CController {
 			if ($events) {
 				$data['event'] = [
 					'acknowledges' => $events[0]['acknowledges'],
-					'value' => $events[0]['value']
+					'value' => $events[0]['value'],
+					'triggerSeverity' => $events[0]['relatedObject']['priority']
 				];
 				order_result($data['acknowledges'], 'clock', ZBX_SORT_DOWN);
 
-				CRemedyService::init(['triggerSeverity' => $events[0]['relatedObject']['priority']]);
+				CRemedyService::init(['triggerSeverity' => $data['event']['triggerSeverity']]);
 
 				if (CRemedyService::$enabled) {
 					$data['ticket'] = CRemedyService::mediaQuery($events[0]['eventid']);
