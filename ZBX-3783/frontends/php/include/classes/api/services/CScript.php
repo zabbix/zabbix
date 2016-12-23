@@ -306,7 +306,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid',
 				'host_access', 'confirmation'
 			],
@@ -384,7 +384,7 @@ class CScript extends CApiService {
 
 		$usrgrpids = array_keys($usrgrpids);
 
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => [],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -420,7 +420,7 @@ class CScript extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = API::getApiService()->select('groups', [
+		$db_groups = DB::select('groups', [
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -443,7 +443,7 @@ class CScript extends CApiService {
 	 * @throws APIException  if global script already exists.
 	 */
 	private function checkDuplicates(array $scripts) {
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name']
 		]);
 
@@ -519,7 +519,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name'],
 			'scriptids' => $scriptids,
 			'preservekeys' => true

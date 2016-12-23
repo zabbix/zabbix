@@ -263,7 +263,7 @@ class DB {
 
 		$schema = self::getSchema($table_name);
 
-		if ($schema['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
+		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {
 			return ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65536;
 		}
 
@@ -275,7 +275,7 @@ class DB {
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			foreach ($tableSchema['fields'] as $name => $field) {
-				if ($field['type'] == DB::FIELD_TYPE_TEXT && !$field['null']) {
+				if ($field['type'] == self::FIELD_TYPE_TEXT && !$field['null']) {
 					foreach ($values as &$value) {
 						if (!isset($value[$name])) {
 							$value[$name] = '';
@@ -861,5 +861,275 @@ class DB {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 *
+	 * @return string
+	 */
+	public static function makeSql($table_name, array &$options, $table_alias = null) {
+		$defaults = [
+			'output' => [],
+			'countOutput' => false,
+			'filter' => [],
+			'sortfield' => [],
+			'sortorder' => [],
+			'limit' => null,
+			'preservekeys' => false
+		];
+
+		if ($array_diff = array_diff_key($options, $defaults)) {
+			if (count($array_diff) > 1 || !array_key_exists(self::getPk($table_name).'s', $array_diff)) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: unsupported option "%s".', [__FUNCTION__, key($array_diff)])
+				);
+			}
+		}
+
+		$options = zbx_array_merge($defaults, $options);
+
+		$sql_parts = self::createSelectQueryParts($table_name, $options, $table_alias);
+
+		return 'SELECT '.implode(',', $sql_parts['select']).
+				' FROM '.implode(',', $sql_parts['from']).
+				($sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '').
+				($sql_parts['order'] ? ' ORDER BY '.implode(',', $sql_parts['order']) : '');
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 *
+	 * @return array
+	 */
+	public static function select($table_name, array $options, $table_alias = null) {
+		$result = [];
+		$field_names = array_flip($options['output']);
+		$db_result = DBSelect(self::makeSql($table_name, $options, $table_alias), $options['limit']);
+
+		if ($options['preservekeys']) {
+			$pk = self::getPk($table_name);
+
+			while ($db_row = DBfetch($db_result)) {
+				$result[$db_row[$pk]] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+			}
+		}
+		else {
+			while ($db_row = DBfetch($db_result)) {
+				$result[] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns the table name with the table alias.
+	 *
+	 * @param string $table_name
+	 * @param string $table_alias
+	 *
+	 * @return string
+	 */
+	private static function tableId($table_name, $table_alias = null) {
+		return($table_alias !== null) ? $table_name.' '.$table_alias : $table_name;
+	}
+
+	/**
+	 * Prepends the table alias to the given field name.
+	 *
+	 * @param string $field_name
+	 * @param string $table_alias
+	 *
+	 * @return string
+	 */
+	private static function fieldId($field_name, $table_alias = null) {
+		return ($table_alias !== null) ? $table_alias.'.'.$field_name : $field_name;
+	}
+
+	/**
+	 * Builds an SQL parts array from the given options.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 *
+	 * @return array		The resulting SQL parts array
+	 */
+	private static function createSelectQueryParts($table_name, array $options, $table_alias = null) {
+		$sql_parts = [
+			'select' => [],
+			'from' => [self::tableId($table_name, $table_alias)],
+			'where' => [],
+			'order' => []
+		];
+
+		// add output options
+		$sql_parts = self::applyQueryOutputOptions($table_name, $options, $table_alias, $sql_parts);
+
+		// add filter options
+		$sql_parts = self::applyQueryFilterOptions($table_name, $options, $table_alias, $sql_parts);
+
+		// add sort options
+		$sql_parts = self::applyQuerySortOptions($table_name, $options, $table_alias, $sql_parts);
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Modifies the SQL parts to implement all of the output related options.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	private static function applyQueryOutputOptions($table_name, array $options, $table_alias = null,
+			array $sql_parts) {
+		if ($options['countOutput']) {
+			$sql_parts['select'][] = 'COUNT('.self::fieldId('*', $table_alias).') AS rowscount';
+		}
+		else {
+			$table_schema = self::getSchema($table_name);
+			$select = [];
+			$select[self::fieldId(self::getPk($table_name), $table_alias)] = true;
+
+			foreach ($options['output'] as $field_name) {
+				if (!array_key_exists($field_name, $table_schema['fields'])) {
+					self::exception(self::SCHEMA_ERROR,
+						vsprintf('%s: field "%s.%s" does not exist.', [__FUNCTION__, $table_name, $field_name])
+					);
+				}
+
+				$select[self::fieldId($field_name, $table_alias)] = true;
+			}
+
+			$sql_parts['select'] = array_keys($select);
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Modifies the SQL parts to implement all of the filter related options.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	private static function applyQueryFilterOptions($table_name, array $options, $table_alias = null,
+			array $sql_parts) {
+		$table_schema = self::getSchema($table_name);
+		$pk = self::getPk($table_name);
+		$pk_option = $pk.'s';
+
+		// pks
+		if (array_key_exists($pk_option, $options)) {
+			if (!is_array($options[$pk_option])) {
+				$options[$pk_option] = [$options[$pk_option]];
+			}
+
+			$field_schema = $table_schema['fields'][$pk];
+
+			$sql_parts['where'][] = self::isNumericFieldType($field_schema['type'])
+				? dbConditionInt(self::fieldId($pk, $table_alias), $options[$pk_option], false, true, false)
+				: dbConditionString(self::fieldId($pk, $table_alias), $options[$pk_option]);
+		}
+
+		// filters
+		if (is_array($options['filter'])) {
+			$sql_parts = self::dbFilter($table_name, $options, $table_alias, $sql_parts);
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Apply filter conditions to sql built query.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 * @param array  $sql_parts
+	 *
+	 * @return bool
+	 */
+	private static function dbFilter($table_name, $options, $table_alias = null, $sql_parts) {
+		$table_schema = self::getSchema($table_name);
+		$filter = [];
+
+		foreach ($options['filter'] as $field_name => $value) {
+			if (!array_key_exists($field_name, $table_schema['fields'])) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: field "%s.%s" does not exist.', [__FUNCTION__, $table_name, $field_name])
+				);
+			}
+
+			$field_schema = $table_schema['fields'][$field_name];
+
+			if ($field_schema['type'] == self::FIELD_TYPE_TEXT) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
+				);
+			}
+
+			if ($value === null) {
+				continue;
+			}
+
+			if (!is_array($value)) {
+				$value = [$value];
+			}
+
+			$filter[] = self::isNumericFieldType($field_schema['type'])
+				? dbConditionInt(self::fieldId($field_name, $table_alias), $value, false, true, false)
+				: dbConditionString(self::fieldId($field_name, $table_alias), $value);
+		}
+
+		if ($filter) {
+			$sql_parts['where'][] = (count($filter) == 1) ? $filter[0] : '('.implode(' OR ', $filter).')';
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Modifies the SQL parts to implement all of the sorting related options.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param string $table_alias
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	private static function applyQuerySortOptions($table_name, array $options, $table_alias = null, array $sql_parts) {
+		$table_schema = self::getSchema($table_name);
+
+		foreach ($options['sortfield'] as $index => $field_name) {
+			if (!array_key_exists($field_name, $table_schema['fields'])) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: field "%s.%s" does not exist.', [__FUNCTION__, $table_name, $field_name])
+				);
+			}
+
+			$sortorder = '';
+			if (array_key_exists($index, $options['sortorder']) && $options['sortorder'][$index] == ZBX_SORT_DOWN) {
+				$sortorder = ' '.ZBX_SORT_DOWN;
+			}
+
+			$sql_parts['order'][] = self::fieldId($field_name, $table_alias).$sortorder;
+		}
+
+		return $sql_parts;
 	}
 }

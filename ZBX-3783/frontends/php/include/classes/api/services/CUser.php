@@ -388,7 +388,7 @@ class CUser extends CApiService {
 		]);
 
 		// 'passwd' can't be received by the user.get method
-		$db_users = API::getApiService()->select('users', [
+		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
 				'theme', 'type', 'refresh', 'rows_per_page'
 			],
@@ -443,7 +443,7 @@ class CUser extends CApiService {
 	 * @throws APIException  if user already exists.
 	 */
 	private function checkDuplicates(array $aliases) {
-		$db_users = API::getApiService()->select('users', [
+		$db_users = DB::select('users', [
 			'output' => ['alias'],
 			'filter' => ['alias' => $aliases],
 			'limit' => 1
@@ -481,7 +481,7 @@ class CUser extends CApiService {
 
 		$usrgrpids = array_keys($usrgrpids);
 
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => [],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -519,7 +519,7 @@ class CUser extends CApiService {
 
 		$mediatypeids = array_keys($mediatypeids);
 
-		$db_mediatypes = API::getApiService()->select('media_type', [
+		$db_mediatypes = DB::select('media_type', [
 			'output' => [],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -550,7 +550,7 @@ class CUser extends CApiService {
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
-					$db_usrgrps = API::getApiService()->select('usrgrp', [
+					$db_usrgrps = DB::select('usrgrp', [
 						'output' => ['gui_access', 'users_status'],
 						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid')
 					]);
@@ -623,7 +623,7 @@ class CUser extends CApiService {
 		}
 
 		$db_users_groups = ($method === 'update')
-			? API::getApiService()->select('users_groups', [
+			? DB::select('users_groups', [
 				'output' => ['id', 'usrgrpid', 'userid'],
 				'filter' => ['userid' => array_keys($users_groups)]
 			])
@@ -702,7 +702,7 @@ class CUser extends CApiService {
 		}
 
 		$db_medias = ($method === 'update')
-			? API::getApiService()->select('media', [
+			? DB::select('media', [
 				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
 				'filter' => ['userid' => array_keys($medias)]
 			])
@@ -878,7 +878,7 @@ class CUser extends CApiService {
 		}
 
 		// Check if deleted users have a slide show.
-		$db_slideshows = API::getApiService()->select('slideshows', [
+		$db_slideshows = DB::select('slideshows', [
 			'output' => ['name', 'userid'],
 			'filter' => ['userid' => $userids],
 			'limit' => 1
@@ -1285,7 +1285,7 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		$db_sessions = API::getApiService()->select('sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
 				'sessionid' => $sessionid,
@@ -1329,7 +1329,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_users = API::getApiService()->select('users', [
+		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
 			],
@@ -1470,7 +1470,7 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		$db_sessions = API::getApiService()->select('sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
 			'sessionids' => $sessionid,
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
@@ -1482,7 +1482,7 @@ class CUser extends CApiService {
 
 		$db_session = $db_sessions[0];
 
-		$db_users = API::getApiService()->select('users', [
+		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page'
 			],

@@ -861,10 +861,11 @@ function check_db_fields($dbFields, &$args) {
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
  * @param bool   $sort			values mandatory must be sorted
+ * @param bool   $quote
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true) {
+function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true, $quote = true) {
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
 	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
@@ -923,7 +924,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		$operatorNot = $notIn ? 'NOT ' : '';
 
 		foreach ($betweens as $between) {
-			$between = $operatorNot.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr(end($between));
+			$between = $quote
+				? $operatorNot.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr(end($between))
+				: $operatorNot.$fieldName.' BETWEEN '.$between[0].' AND '.end($between);
 
 			$condition .= $condition ? $operatorAnd.$between : $between;
 		}
@@ -932,7 +935,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 	if ($dataSize == 1) {
 		$operator = $notIn ? '!=' : '=';
 
-		$condition .= ($condition ? $operatorAnd : '').$fieldName.$operator.zbx_dbstr($data[0]);
+		$condition .= $quote
+			? ($condition ? $operatorAnd : '').$fieldName.$operator.zbx_dbstr($data[0])
+			: ($condition ? $operatorAnd : '').$fieldName.$operator.$data[0];
 	}
 	else {
 		$operatorNot = $notIn ? ' NOT' : '';
@@ -942,7 +947,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 			$chunkIns = '';
 
 			foreach ($chunk as $value) {
-				$chunkIns .= ','.zbx_dbstr($value);
+				$chunkIns .= $quote ? ','.zbx_dbstr($value) : ','.$value;
 			}
 
 			$chunkIns = $fieldName.$operatorNot.' IN ('.substr($chunkIns, 1).')';

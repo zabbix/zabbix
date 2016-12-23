@@ -158,7 +158,7 @@ class CValueMap extends CApiService {
 		}
 
 		if ($mappings) {
-			$db_mappings = API::getApiService()->select('mappings', [
+			$db_mappings = DB::select('mappings', [
 				'output' => ['mappingid', 'valuemapid', 'value', 'newvalue'],
 				'filter' => ['valuemapid' => array_keys($mappings)]
 			]);
@@ -224,7 +224,7 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_valuemaps = API::getApiService()->select('valuemaps', [
+		$db_valuemaps = DB::select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
@@ -260,7 +260,7 @@ class CValueMap extends CApiService {
 	 * @throws APIException  if value map already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_valuemaps = API::getApiService()->select('valuemaps', [
+		$db_valuemaps = DB::select('valuemaps', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
@@ -321,7 +321,7 @@ class CValueMap extends CApiService {
 		}
 
 		// Check value map names.
-		$db_valuemaps = API::getApiService()->select('valuemaps', [
+		$db_valuemaps = DB::select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => zbx_objectValues($valuemaps, 'valuemapid'),
 			'preservekeys' => true
