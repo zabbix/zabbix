@@ -1543,8 +1543,16 @@ static void	lld_trigger_dependencies_make(zbx_vector_ptr_t *trigger_prototypes, 
 			break;
 	}
 
-	/* all trigger prototypes have no dependencies */
-	if (i == trigger_prototypes->values_num)
+	for (j = 0; j < triggers->values_num; j++)
+	{
+		trigger = (zbx_lld_trigger_t *)triggers->values[j];
+
+		if (0 != trigger->dependencies.values_num)
+			break;
+	}
+
+	/* all trigger prototypes and triggers have no dependencies */
+	if (i == trigger_prototypes->values_num && j == triggers->values_num)
 		return;
 
 	/* used for fast search of trigger by item prototype */
