@@ -556,15 +556,9 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 	char		buffer[MAX_STRING_LEN];
 	zbx_uint64_t	value_ui64;
 
-	switch (value->type)
-	{
-		case ZBX_VARIANT_STR:
-			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
-			break;
-		default:
-			*errmsg = zbx_strdup(NULL, "invalid value type");
-			return FAIL;
-	}
+	zbx_variant_convert(value, ZBX_VARIANT_STR);
+
+	zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
 
 	zbx_ltrim(buffer, " \"+");
 	zbx_rtrim(buffer, " \"\n\r");
