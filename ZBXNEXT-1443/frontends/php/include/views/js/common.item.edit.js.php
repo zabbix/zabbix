@@ -33,7 +33,7 @@
 					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
-				(new CNumericBox('preprocessing[#{rowNum}][params][0]', '', 20, false, true))
+				(new CNumericBox('preprocessing[#{rowNum}][params][0]', '', 255, false, true))
 					->setAttribute('placeholder', _('number')),
 				(new CTextBox('preprocessing[#{rowNum}][params][1]'))
 					->setAttribute('placeholder', _('output'))
