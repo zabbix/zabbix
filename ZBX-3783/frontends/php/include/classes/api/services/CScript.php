@@ -434,6 +434,30 @@ class CScript extends CApiService {
 	}
 
 	/**
+	 * Auxiliary function for checkDuplicates().
+	 *
+	 * @param array  $folders
+	 * @param string $name
+	 * @param array  $db_folders
+	 * @param string $db_name
+	 *
+	 * @throws APIException
+	 */
+	private static function checkScriptNames(array $folders, $name, array $db_folders, $db_name) {
+		if (array_slice($folders, 0, count($db_folders)) === $db_folders) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Script menu path "%1$s" already used in script name "%2$s".', $name, $db_name)
+			);
+		}
+
+		if (array_slice($db_folders, 0, count($folders)) === $folders) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Script name "%1$s" already used in menu path for script "%2$s".', $name, $db_name)
+			);
+		}
+	}
+
+	/**
 	 * Check for duplicated scripts.
 	 *
 	 * @param array  $scripts
@@ -455,36 +479,30 @@ class CScript extends CApiService {
 		}
 		unset($db_script);
 
+		$ok_scripts = [];
+
 		foreach ($scripts as $script) {
-			$folders = array_map('trim', splitPath($script['name']));
-			$uniq_name = implode('/', $folders);
+			$script['folders'] = array_map('trim', splitPath($script['name']));
+			$uniq_name = implode('/', $script['folders']);
 
 			if (array_key_exists($uniq_name, $uniq_names)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 			}
 			$uniq_names[$uniq_name] = true;
 
+			foreach ($ok_scripts as $ok_script) {
+				self::checkScriptNames($script['folders'], $script['name'], $ok_script['folders'], $ok_script['name']);
+			}
+
 			foreach ($db_scripts as $db_script) {
 				if (array_key_exists('scriptid', $script) && bccomp($script['scriptid'], $db_script['scriptid']) == 0) {
 					continue;
 				}
 
-				if (array_slice($folders, 0, count($db_script['folders'])) === $db_script['folders']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script menu path "%1$s" already used in script name "%2$s".', $script['name'],
-							$db_script['name']
-						)
-					);
-				}
-
-				if (array_slice($db_script['folders'], 0, count($folders)) === $folders) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script name "%1$s" already used in menu path for script "%2$s".', $script['name'],
-							$db_script['name']
-						)
-					);
-				}
+				self::checkScriptNames($script['folders'], $script['name'], $db_script['folders'], $db_script['name']);
 			}
+
+			$ok_scripts[] = $script;
 		}
 	}
 
