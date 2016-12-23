@@ -2166,7 +2166,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
  * Get last problems by given trigger IDs.
  *
  * @param array $triggerids
- * @param array $output         list of output fields.
+ * @param array $output         List of output fields.
  *
  * @return array
  */
