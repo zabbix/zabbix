@@ -202,6 +202,7 @@ foreach ($dashboardGrid as $key => $val) {
 			opacity: 0.8;
 			z-index: 1000 }
 		.ui-resizable-handle {
+			border: 1px dotted #707070;
 			position: absolute; }
 		.ui-resizable-n {
 			cursor: n-resize;
@@ -285,10 +286,16 @@ foreach ($dashboardGrid as $key => $val) {
 		}
 
 		function getWidgetPosition(obj, $data, widget, target) {
-			var	widget_pos = $(target).position(),
+			var	target_pos = $(target).position(),
 				widget_width_px = Math.floor(obj.width() / $data['options']['columns']),
-				row = (widget_pos.top - (widget_pos.top % $data['options']['widget-height'])) / $data['options']['widget-height'],
-				col = (widget_pos.left - (widget_pos.left % widget_width_px)) / widget_width_px;
+				target_top = target_pos.top + 25,
+				target_left = target_pos.left + 25,
+				target_height = $(target).height() + $data['options']['widget-height'] - 50,
+				target_width = $(target).width() + widget_width_px - 50,
+				row = (target_top - (target_top % $data['options']['widget-height'])) / $data['options']['widget-height'],
+				col = (target_left - (target_left % widget_width_px)) / widget_width_px,
+				height = (target_height - (target_height % $data['options']['widget-height'])) / $data['options']['widget-height'],
+				width = (target_width - (target_width % widget_width_px)) / widget_width_px;
 
 			if (row < 0) {
 				row = 0;
@@ -297,11 +304,22 @@ foreach ($dashboardGrid as $key => $val) {
 			if (col < 0) {
 				col = 0;
 			}
-			else if (col > $data['options']['columns'] - widget['width']) {
-				col = $data['options']['columns'] - widget['width'];
+			else if (col > $data['options']['columns'] - width) {
+				col = $data['options']['columns'] - width;
 			}
 
-			return {'row': row, 'col': col};
+			if (height < 1) {
+				height = 1;
+			}
+
+			if (width < 1) {
+				width = 1;
+			}
+			else if (width > $data['options']['columns'] - col) {
+				width = $data['options']['columns'] - col;
+			}
+
+			return {'row': row, 'col': col, 'height': height, 'width': width};
 		}
 
 		var methods = {
@@ -365,9 +383,11 @@ foreach ($dashboardGrid as $key => $val) {
 							var	widget = getWidgetByTarget($data['widgets'], event.target),
 								widget_pos = getWidgetPosition($this, $data, widget, event.target);
 
+		console.log(widget_pos);
+
 							$data['placeholder'].css({
-								'top': '' + ($data['options']['widget-height'] * widget_pos.row) + 'px',
-								'left': '' + ($data['options']['widget-width'] * widget_pos.col) + '%'
+								'top': '' + ($data['options']['widget-height'] * widget_pos['row']) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget_pos['col']) + '%'
 							});
 
 							if ($data['options']['rows'] < widget_pos.row + widget.height) {
@@ -382,8 +402,8 @@ foreach ($dashboardGrid as $key => $val) {
 							widget['col'] = widget_pos['col'];
 
 							$(event.target).css({
-								'top': '' + ($data['options']['widget-height'] * widget_pos.row) + 'px',
-								'left': '' + ($data['options']['widget-width'] * widget_pos.col) + '%'
+								'top': '' + ($data['options']['widget-height'] * widget['row']) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget['col']) + '%'
 							});
 
 							$data['placeholder'].hide();
@@ -396,13 +416,49 @@ foreach ($dashboardGrid as $key => $val) {
 
 					$widget.resizable({
 						handles: 'all',
+						// TODO: remove autoHide
+						autoHide: true,
 						start: function(event, ui) {
+							$data['placeholder'].show();
+
 							$(event.target).addClass('dashbrd-grid-widget-dragging');
 						},
 						resize: function(event, ui) {
+							var	widget = getWidgetByTarget($data['widgets'], event.target),
+								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+
+							$data['placeholder'].css({
+								'height': '' + ($data['options']['widget-height'] * widget_pos['height']) + 'px',
+								'width': '' + ($data['options']['widget-width'] * widget_pos['width']) + '%',
+								'top': '' + ($data['options']['widget-height'] * widget_pos['row']) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget_pos['col']) + '%'
+							});
+
+							if ($data['options']['rows'] < widget_pos.row + widget.height) {
+								resizeDashboardGrid($this, $data, widget_pos.row + widget.height);
+							}
 						},
 						stop: function(event, ui) {
+							var	widget = getWidgetByTarget($data['widgets'], event.target),
+								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+
+							widget['row'] = widget_pos['row'];
+							widget['col'] = widget_pos['col'];
+							widget['height'] = widget_pos['height'];
+							widget['width'] = widget_pos['width'];
+
+							$(event.target).css({
+								'top': '' + ($data['options']['widget-height'] * widget['row']) + 'px',
+								'left': '' + ($data['options']['widget-width'] * widget['col']) + '%',
+								'height': '' + ($data['options']['widget-height'] * widget['height']) + 'px',
+								'width': '' + ($data['options']['widget-width'] * widget['width']) + '%'
+							});
+
+							$data['placeholder'].hide();
+
 							$(event.target).removeClass('dashbrd-grid-widget-dragging');
+
+							resizeDashboardGrid($this, $data);
 						}
 					});
 				});
