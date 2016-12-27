@@ -425,28 +425,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['applicationPrototypes'] = $application_prototypes;
 			}
 
-			// Check the order of pre-processing steps.
-			if (array_diff_key($preprocessing,
-					array_intersect_assoc(array_keys($db_item['preprocessing']), array_keys($preprocessing)))) {
+			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
-			}
-			// Same order, but different values or simply all fields are removed.
-			else {
-				$preprocessing_changed = false;
-
-				foreach ($preprocessing as $key => $step) {
-					foreach ($db_item['preprocessing'] as $db_key => $db_step) {
-						if ($key == $db_key
-								&& ($step['type'] !== $db_step['type'] || $step['params'] !== $db_step['params'])) {
-							$preprocessing_changed = true;
-							break;
-						}
-					}
-				}
-
-				if ($preprocessing_changed || !$preprocessing) {
-					$item['preprocessing'] = $preprocessing;
-				}
 			}
 
 			$result = API::ItemPrototype()->update($item);
