@@ -3,7 +3,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-11558] fixed removing trigger dependencies for tiggers that are created from LLD prototypes (viktors)
+........S. [ZBX-11558] fixed removing trigger dependencies for triggers that are created from LLD prototypes (viktors)
 ..F....... [ZBX-11385] fixed interfaces displaying in host inventory page (Oleg, Pavel)
 ...G...PS. [ZBX-11101] fixed potential crash in case of failure in zbx_tls_connect() with mbed TLS (gleb)
 ...G...PS. [ZBX-11101] fixed compilation warnings regarding gnutls_transport_set_ptr() with GnuTLS (asaveljevs, gleb)
