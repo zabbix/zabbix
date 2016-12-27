@@ -140,7 +140,7 @@ $fields = [
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'
 	],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'applications' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],

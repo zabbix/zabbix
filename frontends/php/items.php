@@ -105,7 +105,7 @@ $fields = [
 	],
 	'logtimefmt' =>				[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'],
-	'preprocessing' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetid' =>		    [T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_groupid' =>		    [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
