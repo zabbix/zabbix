@@ -52,7 +52,9 @@ static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION 
 
 		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator ||
 				CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		{
 			ret_continue = SUCCEED;
+		}
 		else
 			ret_continue = FAIL;
 
@@ -98,7 +100,9 @@ static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_COND
 
 		if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator ||
 				CONDITION_OPERATOR_NOT_LIKE == condition->operator)
+		{
 			ret_continue = SUCCEED;
+		}
 		else
 			ret_continue = FAIL;
 
@@ -3013,8 +3017,6 @@ static void	conditions_vectors_destroy(zbx_hashset_t *uniq_conditions)
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
@@ -3076,17 +3078,16 @@ static int	event_match_condition(const DB_EVENT *event, const DB_CONDITION *cond
  *                                                                            *
  * Function: check_action_conditions                                          *
  *                                                                            *
- * Purpose: check if actions have to be processed for the event               *
+ * Purpose: check if action have to be processed for the event                *
  *          (check all conditions of the action)                              *
  *                                                                            *
- * Parameters: actionid - action ID for matching                              *
+ * Parameters: event  - [IN] event to check                                   *
+ *             action - [IN] action for matching                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *action)
+static int	check_action_conditions(const DB_EVENT *event, const zbx_action_eval_t *action)
 {
 	const char	*__function_name = "check_action_conditions";
 
@@ -3173,7 +3174,6 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 		zbx_free(expression);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
