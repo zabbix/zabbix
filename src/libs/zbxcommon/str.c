@@ -4480,10 +4480,12 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  * Function: zbx_token_find                                                   *
  *                                                                            *
  * Purpose: finds token {} inside expression starting at specified position   *
+ *          also searches for reference if requested                          *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             pos        - [IN] the starting position                        *
- *             token      - [OUT] the token data                              *
+ * Parameters: expression   - [IN] the expression                             *
+ *             pos          - [IN] the starting position                      *
+ *             token        - [OUT] the token data                            *
+ *             token_search - [IN] specify if references will be searched     *
  *                                                                            *
  * Return value: SUCCEED - the token was parsed successfully                  *
  *               FAIL    - expression does not contain valid token.           *
@@ -4502,14 +4504,34 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *           }                                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
 	int		ret = FAIL;
-	const char	*ptr = expression + pos;
+	const char	*ptr = expression + pos, *dollar = NULL;
 
 	while (SUCCEED != ret)
 	{
-		if (NULL == (ptr = strchr(ptr, '{')))
+		if (ZBX_TOKEN_SEARCH_REFERENCES == token_search)
+			dollar = strchr(ptr, '$');
+
+		ptr = strchr(ptr, '{');
+
+		if (NULL != dollar && (NULL == ptr || ptr > dollar))
+		{
+			if ('1' <= dollar[1] && dollar[1] <= '9')
+			{
+				token->token.l = dollar - expression;
+				token->token.r = token->token.l + 1;
+				return SUCCEED;
+			}
+			else
+			{
+				ptr = dollar + 1;
+				continue;
+			}
+		}
+
+		if (NULL == ptr)
 			return FAIL;
 
 		if ('\0' == ptr[1])
@@ -4589,4 +4611,69 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_number_find                                                  *
+ *                                                                            *
+ * Purpose: finds number inside expression starting at specified position     *
+ *                                                                            *
+ * Parameters: str        - [IN] the expression                               *
+ *             pos        - [IN] the starting position                        *
+ *             number_loc - [OUT] the number location                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - expression does not contain number     .           *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
+{
+	const char	*s, *e;
+
+	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
+	{
+		if (!isdigit(*s))
+			continue;
+
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		{
+			/* skip functions '{65432}' */
+			s = e;
+			continue;
+		}
+
+		for (e = s; '\0' != *e; e++)	/* find end of number */
+		{
+			int	dot_found = 0;
+
+			if (isdigit(*e))
+				continue;
+
+			if ('.' == *e && 0 == dot_found)
+			{
+				dot_found = 1;
+				continue;
+			}
+
+			if ('A' <= *e && *e <= 'Z')
+				e++;
+
+			break;
+		}
+
+		/* number found */
+		number_loc->l = s - str;
+		number_loc->r = e - str - 1;
+
+		return SUCCEED;
+	}
+
+	return FAIL;
 }

@@ -185,118 +185,37 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_number_find                                                  *
- *                                                                            *
- * Purpose: finds number inside expression starting at specified position     *
- *                                                                            *
- * Parameters: str        - [IN] the expression                               *
- *             pos        - [IN] the starting position                        *
- *             number_loc - [OUT] the number location                         *
- *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - expression does not contain number     .           *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
-{
-	const char	*s, *e;
-
-	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
-	{
-		if (!isdigit(*s))
-			continue;
-
-		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
-		{
-			/* skip functions '{65432}' */
-			s = e;
-			continue;
-		}
-
-		for (e = s; '\0' != *e; e++)	/* find end of number */
-		{
-			int	dot_found = 0;
-
-			if (isdigit(*e))
-				continue;
-
-			if ('.' == *e && 0 == dot_found)
-			{
-				dot_found = 1;
-				continue;
-			}
-
-			if ('A' <= *e && *e <= 'Z')
-				e++;
-
-			break;
-		}
-
-		/* number found */
-		number_loc->l = s - str;
-		number_loc->r = e - str - 1;
-
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: expand_trigger_description_constants                             *
  *                                                                            *
- * Purpose: substitute constant macros in data string with real values from   *
- *          expression                                                        *
+ * Purpose: substitute constant macros with real values from expression       *
  *                                                                            *
- * Parameters: data       - [IN/OUT] trigger description                      *
+ * Parameters: replace    - [IN] constant to replace                          *
  *             expression - [IN] trigger expression, source of constants      *
  *                                                                            *
+ * Return value: trigger description constant is expanded and allocated       *
+ *               if no such number found then empty string is allocated       *
+ *               must be freed                                                *
  ******************************************************************************/
-static void	expand_trigger_description_constants(char **data, const char *expression)
+static char	*expand_trigger_description_constant(const char *replace, const char *expression)
 {
-	char		*number = NULL, replace[3] = "$0", *old_data;
-	int		number_cnt = 0, i, ret = SUCCEED;
-	size_t		number_alloc = 0, number_offset, pos = 0;
+	char		*number = NULL;
+	int		ret = SUCCEED;
+	size_t		number_alloc = 0, number_offset = 0, pos = 0, number_cnt = 0, number_ref = replace[1] - '0';
 	zbx_strloc_t	number_loc;
 
-	for (i = 1; i <= 9; i++)
+
+	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < number_ref)
+		pos = number_loc.r + 1;
+
+	if (SUCCEED == ret)
 	{
-		replace[1] = '0' + i;
-
-		if (NULL == strstr(*data, replace))	/* no occurrences of the reference in string */
-			continue;
-
-		if (SUCCEED != ret)	/* ran out of numbers on the previous loop iteration */
-		{
-			old_data = *data;
-			*data = string_replace(*data, replace, "");
-			zbx_free(old_data);
-			continue;
-		}
-
-		while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < i)
-			pos = number_loc.r + 1;
-
-		if (SUCCEED == ret)
-		{
-			number_offset = 0;
-			zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
-					number_loc.r - number_loc.l + 1);
-		}
-
-		old_data = *data;
-		*data = string_replace(*data, replace, (SUCCEED == ret ? number : ""));
-		zbx_free(old_data);
+		zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
+							number_loc.r - number_loc.l + 1);
 	}
+	else
+		number = zbx_strdup(NULL, "");
 
-	zbx_free(number);
+	return number;
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -2522,6 +2441,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
+	zbx_token_search_t	token_search;
+	char			*expression = NULL;
+	unsigned char		macros_expanded = 0;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2532,24 +2454,19 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-	{
-		char	*expression;
+		token_search = ZBX_TOKEN_SEARCH_REFERENCES;
+	else
+		token_search = ZBX_TOKEN_SEARCH_BASIC;
 
-		if (NULL != (expression = DCexpression_expand_user_macros(event->trigger.expression, NULL)))
-		{
-			expand_trigger_description_constants(data, expression);
-			zbx_free(expression);
-		}
-	}
-
-	if (SUCCEED != zbx_token_find(*data, pos, &token))
+	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
 		return res;
 
 	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
-	for (found = SUCCEED; SUCCEED == res && SUCCEED == found; found = zbx_token_find(*data, pos, &token))
+	for (found = SUCCEED; SUCCEED == res && SUCCEED == found;
+			found = zbx_token_find(*data, pos, &token, token_search))
 	{
 		indexed_macro = 0;
 		func_macro = 0;
@@ -3531,6 +3448,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.token.r;
 				}
+				else if (0 == strncmp(m, "$", 1))
+				{
+					if (0 == macros_expanded)
+					{
+						expression = DCexpression_expand_user_macros(event->trigger.expression,
+								NULL);
+						macros_expanded = 1;
+					}
+
+					if (NULL != expression)
+						replace_to = expand_trigger_description_constant(m, expression);
+
+					pos = token.token.r;
+				}
+
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION))
@@ -3858,6 +3790,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		pos++;
 	}
 
+	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
@@ -4799,7 +4732,7 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token))
+	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
 		if (0 != (token.type & flags))
 		{
