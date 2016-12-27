@@ -331,7 +331,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				default:
 					$step['params'] = '';
-					break;
 			}
 		}
 		unset($step);
@@ -378,11 +377,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$db_item = API::ItemPrototype()->get([
 				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-					'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-					'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',	'interfaceid', 'port',
-					'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
+					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
+					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
+					'snmpv3_privprotocol', 'snmpv3_contextname'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
