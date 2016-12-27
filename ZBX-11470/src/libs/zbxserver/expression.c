@@ -185,7 +185,7 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: expand_trigger_description_constants                             *
+ * Function: expand_trigger_description_constant                              *
  *                                                                            *
  * Purpose: substitute constant macros with real values from expression       *
  *                                                                            *
