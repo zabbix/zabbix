@@ -285,13 +285,13 @@ foreach ($dashboardGrid as $key => $val) {
 			return widgets[$.data(target, 'widget-id')];
 		}
 
-		function getWidgetPosition(obj, $data, widget, target) {
+		function getWidgetPosition(obj, $data, target) {
 			var	target_pos = $(target).position(),
 				widget_width_px = Math.floor(obj.width() / $data['options']['columns']),
 				target_top = target_pos.top + 25,
 				target_left = target_pos.left + 25,
-				target_height = $(target).height() + $data['options']['widget-height'] - 50,
-				target_width = $(target).width() + widget_width_px - 50,
+				target_height = $(target).height() + $data['options']['widget-height'] - 25,
+				target_width = $(target).width() + widget_width_px - 25,
 				row = (target_top - (target_top % $data['options']['widget-height'])) / $data['options']['widget-height'],
 				col = (target_left - (target_left % widget_width_px)) / widget_width_px,
 				height = (target_height - (target_height % $data['options']['widget-height'])) / $data['options']['widget-height'],
@@ -301,11 +301,12 @@ foreach ($dashboardGrid as $key => $val) {
 				row = 0;
 			}
 
+			if (col > $data['options']['columns'] - width) {
+				col = $data['options']['columns'] - width;
+			}
+
 			if (col < 0) {
 				col = 0;
-			}
-			else if (col > $data['options']['columns'] - width) {
-				col = $data['options']['columns'] - width;
 			}
 
 			if (height < 1) {
@@ -315,8 +316,8 @@ foreach ($dashboardGrid as $key => $val) {
 			if (width < 1) {
 				width = 1;
 			}
-			else if (width > $data['options']['columns'] - col) {
-				width = $data['options']['columns'] - col;
+			else if (width > $data['options']['columns']) {
+				width = $data['options']['columns'];
 			}
 
 			return {'row': row, 'col': col, 'height': height, 'width': width};
@@ -381,9 +382,7 @@ foreach ($dashboardGrid as $key => $val) {
 						},
 						drag: function(event, ui) {
 							var	widget = getWidgetByTarget($data['widgets'], event.target),
-								widget_pos = getWidgetPosition($this, $data, widget, event.target);
-
-		console.log(widget_pos);
+								widget_pos = getWidgetPosition($this, $data, event.target);
 
 							$data['placeholder'].css({
 								'top': '' + ($data['options']['widget-height'] * widget_pos['row']) + 'px',
@@ -396,7 +395,7 @@ foreach ($dashboardGrid as $key => $val) {
 						},
 						stop: function(event, ui) {
 							var	widget = getWidgetByTarget($data['widgets'], event.target),
-								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+								widget_pos = getWidgetPosition($this, $data, event.target);
 
 							widget['row'] = widget_pos['row'];
 							widget['col'] = widget_pos['col'];
@@ -425,22 +424,22 @@ foreach ($dashboardGrid as $key => $val) {
 						},
 						resize: function(event, ui) {
 							var	widget = getWidgetByTarget($data['widgets'], event.target),
-								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+								widget_pos = getWidgetPosition($this, $data, event.target);
 
 							$data['placeholder'].css({
-								'height': '' + ($data['options']['widget-height'] * widget_pos['height']) + 'px',
-								'width': '' + ($data['options']['widget-width'] * widget_pos['width']) + '%',
 								'top': '' + ($data['options']['widget-height'] * widget_pos['row']) + 'px',
-								'left': '' + ($data['options']['widget-width'] * widget_pos['col']) + '%'
+								'left': '' + ($data['options']['widget-width'] * widget_pos['col']) + '%',
+								'height': '' + ($data['options']['widget-height'] * widget_pos['height']) + 'px',
+								'width': '' + ($data['options']['widget-width'] * widget_pos['width']) + '%'
 							});
 
-							if ($data['options']['rows'] < widget_pos.row + widget.height) {
-								resizeDashboardGrid($this, $data, widget_pos.row + widget.height);
+							if ($data['options']['rows'] < widget_pos.row + widget_pos.height) {
+								resizeDashboardGrid($this, $data, widget_pos.row + widget_pos.height);
 							}
 						},
 						stop: function(event, ui) {
 							var	widget = getWidgetByTarget($data['widgets'], event.target),
-								widget_pos = getWidgetPosition($this, $data, widget, event.target);
+								widget_pos = getWidgetPosition($this, $data, event.target);
 
 							widget['row'] = widget_pos['row'];
 							widget['col'] = widget_pos['col'];
