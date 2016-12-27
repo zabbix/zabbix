@@ -967,9 +967,16 @@ abstract class CItemGeneral extends CApiService {
 						}
 
 						$params = explode("\n", $preprocessing['params']);
-						if (!array_key_exists(1, $params) || trim($params[1]) === '') {
+
+						if ($params[0] === '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a second parameter is expected')
+								'params', _('first parameter is expected')
+							));
+						}
+
+						if (!array_key_exists(1, $params) || $params[1] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('second parameter is expected')
 							));
 						}
 						break;
