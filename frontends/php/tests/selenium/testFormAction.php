@@ -2065,7 +2065,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementValue('esc_period', '123');
 		$this->zbxTestDoubleClickXpath("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]", 'new_operation_esc_step_from');
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
