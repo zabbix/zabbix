@@ -209,7 +209,7 @@ static char	*expand_trigger_description_constant(const char *replace, const char
 	if (SUCCEED == ret)
 	{
 		zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
-							number_loc.r - number_loc.l + 1);
+				number_loc.r - number_loc.l + 1);
 	}
 	else
 		number = zbx_strdup(NULL, "");
