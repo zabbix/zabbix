@@ -4662,7 +4662,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 				continue;
 			}
 
-			if ('A' <= *e && *e <= 'Z')
+			if (NULL != strchr("KMGTsmhdw", *e))
 				e++;
 
 			break;
