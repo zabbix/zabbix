@@ -261,13 +261,10 @@ static int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc
  ******************************************************************************/
 static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	char		*number = NULL, replace[3] = "$0", *old_data, *expr;
+	char		*number = NULL, replace[3] = "$0", *old_data;
 	int		number_cnt = 0, i, ret = SUCCEED;
 	size_t		number_alloc = 0, number_offset, pos = 0;
 	zbx_strloc_t	number_loc;
-
-	if (NULL == (expr = DCexpression_expand_user_macros(expression, NULL)))
-		return;
 
 	for (i = 1; i <= 9; i++)
 	{
@@ -300,7 +297,6 @@ static void	expand_trigger_description_constants(char **data, const char *expres
 	}
 
 	zbx_free(number);
-	zbx_free(expr);
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -2536,7 +2532,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token))
-		return res;
+		goto out;
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2833,7 +2829,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
-					expand_trigger_description_constants(&replace_to, c_event->trigger.expression);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -3026,7 +3021,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
 							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error,
 							maxerrlen);
-					expand_trigger_description_constants(&replace_to, c_event->trigger.expression);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
 				{
@@ -3854,6 +3848,17 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
+out:
+	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
+	{
+		char	*expression;
+
+		if (NULL != (expression = DCexpression_expand_user_macros(event->trigger.expression, NULL)))
+		{
+			expand_trigger_description_constants(data, expression);
+			zbx_free(expression);
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 
