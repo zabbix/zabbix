@@ -357,16 +357,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
 			'data_type'		=> getRequest('data_type'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex,
-			'applications'	=> $applications,
-			'applicationPrototypes' => $application_prototypes
+			'delay_flex'	=> $delay_flex
 		];
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
 
-			$dbItem = get_item_by_itemid_limited($itemId);
-			$dbItem['applications'] = get_applications_by_itemid($itemId);
+			$dbItem = API::ItemPrototype()->get([
+				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
+					'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+					'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+					'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',	'interfaceid', 'port',
+					'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				],
+				'selectApplications' => ['applicationid'],
+				'selectApplicationPrototypes' => ['name'],
+				'itemids' => [$itemId]
+			]);
 
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -377,12 +385,38 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
+			$dbItem = $dbItem[0];
+
 			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 			$item['itemid'] = $itemId;
+
+			$dbItem['applications'] = zbx_objectValues($dbItem['applications'], 'applicationid');
+
+			// compare applications
+			natsort($dbItem['applications']);
+			natsort($applications);
+
+			if (array_values($dbItem['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
+			// compare application prototypes
+			$db_application_prototype_names = zbx_objectValues($dbItem['applicationPrototypes'], 'name');
+			natsort($db_application_prototype_names);
+
+			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			natsort($application_prototype_names);
+
+			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
+				$item['applicationPrototypes'] = $application_prototypes;
+			}
 
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+			$item['applicationPrototypes'] = $application_prototypes;
+
 			$result = API::ItemPrototype()->create($item);
 		}
 	}
