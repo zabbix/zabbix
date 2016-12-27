@@ -2531,8 +2531,19 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
+	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
+	{
+		char	*expression;
+
+		if (NULL != (expression = DCexpression_expand_user_macros(event->trigger.expression, NULL)))
+		{
+			expand_trigger_description_constants(data, expression);
+			zbx_free(expression);
+		}
+	}
+
 	if (SUCCEED != zbx_token_find(*data, pos, &token))
-		goto out;
+		return res;
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -3848,17 +3859,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
-out:
-	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-	{
-		char	*expression;
-
-		if (NULL != (expression = DCexpression_expand_user_macros(event->trigger.expression, NULL)))
-		{
-			expand_trigger_description_constants(data, expression);
-			zbx_free(expression);
-		}
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 
