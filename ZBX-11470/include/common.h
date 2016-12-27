@@ -1320,8 +1320,15 @@ typedef struct
 }
 zbx_token_t;
 
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
+typedef enum
+{
+	ZBX_TOKEN_SEARCH_BASIC,
+	ZBX_TOKEN_SEARCH_REFERENCES
+}
+zbx_token_search_t;
 
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
+int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 #endif
