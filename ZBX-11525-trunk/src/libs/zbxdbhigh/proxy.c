@@ -2512,15 +2512,15 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
  * Purpose: parses agent value from history data json row                     *
  *                                                                            *
  * Parameters: jp_row          - [IN] JSON with history data row              *
- *             client_timediff - [IN] time difference between sending and     *
- *                                    receiving parties                       *
+ *             client_timediff - [IN/OUT] time difference between sending and *
+ *                                        receiving parties                   *
  *             av              - [OUT] the agent value                        *
  *                                                                            *
  * Return value:  SUCCEED - the value was parsed successfully                 *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, const zbx_timespec_t *client_timediff,
+static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *client_timediff,
 		zbx_agent_value_t *av)
 {
 	char	*tmp = NULL;
@@ -2556,12 +2556,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, con
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
 
-			av->ts.ns = client_timediff.ns++;
+			av->ts.ns = client_timediff->ns++;
 
-			if (client_timediff.ns > 999999999)
+			if (client_timediff->ns > 999999999)
 			{
-				client_timediff.sec++;
-				client_timediff.ns = 0;
+				client_timediff->sec++;
+				client_timediff->ns = 0;
 			}
 		}
 	}
@@ -2692,8 +2692,8 @@ static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, z
  *             values_num      - [OUT] the number of values stored in values  *
  *                                     and hostkeys arrays                    *
  *             total_num       - [OUT] the number of values parsed            *
- *             client_timediff - [IN] time difference between sending and     *
- *                                    receiving parties                       *
+ *             client_timediff - [IN/OUT] time difference between sending and *
+ *                                        receiving parties                   *
  *             info            - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -2702,7 +2702,7 @@ static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, z
  *                                                                            *
  ******************************************************************************/
 static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext, zbx_agent_value_t *values,
-		zbx_host_key_t *hostkeys, int *values_num, int *parsed_num, const zbx_timespec_t *client_timediff,
+		zbx_host_key_t *hostkeys, int *values_num, int *parsed_num, zbx_timespec_t *client_timediff,
 		char **error)
 {
 	const char		*__function_name = "parse_history_data";
@@ -2767,7 +2767,7 @@ out:
  *             values_num      - [OUT] the number of values stored in values  *
  *                                     and hostkeys arrays                    *
  *             parsed_num      - [OUT] the number of values parsed            *
- *             client_timediff - [IN] time difference between sending and     *
+ *             client_timediff - [IN/OUT] time difference between sending and *
  *                                    receiving parties                       *
  *             info            - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
@@ -2780,8 +2780,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	parse_history_data_33(struct zbx_json_parse *jp_data, const char **pnext, zbx_agent_value_t *values,
-		zbx_uint64_t *itemids, int *values_num, int *parsed_num, const zbx_timespec_t *client_timediff,
-		char **error)
+		zbx_uint64_t *itemids, int *values_num, int *parsed_num, zbx_timespec_t *client_timediff, char **error)
 {
 	const char		*__function_name = "parse_history_data_33";
 
@@ -3555,8 +3554,8 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
  * Purpose: parses history data array and process the data                    *
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with history data array            *
- *             client_timediff - [IN] time difference between sending and     *
- *                                    receiving parties                       *
+ *             client_timediff - [IN/OUT] time difference between sending and *
+ *                                        receiving parties                   *
  *             info            - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -3568,7 +3567,7 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
  *                                                                            *
  ******************************************************************************/
 static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
-		const zbx_timespec_t *client_timediff, char **info)
+		zbx_timespec_t *client_timediff, char **info)
 {
 	const char		*__function_name = "process_proxy_history_data_33";
 
