@@ -203,7 +203,6 @@ static char	*expand_trigger_description_constant(const char *replace, const char
 	size_t		number_alloc = 0, number_offset = 0, pos = 0, number_cnt = 0, number_ref = replace[1] - '0';
 	zbx_strloc_t	number_loc;
 
-
 	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < number_ref)
 		pos = number_loc.r + 1;
 
