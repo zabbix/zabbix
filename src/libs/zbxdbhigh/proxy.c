@@ -2336,31 +2336,31 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 	size_t			tmp_alloc = 0, values_num = 0;
 	int			ret, processed = 0, total_num = 0;
 	double			sec;
-	zbx_timespec_t		proxy_timediff;
+	zbx_timespec_t		client_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
 
-	proxy_timediff.sec = 0;
-	proxy_timediff.ns = 0;
+	client_timediff.sec = 0;
+	client_timediff.ns = 0;
 
 	if (NULL == values)
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 	{
-		proxy_timediff.sec = ts->sec - atoi(tmp);
+		client_timediff.sec = ts->sec - atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 		{
-			proxy_timediff.ns = ts->ns - atoi(tmp);
+			client_timediff.ns = ts->ns - atoi(tmp);
 
-			if (proxy_timediff.ns < 0)
+			if (client_timediff.ns < 0)
 			{
-				proxy_timediff.sec--;
-				proxy_timediff.ns += 1000000000;
+				client_timediff.sec--;
+				client_timediff.ns += 1000000000;
 			}
 		}
 	}
@@ -2372,7 +2372,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 	}
 
 	if (0 != proxy_hostid)
-		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+		DCconfig_set_proxy_timediff(proxy_hostid, &client_timediff);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
@@ -2393,7 +2393,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 			if (FAIL == is_uint31(tmp, &av->ts.sec))
 				continue;
 
-			av->ts.sec += proxy_timediff.sec;
+			av->ts.sec += client_timediff.sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
@@ -2403,7 +2403,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 					continue;
 				}
 
-				av->ts.ns += proxy_timediff.ns;
+				av->ts.ns += client_timediff.ns;
 
 				if (av->ts.ns > 999999999)
 				{
@@ -2412,7 +2412,17 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 				}
 			}
 			else
-				av->ts.ns = proxy_timediff.ns;
+			{
+				/* ensure unique value timestamp (clock, ns) if only clock is available */
+
+				av->ts.ns = client_timediff.ns++;
+
+				if (client_timediff.ns > 999999999)
+				{
+					client_timediff.sec++;
+					client_timediff.ns = 0;
+				}
+			}
 		}
 		else
 			zbx_timespec(&av->ts);
@@ -2447,7 +2457,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 
 			if (0 == av->meta)
 			{
-				/* only meta information update packets can have empty value*/
+				/* only meta information update packets can have empty value */
 				continue;
 			}
 		}
