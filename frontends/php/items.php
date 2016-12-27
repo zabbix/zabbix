@@ -837,7 +837,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 
 				default:
 					$step['params'] = '';
-					break;
 			}
 		}
 		unset($step);
