@@ -486,7 +486,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					[
 						'name' => 'trigger2',
 						'expression' => '{export-host:item.last(0)}<>0',
-						'recovery_expression' => '',
+						'recovery_expression' => ''
 					]
 				],
 				'tags' => [],
@@ -524,7 +524,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					[
 						'name' => 'trigger2',
 						'expression' => '{export-template:item.last(0)}<>0',
-						'recovery_expression' => '',
+						'recovery_expression' => ''
 					]
 				],
 				'tags' => [],
