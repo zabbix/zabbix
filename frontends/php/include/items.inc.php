@@ -1295,8 +1295,8 @@ function get_preprocessing_types($type = null) {
 		ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
 		ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
 		ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal'),
-		ZBX_PREPROC_DELTA_VALUE => _('Delta per second'),
-		ZBX_PREPROC_DELTA_SPEED => _('Delta')
+		ZBX_PREPROC_DELTA_VALUE => _('Delta'),
+		ZBX_PREPROC_DELTA_SPEED => _('Delta per second')
 	];
 
 	if ($type !== null && array_key_exists($type, $types)) {
