@@ -19,7 +19,7 @@
 **/
 
 
-//$this->addJsFile('class.pmaster.js');
+$this->addJsFile('class.pmaster.js');
 $this->addJsFile('dashboard.grid.js');
 
 /*
@@ -183,13 +183,21 @@ foreach ($dashboardGrid as $key => $val) {
  * Javascript
  */
 // start refresh process
-//$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
+$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
 
 // activating blinking
-//$this->addPostJS('jqBlink.blink();');
+$this->addPostJS('jqBlink.blink();');
 
-/*
-	*/
+// Initialize dashboard grid
+$this->addPostJS(
+	"jQuery('.dashbrd-grid-container')
+		.dashboardGrid()
+		.dashboardGrid('addWidget', {'row': 1, 'col': 5, 'height': 1, 'width': 1})
+		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2})
+		.dashboardGrid('addWidget', {'row': 2, 'col': 6, 'height': 3, 'width': 6})
+		.dashboardGrid('addWidget', {'row': 1, 'col': 2, 'height': 2, 'width': 1});"
+);
+
 ?>
 
 <style>
@@ -210,25 +218,25 @@ foreach ($dashboardGrid as $key => $val) {
 			height: 7px;
 			top: -5px;
 			left: 2px;
-		right: 2px; }
+			right: 2px; }
 		.ui-resizable-e {
 			cursor: e-resize;
 			width: 7px;
 			right: -5px;
 			top: 2px;
-		bottom: 2px; }
+			bottom: 2px; }
 		.ui-resizable-s {
 			cursor: s-resize;
 			height: 7px;
 			bottom: -5px;
 			left: 2px;
-		right: 2px; }
+			right: 2px; }
 		.ui-resizable-w {
 			cursor: w-resize;
 			width: 7px;
 			left: -5px;
 			top: 2px;
-		bottom: 2px; }
+			bottom: 2px; }
 		.ui-resizable-ne {
 			cursor: ne-resize;
 			height: 7px;
@@ -259,18 +267,6 @@ foreach ($dashboardGrid as $key => $val) {
 		position: absolute;
 		z-index: 999 }
 </style>
-
-<script type="text/javascript">
-
-(function($) {
-	$('.dashbrd-grid-container')
-		.dashboardGrid()
-		.dashboardGrid('addWidget', {'row': 1, 'col': 5, 'height': 1, 'width': 1})
-		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2})
-		.dashboardGrid('addWidget', {'row': 2, 'col': 6, 'height': 3, 'width': 6})
-		.dashboardGrid('addWidget', {'row': 1, 'col': 2, 'height': 2, 'width': 1});
-}(jQuery));
-</script>
 
 <script type="text/javascript">
 	/**
