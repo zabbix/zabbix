@@ -1927,7 +1927,6 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
 		}
 
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
@@ -2024,8 +2023,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');

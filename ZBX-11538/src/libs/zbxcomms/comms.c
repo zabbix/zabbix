@@ -1457,15 +1457,14 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char	*error = NULL;
-#endif
 #if defined(_WINDOWS)
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
+		char	*error = NULL;
+
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
@@ -1871,6 +1870,28 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 			inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_connection_type_name                                     *
+ *                                                                            *
+ * Purpose: translate connection type code to name                            *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_tcp_connection_type_name(unsigned int type)
+{
+	switch (type)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			return "unencrypted";
+		case ZBX_TCP_SEC_TLS_CERT:
+			return "TLS with certificate";
+		case ZBX_TCP_SEC_TLS_PSK:
+			return "TLS with PSK";
+		default:
+			return "unknown";
+	}
 }
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
