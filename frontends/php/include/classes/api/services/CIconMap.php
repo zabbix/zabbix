@@ -264,7 +264,7 @@ class CIconMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_iconmaps = API::getApiService()->select('icon_map', [
+		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name', 'default_iconid'],
 			'iconmapids' => zbx_objectValues($iconmaps, 'iconmapid'),
 			'preservekeys' => true
@@ -301,7 +301,7 @@ class CIconMap extends CApiService {
 	 * @throws APIException  if user already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_iconmaps = API::getApiService()->select('icon_map', [
+		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
@@ -335,7 +335,7 @@ class CIconMap extends CApiService {
 		if ($names) {
 			$names = array_keys($names);
 
-			$db_regexps = API::getApiService()->select('regexps', [
+			$db_regexps = DB::select('regexps', [
 				'output' => ['name'],
 				'filter' => ['name' => $names]
 			]);
@@ -417,12 +417,11 @@ class CIconMap extends CApiService {
 		}
 
 		$db_mappings = ($method === 'update')
-			? DBfetchArray(DBselect(
-				'SELECT m.iconmappingid,m.iconmapid,m.iconid,m.expression,m.inventory_link,m.sortorder'.
-				' FROM icon_mapping m'.
-				' WHERE '.dbConditionInt('m.iconmapid', array_keys($mappings)).
-				' ORDER BY m.iconmapid,m.sortorder'
-			))
+			? DB::select('icon_mapping', [
+				'output' => ['iconmappingid', 'iconmapid', 'iconid', 'expression', 'inventory_link', 'sortorder'],
+				'filter' => ['iconmapid' => array_keys($mappings)],
+				'sortfield' => ['iconmapid', 'sortorder']
+			])
 			: [];
 
 		$ins_mappings = [];
@@ -520,7 +519,7 @@ class CIconMap extends CApiService {
 			}
 		}
 
-		$db_sysmaps = API::getApiService()->select('sysmaps', [
+		$db_sysmaps = DB::select('sysmaps', [
 			'output' => ['name', 'iconmapid'],
 			'filter' => ['iconmapid' => $iconmapids],
 			'limit' => 1
