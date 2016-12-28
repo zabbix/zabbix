@@ -2500,8 +2500,10 @@ static int	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *
 				client_timediff->ns += 1000000000;
 			}
 		}
+
 		return SUCCEED;
 	}
+
 	return FAIL;
 }
 
@@ -2650,8 +2652,8 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
  *                                                                            *
  * Purpose: parses host,key pair from history data json row                   *
  *                                                                            *
- * Parameters: jp_row  - [IN] JSON with history data row                      *
- *             hk      - [OUT] the host,key pair                              *
+ * Parameters: jp_row - [IN] JSON with history data row                       *
+ *             hk     - [OUT] the host,key pair                               *
  *                                                                            *
  * Return value:  SUCCEED - the host,key pair was parsed successfully         *
  *                FAIL    - otherwise                                         *
@@ -2776,7 +2778,7 @@ out:
  *                FAIL    - an error occurred                                 *
  *                                                                            *
  * Comments: This function is used to parse the new proxy history data        *
- *           protocol introduced in Zabbix v3.3                               *
+ *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
  ******************************************************************************/
 static int	parse_history_data_33(struct zbx_json_parse *jp_data, const char **pnext, zbx_agent_value_t *values,
@@ -3563,7 +3565,7 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Comments: This function is used to parse the new proxy history data        *
- *           protocol introduced in Zabbix v3.3                               *
+ *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
  ******************************************************************************/
 static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
