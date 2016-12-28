@@ -384,6 +384,7 @@ typedef struct
 	char		*ssl_cert_file;
 	char		*ssl_key_file;
 	char		*ssl_key_password;
+	char		*delay;
 	int		authentication;
 	int		retries;
 	int		verify_peer;

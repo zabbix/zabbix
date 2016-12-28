@@ -361,6 +361,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	char		*err_str = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
+	char		*delay_str;
+	int		delay;
 	zbx_httpstat_t	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
@@ -761,14 +763,35 @@ clean:
 	}
 	DBfree_result(result);
 
-	DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64,
-			ts.sec, httptest->httptest.httptestid);
+	delay_str = zbx_strdup(NULL, httptest->httptest.delay);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON, NULL, 0);
+
+	if (SUCCEED != is_time_suffix(delay_str, &delay))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid update interval \"%s\" configured for web scenario \"%s\""
+				" on host \"%s\"", delay_str, httptest->httptest.name, host->name);
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ZBX_JAN_2038, httptest->httptest.httptestid);
+	}
+	else if (0 > ts.sec + delay)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "nextcheck update causes overflow for web scenario \"%s\" on host \"%s\"",
+				httptest->httptest.name, host->name);
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ZBX_JAN_2038, httptest->httptest.httptestid);
+	}
+	else
+	{
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ts.sec + delay, httptest->httptest.httptestid);
+	}
 
 	if (0 != speed_download_num)
 		speed_download /= speed_download_num;
 
 	process_test_data(httptest->httptest.httptestid, lastfailedstep, speed_download, err_str, &ts);
 
+	zbx_free(delay_str);
 	zbx_free(err_str);
 
 	dc_flush_history();
@@ -809,7 +832,7 @@ int	process_httptests(int httppoller_num, int now)
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.headers,t.agent,"
 				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
-				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host"
+				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host,t.delay"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -881,6 +904,8 @@ int	process_httptests(int httppoller_num, int now)
 
 		httptest.httptest.verify_peer = atoi(row[16]);
 		httptest.httptest.verify_host = atoi(row[17]);
+
+		httptest.httptest.delay = row[18];
 
 		/* add httptest variables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
