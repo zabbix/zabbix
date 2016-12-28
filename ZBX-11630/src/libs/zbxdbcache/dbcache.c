@@ -165,8 +165,6 @@ typedef struct
 	int			history_num;
 	int			trends_num;
 	int			trends_last_cleanup_hour;
-
-	zbx_timespec_t		last_ts;
 }
 ZBX_DC_CACHE;
 
@@ -2243,17 +2241,6 @@ finish:
 	return next_sync;
 }
 
-static void	DCcheck_ns(zbx_timespec_t *ts)
-{
-	if (ts->ns >= 0)
-		return;
-
-	ts->ns = cache->last_ts.ns++;
-	if ((cache->last_ts.ns > 999900000 && cache->last_ts.sec != ts->sec) || cache->last_ts.ns == 1000000000)
-		cache->last_ts.ns = 0;
-	cache->last_ts.sec = ts->sec;
-}
-
 /******************************************************************************
  *                                                                            *
  * local history cache                                                        *
@@ -2863,7 +2850,6 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		(*data)->state = item_value->state;
 		(*data)->ts = item_value->ts;
 		(*data)->flags = item_value->flags;
-		DCcheck_ns(&(*data)->ts);
 	}
 
 	if (ITEM_STATE_NOTSUPPORTED == item_value->state)
