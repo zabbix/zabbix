@@ -1444,3 +1444,16 @@ INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, la
 INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200021, 'Api screen', 1, 1, NULL, 15, 0);
 INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200004, 'Api slide show', 10, 16, 0);
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200000, 0, 0);
+
+-- scripts
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (6,'Api script for update one','/sbin/shutdown -r',2,NULL,6,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (7,'Api script for update two','/sbin/shutdown -r',2,8,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (8,'Api script for delete','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (9,'Api script for delete1','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (10,'Api script for delete2','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (11,'Api script in action','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata) VALUES (18,'Api action with script',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}');
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (33, 18, 1, 0, 1, 1, 0);
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
+INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
+
