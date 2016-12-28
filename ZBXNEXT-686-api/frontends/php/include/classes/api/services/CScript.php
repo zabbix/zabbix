@@ -184,8 +184,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Add scripts.
-	 *
 	 * @param array $scripts
 	 *
 	 * @return array
@@ -206,8 +204,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $scripts
 	 *
 	 * @throws APIException if the input is invalid
@@ -239,8 +235,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Update scripts.
-	 *
 	 * @param array $scripts
 	 *
 	 * @return array
@@ -286,8 +280,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $scripts
 	 * @param array $db_scripts
 	 *
@@ -314,7 +306,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid',
 				'host_access', 'confirmation'
 			],
@@ -392,7 +384,7 @@ class CScript extends CApiService {
 
 		$usrgrpids = array_keys($usrgrpids);
 
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => [],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -428,7 +420,7 @@ class CScript extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = API::getApiService()->select('groups', [
+		$db_groups = DB::select('groups', [
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -442,6 +434,30 @@ class CScript extends CApiService {
 	}
 
 	/**
+	 * Auxiliary function for checkDuplicates().
+	 *
+	 * @param array  $folders
+	 * @param string $name
+	 * @param array  $db_folders
+	 * @param string $db_name
+	 *
+	 * @throws APIException
+	 */
+	private static function checkScriptNames(array $folders, $name, array $db_folders, $db_name) {
+		if (array_slice($folders, 0, count($db_folders)) === $db_folders) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Script menu path "%1$s" already used in script name "%2$s".', $name, $db_name)
+			);
+		}
+
+		if (array_slice($db_folders, 0, count($folders)) === $folders) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Script name "%1$s" already used in menu path for script "%2$s".', $name, $db_name)
+			);
+		}
+	}
+
+	/**
 	 * Check for duplicated scripts.
 	 *
 	 * @param array  $scripts
@@ -451,7 +467,7 @@ class CScript extends CApiService {
 	 * @throws APIException  if global script already exists.
 	 */
 	private function checkDuplicates(array $scripts) {
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name']
 		]);
 
@@ -463,42 +479,34 @@ class CScript extends CApiService {
 		}
 		unset($db_script);
 
+		$ok_scripts = [];
+
 		foreach ($scripts as $script) {
-			$folders = array_map('trim', splitPath($script['name']));
-			$uniq_name = implode('/', $folders);
+			$script['folders'] = array_map('trim', splitPath($script['name']));
+			$uniq_name = implode('/', $script['folders']);
 
 			if (array_key_exists($uniq_name, $uniq_names)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 			}
 			$uniq_names[$uniq_name] = true;
 
+			foreach ($ok_scripts as $ok_script) {
+				self::checkScriptNames($script['folders'], $script['name'], $ok_script['folders'], $ok_script['name']);
+			}
+
 			foreach ($db_scripts as $db_script) {
 				if (array_key_exists('scriptid', $script) && bccomp($script['scriptid'], $db_script['scriptid']) == 0) {
 					continue;
 				}
 
-				if (array_slice($folders, 0, count($db_script['folders'])) === $db_script['folders']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script menu path "%1$s" already used in script name "%2$s".', $script['name'],
-							$db_script['name']
-						)
-					);
-				}
-
-				if (array_slice($db_script['folders'], 0, count($folders)) === $folders) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script name "%1$s" already used in menu path for script "%2$s".', $script['name'],
-							$db_script['name']
-						)
-					);
-				}
+				self::checkScriptNames($script['folders'], $script['name'], $db_script['folders'], $db_script['name']);
 			}
+
+			$ok_scripts[] = $script;
 		}
 	}
 
 	/**
-	 * Delete scripts.
-	 *
 	 * @param array $scriptids
 	 *
 	 * @return array
@@ -514,8 +522,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @param array $scriptids
 	 * @param array $db_scripts
 	 *
@@ -531,7 +537,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name'],
 			'scriptids' => $scriptids,
 			'preservekeys' => true
@@ -565,8 +571,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Execute script.
-	 *
 	 * @param array $data
 	 *
 	 * @return array

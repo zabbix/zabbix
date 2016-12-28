@@ -89,7 +89,7 @@ class CScreenHttpTest extends CScreenBase {
 
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'web.view')
-				->setArgument('groupid', $this->groupid)
+				->setArgument('groupid', $this->data['groupid'])
 				->setArgument('hostid', $this->hostid)
 				->setArgument('fullscreen', $this->data['fullscreen']);
 

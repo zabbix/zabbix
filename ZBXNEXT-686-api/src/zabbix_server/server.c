@@ -761,7 +761,7 @@ int	main(int argc, char **argv)
 	zbx_initialize_events();
 
 #ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
+	zbx_init_ipmi_handler();
 #endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
@@ -1081,7 +1081,7 @@ void	zbx_on_exit(void)
 	zbx_destroy_itservices_lock();
 
 #ifdef HAVE_OPENIPMI
-	free_ipmi_handler();
+	zbx_free_ipmi_handler();
 #endif
 
 #ifdef HAVE_SQLITE3

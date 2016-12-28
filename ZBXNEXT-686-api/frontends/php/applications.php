@@ -82,24 +82,8 @@ if (hasRequest('action')) {
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid')) {
-	$hosts = API::Host()->get([
-		'output' => [],
-		'hostids' => getRequest('hostid'),
-		'editable' => true
-	]);
-
-	if (!$hosts) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'templateids' => getRequest('hostid'),
-			'editable' => true
-		]);
-
-		if (!$templates) {
-			access_deny();
-		}
-	}
+if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
 }
 
 $pageFilter = new CPageFilter([

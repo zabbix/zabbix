@@ -200,7 +200,7 @@ $itemId = getRequest('itemid');
 if ($itemId) {
 	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['status'],
+		'selectHosts' => ['hostid', 'status'],
 		'itemids' => $itemId,
 		'editable' => true
 	]);
@@ -213,7 +213,7 @@ else {
 	$hostId = getRequest('hostid');
 	if ($hostId) {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
+			'output' => ['hostid', 'status'],
 			'hostids' => $hostId,
 			'templated_hosts' => true,
 			'editable' => true
@@ -227,25 +227,8 @@ else {
 if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_groupid')])) {
 	access_deny();
 }
-
-if (getRequest('filter_hostid')) {
-	$hosts = API::Host()->get([
-		'output' => [],
-		'hostids' => getRequest('filter_hostid'),
-		'editable' => true
-	]);
-
-	if (!$hosts) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'templateids' => getRequest('filter_hostid'),
-			'editable' => true
-		]);
-
-		if (!$templates) {
-			access_deny();
-		}
-	}
+if (getRequest('filter_hostid') && !isWritableHostTemplates([getRequest('filter_hostid')])) {
+	access_deny();
 }
 
 if (!empty($hosts)) {

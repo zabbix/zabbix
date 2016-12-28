@@ -43,13 +43,12 @@ check_fields($fields);
  */
 if (hasRequest('iconmapid')) {
 	$iconMap = API::IconMap()->get([
+		'output' => ['iconmapid', 'name', 'default_iconid'],
+		'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
 		'iconmapids' => getRequest('iconmapid'),
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true,
-		'preservekeys' => true,
-		'selectMappings' => API_OUTPUT_EXTEND,
+		'editable' => true
 	]);
-	if (empty($iconMap)) {
+	if (!$iconMap) {
 		access_deny();
 	}
 }
@@ -62,32 +61,22 @@ if (hasRequest('add') || hasRequest('update')) {
 		? $_REQUEST['iconmap']['mappings']
 		: [];
 
-	$i = 0;
-	foreach ($_REQUEST['iconmap']['mappings'] as &$mapping) {
-		$mapping['sortorder'] = $i++;
-	}
-	unset($mapping);
-
 	if (hasRequest('update')) {
 		$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
-		$result = API::IconMap()->update($_REQUEST['iconmap']);
-		$msgOk = _('Icon map updated');
-		$msgErr = _('Cannot update icon map');
+		$result = (bool) API::IconMap()->update($_REQUEST['iconmap']);
+		show_messages($result, _('Icon map updated'), _('Cannot update icon map'));
 	}
 	else {
-		$result = API::IconMap()->create($_REQUEST['iconmap']);
-		$msgOk = _('Icon map created');
-		$msgErr = _('Cannot create icon map');
+		$result = (bool) API::IconMap()->create($_REQUEST['iconmap']);
+		show_messages($result, _('Icon map created'), _('Cannot create icon map'));
 	}
-
-	show_messages($result, $msgOk, $msgErr);
 
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
 }
 elseif (hasRequest('delete')) {
-	$result = API::IconMap()->delete([getRequest('iconmapid')]);
+	$result = (bool) API::IconMap()->delete([getRequest('iconmapid')]);
 
 	if ($result) {
 		unset($_REQUEST['form']);
