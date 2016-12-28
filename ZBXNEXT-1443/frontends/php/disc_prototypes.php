@@ -434,7 +434,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		else {
 			$item['applications'] = $applications;
 			$item['applicationPrototypes'] = $application_prototypes;
-			$item['preprocessing'] = $preprocessing;
+
+			if ($preprocessing) {
+				$item['preprocessing'] = $preprocessing;
+			}
 
 			$result = API::ItemPrototype()->create($item);
 		}
