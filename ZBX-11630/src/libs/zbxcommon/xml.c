@@ -72,23 +72,23 @@ void	xml_free_data_dyn(char **data)
  * Purpose: replace <> symbols in string with &lt;&gt; so the resulting       *
  *          string can be written into xml field                              *
  *                                                                            *
- * Parameters: in     - [IN] the input string                                 *
+ * Parameters: data - [IN] the input string                                   *
  *                                                                            *
- * Return value: An allocated string containing escaped input string          *
+ * Return value: an allocated string containing escaped input string          *
  *                                                                            *
  * Comments: The caller must free the returned string after it has been used. *
  *                                                                            *
  ******************************************************************************/
-char	*xml_escape_dyn(const char *in)
+char	*xml_escape_dyn(const char *data)
 {
 	char		*out, *ptr_out;
 	const char	*ptr_in;
 	int		size = 0;
 
-	if (NULL == in)
+	if (NULL == data)
 		return zbx_strdup(NULL, "");
 
-	for (ptr_in = in; '\0' != *ptr_in; ptr_in++)
+	for (ptr_in = data; '\0' != *ptr_in; ptr_in++)
 	{
 		switch (*ptr_in)
 		{
@@ -111,7 +111,7 @@ char	*xml_escape_dyn(const char *in)
 
 	out = zbx_malloc(NULL, size);
 
-	for (ptr_out = out, ptr_in = in; '\0' != *ptr_in; ptr_in++)
+	for (ptr_out = out, ptr_in = data; '\0' != *ptr_in; ptr_in++)
 	{
 		switch (*ptr_in)
 		{
