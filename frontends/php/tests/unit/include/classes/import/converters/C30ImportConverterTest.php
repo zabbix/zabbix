@@ -39,7 +39,7 @@ class C30ImportConverterTest extends CImportConverterTest {
 												[
 													'description' => 'trigger2',
 													'expression' => '{Template:item2.last()}',
-													'recovery_expression' => '',
+													'recovery_expression' => ''
 												]
 											],
 											'tags' => [],
@@ -66,7 +66,7 @@ class C30ImportConverterTest extends CImportConverterTest {
 												[
 													'description' => 'trigger2',
 													'expression' => '{host:item2.last()}',
-													'recovery_expression' => '',
+													'recovery_expression' => ''
 												]
 											],
 											'tags' => [],
