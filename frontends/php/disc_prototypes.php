@@ -135,7 +135,8 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({type}) && ({type} == 2)'
 	],
 	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 0'
+		'(isset({add}) || isset({update})) && isset({value_type}) && '.
+		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 	],
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'
