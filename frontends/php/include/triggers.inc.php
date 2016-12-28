@@ -797,7 +797,11 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 			$ack = null;
 
 			if ($config['event_ack_enable']) {
-				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
+				$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
+
+				if ($event) {
+					$event = reset($event);
+
 					if ($screenid !== null) {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
@@ -2156,4 +2160,33 @@ function makeTriggersHostsList(array $triggers_hosts) {
 	unset($hosts);
 
 	return $triggers_hosts;
+}
+
+/**
+ * Get last problems by given trigger IDs.
+ *
+ * @param array $triggerids
+ * @param array $output         List of output fields.
+ *
+ * @return array
+ */
+function getTriggerLastProblems(array $triggerids, array $output) {
+	$problems = DBfetchArray(DBselect(
+		'SELECT '.implode(',e.', $output).
+		' FROM events e'.
+		' JOIN ('.
+			'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
+			' FROM events e2'.
+			' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
+				' AND e2.object='.EVENT_OBJECT_TRIGGER.
+				' AND e2.value='.TRIGGER_VALUE_TRUE.
+				' AND '.dbConditionInt('e2.objectid', $triggerids).
+			' GROUP BY e2.source,e2.object,e2.objectid'.
+		') e3 ON e3.source=e.source'.
+			' AND e3.object=e.object'.
+			' AND e3.objectid=e.objectid'.
+			' AND e3.clock=e.clock'
+	));
+
+	return $problems;
 }
