@@ -32,15 +32,12 @@
  *                                                                            *
  * Purpose: check condition event tag                                         *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - supported operator                                 *
- *               NOTSUPPORTED - not supported operator                        *
- *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
+static void	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	i, ret, ret_continue;
 
@@ -70,8 +67,6 @@ static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION 
 		if (SUCCEED == ret)
 			zbx_vector_uint64_append(&condition->objectids, event->objectid);
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -80,15 +75,12 @@ static int	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION 
  *                                                                            *
  * Purpose: check condition event tag value                                   *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - supported operator                                 *
- *               NOTSUPPORTED - not supported operator                        *
- *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
+static void	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
 {
 	int	i, ret, ret_continue;
 
@@ -119,8 +111,6 @@ static int	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_COND
 		if (SUCCEED == ret)
 			zbx_vector_uint64_append(&condition->objectids, event->objectid);
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -154,8 +144,8 @@ static void	get_object_ids(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *ob
  *                                                                            *
  * Purpose: check host group condition                                        *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -227,8 +217,8 @@ static int	check_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
  *                                                                            *
  * Purpose: check maintenance condition                                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -289,8 +279,8 @@ static int	check_maintenance_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
  *                                                                            *
  * Purpose: check host condition                                              *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -355,8 +345,8 @@ static int	check_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *cond
  *                                                                            *
  * Purpose: check application condition                                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -664,10 +654,10 @@ static void	check_object_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_ui
  *                                                                            *
  * Function: check_trigger_id_condition                                       *
  *                                                                            *
- * Purpose: check trigger type condition                                      *
+ * Purpose: check trigger id condition                                        *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -805,8 +795,8 @@ static void	trigger_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_
  *                                                                            *
  * Purpose: check host template condition                                     *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -871,10 +861,10 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
  *                                                                            *
  * Function: check_trigger_name_condition                                     *
  *                                                                            *
- * Purpose: check trigger name condition                                     *
+ * Purpose: check trigger name condition                                      *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -927,8 +917,8 @@ static int	check_trigger_name_condition(zbx_vector_ptr_t *esc_events, DB_CONDITI
  *                                                                            *
  * Purpose: check trigger severity condition                                  *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -983,8 +973,8 @@ static int	check_trigger_severity_condition(zbx_vector_ptr_t *esc_events, DB_CON
  *                                                                            *
  * Purpose: check time period condition                                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1028,8 +1018,8 @@ static int	check_time_period_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
  *                                                                            *
  * Purpose: check acknowledged condition                                      *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1080,13 +1070,14 @@ static int	check_acknowledged_condition(zbx_vector_ptr_t *esc_events, DB_CONDITI
  *                                                                            *
  * Function: check_trigger_condition                                          *
  *                                                                            *
- * Purpose: check if events match single condition                            *
+ * Purpose: check if multiple events match single condition                   *
  *                                                                            *
- * Parameters: esc_events [IN]     - events to check                          *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match, FAIL - otherwise               *
+ * Return value: SUCCEED - successfully checked                               *
+ *               FAIL    - unsupported operator or condition                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -1140,11 +1131,13 @@ static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
 	}
 	else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
 	{
-		ret = check_condition_event_tag(esc_events, condition);
+		check_condition_event_tag(esc_events, condition);
+		ret = SUCCEED;
 	}
 	else if (CONDITION_TYPE_EVENT_TAG_VALUE == condition->conditiontype)
 	{
-		ret = check_condition_event_tag_value(esc_events, condition);
+		check_condition_event_tag_value(esc_events, condition);
+		ret = SUCCEED;
 	}
 	else
 	{
@@ -1293,8 +1286,8 @@ static int	check_drule_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *con
  *                                                                            *
  * Purpose: check discovery check condition                                   *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1366,8 +1359,8 @@ static int	check_dcheck_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *co
  *                                                                            *
  * Purpose: check discovery object condition                                  *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1404,10 +1397,10 @@ static int	check_dobject_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  *                                                                            *
  * Function: check_proxy_condition                                            *
  *                                                                            *
- * Purpose: check discovered proxy condition                                  *
+ * Purpose: check proxy condition for discovery event                         *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1499,8 +1492,8 @@ static int	check_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *con
  *                                                                            *
  * Purpose: check discovery value condition                                   *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1598,10 +1591,10 @@ static int	check_dvalue_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *co
  *                                                                            *
  * Function: check_dhost_ip_condition                                         *
  *                                                                            *
- * Purpose: check discovered host ip condition                                *
+ * Purpose: check host ip condition for discovery event                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1688,10 +1681,10 @@ static int	check_dhost_ip_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *
  *                                                                            *
  * Function: check_dservice_type_condition                                    *
  *                                                                            *
- * Purpose: check discovered service type condition                           *
+ * Purpose: check service type condition for discovery event                  *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1771,8 +1764,8 @@ static int	check_dservice_type_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
  *                                                                            *
  * Purpose: check discovery status condition                                  *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1816,8 +1809,8 @@ static int	check_dstatus_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  *                                                                            *
  * Purpose: check uptime condition for discovery                              *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1912,8 +1905,8 @@ static int	check_duptime_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  *                                                                            *
  * Purpose: check service port condition for discovery                        *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -1985,13 +1978,14 @@ static int	check_dservice_port_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
  *                                                                            *
  * Function: check_discovery_condition                                        *
  *                                                                            *
- * Purpose: check if events match single condition                            *
+ * Purpose: check if discovery events match single condition                  *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match, FAIL - otherwise               *
+ * Return value: SUCCEED - successfully checked                               *
+ *               FAIL    - unsupported operator or condition                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -2067,8 +2061,8 @@ static int	check_discovery_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION 
  *                                                                            *
  * Purpose: check metadata or host condition for auto registration            *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2138,8 +2132,8 @@ static int	check_hostname_metadata_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Purpose: check proxy condition for auto registration                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2205,13 +2199,14 @@ static int	check_areg_proxy_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
  *                                                                            *
  * Function: check_auto_registration_condition                                *
  *                                                                            *
- * Purpose: check if events match single condition                            *
+ * Purpose: check if auto registration events match single condition          *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match, FAIL - otherwise               *
+ * Return value: SUCCEED - successfully checked                               *
+ *               FAIL    - unsupported operator or condition                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -2282,8 +2277,8 @@ static int	is_supported_event_object(const DB_EVENT *event)
  *                                                                            *
  * Purpose: check event type condition for internal events                    *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2374,8 +2369,8 @@ static void	get_object_ids_internal(zbx_vector_ptr_t *esc_events, zbx_vector_uin
  *                                                                            *
  * Purpose: check host group condition for internal events                    *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2415,7 +2410,7 @@ static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CO
 		if (0 == objectids[i].values_num)
 			continue;
 
-		if (0 == i)
+		if (0 == i)	/* EVENT_OBJECT_TRIGGER */
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct t.triggerid"
@@ -2534,8 +2529,8 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
  *                                                                            *
  * Purpose: check host template condition for internal events                 *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2576,7 +2571,7 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
 
 		objectids_to_pair(objectids_ptr, objectids_pair_ptr);
 
-		if (0 == i)
+		if (0 == i)	/* EVENT_OBJECT_TRIGGER */
 			trigger_parents_sql_alloc(&sql, &sql_alloc, objectids_ptr);
 		else
 			item_parents_sql_alloc(&sql, &sql_alloc, objectids_ptr);
@@ -2620,8 +2615,8 @@ static int	check_intern_host_template_condition(zbx_vector_ptr_t *esc_events, DB
  *                                                                            *
  * Purpose: check host condition for internal events                          *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2664,7 +2659,7 @@ static int	check_intern_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
 		if (0 == objectids[i].values_num)
 			continue;
 
-		if (0 == i)
+		if (0 == i)	/* EVENT_OBJECT_TRIGGER */
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct t.triggerid"
@@ -2718,8 +2713,8 @@ static int	check_intern_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
  *                                                                            *
  * Purpose: check application condition for internal events                   *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported operator                                 *
@@ -2751,7 +2746,7 @@ static int	check_intern_application_condition(zbx_vector_ptr_t *esc_events, DB_C
 		if (0 == objectids[i].values_num)
 			continue;
 
-		if (0 == i)
+		if (0 == i)	/* EVENT_OBJECT_TRIGGER */
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct t.triggerid,a.name"
@@ -2827,11 +2822,13 @@ static int	check_intern_application_condition(zbx_vector_ptr_t *esc_events, DB_C
  *                                                                            *
  * Purpose: check if internal events match single condition                   *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - at least one match, FAIL - otherwise               *
+ * Return value: SUCCEED - successfully checked                               *
+ *               FAIL    - unsupported operator or condition                  *
+ *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	check_internal_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *condition)
@@ -2886,11 +2883,10 @@ static int	check_internal_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *
  *                                                                            *
  * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             source     [IN]  - specific event source that need checking    *
- *             condition  [IN/OUT] - condition for matching, outputs          *
- *                                  event ids that match condition            *
- *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             source     - [IN] specific event source that need checking     *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -2931,11 +2927,10 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
  * Purpose: check if multiple events matches multiple conditions              *
  *                                                                            *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             source     [IN] - specific event source that need checking     *
- *                                                                            *
- *             condition  [IN/OUT] - condition for matching, outputs event ids*
- *                                   that match condition                     *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             source     - [IN] specific event source that need checking     *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
  ******************************************************************************/
 static void	check_events_conditions(zbx_vector_ptr_t *esc_events, zbx_hashset_t *uniq_conditions)
@@ -2963,7 +2958,7 @@ static void	check_events_conditions(zbx_vector_ptr_t *esc_events, zbx_hashset_t 
  *                                                                            *
  * Purpose: each condition must store event ids that match condition          *
  *                                                                            *
- * Parameters: uniq_conditions [IN/OUT] - conditions that need vectors to be  *
+ * Parameters: uniq_conditions - [IN/OUT] conditions that need vectors to be  *
  *                                        created                             *
  ******************************************************************************/
 static void	conditions_vectors_create(zbx_hashset_t *uniq_conditions)
