@@ -1386,8 +1386,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		zbx_free(*error);
 	}
 
-	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
-			vmware_service_objects[service->type].session_manager,
+	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
 			username_esc, password_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
@@ -1506,12 +1505,12 @@ static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_
 
 	const char	*__function_name = "vmware_service_get_perfcounter_refreshrate";
 
-	char		tmp[MAX_STRING_LEN], *value = NULL, *id_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	id_esc  = xml_escape_dyn(id);
+	id_esc = xml_escape_dyn(id);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
@@ -1998,7 +1997,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	const char	*__function_name = "vmware_service_get_vm_data";
 
-	char		tmp[MAX_STRING_LEN], *vmid_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *vmid_esc;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
@@ -2136,7 +2135,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value, *id_esc = NULL;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value, *id_esc;
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
 
@@ -2230,7 +2229,7 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		char **data, char **error)
 {
-#	define ZBX_POST_hv_DETAILS 								\
+#	define ZBX_POST_HV_DETAILS 								\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrieveProperties>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
@@ -2257,21 +2256,21 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_data";
 
-	char		tmp[MAX_STRING_LEN], *hvid_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *hvid_esc;
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
 
 	hvid_esc = xml_escape_dyn(hvid);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_hv_DETAILS,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS,
 			vmware_service_objects[service->type].property_collector, hvid_esc);
 
 	zbx_free(hvid_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -2540,14 +2539,14 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_list";
 
-	char		tmp[MAX_STRING_LEN], *token_esc = NULL;
+	char		tmp[MAX_STRING_LEN];
 	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
 	{
-		char	*token, *token_xpath = NULL;
+		char	*token, *token_esc, *token_xpath = NULL;
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
 		{
@@ -2591,16 +2590,14 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 			{
-				*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt,
+				*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt,
 						curl_easy_strerror(err));
 				goto out;
 			}
 		}
 	}
 	else
-	{
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
-	}
 
 	ret = SUCCEED;
 out:
@@ -2706,7 +2703,7 @@ static int	vmware_service_destroy_event_session(const zbx_vmware_service_t *serv
 	const char	*__function_name = "vmware_service_destroy_event_session";
 
 	int		err, opt, ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *event_session_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *event_session_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2778,7 +2775,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	const char	*__function_name = "vmware_service_get_event_data";
 
-	char		tmp[MAX_STRING_LEN], *event_session = NULL, *event_session_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *event_session = NULL, *event_session_esc;
 	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event_session:'%s'", __function_name, event_session);
@@ -3038,7 +3035,7 @@ static int	vmware_service_get_cluster_status(const zbx_vmware_service_t *service
 
 	const char	*__function_name = "vmware_service_get_cluster_status";
 
-	char		tmp[MAX_STRING_LEN], *clusterid_esc = NULL;
+	char		tmp[MAX_STRING_LEN], *clusterid_esc;
 	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __function_name, clusterid);
@@ -3384,7 +3381,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -3679,7 +3676,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
-		error = zbx_dsprintf(error, "cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -3742,7 +3739,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_hashset_iter_reset(&service->entities, &iter);
 	while (NULL != (entity = zbx_hashset_iter_next(&iter)))
 	{
-		char *id_esc = NULL;
+		char	*id_esc;
 
 		if (0 == entity->refresh)
 		{
@@ -3785,7 +3782,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		error = zbx_dsprintf(error, "dannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
