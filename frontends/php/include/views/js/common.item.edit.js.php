@@ -33,7 +33,7 @@
 					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
-				(new CNumericBox('preprocessing[#{rowNum}][params][0]', '', 255, false, true))
+				(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 					->setAttribute('placeholder', _('number')),
 				(new CTextBox('preprocessing[#{rowNum}][params][1]'))
 					->setAttribute('placeholder', _('output'))
@@ -119,9 +119,7 @@
 						case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('number') ?>')
-								.attr('onchange', 'validateNumericBox(this, true, true);')
-								.attr('style', 'text-align: right;');
+								.attr('placeholder', '<?= _('number') ?>');
 							$(inputs[1]).hide();
 							break;
 
@@ -130,18 +128,14 @@
 						case '<?= ZBX_PREPROC_TRIM ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('list of characters') ?>')
-								.removeAttr('onchange')
-								.removeAttr('style');
+								.attr('placeholder', '<?= _('list of characters') ?>');
 							$(inputs[1]).hide();
 							break;
 
 						case '<?= ZBX_PREPROC_REGSUB ?>':
 							$(inputs[0])
 								.show()
-								.attr('placeholder', '<?= _('pattern') ?>')
-								.removeAttr('onchange')
-								.removeAttr('style');
+								.attr('placeholder', '<?= _('pattern') ?>');
 							$(inputs[1]).show();
 							break;
 
