@@ -50,6 +50,7 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
 	'common.js' => '',
+	'dashboard.grid.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
