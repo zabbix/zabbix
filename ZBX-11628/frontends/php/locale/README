@@ -1,0 +1,24 @@
+This directory holds Zabbix translations and helper scripts to work with them.
+
+If you have checked out this copy of frontend from svn and want to access
+ translations, run make_mo.sh .
+
+Working msgfmt and find are required. This script will generate mo files for all
+ translations.
+
+If you want to update po files with new strings in the sourcefile, run
+ update_po.sh . It will gather translatable strings from all files that end with
+ ".php"
+
+If you want to start translating in a new language, run add_new_language.sh and
+ pass language code as the only argument, for example:
+
+  $ ./add_new_language.sh et
+
+It's important to check and make sure that "Plural-Forms" value is set correctly.
+
+For this script language template is needed. Running update_po.sh will generate
+ one as frontend.pot (which add_new_language.sh requires).
+
+After new language po file has been created, need to add the language codes to 
+ PHP code in include/locales.inc.php file.
