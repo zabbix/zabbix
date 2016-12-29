@@ -817,11 +817,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($expressions_changed) {
 				$this->checkTriggerExpressions($trigger);
-
-				// If the expression has changed, revalidate the existing dependencies.
-				if (!array_key_exists('dependencies', $trigger)) {
-					$trigger['dependencies'] = $_db_trigger['dependencies'];
-				}
 			}
 
 			if ($expressions_changed || $trigger['description'] !== $_db_trigger['description']) {
