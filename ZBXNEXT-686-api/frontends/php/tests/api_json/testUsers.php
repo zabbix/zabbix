@@ -36,43 +36,6 @@ class testUsers extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "passwd" is missing.'
 			],
-			// Check readonly parameter.
-			[
-				'user' => [
-					'alias' => 'Unexpected parameter attempt_clock',
-					'passwd' => 'zabbix',
-					'attempt_clock' => '0',
-					'usrgrps' => [
-						['usrgrpid' => 7]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_clock".'
-			],
-			[
-				'user' => [
-					'alias' => 'Unexpected parameter attempt_failed',
-					'passwd' => 'zabbix',
-					'attempt_failed' => '3',
-					'usrgrps' => [
-						['usrgrpid' => 7]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_failed".'
-			],
-			[
-				'user' => [
-					'alias' => 'Unexpected parameter attempt_ip',
-					'passwd' => 'zabbix',
-					'attempt_ip' => '127.0.0.1',
-					'usrgrps' => [
-						['usrgrpid' => 7]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_ip".'
-			],
 			// Check user alias.
 			[
 				'user' => [
@@ -222,6 +185,457 @@ class testUsers extends CZabbixTest {
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
+			],
+			// Check successfully creation of user.
+			[
+				'user' => [
+					[
+						'alias' => 'Api user create 1',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'alias' => 'УТФ Юзер',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'alias' => 'Api user create with media',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'user_medias' => [
+							[
+								'mediatypeid' => '1',
+								'sendto' => 'api@zabbix.com',
+							]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	* @dataProvider user_create
+	*/
+	public function testUsers_Create($user, $success_expected, $expected_error) {
+		$result = $this->api_acall('user.create', $user, $debug);
+
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+			
+			foreach ($result['result']['userids'] as $key => $id) {
+				$dbResultUser = DBSelect('select * from users where userid='.$id);
+				$dbRowUser = DBFetch($dbResultUser);
+				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
+				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
+				$this->assertEquals($dbRowUser['name'], '');
+				$this->assertEquals($dbRowUser['surname'], '');
+				$this->assertEquals($dbRowUser['autologin'], 0);
+				$this->assertEquals($dbRowUser['autologout'], 900);
+				$this->assertEquals($dbRowUser['lang'], 'en_GB');
+				$this->assertEquals($dbRowUser['refresh'], 30);
+				$this->assertEquals($dbRowUser['rows_per_page'], 50);
+				$this->assertEquals($dbRowUser['theme'], 'default');
+				$this->assertEquals($dbRowUser['url'], '');
+
+				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
+				
+				if (array_key_exists('user_medias', $user[$key])) {
+					$dbResultMedia = DBSelect('select * from media where userid='.$id);
+					$dbRowMedia = DBFetch($dbResultMedia);
+					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
+					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
+					$this->assertEquals($dbRowMedia['active'], 0);
+					$this->assertEquals($dbRowMedia['severity'], 63);
+					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
+				} 
+				else {
+					$dbResultGroup = 'select * from media where userid='.$id;
+					$this->assertEquals(0, DBcount($dbResultGroup));
+				}
+			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
+		}
+	}
+
+	public static function user_update() {
+		return [
+			// Check user id.
+			[
+				'user' => [
+					'alias' => 'Api user update without userid'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": the parameter "userid" is missing.'
+			],
+			[
+				'user' => [
+					'alias' => 'Api user update with empty userid',
+					'userid' => ''
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
+			],
+			[
+				'user' => [
+					'alias' => 'Api user update with nonexistent userid',
+					'userid' => '1.1'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
+			],
+			[
+				'user' => [
+					'alias' => 'Api user update with nonexistent userid',
+					'userid' => 'abc'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
+			],
+			[
+				'user' => [
+					'alias' => 'Api user update with nonexistent userid',
+					'userid' => '123456'
+				],
+				'success_expected' => false,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Check user password.
+			[
+				'user' => [
+					'userid' => '2',
+					'passwd' => 'zabbix'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Not allowed to set password for user "guest".'
+			],
+			// Check user alias.
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => ''
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
+			],
+			[
+				'user' => [
+					'userid' => '2',
+					'alias' => 'Try rename guest'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Cannot rename guest user.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'Admin'
+				],
+				'success_expected' => false,
+				'expected_error' => 'User with alias "Admin" already exists.'
+			],
+			[
+				'user' => [
+					[
+						'userid' => '9',
+						'alias' => 'Api update users with the same names'
+					],
+					[
+						'userid' => '9',
+						'alias' => 'Api update users with the same names'
+					],
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
+			],
+			// Check user group.
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User without group',
+					'usrgrps' => [
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'Group unexpected parameter',
+					'usrgrps' => [
+						['userid' => '1']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1": unexpected parameter "userid".'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User with empty group id',
+					'usrgrps' => [
+						['usrgrpid' => '']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User group id not number',
+					'usrgrps' => [
+						['usrgrpid' => 'abc']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User group id not valid',
+					'usrgrps' => [
+						['usrgrpid' => '1.1']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User with nonexistent group id',
+					'usrgrps' => [
+						['usrgrpid' => '123456']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'User group with ID "123456" is not available.'
+			],
+			[
+				'user' => [
+					'userid' => '9',
+					'alias' => 'User with two identical user group id',
+					'usrgrps' => [
+						['usrgrpid' => '7'],
+						['usrgrpid' => '7']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
+			],
+			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
+			[
+				'user' => [
+					'userid' => '1',
+					'alias' => 'Try add user to group with disabled GUI access',
+					'usrgrps' => [
+						['usrgrpid' => '12']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+			],
+			[
+				'user' => [
+					'userid' => '1',
+					'alias' => 'Try add user to a disabled group',
+					'usrgrps' => [
+						['usrgrpid' => '9']
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+			],
+			// Check user properties, super-admin user type.
+			[
+				'user' => [
+					'userid' => '1',
+					'alias' => 'Try to change super-admin user type',
+					'type' => '2'
+				],
+				'success_expected' => false,
+				'expected_error' => 'User cannot change their user type.'
+			],
+			// Successfully user update.
+			[
+				'user' => [
+					[
+						'userid' => '9',
+						'alias' => 'Api user updated',
+						'passwd' => 'zabbix1',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'userid' => '9',
+						'alias' => 'УТФ Юзер обновлённ',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'userid' => '9',
+						'alias' => 'Api user update with media',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'user_medias' => [
+							[
+								'mediatypeid' => '1',
+								'sendto' => 'api@zabbix.com',
+							]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	* @dataProvider user_update
+	*/
+	public function testUsers_Update($user, $success_expected, $expected_error) {
+		$result = $this->api_acall('user.update', $user, $debug);
+
+		if ($success_expected) {
+			$this->assertTrue(array_key_exists('result', $result));
+			$this->assertFalse(array_key_exists('error', $result));
+
+			foreach ($result['result']['userids'] as $key => $id) {
+				$dbResultUser = DBSelect('select * from users where userid='.$id);
+				$dbRowUser = DBFetch($dbResultUser);
+				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
+				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
+				$this->assertEquals($dbRowUser['name'], '');
+				$this->assertEquals($dbRowUser['surname'], '');
+				$this->assertEquals($dbRowUser['autologin'], 0);
+				$this->assertEquals($dbRowUser['autologout'], 900);
+				$this->assertEquals($dbRowUser['lang'], 'en_GB');
+				$this->assertEquals($dbRowUser['refresh'], 30);
+				$this->assertEquals($dbRowUser['rows_per_page'], 50);
+				$this->assertEquals($dbRowUser['theme'], 'default');
+				$this->assertEquals($dbRowUser['url'], '');
+
+				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
+
+				if (array_key_exists('user_medias', $user[$key])) {
+					$dbResultMedia = DBSelect('select * from media where userid='.$id);
+					$dbRowMedia = DBFetch($dbResultMedia);
+					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
+					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
+					$this->assertEquals($dbRowMedia['active'], 0);
+					$this->assertEquals($dbRowMedia['severity'], 63);
+					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
+				}
+				else {
+					$dbResultGroup = 'select * from media where userid='.$id;
+					$this->assertEquals(0, DBcount($dbResultGroup));
+				}
+			}
+		}
+		else {
+			$this->assertFalse(array_key_exists('result', $result));
+			$this->assertTrue(array_key_exists('error', $result));
+
+			$this->assertSame($expected_error, $result['error']['data']);
+		}
+	}
+
+	public static function user_properties() {
+		return [
+			// Check readonly parameter.
+			[
+				'user' => [
+					'alias' => 'Unexpected parameter attempt_clock',
+					'passwd' => 'zabbix',
+					'attempt_clock' => '0',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_clock".'
+			],
+			[
+				'user' => [
+					'alias' => 'Unexpected parameter attempt_failed',
+					'passwd' => 'zabbix',
+					'attempt_failed' => '3',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_failed".'
+			],
+			[
+				'user' => [
+					'alias' => 'Unexpected parameter attempt_ip',
+					'passwd' => 'zabbix',
+					'attempt_ip' => '127.0.0.1',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_ip".'
 			],
 			// Check user properties, name and surname.
 			[
@@ -906,977 +1320,10 @@ class testUsers extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
 			],
-			// Check successfully creation of user.
+			// Successfully user update and create with all parameters.
 			[
 				'user' => [
-					[
-						'alias' => 'Api user create 1',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'alias' => 'УТФ Юзер',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'alias' => 'Api user create with media',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'user_medias' => [
-							[
-								'mediatypeid' => '1',
-								'sendto' => 'api@zabbix.com',
-							]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider user_create
-	*/
-	public function testUsers_Create($user, $success_expected, $expected_error) {
-		$result = $this->api_acall('user.create', $user, $debug);
-
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-			
-			foreach ($result['result']['userids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from users where userid='.$id);
-				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
-				$this->assertEquals($dbRowUser['name'], '');
-				$this->assertEquals($dbRowUser['surname'], '');
-				$this->assertEquals($dbRowUser['autologin'], 0);
-				$this->assertEquals($dbRowUser['autologout'], 900);
-				$this->assertEquals($dbRowUser['lang'], 'en_GB');
-				$this->assertEquals($dbRowUser['refresh'], 30);
-				$this->assertEquals($dbRowUser['rows_per_page'], 50);
-				$this->assertEquals($dbRowUser['theme'], 'default');
-				$this->assertEquals($dbRowUser['url'], '');
-
-				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
-				$this->assertEquals(1, DBcount($dbResultGroup));
-				
-				if (array_key_exists('user_medias', $user[$key])) {
-					$dbResultMedia = DBSelect('select * from media where userid='.$id);
-					$dbRowMedia = DBFetch($dbResultMedia);
-					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
-					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
-					$this->assertEquals($dbRowMedia['active'], 0);
-					$this->assertEquals($dbRowMedia['severity'], 63);
-					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
-				} 
-				else {
-					$dbResultGroup = 'select * from media where userid='.$id;
-					$this->assertEquals(0, DBcount($dbResultGroup));
-				}
-			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertSame($expected_error, $result['error']['data']);
-		}
-	}
-
-	public static function user_update() {
-		return [
-			// Check user id.
-			[
-				'user' => [
-					'alias' => 'Api user update without userid'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": the parameter "userid" is missing.'
-			],
-			[
-				'user' => [
-					'alias' => 'Api user update with empty userid',
-					'userid' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
-			],
-			[
-				'user' => [
-					'alias' => 'Api user update with nonexistent userid',
-					'userid' => '1.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
-			],
-			[
-				'user' => [
-					'alias' => 'Api user update with nonexistent userid',
-					'userid' => 'abc'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
-			],
-			[
-				'user' => [
-					'alias' => 'Api user update with nonexistent userid',
-					'userid' => '123456'
-				],
-				'success_expected' => false,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// Check user password.
-			[
-				'user' => [
-					'userid' => '2',
-					'passwd' => 'zabbix'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Not allowed to set password for user "guest".'
-			],
-			// Check readonly parameter.
-			[
-				'user' => [
-					'userid' => '2',
-					'alias' => 'Unexpected parameter attempt_clock',
-					'attempt_clock' => '0'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_clock".'
-			],
-			[
-				'user' => [
-					'userid' => '2',
-					'alias' => 'Unexpected parameter attempt_failed',
-					'attempt_failed' => '3'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_failed".'
-			],
-			[
-				'user' => [
-					'userid' => '2',
-					'alias' => 'Unexpected parameter attempt_ip',
-					'attempt_ip' => '127.0.0.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "attempt_ip".'
-			],
-			// Check user alias.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
-			],
-			[
-				'user' => [
-					'userid' => '2',
-					'alias' => 'Try rename guest'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Cannot rename guest user.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'Admin'
-				],
-				'success_expected' => false,
-				'expected_error' => 'User with alias "Admin" already exists.'
-			],
-			[
-				'user' => [
-					[
-						'userid' => '9',
-						'alias' => 'Api update users with the same names'
-					],
-					[
-						'userid' => '9',
-						'alias' => 'Api update users with the same names'
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
-			],
-			// Check user group.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User without group',
-					'usrgrps' => [
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'Group unexpected parameter',
-					'usrgrps' => [
-						['userid' => '1']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps/1": unexpected parameter "userid".'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty group id',
-					'usrgrps' => [
-						['usrgrpid' => '']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User group id not number',
-					'usrgrps' => [
-						['usrgrpid' => 'abc']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User group id not valid',
-					'usrgrps' => [
-						['usrgrpid' => '1.1']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with nonexistent group id',
-					'usrgrps' => [
-						['usrgrpid' => '123456']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'User group with ID "123456" is not available.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with two identical user group id',
-					'usrgrps' => [
-						['usrgrpid' => '7'],
-						['usrgrpid' => '7']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
-			],
-			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
-			[
-				'user' => [
-					'userid' => '1',
-					'alias' => 'Try add user to group with disabled GUI access',
-					'usrgrps' => [
-						['usrgrpid' => '12']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
-			],
-			[
-				'user' => [
-					'userid' => '1',
-					'alias' => 'Try add user to a disabled group',
-					'usrgrps' => [
-						['usrgrpid' => '9']
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
-			],
-			// Check user properties, name and surname.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with long name',
-					'name' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with long surname',
-					'surname' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/surname": value is too long.'
-			],
-			// Check user properties, autologin.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid autologin',
-					'autologin' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologin": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'autologin' => '2'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologin": value must be one of 0, 1.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'autologin' => '-1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologin": value must be one of 0, 1.'
-			],
-			// Check user properties, autologout.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid autologout',
-					'autologout' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid autologout',
-					'autologout' => '10001'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-10000.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'autologout' => '1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-10000.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'autologout' => '89'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-10000.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with autologout and autologin together',
-					'autologout' => '90',
-					'autologin' => '1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Auto-login and auto-logout options cannot be enabled together.'
-			],
-			// Check user properties, lang.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty lang',
-					'lang' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/lang": cannot be empty.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid lang',
-					'lang' => '123456'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/lang": value is too long.'
-			],
-			// Check user properties, theme.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty theme',
-					'theme' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid theme',
-					'theme' => 'classic'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'theme' => 'originalblue'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of default, blue-theme, dark-theme.'
-			],
-			// Check user properties, type.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty type',
-					'type' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid type',
-					'type' => '0'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'type' => '1.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '1',
-					'alias' => 'Try to change super-admin user type',
-					'type' => '2'
-				],
-				'success_expected' => false,
-				'expected_error' => 'User cannot change their user type.'
-			],
-			// Check user properties, refresh.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty refresh',
-					'refresh' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/refresh": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'refresh' => '3601'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'refresh' => '1.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/refresh": a number is expected.'
-			],
-			// Check user properties, rows_per_page.
-			[
-				'user' => [
-					'userid' => '9',
-					'rows_per_page' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rows_per_page": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'rows_per_page' => '0'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'rows_per_page' => '1000000'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
-			],
-			// Check user media, mediatypeid.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User without user_medias properties',
-					'user_medias' => [[ ]],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "mediatypeid" is missing.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty mediatypeid',
-					'user_medias' => [
-						[
-							'mediatypeid' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid mediatypeid',
-					'user_medias' => [
-						[
-							'mediatypeid' => '1.1'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with nonexistent media type id',
-					'user_medias' => [
-						[
-							'mediatypeid' => '10',
-							'sendto' => 'api@zabbix.com'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Media type with ID "10" is not available.'
-			],
-			// Check user media, sendto.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User without sendto',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "sendto" is missing.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty sendto',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto": cannot be empty.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with long sendto',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto": value is too long.'
-			],
-			// Check user media, active.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty active',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'active' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'active' => '1.1'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'active' => '2'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": value must be one of 0, 1.'
-			],
-			// Check user media, severity.
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'severity' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": a number is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'severity' => '64'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": value must be one of 0-63.'
-			],
-			// Check user media, period.
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with empty period',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => ''
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": cannot be empty.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with string period',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => 'test'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid period, without comma',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-7 00:00-24:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid period, with two comma',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-5,09:00-18:00,6-7,10:00-16:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid period, 8 week days',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-8,00:00-24:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid period, zero week day',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '0-7,00:00-24:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'User with invalid time',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-7,24:00-00:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-7,14:00-13:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-7,25:00-26:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			[
-				'user' => [
-					'userid' => '9',
-					'user_medias' => [
-						[
-						'mediatypeid' => '1',
-						'sendto' => 'api@zabbix.com',
-						'period' => '1-7,13:60-14:00'
-						]
-					],
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
-			],
-			// Successfully user update.
-			[
-				'user' => [
-					[
-						'userid' => '9',
-						'alias' => 'Api user updated',
-						'passwd' => 'zabbix1',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'userid' => '9',
-						'alias' => 'УТФ Юзер обновлённ',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'userid' => '9',
-						'alias' => 'Api user update with media',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'user_medias' => [
-							[
-								'mediatypeid' => '1',
-								'sendto' => 'api@zabbix.com',
-							]
-						]
-					]
-				],
-				'success_expected' => true,
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider user_update
-	*/
-	public function testUsers_Update($user, $success_expected, $expected_error) {
-		$result = $this->api_acall('user.update', $user, $debug);
-
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-			
-			foreach ($result['result']['userids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from users where userid='.$id);
-				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
-				$this->assertEquals($dbRowUser['name'], '');
-				$this->assertEquals($dbRowUser['surname'], '');
-				$this->assertEquals($dbRowUser['autologin'], 0);
-				$this->assertEquals($dbRowUser['autologout'], 900);
-				$this->assertEquals($dbRowUser['lang'], 'en_GB');
-				$this->assertEquals($dbRowUser['refresh'], 30);
-				$this->assertEquals($dbRowUser['rows_per_page'], 50);
-				$this->assertEquals($dbRowUser['theme'], 'default');
-				$this->assertEquals($dbRowUser['url'], '');
-
-				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
-				$this->assertEquals(1, DBcount($dbResultGroup));
-				
-				if (array_key_exists('user_medias', $user[$key])) {
-					$dbResultMedia = DBSelect('select * from media where userid='.$id);
-					$dbRowMedia = DBFetch($dbResultMedia);
-					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
-					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
-					$this->assertEquals($dbRowMedia['active'], 0);
-					$this->assertEquals($dbRowMedia['severity'], 63);
-					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
-				} 
-				else {
-					$dbResultGroup = 'select * from media where userid='.$id;
-					$this->assertEquals(0, DBcount($dbResultGroup));
-				}
-			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertSame($expected_error, $result['error']['data']);
-		}
-	}
-	
-	public static function user_all_parameters() {
-		return [
-			[
-				'user' => [
-					'alias' => 'all-parameters-create',
+					'alias' => 'all-parameters',
 					'passwd' => 'zabbix',
 					'usrgrps' => [['usrgrpid' => 7]],
 					'user_medias' => [
@@ -1898,73 +1345,64 @@ class testUsers extends CZabbixTest {
 					'theme' => 'dark-theme',
 					'rows_per_page' => 25,
 					'url' => '/profile.php'
-					],
-				'method' => 'user.create',
+				],
+				'success_expected' => true,
+				'expected_error' => null
 			],
-			[
-				'user' => [
-					'userid' => '9',
-					'alias' => 'all-parameters-updated',
-					'passwd' => 'zabbix1',
-					'usrgrps' => [['usrgrpid' => 7]],
-					'user_medias' => [
-							[
-								'mediatypeid' => '2',
-								'sendto' => 'apiupdate@zabbix.com',
-								'active' => '1',
-								'severity' => '60',
-								'period' => '1-5,09:00-18:00;5-7,12:00-16:00'
-							]
-					],
-					'name' => 'User with all parameters',
-					'surname' => 'User Surname',
-					'autologin' => 1,
-					'autologout' => 0,
-					'lang' => 'en_US',
-					'refresh' => 90,
-					'type' => 3,
-					'theme' => 'dark-theme',
-					'rows_per_page' => 25,
-					'url' => '/profile.php'
-					],
-				'method' => 'user.update',
-			]
 		];
 	}
 
 	/**
-	* @dataProvider user_all_parameters
+	* @dataProvider user_properties
 	*/
-	public function testUsers_UserWithAllParameters($user, $method) {
-		$result = $this->api_acall($method, $user, $debug);
+	public function testUser_NotRequiredPropertiesAndMedias($user, $success_expected, $expected_error) {
+		$methods = ['user.create', 'user.update'];
 
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
-			
-		$dbResultUser = DBSelect('select * from users where userid='.$result['result']['userids'][0]);
-		$dbRowUser = DBFetch($dbResultUser);
-		$this->assertEquals($dbRowUser['alias'], $user['alias']);
-		$this->assertEquals($dbRowUser['passwd'], md5($user['passwd']));
-		$this->assertEquals($dbRowUser['name'], $user['name']);
-		$this->assertEquals($dbRowUser['surname'], $user['surname']);
-		$this->assertEquals($dbRowUser['autologin'], $user['autologin']);
-		$this->assertEquals($dbRowUser['autologout'], $user['autologout']);
-		$this->assertEquals($dbRowUser['lang'], $user['lang']);
-		$this->assertEquals($dbRowUser['refresh'], $user['refresh']);
-		$this->assertEquals($dbRowUser['rows_per_page'], $user['rows_per_page']);
-		$this->assertEquals($dbRowUser['theme'], $user['theme']);
-		$this->assertEquals($dbRowUser['url'], $user['url']);
+		foreach ($methods as $method) {
+			if ($method == 'user.update') {
+				$user['userid'] = '9';
+				$user['alias'] = 'updated-'.$user['alias'];
+			}
+			$result = $this->api_acall($method, $user, $debug);
 
-		$dbResultGroup = "select * from users_groups where userid='".$result['result']['userids'][0]."' and usrgrpid=".$user['usrgrps'][0]['usrgrpid'];
-		$this->assertEquals(1, DBcount($dbResultGroup));
-				
-		$dbResultMedia = DBSelect('select * from media where userid='.$result['result']['userids'][0]);
-		$dbRowMedia = DBFetch($dbResultMedia);
-		$this->assertEquals($dbRowMedia['mediatypeid'], $user['user_medias'][0]['mediatypeid']);
-		$this->assertEquals($dbRowMedia['sendto'], $user['user_medias'][0]['sendto']);
-		$this->assertEquals($dbRowMedia['active'], $user['user_medias'][0]['active']);
-		$this->assertEquals($dbRowMedia['severity'], $user['user_medias'][0]['severity']);
-		$this->assertEquals($dbRowMedia['period'], $user['user_medias'][0]['period']);
+			if ($success_expected) {
+				$this->assertTrue(array_key_exists('result', $result));
+				$this->assertFalse(array_key_exists('error', $result));
+
+				$dbResultUser = DBSelect('select * from users where userid='.$result['result']['userids'][0]);
+				$dbRowUser = DBFetch($dbResultUser);
+				$this->assertEquals($dbRowUser['alias'], $user['alias']);
+				$this->assertEquals($dbRowUser['passwd'], md5($user['passwd']));
+				$this->assertEquals($dbRowUser['name'], $user['name']);
+				$this->assertEquals($dbRowUser['surname'], $user['surname']);
+				$this->assertEquals($dbRowUser['autologin'], $user['autologin']);
+				$this->assertEquals($dbRowUser['autologout'], $user['autologout']);
+				$this->assertEquals($dbRowUser['lang'], $user['lang']);
+				$this->assertEquals($dbRowUser['refresh'], $user['refresh']);
+				$this->assertEquals($dbRowUser['rows_per_page'], $user['rows_per_page']);
+				$this->assertEquals($dbRowUser['theme'], $user['theme']);
+				$this->assertEquals($dbRowUser['url'], $user['url']);
+
+				$dbResultGroup = "select * from users_groups where userid='".$result['result']['userids'][0]."' and usrgrpid=".$user['usrgrps'][0]['usrgrpid'];
+				$this->assertEquals(1, DBcount($dbResultGroup));
+
+				$dbResultMedia = DBSelect('select * from media where userid='.$result['result']['userids'][0]);
+				$dbRowMedia = DBFetch($dbResultMedia);
+				$this->assertEquals($dbRowMedia['mediatypeid'], $user['user_medias'][0]['mediatypeid']);
+				$this->assertEquals($dbRowMedia['sendto'], $user['user_medias'][0]['sendto']);
+				$this->assertEquals($dbRowMedia['active'], $user['user_medias'][0]['active']);
+				$this->assertEquals($dbRowMedia['severity'], $user['user_medias'][0]['severity']);
+				$this->assertEquals($dbRowMedia['period'], $user['user_medias'][0]['period']);
+			}
+			else {
+				$this->assertFalse(array_key_exists('result', $result));
+				$this->assertTrue(array_key_exists('error', $result));
+
+				$this->assertSame($expected_error, $result['error']['data']);
+				$dbResult = 'select * from users where alias='.$user['alias'];
+				$this->assertEquals(0, DBcount($dbResult));
+			}
+		}
 	}
 
 	public static function user_delete() {
