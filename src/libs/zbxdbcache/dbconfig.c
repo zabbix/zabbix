@@ -1228,6 +1228,26 @@ static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACR
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: set_hk_opt                                                       *
+ *                                                                            *
+ * Purpose: sets and validates global housekeeping option                     *
+ *                                                                            *
+ * Parameters: value     - [OUT] housekeeping setting                         *
+ *             non_zero  - [IN] 0 if value is allowed to be zero, 1 otherwise *
+ *             value_min - [IN] minimal acceptable setting value              *
+ *             value_raw - [IN] setting value to validate                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value_raw)
+{
+	if (SUCCEED != is_time_suffix(value_raw, value) || (0 != non_zero && 0 == *value) || value_min > *value)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
 	static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
@@ -1268,27 +1288,27 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 			/* set default housekeeper configuration */
 			config->config->hk.events_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.events_trigger = 365;
-			config->config->hk.events_internal = 365;
-			config->config->hk.events_autoreg = 365;
-			config->config->hk.events_discovery = 365;
+			config->config->hk.events_trigger = 365 * SEC_PER_DAY;
+			config->config->hk.events_internal = 365 * SEC_PER_DAY;
+			config->config->hk.events_autoreg = 365 * SEC_PER_DAY;
+			config->config->hk.events_discovery = 365 * SEC_PER_DAY;
 
 			config->config->hk.audit_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.audit = 365;
+			config->config->hk.audit = 365 * SEC_PER_DAY;
 
 			config->config->hk.services_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.services = 365;
+			config->config->hk.services = 365 * SEC_PER_DAY;
 
 			config->config->hk.sessions_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.sessions = 365;
+			config->config->hk.sessions = 365 * SEC_PER_DAY;
 
 			config->config->hk.history_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.history_global = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.history = 90;
+			config->config->hk.history = 90 * SEC_PER_DAY;
 
 			config->config->hk.trends_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.trends_global = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.trends = 365;
+			config->config->hk.trends = 365 * SEC_PER_DAY;
 		}
 	}
 	else
@@ -1311,36 +1331,60 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
 
 		/* read housekeeper configuration */
-		config->config->hk.events_mode = atoi(row[9]);
-		config->config->hk.events_trigger = atoi(row[10]);
-		config->config->hk.events_internal = atoi(row[11]);
-		config->config->hk.events_discovery = atoi(row[12]);
-		config->config->hk.events_autoreg = atoi(row[13]);
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[9])) &&
+				(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[10]) ||
+				SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[11]) ||
+				SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[12]) ||
+				SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[13])))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
+					" housekeeping will be disabled due to invalid settings");
+			config->config->hk.events_mode = ZBX_HK_OPTION_DISABLED;
+		}
 
-		config->config->hk.services_mode = atoi(row[14]);
-		config->config->hk.services = atoi(row[15]);
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[14])) &&
+				SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[15]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "IT services data housekeeping will be disabled due to invalid"
+					" settings");
+			config->config->hk.services_mode = ZBX_HK_OPTION_DISABLED;
+		}
 
-		config->config->hk.audit_mode = atoi(row[16]);
-		config->config->hk.audit = atoi(row[17]);
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[16])) &&
+				SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[17]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
+					" settings");
+			config->config->hk.audit_mode = ZBX_HK_OPTION_DISABLED;
+		}
 
-		config->config->hk.sessions_mode = atoi(row[18]);
-		config->config->hk.sessions = atoi(row[19]);
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[18])) &&
+				SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[19]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "user sessions data housekeeping will be disabled due to invalid"
+					" settings");
+			config->config->hk.sessions_mode = ZBX_HK_OPTION_DISABLED;
+		}
 
 		config->config->hk.history_mode = atoi(row[20]);
-		config->config->hk.history = atoi(row[22]);
-
-		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_mode)
-			config->config->hk.history_global = atoi(row[21]);
-		else
-			config->config->hk.history_global = ZBX_HK_OPTION_DISABLED;
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[21])) &&
+				SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[22]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
+					" store their history due to invalid global override settings");
+			config->config->hk.history_mode = ZBX_HK_OPTION_DISABLED;
+			config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
+		}
 
 		config->config->hk.trends_mode = atoi(row[23]);
-		config->config->hk.trends = atoi(row[25]);
-
-		if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_mode)
-			config->config->hk.trends_global = atoi(row[24]);
-		else
-			config->config->hk.trends_global = ZBX_HK_OPTION_DISABLED;
+		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
+				SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[25]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
+					" will store their history due to invalid global override settings");
+			config->config->hk.trends_mode = ZBX_HK_OPTION_DISABLED;
+			config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
+		}
 
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
