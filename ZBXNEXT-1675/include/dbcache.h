@@ -471,6 +471,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
+#define ZBX_HK_HISTORY_MIN	SEC_PER_HOUR
+#define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
+
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
 		int *mtimes, int *errcodes, size_t num);
 void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
