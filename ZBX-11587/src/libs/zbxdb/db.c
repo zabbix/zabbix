@@ -714,6 +714,9 @@ int	zbx_db_begin(void)
 int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
+#if defined(HAVE_ORACLE)
+	sword	err = OCI_SUCCESS;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -745,7 +748,8 @@ int	zbx_db_commit(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
-	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	if ( OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)
+		rc = OCI_handle_sql_error(ERR_Z3005, err, sql);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
 	zbx_mutex_unlock(&sqlite_access);
