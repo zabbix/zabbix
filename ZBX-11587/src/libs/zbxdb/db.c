@@ -755,8 +755,11 @@ int	zbx_db_commit(void)
 	zbx_mutex_unlock(&sqlite_access);
 #endif
 
-	if (ZBX_DB_FAIL == rc)
+	if (ZBX_DB_FAIL == rc && 1 == txn_error)
+	{
+		txn_error = 0;
 		return zbx_db_rollback();
+	}
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
@@ -1198,9 +1201,7 @@ lbl_exec:
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
-
-		if (0 != strcmp("commit;", sql))
-			txn_error = 1;
+		txn_error = 1;
 	}
 clean:
 	zbx_free(sql);
