@@ -974,7 +974,8 @@ footer, .footer {
     display: block; }
   .table-forms th {
     color: #768d99;
-    padding: 0 5px 0 0; }
+    padding: 0 5px 0 0;
+    text-align: left; }
     .table-forms th:last-child {
       padding: 0; }
   .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {

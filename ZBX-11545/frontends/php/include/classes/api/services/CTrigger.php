@@ -1334,12 +1334,6 @@ class CTrigger extends CTriggerGeneral {
 				$maxNs = max(array_keys($events));
 				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
-
-			foreach ($lastEvents as $triggerId => $events) {
-				// find max 'ns' for each trigger and that will be the 'lastEvent'
-				$maxNs = max(array_keys($events));
-				$result[$triggerId]['lastEvent'] = $events[$maxNs];
-			}
 		}
 
 		return $result;
