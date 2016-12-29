@@ -282,29 +282,6 @@ DB_EVENT;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	zbx_item_type_t		type;
-	zbx_item_data_type_t	data_type;
-	char			*key;
-	char			*host_name;
-	int			history;
-	int			trends;
-	zbx_item_value_type_t	value_type;
-	int			delta;
-	int			multiplier;
-	char			*units;
-	char			*formula;
-	zbx_uint64_t		valuemapid;
-	char			*error;
-
-	unsigned char		state;
-	unsigned char		flags;
-}
-DB_ITEM;
-
-typedef struct
-{
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
 	char			*description;
@@ -475,7 +452,6 @@ ZBX_GRAPH_ITEMS;
 void	process_triggers(zbx_vector_ptr_t *triggers);
 int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
@@ -485,16 +461,14 @@ char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
-int	DBadd_templates_to_host(int hostid,int host_templateid);
+int	DBadd_templates_to_host(int hostid, int host_templateid);
 
-int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
+int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
 
-int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
-
-int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
+int	DBadd_trigger_to_linked_hosts(int triggerid, int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
-int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
+int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
