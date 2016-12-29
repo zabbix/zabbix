@@ -752,14 +752,18 @@ int	zbx_db_commit(void)
 		rc = OCI_handle_sql_error(ERR_Z3005, err, sql);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
-	zbx_mutex_unlock(&sqlite_access);
 #endif
 
 	if (ZBX_DB_FAIL == rc && 1 == txn_error)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
 		txn_error = 0;
 		return zbx_db_rollback();
 	}
+
+#ifdef HAVE_SQLITE3
+	zbx_mutex_unlock(&sqlite_access);
+#endif
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
