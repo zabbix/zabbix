@@ -894,28 +894,6 @@ char	*DBdyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
-void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
-{
-	ZBX_STR2UINT64(item->itemid, row[0]);
-	item->key = row[1];
-	item->host_name = row[2];
-	item->type = atoi(row[3]);
-	item->history = atoi(row[4]);
-	item->trends = atoi(row[13]);
-	item->value_type = atoi(row[6]);
-
-	ZBX_STR2UINT64(item->hostid, row[5]);
-	item->delta = atoi(row[7]);
-
-	item->units = row[8];
-	item->multiplier = atoi(row[9]);
-	item->formula = row[10];
-	item->state = (unsigned char)atoi(row[11]);
-	ZBX_DBROW2UINT64(item->valuemapid, row[12]);
-
-	item->data_type = atoi(row[14]);
-}
-
 const ZBX_TABLE *DBget_table(const char *tablename)
 {
 	int	t;
