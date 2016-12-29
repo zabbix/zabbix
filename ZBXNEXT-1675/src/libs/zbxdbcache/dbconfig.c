@@ -1317,7 +1317,11 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 		/* store the config data */
 
-		refresh_unsupported = atoi(row[0]);
+		if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid unsupported item refresh interval, restoring default");
+			refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
+		}
 
 		if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
 			*refresh_unsupported_changed = 1;
