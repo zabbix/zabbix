@@ -450,7 +450,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				default:
 					$step['params'] = '';
-					break;
 			}
 		}
 		unset($step);
