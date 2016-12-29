@@ -1864,42 +1864,37 @@ static int	validate_hostname(const char *hostname, int len)
 
 int	zbx_validate_ip_list(const char *ip_list, char **error)
 {
-	char	*pch, *cidr_sep;
+	char	*start, *end, *cidr_sep;
 	char	tmp[MAX_STRING_LEN];
-
-	if (NULL == ip_list)
-		return FAIL;
 
 	strscpy(tmp, ip_list);
 
-	pch = strtok(tmp, ",");
-
-	while (NULL != pch)
+	for (start = tmp; '\0' != *start;)
 	{
-		if (NULL != (cidr_sep = strchr(pch, '/')))
+		if (NULL != (end = strchr(start, ',')))
+			*end = '\0';
+
+		if (NULL != (cidr_sep = strchr(start, '/')))
 		{
 			*cidr_sep = '\0';
 
-			if (FAIL == validate_cidr(pch, cidr_sep + 1, NULL))
+			if (FAIL == validate_cidr(start, cidr_sep + 1, NULL))
 			{
-				if (NULL != error)
-				{
-					*cidr_sep = '/';
-					*error = zbx_dsprintf(NULL, "invalid CIDR notation \"%s\"", pch);
-				}
-
+				*cidr_sep = '/';
+				*error = zbx_dsprintf(NULL, "\"%s\"", start);
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_ip(pch) && FAIL == validate_hostname(pch, strlen(pch)))
+		else if (FAIL == is_ip(start) && FAIL == validate_hostname(start, strlen(start)))
 		{
-			if (NULL != error)
-				*error = zbx_dsprintf(NULL, "\"%s\"", pch);
-
+			*error = zbx_dsprintf(NULL, "\"%s\"", start);
 			return FAIL;
 		}
 
-		pch = strtok(NULL, ",");
+		if (NULL != end)
+			start = end + 1;
+		else
+			break;
 	}
 
 	return SUCCEED;
