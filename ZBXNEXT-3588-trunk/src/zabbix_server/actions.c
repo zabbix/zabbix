@@ -57,7 +57,7 @@ static void	check_condition_event_tag(zbx_vector_ptr_t *esc_events, DB_CONDITION
 
 		for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
 		{
-			zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+			const zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
 			ret = zbx_strmatch_condition(tag->tag, condition->value, condition->operator);
 		}
@@ -113,7 +113,7 @@ static void	check_condition_event_tag_value(zbx_vector_ptr_t *esc_events, DB_CON
  *                                                                            *
  * Function: get_object_ids                                                   *
  *                                                                            *
- * Purpose: to get objectids of escalation events                             *
+ * Purpose: get objectids of escalation events                                *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             objectids  [OUT] - event objectids to be used in condition     *
@@ -424,7 +424,7 @@ static int	check_application_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
  *                                                                            *
  * Function: check_trigger_id_sql_alloc                                       *
  *                                                                            *
- * Purpose: to allocate sql query for trigger id condition                    *
+ * Purpose: allocate sql query for trigger id condition                       *
  *                                                                            *
  * Parameters: sql           [IN/OUT] - allocated sql query                   *
  *             sql_alloc     [IN/OUT] - how much bytes allocated              *
@@ -503,8 +503,8 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
 	}
 }
 
-typedef void (*hierarchy_sql_allocate_func_t) (char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp);
-typedef int (*hierarchy_row_check_func_t) (DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t *templateid,
+typedef void	(*hierarchy_sql_allocate_func_t) (char **sql, size_t *sql_alloc, zbx_vector_uint64_t *objectids_tmp);
+typedef int	(*hierarchy_row_check_func_t) (DB_ROW row, zbx_uint64_t *objectid, zbx_uint64_t *templateid,
 		zbx_uint64_t *value);
 
 /******************************************************************************
@@ -514,27 +514,28 @@ typedef int (*hierarchy_row_check_func_t) (DB_ROW row, zbx_uint64_t *objectid, z
  * Purpose: there can be multiple levels of templates, that need              *
  *          resolving in order to compare to condition                        *
  *                                                                            *
- * Parameters: objectids      [IN] -     event id's to check                  *
- *                                       in case of not equal condition will  *
- *                                       delete objectids that match          *
- *                                       condition for internal usage         *
- *             objectids_pair [IN] -     first is original trigger id, second *
- *                                       is parent trigger id and will be     *
- *                                       updated for internal usage           *
- *             condition      [IN/OUT] - condition for matching, outputs      *
- *                                       event ids that match condition       *
- *                                                                            *
- *             hierarchy_sql_allocate [IN] - custom sql query, must obtain    *
+ * Parameters: objectids              - [IN] event ids to check in case of    *
+ *                                           not equal condition will delete  *
+ *                                           objectids that match condition   *
+ *                                           for internal usage               *
+ *             objectids_pair         - [IN] first is original trigger id,    *
+ *                                           second is parent trigger id and  *
+ *                                           will be updated for internal     *
+ *                                           usage                            *
+ *             condition              - [IN/OUT] condition for matching,      *
+ *                                               outputs event ids that match *
+ *                                               condition                    *
+ *             condition_value        - [IN] condition value for matching     *
+ *             hierarchy_sql_allocate - [IN] custom sql query, must obtain    *
  *                                           object, template id and value    *
  *                                                                            *
- *             hierarchy_row_check [IN] - custom function to fetch trigger id,*
- *                                        object id and value                 *
+ *             hierarchy_row_check    - [IN] custom function to fetch trigger *
+ *                                           id, object id and value          *
  *                                                                            *
  ******************************************************************************/
 static void	check_object_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair,
 		DB_CONDITION *condition, zbx_uint64_t condition_value,
-		hierarchy_sql_allocate_func_t hierarchy_sql_allocate,
-		hierarchy_row_check_func_t hierarchy_row_check)
+		hierarchy_sql_allocate_func_t hierarchy_sql_allocate, hierarchy_row_check_func_t hierarchy_row_check)
 {
 	int				i;
 	zbx_vector_uint64_t		objectids_tmp;
@@ -572,7 +573,7 @@ static void	check_object_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_ui
 
 			if (value == condition_value)
 			{
-				/* find all templates or trigger id's that match our condition and get original id */
+				/* find all templates or trigger ids that match our condition and get original id */
 				for (i = 0; i < objectids_pair->values_num; i++)
 				{
 					/* objectid is id that has template id, that match condition */
@@ -586,7 +587,7 @@ static void	check_object_hierarchy(zbx_vector_uint64_t *objectids, zbx_vector_ui
 						}
 						else
 						{
-							int j;
+							int	j;
 
 							/* remove equals from result set, leaving only not equals */
 							if (FAIL != (j = zbx_vector_uint64_search(objectids,
@@ -667,7 +668,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	objectids_pair;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->operator  && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
+	if (CONDITION_OPERATOR_EQUAL != condition->operator && CONDITION_OPERATOR_NOT_EQUAL != condition->operator)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -693,8 +694,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
 		objectids_to_pair(&objectids, &objectids_pair);
 
 		check_object_hierarchy(&objectids, &objectids_pair, condition, condition_value,
-				check_trigger_id_sql_alloc,
-				check_trigger_id_row);
+				check_trigger_id_sql_alloc, check_trigger_id_row);
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -706,7 +706,7 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
  *                                                                            *
  * Function: check_template_id_sql_alloc                                      *
  *                                                                            *
- * Purpose: to allocate sql query for template id condition                   *
+ * Purpose: allocate sql query for template id condition                      *
  *                                                                            *
  * Parameters: sql           [IN/OUT] - allocated sql query                   *
  *             sql_alloc     [IN/OUT] - how much bytes allocated              *
@@ -739,7 +739,7 @@ static void	check_template_id_sql_alloc(char **sql, size_t *sql_alloc, zbx_vecto
  *                                                                            *
  * Function: check_template_id_row                                            *
  *                                                                            *
- * Purpose: to check template id row                                          *
+ * Purpose: check template id row                                             *
  *                                                                            *
  * Parameters: row        [IN]  - fetched row                                 *
  *             objectid   [OUT] - trigger id                                  *
@@ -842,8 +842,7 @@ static int	check_host_template_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 	}
 	DBfree_result(result);
 
-	check_object_hierarchy(&objectids, &objectids_pair, condition, condition_value,
-			check_template_id_sql_alloc,
+	check_object_hierarchy(&objectids, &objectids_pair, condition, condition_value, check_template_id_sql_alloc,
 			check_template_id_row);
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -1136,7 +1135,7 @@ static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  *                                                                            *
  * Function: get_object_ids_discovery                                         *
  *                                                                            *
- * Purpose: to get objectids for dhost                                        *
+ * Purpose: get objectids for dhost                                           *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             objectids  [OUT] - event objectids to be used in condition     *
@@ -2294,13 +2293,13 @@ static int	check_intern_event_type_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Function: get_object_ids_internal                                          *
  *                                                                            *
- * Purpose: to get objectids of escalation internal events                    *
+ * Purpose: get objectids of escalation internal events                       *
  *                                                                            *
  * Parameters: esc_events [IN]  - events to check                             *
  *             objectids  [OUT] - event objectids to be used in condition     *
  *                                allocation 2 vectors where first one is     *
  *                                trigger object ids, second is rest          *
-*                                                                            *
+ *                                                                            *
  ******************************************************************************/
 static void	get_object_ids_internal(zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids)
 {
@@ -2425,7 +2424,7 @@ static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Function: check_template_id_sql_alloc                                      *
  *                                                                            *
- * Purpose: to allocate sql query for template id condition                   *
+ * Purpose: allocate sql query for template id condition                      *
  *                                                                            *
  * Parameters: sql           [IN/OUT] - allocated sql query                   *
  *             sql_alloc     [IN/OUT] - how much bytes allocated              *
@@ -2455,9 +2454,9 @@ static void	check_template_id_item_sql_alloc(char **sql, size_t *sql_alloc, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: trigger_parents_sql_alloc                                        *
+ * Function: item_parents_sql_alloc                                           *
  *                                                                            *
- * Purpose: to get parent id from trigger discovery                           *
+ * Purpose: get parent id from item discovery                                 *
  *                                                                            *
  * Parameters: sql           [IN/OUT] - allocated sql query                   *
  *             sql_alloc     [IN/OUT] - how much bytes allocated              *
@@ -2941,7 +2940,7 @@ static void	conditions_vectors_create(zbx_hashset_t *uniq_conditions)
  *                                                                            *
  * Function: conditions_vectors_destroy                                       *
  *                                                                            *
- * Purpose: to destroy previously allocated vectors                           *
+ * Purpose: destroy previously allocated vectors                              *
  *                                                                            *
  * Parameters: uniq_conditions [IN/OUT] - conditions that need vectors to be  *
  *                                        destroyed                           *
@@ -2968,7 +2967,7 @@ static void	conditions_vectors_destroy(zbx_hashset_t *uniq_conditions)
  *                                                                            *
  * Purpose: check if event matches single condition                           *
  *                                                                            *
- * Parameters: event - event to check                                         *
+ * Parameters: event     - event to check                                     *
  *             condition - condition for matching                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
@@ -3001,7 +3000,7 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  *                                                                            *
  * Purpose: check if event matches single previously checked condition        *
  *                                                                            *
- * Parameters: event - event to check                                         *
+ * Parameters: event     - event to check                                     *
  *             condition - condition with event ids that match condition      *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
@@ -3392,7 +3391,7 @@ static zbx_hash_t	uniq_conditions_hash_func(const void *data)
  *                                                                            *
  * Function: get_escalation_events                                            *
  *                                                                            *
- * Purpose: to add events that have escalation possible and skip others, also *
+ * Purpose: add events that have escalation possible and skip others, also    *
  *          adds according to source                                          *
  *                                                                            *
  * Parameters: events       - [IN] events to apply actions for                *
