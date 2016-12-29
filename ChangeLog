@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-11545] fixed dependency validation and update when trigger expression is changed (Gunars)
 ..F....... [ZBX-11538] fixed event acknowledgement in screens and dashboard widgets when last event is a recovery event (Gunars)
 .......PS. [ZBX-11630] added escaping '"', ''', '&', '<' and '>' characters in SOAP XML for VMware requests (Sergejs)
 .......PS. [ZBX-11525] ensured unique value timestamps (clock, ns) from active agents and senders (dimir)
