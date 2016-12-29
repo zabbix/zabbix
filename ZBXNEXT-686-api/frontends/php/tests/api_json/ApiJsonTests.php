@@ -19,12 +19,12 @@
 **/
 
 require_once dirname(__FILE__).'/APIInfo.php';
-require_once dirname(__FILE__).'/User.php';
 require_once dirname(__FILE__).'/CHost.php';
 require_once dirname(__FILE__).'/CItem.php';
 require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
+require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
@@ -39,6 +39,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testHostGroup');
+		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');

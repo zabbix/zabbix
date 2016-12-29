@@ -730,6 +730,15 @@ class testScripts extends CZabbixTest {
 
 	public static function script_execute() {
 		return [
+			[
+				'script' => [
+					'scriptid' => '1',
+					'hostid' => '10084',
+					'value' => 'test'
+					],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "value".'
+			],
 			// Check script id.
 			[
 				'script' => [
@@ -777,14 +786,6 @@ class testScripts extends CZabbixTest {
 					],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'script' => [
-					'scriptid' => '6',
-					'hostid' => '10084'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Unknown Script ID [6]'
 			],
 			// Check host id.
 			[
@@ -834,28 +835,11 @@ class testScripts extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			// Check script peremissions for host group. Host belongs to the host group that hasn't permission to execute current script
 			[
 				'script' => [
-					'scriptid' => '1',
+					'scriptid' => '4',
 					'hostid' => '50009'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Unknown Host ID [50009].'
-			],
-			[
-				'script' => [
-					'scriptid' => '1',
-					'hostid' => '10084',
-					'value' => 'test'
-					],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/": unexpected parameter "value".'
-			],
-			// Check host group peremissions.
-			[
-				'script' => [
-					'scriptid' => '6',
-					'hostid' => '10084'
 					],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -893,6 +877,47 @@ class testScripts extends CZabbixTest {
 
 	public static function script_permissions() {
 		return [
+			// User have permissions to host, but not to script (script can execute only specific user group).
+			[
+				'method' => 'script.execute',
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'script' => [
+							'scriptid' => '12',
+							'hostid' => '50009'
+						],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// User have permissions to script, but not to host (script can execute only on specific host group).
+			[
+				'method' => 'script.execute',
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'script' => [
+							'scriptid' => '13',
+							'hostid' => '10084'
+						],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// User have only read permissions to host, but script required write permissions for the host.
+			[
+				'method' => 'script.execute',
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'script' => [
+							'scriptid' => '14',
+							'hostid' => '50012'
+						],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// User have deny permissions to host, but script required read permissions for the host.
+			[
+				'method' => 'script.execute',
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'script' => [
+							'scriptid' => '1',
+							'hostid' => '50014'
+						],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Check zabbix admin permissions to create, update, delete and execute script.
 			[
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
@@ -926,26 +951,7 @@ class testScripts extends CZabbixTest {
 						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// User have permissions to host, but not to script.
-			[
-				'method' => 'script.execute',
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'script' => [
-							'scriptid' => '6',
-							'hostid' => '50009'
-						],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// User have permissions to script, but not to host.
-			[
-				'method' => 'script.execute',
-				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'script' => [
-							'scriptid' => '7',
-							'hostid' => '10084'
-						],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
+			// Check zabbix user permissions to create, update, delete and execute script.
 			[
 				'method' => 'script.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],

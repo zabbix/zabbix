@@ -1446,12 +1446,28 @@ INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (20000
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200000, 0, 0);
 
 -- scripts
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (6,'Api script for update one','/sbin/shutdown -r',2,NULL,6,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (7,'Api script for update two','/sbin/shutdown -r',2,8,NULL,'');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50024,50013,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50013, 50012);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for with read permissions', 0, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
+INSERT INTO groups (groupid,name,internal) VALUES (50016,'Api group with read permissions',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50012, 50012, 50016);
+INSERT INTO rights (rightid, groupid, permission, id) VALUES (3, 14, 2, 50016);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50025,50014,1,1,1,'127.0.0.1','','10050');
+INSERT INTO groups (groupid,name,internal) VALUES (50017,'Api group with deny permissions',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
+INSERT INTO rights (rightid, groupid, permission, id) VALUES (4, 14, 0, 50017);
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (6,'Api script for update one','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (7,'Api script for update two','/sbin/shutdown -r',2,NULL,NULL,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (8,'Api script for delete','/sbin/shutdown -r',2,NULL,NULL,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (9,'Api script for delete1','/sbin/shutdown -r',2,NULL,NULL,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (10,'Api script for delete2','/sbin/shutdown -r',2,NULL,NULL,'');
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (11,'Api script in action','/sbin/shutdown -r',2,NULL,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (12,'Api script with user group','/sbin/shutdown -r',2,7,NULL,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (13,'Api script with host group','/sbin/shutdown -r',2,NULL,4,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (14,'Api script with write permissions for the host group','/sbin/shutdown -r',3,NULL,NULL,'');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, r_shortdata, r_longdata) VALUES (18,'Api action with script',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}','{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (33, 18, 1, 0, 1, 1, 0);
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);

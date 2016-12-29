@@ -835,7 +835,7 @@ class testUserGroup extends CZabbixTest {
 
 	public function testUserGroup_UpdateUsersAndGroupProperty() {
 		$group = [
-					'usrgrpid' => '14',
+					'usrgrpid' => '13',
 					'name' => 'Api user group with users updated',
 					'gui_access' => 1,
 					'users_status' => 1,

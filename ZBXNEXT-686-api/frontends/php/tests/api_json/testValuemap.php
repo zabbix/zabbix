@@ -22,10 +22,6 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testValuemap extends CZabbixTest {
 
-	public function testValuemap_backup() {
-		DBsave_tables('valuemaps');
-	}
-
 	public static function valuemap_create_data() {
 		return [
 			[
@@ -735,9 +731,5 @@ class testValuemap extends CZabbixTest {
 		$this->assertTrue(array_key_exists('error', $result));
 
 		$this->assertEquals($expected_error, $result['error']['data']);
-	}
-
-	public function testValuemap_restore() {
-		DBrestore_tables('valuemaps');
 	}
 }
