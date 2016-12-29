@@ -445,7 +445,7 @@ class CItem extends CItemGeneral {
 			DB::insert('items_applications', $itemApplications);
 		}
 
-		$this->createItemPreProcessing($items);
+		$this->createItemPreprocessing($items);
 
 		$itemHosts = $this->get([
 			'output' => ['name'],
@@ -497,7 +497,7 @@ class CItem extends CItemGeneral {
 			DB::insert('items_applications', $itemApplications);
 		}
 
-		$this->updateItemPreProcessing($items);
+		$this->updateItemPreprocessing($items);
 
 		$itemHosts = $this->get([
 			'output' => ['name'],
@@ -715,7 +715,7 @@ class CItem extends CItemGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
-		$this->validateItemPreProcessing($item, $method);
+		$this->validateItemPreprocessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {

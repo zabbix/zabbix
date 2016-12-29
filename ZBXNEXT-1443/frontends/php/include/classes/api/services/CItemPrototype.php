@@ -421,7 +421,7 @@ class CItemPrototype extends CItemGeneral {
 			DB::insert('item_application_prototype', $item_application_prototypes);
 		}
 
-		$this->createItemPreProcessing($items);
+		$this->createItemPreprocessing($items);
 
 // TODO: REMOVE info
 		$itemHosts = $this->get([
@@ -663,7 +663,7 @@ class CItemPrototype extends CItemGeneral {
 			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
-		$this->updateItemPreProcessing($items);
+		$this->updateItemPreprocessing($items);
 
 // TODO: REMOVE info
 		$itemHosts = $this->get([
@@ -924,7 +924,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
-		$this->validateItemPreProcessing($item, $method);
+		$this->validateItemPreprocessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {

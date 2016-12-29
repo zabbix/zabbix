@@ -872,7 +872,7 @@ abstract class CItemGeneral extends CApiService {
 	 *														parameters are separated by LF (\n)character.
 	 * @param string $method								A string of "create" or "update" method.
 	 */
-	protected function validateItemPreProcessing(array $item, $method) {
+	protected function validateItemPreprocessing(array $item, $method) {
 		if (array_key_exists('preprocessing', $item)) {
 			if (!is_array($item['preprocessing'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1028,7 +1028,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items							An array of items.
 	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
 	 */
-	protected function createItemPreProcessing(array $items) {
+	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$step = 1;
 
@@ -1056,7 +1056,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items							An array of items.
 	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
 	 */
-	protected function updateItemPreProcessing(array $items) {
+	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
 		$step = 1;
