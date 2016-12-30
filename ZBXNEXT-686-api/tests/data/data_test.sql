@@ -1473,3 +1473,9 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
 INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
 
+-- global macro
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (15,'{$API_MACRO_FOR_DELETE}','abc');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (17,'{$API_MACRO_FOR_DELETE2}','2');
