@@ -96,7 +96,7 @@
 			});
 
 			preprocessing
-				.delegate('.element-table-add', 'click', function() {
+				.on('click', '.element-table-add', function() {
 					var row = $(this).parent().parent();
 					row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('tr.sortable').length}));
 
@@ -104,7 +104,7 @@
 						preprocessing.sortable('enable');
 					}
 				})
-				.delegate('.element-table-remove', 'click', function() {
+				.on('click', '.element-table-remove', function() {
 					var row = $(this).parent().parent();
 					row.remove();
 
@@ -112,7 +112,7 @@
 						preprocessing.sortable('disable');
 					}
 				})
-				.delegate('select[name*="type"]', 'change', function() {
+				.on('change', 'select[name*="type"]', function() {
 					var inputs = $(this).parent().parent().find('[name*="params"]');
 
 					switch ($(this).val()) {
