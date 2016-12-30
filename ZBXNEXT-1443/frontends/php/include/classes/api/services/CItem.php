@@ -1135,7 +1135,9 @@ class CItem extends CItemGeneral {
 				$itemid = $step['itemid'];
 				unset($step['item_preprocid'], $step['itemid'], $step['step']);
 
-				$result[$itemid]['preprocessing'][] = $step;
+				if (array_key_exists($itemid, $result)) {
+					$result[$itemid]['preprocessing'][] = $step;
+				}
 			}
 		}
 
