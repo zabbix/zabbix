@@ -1614,9 +1614,9 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']] : [];
 		$r_event_alerts = [];
 		if (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0 && array_key_exists($problem['r_eventid'], $alerts)) {
-			foreach ($alerts[$problem['r_eventid']] as $r) {
-				if ($r['p_eventid'] == $problem['eventid']) {
-					$r_event_alerts[] = $r;
+			foreach ($alerts[$problem['r_eventid']] as $r_alert) {
+				if ($r_alert['p_eventid'] == $problem['eventid']) {
+					$r_event_alerts[] = $r_alert;
 				}
 			}
 		}
