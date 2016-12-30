@@ -988,10 +988,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 	result = DBselect(
 			"select h.hostid,h.proxy_hostid,h.host,h.name,i.itemid,i.name,i.key_,i.description"
-				",ii.ip,ii.dns,ii.useip,ii.type,ii.main"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
-				" left join interface ii on ii.interfaceid=i.interfaceid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
 
 	if (NULL != (row = DBfetch(result)))
