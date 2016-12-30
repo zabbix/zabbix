@@ -971,11 +971,20 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DC_ITEM		dc_item;
-	char		*key = NULL, *addr = NULL;
-	zbx_uint64_t	proxy_hostid, hostid;
-	int		ret = FAIL;
+	char		*key = NULL;
+	zbx_uint64_t	proxy_hostid;
+	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_IP:
+		case ZBX_REQUEST_HOST_DNS:
+		case ZBX_REQUEST_HOST_CONN:
+		case ZBX_REQUEST_HOST_PORT:
+			return get_interface_value(0, itemid, replace_to, request);
+	}
 
 	result = DBselect(
 			"select h.hostid,h.proxy_hostid,h.host,h.name,i.itemid,i.name,i.key_,i.description"
@@ -997,48 +1006,24 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
-			case ZBX_REQUEST_HOST_IP:
-			case ZBX_REQUEST_HOST_DNS:
-			case ZBX_REQUEST_HOST_CONN:
-			case ZBX_REQUEST_HOST_PORT:
-				ZBX_STR2UINT64(hostid, row[0]);
-				ret = get_interface_value(hostid, itemid, replace_to, request);
-				break;
 			case ZBX_REQUEST_ITEM_ID:
 				*replace_to = zbx_strdup(*replace_to, row[4]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				ZBX_STR2UINT64(dc_item.host.hostid, row[0]);
-				strscpy(dc_item.host.host, row[2]);
-				strscpy(dc_item.host.name, row[3]);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
-				if (SUCCEED != DBis_null(row[11]))	/* interface type */
-					dc_item.interface.type = (unsigned char)atoi(row[11]);
-				else
-					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
+				if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
+					DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
 
-				dc_item.interface.addr = ('1' == *row[10] ? dc_item.interface.ip_orig :
-						dc_item.interface.dns_orig);
-
-				addr = zbx_strdup(addr, row[8]);	/* ip */
-				get_interface_value(dc_item.host.hostid, itemid, &addr, ZBX_REQUEST_HOST_IP);
-				strscpy(dc_item.interface.ip_orig, addr);
-				zbx_free(addr);
-
-				addr = zbx_strdup(addr, row[9]);	/* dns */
-				get_interface_value(dc_item.host.hostid, itemid, &addr, ZBX_REQUEST_HOST_DNS);
-				strscpy(dc_item.interface.dns_orig, addr);
-				zbx_free(addr);
-
-				key = zbx_strdup(key, row[6]);
-				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				dc_item.key = zbx_strdup(dc_item.key, dc_item.key_orig);
+				substitute_key_macros(&dc_item.key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
 					*replace_to = zbx_strdup(*replace_to, row[5]);
-					item_description(replace_to, key, dc_item.host.hostid);
+					item_description(replace_to, dc_item.key, dc_item.host.hostid);
 					zbx_free(key);
 				}
 				else	/* ZBX_REQUEST_ITEM_KEY */
@@ -1046,6 +1031,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					zbx_free(*replace_to);
 					*replace_to = key;
 				}
+				DCconfig_clean_items(&dc_item, &errcode, 1);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
@@ -3449,27 +3435,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.addr);
-				}
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
@@ -3482,27 +3459,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				}
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				}
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
-				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
-						dc_host->hostid, INTERFACE_TYPE_AGENT)))
-				{
+				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.addr);
-				}
 			}
 		}
 

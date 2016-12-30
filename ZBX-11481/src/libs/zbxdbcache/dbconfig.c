@@ -2485,11 +2485,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 
-	int			found, update_index, idx, i;
+	int			found, update_index, i;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
 	unsigned char		reset_snmp_stats;
-	zbx_vector_ptr_t 	interfaces;
+	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2505,8 +2505,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 		zbx_hashset_iter_remove(&iter);
 	}
 
-	zbx_vector_ptr_create(&interfaces);
-	zbx_vector_ptr_reserve(&interfaces, config->interfaces.num_data + 32);
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->interfaces.num_data + 32);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2519,7 +2519,9 @@ static void	DCsync_interfaces(DB_RESULT result)
 		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 
 		/* array of selected interfaces */
-		zbx_vector_ptr_append(&interfaces, interface);
+		zbx_vector_uint64_append(&ids, interfaceid);
+
+		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 
 		/* see whether we should and can update interfaces_ht index at this point */
 
@@ -2611,91 +2613,80 @@ static void	DCsync_interfaces(DB_RESULT result)
 		}
 	}
 
-	zbx_hashset_iter_reset(&config->interfaces, &iter);
-
-	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
-	{
-		for (idx = 0; idx < interfaces.values_num; idx++)
-		{
-			if (((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid == interface->interfaceid)
-				break;
-		}
-
-		/* remove deleted interface from cache */
-
-		if (idx == interfaces.values_num)
-		{
-			if (1 == interface->main)
-			{
-				interface_ht_local.hostid = interface->hostid;
-				interface_ht_local.type = interface->type;
-				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
-
-				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
-				{
-					/* see ZBX-4045 for NULL check in the conditional */
-					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
-				}
-			}
-
-			zbx_strpool_release(interface->ip);
-			zbx_strpool_release(interface->dns);
-			zbx_strpool_release(interface->port);
-
-			zbx_hashset_iter_remove(&iter);
-		}
-	}
-
 	/* Resolve macros for ip and dns fields. First iteration macros should be resolve for main agent interface,
 	because it may contain user marcos and in next iteration it help substitute {HOST.IP} and {HOST.DNS} marcos
 	for secondary host interfaces correctly. */
 
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	for (i = 0; i < 2; i++)
 	{
-		for (idx = 0; idx < interfaces.values_num; idx++)
+		zbx_hashset_iter_reset(&config->interfaces, &iter);
+
+		while (NULL != (interface = zbx_hashset_iter_next(&iter)))
 		{
-			int	macros;
-			char	*addr;
-			DC_HOST	host;
-
-			interface = DCfind_id(&config->interfaces, ((ZBX_DC_INTERFACE *)interfaces.values[idx])->interfaceid,
-					sizeof(ZBX_DC_INTERFACE), &found);
-
-			if (0 == found || NULL == interface)
-				continue;
-
-			if (0 == i && (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type))
-				continue;
-
-			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
-			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
-
-			if (0 != macros)
+			if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				DCget_host_by_hostid(&host, interface->hostid);
+				/* remove from buffer */
 
-				if (0 != (macros & 0x01))
+				if (1 == interface->main)
 				{
-					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-					DCstrpool_replace(1, &interface->ip, addr);
-					zbx_free(addr);
+					interface_ht_local.hostid = interface->hostid;
+					interface_ht_local.type = interface->type;
+					interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+
+					if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+					{
+						/* see ZBX-4045 for NULL check in the conditional */
+						zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+					}
 				}
 
-				if (0 != (macros & 0x02))
+				zbx_strpool_release(interface->ip);
+				zbx_strpool_release(interface->dns);
+				zbx_strpool_release(interface->port);
+
+				zbx_hashset_iter_remove(&iter);
+			}
+			else
+			{
+				int	macros;
+				char	*addr;
+				DC_HOST	host;
+
+				if (0 == i && (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type))
+					continue;
+
+				macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
+				macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+
+				if (0 != macros)
 				{
-					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-					DCstrpool_replace(1, &interface->dns, addr);
-					zbx_free(addr);
+					DCget_host_by_hostid(&host, interface->hostid);
+
+					if (0 != (macros & 0x01))
+					{
+						addr = zbx_strdup(NULL, interface->ip);
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+						DCstrpool_replace(1, &interface->ip, addr);
+						zbx_free(addr);
+					}
+
+					if (0 != (macros & 0x02))
+					{
+						addr = zbx_strdup(NULL, interface->dns);
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+								MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+						DCstrpool_replace(1, &interface->dns, addr);
+						zbx_free(addr);
+					}
 				}
 			}
 		}
 	}
 
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4664,28 +4655,6 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 	return res;
 }
 
-static int	dc_get_interface_by_itemid(DC_INTERFACE *interface, zbx_uint64_t itemid)
-{
-	ZBX_DC_ITEM		*dc_item;
-	const ZBX_DC_INTERFACE	*dc_interface;
-
-	if (0 >= itemid)
-		return FAIL;
-
-	if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
-		return FAIL;
-
-	if (0 == dc_item->interfaceid ||
-			NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid)))
-	{
-		return FAIL;
-	}
-
-	DCget_interface(interface, dc_interface);
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_interface                                           *
@@ -4694,18 +4663,38 @@ static int	dc_get_interface_by_itemid(DC_INTERFACE *interface, zbx_uint64_t item
  *                                                                            *
  * Parameters: interface - [OUT] pointer to DC_INTERFACE structure            *
  *             hostid - [IN] host ID                                          *
- *             type - [IN] interface type                                     *
+ *             itemid - [IN] item ID                                          *
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uint64_t itemid)
 {
-	int		res = FAIL, i;
+	int			res = FAIL, i;
+	ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_INTERFACE	*dc_interface;
 
 	LOCK_CACHE;
 
-	if (SUCCEED == (res = dc_get_interface_by_itemid(interface, itemid)))
+	if (0 != itemid)
+	{
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
+				goto unlock;
+
+		if (0 != dc_item->interfaceid)
+		{
+			if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid)))
+				return FAIL;
+
+			DCget_interface(interface, dc_interface);
+			res = SUCCEED;
+			goto unlock;
+		}
+
+		hostid = dc_item->hostid;
+	}
+
+	if (0 == hostid)
 		goto unlock;
 
 	for (i = 0; i < (int)ARRSIZE(INTERFACE_TYPE_PRIORITY); i++)
@@ -4713,6 +4702,7 @@ int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uin
 		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
 			break;
 	}
+
 unlock:
 	UNLOCK_CACHE;
 
