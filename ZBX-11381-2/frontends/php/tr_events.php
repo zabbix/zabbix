@@ -124,7 +124,7 @@ if ($event['r_eventid'] != 0) {
 		if ($r_event['alerts']) {
 			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => SORT_DESC]]);
 			foreach ($r_event['alerts'] as $alert) {
-				if($alert['p_eventid'] == $event['eventid']) {
+				if ($alert['p_eventid'] == $event['eventid']) {
 					$r_alerts[] = $alert;
 				}
 			}

@@ -179,7 +179,7 @@ static int	DBpatch_3030016(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select eventid, r_eventid"
-			" from event_recovery "
+			" from event_recovery"
 			" order by r_eventid, eventid desc");
 
 	while (NULL != (row = DBfetch(result)))
