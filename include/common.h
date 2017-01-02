@@ -1299,6 +1299,13 @@ typedef struct
 }
 zbx_token_simple_macro_t;
 
+/* second…ninth constant of the expression. */
+typedef struct
+{
+	int	number;
+}
+zbx_token_reference_t;
+
 /* the token type specific data */
 typedef union
 {
@@ -1308,6 +1315,7 @@ typedef union
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
 	zbx_token_simple_macro_t	simple_macro;
+	zbx_token_reference_t		reference;
 }
 zbx_token_data_t;
 
