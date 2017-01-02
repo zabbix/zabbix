@@ -4683,3 +4683,50 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_replace_mem_dyn                                              *
+ *                                                                            *
+ * Purpose: to replace memory block and allocate more memory if needed        *
+ *                                                                            *
+ * Parameters: data       - [IN/OUT] allocated memory                         *
+ *             data_alloc - [IN/OUT] allocated memory size                    *
+ *             data_len -   [IN/OUT] used memory size                         *
+ *             to -         [OUT] points to block that need to be replaced    *
+ *             sz_to -      [IN] size of block that need to be replaced       *
+ *             from -       [IN] what to replace with                         *
+ *             sz_from -    [IN] size of new block                            *
+ *                                                                            *
+ * Return value: once data is replaced offset can become less, bigger or      *
+ *               remain unchanged                                             *
+ ******************************************************************************/
+int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, char *to, size_t sz_to,
+		const char *from, size_t sz_from)
+{
+	int	sz_changed = 0;
+
+	if (sz_to != sz_from)
+	{
+		sz_changed = sz_from - sz_to;
+		*data_len += sz_from - sz_to;
+
+		if (*data_len > *data_alloc)
+		{
+			size_t	offset = to - *data;
+
+			while (*data_len > *data_alloc)
+				*data_alloc *= 2;
+
+			*data = zbx_realloc(*data, *data_alloc);
+
+			to = *data + offset;
+		}
+
+		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
+	}
+
+	memcpy(to, from, sz_from);
+
+	return sz_changed;
+}
