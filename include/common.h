@@ -1299,7 +1299,7 @@ typedef struct
 }
 zbx_token_simple_macro_t;
 
-/* second…ninth constant of the expression. */
+/* reference to second…ninth constant of the expression. */
 typedef struct
 {
 	int	number;
