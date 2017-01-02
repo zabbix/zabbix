@@ -7297,11 +7297,11 @@ void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *l
  ******************************************************************************/
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 {
-	LOCK_CACHE;
-
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
 
 	for (i = 0; i < itemids_num; i++)
 	{

@@ -18,14 +18,17 @@
 **/
 
 #include "common.h"
+
+#ifdef HAVE_OPENIPMI
+
 #include "log.h"
 #include "zbxserialize.h"
 
 #include "ipmi_protocol.h"
 
-zbx_uint32_t	zbx_ipmi_serialize_value_request(unsigned char **data, zbx_uint64_t itemid, const char *addr,
+zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,
 		unsigned short port, signed char authtype, unsigned char privilege, const char *username,
-		const char *password, const char *sensor)
+		const char *password, const char *sensor, int command)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len;
@@ -36,11 +39,11 @@ zbx_uint32_t	zbx_ipmi_serialize_value_request(unsigned char **data, zbx_uint64_t
 	sensor_len = strlen(sensor) + 1;
 
 	data_len = sizeof(zbx_uint64_t) + sizeof(short) + sizeof(char) * 2 + addr_len + username_len + password_len +
-			sensor_len + sizeof(zbx_uint32_t) * 4;
+			sensor_len + sizeof(zbx_uint32_t) * 4 + sizeof(int);
 
 	*data = zbx_malloc(NULL, data_len);
 	ptr = *data;
-	ptr += zbx_serialize_uint64(ptr, itemid);
+	ptr += zbx_serialize_uint64(ptr, objectid);
 	ptr += zbx_serialize_str(ptr, addr, addr_len);
 	ptr += zbx_serialize_short(ptr, port);
 	ptr += zbx_serialize_char(ptr, authtype);
@@ -48,17 +51,18 @@ zbx_uint32_t	zbx_ipmi_serialize_value_request(unsigned char **data, zbx_uint64_t
 	ptr += zbx_serialize_str(ptr, username, username_len);
 	ptr += zbx_serialize_str(ptr, password, password_len);
 	ptr += zbx_serialize_str(ptr, sensor, sensor_len);
+	ptr += zbx_serialize_int(ptr, command);
 
 	return data_len;
 }
 
-void	zbx_ipmi_deserialize_value_request(const unsigned char *data, zbx_uint64_t *itemid, char **addr,
+void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objectid, char **addr,
 		unsigned short *port, signed char *authtype, unsigned char *privilege, char **username, char **password,
-		char **sensor)
+		char **sensor, int *command)
 {
 	zbx_uint32_t	value_len;
 
-	data += zbx_deserialize_uint64(data, itemid);
+	data += zbx_deserialize_uint64(data, objectid);
 	data += zbx_deserialize_str(data, addr, value_len);
 	data += zbx_deserialize_short(data, port);
 	data += zbx_deserialize_char(data, authtype);
@@ -66,21 +70,26 @@ void	zbx_ipmi_deserialize_value_request(const unsigned char *data, zbx_uint64_t 
 	data += zbx_deserialize_str(data, username, value_len);
 	data += zbx_deserialize_str(data, password, value_len);
 	data += zbx_deserialize_str(data, sensor, value_len);
+	data += zbx_deserialize_int(data, command);
 }
 
-zbx_uint32_t	zbx_ipmi_serialize_value_response(unsigned char **data, zbx_uint64_t itemid, const zbx_timespec_t *ts,
-		int errcode, const char *value)
+void	zbx_ipmi_deserialize_request_objectid(const unsigned char *data, zbx_uint64_t *objectid)
+{
+	data += zbx_deserialize_uint64(data, objectid);
+}
+
+zbx_uint32_t	zbx_ipmi_serialize_result(unsigned char **data, const zbx_timespec_t *ts, int errcode,
+		const char *value)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len, value_len;
 
-	value_len = strlen(value)  + 1;
+	value_len = (NULL != value ? strlen(value)  + 1 : 0);
 
-	data_len = value_len + sizeof(zbx_uint32_t) + sizeof(zbx_uint64_t) + sizeof(int) * 3;
+	data_len = value_len + sizeof(zbx_uint32_t) + sizeof(int) * 3;
 	*data = zbx_malloc(NULL, data_len);
 
 	ptr = *data;
-	ptr += zbx_serialize_uint64(ptr, itemid);
 	ptr += zbx_serialize_int(ptr, ts->sec);
 	ptr += zbx_serialize_int(ptr, ts->ns);
 	ptr += zbx_serialize_int(ptr, errcode);
@@ -89,15 +98,14 @@ zbx_uint32_t	zbx_ipmi_serialize_value_response(unsigned char **data, zbx_uint64_
 	return data_len;
 }
 
-void	zbx_ipmi_deserialize_value_response(const unsigned char *data, zbx_uint64_t *itemid, zbx_timespec_t *ts,
-		int *errcode, char **value)
+void	zbx_ipmi_deserialize_result(const unsigned char *data, zbx_timespec_t *ts, int *errcode, char **value)
 {
 	int	value_len;
 
-	data += zbx_deserialize_uint64(data, itemid);
 	data += zbx_deserialize_int(data, &ts->sec);
 	data += zbx_deserialize_int(data, &ts->ns);
 	data += zbx_deserialize_int(data, errcode);
 	data += zbx_deserialize_str(data, value, value_len);
 }
 
+#endif

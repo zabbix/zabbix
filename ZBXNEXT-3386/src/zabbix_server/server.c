@@ -45,7 +45,6 @@
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
-#include "poller/checks_ipmi.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
@@ -60,8 +59,12 @@
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
 #include "zbxipcservice.h"
+
+#ifdef HAVE_OPENIPMI
+#include "ipmi/checks_ipmi.h"
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
+#endif
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_server.conf"
 
@@ -487,6 +490,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+#endif
+
+#if !defined(HAVE_OPENIPMI)
+	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
@@ -1015,9 +1022,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 				threads[i] = zbx_thread_start(escalator_thread, &thread_args);
 				break;
-			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
-				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
 				thread_args.args = &poller_type;
@@ -1038,9 +1042,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				threads[i] = zbx_thread_start(taskmanager_thread, &thread_args);
 				break;
+#ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
 				threads[i] = zbx_thread_start(ipmi_manager_thread, &thread_args);
 				break;
+			case ZBX_PROCESS_TYPE_IPMIPOLLER:
+				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
+				break;
+#endif
 		}
 	}
 

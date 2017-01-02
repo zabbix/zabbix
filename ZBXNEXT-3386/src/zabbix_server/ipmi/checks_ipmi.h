@@ -17,17 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_IPMI_POLLER_H
-#define ZABBIX_IPMI_POLLER_H
+#ifndef ZABBIX_CHECKS_IPMI_H
+#define ZABBIX_CHECKS_IPMI_H
 
 #include "common.h"
 
 #ifdef HAVE_OPENIPMI
 
-#include "threads.h"
+#include "dbcache.h"
+#include "sysinfo.h"
 
-ZBX_THREAD_ENTRY(ipmi_poller_thread, args);
+int	init_ipmi_handler(void);
+void	free_ipmi_handler(void);
+int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value);
+int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
+int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
+void	delete_inactive_ipmi_hosts(time_t last_check);
 
-#endif
+#endif	/* HAVE_OPENIPMI */
 
-#endif
+#endif	/* ZABBIX_CHECKS_IPMI_H */

@@ -6,20 +6,22 @@
 
 #define ZBX_IPC_SOCKET_BUFFER_SIZE	4096
 
-#define ZBX_IPC_MESSAGE_CODE	0
-#define ZBX_IPC_MESSAGE_SIZE	1
+#define ZBX_IPC_RECV_IMMEDIATE	0
+#define ZBX_IPC_RECV_WAIT	1
+#define ZBX_IPC_RECV_TIMEOUT	2
 
 typedef struct
 {
-	/* the message header containing code and data */
-	zbx_uint32_t	header[2];
+	/* the message code */
+	zbx_uint32_t	code;
+
+	/* the data size */
+	zbx_uint32_t	size;
+
 	/* the data */
 	unsigned char	*data;
 }
 zbx_ipc_message_t;
-
-#define zbx_ipc_message_code(message) (message)->header[ZBX_IPC_MESSAGE_CODE]
-#define zbx_ipc_message_size(message) (message)->header[ZBX_IPC_MESSAGE_SIZE]
 
 /* messaging socket */
 typedef struct
@@ -53,21 +55,22 @@ typedef struct
 
 	/* the clients with messages */
 	zbx_queue_ptr_t		clients_recv;
-
-	/* the client to be removed during next recv() call */
-	zbx_ipc_client_t	*client_remove;
 }
 zbx_ipc_service_t;
 
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env();
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
-void	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
 void	zbx_ipc_client_close(zbx_ipc_client_t *client);
+
+void	zbx_ipc_client_addref(zbx_ipc_client_t *client);
+void	zbx_ipc_client_release(zbx_ipc_client_t *client);
+int	zbx_ipc_client_connected(zbx_ipc_client_t *client);
 
 int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
@@ -79,6 +82,7 @@ void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
+void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src);
 
 #endif
 
