@@ -950,6 +950,7 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
+int	zbx_check_time_period(const char *period, time_t time, int *res);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
