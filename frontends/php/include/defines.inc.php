@@ -942,7 +942,7 @@ define('IPMI_PRIVILEGE_OPERATOR',	3);
 define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
-define('ZBX_HAVE_IPV6', 1);
+define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit

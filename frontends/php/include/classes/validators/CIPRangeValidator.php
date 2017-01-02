@@ -22,7 +22,7 @@
 /**
  * Class containing methods for IP range and network mask validation.
  */
-class CIPRangeValidator extends CIPValidator {
+class CIPRangeValidator extends CValidator {
 
 	/**
 	 * Maximum amount of IP addresses for each range (configuration parameter).
@@ -43,6 +43,23 @@ class CIPRangeValidator extends CIPValidator {
 	 * @var string
 	 */
 	private $maxIPRange;
+
+	/**
+	 * @var CIPv4Parser
+	 */
+	private $ipv4_parser;
+
+	/**
+	 * @var CIPv6Parser
+	 */
+	private $ipv6_parser;
+
+	public function __construct(array $options = []) {
+		parent::__construct($options);
+
+		$this->ipv4_parser = new CIPv4Parser();
+		$this->ipv6_parser = new CIPv6Parser(['v6' => ZBX_HAVE_IPV6]);
+	}
 
 	/**
 	 * Validate comma-separated IP address ranges.
@@ -113,7 +130,7 @@ class CIPRangeValidator extends CIPValidator {
 			return false;
 		}
 
-		if (!$this->isValidIPv4($parts[0])) {
+		if ($this->ipv4_parser->parse($parts[0]) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
@@ -145,7 +162,7 @@ class CIPRangeValidator extends CIPValidator {
 			return false;
 		}
 
-		if (!$this->isValidIPv6($parts[0])) {
+		if ($this->ipv6_parser->parse($parts[0]) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
@@ -201,7 +218,7 @@ class CIPRangeValidator extends CIPValidator {
 			}
 		}
 
-		if (!$this->isValidIPv4(implode('.', $ipParts))) {
+		if ($this->ipv4_parser->parse(implode('.', $ipParts)) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
@@ -243,7 +260,7 @@ class CIPRangeValidator extends CIPValidator {
 			}
 		}
 
-		if (!$this->isValidIPv6(implode(':', $ipParts))) {
+		if ($this->ipv6_parser->parse(implode(':', $ipParts)) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
