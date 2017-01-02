@@ -1845,8 +1845,8 @@ static int	validate_hostname(const char *hostname, int len)
 	if (0 == isalnum(*hostname))
 		return FAIL;
 
-	/* the last character must not be a minus sign or period */
-	if ('-' == hostname[len - 1] || '.' == hostname[len - 1])
+	/* the last character must not be a minus sign */
+	if ('-' == hostname[len - 1])
 		return FAIL;
 
 	for (i = 0; i < len; i++)
