@@ -189,18 +189,19 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
  *                                                                            *
  * Purpose: substitute constant macros with real values from expression       *
  *                                                                            *
- * Parameters: replace    - [IN] constant to replace                          *
+ * Parameters: number_ref - [IN] can be used to refer to the first, second    *
+ *                               and up to ninth constant of the expression   *
  *             expression - [IN] trigger expression, source of constants      *
  *                                                                            *
  * Return value: trigger description constant is expanded and allocated       *
  *               if no such number found then empty string is allocated       *
  *               must be freed                                                *
  ******************************************************************************/
-static char	*expand_trigger_description_constant(const char *replace, const char *expression)
+static char	*expand_trigger_description_constant(int number_ref, const char *expression)
 {
 	char		*number = NULL;
 	int		ret = SUCCEED;
-	size_t		number_alloc = 0, number_offset = 0, pos = 0, number_cnt = 0, number_ref = replace[1] - '0';
+	size_t		number_alloc = 0, number_offset = 0, pos = 0, number_cnt = 0;
 	zbx_strloc_t	number_loc;
 
 	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < number_ref)
@@ -3398,7 +3399,22 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				if (ZBX_TOKEN_REFERENCE == token.type)
+				{
+					if (0 == macros_expanded)
+					{
+						expression = DCexpression_expand_user_macros(event->trigger.expression,
+								NULL);
+						macros_expanded = 1;
+					}
+
+					if (NULL != expression)
+						replace_to = expand_trigger_description_constant(
+								token.data.reference.number, expression);
+
+					pos = token.token.r;
+				}
+				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
@@ -3445,20 +3461,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					cache_trigger_hostids(&hostids, event->trigger.expression,
 							event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-					pos = token.token.r;
-				}
-				else if (0 == strncmp(m, "$", 1))
-				{
-					if (0 == macros_expanded)
-					{
-						expression = DCexpression_expand_user_macros(event->trigger.expression,
-								NULL);
-						macros_expanded = 1;
-					}
-
-					if (NULL != expression)
-						replace_to = expand_trigger_description_constant(m, expression);
-
 					pos = token.token.r;
 				}
 			}
