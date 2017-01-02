@@ -185,11 +185,14 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: expand_trigger_description_constant                              *
+ * Function: find_trigger_description_constant                                *
  *                                                                            *
  * Purpose: substitute constant macros with real values from expression       *
  *                                                                            *
- * Parameters: number_ref - [IN] can be used to refer to the first, second    *
+ * Parameters: number     - [OUT] point to number from expression or          *
+ *                                empty string if number not found            *
+ *             len        - [OUT] length of number                            *
+ *             number_ref - [IN] can be used to refer to the first, second    *
  *                               and up to ninth constant of the expression   *
  *             expression - [IN] trigger expression, source of constants      *
  *                                                                            *
@@ -197,11 +200,11 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
  *               if no such number found then empty string is allocated       *
  *               must be freed                                                *
  ******************************************************************************/
-static char	*expand_trigger_description_constant(int number_ref, const char *expression)
+static void	find_trigger_description_constant(const char **number, size_t *len,
+		int number_ref, const char *expression)
 {
-	char		*number = NULL;
 	int		ret = SUCCEED;
-	size_t		number_alloc = 0, number_offset = 0, pos = 0, number_cnt = 0;
+	size_t		pos = 0, number_cnt = 0;
 	zbx_strloc_t	number_loc;
 
 	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < number_ref)
@@ -209,13 +212,14 @@ static char	*expand_trigger_description_constant(int number_ref, const char *exp
 
 	if (SUCCEED == ret)
 	{
-		zbx_strncpy_alloc(&number, &number_alloc, &number_offset, expression + number_loc.l,
-				number_loc.r - number_loc.l + 1);
+		*len = number_loc.r - number_loc.l + 1;
+		*number = expression + number_loc.l;
 	}
 	else
-		number = zbx_strdup(NULL, "");
-
-	return number;
+	{
+		*len = 0;
+		*number = "";
+	}
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -2434,10 +2438,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	const char		*__function_name = "substitute_simple_macros";
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
-	const char		*m;
+	const char		*m, *replace = NULL;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, func_macro,
 				found, raw_value;
-	size_t			data_alloc, data_len;
+	size_t			data_alloc, data_len, replace_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
@@ -3409,7 +3413,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					}
 
 					if (NULL != expression)
-						replace_to = expand_trigger_description_constant(
+						find_trigger_description_constant(&replace, &replace_len,
 								token.data.reference.number, expression);
 
 					pos = token.token.r;
@@ -3758,33 +3762,20 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (NULL != replace_to)
 		{
-			size_t	sz_m, sz_r;
-
 			pos = token.token.r;
 
-			sz_m = br - bl;
-			sz_r = strlen(replace_to);
-
-			if (sz_m != sz_r)
-			{
-				pos += sz_r - sz_m;
-				data_len += sz_r - sz_m;
-
-				if (data_len > data_alloc)
-				{
-					char	*old_data = *data;
-
-					while (data_len > data_alloc)
-						data_alloc *= 2;
-					*data = zbx_realloc(*data, data_alloc);
-					bl += *data - old_data;
-				}
-
-				memmove(bl + sz_r, bl + sz_m, data_len - (bl - *data) - sz_r);
-			}
-
-			memcpy(bl, replace_to, sz_r);
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl, br - bl,
+					replace_to, strlen(replace_to));
 			zbx_free(replace_to);
+		}
+		else if (NULL != replace)
+		{
+			pos = token.token.r;
+
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl, br - bl,
+					replace, replace_len);
+
+			replace = NULL;
 		}
 
 		pos++;
