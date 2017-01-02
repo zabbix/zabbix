@@ -4639,7 +4639,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
-		if (!isdigit(*s))
+		if (0 == isdigit(*s))
 			continue;
 
 		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
@@ -4653,7 +4653,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 		{
 			int	dot_found = 0;
 
-			if (isdigit(*e))
+			if (0 != isdigit(*e))
 				continue;
 
 			if ('.' == *e && 0 == dot_found)
