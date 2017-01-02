@@ -4507,28 +4507,32 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
 	int		ret = FAIL;
-	const char	*ptr = expression + pos, *dollar = NULL;
+	const char	*ptr = expression + pos, *dollar = ptr;
 
 	while (SUCCEED != ret)
 	{
-		if (ZBX_TOKEN_SEARCH_REFERENCES == token_search)
-			dollar = strchr(ptr, '$');
-
 		ptr = strchr(ptr, '{');
 
-		if (NULL != dollar && (NULL == ptr || ptr > dollar))
+		switch (token_search)
 		{
-			if ('1' <= dollar[1] && dollar[1] <= '9')
-			{
-				token->token.l = dollar - expression;
-				token->token.r = token->token.l + 1;
-				return SUCCEED;
-			}
-			else
-			{
-				ptr = dollar + 1;
-				continue;
-			}
+			case ZBX_TOKEN_SEARCH_BASIC:
+				break;
+			case ZBX_TOKEN_SEARCH_REFERENCES:
+				while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+				{
+					if (0 == isdigit(dollar[1]))
+					{
+						dollar++;
+						continue;
+					}
+
+					token->token.l = dollar - expression;
+					token->token.r = token->token.l + 1;
+					return SUCCEED;
+				}
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		if (NULL == ptr)
