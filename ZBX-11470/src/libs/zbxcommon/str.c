@@ -4525,7 +4525,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 						dollar++;
 						continue;
 					}
-
+					token->type = ZBX_TOKEN_REFERENCE;
 					token->token.l = dollar - expression;
 					token->token.r = token->token.l + 1;
 					return SUCCEED;
