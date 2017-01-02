@@ -2144,7 +2144,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
 			break;
 
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
@@ -2197,7 +2197,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (max_src_len < csize)
 			break;
 
-#if defined(HAVE_MYSQL)
+#ifdef HAVE_MYSQL
 		if ('\'' == *s || '\\' == *s)
 #else
 		if ('\'' == *s)
