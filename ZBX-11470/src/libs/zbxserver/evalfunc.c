@@ -632,7 +632,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, ti
 			{
 				if (OP_BAND != op)
 				{
-					if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
+					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
 								" value", arg2);
