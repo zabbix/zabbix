@@ -44,7 +44,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
-	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
+		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
+	],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'width' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Height')],
@@ -201,6 +203,19 @@ if (hasRequest('add') || hasRequest('update')) {
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
+		if (getRequest('form') === 'full_clone') {
+			$clone_map = API::Map()->get([
+				'sysmapids' => $sysmap['sysmapid'],
+				'selectSelements' => ['elementid', 'elementtype', 'iconid_off', 'iconid_on',
+					'label', 'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance',
+					'elementsubtype', ' areatype', 'width', 'height', 'viewtype', 'use_iconmap',
+					'application', 'urls'
+				]
+			]);
+
+			$map['selements'] = $clone_map[0]['selements'];
+		}
+
 		$result = API::Map()->create($map);
 
 		$messageSuccess = _('Network map added');
