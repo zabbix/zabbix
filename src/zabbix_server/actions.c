@@ -350,19 +350,36 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	}
 	else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
 	{
-		switch (condition->operator)
+		char	*period;
+		int	res;
+
+		period = zbx_strdup(NULL, condition->value);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period, MACRO_TYPE_COMMON,
+				NULL, 0);
+
+		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
 		{
-			case CONDITION_OPERATOR_IN:
-				if (SUCCEED == check_time_period(condition->value, (time_t)event->clock))
-					ret = SUCCEED;
-				break;
-			case CONDITION_OPERATOR_NOT_IN:
-				if (FAIL == check_time_period(condition->value, (time_t)event->clock))
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
+			switch (condition->operator)
+			{
+				case CONDITION_OPERATOR_IN:
+					if (SUCCEED == res)
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_NOT_IN:
+					if (FAIL == res)
+						ret = SUCCEED;
+					break;
+				default:
+					ret = NOTSUPPORTED;
+			}
 		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid time period \"%s\" for condition id [" ZBX_FS_UI64 "]",
+					period, condition->conditionid);
+		}
+
+		zbx_free(period);
 	}
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{

@@ -875,8 +875,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		now, severity, medias_num = 0, status;
-	char		error[MAX_STRING_LEN], *perror;
+	int		now, severity, medias_num = 0, status, res;
+	char		error[MAX_STRING_LEN], *perror, *period = NULL;
 	const DB_EVENT	*c_event;
 	zbx_db_insert_t	db_insert;
 
@@ -913,9 +913,12 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 	{
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
+		period = zbx_strdup(period, row[3]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period, MACRO_TYPE_COMMON,
+				NULL, 0);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "trigger severity:%d, media severity:%d, period:'%s'",
-				(int)c_event->trigger.priority, severity, row[3]);
+				(int)c_event->trigger.priority, severity, period);
 
 		if (((1 << c_event->trigger.priority) & severity) == 0)
 		{
@@ -923,7 +926,12 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 			continue;
 		}
 
-		if (FAIL == check_time_period(row[3], (time_t)0))
+		if (SUCCEED != zbx_check_time_period(period, time(NULL), &res))
+		{
+			status = ALERT_STATUS_FAILED;
+			perror = "Invalid media activity period";
+		}
+		else if (SUCCEED != res)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
@@ -953,6 +961,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 	}
 
 	DBfree_result(result);
+	zbx_free(period);
 
 	if (0 == mediatypeid)
 	{
