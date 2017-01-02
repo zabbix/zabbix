@@ -27,57 +27,55 @@ class CIPv4ParserTest extends PHPUnit_Framework_TestCase {
 	public static function testProvider() {
 		return [
 			[
-				'192.168.3.4', 0,
-				[
+				'192.168.3.4', 0, [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '192.168.3.4'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0', 0,
-				[
+				'192.168.3.4,192.168.5.0', 0, [
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '192.168.3.4'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0', 12,
-				[
+				'192.168.3.4,192.168.5.0', 12, [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '192.168.5.0'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0/24', 12,
-				[
+				'192.168.3.4,192.168.5.0/24', 12, [
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '192.168.5.0'
 				]
 			],
 			[
-				'192.168.3.256', 0,
-				[
+				'192.168.3.256', 0, [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'192.168.3.256', 0,
-				[
+				'192.168.3.256', 0, [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'192.168..4', 0,
-				[
+				'192.168..4', 0, [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'', 0,
-				[
+				'321.654.987.456', 0, [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'', 0, [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
