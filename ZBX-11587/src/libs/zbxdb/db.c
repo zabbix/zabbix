@@ -714,7 +714,7 @@ int	zbx_db_begin(void)
 int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
-#if defined(HAVE_ORACLE)
+#ifdef HAVE_ORACLE
 	sword	err = OCI_SUCCESS;
 #endif
 
