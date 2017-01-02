@@ -135,7 +135,7 @@ static double	evaluate_number(int *unknown_idx)
 
 		if (0 != isalpha((unsigned char)*iter))
 		{
-			if (NULL == strchr("KMGTsmhdw", *iter))
+			if (NULL == strchr(ZBX_UNIT_SYMBOLS, *iter))
 				return ZBX_INFINITY;
 
 			factor = suffix2factor(*iter++);

@@ -417,6 +417,9 @@ zbx_graph_yaxis_types_t;
 /* Zabbix Agent non-critical error (agents older than 2.0) */
 #define ZBX_ERROR		"ZBX_ERROR"
 
+/* time and memory size suffixes */
+#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
+
 /* media types */
 typedef enum
 {
