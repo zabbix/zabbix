@@ -3461,7 +3461,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 					pos = token.token.r;
 				}
-
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION))
