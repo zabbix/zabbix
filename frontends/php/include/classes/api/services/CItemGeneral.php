@@ -190,6 +190,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$item_key_parser = new CItemKey();
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
 
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
@@ -391,6 +392,14 @@ abstract class CItemGeneral extends CApiService {
 							$item_delay_flex_parser->getError())
 						);
 					}
+				}
+			}
+
+			if ($fullItem['type'] == ITEM_TYPE_TRAPPER) {
+				if ($fullItem['trapper_hosts'] !== '' && !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
+					);
 				}
 			}
 
