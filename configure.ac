@@ -1336,6 +1336,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_ipmi="yes"
 		fi
 	fi
+	
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENIPMI_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $OPENIPMI_LIBS"
 

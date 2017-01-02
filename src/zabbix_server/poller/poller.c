@@ -34,7 +34,6 @@
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
-#include "checks_ipmi.h"
 #include "checks_db.h"
 #ifdef HAVE_SSH2
 #	include "checks_ssh.h"
@@ -353,14 +352,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_agent(item, result);
 			zbx_alarm_off();
 			break;
-		case ITEM_TYPE_IPMI:
-#ifdef HAVE_OPENIPMI
-			res = get_value_ipmi(item, result);
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
-			res = CONFIG_ERROR;
-#endif
-			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
 			res = get_value_simple(item, result, add_results);
@@ -480,7 +471,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -736,7 +726,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time, last_ipmi_host_check;
+	time_t		last_stat_time;
 	unsigned char	poller_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -759,7 +749,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = last_ipmi_host_check = time(NULL);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -777,13 +767,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
-#ifdef HAVE_OPENIPMI
-		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
-		{
-			last_ipmi_host_check = time(NULL);
-			delete_inactive_ipmi_hosts(last_ipmi_host_check);
-		}
-#endif
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
