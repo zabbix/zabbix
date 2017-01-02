@@ -417,9 +417,6 @@ zbx_graph_yaxis_types_t;
 /* Zabbix Agent non-critical error (agents older than 2.0) */
 #define ZBX_ERROR		"ZBX_ERROR"
 
-/* time and memory size suffixes */
-#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
-
 /* media types */
 typedef enum
 {
@@ -1140,6 +1137,8 @@ void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
+/* time and memory size suffixes */
+#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
 #if defined(_WINDOWS)
