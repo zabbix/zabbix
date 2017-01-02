@@ -532,7 +532,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 	zbx_uint64_t		hostid = 0;
 	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc;
 	unsigned char		state = 0;
-	unsigned short		lifetime;
+	int			lifetime;
 	zbx_vector_ptr_t	lld_rows;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
@@ -568,12 +568,12 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 		lifetime_str = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
+		if (SUCCEED != is_time_suffix(lifetime_str, &lifetime))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
 					" \"%s\" is not a valid value",
 					zbx_host_string(hostid), discovery_key, lifetime_str);
-			lifetime = 3650;	/* max value for the field */
+			lifetime = 10 * SEC_PER_YEAR;	/* max value for the field */
 		}
 		zbx_free(lifetime_str);
 	}
