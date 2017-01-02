@@ -1988,7 +1988,7 @@ out:
  *          fields; removes lost resources                                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, unsigned short lifetime, int lastcheck)
+static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, int lifetime, int lastcheck)
 {
 	const char			*__function_name = "lld_remove_lost_items";
 	char				*sql = NULL;
@@ -1996,14 +1996,12 @@ static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, unsigned short 
 	zbx_lld_item_t			*item;
 	zbx_vector_uint64_t		del_itemids, lc_itemids, ts_itemids;
 	zbx_vector_uint64_pair_t	discovery_itemts;
-	int				i, lifetime_sec;
+	int				i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == items->values_num)
 		goto out;
-
-	lifetime_sec = lifetime * SEC_PER_DAY;
 
 	zbx_vector_uint64_create(&del_itemids);
 	zbx_vector_uint64_create(&lc_itemids);
@@ -2019,16 +2017,16 @@ static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, unsigned short 
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		{
-			if (item->lastcheck < lastcheck - lifetime_sec)
+			if (item->lastcheck < lastcheck - lifetime)
 			{
 				zbx_vector_uint64_append(&del_itemids, item->itemid);
 			}
-			else if (item->ts_delete != item->lastcheck + lifetime_sec)
+			else if (item->ts_delete != item->lastcheck + lifetime)
 			{
 				zbx_uint64_pair_t	itemts;
 
 				itemts.first = item->itemid;
-				itemts.second = item->lastcheck + lifetime_sec;
+				itemts.second = item->lastcheck + lifetime;
 				zbx_vector_uint64_pair_append(&discovery_itemts, itemts);
 			}
 		}
@@ -2115,7 +2113,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *applications,
-		unsigned short lifetime, int lastcheck)
+		int lifetime, int lastcheck)
 {
 	const char			*__function_name = "lld_remove_lost_applications";
 	DB_RESULT			result;
@@ -2124,7 +2122,7 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t		del_applicationids, del_discoveryids, ts_discoveryids, lc_discoveryids;
 	zbx_vector_uint64_pair_t	discovery_applicationts;
-	int				i, lifetime_sec, index;
+	int				i, index;
 	const zbx_lld_application_t	*application;
 	zbx_uint64_t			applicationid;
 
@@ -2132,8 +2130,6 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 
 	if (0 == applications->values_num)
 		goto out;
-
-	lifetime_sec = lifetime * SEC_PER_DAY;
 
 	zbx_vector_uint64_create(&del_applicationids);
 	zbx_vector_uint64_create(&del_discoveryids);
@@ -2151,17 +2147,17 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 		{
-			if (application->lastcheck < lastcheck - lifetime_sec)
+			if (application->lastcheck < lastcheck - lifetime)
 			{
 				zbx_vector_uint64_append(&del_applicationids, application->applicationid);
 				zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
 			}
-			else if (application->ts_delete != application->lastcheck + lifetime_sec)
+			else if (application->ts_delete != application->lastcheck + lifetime)
 			{
 				zbx_uint64_pair_t	applicationts;
 
 				applicationts.first = application->application_discoveryid;
-				applicationts.second = application->lastcheck + lifetime_sec;
+				applicationts.second = application->lastcheck + lifetime;
 				zbx_vector_uint64_pair_append(&discovery_applicationts, applicationts);
 			}
 		}
@@ -3170,7 +3166,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
  *                                                                            *
  ******************************************************************************/
 void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
-		unsigned short lifetime, int lastcheck)
+		int lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_items";
 
