@@ -1092,6 +1092,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	ZBX_USER_MSG	*user_msg = NULL;
 	zbx_uint64_t	operationid;
 	unsigned char	operationtype, evaltype, operations = 0;
+	char		*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1135,7 +1136,16 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	{
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
-		esc_period = atoi(row[2]);
+
+		tmp = zbx_strdup(tmp, row[2]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		if (SUCCEED != is_time_suffix(tmp, &esc_period))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
+					" using default operation step duration of the action", tmp, action->name);
+			esc_period = 0;
+		}
+
 		evaltype = (unsigned char)atoi(row[3]);
 
 		if (0 == esc_period)
@@ -1226,6 +1236,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	/* schedule nextcheck for sleeping escalations */
 	if (ESCALATION_STATUS_SLEEP == escalation->status)
 		escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+
+	zbx_free(tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1837,6 +1849,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 {
 	DB_ROW		row;
 	DB_RESULT	result;
+	char		*tmp = NULL;
 	int		ret = SUCCEED;
 
 	result = DBselect(
@@ -1858,7 +1871,16 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 		ZBX_STR2UCHAR(action->status, row[2]);
 		ZBX_STR2UINT64(action->actionid, row[0]);
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
-		action->esc_period = atoi(row[4]);
+
+		tmp = zbx_strdup(tmp, row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		if (SUCCEED != is_time_suffix(tmp, &action->esc_period))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
+					" \"%s\", using default value of 1 hour", tmp, row[1]);
+			action->esc_period = SEC_PER_HOUR;
+		}
+
 		action->shortdata = zbx_strdup(NULL, row[5]);
 		action->longdata = zbx_strdup(NULL, row[6]);
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
@@ -1883,6 +1905,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 
 out:
 	DBfree_result(result);
+	zbx_free(tmp);
 
 	return ret;
 }
