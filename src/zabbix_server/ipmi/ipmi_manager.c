@@ -723,7 +723,6 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 			break;
 	}
 
-	/* TODO: use ITEM_VALUE_TYPE_TEXT when ZBXNEXT-1443 is merged (item preprocessing) */
 	/* add received data to history cache */
 	switch (errcode)
 	{
@@ -734,7 +733,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				/* reusing exiting value, so free_result() shouldn't be used */
 				init_result(&result);
 				SET_STR_RESULT(&result, value);
-				dc_add_history(itemid, ITEM_VALUE_TYPE_STR, 0, &result, &ts, state, NULL);
+				dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, &result, &ts, state, NULL);
 			}
 			break;
 
@@ -742,7 +741,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(itemid, ITEM_VALUE_TYPE_STR, 0, NULL, &ts, state, value);
+			dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, value);
 	}
 
 	dc_flush_history();
