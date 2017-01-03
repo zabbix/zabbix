@@ -212,7 +212,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				]
 			]);
 
-			if ($clone_map != []) {
+			if ($clone_map) {
 				$map['selements'] = $clone_map[0]['selements'];
 			}
 		}
