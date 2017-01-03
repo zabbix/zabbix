@@ -36,21 +36,22 @@
  *          included (regex_incl) and doesn't match regexp pattern for        *
  *          filenames to be excluded (regex_excl)                             *
  *                                                                            *
- * Parameters: name       - [IN] filename to be checked                       *
- *             regex_incl - [IN] regexp for filenames to include (NULL for    *
- *                               none)                                        *
- *             regex_excl - [IN] regexp for filenames to exclude (NULL for    *
- *                               none)                                        *
+ * Parameters: name            - [IN] filename to be checked                  *
+ *             regex_incl      - [IN] regexp for filenames to include         *
+ *             regex_excl      - [IN] regexp for filenames to exclude         *
+ *             regex_incl_used - [IN] flag: 0 - ignore 'regex_incl'           *
+ *             regex_excl_used - [IN] flag: 0 - ignore 'regex_incl'           *
  *                                                                            *
  * Return value: If filename passes both checks, nonzero value is returned    *
  *               If filename fails to pass, 0 is returned.                    *
  *                                                                            *
  ******************************************************************************/
-static int	filename_matches(const char *name, const regex_t *regex_incl, const regex_t *regex_excl)
+static int	filename_matches(const char *name, const regex_t *regex_incl, const regex_t *regex_excl,
+		int regex_incl_used, int regex_excl_used)
 {
-	return ((regex_incl == NULL ||
+	return ((0 == regex_incl_used ||
 			0 == zbx_regexp_match_precompiled(name, regex_incl)) &&
-			(regex_excl == NULL ||
+			(0 == regex_excl_used ||
 			0 != zbx_regexp_match_precompiled(name, regex_excl)));
 }
 
@@ -244,7 +245,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_append(&list, item);
 
 #ifndef _WINDOWS
-	if (0 != filename_matches(dir, &regex_incl, &regex_excl))
+	if (0 != filename_matches(dir, &regex_incl, &regex_excl, regex_incl_used, regex_excl_used))
 	{
 		if (SIZE_MODE_APPARENT == mode)
 			size += status.st_size;
@@ -301,7 +302,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == (data.attrib & _A_SUBDIR))
 			{
-				if (0 != filename_matches(name, &regex_incl, &regex_excl))
+				if (0 != filename_matches(name, &regex_incl, &regex_excl, regex_incl_used,
+						regex_excl_used))
 				{
 					wpath = zbx_utf8_to_unicode(path);
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
@@ -360,7 +362,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == zbx_stat(path, &status))
 			{
 				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISDIR(status.st_mode)) &&
-						0 != filename_matches(entry->d_name, &regex_incl, &regex_excl))
+						0 != filename_matches(entry->d_name, &regex_incl, &regex_excl,
+						regex_incl_used, regex_excl_used))
 				{
 					if (0 != S_ISREG(status.st_mode) && 1 < status.st_nlink)
 					{
