@@ -1454,13 +1454,16 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *             client  - [OUT] the client that sent the message or            *
  *                             NULL if there are no messages and the          *
  *                             specified timeout passed.                      *
+ *                             The client must be released by caller with     *
+ *                             zbx_ipc_client_release() function.             *
  *             message - [OUT] the received message or NULL if the client     *
- *                            connection was closed.                          *
- *                            The message must be freed by caller with        *
- *                            ipc_message_free() function.                    *
+ *                             connection was closed.                         *
+ *                             The message must be freed by caller with       *
+ *                             ipc_message_free() function.                   *
  *                                                                            *
  * Return value: ZBX_IPC_RECV_IMMEDIATE - returned immediately without        *
  *                                        waiting for socket events           *
+ *                                        (pending events are processed)      *
  *               ZBX_IPC_RECV_WAIT      - returned after receiving socket     *
  *                                        event                               *
  *               ZBX_IPC_RECV_TIMEOUT   - returned after timeout expired      *
