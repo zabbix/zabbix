@@ -1479,3 +1479,20 @@ INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (14,'{$API_MACRO_FO
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (15,'{$API_MACRO_FOR_DELETE}','abc');
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1');
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (17,'{$API_MACRO_FOR_DELETE2}','2');
+
+-- icon map
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (1,'Api icon map',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (1,1,2,1,'api icon map expression',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (2,'Api icon map for update1',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (2,2,2,1,'api expression for update1',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (3,'Api icon map for update2',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (3,3,2,1,'api expression for update2',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (4,'Api icon map for delete',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (4,4,2,1,'api expression for delete',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (5,'Api icon map for delete1',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (5,5,2,1,'api expression for delete1',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (6,'Api icon map for delete2',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (6,6,2,1,'api expression for delete2',0);
+INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (7,'Api iconmap in map',2);
+INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (7,7,7,1,'api expression',0);
+INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, iconmapid, userid, private) VALUES (7, 'Map with iconmap', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 7, 1, 0);

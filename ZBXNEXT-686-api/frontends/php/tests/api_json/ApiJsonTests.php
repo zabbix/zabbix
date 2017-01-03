@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/CItem.php';
 require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
+require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
@@ -40,6 +41,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testHostGroup');
+		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
