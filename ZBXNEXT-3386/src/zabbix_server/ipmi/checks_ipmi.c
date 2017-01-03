@@ -1388,40 +1388,42 @@ fail:
 	return ret;
 }
 
-int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len)
+int	set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, const char *sensor,
+		int value, char **error)
 {
 	const char		*__function_name = "set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:%s value:%d", __function_name, item->ipmi_sensor, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
+			__function_name, hostid, sensor, value);
 
 	if (NULL == os_hnd)
 	{
-		zbx_strlcpy(error, "IPMI handler is not initialized.", max_error_len);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		*error = zbx_strdup(*error, "IPMI handler is not initialized.");
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
-			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
+	h = init_ipmi_host(addr, port, authtype, privilege, username, password);
 
 	if (0 == h->domain_up)
 	{
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, max_error_len);
+			*error = zbx_strdup(*error, h->err);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 		return h->ret;
 	}
 
-	c = get_ipmi_control_by_name(h, item->ipmi_sensor);
+	c = get_ipmi_control_by_name(h, sensor);
 
 	if (NULL == c)
 	{
-		zbx_snprintf(error, max_error_len, "Control %s@ on address %s:%d does not exist.",
-				item->ipmi_sensor, h->ip, h->port);
+		*error = zbx_dsprintf(*error, "Control %s@ on address %s:%d does not exist.",
+				sensor, h->ip, h->port);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 		return NOTSUPPORTED;
 	}
@@ -1432,7 +1434,7 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_err
 	{
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, max_error_len);
+			*error = zbx_strdup(*error, h->err);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 	}

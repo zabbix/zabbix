@@ -130,7 +130,7 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 {
 	const char	*__function_name = "ipmi_poller_process_command_request";
 	zbx_uint64_t	itemid;
-	char		*addr, *username, *password, *sensor, *value = NULL;
+	char		*addr, *username, *password, *sensor, *error = NULL;
 	signed char	authtype;
 	unsigned char	privilege;
 	unsigned short	port;
@@ -145,10 +145,11 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 			" sensor:%s", __function_name, itemid, addr, (int)port, (int)authtype, (int)privilege,
 			username, sensor);
 
-	errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
-	ipmi_poller_send_result(socket, ZBX_IPC_IPMI_COMMAND_RESULT, errcode, value);
+	errcode = set_ipmi_control_value(itemid, addr, port, authtype, privilege, username, password, sensor, command,
+			&error);
+	ipmi_poller_send_result(socket, ZBX_IPC_IPMI_COMMAND_RESULT, errcode, error);
 
-	zbx_free(value);
+	zbx_free(error);
 	zbx_free(addr);
 	zbx_free(username);
 	zbx_free(password);
