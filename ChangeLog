@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11628] fixed global regexps to be extracted from log.count[] and logrt.count[] keys (vso)
 A.F....... [ZBX-11482] improved performance for getting last value of web items by limiting query results for values in last 24h; thanks to D.Spindel Ljungmark for patch (Cemeris)
 A......... [ZBX-11545] fixed dependency validation and update when trigger expression is changed (Gunars)
 ..F....... [ZBX-11538] fixed event acknowledgement in screens and dashboard widgets when last event is a recovery event (Gunars)
