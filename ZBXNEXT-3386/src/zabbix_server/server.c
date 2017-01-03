@@ -61,7 +61,6 @@
 #include "zbxipcservice.h"
 
 #ifdef HAVE_OPENIPMI
-#include "ipmi/checks_ipmi.h"
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
 #endif
@@ -790,9 +789,6 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
-#endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -1117,10 +1113,6 @@ void	zbx_on_exit(void)
 	zbx_vc_destroy();
 
 	zbx_destroy_itservices_lock();
-
-#ifdef HAVE_OPENIPMI
-	free_ipmi_handler();
-#endif
 
 #ifdef HAVE_SQLITE3
 	zbx_remove_sqlite3_mutex();

@@ -188,6 +188,8 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+	init_ipmi_handler();
+
 	ipmi_poller_register(&ipmi_socket);
 
 	/* initialize statistics */
@@ -247,6 +249,8 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	}
 
 	zbx_ipc_socket_close(&ipmi_socket);
+
+	free_ipmi_handler();
 
 #undef STAT_INTERVAL
 }

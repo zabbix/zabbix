@@ -58,7 +58,6 @@
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "../zabbix_server/ipmi/ipmi_poller.h"
-#include "../zabbix_server/ipmi/checks_ipmi.h"
 #endif
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
@@ -830,9 +829,6 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
-#endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -1110,10 +1106,6 @@ void	zbx_on_exit(void)
 	free_database_cache();
 	free_configuration_cache();
 	DBclose();
-
-#ifdef HAVE_OPENIPMI
-	free_ipmi_handler();
-#endif
 
 #ifdef HAVE_SQLITE3
 	zbx_remove_sqlite3_mutex();
