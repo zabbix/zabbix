@@ -302,6 +302,21 @@ static void	ipmi_poller_schedule_request(zbx_ipmi_poller_t *poller, zbx_ipmi_req
 
 /******************************************************************************
  *                                                                            *
+ * Function: ipmi_poller_free_request                                         *
+ *                                                                            *
+ * Purpose: frees the current request processed by IPMI poller                *
+ *                                                                            *
+ * Parameters: poller  - [IN] the IPMI poller                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
+{
+	ipmi_request_free(poller->request);
+	poller->request = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ipmi_poller_free                                                 *
  *                                                                            *
  * Purpose: frees IPMI poller                                                 *
@@ -532,13 +547,6 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 	zbx_ipmi_request_t	*request;
 	zbx_ipmi_manager_host_t	*host;
 
-	/* free the current request */
-	if (NULL != poller->request)
-	{
-		ipmi_request_free(poller->request);
-		poller->request = NULL;
-	}
-
 	while (NULL != (request = ipmi_poller_pop_request(poller)))
 	{
 		switch (request->message.code)
@@ -556,6 +564,7 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 				if (now < host->disable_until)
 				{
 					zbx_dc_requeue_unreachable_items(&request->itemid, 1);
+					ipmi_request_free(request);
 					continue;
 				}
 				break;
@@ -730,10 +739,11 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 			state = ITEM_STATE_NORMAL;
 			if (NULL != value)
 			{
-				/* reusing exiting value, so free_result() shouldn't be used */
 				init_result(&result);
-				SET_STR_RESULT(&result, value);
+				SET_TEXT_RESULT(&result, value);
+				value = NULL;
 				dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, &result, &ts, state, NULL);
+				free_result(&result);
 			}
 			break;
 
@@ -750,6 +760,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	/* put back the item in configuration cache IPMI poller queue */
 	DCrequeue_items(&itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
 
+	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
@@ -894,6 +905,7 @@ static void	ipmi_manager_process_command_result(zbx_ipmi_manager_t *manager, zbx
 		zbx_ipc_client_release(poller->request->client);
 	}
 
+	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
