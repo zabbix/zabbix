@@ -4684,7 +4684,7 @@ int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uin
 		if (0 != dc_item->interfaceid)
 		{
 			if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid)))
-				return FAIL;
+				goto unlock;
 
 			DCget_interface(interface, dc_interface);
 			res = SUCCEED;
