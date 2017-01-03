@@ -1184,7 +1184,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type);
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
-int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, char *to, size_t sz_to,
+int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from);
 
 void	zbx_trim_str_list(char *list, char delimiter);

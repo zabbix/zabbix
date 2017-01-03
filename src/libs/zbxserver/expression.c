@@ -3764,7 +3764,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			pos = token.token.r;
 
-			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl, br - bl,
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl - *data, br - bl,
 					replace_to, strlen(replace_to));
 			zbx_free(replace_to);
 		}
@@ -3772,7 +3772,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			pos = token.token.r;
 
-			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl, br - bl,
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl - *data, br - bl,
 					replace, replace_len);
 
 			replace = NULL;
