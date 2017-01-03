@@ -1,0 +1,697 @@
+
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+   <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Zabbix | Hosts</title>
+        <link rel="stylesheet" href="stylesheets/screen.css">
+        <!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
+   </head>
+<body>
+
+   <div class="article">
+      <ul class="action-menu" style="top: 10px; left: 650px">
+      <li><h3>Favourite screens</h3></li>
+      <li><a href="" class="action-menu-item">Add</a></li>
+      <li><a href="" class="action-menu-item">Remove<span class="arrow-right"></span></a>
+      <ul class="action-menu" style="top: 47px; left: 203px;">
+      <li><a href="" class="action-menu-item">Zabbix server</a></li>
+      </ul></li>
+      <li><a href="" class="action-menu-item">Remove all</a></li>
+      <li><div></div></li>
+      <li><h3>Favourite slide shows</h3></li>
+      <li><a href="" class="action-menu-item selected">Add</a></li>
+      <li><a class="action-menu-item-disabled">Remove</a></li>
+      <li><a class="action-menu-item-disabled">Remove all</a></li>
+      </ul>
+<!--
+      <ul class="action-menu" style="top: 58px; left: 840px">
+      <li><a href="#">Zabbix server</a></li>
+      </ul>
+-->
+      <div class="overlay-dialogue" style="top: 20px; left: 20px; max-width: 500px">
+      <button type="button" class="overlay-close-btn"></button>
+      <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</div><div class="overlay-descr-url"><a href="">A random link goes here</a></div>
+            <!--<table class="list-table">
+            <thead>
+            <tr>
+                  <th>Host</th>
+                  <th>Disaster</th>
+                  <th>High</th>
+                  <th>Average</th>
+                  <th>Warning</th>
+                  <th>Information</th>
+                  <th>Not classified</th>
+            </tr>
+            </thead>
+            <tbody>
+                  <tr><td><a href="#">vSphere 001</a></td><td class="disaster-bg">25</td><td class="high-bg">7</td><td class="average-bg">0</td><td class="warning-bg">2</td><td class="info-bg">0</td><td class="na-bg">0</td></tr>
+                  <tr><td><a href="#">vSphere 002</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+                  <tr><td><a href="#">vSphere 003</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+                  <tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+                  <tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+            </tbody>
+            </table>-->
+            <table class="list-table" id="t5603d1928c1e4">
+   <thead>
+      <tr>
+         <th>Time</th>
+         <th>Status</th>
+         <th>Duration</th>
+         <th>Age</th>
+         <th>Ack</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>2015-09-08 13:47:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>15d 23h 45m</td>
+         <td>15d 23h 45m</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=183267&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-05 06:14:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>1m 4d 7h</td>
+         <td>1m 20d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=181305&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-05 05:32:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>42m</td>
+         <td>1m 20d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=181290&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-04 06:11:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 21m</td>
+         <td>1m 21d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180744&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-04 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>33m</td>
+         <td>1m 21d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180739&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-03 06:08:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 30m</td>
+         <td>1m 22d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180486&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-03 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>30m</td>
+         <td>1m 22d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180479&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-02 06:14:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 24m</td>
+         <td>1m 23d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180267&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-02 05:47:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>27m</td>
+         <td>1m 23d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180262&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-01 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 45m</td>
+         <td>1m 24d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180109&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-01 05:41:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>21m</td>
+         <td>1m 24d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180105&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-31 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 39m</td>
+         <td>1m 25d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179919&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-31 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>24m</td>
+         <td>1m 25d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179914&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-30 06:05:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 33m</td>
+         <td>1m 26d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179477&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-30 05:35:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>30m</td>
+         <td>1m 26d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179476&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-29 05:59:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 36m</td>
+         <td>1m 27d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179301&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-29 05:17:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>42m</td>
+         <td>1m 27d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179300&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-28 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 15m</td>
+         <td>1m 28d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179055&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-27 05:17:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>1d 45m</td>
+         <td>1m 29d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=178660&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-26 05:59:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 18m</td>
+         <td>2m 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=178597&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+   </tbody>
+</table>
+      </div>
+
+   <div class="overlay-dialogue" style="top: 300px; left: 10px">
+      <button type="button" class="overlay-close-btn"></button>
+   <div class="dashbrd-widget-head cursor-move"><h4>Edit map element</h4></div>
+   <ul class="table-forms">
+            <li>
+            <div class="table-forms-td-left"><label for="HostName">Type</label></div>
+      <div class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Show</label></div>
+      <div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Host group</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Host group elements</label></li></ul></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Area type</label></div>
+      <div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Fit to map</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Custom size</label></li></ul></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="VisibleName">Label</label></div>
+      <div class="table-forms-td-right"><textarea id="VisibleName"></textarea></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Label location</label></div>
+      <div class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Host</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Application</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left">Icons</div>
+      <div class="table-forms-td-right"><label for="UseIconmap"><input type="checkbox" id="UseIconmap">Automatic icon selection</label><table><tr><td><label>Default</label>
+      <select>
+          <option value="2">Cloud_(24)</option>
+          <option value="3">Cloud_(48)</option>
+          <option value="4">Cloud_(64)</option>
+          <option value="5">Cloud_(96)</option>
+          <option value="1">Cloud_(128)</option>
+          <option value="7">Crypto-router_(24)</option>
+      </select></td><td><label>Problem</label>
+      <select>
+      <option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+        </select></td></tr><tr><td><label>Maintenance</label>
+      <select>
+      <option value="0">Default</option>
+      <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            </select></td><td><label>Disabled</label>
+        <select>
+            <option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+        </select></td></tr></tbody></table></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Coordinates</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="number" id="HostName"><label>X</label></div><div class="form-input-margin"><input type="number" id="HostName"><label>Y</label></div></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label>URLs</label></div>
+      <div class="table-forms-td-right"><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></div>
+      </li>
+    <li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button type="button">Apply</button><button type="button" class="btn-alt">Remove</button><button type="button" class="btn-alt">Cancel</button></div>
+    </li>
+      </ul>
+   </div>
+
+      <div class="overlay-dialogue calendar" style="top: 280px; left: 1210px; z-index: 10000">
+      <div class="calendar-header">
+      <div class="calendar-year"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+      </div>
+      <table>
+      <thead>
+      <tr><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th><th>S</th></tr>
+      </thead>
+      <tbody>
+      <tr><td class="grey">29</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+      <tr><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+      <tr><td>14</td><td>15</td><td class="selected">16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
+      <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td></tr>
+      <tr><td>28</td><td>29</td><td>30</td><td>31</td><td class="grey">1</td><td class="grey">2</td><td class="grey">3</td></tr>
+      <tr><td class="grey">4</td><td class="grey">5</td><td class="grey">6</td><td class="grey">7</td><td class="grey">8</td><td class="grey">9</td><td class="grey">10</td></tr>
+      </tbody>
+      </table>
+      <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
+      <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Done</button></div>
+      </div>
+
+      <div class="overlay-dialogue" style="top: 10px; left: 1050px">
+      <button type="button" class="overlay-close-btn"></button>
+      <div class="dashbrd-widget-head cursor-move"><h4>Execution confirmation</h4></div>
+      <div class="overlay-dialogue-body">Some random confirmation text goes right here</div>
+      <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
+      </div>
+
+       <div class="overlay-dialogue" style="top: 10px; left: 1350px">
+      <button type="button" class="overlay-close-btn"></button>
+<div class="color-picker">
+<div title="#000000" style="background: #000000" onclick="set_color(&quot;000000&quot;);"></div><div title="#111111" style="background: #111111" onclick="set_color(&quot;111111&quot;);"></div><div title="#222222" style="background: #222222" onclick="set_color(&quot;222222&quot;);"></div><div title="#333333" style="background: #333333" onclick="set_color(&quot;333333&quot;);"></div><div title="#444444" style="background: #444444" onclick="set_color(&quot;444444&quot;);"></div><div title="#555555" style="background: #555555" onclick="set_color(&quot;555555&quot;);"></div><div title="#666666" style="background: #666666" onclick="set_color(&quot;666666&quot;);"></div><div title="#777777" style="background: #777777" onclick="set_color(&quot;777777&quot;);"></div><div title="#888888" style="background: #888888" onclick="set_color(&quot;888888&quot;);"></div><div title="#999999" style="background: #999999" onclick="set_color(&quot;999999&quot;);"></div><div title="#AAAAAA" style="background: #AAAAAA" onclick="set_color(&quot;AAAAAA&quot;);"></div><div title="#BBBBBB" style="background: #BBBBBB" onclick="set_color(&quot;BBBBBB&quot;);"></div><div title="#CCCCCC" style="background: #CCCCCC" onclick="set_color(&quot;CCCCCC&quot;);"></div><div title="#DDDDDD" style="background: #DDDDDD" onclick="set_color(&quot;DDDDDD&quot;);"></div><div title="#EEEEEE" style="background: #EEEEEE" onclick="set_color(&quot;EEEEEE&quot;);"></div><div title="#FFFFFF" style="background: #FFFFFF" onclick="set_color(&quot;FFFFFF&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#000033" style="background: #000033" onclick="set_color(&quot;000033&quot;);"></div><div title="#000044" style="background: #000044" onclick="set_color(&quot;000044&quot;);"></div><div title="#000055" style="background: #000055" onclick="set_color(&quot;000055&quot;);"></div><div title="#000066" style="background: #000066" onclick="set_color(&quot;000066&quot;);"></div><div title="#000077" style="background: #000077" onclick="set_color(&quot;000077&quot;);"></div><div title="#000088" style="background: #000088" onclick="set_color(&quot;000088&quot;);"></div><div title="#000099" style="background: #000099" onclick="set_color(&quot;000099&quot;);"></div><div title="#0000AA" style="background: #0000aa" onclick="set_color(&quot;0000aa&quot;);"></div><div title="#0000BB" style="background: #0000bb" onclick="set_color(&quot;0000bb&quot;);"></div><div title="#0000CC" style="background: #0000cc" onclick="set_color(&quot;0000cc&quot;);"></div><div title="#0000DD" style="background: #0000dd" onclick="set_color(&quot;0000dd&quot;);"></div><div title="#0000EE" style="background: #0000ee" onclick="set_color(&quot;0000ee&quot;);"></div><div title="#3333FF" style="background: #3333ff" onclick="set_color(&quot;3333ff&quot;);"></div><div title="#6666FF" style="background: #6666ff" onclick="set_color(&quot;6666ff&quot;);"></div><div title="#9999FF" style="background: #9999ff" onclick="set_color(&quot;9999ff&quot;);"></div><div title="#CCCCFF" style="background: #ccccff" onclick="set_color(&quot;ccccff&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#003300" style="background: #003300" onclick="set_color(&quot;003300&quot;);"></div><div title="#004400" style="background: #004400" onclick="set_color(&quot;004400&quot;);"></div><div title="#005500" style="background: #005500" onclick="set_color(&quot;005500&quot;);"></div><div title="#006600" style="background: #006600" onclick="set_color(&quot;006600&quot;);"></div><div title="#007700" style="background: #007700" onclick="set_color(&quot;007700&quot;);"></div><div title="#008800" style="background: #008800" onclick="set_color(&quot;008800&quot;);"></div><div title="#009900" style="background: #009900" onclick="set_color(&quot;009900&quot;);"></div><div title="#00AA00" style="background: #00AA00" onclick="set_color(&quot;00AA00&quot;);"></div><div title="#00BB00" style="background: #00BB00" onclick="set_color(&quot;00BB00&quot;);"></div><div title="#00CC00" style="background: #00CC00" onclick="set_color(&quot;00CC00&quot;);"></div><div title="#00DD00" style="background: #00DD00" onclick="set_color(&quot;00DD00&quot;);"></div><div title="#00EE00" style="background: #00EE00" onclick="set_color(&quot;00EE00&quot;);"></div><div title="#33FF33" style="background: #33FF33" onclick="set_color(&quot;33FF33&quot;);"></div><div title="#66FF66" style="background: #66FF66" onclick="set_color(&quot;66FF66&quot;);"></div><div title="#99FF99" style="background: #99FF99" onclick="set_color(&quot;99FF99&quot;);"></div><div title="#CCFFCC" style="background: #CCFFCC" onclick="set_color(&quot;CCFFCC&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#330000" style="background: #330000" onclick="set_color(&quot;330000&quot;);"></div><div title="#440000" style="background: #440000" onclick="set_color(&quot;440000&quot;);"></div><div title="#550000" style="background: #550000" onclick="set_color(&quot;550000&quot;);"></div><div title="#660000" style="background: #660000" onclick="set_color(&quot;660000&quot;);"></div><div title="#770000" style="background: #770000" onclick="set_color(&quot;770000&quot;);"></div><div title="#880000" style="background: #880000" onclick="set_color(&quot;880000&quot;);"></div><div title="#990000" style="background: #990000" onclick="set_color(&quot;990000&quot;);"></div><div title="#AA0000" style="background: #AA0000" onclick="set_color(&quot;AA0000&quot;);"></div><div title="#BB0000" style="background: #BB0000" onclick="set_color(&quot;BB0000&quot;);"></div><div title="#CC0000" style="background: #CC0000" onclick="set_color(&quot;CC0000&quot;);"></div><div title="#DD0000" style="background: #DD0000" onclick="set_color(&quot;DD0000&quot;);"></div><div title="#EE0000" style="background: #EE0000" onclick="set_color(&quot;EE0000&quot;);"></div><div title="#FF3333" style="background: #FF3333" onclick="set_color(&quot;FF3333&quot;);"></div><div title="#FF6666" style="background: #FF6666" onclick="set_color(&quot;FF6666&quot;);"></div><div title="#FF9999" style="background: #FF9999" onclick="set_color(&quot;FF9999&quot;);"></div><div title="#FFCCCC" style="background: #FFCCCC" onclick="set_color(&quot;FFCCCC&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#003333" style="background: #003333" onclick="set_color(&quot;003333&quot;);"></div><div title="#004444" style="background: #004444" onclick="set_color(&quot;004444&quot;);"></div><div title="#005555" style="background: #005555" onclick="set_color(&quot;005555&quot;);"></div><div title="#006666" style="background: #006666" onclick="set_color(&quot;006666&quot;);"></div><div title="#007777" style="background: #007777" onclick="set_color(&quot;007777&quot;);"></div><div title="#008888" style="background: #008888" onclick="set_color(&quot;008888&quot;);"></div><div title="#009999" style="background: #009999" onclick="set_color(&quot;009999&quot;);"></div><div title="#00AAAA" style="background: #00AAAA" onclick="set_color(&quot;00AAAA&quot;);"></div><div title="#00BBBB" style="background: #00BBBB" onclick="set_color(&quot;00BBBB&quot;);"></div><div title="#00CCCC" style="background: #00CCCC" onclick="set_color(&quot;00CCCC&quot;);"></div><div title="#00DDDD" style="background: #00DDDD" onclick="set_color(&quot;00DDDD&quot;);"></div><div title="#00EEEE" style="background: #00EEEE" onclick="set_color(&quot;00EEEE&quot;);"></div><div title="#33FFFF" style="background: #33FFFF" onclick="set_color(&quot;33FFFF&quot;);"></div><div title="#66FFFF" style="background: #66FFFF" onclick="set_color(&quot;66FFFF&quot;);"></div><div title="#99FFFF" style="background: #99FFFF" onclick="set_color(&quot;99FFFF&quot;);"></div><div title="#CCFFFF" style="background: #CCFFFF" onclick="set_color(&quot;CCFFFF&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#330033" style="background: #330033" onclick="set_color(&quot;330033&quot;);"></div><div title="#440044" style="background: #440044" onclick="set_color(&quot;440044&quot;);"></div><div title="#550055" style="background: #550055" onclick="set_color(&quot;550055&quot;);"></div><div title="#660066" style="background: #660066" onclick="set_color(&quot;660066&quot;);"></div><div title="#770077" style="background: #770077" onclick="set_color(&quot;770077&quot;);"></div><div title="#880088" style="background: #880088" onclick="set_color(&quot;880088&quot;);"></div><div title="#990099" style="background: #990099" onclick="set_color(&quot;990099&quot;);"></div><div title="#AA00AA" style="background: #AA00AA" onclick="set_color(&quot;AA00AA&quot;);"></div><div title="#BB00BB" style="background: #BB00BB" onclick="set_color(&quot;BB00BB&quot;);"></div><div title="#CC00CC" style="background: #CC00CC" onclick="set_color(&quot;CC00CC&quot;);"></div><div title="#DD00DD" style="background: #DD00DD" onclick="set_color(&quot;DD00DD&quot;);"></div><div title="#EE00EE" style="background: #EE00EE" onclick="set_color(&quot;EE00EE&quot;);"></div><div title="#FF33FF" style="background: #FF33FF" onclick="set_color(&quot;FF33FF&quot;);"></div><div title="#FF66FF" style="background: #FF66FF" onclick="set_color(&quot;FF66FF&quot;);"></div><div title="#FF99FF" style="background: #FF99FF" onclick="set_color(&quot;FF99FF&quot;);"></div><div title="#FFCCFF" style="background: #FFCCFF" onclick="set_color(&quot;FFCCFF&quot;);"></div>
+</div>
+<div class="color-picker">
+<div title="#333300" style="background: #333300" onclick="set_color(&quot;333300&quot;);"></div><div title="#444400" style="background: #444400" onclick="set_color(&quot;444400&quot;);"></div><div title="#555500" style="background: #555500" onclick="set_color(&quot;555500&quot;);"></div><div title="#666600" style="background: #666600" onclick="set_color(&quot;666600&quot;);"></div><div title="#777700" style="background: #777700" onclick="set_color(&quot;777700&quot;);"></div><div title="#888800" style="background: #888800" onclick="set_color(&quot;888800&quot;);"></div><div title="#999900" style="background: #999900" onclick="set_color(&quot;999900&quot;);"></div><div title="#AAAA00" style="background: #AAAA00" onclick="set_color(&quot;AAAA00&quot;);"></div><div title="#BBBB00" style="background: #BBBB00" onclick="set_color(&quot;BBBB00&quot;);"></div><div title="#CCCC00" style="background: #CCCC00" onclick="set_color(&quot;CCCC00&quot;);"></div><div title="#DDDD00" style="background: #DDDD00" onclick="set_color(&quot;DDDD00&quot;);"></div><div title="#EEEE00" style="background: #EEEE00" onclick="set_color(&quot;EEEE00&quot;);"></div><div title="#FFFF33" style="background: #FFFF33" onclick="set_color(&quot;FFFF33&quot;);"></div><div title="#FFFF66" style="background: #FFFF66" onclick="set_color(&quot;FFFF66&quot;);"></div><div title="#FFFF99" style="background: #FFFF99" onclick="set_color(&quot;FFFF99&quot;);"></div><div title="#FFFFCC" style="background: #FFFFCC" onclick="set_color(&quot;FFFFCC&quot;);"></div>
+</div>
+      </div>
+
+   <div class="overlay-dialogue" style="top: 300px; left: 640px">
+   <div class="dashbrd-widget-head cursor-move"><h4>Mass update elements (2)</h4></div>
+   <table class="table-forms">
+      <tfoot>
+      <tr>
+      <td class="table-forms-td-left"></td>
+      <td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+      </tr>
+      </tfoot>
+      <tbody>
+      <tr>
+      <td class="table-forms-td-right" colspan="2">
+      <div class="maps-container">
+         <table class="list-table">
+         <tbody>
+         <tr>
+            <td>Host</td>
+            <td>Zabbix server</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         </tbody>
+         </table>
+      </div>
+      </td>
+      </tr>
+      <tr>
+      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
+      <td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
+      </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label location</label></td>
+            <td class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></td>
+            </tr>
+      <tr>
+      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
+      <td class="table-forms-td-right"><input type="checkbox"></td>
+      </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (default)</label></td>
+            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (problem)</label></td>
+            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (maintenance)</label></td>
+            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (disabled)</label></td>
+            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+            </tr>
+      </tbody>
+   </table>
+      <div class="dashbrd-widget-head"><h4>Links between the selected elements</h4></div>
+      <table class="table-forms">
+            <tfoot>
+            <tr>
+            <td class="table-forms-td-left"></td>
+            <td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+            </tr>
+            </tfoot>
+            <tbody>
+            <tr>
+            <td class="table-forms-td-right" colspan="2">
+            <div class="maps-container">
+                  <table class="list-table">
+                  <thead>
+                  <tr><th></th><th>From</th><th>To</th><th>Link indicators</th></tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                        <td><a href="#" class="link-dotted">Edit</a></td>
+                        <td>Host</td>
+                        <td>Zabbix server</td>
+                        <td></td>
+                  </tr>
+                  </tbody>
+                  </table>
+            </div>
+            </td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName">Label</label></td>
+            <td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName">Type (OK)</label></td>
+            <td class="table-forms-td-right"><select><option>Line</option></select></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-left"><label for="VisibleName">Color (OK)</label></td>
+            <td class="table-forms-td-right"><div class="input-color-picker"><div style="background-color: #00ffff"></div><input type="text"></div></td>
+            </tr>
+            <tr>
+            <td class="table-forms-td-right" colspan="2">
+            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
+            </td>
+            </tr>
+            
+            </tbody>
+      </table>
+   </div>
+
+   <div class="overlay-dialogue" style="top: 950px; left: 20px">
+   <button class="overlay-close-btn"></button>
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Step</th>
+            <th>Time</th>
+            <th>User</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Info</th>
+         </tr>
+      </thead>
+      <tbody>
+      <tr class="hover-nobg"><td colspan="6"><h4>Recovery</h4></td></tr>
+         <tr>
+            <td>43</td>
+            <td>2016-09-02 11:34:21</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>43</td>
+            <td>2016-09-02 11:34:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>42</td>
+            <td>2016-09-02 11:33:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>41</td>
+            <td>2016-09-02 11:32:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>40</td>
+            <td>2016-09-02 11:31:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>39</td>
+            <td>2016-09-02 11:30:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>38</td>
+            <td>2016-09-02 11:29:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>37</td>
+            <td>2016-09-02 11:28:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>36</td>
+            <td>2016-09-02 11:27:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>35</td>
+            <td>2016-09-02 11:26:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr class="hover-nobg"><td colspan="6"><h4>Problem</h4></td></tr>
+         <tr>
+            <td>34</td>
+            <td>2016-09-02 11:25:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>33</td>
+            <td>2016-09-02 11:24:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>32</td>
+            <td>2016-09-02 11:23:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>31</td>
+            <td>2016-09-02 11:22:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>30</td>
+            <td>2016-09-02 11:21:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>29</td>
+            <td>2016-09-02 11:20:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>28</td>
+            <td>2016-09-02 11:19:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>27</td>
+            <td>2016-09-02 11:18:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>26</td>
+            <td>2016-09-02 11:17:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+         <tr>
+            <td>25</td>
+            <td>2016-09-02 11:16:12</td>
+            <td>Admin (Zabbix Administrator)</td>
+            <td></td>
+            <td><span class="red">Failed</span></td>
+            <td><div class="rel-container"><span class="icon-info status-red"></span></div></td>
+         </tr>
+      </tbody>
+   </table>
+   <div class="table-paging"><div class="paging-btn-container"><div class="table-stats">Displaying 6 of 45</div></div></div>
+</div>
+   </div>
+   <div class="footer">
+   <!--<a href="http://www.zabbix.com" target="_blank" class="logo"></a>-->
+   Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+   </div>
+</body>
+</html>
