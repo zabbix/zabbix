@@ -239,8 +239,9 @@ retry:
 	}
 	while (!WIFEXITED(result) && !WIFSIGNALED(result));
 exit:
-	if(NULL != status)
+	if (NULL != status)
 		*status = result;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
@@ -440,7 +441,7 @@ close:
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
-		else if (WIFEXITED(status) && 0 != WEXITSTATUS(status))
+		else if (WIFEXITED(status) && EXIT_SUCCESS != WEXITSTATUS(status))
 		{
 			if (NULL != buffer && '\0' != **buffer)
 				zbx_strlcpy(error, *buffer, max_error_len);
