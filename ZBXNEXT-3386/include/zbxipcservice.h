@@ -29,6 +29,7 @@ typedef struct
 	/* socket descriptor */
 	int		fd;
 
+	/* incoming data buffer */
 	unsigned char	rx_buffer[ZBX_IPC_SOCKET_BUFFER_SIZE];
 	zbx_uint32_t	rx_buffer_bytes;
 	zbx_uint32_t	rx_buffer_offset;

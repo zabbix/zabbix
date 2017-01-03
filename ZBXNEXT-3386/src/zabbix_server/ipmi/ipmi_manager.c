@@ -780,7 +780,7 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx
 	zbx_uint32_t	size;
 
 	size = zbx_ipmi_serialize_request(&message->data, item->itemid, item->interface.addr,
-			item->interface.port, item->host.ipmi_privilege, item->host.ipmi_authtype,
+			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
 			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, command);
 
 	message->code = ZBX_IPC_IPMI_VALUE_REQUEST;
@@ -828,11 +828,32 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	int			i, num;
 	DC_ITEM			items[MAX_POLLER_ITEMS];
 	zbx_ipmi_request_t	*request;
+	char			*port;
 
 	num = DCconfig_get_ipmi_poller_items(now, items, MAX_POLLER_ITEMS, nextcheck);
 
 	for (i = 0; i < num; i++)
 	{
+		ZBX_STRDUP(port, items[i].interface.port_orig);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL, &port,
+				MACRO_TYPE_COMMON, NULL, 0);
+
+		/* generate configuration error if port contains invalid value */
+		if (FAIL == is_ushort(port, &items[i].interface.port))
+		{
+			zbx_timespec_t	ts;
+			unsigned char	state = ITEM_STATE_NOTSUPPORTED;
+			int		errcode = CONFIG_ERROR;
+			char		*error;
+
+			zbx_timespec(&ts);
+			error = zbx_dsprintf(NULL, "Invalid port value \"%s\".", port);
+			dc_add_history(items[i].itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, error);
+			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
+			zbx_free(error);
+			continue;
+		}
+
 		request = ipmi_request_create(items[i].host.hostid);
 		request->itemid = items[i].itemid;
 		ipmi_manager_serialize_request(&items[i], 0, &request->message);
@@ -924,7 +945,6 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
-
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
@@ -980,6 +1000,9 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		if (FAIL != nextcheck)
 			timeout = (nextcheck > now ? nextcheck - now : 0);
 		else
+			timeout = ZBX_IPMI_MANAGER_DELAY;
+
+		if (ZBX_IPMI_MANAGER_DELAY < timeout)
 			timeout = ZBX_IPMI_MANAGER_DELAY;
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);

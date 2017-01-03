@@ -1279,7 +1279,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
 	if (NULL == os_hnd)
 	{
