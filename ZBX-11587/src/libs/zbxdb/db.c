@@ -715,7 +715,7 @@ int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
 #ifdef HAVE_ORACLE
-	sword	err = OCI_SUCCESS;
+	sword	err;
 #endif
 
 	if (0 == txn_level)
@@ -745,13 +745,11 @@ int	zbx_db_commit(void)
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
-	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)
-		rc = OCI_handle_sql_error(ERR_Z3005, err, sql);
-#elif defined(HAVE_SQLITE3)
-	rc = zbx_db_execute("%s", "commit;");
+	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
 #endif
 
 	if (ZBX_DB_FAIL == rc && 1 == txn_error)
