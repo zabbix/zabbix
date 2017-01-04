@@ -180,11 +180,25 @@ class CControllerProblemView extends CController {
 		$groups = [];
 
 		if ($filter_groupids) {
-			$groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			$filter_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter_groupids,
 				'preservekeys' => true
-			]), ['groupid' => 'id']);
+			]);
+
+			foreach ($filter_groups as $group) {
+				$child_groups = API::HostGroup()->get([
+					'output' => ['groupid'],
+					'search' => ['name' => $group['name'].'/'],
+					'startSearch' => true
+				]);
+
+				foreach ($child_groups as $child_group) {
+					$filter_groupids[] = $child_group['groupid'];
+				}
+			}
+
+			$groups = CArrayHelper::renameObjectsKeys($filter_groups, ['groupid' => 'id']);
 		}
 
 		$filter_triggers = $filter_triggerids
