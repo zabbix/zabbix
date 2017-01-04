@@ -971,7 +971,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DC_ITEM		dc_item;
-	char		*key = NULL;
+	char		*key;
 	zbx_uint64_t	proxy_hostid;
 	int		ret = FAIL, errcode;
 
@@ -1015,13 +1015,13 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
 					DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
 
-				dc_item.key = zbx_strdup(dc_item.key, dc_item.key_orig);
-				substitute_key_macros(&dc_item.key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+				key = zbx_strdup(NULL, dc_item.key_orig);
+				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
 					*replace_to = zbx_strdup(*replace_to, row[5]);
-					item_description(replace_to, dc_item.key, dc_item.host.hostid);
+					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
 				else	/* ZBX_REQUEST_ITEM_KEY */

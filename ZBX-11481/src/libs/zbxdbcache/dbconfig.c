@@ -2680,12 +2680,14 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			zbx_hashset_iter_remove(&iter);
 		}
-		/* Firstly resolve macros for ip and dns fields in main agent interface, because it may contain
-		user marcos and in next iteration it help substitute {HOST.IP} and {HOST.DNS} marcos for secondary
-		host interfaces correctly. */
-
-		else if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
-			substitute_host_interface_macros(interface);
+		else
+		{
+			/* first resolve macros for ip and dns fields in main agent interface  */
+			/* because other interfaces might reference main interfaces ip and dns */
+			/* with {HOST.IP} and {HOST.DNS} macros                                */
+			if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
+				substitute_host_interface_macros(interface);
+		}
 	}
 
 	zbx_hashset_iter_reset(&config->interfaces, &iter);
