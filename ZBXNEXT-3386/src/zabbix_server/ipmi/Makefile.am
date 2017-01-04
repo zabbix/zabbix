@@ -2,7 +2,7 @@
 
 noinst_LIBRARIES = libipmi.a
 
-libipmi_a_SOURCES = $SOURCES \
+libipmi_a_SOURCES = \
 	checks_ipmi.c checks_ipmi.h \
 	ipmi_protocol.c ipmi_protocol.h \
 	ipmi_poller.c ipmi_poller.h \
