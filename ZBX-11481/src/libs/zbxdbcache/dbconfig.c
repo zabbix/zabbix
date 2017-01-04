@@ -2475,6 +2475,46 @@ static void	DCsync_hmacros(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_host_interface_macros                                 *
+ *                                                                            *
+ * Purpose: trying to resolve the macros in host inteface                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
+{
+	int	macros;
+	char	*addr;
+	DC_HOST	host;
+
+	macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
+	macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+
+	if (0 != macros)
+	{
+		DCget_host_by_hostid(&host, interface->hostid);
+
+		if (0 != (macros & 0x01))
+		{
+			addr = zbx_strdup(NULL, interface->ip);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+					MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+			DCstrpool_replace(1, &interface->ip, addr);
+			zbx_free(addr);
+		}
+
+		if (0 != (macros & 0x02))
+		{
+			addr = zbx_strdup(NULL, interface->dns);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+					MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+			DCstrpool_replace(1, &interface->dns, addr);
+			zbx_free(addr);
+		}
+	}
+}
+
 static void	DCsync_interfaces(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_interfaces";
@@ -2485,7 +2525,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 
-	int			found, update_index, i;
+	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
 	unsigned char		reset_snmp_stats;
@@ -2515,8 +2555,6 @@ static void	DCsync_interfaces(DB_RESULT result)
 		type = (unsigned char)atoi(row[2]);
 		main_ = (unsigned char)atoi(row[3]);
 		useip = (unsigned char)atoi(row[4]);
-
-		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 
 		/* array of selected interfaces */
 		zbx_vector_uint64_append(&ids, interfaceid);
@@ -2613,77 +2651,51 @@ static void	DCsync_interfaces(DB_RESULT result)
 		}
 	}
 
-	/* Resolve macros for ip and dns fields. First iteration macros should be resolve for main agent interface,
-	because it may contain user marcos and in next iteration it help substitute {HOST.IP} and {HOST.DNS} marcos
-	for secondary host interfaces correctly. */
-
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	for (i = 0; i < 2; i++)
+	zbx_hashset_iter_reset(&config->interfaces, &iter);
+
+	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
 	{
-		zbx_hashset_iter_reset(&config->interfaces, &iter);
-
-		while (NULL != (interface = zbx_hashset_iter_next(&iter)))
+		if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			/* remove from buffer */
+
+			if (1 == interface->main)
 			{
-				/* remove from buffer */
+				interface_ht_local.hostid = interface->hostid;
+				interface_ht_local.type = interface->type;
+				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-				if (1 == interface->main)
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
 				{
-					interface_ht_local.hostid = interface->hostid;
-					interface_ht_local.type = interface->type;
-					interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
-
-					if (NULL != interface_ht && interface == interface_ht->interface_ptr)
-					{
-						/* see ZBX-4045 for NULL check in the conditional */
-						zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
-					}
-				}
-
-				zbx_strpool_release(interface->ip);
-				zbx_strpool_release(interface->dns);
-				zbx_strpool_release(interface->port);
-
-				zbx_hashset_iter_remove(&iter);
-			}
-			else
-			{
-				int	macros;
-				char	*addr;
-				DC_HOST	host;
-
-				if (0 == i && (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type))
-					continue;
-
-				macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
-				macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
-
-				if (0 != macros)
-				{
-					DCget_host_by_hostid(&host, interface->hostid);
-
-					if (0 != (macros & 0x01))
-					{
-						addr = zbx_strdup(NULL, interface->ip);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-						DCstrpool_replace(1, &interface->ip, addr);
-						zbx_free(addr);
-					}
-
-					if (0 != (macros & 0x02))
-					{
-						addr = zbx_strdup(NULL, interface->dns);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-						DCstrpool_replace(1, &interface->dns, addr);
-						zbx_free(addr);
-					}
+					/* see ZBX-4045 for NULL check in the conditional */
+					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
 				}
 			}
+
+			zbx_strpool_release(interface->ip);
+			zbx_strpool_release(interface->dns);
+			zbx_strpool_release(interface->port);
+
+			zbx_hashset_iter_remove(&iter);
 		}
+		/* Firstly resolve macros for ip and dns fields in main agent interface, because it may contain
+		user marcos and in next iteration it help substitute {HOST.IP} and {HOST.DNS} marcos for secondary
+		host interfaces correctly. */
+
+		else if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
+			substitute_host_interface_macros(interface);
+	}
+
+	zbx_hashset_iter_reset(&config->interfaces, &iter);
+
+	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
+	{
+		/* resolve {HOST.IP} and {HOST.DNS} marcos for secondary host interfaces */
+
+		if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
+			substitute_host_interface_macros(interface);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -4679,7 +4691,7 @@ int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uin
 	if (0 != itemid)
 	{
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
-				goto unlock;
+			goto unlock;
 
 		if (0 != dc_item->interfaceid)
 		{
