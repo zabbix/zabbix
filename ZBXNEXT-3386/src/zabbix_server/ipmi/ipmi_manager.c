@@ -46,7 +46,7 @@ extern int	CONFIG_IPMIPOLLER_FORKS;
 #define ZBX_IPMI_POLLER_READY		1
 #define ZBX_IPMI_POLLER_BUSY		2
 
-#define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
+#define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_HOUR
 #define ZBX_IPMI_MANAGER_HOST_TTL		SEC_PER_DAY
 
 /* IPMI request queued by pollers */
@@ -412,10 +412,13 @@ static void	ipmi_manager_destroy(zbx_ipmi_manager_t *manager)
  ******************************************************************************/
 static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 {
+	const char		*__function_name = "ipmi_manager_host_cleanup";
 	zbx_hashset_iter_t	iter;
 	zbx_ipmi_manager_host_t	*host;
 	zbx_ipmi_poller_t	*poller;
 	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __function_name, CONFIG_IPMIPOLLER_FORKS);
 
 	zbx_hashset_iter_reset(&manager->hosts, &iter);
 	while (NULL != (host = (zbx_ipmi_manager_host_t *)zbx_hashset_iter_next(&iter)))
@@ -434,6 +437,8 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 		if (NULL != poller->client)
 			zbx_ipc_client_send(poller->client, ZBX_IPC_IPMI_CLEANUP_REQUEST, NULL, 0);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -825,7 +830,7 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
  ******************************************************************************/
 static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, int *nextcheck)
 {
-	int			i, num;
+	int			i, num, rc;
 	DC_ITEM			items[MAX_POLLER_ITEMS];
 	zbx_ipmi_request_t	*request;
 	char			*port;
@@ -834,12 +839,15 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 	for (i = 0; i < num; i++)
 	{
-		ZBX_STRDUP(port, items[i].interface.port_orig);
+		port = zbx_strdup(NULL, items[i].interface.port_orig);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL, &port,
 				MACRO_TYPE_COMMON, NULL, 0);
 
+		rc = is_ushort(port, &items[i].interface.port);
+		zbx_free(port);
+
 		/* generate configuration error if port contains invalid value */
-		if (FAIL == is_ushort(port, &items[i].interface.port))
+		if (FAIL == rc)
 		{
 			zbx_timespec_t	ts;
 			unsigned char	state = ITEM_STATE_NOTSUPPORTED;
@@ -1020,34 +1028,30 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 			time_now = time_recv;
 		}
 
-		if (ZBX_IPC_RECV_TIMEOUT == ret)
-			continue;
-
-		if (NULL == message)
+		if (NULL != message)
 		{
+			switch (message->code)
+			{
+				case ZBX_IPC_IPMI_REGISTER:
+					poller = ipmi_manager_register_poller(&ipmi_manager, client);
+					ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
+					break;
+				case ZBX_IPC_IPMI_VALUE_RESULT:
+					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
+					polled_num++;
+					break;
+				case ZBX_IPC_IPMI_SCRIPT_REQUEST:
+					ipmi_manager_process_script_request(&ipmi_manager, client, message, now);
+					break;
+				case ZBX_IPC_IPMI_COMMAND_RESULT:
+					ipmi_manager_process_command_result(&ipmi_manager, client, message, now);
+			}
+
+			zbx_ipc_message_free(message);
+		}
+
+		if (NULL != client)
 			zbx_ipc_client_release(client);
-			continue;
-		}
-
-		switch (message->code)
-		{
-			case ZBX_IPC_IPMI_REGISTER:
-				poller = ipmi_manager_register_poller(&ipmi_manager, client);
-				ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
-				break;
-			case ZBX_IPC_IPMI_VALUE_RESULT:
-				ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
-				polled_num++;
-				break;
-			case ZBX_IPC_IPMI_SCRIPT_REQUEST:
-				ipmi_manager_process_script_request(&ipmi_manager, client, message, now);
-				break;
-			case ZBX_IPC_IPMI_COMMAND_RESULT:
-				ipmi_manager_process_command_result(&ipmi_manager, client, message, now);
-		}
-
-		zbx_ipc_message_free(message);
-		zbx_ipc_client_release(client);
 
 		if (now >= nextcleanup)
 		{
