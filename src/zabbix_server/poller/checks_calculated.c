@@ -165,7 +165,7 @@ out:
 	return ret;
 }
 
-static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, char *error, size_t max_error_len,
+static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs)
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
@@ -336,7 +336,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	/* Therefore initialize error messages vector but do not reserve any space. */
 	zbx_vector_ptr_create(&unknown_msgs);
 
-	if (SUCCEED != (ret = calcitem_evaluate_expression(dc_item, &exp, error, sizeof(error), &unknown_msgs)))
+	if (SUCCEED != (ret = calcitem_evaluate_expression(&exp, error, sizeof(error), &unknown_msgs)))
 	{
 		SET_MSG_RESULT(result, strdup(error));
 		goto clean;
