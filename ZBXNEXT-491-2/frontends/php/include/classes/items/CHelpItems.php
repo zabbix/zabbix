@@ -309,6 +309,10 @@ class CHelpItems {
 					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'description' => _('Directory size (in bytes), dir - Absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - Mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
+				],
+				[
 					'key' => 'vm.memory.size[<mode>]',
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
