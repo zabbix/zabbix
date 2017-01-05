@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 ........S. [ZBX-11628] fixed global regexps to be extracted from log.count[] and logrt.count[] keys (vso)
 A.F....... [ZBX-11482] improved performance for getting last value of web items by limiting query results for values in last 24h; thanks to D.Spindel Ljungmark for patch (Cemeris)
@@ -310,6 +311,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 A.F....... [ZBX-11482] improved performance for getting last value of web items by limiting query results for values in last 24h; thanks to D.Spindel Ljungmark for patch (Cemeris)
 .......PS. [ZBX-11630] added escaping '"', ''', '&', '<' and '>' characters in SOAP XML for VMware requests (Sergejs)
@@ -1911,6 +1913,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 ..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
 ...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
