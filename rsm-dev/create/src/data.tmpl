@@ -76,7 +76,7 @@ ROW   |225          |10057 |Zabbix agent      |0    |
 
 TABLE |interface
 FIELDS|interfaceid|hostid|main|type|useip|ip       |dns|port |bulk|
-ROW   |1          |10057 |1   |1   |1    |127.0.0.1|   |11339|1   |
+ROW   |1          |10057 |1   |1   |1    |127.0.0.1|   |10050|1   |
 
 TABLE |valuemaps
 FIELDS|valuemapid|name                    |
@@ -245,15 +245,15 @@ ROW   |23385 |0   |              |        |10057 |Available memory              
 ROW   |23386 |0   |              |        |10057 |Total memory                                |vm.memory.size[total]                        |3600 |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |0      |          |10026     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |1          |    |                                                                                                                                 |0             |0       |0                  |0                  |                  |0       |
 
 TABLE |media_type
-FIELDS|mediatypeid|type|description|smtp_server    |smtp_helo |smtp_email      |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|
-ROW   |1          |0   |Email      |mail.zabbix.com|zabbix.com|dimir@zabbix.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |
-ROW   |2          |3   |Jabber     |               |          |                |         |          |jabber@company.com|zabbix|0     |25       |0            |0               |0               |0                  |           |
-ROW   |3          |2   |SMS        |               |          |                |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |
+FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|
+ROW   |1          |0   |Email      |mail.company.com|company.com|zabbix@company.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |
+ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@company.com|zabbix|0     |25       |0            |0               |0               |0                  |           |
+ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |
 
 TABLE |users
 FIELDS|userid|alias|name   |surname      |passwd                          |url|autologin|autologout|lang |refresh|type|theme  |rows_per_page|
-ROW   |1     |Admin|Zabbix |Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30     |3   |default|300          |
-ROW   |2     |guest|Default|User         |d41d8cd98f00b204e9800998ecf8427e|   |0        |0         |en_GB|30     |1   |default|300          |
+ROW   |1     |Admin|Zabbix |Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30     |3   |default|50           |
+ROW   |2     |guest|Default|User         |d41d8cd98f00b204e9800998ecf8427e|   |0        |900       |en_GB|30     |1   |default|50           |
 
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
@@ -270,7 +270,7 @@ ROW   |4 |7       |1     |
 
 TABLE |config
 FIELDS|configid|refresh_unsupported|work_period     |alert_usrgrpid|discovery_groupid|
-ROW   |1       |15                 |1-5,09:00-18:00;|7             |5                |
+ROW   |1       |600                |1-5,09:00-18:00;|7             |5                |
 
 TABLE |triggers
 FIELDS|triggerid|expression  |description                                                     |url|status|priority|comments                                                                                                                              |templateid|type|flags|
@@ -1223,10 +1223,6 @@ ROW   |495      |13        |-827 |DNS TCP - Malformed DNSSEC response           
 ROW   |497      |13        |-613 |DNS TCP - Authority section incomplete                                                                          |
 ROW   |498      |13        |-614 |DNS TCP - Additional section incomplete                                                                         |
 ROW   |499      |13        |-615 |DNS TCP - Malformed DNS response                                                                                |
-
-TABLE |media
-FIELDS|mediaid|userid|mediatypeid|sendto                     |active|severity|period          |
-ROW   |1      |1     |1          |vladimir.levijev@zabbix.com|0     |63      |1-7,00:00-24:00;|
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|
