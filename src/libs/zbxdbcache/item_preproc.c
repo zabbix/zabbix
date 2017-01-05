@@ -49,6 +49,48 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_convert_value_to_numeric                            *
+ *                                                                            *
+ * Purpose: converts variant value to numeric                                 *
+ *                                                                            *
+ * Parameters: value_num - [OUT] the converted value                          *
+ *             value     - [IN] the value to convert                          *
+ *             errmsg    - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the value was converted successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_convert_value_to_numeric(const DC_ITEM *item, zbx_variant_t *value_num,
+		const zbx_variant_t *value, char **errmsg)
+{
+	int	ret = FAIL;
+
+	switch (value->type)
+	{
+		case ZBX_VARIANT_DBL:
+		case ZBX_VARIANT_UI64:
+			zbx_variant_set_variant(value_num, value);
+			ret = SUCCEED;
+			break;
+		case ZBX_VARIANT_STR:
+			ret = zbx_variant_set_numeric(value_num, value->data.str);
+			break;
+		default:
+			ret = FAIL;
+	}
+
+	if (FAIL == ret)
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot convert value to numeric type");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_multiplier_variant                                  *
  *                                                                            *
  * Purpose: execute custom multiplier preprocessing operation on variant      *
@@ -68,38 +110,10 @@ static int	item_preproc_multiplier_variant(const DC_ITEM *item, zbx_variant_t *v
 {
 	zbx_uint64_t	multiplier_ui64, value_ui64;
 	double		value_dbl;
-	int		ret;
 	zbx_variant_t	value_num;
 
-	switch (value->type)
-	{
-		case ZBX_VARIANT_DBL:
-		case ZBX_VARIANT_UI64:
-			zbx_variant_set_variant(&value_num, value);
-			ret = SUCCEED;
-			break;
-		case ZBX_VARIANT_STR:
-			ret = zbx_variant_set_numeric(&value_num, value->data.str);
-			break;
-		default:
-			ret = FAIL;
-	}
-
-	if (FAIL == ret)
-	{
-		*errmsg = zbx_strdup(*errmsg, "cannot convert value to numeric type");
+	if (FAIL == item_preproc_convert_value_to_numeric(item, &value_num, value, errmsg))
 		return FAIL;
-	}
-
-	switch (item->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_variant_convert(&value_num, ZBX_VARIANT_DBL);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			zbx_variant_convert(&value_num, ZBX_VARIANT_UI64);
-			break;
-	}
 
 	switch (value_num.type)
 	{
@@ -213,23 +227,23 @@ static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *
  *                                                                            *
  ******************************************************************************/
 static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t *ts, unsigned char op_type,
-		zbx_item_history_value_t *deltaitem)
+		zbx_item_history_value_t *hvalue)
 {
-	if (0 == deltaitem->timestamp.sec || deltaitem->value.data.dbl > value->data.dbl)
+	if (0 == hvalue->timestamp.sec || hvalue->value.data.ui64 > value->data.ui64)
 		return FAIL;
 
 	switch (op_type)
 	{
 		case ZBX_PREPROC_DELTA_SPEED:
-			if (0 <= zbx_timespec_compare(&deltaitem->timestamp, ts))
+			if (0 <= zbx_timespec_compare(&hvalue->timestamp, ts))
 				return FAIL;
 
-			value->data.dbl = (value->data.dbl - deltaitem->value.data.dbl) /
-					((ts->sec - deltaitem->timestamp.sec) +
-						(double)(ts->ns - deltaitem->timestamp.ns) / 1000000000);
+			value->data.ui64 = (value->data.ui64 - hvalue->value.data.ui64) /
+					((ts->sec - hvalue->timestamp.sec) +
+						(double)(ts->ns - hvalue->timestamp.ns) / 1000000000);
 			break;
 		case ZBX_PREPROC_DELTA_VALUE:
-			value->data.dbl = value->data.dbl - deltaitem->value.data.dbl;
+			value->data.ui64 = value->data.ui64 - hvalue->value.data.ui64;
 			break;
 	}
 
@@ -259,22 +273,10 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 {
 	int				ret = FAIL;
 	zbx_item_history_value_t	*deltaitem;
-	zbx_variant_t			value_delta;
+	zbx_variant_t			value_num;
 
-	switch (item->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_DBL, errmsg))
-				return FAIL;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_UI64, errmsg))
-				return FAIL;
-			break;
-		default:
-			*errmsg = zbx_strdup(*errmsg, "invalid value type");
-			return FAIL;
-	}
+	if (FAIL == item_preproc_convert_value_to_numeric(item, &value_num, value, errmsg))
+		return FAIL;
 
 	if (NULL == (deltaitem = zbx_hashset_search(delta_history, &item->itemid)))
 	{
@@ -282,7 +284,7 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 
 		deltaitem_local.itemid = item->itemid;
 		deltaitem_local.timestamp = *ts;
-		zbx_variant_set_variant(&deltaitem_local.value, value);
+		zbx_variant_set_variant(&deltaitem_local.value, &value_num);
 
 		zbx_hashset_insert(delta_history, &deltaitem_local, sizeof(deltaitem_local));
 
@@ -291,20 +293,25 @@ static int	item_preproc_delta(const DC_ITEM *item, zbx_variant_t *value, const z
 		return SUCCEED;
 	}
 
-	zbx_variant_set_variant(&value_delta, value);
+	zbx_variant_clear(value);
+	zbx_variant_set_variant(value, &value_num);
 
-	switch (item->value_type)
+	if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == deltaitem->value.type)
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			ret = item_preproc_delta_float(value, ts, op_type, deltaitem);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ret = item_preproc_delta_uint64(value, ts, op_type, deltaitem);
-			break;
+		zbx_variant_convert(value, ZBX_VARIANT_DBL);
+		zbx_variant_convert(&deltaitem->value, ZBX_VARIANT_DBL);
+		ret = item_preproc_delta_float(value, ts, op_type, deltaitem);
+	}
+	else
+	{
+		zbx_variant_convert(value, ZBX_VARIANT_UI64);
+		zbx_variant_convert(&deltaitem->value, ZBX_VARIANT_UI64);
+		ret = item_preproc_delta_uint64(value, ts, op_type, deltaitem);
 	}
 
 	deltaitem->timestamp = *ts;
-	zbx_variant_set_variant(&deltaitem->value, &value_delta);
+	zbx_variant_set_variant(&deltaitem->value, &value_num);
+	zbx_variant_clear(&value_num);
 
 	if (SUCCEED != ret)
 		zbx_variant_clear(value);
