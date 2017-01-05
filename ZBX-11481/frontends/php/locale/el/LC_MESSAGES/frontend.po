@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 17:29+0300\n"
+"POT-Creation-Date: 2016-12-04 11:10+0200\n"
 "PO-Revision-Date: 2014-01-20 10:54+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -237,19 +237,19 @@ msgstr "Απαγορευμένη πρόσβαση!"
 msgid "Access denied."
 msgstr "Απαγορευμένη πρόσβαση."
 
-#: api/classes/CUser.php:1058
+#: api/classes/CUser.php:1060
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Αποκλεισμένος λογαριασμός για %s δευτερόλεπτα"
 
-#: events.php:590 events.php:603 include/actions.inc.php:256
+#: events.php:540 events.php:553 include/actions.inc.php:256
 #: include/blocks.inc.php:953 include/blocks.inc.php:1529
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
 msgstr "Αναγνώριση"
 
-#: acknow.php:230 jsLoader.php:199 tr_status.php:729
+#: acknow.php:230 jsLoader.php:199 tr_status.php:730
 msgid "Acknowledge"
 msgstr "Αναγνώριση"
 
@@ -269,7 +269,7 @@ msgstr "Αναγνώριση και επιστροφή"
 msgid "Acknowledge status"
 msgstr "Κατάσταση αναγνώρισης"
 
-#: include/events.inc.php:189 tr_status.php:375 tr_status.php:740
+#: include/events.inc.php:189 tr_status.php:375 tr_status.php:741
 msgid "Acknowledged"
 msgstr "Αναγνωρισμένο"
 
@@ -360,7 +360,7 @@ msgstr "Λειτουργίες ενέργειας"
 msgid "Action updated"
 msgstr "Ενέργεια ενημερώθηκε"
 
-#: events.php:591 events.php:604 include/blocks.inc.php:954
+#: events.php:541 events.php:554 include/blocks.inc.php:954
 #: include/blocks.inc.php:1530 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
@@ -442,7 +442,7 @@ msgstr "Ενεργό έως"
 #: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.history.php:100 popup_bitem.php:166
 #: popup_media.php:141 popup_period.php:134 tr_logform.php:293
-#: tr_status.php:784
+#: tr_status.php:785
 msgid "Add"
 msgstr "Προσθήκη"
 
@@ -1002,7 +1002,7 @@ msgstr "Φωτεινό"
 msgid "Bulgarian (bg_BG)"
 msgstr "Βουλγάρικα (bg_BG)"
 
-#: tr_status.php:871
+#: tr_status.php:872
 msgid "Bulk acknowledge"
 msgstr "Μαζική αναγνώριση"
 
@@ -1234,11 +1234,11 @@ msgstr "Υπολογισμένα δικαιώματα"
 msgid "Callback"
 msgstr "Επανάκληση"
 
-#: api/classes/CTemplate.php:1037 api/classes/CTemplate.php:1047
+#: api/classes/CTemplate.php:1044 api/classes/CTemplate.php:1054
 msgid "Can't link template"
 msgstr "Αδύνατη η σύνδεση σχεδιότυπου"
 
-#: api/classes/CTemplate.php:1008 api/classes/CTemplate.php:1026
+#: api/classes/CTemplate.php:1015 api/classes/CTemplate.php:1033
 msgid "Can't unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
@@ -1543,7 +1543,7 @@ msgstr "Αδύνατη η δημιουργία νέου στοιχείου"
 msgid "Cannot create screen."
 msgstr "Αδύνατη η δημιουργία οθόνης."
 
-#: api/classes/CUser.php:1398
+#: api/classes/CUser.php:1400
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Αδύνατη η διαγραφή Zabbix εσωτερικού χρήστη \"%1$s\", απενεργοποιήστε το χρήστη."
@@ -1617,7 +1617,7 @@ msgstr "Αδύνατη η διαγραφή αντιστοίχισης εικον
 msgid "Cannot delete image"
 msgstr "Αδύνατη η διαγραφή εικόνας"
 
-#: api/classes/CHost.php:1273
+#: api/classes/CHost.php:1290
 msgid "Cannot delete inventory."
 msgstr "Αδύνατη η διαγραφή απογραφής."
 
@@ -1675,16 +1675,16 @@ msgstr "Αδύνατη η διαγραφή οθόνης"
 msgid "Cannot delete script"
 msgstr "Αδύνατη η διαγραφή δέσμης ενεργειών"
 
-#: api/classes/CScript.php:504
+#: api/classes/CScript.php:516
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
 msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Κενή παράμετρος εισόδου \"scriptids\"."
 
-#: api/classes/CScript.php:536
+#: api/classes/CScript.php:548
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Δέσμη ενεργειών \"%1$s\" χρησιμοποιείτε στην εργασία ενέργειας \"%2$s\"."
 
-#: api/classes/CScript.php:519
+#: api/classes/CScript.php:531
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Δέσμη ενεργειών με scriptid \"%1$s\" ανύπαρκτη."
@@ -1734,7 +1734,7 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπων συλλεκτ
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου εναύσματος \"%1$s:%2$s\"."
 
-#: api/classes/CHttpTest.php:392
+#: api/classes/CHttpTest.php:393
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου σενάριου ιστού \"%1$s\"."
@@ -1767,7 +1767,7 @@ msgstr "Αδύνατη η διαγραφή εναυσμάτων δημιουργ
 msgid "Cannot delete user"
 msgstr "Αδύνατη η διαγραφή χρήστη"
 
-#: api/classes/CUser.php:949
+#: api/classes/CUser.php:951
 msgid "Cannot delete user media."
 msgstr "Αδύνατη η διαγραφή μέσου χρήστη."
 
@@ -2081,7 +2081,7 @@ msgstr "Αδύνατον ο μορφότυπος Δένδρου. Έλεγξε τ
 msgid "Cannot format tree."
 msgstr "Αδύνατον ο μορφότυπος δένδρου."
 
-#: api/classes/CTemplate.php:933
+#: api/classes/CTemplate.php:940
 msgid "Cannot have empty visible template name"
 msgstr "Δεν μπορώ να έχω κενό ορατό όνομα σχεδιότυπου"
 
@@ -2114,35 +2114,35 @@ msgstr "Δεν περιέχει προβολή αρχείου \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr ""
 
-#: api/classes/CUser.php:738
+#: api/classes/CUser.php:740
 msgid "Cannot insert user media."
 msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 
-#: api/classes/CHost.php:1251
+#: api/classes/CHost.php:1268
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
-#: api/classes/CUser.php:1099
+#: api/classes/CUser.php:1101
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:1021
+#: api/classes/CUser.php:1023
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
 
-#: api/classes/CHost.php:1111
+#: api/classes/CHost.php:1128
 msgid "Cannot mass update host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξενιστή."
 
-#: api/classes/CTemplate.php:883
+#: api/classes/CTemplate.php:890
 msgid "Cannot mass update template name"
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχεδιότυπου"
 
-#: api/classes/CHost.php:1101
+#: api/classes/CHost.php:1118
 msgid "Cannot mass update visible host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος ξενιστή."
 
-#: api/classes/CTemplate.php:850
+#: api/classes/CTemplate.php:857
 msgid "Cannot mass update visible template name"
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος σχεδιότυπου"
 
@@ -2226,7 +2226,7 @@ msgstr "Αδύνατη η τοποθέτηση \"templateid\" για οθόνη 
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Αδύνατη η τοποθέτηση \"templateid\" για πρωτότυπο έναυσμα \"%1$s\"."
 
-#: api/classes/CHost.php:703 api/classes/CHost.php:1156
+#: api/classes/CHost.php:705 api/classes/CHost.php:1173
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Αδύνατη η τοποθέτηση πεδίων απογραφής σε απενεργοποιημένη απογραφή."
 
@@ -2270,7 +2270,7 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός συ�
 msgid "Cannot unlink and clear triggers"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός εναυσμάτων"
 
-#: api/classes/CHost.php:1242
+#: api/classes/CHost.php:1259
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
@@ -2279,7 +2279,7 @@ msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Αδύνατη η αποσύνδεση εναύσματος \"%s\", έχει συλλέκτες από σχεδιότυπο συνδεδεμένο με ξενιστή."
 
-#: api/classes/CHost.php:716
+#: api/classes/CHost.php:718
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr "Αδύνατη η ενημέρωση \"%1$s\" εντοπισμένου ξενιστή."
@@ -2360,7 +2360,7 @@ msgstr "Αδύνατη η ενημέρωση ενέργειας"
 msgid "Cannot update application"
 msgstr "Αδύνατη η ενημέρωση κατηγορίας"
 
-#: tr_comments.php:69
+#: tr_comments.php:71
 msgid "Cannot update comment"
 msgstr "Αδύνατη η ενημέρωση σχολίου"
 
@@ -2398,8 +2398,8 @@ msgstr "Αδύνατη η ενημέρωση ομάδος"
 msgid "Cannot update group."
 msgstr "Αδύνατη η ενημέρωση ομάδος."
 
-#: api/classes/CHostGroup.php:940 api/classes/CHostGroup.php:1045
-#: api/classes/CHostGroup.php:1186
+#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1039
+#: api/classes/CHostGroup.php:1167
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση ομάδων εντοπισμένων ξενιστών \"%1$s\"."
@@ -2515,7 +2515,7 @@ msgstr "Αδύνατη η ενημέρωση σχεδιότυπου"
 msgid "Cannot update templated applications."
 msgstr "Αδύνατη η ενημέρωση σχεδιότυπης κατηγορίας."
 
-#: api/classes/CTemplate.php:806 api/classes/CTemplate.php:1127
+#: api/classes/CTemplate.php:808 api/classes/CTemplate.php:1134
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση σχεδιότυπων εντοπισμένου ξενιστή \"%1$s\"."
@@ -2536,7 +2536,7 @@ msgstr "Αδύνατη η ενημέρωση πρωτότυπων εναυσμά
 msgid "Cannot update user"
 msgstr "Αδύνατη η ενημέρωση χρήστη"
 
-#: api/classes/CUser.php:818
+#: api/classes/CUser.php:820
 msgid "Cannot update user media."
 msgstr "Αδύνατη η ενημέρωση μέσων χρήστη."
 
@@ -2844,12 +2844,12 @@ msgstr "Η εντολή δεν μπορεί να είναι κενή."
 msgid "Commands"
 msgstr "Εντολές"
 
-#: tr_comments.php:69
+#: tr_comments.php:71
 msgid "Comment updated"
 msgstr "Σχόλιο ενημερώθηκε"
 
 #: include/acknow.inc.php:49 include/views/monitoring.triggerComment.php:39
-#: tr_comments.php:76 tr_logform.php:371 tr_status.php:379
+#: tr_logform.php:371 tr_status.php:379
 msgid "Comments"
 msgstr "Σχόλια"
 
@@ -3155,7 +3155,7 @@ msgstr "Αντιγραφή"
 msgid "Copy selected to ..."
 msgstr "Αντιγραφή επιλεγμένων σε ..."
 
-#: api/classes/CUser.php:1144
+#: api/classes/CUser.php:1146
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Σωστή σύνδεση \"%s\"."
@@ -3478,7 +3478,7 @@ msgstr "ΕΝΤΟΠΙΣΜΕΝΟ"
 msgid "DM"
 msgstr "ΚΠ"
 
-#: events.php:509 events.php:518 hosts.php:780
+#: events.php:459 events.php:468 hosts.php:780
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -4080,7 +4080,7 @@ msgstr "Διεγράφη: Κανόνας εντοπισμού \"%1$s\" σε \"%2
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHost.php:1601
+#: api/classes/CHost.php:1618
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
@@ -4105,7 +4105,7 @@ msgstr "Διεγράφη: Πρωτότυπος συλλέκτης \"%1$s\" σε 
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "Διεγράφη: Διαμεσολαβητής \"%1$s\"."
 
-#: api/classes/CTemplate.php:766
+#: api/classes/CTemplate.php:768
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Διεγράφη: Σχεδιότυπο \"%1$s\"."
@@ -4120,7 +4120,7 @@ msgstr "Διεγράφη: Έναυσμα \"%1$s\" σε \"%2$s\"."
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Πρωτότυπο έναυσμα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/CHttpTest.php:452
+#: api/classes/CHttpTest.php:453
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Σενάριο ιστού \"%1$s\" σε \"%2$s\"."
@@ -4150,14 +4150,14 @@ msgstr "Άρνηση"
 msgid "Dependencies"
 msgstr "Εξαρτήσεις"
 
-#: include/triggers.inc.php:1376 tr_status.php:628
+#: include/triggers.inc.php:1376 tr_status.php:629
 msgid "Dependent"
 msgstr "Εξαρτημένο"
 
 #: include/triggers.inc.php:1356
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
-#: tr_status.php:612
+#: tr_status.php:613
 msgid "Depends on"
 msgstr "Εξαρτάται από"
 
@@ -4165,7 +4165,7 @@ msgstr "Εξαρτάται από"
 msgid "Deployment status"
 msgstr "Κατάσταση υλοποίησης"
 
-#: events.php:510 events.php:519 events.php:586 events.php:599
+#: events.php:460 events.php:469 events.php:536 events.php:549
 #: include/classes/screens/CScreenEvents.php:42
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
@@ -4610,12 +4610,12 @@ msgstr "Διπλότυπο ονόματος πρωτότυπης ομάδος \"
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "Διπλότυπο ομάδος ξενιστή ID \"%2$s\" πρωτότυπου ξενιστή \"%1$s\"."
 
-#: api/classes/CHost.php:760
+#: api/classes/CHost.php:762
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Διπλότυπο ξενιστή. Ξενιστής με ίδιο όνομα \"%s\" υπάρχει ήδη."
 
-#: api/classes/CHost.php:792
+#: api/classes/CHost.php:794
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Διπλότυπο ξενιστή. Ξενιστής με ίδιο ορατό όνομα \"%s\" υπάρχει ήδη."
@@ -4625,7 +4625,7 @@ msgstr "Διπλότυπο ξενιστή. Ξενιστής με ίδιο ορα
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Διπλότυπο όνομα χάρτη για χάρτη \"%s\"."
 
-#: api/classes/CScript.php:411 api/classes/CScript.php:467
+#: api/classes/CScript.php:423 api/classes/CScript.php:479
 #, c-format
 msgid "Duplicate script name \"%1$s\"."
 msgstr "Διπλότυπο όνομα δέσμης ενεργειών \"%1$s\"."
@@ -4640,7 +4640,7 @@ msgstr "Διπλότυπο όνομα βαρύτητας \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Διπλότυπο ψευδώνυμο χρήστη \"%s\"."
 
-#: events.php:589 events.php:602 include/events.inc.php:202
+#: events.php:539 events.php:552 include/events.inc.php:202
 #: include/events.inc.php:279 include/events.inc.php:282 tr_status.php:374
 msgid "Duration"
 msgstr "Διάρκεια"
@@ -4746,16 +4746,16 @@ msgstr "Κενός ξενιστής."
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1454
 #: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
-#: api/classes/CService.php:515 api/classes/CTemplate.php:627
+#: api/classes/CService.php:515 api/classes/CTemplate.php:629
 #: api/classes/CTrigger.php:875 api/classes/CTrigger.php:948
 #: api/classes/CTrigger.php:1038 api/classes/CTriggerPrototype.php:613
-#: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
+#: api/classes/CUserGroup.php:653 api/classes/CUserMacro.php:394
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:568
 msgid "Empty input parameter."
 msgstr "Κενή παράμετρος εισόδου."
 
@@ -4780,12 +4780,12 @@ msgstr "Κενό όνομα πρωτότυπης ομάδος."
 msgid "Empty name for host prototype \"%1$s\"."
 msgstr "Κενό όνομα πρωτότυπου ξενιστή \"%1$s\"."
 
-#: api/classes/CScript.php:569
+#: api/classes/CScript.php:581
 #, c-format
 msgid "Empty name for script \"%1$s\"."
 msgstr "Κενό όνομα δέσμης ενεργειών \"%1$s\"."
 
-#: api/classes/CScript.php:408 api/classes/CScript.php:464
+#: api/classes/CScript.php:420 api/classes/CScript.php:476
 msgid "Empty name for script."
 msgstr "Κενό όνομα δέσμης ενεργειών."
 
@@ -4961,7 +4961,7 @@ msgstr "Αγγλικά (en_US)"
 msgid "Error"
 msgstr "Σφάλμα"
 
-#: include/db.inc.php:870
+#: include/db.inc.php:874
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Σφάλμα αιτήματος αναζήτησης πίνακα \"%1$s\"."
@@ -5189,7 +5189,7 @@ msgstr "Αποτυχία"
 msgid "Failed"
 msgstr "Απέτυχε"
 
-#: api/classes/CTemplate.php:611
+#: api/classes/CTemplate.php:613
 msgid "Failed to update template"
 msgstr "Απέτυχε η ενημέρωση σχεδιότυπου"
 
@@ -5231,6 +5231,7 @@ msgstr "Πεδίο"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Πεδίο \"%1$s\" δεν μπορεί να ορισθεί σε NULL."
 
+#: api/classes/CHost.php:1084 api/classes/CTemplate.php:827
 #: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -5270,7 +5271,7 @@ msgstr "Πεδίο \"%1$s\" πρέπει να λείπει."
 msgid "Field \"druleid\" is required."
 msgstr "Πεδίο \"druleid\" είναι απαιτούμενο."
 
-#: api/classes/CTemplate.php:496
+#: api/classes/CTemplate.php:498
 msgid "Field \"host\" is mandatory"
 msgstr "Πεδίο \"ξενιστής\" είναι υποχρεωτικό"
 
@@ -5546,7 +5547,7 @@ msgstr "Γενικές δέσμες ενεργειών"
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:67
 #: include/views/configuration.triggers.list.php:292 templates.php:658
-#: tr_status.php:873
+#: tr_status.php:874
 msgid "Go"
 msgstr "Μετάβαση"
 
@@ -5776,7 +5777,7 @@ msgstr "Πλέγμα"
 msgid "Group"
 msgstr "Ομάδα"
 
-#: api/classes/CHostGroup.php:606
+#: api/classes/CHostGroup.php:608
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Ομάδα \"%1$s\" δεν διαγράφεται, διότι χρησιμοποιείται σε πρωτότυπο ξενιστή."
@@ -6032,7 +6033,7 @@ msgstr "Οριζόντια"
 msgid "Horizontal align"
 msgstr "Οριζόντια ευθυγράμμιση"
 
-#: events.php:293 events.php:534 events.php:585 events.php:598 httpmon.php:73
+#: events.php:293 events.php:484 events.php:535 events.php:548 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:632 include/blocks.inc.php:679
 #: include/blocks.inc.php:937 include/blocks.inc.php:948
@@ -6073,10 +6074,16 @@ msgstr "Οριζόντια ευθυγράμμιση"
 msgid "Host"
 msgstr "Ξενιστής"
 
-#: api/classes/CHost.php:1124 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1141 api/classes/CTemplate.php:514
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Ξενιστής \"%1$s\" υπάρχει ήδη."
+
+#: api/classes/CHostGroup.php:1454 api/classes/CHost.php:677
+#: api/classes/CHost.php:684 api/classes/CHost.php:1109
+#, c-format
+msgid "Host \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: api/classes/CProxy.php:591
 #, c-format
@@ -6149,17 +6156,12 @@ msgstr "Ομάδα ξενιστών"
 msgid "Host group \"%1$s\" already exists."
 msgstr "Ομάδα ξενιστών \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHostGroup.php:638
+#: api/classes/CHostGroup.php:641
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη, διότι χρησιμοποιείται σε καθολική δέσμη ενεργειών."
 
-#: api/classes/CHostGroup.php:619
-#, c-format
-msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη, διότι εξαρτώνται μερικοί ξενιστές."
-
-#: api/classes/CHostGroup.php:593
+#: api/classes/CHostGroup.php:595
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη ως εσωτερική."
@@ -6255,8 +6257,8 @@ msgstr "Πρωτότυπος ξενιστής \"%1$s\" υπάρχει ήδη σ�
 
 #: api/classes/CHostPrototype.php:189
 #, c-format
-msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr "Πρωτότυπος ξενιστής \"%1$s\" να έχει τουλάχιστον μία ομάδα ξενιστή."
+msgid "Host prototype \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
@@ -6336,7 +6338,7 @@ msgstr "Μάσκα υποδικτύου ξενιστή"
 msgid "Host time"
 msgstr "Χρόνος ξενιστή"
 
-#: api/classes/CHost.php:1003
+#: api/classes/CHost.php:1013
 msgid "Host update failed."
 msgstr "Αποτυχία ενημέρωσης ξενιστή."
 
@@ -6344,22 +6346,22 @@ msgstr "Αποτυχία ενημέρωσης ξενιστή."
 msgid "Host updated"
 msgstr "Ξενιστής ενημερώθηκε"
 
-#: api/classes/CTemplate.php:908
+#: api/classes/CTemplate.php:915
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHost.php:822
+#: api/classes/CHost.php:824
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Ξενιστής με ίδιο όνομα \"%s\" υπάρχει ήδη."
 
-#: api/classes/CTemplate.php:526 api/classes/CTemplate.php:875
+#: api/classes/CTemplate.php:528 api/classes/CTemplate.php:882
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHost.php:828
+#: api/classes/CHost.php:830
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Ξενιστής με ίδιο ορατό όνομα \"%s\" υπάρχει ήδη."
@@ -6452,7 +6454,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:508 events.php:517 hosts.php:781
+#: events.php:458 events.php:467 hosts.php:781
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6993,8 +6995,8 @@ msgid "Incorrect arguments passed to function"
 msgstr "Λανθασμένα ορίσματα πέρασαν στην συνάρτηση"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
-#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:534
-#: api/classes/CItemGeneral.php:197
+#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:535
+#: api/classes/CItemGeneral.php:197 api/classes/CScript.php:293
 msgid "Incorrect arguments passed to function."
 msgstr "Λανθασμένα ορίσματα πέρασαν στη συνάρτηση."
 
@@ -7021,7 +7023,7 @@ msgstr "Λανθασμένη τιμή υπολογισμού SLA για υπηρ
 msgid "Incorrect characters used for Node name."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα Κόμβου."
 
-#: api/classes/CTemplate.php:501
+#: api/classes/CTemplate.php:503
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα Σχεδιότυπου \"%1$s\""
@@ -7031,7 +7033,7 @@ msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όν�
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για ξενιστή \"%1$s\"."
 
-#: api/classes/CHost.php:756 api/classes/CHost.php:1107
+#: api/classes/CHost.php:758 api/classes/CHost.php:1124
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Λανθασμένοι χαρακτήρες για όνομα ξενιστή \"%s\"."
@@ -7041,7 +7043,7 @@ msgstr "Λανθασμένοι χαρακτήρες για όνομα ξενισ
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα διαμεσολαβητή \"%1$s\"."
 
-#: api/classes/CTemplate.php:916
+#: api/classes/CTemplate.php:923
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα σχεδιότυπου \"%1$s\"."
@@ -7164,7 +7166,7 @@ msgstr "Λανθασμένη παράμετρος διεπαφής IP \"%s\" π�
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Λανθασμένη θύρα διεπαφής \"%s\" παρέχεται."
 
-#: api/classes/CHost.php:709
+#: api/classes/CHost.php:711
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Λανθασμένο πεδίο απογραφής \"%s\"."
@@ -7243,7 +7245,7 @@ msgstr "Λανθασμένη τιμή ύψους για χάρτη \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Λανθασμένη τιμή πλάτους για χάρτη \"%s\"."
 
-#: api/classes/CScript.php:576
+#: api/classes/CScript.php:588
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
 msgstr "Λανθασμένος κατάλογος διαδρομών για δέσμη ενεργειών \"%1$s\"."
@@ -7380,7 +7382,7 @@ msgstr "Λανθασμένη κατάσταση."
 msgid "Incorrect template screen ID."
 msgstr ""
 
-#: api/classes/CUser.php:362
+#: api/classes/CUser.php:364
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "Λανθασμένο θέμα χρήστη \"%1$s\"."
@@ -7679,12 +7681,12 @@ msgid "Invalid maintenance period"
 msgstr "Άκυρη περίοδος συντήρησης"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:241
-#: api/classes/CScreenItem.php:302 api/classes/CScript.php:442
+#: api/classes/CScreenItem.php:302 api/classes/CScript.php:454
 #: api/classes/CService.php:206 api/classes/CService.php:382
 #: api/classes/CService.php:1474 api/classes/CUserMacro.php:339
-#: api/classes/CUserMacro.php:472 api/classes/CUser.php:673
-#: api/classes/CUser.php:693 api/classes/CUser.php:851
-#: api/classes/CUser.php:896 api/rpc/class.cjsonrpc.php:197
+#: api/classes/CUserMacro.php:472 api/classes/CUser.php:675
+#: api/classes/CUser.php:695 api/classes/CUser.php:853
+#: api/classes/CUser.php:898 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Άκυρες παράμετροι μεθόδου."
 
@@ -7701,7 +7703,7 @@ msgstr "Άκυρες παράμετροι."
 msgid "Invalid period for field \"%1$s\"."
 msgstr "Άκυρη περίοδος πεδίου \"%1$s\"."
 
-#: api/classes/CHttpTest.php:663 api/classes/CHttpTest.php:669
+#: api/classes/CHttpTest.php:664 api/classes/CHttpTest.php:670
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Άκυρη απόκριση κωδικού \"%1$s\"."
@@ -7728,7 +7730,7 @@ msgstr "Δόθηκε άκυρο όνομα προβολής \"%s\". Επιτρε
 msgid "Inventory"
 msgstr "Απογραφή"
 
-#: api/classes/CHost.php:1292
+#: api/classes/CHost.php:1309
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Απογραφή απενεργοποιημένη για ξενιστή \"%1$s\"."
@@ -7950,12 +7952,6 @@ msgstr "Συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
-
-#: api/classes/managers/CHttpTestManager.php:713
-#: api/classes/managers/CHttpTestManager.php:844
-#, c-format
-msgid "Item with key \"%1$s\" already exists."
-msgstr "Συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη."
 
 #: hosts.php:815 hosts.php:906 include/html.inc.php:425
 #: include/html.inc.php:429 include/items.inc.php:735
@@ -8470,12 +8466,12 @@ msgstr "Σύνδεση"
 msgid "Login as Guest"
 msgstr "Σύνδεση ως Φιλοξενούμενος"
 
-#: api/classes/CUser.php:1136
+#: api/classes/CUser.php:1138
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Αποτυχημένη σύνδεση \"%s\"."
 
-#: api/classes/CUser.php:1104
+#: api/classes/CUser.php:1106
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8484,8 +8480,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:984 api/classes/CUser.php:1003
-#: api/classes/CUser.php:1052
+#: api/classes/CUser.php:986 api/classes/CUser.php:1005
+#: api/classes/CUser.php:1054
 msgid "Login name or password is incorrect."
 msgstr "Όνομα ή συνθηματικό σύνδεσης ανακριβές."
 
@@ -8664,11 +8660,11 @@ msgstr "Τύπος συντήρησης"
 msgid "Maintenance updated"
 msgstr "Συντήρηση ενημερώθηκε"
 
-#: include/blocks.inc.php:981 tr_status.php:678
+#: include/blocks.inc.php:981 tr_status.php:679
 msgid "Maintenance with data collection"
 msgstr "Συντήρηση με συλλογή δεδομένων"
 
-#: include/blocks.inc.php:980 tr_status.php:677
+#: include/blocks.inc.php:980 tr_status.php:678
 msgid "Maintenance without data collection"
 msgstr "Συντήρηση χωρίς συλλογή δεδομένων"
 
@@ -8837,7 +8833,7 @@ msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characte
 msgstr[0] "Μέγιστο ψευδώνυμο %1$d χαρακτήρες, \"%2$s\" είναι %3$d χαρακτήρας."
 msgstr[1] "Μέγιστο ψευδώνυμο %1$d χαρακτήρες, \"%2$s\" είναι %3$d χαρακτήρες."
 
-#: api/classes/CHost.php:746
+#: api/classes/CHost.php:748
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8882,7 +8878,7 @@ msgstr "Μέγιστη τιμή περιόδου T > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Μέγιστη τιμή περιόδου T ΟΧΙ N"
 
-#: api/classes/CHost.php:782
+#: api/classes/CHost.php:784
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9446,7 +9442,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Επόμενο"
 
-#: events.php:839 include/events.inc.php:362 include/events.inc.php:380
+#: events.php:789 include/events.inc.php:362 include/events.inc.php:380
 #: include/func.inc.php:2442 include/triggers.inc.php:1604
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
@@ -9646,7 +9642,7 @@ msgstr "Δεν επιλέχθηκαν στοιχεία!"
 msgid "No errors found."
 msgstr "Δεν βρέθηκαν λάθη."
 
-#: include/blocks.inc.php:1026 include/blocks.inc.php:1552 tr_status.php:750
+#: include/blocks.inc.php:1026 include/blocks.inc.php:1552 tr_status.php:751
 msgid "No events"
 msgstr "Χωρίς συμβάντα"
 
@@ -9695,25 +9691,7 @@ msgstr "Δεν προστέθηκαν γραφήματα."
 msgid "No graphs found."
 msgstr "Δεν βρέθηκαν γραφήματα."
 
-#: api/classes/CHost.php:676 api/classes/CHost.php:683
-#, c-format
-msgid "No groups for host \"%s\"."
-msgstr "Χωρίς ομάδες για ξενιστή \"%s\"."
-
-#: api/classes/CHost.php:1093
-msgid "No groups for hosts."
-msgstr "Χωρίς ομάδες για ξενιστές."
-
-#: api/classes/CTemplate.php:842
-msgid "No groups for template"
-msgstr "Χωρίς ομάδες για σχεδιότυπο"
-
-#: api/classes/CTemplate.php:460
-#, c-format
-msgid "No groups for template \"%1$s\"."
-msgstr "Χωρίς ομάδες για σχεδιότυπο \"%1$s\"."
-
-#: api/classes/CHost.php:1461
+#: api/classes/CHost.php:1478
 msgid "No host ID given."
 msgstr "Δεν δόθηκε ID ξενιστή."
 
@@ -9792,7 +9770,7 @@ msgstr "Δεν βρέθηκε διεπαφή."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Χωρίς διαθέσιμη διεπαφή για διαμεσολαβητή \"%s\"."
 
-#: api/classes/CHost.php:730 api/classes/CHost.php:736
+#: api/classes/CHost.php:732 api/classes/CHost.php:738
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Χωρίς διεπαφές για ξενιστή \"%s\"."
@@ -9919,7 +9897,7 @@ msgstr "Χωρίς δικαιώματα για χάρτη \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Χωρίς δικαιώματα για οθόνη \"%1$s\"."
 
-#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
+#: api/classes/CUser.php:1068 api/classes/CUser.php:1196
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -9934,16 +9912,16 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:509
-#: api/classes/CHostGroup.php:588 api/classes/CHostGroup.php:974
-#: api/classes/CHostGroup.php:1004 api/classes/CHostGroup.php:1133
-#: api/classes/CHostGroup.php:1235 api/classes/CHostGroup.php:1262
+#: api/classes/CHostGroup.php:590 api/classes/CHostGroup.php:977
+#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1101
+#: api/classes/CHostGroup.php:1215 api/classes/CHostGroup.php:1234
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
-#: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHost.php:671 api/classes/CHost.php:691
+#: api/classes/CHost.php:1841 api/classes/CHostPrototype.php:1021
 #: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
-#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
-#: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:396
+#: api/classes/CHttpTest.php:606 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:240 api/classes/CItem.php:690
@@ -9956,18 +9934,19 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CProxy.php:213 api/classes/CProxy.php:285
 #: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
 #: api/classes/CScreenItem.php:445 api/classes/CScreen.php:498
-#: api/classes/CScreen.php:676 api/classes/CService.php:1257
-#: api/classes/CService.php:1272 api/classes/CTemplate.php:800
-#: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
+#: api/classes/CScreen.php:676 api/classes/CScript.php:302
+#: api/classes/CScript.php:312 api/classes/CService.php:1257
+#: api/classes/CService.php:1272 api/classes/CTemplate.php:802
+#: api/classes/CTemplate.php:1003 api/classes/CTemplate.php:1128
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
-#: api/classes/CUser.php:680 api/classes/CUser.php:859
-#: api/classes/CUser.php:879 api/classes/CUser.php:938
-#: api/classes/CUser.php:1363 include/func.inc.php:2082
+#: api/classes/CUser.php:682 api/classes/CUser.php:861
+#: api/classes/CUser.php:881 api/classes/CUser.php:940
+#: api/classes/CUser.php:1365 include/func.inc.php:2082
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Χωρίς δικαιώματα σε αναφερόμενο αντικείμενο ή δεν υπάρχει!"
 
@@ -10091,7 +10070,7 @@ msgstr "Δεν ορίσθηκαν εναύσματα."
 msgid "No triggers found."
 msgstr "Δεν βρέθηκαν εναύσματα."
 
-#: api/classes/CUser.php:590
+#: api/classes/CUser.php:592
 msgid "No user ID given."
 msgstr "Δεν δόθηκε ID χρήστη."
 
@@ -10120,7 +10099,7 @@ msgstr "Δεν βρέθηκαν τιμές."
 msgid "No web scenarios found."
 msgstr "Δεν βρέθηκαν σενάρια ιστού."
 
-#: events.php:584 events.php:597 hosts.php:812 httpmon.php:86
+#: events.php:534 events.php:547 hosts.php:812 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:400
 #: include/blocks.inc.php:947 include/blocks.inc.php:1122
@@ -10213,7 +10192,7 @@ msgstr "Μη Σχεδιότυποι συλλέκτες"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Δεν συνδέονται όλα τα σχεδιότυπα με \"%s\"."
 
-#: api/classes/CUser.php:384
+#: api/classes/CUser.php:386
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Δεν επιτρέπεται ορισμός συνθηματικού για χρήστη \"guest\"."
 
@@ -10541,8 +10520,7 @@ msgstr "Σε αλλαγή κατάστασης τα εναύσματα αναβ�
 msgid "Once"
 msgstr "Άπαξ"
 
-#: api/classes/CHostGroup.php:1142 api/classes/CHostGroup.php:1151
-#: api/classes/CHostGroup.php:1244
+#: api/classes/CHostGroup.php:1110
 msgid "One of the objects is left without a host group."
 msgstr "Ένα των αντικειμένων έμεινε χωρίς ομάδα ξενιστή."
 
@@ -10581,7 +10559,7 @@ msgstr "Μόνο Υπέρ Διαχειριστές διαγράφουν τύπο
 
 #: api/classes/CUserGroup.php:237 api/classes/CUserGroup.php:288
 #: api/classes/CUserGroup.php:312 api/classes/CUserGroup.php:407
-#: api/classes/CUserGroup.php:631
+#: api/classes/CUserGroup.php:649
 msgid "Only Super Admins can delete user groups."
 msgstr "Μόνο Υπέρ Διαχειριστές διαγράφουν ομάδες χρηστών."
 
@@ -10597,19 +10575,19 @@ msgstr "Μόνο Υπέρ Διαχειριστές ενημερώνουν γεν
 msgid "Only Super Admins can update icon maps."
 msgstr "Μόνο Υπέρ Διαχειριστές ενημερώνουν αντιστοιχίσεις εικονιδίων."
 
-#: api/classes/CUser.php:669
+#: api/classes/CUser.php:671
 msgid "Only Zabbix Admins can add user media."
 msgstr "Μόνο Διαχειριστές Zabbix προσθέτουν μέσα χρήστη."
 
-#: api/classes/CUser.php:847
+#: api/classes/CUser.php:849
 msgid "Only Zabbix Admins can change user media."
 msgstr "Μόνο Διαχειριστές Zabbix αλλάζουν μέσα χρήστη."
 
-#: api/classes/CUser.php:928
+#: api/classes/CUser.php:930
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Μόνο Διαχειριστές Zabbix αφαιρούν μέσα χρήστη."
 
-#: api/classes/CHttpTest.php:690
+#: api/classes/CHttpTest.php:691
 msgid "Only characters are allowed."
 msgstr "Επιτρέπονται μόνο χαρακτήρες."
 
@@ -11307,7 +11285,7 @@ msgstr "Αρχείο ιδιωτικού κλειδιού"
 msgid "Privilege level"
 msgstr "Επίπεδο δικαιωμάτων"
 
-#: api/classes/CUser.php:975
+#: api/classes/CUser.php:977
 msgid "Probably php-ldap module is missing."
 msgstr "Πιθανή απουσία μονάδος php-ldap."
 
@@ -12297,8 +12275,8 @@ msgstr "Οθόνες"
 msgid "Script"
 msgstr "Δέσμη ενεργειών"
 
-#: api/classes/CScript.php:424 api/classes/CScript.php:485
-#: api/classes/CScript.php:617
+#: api/classes/CScript.php:436 api/classes/CScript.php:497
+#: api/classes/CScript.php:629
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "Δέσμη ενεργειών \"%1$s\" υπάρχει ήδη."
@@ -12311,7 +12289,7 @@ msgstr "Δέσμη ενεργειών προστέθηκε"
 msgid "Script deleted"
 msgstr "Δέσμη ενεργειών διεγράφη"
 
-#: api/classes/CScript.php:609
+#: api/classes/CScript.php:621
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Δέσμη ενεργειών διαδρομής καταλόγου \"%1$s\" σε χρήση στο όνομα δέσμης ενεργειών \"%2$s\"."
@@ -12321,7 +12299,7 @@ msgstr "Δέσμη ενεργειών διαδρομής καταλόγου \"%1
 msgid "Script name"
 msgstr "Όνομα δέσμης ενεργειών"
 
-#: api/classes/CScript.php:596
+#: api/classes/CScript.php:608
 #, c-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
 msgstr "Όνομα δέσμης ενεργειών \"%1$s\" σε χρήση στη διαδρομή καταλόγου για δέσμη ενεργειών \"%2$s\"."
@@ -12334,7 +12312,7 @@ msgstr "Δέσμη ενεργειών δημιουργίας προφίλ"
 msgid "Script updated"
 msgstr "Δέσμη ενεργειών ενημερώθηκε"
 
-#: api/classes/CScript.php:459
+#: api/classes/CScript.php:471
 #, c-format
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "Δέσμη ενεργειών με scriptid \"%1$s\" ανύπαρκτη."
@@ -12432,7 +12410,7 @@ msgstr "Όνομα ασφάλειας"
 #: include/views/configuration.screen.constructor.edit.php:465
 #: include/views/configuration.screen.constructor.edit.php:543
 #: include/views/configuration.screen.constructor.edit.php:550
-#: include/views/configuration.services.child.list.php:63
+#: include/views/configuration.services.child.list.php:65
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
 #: include/views/js/configuration.sysmaps.js.php:107
@@ -12547,7 +12525,7 @@ msgstr "Πληροφορίες εξυπηρετητή"
 msgid "Server time"
 msgstr "Ώρα εξυπηρετητή"
 
-#: events.php:548 include/actions.inc.php:105
+#: events.php:498 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:277
 #: include/views/configuration.services.parent.list.php:36 services.php:466
@@ -12615,11 +12593,11 @@ msgstr "Υπηρεσίες"
 msgid "Services form a circular dependency."
 msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 
-#: api/classes/CUser.php:1188
+#: api/classes/CUser.php:1190
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας, επανασυνδεθείτε."
 
-#: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
+#: events.php:538 events.php:551 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
 #: include/triggers.inc.php:1599 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
@@ -12643,7 +12621,7 @@ msgstr "Το όνομα βαρύτητας δεν μπορεί να είναι �
 #: include/reports.inc.php:456
 #: include/views/configuration.application.list.php:63
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:422
-#: tr_status.php:784 tr_status.php:789
+#: tr_status.php:785 tr_status.php:790
 msgid "Show"
 msgstr "Εμφάνιση"
 
@@ -12970,7 +12948,7 @@ msgstr "Κατάσταση"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "Κατάσταση υπηρεσίας. 0 - τρέχουσα, 1 - παυθείσα, 2 - αναμονή έναρξης, 3 - αναμονή παύσης, 4 - αναμονή συνέχειας, 5 - αναμονή σταματήματος, 6 - σταματημένη, 7 - άγνωστο, 255 - ανύπαρκτη υπηρεσία"
 
-#: events.php:511 events.php:520 events.php:587 events.php:600 hosts.php:822
+#: events.php:461 events.php:470 events.php:537 events.php:550 hosts.php:822
 #: httpdetails.php:136 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -13276,10 +13254,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Σχεδιότυπο"
 
-#: api/classes/CHost.php:1129 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1146 api/classes/CTemplate.php:510
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Σχεδιότυπο \"%1$s\" υπάρχει ήδη."
+
+#: api/classes/CHostGroup.php:1459 api/classes/CTemplate.php:461
+#: api/classes/CTemplate.php:850
+#, c-format
+msgid "Template \"%1$s\" cannot be without host group."
+msgstr ""
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, c-format
@@ -13341,22 +13325,22 @@ msgstr "Σχεδιότυπο ενημερώθηκε"
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Σχεδιότυπο με κλειδί συλλέκτη \"%1$s\" ήδη συνδεδεμένο σε ξενιστή."
 
-#: api/classes/CTemplate.php:900
+#: api/classes/CTemplate.php:907
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHost.php:838
+#: api/classes/CHost.php:840
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο όνομα \"%s\" υπάρχει ήδη."
 
-#: api/classes/CTemplate.php:519 api/classes/CTemplate.php:867
+#: api/classes/CTemplate.php:521 api/classes/CTemplate.php:874
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHost.php:844
+#: api/classes/CHost.php:846
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%s\" υπάρχει ήδη."
@@ -13484,7 +13468,7 @@ msgstr "Η ληφθείσα JSON είναι άκυρη αίτηση JSON-RPC."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Η ζητούμενη απομακρυσμένη-διαδικασία δεν υπάρχει / μη διαθέσιμη"
 
-#: api/classes/CHttpTest.php:573
+#: api/classes/CHttpTest.php:574
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Η κατηγορία σενάριο ιστού ανήκει σε διαφορετικό ξενιστή από τον ξενιστή σενάριο ιστού."
 
@@ -13545,7 +13529,7 @@ msgstr "Πέμπτη"
 msgid "Till"
 msgstr "Έως"
 
-#: events.php:507 events.php:516 events.php:583 events.php:596
+#: events.php:457 events.php:466 events.php:533 events.php:546
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
 #: include/actions.inc.php:925 include/blocks.inc.php:941
@@ -13710,8 +13694,8 @@ msgstr "Τάσεις"
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:103 jsLoader.php:148
-#: jsLoader.php:215 report5.php:60 services.php:468 tr_comments.php:75
-#: tr_logform.php:152 tr_logform.php:165
+#: jsLoader.php:215 report5.php:60 services.php:468 tr_logform.php:152
+#: tr_logform.php:165
 msgid "Trigger"
 msgstr "Έναυσμα"
 
@@ -14167,8 +14151,8 @@ msgstr "Απεμπλοκή επιλεγμένων χρηστών;"
 msgid "Units"
 msgstr "Μονάδες"
 
-#: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:957 httpdetails.php:168 httpmon.php:170
+#: events.php:481 events.php:482 events.php:492 events.php:493 events.php:494
+#: events.php:495 hosts.php:957 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14419,7 +14403,7 @@ msgstr "Ενημερώθηκε: Έναυσμα \"%1$s\" σε \"%2$s\"."
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Πρωτότυπο έναυσμα \"%1$s\" σε \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:264
+#: api/classes/managers/CHttpTestManager.php:282
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Ενημερώθηκε: Σενάριο ιστού \"%1$s\" σε \"%2$s\"."
@@ -14474,10 +14458,11 @@ msgstr "Χρήση σε ενέργειες"
 msgid "User"
 msgstr "Χρήστης"
 
-#: api/classes/CUser.php:338
+#: api/classes/CUserGroup.php:518 api/classes/CUserGroup.php:707
+#: api/classes/CUser.php:339
 #, c-format
-msgid "User \"%s\" cannot be without user group."
-msgstr "Χρήστης \"%s\" δεν μπορεί να είναι χωρίς ομάδα χρήστη."
+msgid "User \"%1$s\" cannot be without user group."
+msgstr ""
 
 #: users.php:248
 msgid "User added"
@@ -14487,7 +14472,7 @@ msgstr "Χρήστης προστέθηκε"
 msgid "User can't change type for himself"
 msgstr "Ο χρήστης δεν μπορεί να αλλάξει τον τύπο για τον εαυτό του"
 
-#: api/classes/CUserGroup.php:462
+#: api/classes/CUserGroup.php:465
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Ο χρήστης δεν μπορεί να προσθέσει τον εαυτό του σε απενεργοποιημένη ομάδα ή ομάδα με απενεργοποιημένη πρόσβαση GUI."
 
@@ -14517,17 +14502,12 @@ msgstr "Χρήστης διεγράφη"
 msgid "User group"
 msgstr "Ομάδα χρήστη"
 
-#: api/classes/CUserGroup.php:685
-#, c-format
-msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr "Ομάδα χρήστη \"%1$s\" είναι η μόνη ομάδα όπου ανήκει ο χρήστης \"%2$s\"."
-
-#: api/classes/CUserGroup.php:668
+#: api/classes/CUserGroup.php:686
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "Ομάδα χρήστη \"%1$s\" σε χρήση για μηνύματα πτώσης βάσης δεδομένων."
 
-#: api/classes/CUserGroup.php:657
+#: api/classes/CUserGroup.php:675
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Ομάδα χρήστη \"%1$s\" χρησιμοποιείται στη δέσμη ενεργειών \"%2$s\"."
@@ -14565,16 +14545,16 @@ msgstr "Ομάδα χρήστη για μήνυμα πτώσης βάσης δε
 msgid "User groups"
 msgstr "Ομάδες χρηστών"
 
-#: api/classes/CUser.php:1376
+#: api/classes/CUser.php:1378
 msgid "User is not allowed to delete himself."
 msgstr "Ο χρήστης δεν επιτρέπεται να διαγράψει τον εαυτό του."
 
-#: api/classes/CUser.php:351
+#: api/classes/CUser.php:353
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Ο χρήστης δεν μπορεί να τροποποιήσει την πρόσβαση GUI για τον εαυτό του με το να γίνει μέλος της ομάδας χρηστών \"%s\"."
 
-#: api/classes/CUser.php:355
+#: api/classes/CUser.php:357
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Ο χρήστης δεν μπορεί να τροποποιήσει την κατάσταση του συστήματος για τον εαυτό του με το να γίνει μέλος της ομάδας χρηστών \"%s\"."
@@ -14622,7 +14602,7 @@ msgstr "Τύπος χρήστη"
 msgid "User updated"
 msgstr "Χρήστης ενημερώθηκε"
 
-#: api/classes/CUser.php:400
+#: api/classes/CUser.php:402
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Χρήστης με ψευδώνυμο \"%s\" υπάρχει ήδη."
@@ -15014,7 +14994,7 @@ msgstr "Στατιστικά εικονικής μνήμης."
 msgid "Visible name"
 msgstr "Ορατό όνομα"
 
-#: api/classes/CHost.php:771
+#: api/classes/CHost.php:773
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Το ορατό όνομα δεν μπορεί να είναι κενό εάν το όνομα ξενιστή απουσιάζει."
 
@@ -15052,13 +15032,13 @@ msgstr "Ιστός"
 msgid "Web monitoring"
 msgstr "Εποπτεία ιστού"
 
-#: api/classes/managers/CHttpTestManager.php:383
-#: api/classes/managers/CHttpTestManager.php:391
+#: api/classes/managers/CHttpTestManager.php:401
+#: api/classes/managers/CHttpTestManager.php:409
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη σε ξενιστή \"%2$s\"."
 
-#: api/classes/CHttpTest.php:480 api/classes/CHttpTest.php:529
+#: api/classes/CHttpTest.php:481 api/classes/CHttpTest.php:530
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη."
@@ -15079,29 +15059,29 @@ msgid_plural "Web scenarios enabled"
 msgstr[0] "Σενάριο ιστού ενεργοποιημένο"
 msgstr[1] "Σενάρια ιστού ενεργοποιημένα"
 
-#: api/classes/CHttpTest.php:473 api/classes/CHttpTest.php:510
+#: api/classes/CHttpTest.php:474 api/classes/CHttpTest.php:511
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr "Απούσες παράμετροι σενάριου ιστού: %1$s"
 
-#: api/classes/CHttpTest.php:595
+#: api/classes/CHttpTest.php:596
 msgid "Web scenario must have at least one step."
 msgstr "Το σενάριο ιστού πρέπει να έχει τουλάχιστον ένα βήμα."
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:639
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr "Βήμα σενάριου ιστού \"%1$s\" υπάρχει ήδη."
 
-#: api/classes/CHttpTest.php:618
+#: api/classes/CHttpTest.php:619
 msgid "Web scenario step URL cannot be empty."
 msgstr ""
 
-#: api/classes/CHttpTest.php:613
+#: api/classes/CHttpTest.php:614
 msgid "Web scenario step name cannot be empty."
 msgstr ""
 
-#: api/classes/CHttpTest.php:622
+#: api/classes/CHttpTest.php:623
 msgid "Web scenario step number cannot be less than 1."
 msgstr "Ο αριθμός βήματος σενάριου ιστού δεν μπορεί να είναι μικρότερος από 1."
 
@@ -15251,7 +15231,7 @@ msgstr "Λάθος πεδία τύπου μέσου ενημέρωσης."
 msgid "Wrong fields for proxy \"%1$s\"."
 msgstr "Λάθος πεδία διαμεσολαβητή \"%1$s\"."
 
-#: api/classes/CScript.php:405
+#: api/classes/CScript.php:417
 msgid "Wrong fields for script."
 msgstr "Λάθος πεδία δέσμης εντολών."
 
@@ -15378,7 +15358,7 @@ msgstr "Έτος"
 msgid "Yearly"
 msgstr "Ετησίως"
 
-#: events.php:839 include/blocks.inc.php:767
+#: events.php:789 include/blocks.inc.php:767
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2442
 #: include/triggers.inc.php:1604
@@ -15395,7 +15375,7 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Δεν μπορείτε να επιλέξετε κάποια από τις γλώσσες, επειδή οι τοπικές ρυθμίσεις για αυτές δεν είναι εγκατεστημένες στον εξυπηρετητή ιστού."
 
-#: api/classes/CUser.php:367
+#: api/classes/CUser.php:369
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Μη επιτρεπόμενη αύξηση προνομίων χρήστη \"%s\"."
@@ -15427,15 +15407,14 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Δεν καθορίσατε στόχους για γενική δέσμη ενεργειών εργασίας ενέργειας \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1030 api/classes/CHost.php:1087
-#: api/classes/CHost.php:1403 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1040 api/classes/CHost.php:1101
+#: api/classes/CHost.php:1420 api/classes/CHttpTest.php:503
 #: api/classes/CMaintenance.php:551 api/classes/CMaintenance.php:670
-#: api/classes/CMaintenance.php:682 api/classes/CScript.php:300
-#: api/classes/CScript.php:397 api/classes/CScript.php:437
-#: api/classes/CScript.php:500 api/classes/CTemplate.php:480
-#: api/classes/CTemplate.php:580 api/classes/CTemplate.php:641
-#: api/classes/CTemplate.php:791 api/classes/CTemplate.php:836
-#: api/classes/CTemplate.php:1115
+#: api/classes/CMaintenance.php:682 api/classes/CScript.php:409
+#: api/classes/CScript.php:449 api/classes/CScript.php:512
+#: api/classes/CTemplate.php:482 api/classes/CTemplate.php:582
+#: api/classes/CTemplate.php:643 api/classes/CTemplate.php:793
+#: api/classes/CTemplate.php:842 api/classes/CTemplate.php:1122
 msgid "You do not have permission to perform this operation."
 msgstr "Δεν έχετε άδεια για να εκτελέσετε αυτή τη λειτουργία."
 
@@ -15698,8 +15677,8 @@ msgstr "d M Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:123
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:715
-#: tr_status.php:833
+#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:716
+#: tr_status.php:834
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 

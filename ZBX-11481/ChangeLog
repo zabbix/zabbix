@@ -1,3 +1,23 @@
+Changes for 2.2.17rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
+..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
+..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
+...G...... [ZBX-11494] fixed "system.stat" returning not supported after Zabbix agent restart on AIX (viktors)
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+........S. [ZBX-11534] fixed default operation step duration to be included in minimal step calculation instead of overriding (vso)
+...G...... [ZBX-11528] fixed zabbix_get to match zabbix_server protocol (vso)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.16
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), Spanish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.16rc1
 
 New features:
@@ -5,6 +25,9 @@ New features:
 ........S. [ZBX-10694] added rollup health sensor item to vmware hypervisor template (wiper)
 
 Bug fixes:
+........S. [ZBX-11509] fixed system.run command parameter to be quoted only if it contains special characters (vso)
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 ...G...... [ZBX-11397] fixed system.hw.chassis key to read DMI tables through sysfs and fall back to /dev/mem only if sysfs is not available (vso)
 ........S. [ZBX-11411] added check for LLD macro values in calculated item formula to be numeric (viktors)
 A......... [ZBX-11483] improved API script.execute validation (Oleg)
@@ -1491,11 +1514,24 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
-Changes for 2.0.20rc1
+Changes for 2.0.21rc1
 
 New features:
 
 Bug fixes:
+...G...... [ZBX-11479] fixed threaded metric to handle interruption by a signal (vso)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.20
+
+2.0.20rc1 was released as 2.0.20 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.20rc1
+
+Bug fixes:
+.......PS. [ZBX-4661] fixed possible crash when Oracle database is not available (vso)
+..F....... [ZBX-11521] fixed JS error in media popup (Oleg)
 A......... [ZBX-11483] improved API script.execute validation (Oleg)
 ...G...... [ZBX-9781] changed vfs.fs.size, vfs.fs.inode checks to be executed in separate process/thread to avoid lockup with stale NFS mounts (wiper)
 ....I..... [ZBX-11219] renamed second argument for net.dns and net.dns.record items from "zone" to "name" (Cemeris)

@@ -275,8 +275,7 @@ elseif (hasRequest('save')) {
 		'ipmi_sensor'	=> get_request('ipmi_sensor'),
 		'data_type'		=> get_request('data_type'),
 		'ruleid'		=> get_request('parent_discoveryid'),
-		'delay_flex'	=> $db_delay_flex,
-		'applications'	=> $applications
+		'delay_flex'	=> $db_delay_flex
 	);
 
 	if (hasRequest('itemid')) {
@@ -297,10 +296,19 @@ elseif (hasRequest('save')) {
 		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 		$item['itemid'] = $itemId;
 
+		// compare applications
+		natsort($dbItem['applications']);
+		natsort($applications);
+		if (array_values($dbItem['applications']) !== array_values($applications)) {
+			$item['applications'] = $applications;
+		}
+
 		$result = API::Itemprototype()->update($item);
 		show_messages($result, _('Item prototype updated'), _('Cannot update item prototype'));
 	}
 	else {
+		$item['applications'] = $applications;
+
 		$result = API::Itemprototype()->create($item);
 		show_messages($result, _('Item prototype added'), _('Cannot add item prototype'));
 	}
