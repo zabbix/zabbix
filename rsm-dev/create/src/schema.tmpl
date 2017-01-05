@@ -675,14 +675,14 @@ UNIQUE		|1		|theme
 TABLE|globalmacro|globalmacroid|ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|value		|t_text		|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_DATA
 FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|value		|t_text		|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,macro
 
 TABLE|hosts_groups|hostgroupid|ZBX_DATA
@@ -710,7 +710,7 @@ TABLE|mappings|mappingid|ZBX_DATA
 FIELD		|mappingid	|t_id		|	|NOT NULL	|0
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemaps
 FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|newvalue	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|newvalue	|t_varchar(512)	|''	|NOT NULL	|0
 INDEX		|1		|valuemapid
 
 TABLE|media|mediaid|ZBX_DATA
@@ -1046,6 +1046,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
+FIELD		|false_positive	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
