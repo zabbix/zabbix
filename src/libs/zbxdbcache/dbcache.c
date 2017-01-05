@@ -2441,7 +2441,7 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+		item_value->value.value_str.len = strlen(value_orig) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
 		item_value->value.value_str.pvalue = string_values_offset;
@@ -2478,7 +2478,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 		item_value->logeventid = log->logeventid;
 		item_value->timestamp = log->timestamp;
 
-		item_value->value.value_str.len = zbx_db_strlen_n(log->value, HISTORY_LOG_VALUE_LEN) + 1;
+		item_value->value.value_str.len = strlen(log->value) + 1;
 
 		if (NULL != log->source && '\0' != *log->source)
 			item_value->source.len = zbx_db_strlen_n(log->source, HISTORY_LOG_SOURCE_LEN) + 1;
