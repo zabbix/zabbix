@@ -567,9 +567,8 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 
 	zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
 
-	zbx_ltrim(buffer, " \"+");
+	zbx_ltrim(buffer, " \"");
 	zbx_rtrim(buffer, " \"\n\r");
-	del_zeroes(buffer);
 
 	switch (op_type)
 	{
