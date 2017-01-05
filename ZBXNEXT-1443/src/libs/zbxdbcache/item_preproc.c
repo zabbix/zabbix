@@ -560,40 +560,38 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg)
 {
-	char		buffer[MAX_STRING_LEN];
 	zbx_uint64_t	value_ui64;
 
-	zbx_variant_convert(value, ZBX_VARIANT_STR);
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
 
-	zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
-
-	zbx_ltrim(buffer, " \"");
-	zbx_rtrim(buffer, " \"\n\r");
+	zbx_ltrim(value->data.str, " \"");
+	zbx_rtrim(value->data.str, " \"\n\r");
 
 	switch (op_type)
 	{
 		case ZBX_PREPROC_BOOL2DEC:
-			if (SUCCEED != is_boolean(buffer, &value_ui64))
+			if (SUCCEED != is_boolean(value->data.str, &value_ui64))
 			{
 				*errmsg = zbx_strdup(NULL, "invalid value format");
 				return FAIL;
 			}
 			break;
 		case ZBX_PREPROC_OCT2DEC:
-			if (SUCCEED != is_uoct(buffer))
+			if (SUCCEED != is_uoct(value->data.str))
 			{
 				*errmsg = zbx_strdup(NULL, "invalid value format");
 				return FAIL;
 			}
-			ZBX_OCT2UINT64(value_ui64, buffer);
+			ZBX_OCT2UINT64(value_ui64, value->data.str);
 			break;
 		case ZBX_PREPROC_HEX2DEC:
-			if (SUCCEED != is_uhex(buffer))
+			if (SUCCEED != is_uhex(value->data.str))
 			{
 				*errmsg = zbx_strdup(NULL, "invalid value format");
 				return FAIL;
 			}
-			ZBX_HEX2UINT64(value_ui64, buffer);
+			ZBX_HEX2UINT64(value_ui64, value->data.str);
 			break;
 	}
 
