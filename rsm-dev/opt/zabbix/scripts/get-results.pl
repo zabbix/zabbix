@@ -1,9 +1,14 @@
 #!/usr/bin/perl -w
 
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
+
 use strict;
 use warnings;
 
-use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
 

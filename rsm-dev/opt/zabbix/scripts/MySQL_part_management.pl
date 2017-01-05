@@ -8,7 +8,11 @@
 #
 #
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use Data::Dumper;

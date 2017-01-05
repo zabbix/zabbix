@@ -43,7 +43,11 @@
 # - EPP monthly UPDATE resolution RTT	(monthly)		rsm.slv.epp.rtt.update.month	-|-
 # - EPP monthly INFO resolution RTT	(monthly)		rsm.slv.epp.rtt.info.month	-|-
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use warnings;
