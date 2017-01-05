@@ -272,6 +272,14 @@ static int	DBpatch_3030021(void)
 	return DBdrop_field("items", "delta");
 }
 
+static int	DBpatch_3030022(void)
+{
+	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags<>1 or evaltype<>3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -300,5 +308,6 @@ DBPATCH_ADD(3030018, 0, 1)
 DBPATCH_ADD(3030019, 0, 1)
 DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
+DBPATCH_ADD(3030022, 0, 1)
 
 DBPATCH_END()
