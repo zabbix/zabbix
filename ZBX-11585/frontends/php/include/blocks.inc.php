@@ -283,14 +283,31 @@ function make_system_status($filter, $backurl) {
 
 	$table->setHeader($header);
 
-	// get host groups
-	$groups = API::HostGroup()->get([
-		'groupids' => $filter['groupids'],
-		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
-		'monitored_hosts' => true,
+	$filter_groups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
-		'preservekeys' => true
+		'groupids' => $filter['groupids']
 	]);
+
+	$groups = [];
+
+	foreach ($filter_groups as $group) {
+		$options = [
+			'output' => ['groupid', 'name'],
+			'monitored_hosts' => true,
+			'search' => ['name' => $group['name']],
+			'startSearch' => true
+		];
+
+		if (isset($filter['hostids'])) {
+			$options['hostids'] = $filter['hostids'];
+		}
+
+		$child_groups = API::HostGroup()->get($options);
+
+		foreach ($child_groups as $child_group) {
+			$groups[$child_group['groupid']] = $child_group;
+		}
+	}
 
 	CArrayHelper::sort($groups, [
 		['field' => 'name', 'order' => ZBX_SORT_UP]
