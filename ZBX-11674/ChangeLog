@@ -3,7 +3,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-9889] fixed log item values to have unique timestamps in history table (dimir)
+........S. [ZBX-11674] fixed log item values to have unique timestamps in history table (dimir)
 .......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
