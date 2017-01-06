@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 .......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
@@ -312,6 +313,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 .......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
