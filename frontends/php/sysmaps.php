@@ -205,11 +205,12 @@ if (hasRequest('add') || hasRequest('update')) {
 	else {
 		if (getRequest('form') === 'full_clone') {
 			$clone_maps = API::Map()->get([
-				'sysmapids' => $sysmap['sysmapid'],
+				'output' => [],
 				'selectSelements' => ['elementid', 'elementtype', 'iconid_off', 'iconid_on', 'label', 'label_location',
 					'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype', 'width', 'height',
 					'viewtype', 'use_iconmap', 'application', 'urls'
-				]
+				],
+				'sysmapids' => $sysmap['sysmapid']
 			]);
 
 			if ($clone_maps) {
