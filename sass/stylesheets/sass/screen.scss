@@ -2553,6 +2553,8 @@ $form-icon-btn: (
 	z-index: 1000;
 }
 
+
+
 .dashbrd-grid-widget-content {
 	flex: 1;
 	padding: .5rem;
@@ -2566,6 +2568,53 @@ $form-icon-btn: (
 	position: absolute;
 }
 
+.ui-resizable-n {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	cursor: s-resize;
+	height: 5px;
+	width: 100%;
+	top: -1px;
+	left: 0;
+}
+
+.ui-resizable-e {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+	cursor: e-resize;
+	width: 5px;
+	right: 0;
+	top: 0;
+	height: 100%;
+}
+
+.ui-resizable-s {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: s-resize;
+	height: 5px;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
+.ui-resizable-w {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+	cursor: e-resize;
+	width: 5px;
+	left: 0;
+	top: 0;
+	height: 100%;
+}
+
 .dashbrd-widget-placeholder {
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
@@ -2576,6 +2625,8 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%) !important;
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 }
+
+.dashbrd
 
 .dashbrd-widget {
 	min-width: 250px;
