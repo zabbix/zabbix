@@ -283,18 +283,29 @@ function make_system_status($filter, $backurl) {
 
 	$table->setHeader($header);
 
+	$options = [
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groupids'],
+		'monitored_hosts' => true,
+		'preservekeys' => true
+	];
+
+	if (isset($filter['hostids'])) {
+		$options['hostids'] = $filter['hostids'];
+	}
+
+	$groups = API::HostGroup()->get($options);
+
 	$filter_groups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groupids']
 	]);
 
-	$groups = [];
-
 	foreach ($filter_groups as $group) {
 		$options = [
 			'output' => ['groupid', 'name'],
 			'monitored_hosts' => true,
-			'search' => ['name' => $group['name']],
+			'search' => ['name' => $group['name'].'/'],
 			'startSearch' => true
 		];
 

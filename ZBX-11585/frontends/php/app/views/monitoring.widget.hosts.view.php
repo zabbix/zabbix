@@ -28,13 +28,43 @@ $table = (new CTableInfo())
 	]);
 
 // get host groups
-$groups = API::HostGroup()->get([
+$options = [
 	'output' => ['groupid', 'name'],
 	'groupids' => $data['filter']['groupids'],
-	'hostids' => isset($data['filter']['hostids']) ? $data['filter']['hostids'] : null,
 	'monitored_hosts' => true,
 	'preservekeys' => true
+];
+
+if (isset($data['filter']['hostids'])) {
+	$options['hostids'] = $data['filter']['hostids'];
+}
+
+$groups = API::HostGroup()->get($options);
+
+$filter_groups = API::HostGroup()->get([
+	'output' => ['name'],
+	'groupids' => $data['filter']['groupids']
 ]);
+
+foreach ($filter_groups as $group) {
+	$options = [
+		'output' => ['groupid', 'name'],
+		'monitored_hosts' => true,
+		'search' => ['name' => $group['name'].'/'],
+		'startSearch' => true
+	];
+
+	if (isset($data['filter']['hostids'])) {
+		$options['hostids'] = $data['filter']['hostids'];
+	}
+
+	$child_groups = API::HostGroup()->get($options);
+
+	foreach ($child_groups as $child_group) {
+		$groups[$child_group['groupid']] = $child_group;
+	}
+}
+
 CArrayHelper::sort($groups, ['name']);
 
 // get hosts
