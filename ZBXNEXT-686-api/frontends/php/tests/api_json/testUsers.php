@@ -203,6 +203,19 @@ class testUsers extends CZabbixTest {
 			[
 				'user' => [
 					[
+						'alias' => '☺',
+						'passwd' => '☺',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
 						'alias' => 'УТФ Юзер',
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -290,75 +303,89 @@ class testUsers extends CZabbixTest {
 		return [
 			// Check user id.
 			[
-				'user' => [
+				'user' => [[
 					'alias' => 'Api user update without userid'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "userid" is missing.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'alias' => 'Api user update with empty userid',
 					'userid' => ''
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'alias' => 'Api user update with nonexistent userid',
 					'userid' => '1.1'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'alias' => 'Api user update with nonexistent userid',
 					'userid' => 'abc'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'alias' => 'Api user update with nonexistent userid',
 					'userid' => '123456'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check user password.
 			[
 				'user' => [
+					[
+						'userid' => '9',
+						'alias' => 'Api update users with the same id1'
+					],
+					[
+						'userid' => '9',
+						'alias' => 'Api update users with the same id2'
+					],
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
+			],
+			// Check user password.
+			[
+				'user' => [[
 					'userid' => '2',
 					'passwd' => 'zabbix'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
 			// Check user alias.
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => ''
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '2',
 					'alias' => 'Try rename guest'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Cannot rename guest user.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'Admin'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User with alias "Admin" already exists.'
 			],
@@ -366,132 +393,132 @@ class testUsers extends CZabbixTest {
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'Api update users with the same names'
+						'alias' => 'Api update users with the same alias'
 					],
 					[
-						'userid' => '9',
-						'alias' => 'Api update users with the same names'
+						'userid' => '10',
+						'alias' => 'Api update users with the same alias'
 					],
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (alias)=(Api update users with the same alias) already exists.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
 			],
 			// Check user group.
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User without group',
 					'usrgrps' => [
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'Group unexpected parameter',
 					'usrgrps' => [
 						['userid' => '1']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1": unexpected parameter "userid".'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User with empty group id',
 					'usrgrps' => [
 						['usrgrpid' => '']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User group id not number',
 					'usrgrps' => [
 						['usrgrpid' => 'abc']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User group id not valid',
 					'usrgrps' => [
 						['usrgrpid' => '1.1']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/1/usrgrpid": a number is expected.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User with nonexistent group id',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User group with ID "123456" is not available.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '9',
 					'alias' => 'User with two identical user group id',
 					'usrgrps' => [
 						['usrgrpid' => '7'],
 						['usrgrpid' => '7']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
 			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '1',
 					'alias' => 'Try add user to group with disabled GUI access',
 					'usrgrps' => [
 						['usrgrpid' => '12']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '1',
 					'alias' => 'Try add user to a disabled group',
 					'usrgrps' => [
 						['usrgrpid' => '9']
 					]
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check user properties, super-admin user type.
 			[
-				'user' => [
+				'user' => [[
 					'userid' => '1',
 					'alias' => 'Try to change super-admin user type',
 					'type' => '2'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot change their user type.'
 			],
@@ -550,8 +577,15 @@ class testUsers extends CZabbixTest {
 	/**
 	* @dataProvider user_update
 	*/
-	public function testUsers_Update($user, $success_expected, $expected_error) {
-		$result = $this->api_acall('user.update', $user, $debug);
+	public function testUsers_Update($users, $success_expected, $expected_error) {
+		foreach ($users as $user) {
+			if (array_key_exists('userid', $user) && !$success_expected){
+				$sqlUser = "select * from users where userid=".$user['userid'];
+				$oldHashUser = DBhash($sqlUser);
+			}
+		}
+
+		$result = $this->api_acall('user.update', $users, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
@@ -560,8 +594,8 @@ class testUsers extends CZabbixTest {
 			foreach ($result['result']['userids'] as $key => $id) {
 				$dbResultUser = DBSelect('select * from users where userid='.$id);
 				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
-				$this->assertEquals($dbRowUser['passwd'], md5($user[$key]['passwd']));
+				$this->assertEquals($dbRowUser['alias'], $users[$key]['alias']);
+				$this->assertEquals($dbRowUser['passwd'], md5($users[$key]['passwd']));
 				$this->assertEquals($dbRowUser['name'], '');
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
@@ -572,14 +606,14 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$user[$key]['usrgrps'][0]['usrgrpid'];
+				$dbResultGroup = "select * from users_groups where userid='".$id."' and usrgrpid=".$users[$key]['usrgrps'][0]['usrgrpid'];
 				$this->assertEquals(1, DBcount($dbResultGroup));
 
-				if (array_key_exists('user_medias', $user[$key])) {
+				if (array_key_exists('user_medias', $users[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.$id);
 					$dbRowMedia = DBFetch($dbResultMedia);
-					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
-					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
+					$this->assertEquals($dbRowMedia['mediatypeid'], $users[$key]['user_medias'][0]['mediatypeid']);
+					$this->assertEquals($dbRowMedia['sendto'], $users[$key]['user_medias'][0]['sendto']);
 					$this->assertEquals($dbRowMedia['active'], 0);
 					$this->assertEquals($dbRowMedia['severity'], 63);
 					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
@@ -593,8 +627,11 @@ class testUsers extends CZabbixTest {
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertSame($expected_error, $result['error']['data']);
+
+			if (isset($oldHashUser)) {
+				$this->assertEquals($oldHashUser, DBhash($sqlUser));
+			}
 		}
 	}
 

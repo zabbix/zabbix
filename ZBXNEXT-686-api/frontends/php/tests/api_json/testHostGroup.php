@@ -26,8 +26,17 @@ class testHostGroup extends CZabbixTest {
 		DBsave_tables('groups');
 	}
 
-	public static function hostgroup_create_data() {
+	public static function hostgroup_create() {
 		return [
+			[
+				'hostgroup' => [
+					'name' => 'non existent parametr',
+					'flags' => '4'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
+			],
+			// Check hostgroup name.
 			[
 				'hostgroup' => [
 					'name' => '',
@@ -37,12 +46,12 @@ class testHostGroup extends CZabbixTest {
 			],
 			[
 				'hostgroup' => [
-					'name' => 'non existent parametr',
-					'flags' => '4'
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
+				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
+			// Check for duplicated host groups names.
 			[
 				'hostgroup' => [
 					'name' => 'Templates',
@@ -74,6 +83,7 @@ class testHostGroup extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical name) already exists.'
 			],
+			// Check successfully create.
 			[
 				'hostgroup' => [
 					[
@@ -86,10 +96,10 @@ class testHostGroup extends CZabbixTest {
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Api host group create one',
+						'name' => '☺',
 					],
 					[
-						'name' => 'Api host group create two',
+						'name' => 'æų',
 					]
 				],
 				'success_expected' => true,
@@ -120,7 +130,7 @@ class testHostGroup extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider hostgroup_create_data
+	* @dataProvider hostgroup_create
 	*/
 	public function testHostGroup_Create($hostgroup, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.create', $hostgroup, $debug);
@@ -145,8 +155,29 @@ class testHostGroup extends CZabbixTest {
 		}
 	}
 
-	public static function hostgroup_update_data() {
+	public static function hostgroup_update() {
 		return [
+			[
+				'hostgroup' => [
+					[
+					'groupid' => '50005',
+					'name' => 'non existent parametr',
+					'flags' => '4'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
+			],
+			// Check groupid.
+			[
+				'hostgroup' => [
+					[
+					'name' => 'without groupid'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": the parameter "groupid" is missing.'
+			],
 			[
 				'hostgroup' => [
 					[
@@ -156,16 +187,6 @@ class testHostGroup extends CZabbixTest {
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
-			],
-			[
-				'hostgroup' => [
-					[
-					'groupid' => '50005',
-					'name' => ''
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'hostgroup' => [
@@ -180,17 +201,6 @@ class testHostGroup extends CZabbixTest {
 			[
 				'hostgroup' => [
 					[
-					'groupid' => '50005',
-					'name' => 'non existent parametr',
-					'flags' => '4'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
-			],
-			[
-				'hostgroup' => [
-					[
 					'groupid' => 'abc',
 					'name' => 'id not number'
 					]
@@ -201,12 +211,33 @@ class testHostGroup extends CZabbixTest {
 			[
 				'hostgroup' => [
 					[
-					'groupid' => '.',
-					'name' => 'id not number'
+					'groupid' => '0.0',
+					'name' => 'æų'
 					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
+			],
+			// Check name.
+			[
+				'hostgroup' => [
+					[
+					'groupid' => '50005',
+					'name' => ''
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				'hostgroup' => [
+					[
+					'groupid' => '50005',
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
 				'hostgroup' => [
@@ -256,6 +287,7 @@ class testHostGroup extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Cannot update a discovered host group.'
 			],
+			// Check successfully update.
 			[
 				'hostgroup' => [
 					[
@@ -284,7 +316,7 @@ class testHostGroup extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider hostgroup_update_data
+	* @dataProvider hostgroup_update
 	*/
 	public function testHostGroup_Update($hostgroups, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.update', $hostgroups, $debug);
@@ -306,7 +338,7 @@ class testHostGroup extends CZabbixTest {
 
 			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($hostgroups as $hostgroup) {
-				if (isset($hostgroup['name'])){
+				if (array_key_exists('name', $hostgroup) && array_key_exists('groupid', $hostgroup)){
 					$dbResult = "select * from groups where groupid=".$hostgroup['groupid'].
 							" and name='".$hostgroup['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
@@ -315,7 +347,7 @@ class testHostGroup extends CZabbixTest {
 		}
 	}
 
-	public static function hostgroup_delete_data() {
+	public static function hostgroup_delete() {
 		return [
 			[
 				'hostgroup' => [
@@ -425,7 +457,7 @@ class testHostGroup extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider hostgroup_delete_data
+	* @dataProvider hostgroup_delete
 	*/
 	public function testHostGroup_Delete($hostgroups, $success_expected, $expected_error) {
 		$result = $this->api_acall('hostgroup.delete', $hostgroups, $debug);
@@ -447,13 +479,13 @@ class testHostGroup extends CZabbixTest {
 		}
 	}
 
-	public static function hostgroup_user_data() {
+	public static function hostgroup_user_permission() {
 		return [
 			[
 				'method' => 'hostgroup.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
-					'name' => 'Api host group create as admin user'
+					'name' => 'Api host group create as zabbix admin'
 				],
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
@@ -462,7 +494,7 @@ class testHostGroup extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
-					'name' => 'Api host group update as admin user without peremissions'
+					'name' => 'Api host group update as zabbix admin without peremissions'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -481,12 +513,29 @@ class testHostGroup extends CZabbixTest {
 					'name' => 'Api host group create as zabbix user'
 				],
 				'expected_error' => 'Only Super Admins can create host groups.'
+			],
+			[
+				'method' => 'hostgroup.update',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'hostgroup' => [
+					'groupid' => '50005',
+					'name' => 'Api host group update as zabbix user without peremissions'
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'method' => 'hostgroup.delete',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'hostgroup' => [
+					'50008'
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
 	}
 
 	/**
-	* @dataProvider hostgroup_user_data
+	* @dataProvider hostgroup_user_permission
 	*/
 	public function testHostGroup_UserPermissions($method, $user, $hostgroups, $expected_error) {
 		$result = $this->api_call_with_user($method, $user, $hostgroups, $debug);

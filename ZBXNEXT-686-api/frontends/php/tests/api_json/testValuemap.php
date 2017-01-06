@@ -22,8 +22,35 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class testValuemap extends CZabbixTest {
 
-	public static function valuemap_create_data() {
+	public static function valuemap_create() {
 		return [
+			[
+				'valuemap' => [
+					'name' => 'non existent parametr',
+					'valuemapid' => 4,
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down'
+						]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "valuemapid".'
+			],
+			// Check valuemap name.
+			[
+				'valuemap' => [
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down'
+						]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
+			],
 			[
 				'valuemap' => [
 					'name' => '',
@@ -36,6 +63,19 @@ class testValuemap extends CZabbixTest {
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				'valuemap' => [
+					'name' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down'
+						]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
 				'valuemap' => [
@@ -52,17 +92,42 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'valuemap' => [
-					'name' => 'non existent parametr',
-					'valuemapid' => 4,
-					'mappings' =>[
-						[
-							'value' => '0',
-							'newvalue' => 'Down'
+					[
+					'name' => 'Valuemaps with the same names',
+						'mappings' =>[
+							[
+								'value' => '0',
+								'newvalue' => 'Down'
+							]
+						]
+					],
+					[
+					'name' => 'Valuemaps with the same names',
+						'mappings' =>[
+							[
+								'value' => '0',
+								'newvalue' => 'Down'
+							]
 						]
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "valuemapid".'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(Valuemaps with the same names) already exists.'
+			],
+			// Check valuemap mappings.
+			[
+				'valuemap' => [
+					'name' => 'non existent parametr',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down',
+							'mappingid' => 4
+						]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1": unexpected parameter "mappingid".'
 			],
 			[
 				'valuemap' => [
@@ -94,6 +159,19 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'valuemap' => [
+					'name' => 'long newvalue',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65'
+						]
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1/newvalue": value is too long.'
+			],
+			[
+				'valuemap' => [
 					'name' => 'without mapping value',
 					'mappings' =>[
 						[
@@ -106,17 +184,16 @@ class testValuemap extends CZabbixTest {
 			],
 			[
 				'valuemap' => [
-					'name' => 'non existent parametr',
+					'name' => 'long value',
 					'mappings' =>[
 						[
-							'value' => '0',
-							'newvalue' => 'Down',
-							'mappingid' => 4
+							'value' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65',
+							'newvalue' => 'test'
 						]
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings/1": unexpected parameter "mappingid".'
+				'expected_error' => 'Invalid parameter "/1/mappings/1/value": value is too long.'
 			],
 			[
 				'valuemap' => [
@@ -135,30 +212,7 @@ class testValuemap extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(0) already exists.'
 			],
-			[
-				'valuemap' => [
-					[
-					'name' => 'Valuemaps with the same names',
-						'mappings' =>[
-							[
-								'value' => '0',
-								'newvalue' => 'Down'
-							]
-						]
-					],
-					[
-					'name' => 'Valuemaps with the same names',
-						'mappings' =>[
-							[
-								'value' => '0',
-								'newvalue' => 'Down'
-							]
-						]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Valuemaps with the same names) already exists.'
-			],
+			// Successfully create.
 			[
 				'valuemap' => [
 					[
@@ -177,7 +231,7 @@ class testValuemap extends CZabbixTest {
 			[
 				'valuemap' => [
 					[
-						'name' => 'Api УТФ-8',
+						'name' => 'АПИ УТФ-8',
 						'mappings' =>[
 							[
 								'value' => 'один',
@@ -220,11 +274,11 @@ class testValuemap extends CZabbixTest {
 						]
 					],
 					[
-					'name' => 'Api create valuemap two',
+					'name' => 'æų',
 						'mappings' =>[
 							[
-								'value' => '1',
-								'newvalue' => 'Up'
+								'value' => 'æų',
+								'newvalue' => 'æų'
 							]
 						]
 					]
@@ -236,7 +290,7 @@ class testValuemap extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider valuemap_create_data
+	* @dataProvider valuemap_create
 	*/
 	public function testValuemap_Create($valuemap, $success_expected, $expected_error) {
 		$result = $this->api_acall('valuemap.create', $valuemap, $debug);
@@ -265,147 +319,56 @@ class testValuemap extends CZabbixTest {
 		}
 	}
 
-	public static function valuemap_update_data() {
+	public static function valuemap_update() {
 		return [
 			[
-				'valuemap' => [
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update non existent parametr',
+					'value' => 4
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
+			],
+			// Check valuemap id.
+			[
+				'valuemap' => [[
+					'name' => 'Api valuemap updated'
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": the parameter "valuemapid" is missing.'
+			],
+			[
+				'valuemap' => [[
 					'valuemapid' => '',
 					'name' => 'Api valuemap updated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
 			],
 			[
-				'valuemap' => [
+				'valuemap' => [[
 					'valuemapid' => '123456',
-					'name' => 'Api valuemap udated'
-				],
+					'name' => 'Api valuemap updated'
+				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'valuemap' => [
+				'valuemap' => [[
 					'valuemapid' => 'abc',
 					'name' => 'Api valuemap updated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
 			],
 			[
-				'valuemap' => [
-					'valuemapid' => '.',
+				'valuemap' => [[
+					'valuemapid' => '0.0',
 					'name' => 'Api valuemap udated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'APC Battery Replacement Status'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Value map "APC Battery Replacement Status" already exists.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update non existent parametr',
-					'value' => 4
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update without mappings',
-					'mappings' =>[
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings": cannot be empty.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update without mapping newvalue',
-					'mappings' =>[
-						[
-							'value' => '0'
-						]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "newvalue" is missing.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update without mapping value',
-					'mappings' =>[
-						[
-							'newvalue' => 'Down'
-						]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update non existent parametr',
-					'mappings' =>[
-						[
-							'value' => '0',
-							'newvalue' => 'Down',
-							'mappingid' => 4
-						]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings/1": unexpected parameter "mappingid".'
-			],
-			[
-				'valuemap' => [
-					'valuemapid' => '18',
-					'name' => 'Api update with the same mapping values',
-					'mappings' =>[
-						[
-							'value' => '0',
-							'newvalue' => 'Down'
-						],
-						[
-							'value' => '0',
-							'newvalue' => 'Up'
-						]
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(0) already exists.'
-			],
-			[
-				'valuemap' => [
-					[
-						'valuemapid' => '18',
-						'name' => 'Valuemaps with the same names'
-					],
-					[
-						'valuemapid' => '19',
-						'name' => 'Valuemaps with the same names'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Valuemaps with the same names) already exists.'
 			],
 			[
 				'valuemap' => [
@@ -421,6 +384,150 @@ class testValuemap extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (valuemapid)=(19) already exists.'
 			],
+			// Check valuemap name.
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => ''
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'APC Battery Replacement Status'
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Value map "APC Battery Replacement Status" already exists.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				'valuemap' => [
+					[
+						'valuemapid' => '18',
+						'name' => 'Valuemaps with the same names'
+					],
+					[
+						'valuemapid' => '19',
+						'name' => 'Valuemaps with the same names'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/2": value (name)=(Valuemaps with the same names) already exists.'
+			],
+			// Check valuemap mappings.
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update without mappings',
+					'mappings' =>[
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings": cannot be empty.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update without mapping newvalue',
+					'mappings' =>[
+						[
+							'value' => '0'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "newvalue" is missing.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update long newvalue',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1/newvalue": value is too long.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update without mapping value',
+					'mappings' =>[
+						[
+							'newvalue' => 'Down'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update long value',
+					'mappings' =>[
+						[
+							'value' => 'Pellentesque rutrum, odio at imperdiet venenatis, mauris mauris65',
+							'newvalue' => 'Up'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1/value": value is too long.'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update non existent parametr',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down',
+							'mappingid' => 4
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/1": unexpected parameter "mappingid".'
+			],
+			[
+				'valuemap' => [[
+					'valuemapid' => '18',
+					'name' => 'Api update with the same mapping values',
+					'mappings' =>[
+						[
+							'value' => '0',
+							'newvalue' => 'Down'
+						],
+						[
+							'value' => '0',
+							'newvalue' => 'Up'
+						]
+					]
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(0) already exists.'
+			],
+			// Check successfully update.
 			[
 				'valuemap' => [
 					[
@@ -470,8 +577,8 @@ class testValuemap extends CZabbixTest {
 						'name' => 'Api update valuemap with two values',
 						'mappings' =>[
 							[
-								'value' => '0',
-								'newvalue' => 'Down'
+								'value' => 'æų',
+								'newvalue' => 'æų'
 							],
 							[
 								'value' => '1',
@@ -513,10 +620,10 @@ class testValuemap extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider valuemap_update_data
+	* @dataProvider valuemap_update
 	*/
-	public function testValuemap_Update($valuemap, $success_expected, $expected_error) {
-		$result = $this->api_acall('valuemap.update', $valuemap, $debug);
+	public function testValuemap_Update($valuemaps, $success_expected, $expected_error) {
+		$result = $this->api_acall('valuemap.update', $valuemaps, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
@@ -525,10 +632,10 @@ class testValuemap extends CZabbixTest {
 			foreach ($result['result']['valuemapids'] as $key => $id) {
 				$dbResult = DBSelect('select * from valuemaps where valuemapid='.$id);
 				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $valuemap[$key]['name']);
+				$this->assertEquals($dbRow['name'], $valuemaps[$key]['name']);
 
-				if (isset($valuemap[$key]['mappings'])){
-					foreach ($valuemap[$key]['mappings'] as $values) {
+				if (array_key_exists('mappings', $valuemaps[$key])){
+					foreach ($valuemaps[$key]['mappings'] as $values) {
 						$sql = "select * from mappings where valuemapid=".$id.
 								" and value='".$values['value']."' and newvalue='".$values['newvalue']."'";
 						$this->assertEquals(1, DBcount($sql));
@@ -539,17 +646,19 @@ class testValuemap extends CZabbixTest {
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertSame($expected_error, $result['error']['data']);
-				if (isset($valuemap['name'])){
+
+			foreach ($valuemaps as $valuemap) {
+				if (array_key_exists('name', $valuemap) && array_key_exists('valuemapid', $valuemap)){
 					$dbResult = "select * from valuemaps where valuemapid=".$valuemap['valuemapid'].
-							" and name='".$valuemap['name']."'";
+								" and name='".$valuemap['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
+			}
 		}
 	}
 
-	public static function valuemap_delete_data() {
+	public static function valuemap_delete() {
 		return [
 			[
 				'valuemap' => [
@@ -630,7 +739,7 @@ class testValuemap extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider valuemap_delete_data
+	* @dataProvider valuemap_delete
 	*/
 	public function testValuemap_Delete($valuemap, $success_expected, $expected_error) {
 		$result = $this->api_acall('valuemap.delete', $valuemap, $debug);
@@ -654,13 +763,13 @@ class testValuemap extends CZabbixTest {
 		}
 	}
 
-	public static function valuemap_user_data() {
+	public static function valuemap_user_permission() {
 		return [
 			[
 				'method' => 'valuemap.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
-					'name' => 'Api value create as admin user',
+					'name' => 'Api value create as zabbix admin',
 					'mappings' =>[
 						[
 							'value' => '123',
@@ -675,7 +784,7 @@ class testValuemap extends CZabbixTest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'Api value update as admin user',
+					'name' => 'Api value update as zabbix admin',
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],
@@ -722,7 +831,7 @@ class testValuemap extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider valuemap_user_data
+	* @dataProvider valuemap_user_permission
 	*/
 	public function testValuemap_UserPermissions($method, $user, $valuemap, $expected_error) {
 		$result = $this->api_call_with_user($method, $user, $valuemap, $debug);

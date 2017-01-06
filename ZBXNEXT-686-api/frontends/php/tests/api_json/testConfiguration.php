@@ -187,6 +187,7 @@ class testConfiguration extends CZabbixTest {
 
 	public static function import_fail_data() {
 		return [
+			// Check format.
 			[
 				'import' => [
 					'rules' => [
@@ -255,6 +256,7 @@ class testConfiguration extends CZabbixTest {
 				],
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "hosts".'
 			],
+			// Check rules.
 			[
 				'import' => [
 					'format' => 'json',
@@ -620,5 +622,91 @@ class testConfiguration extends CZabbixTest {
 		$this->assertSame(true, $result['result']);
 
 		$this->assertEquals(1, DBcount($sql));
+	}
+
+	public static function import_users() {
+		return [
+			[
+				'format' => 'xml',
+				'parametr' => 'groups',
+				'source' => '<?xml version="1.0" encoding="UTF-8"?>
+								<zabbix_export>
+								<version>3.2</version>
+								<date>2016-12-09T07:12:45Z</date>
+								<groups>
+									<group>
+										<name>Api host group xml import as non Super Admin</name>
+									</group>
+								</groups>
+								</zabbix_export>',
+				'sql' => 'select * from groups where name=\'Api host group xml import as non Super Admin\'',
+				'expected_error' => 'Only Super Admins can create host groups.'
+			],
+			[
+				'format' => 'json',
+				'parametr' => 'groups',
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"Api host group json import as non Super Admin"}]}}',
+				'sql' => 'select * from groups where name=\'Api host group json import as non Super Admin\'',
+				'expected_error' => 'Only Super Admins can create host groups.'
+			],
+			[
+				'format' => 'xml',
+				'parametr' => 'valueMaps',
+				'source' => '<?xml version="1.0" encoding="UTF-8"?>
+								<zabbix_export>
+								<version>3.2</version>
+								<date>2016-12-12T07:18:00Z</date>
+								<value_maps>
+									<value_map>
+										<name>Api valueMap xml import as non Super Admin</name>
+										<mappings>
+											<mapping>
+												<value>1</value>
+												<newvalue>Up</newvalue>
+											</mapping>
+										</mappings>
+									</value_map>
+								</value_maps>
+								</zabbix_export>',
+				'sql' => 'select * from valuemaps where name=\'Api valueMap xml import as non Super Admin\'',
+				'expected_error' => 'Only super admins can create value maps.'
+			],
+			[
+				'format' => 'json',
+				'parametr' => 'valueMaps',
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"Api valueMap json import as non Super Admin",'
+							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
+				'sql' => 'select * from valuemaps where name=\'Api valueMap json import as non Super Admin\'',
+				'expected_error' => 'Only super admins can create value maps.'
+			]
+		];
+	}
+
+	/**
+	* @dataProvider import_users
+	*/
+	public function testConfiguration_UsersPermissionsToImportCreate($format, $parametr, $source, $sql, $expected_error) {
+		$users = ['zabbix-admin', 'zabbix-user'];
+
+		foreach ($users as $username) {
+			$result = $this->api_call_with_user('configuration.import',
+					['user' => $username, 'password' => 'zabbix'],
+					[
+						'format' => $format,
+						'rules' => [
+							$parametr => [
+								'createMissing' => true
+							]
+						],
+						'source' => $source
+					],
+					$debug);
+		}
+
+		$this->assertFalse(array_key_exists('result', $result));
+		$this->assertTrue(array_key_exists('error', $result));
+		$this->assertEquals($expected_error, $result['error']['data']);
+
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

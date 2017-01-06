@@ -28,7 +28,22 @@ class testUserGroup extends CZabbixTest {
 
 	public static function usergroup_create() {
 		return [
+			[
+				'group' => [
+					'name' => 'non existent parametr',
+					'usrgrpid' => '7'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
 			// Check user group name.
+			[
+				'group' => [
+					'gui_access' => 0
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
+			],
 			[
 				'group' => [
 					'name' => '',
@@ -46,10 +61,10 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					[
-					'name' => 'One user group with existing name',
+						'name' => 'One user group with existing name',
 					],
 					[
-					'name' => 'Zabbix administrators',
+						'name' => 'Zabbix administrators',
 					]
 				],
 				'success_expected' => false,
@@ -58,85 +73,16 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					[
-					'name' => 'User group with two identical name',
+						'name' => 'User group with two identical name',
 					],
 					[
-					'name' => 'User group with two identical name',
+						'name' => 'User group with two identical name',
 					]
 				],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(User group with two identical name) already exists.'
 			],
-			[
-				'group' => [
-					'name' => 'non existent parametr',
-					'usrgrpid' => '7'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
-			],
-			// Check user group settings.
-			[
-				'group' => [
-					'name' => 'gui_access non existent value',
-					'gui_access' => 3,
-					'users_status' => 0,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/gui_access": value must be one of 0, 1, 2.'
-			],
-			[
-				'group' => [
-					'name' => 'gui_access not valid value',
-					'gui_access' => '1.2',
-					'users_status' => 0,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/gui_access": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'users_status non existent value',
-					'gui_access' => 0,
-					'users_status' => 2,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/users_status": value must be one of 0, 1.'
-			],
-			[
-				'group' => [
-					'name' => 'users_status not valid value',
-					'gui_access' => 0,
-					'users_status' => 'abc',
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/users_status": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'debug_mode non existent value',
-					'gui_access' => 0,
-					'users_status' => 0,
-					'debug_mode' => 2
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/debug_mode": value must be one of 0, 1.'
-			],
-			[
-				'group' => [
-					'name' => 'debug_mode not valid value',
-					'gui_access' => 0,
-					'users_status' => 0,
-					'debug_mode' => '0.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/debug_mode": a number is expected.'
-			],
-			// Check group users.
+			// Check Super Admin user in group.
 			[
 				'group' => [
 					'name' => 'Admin in group with disabled GUI access',
@@ -155,149 +101,14 @@ class testUserGroup extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
-			[
-				'group' => [
-					'name' => 'Non existent user',
-					'userids' => '123456'
-				],
-				'success_expected' => false,
-				'expected_error' => 'User with ID "123456" is not available.'
-			],
-			[
-				'group' => [
-					'name' => 'Non existent user, string',
-					'userids' => 'abc'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Empty user id',
-					'userids' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
-			],
-			// Check user group rights, host group id.
-			[
-				'group' => [
-					'name' => 'Check rights, without host group id',
-					'rights' => [
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "id" is missing.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, with empty host group id',
-					'rights' => [
-						'id' => '',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, id not number',
-					'rights' => [
-						'id' => 'abc',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, id not valid',
-					'rights' => [
-						'id' => '1.1',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, non existen host group id',
-					'rights' => [
-						'id' => '123456',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Host group with ID "123456" is not available.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, unexpected parameter',
-					'rights' => [
-						'id' => '4',
-						'permission' => '0',
-						'usrgrpid' => '7'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": unexpected parameter "usrgrpid".'
-			],
-			// Check user group rights, host group permission.
-			[
-				'group' => [
-					'name' => 'Check rights, without permission',
-					'rights' => [
-						'id' => '4',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "permission" is missing.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, with empty permission',
-					'rights' => [
-						'id' => '4',
-						'permission' => '',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, permission not valid number',
-					'rights' => [
-						'id' => '4',
-						'permission' => '1.1',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
-			],
-			[
-				'group' => [
-					'name' => 'Check rights, incorrect permission value',
-					'rights' => [
-						'id' => '4',
-						'permission' => '1',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
-			],
 			// Check successfully creation of user group.
 			[
 				'group' => [
 					[
-					'name' => 'Api user group create one',
+						'name' => 'Api user group create one',
 					],
 					[
-					'name' => 'Api user group create two',
+						'name' => 'æų',
 					]
 				],
 				'success_expected' => true,
@@ -306,7 +117,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					[
-					'name' => 'Апи группа УТФ-8',
+						'name' => 'Апи группа УТФ-8',
 					]
 				],
 				'success_expected' => true,
@@ -318,7 +129,7 @@ class testUserGroup extends CZabbixTest {
 	/**
 	* @dataProvider usergroup_create
 	*/
-	public function testUserGroup_SimpleCreate($group, $success_expected, $expected_error) {
+	public function testUserGroup_Create($group, $success_expected, $expected_error) {
 		$result = $this->api_acall('usergroup.create', $group, $debug);
 
 		if ($success_expected) {
@@ -337,375 +148,125 @@ class testUserGroup extends CZabbixTest {
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 
-	public function testUserGroup_FullCreate() {
-		$group = [
-					'name' => 'Api user group with users and rights',
-					'gui_access' => 1,
-					'users_status' => 1,
-					'debug_mode' => 1,
-					'rights' => [
-						'id' => '50012',
-						'permission' => '3',
-					],
-					'userids' => ['2', '8']
-				];
-		$result = $this->api_acall('usergroup.create', $group, $debug);
-
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
-
-		$dbResult = DBSelect('select * from usrgrp where usrgrpid='.$result['result']['usrgrpids'][0]);
-		$dbRow = DBFetch($dbResult);
-		$this->assertEquals($dbRow['name'], $group['name']);
-		$this->assertEquals($dbRow['gui_access'], $group['gui_access']);
-		$this->assertEquals($dbRow['users_status'], $group['users_status']);
-		$this->assertEquals($dbRow['debug_mode'], $group['debug_mode']);
-
-		$sqlUsersGroups1 = "select * from users_groups where userid='".$group['userids'][0]."' and usrgrpid=".$result['result']['usrgrpids'][0];
-		$sqlUsersGroups2 = "select * from users_groups where userid='".$group['userids'][1]."' and usrgrpid=".$result['result']['usrgrpids'][0];
-		$this->assertEquals(1, DBcount($sqlUsersGroups1));
-		$this->assertEquals(1, DBcount($sqlUsersGroups2));
-
-		$dbRight = DBSelect('select * from rights where groupid='.$result['result']['usrgrpids'][0]);
-		$dbRowRight = DBFetch($dbRight);
-		$this->assertEquals($dbRowRight['id'], $group['rights']['id']);
-		$this->assertEquals($dbRowRight['permission'], $group['rights']['permission']);
-	}
-
 	public static function usergroup_update() {
 		return [
+			[
+				'group' => [[
+					'usrgrpid' => '13',
+					'name' => 'Api update with non existent parametr',
+					'value' => '4'
+				]],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
+			],
 			// Check user group id.
 			[
-				'group' => [
+				'group' => [[
 					'name' => 'Api user group updated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrpid" is missing.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '',
 					'name' => 'Api user group udated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '123456',
 					'name' => 'Api user group udated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => 'abc',
 					'name' => 'Api user group updated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '1.1',
 					'name' => 'Api user group udated'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			// Check user group name.
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '13',
 					'name' => ''
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '13',
 					'name' => 'Zabbix administrators'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User group "Zabbix administrators" already exists.'
 			],
+			// Check Super Admin user in group.
 			[
-				'valuemap' => [
-					'usrgrpid' => '13',
-					'name' => 'Api update with non existent parametr',
-					'value' => '4'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
-			],
-			// Check user group settings.
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'gui_access' => 3,
-					'users_status' => 0,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/gui_access": value must be one of 0, 1, 2.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'gui_access not valid value',
-					'gui_access' => '1.2',
-					'users_status' => 0,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/gui_access": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'users_status non existent value',
-					'gui_access' => 0,
-					'users_status' => 2,
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/users_status": value must be one of 0, 1.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'users_status not valid value',
-					'gui_access' => 0,
-					'users_status' => 'abc',
-					'debug_mode' => 0
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/users_status": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'debug_mode non existent value',
-					'gui_access' => 0,
-					'users_status' => 0,
-					'debug_mode' => 2
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/debug_mode": value must be one of 0, 1.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'debug_mode not valid value',
-					'gui_access' => 0,
-					'users_status' => 0,
-					'debug_mode' => '0.1'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/debug_mode": a number is expected.'
-			],
-			// Check group users.
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Api non existent user',
-					'userids' => '123456'
-				],
-				'success_expected' => false,
-				'expected_error' => 'User with ID "123456" is not available.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Api non existent user, string',
-					'userids' => 'abc'
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Api empty user id',
-					'userids' => ''
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
-			],
-			[
-				'group' => [
+				'group' => [[
 					'name' => 'Disable group with admin',
 					'usrgrpid' => '7',
 					'users_status' => 1,
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'name' => 'Disable group GUI access with admin',
 					'usrgrpid' => '7',
 					'gui_access' => 2,
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '14',
 					'name' => 'Admin in group with disabled GUI access',
 					'gui_access' => 2,
 					'userids' => 1
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '14',
 					'name' => 'Admin in disabled group',
 					'users_status' => 1,
 					'userids' => 1
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
 			[
-				'group' => [
+				'group' => [[
 					'usrgrpid' => '15',
 					'name' => 'User without user group',
 					'userids' => 1
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
-			],
-			// Check user group rights, host group id.
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, without host group id',
-					'rights' => [
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "id" is missing.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, with empty host group id',
-					'rights' => [
-						'id' => '',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, host group id not number',
-					'rights' => [
-						'id' => 'abc',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, host group id not valid',
-					'rights' => [
-						'id' => '1.1',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, non existen host group',
-					'rights' => [
-						'id' => '123456',
-						'permission' => '0'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Host group with ID "123456" is not available.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'rights, unexpected parameter',
-					'rights' => [
-						'id' => '4',
-						'permission' => '0',
-						'usrgrpid' => '7'
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": unexpected parameter "usrgrpid".'
-			],
-			// Check user group rights, host group permission.
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, without permission',
-					'rights' => [
-						'id' => '4',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "permission" is missing.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, with empty permission',
-					'rights' => [
-						'id' => '4',
-						'permission' => '',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, permission not valid number',
-					'rights' => [
-						'id' => '4',
-						'permission' => '1.1',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
-			],
-			[
-				'group' => [
-					'usrgrpid' => '13',
-					'name' => 'Check rights, with incorrect permission value',
-					'rights' => [
-						'id' => '4',
-						'permission' => '1',
-					]
-				],
-				'success_expected' => false,
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
 			],
 			// Check two user group for update.
 			[
@@ -795,8 +356,8 @@ class testUserGroup extends CZabbixTest {
 	/**
 	* @dataProvider usergroup_update
 	*/
-	public function testUserGroup_SimpleUpdate($group, $success_expected, $expected_error) {
-		$result = $this->api_acall('usergroup.update', $group, $debug);
+	public function testUserGroup_Update($groups, $success_expected, $expected_error) {
+		$result = $this->api_acall('usergroup.update', $groups, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
@@ -805,13 +366,13 @@ class testUserGroup extends CZabbixTest {
 			foreach ($result['result']['usrgrpids'] as $key => $id) {
 				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.$id);
 				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $group[$key]['name']);
+				$this->assertEquals($dbRow['name'], $groups[$key]['name']);
 				$this->assertEquals($dbRow['gui_access'], 0);
 				$this->assertEquals($dbRow['users_status'], 0);
 				$this->assertEquals($dbRow['debug_mode'], 0);
 
-				if (array_key_exists('rights', $group[$key])){
-					foreach ($group[$key]['rights'] as $rights) {
+				if (array_key_exists('rights', $groups[$key])){
+					foreach ($groups[$key]['rights'] as $rights) {
 						$dbRight = DBSelect('select * from rights where groupid='.$id);
 						$dbRowRight = DBFetch($dbRight);
 						$this->assertEquals($dbRowRight['id'], $rights['id']);
@@ -823,39 +384,286 @@ class testUserGroup extends CZabbixTest {
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertSame($expected_error, $result['error']['data']);
-			if (array_key_exists('name', $group) && array_key_exists('usrgrpid', $group)){
-				$dbResult = "select * from usrgrp where usrgrpid=".$group['usrgrpid'].
-						" and name='".$group['name']."'";
-				$this->assertEquals(0, DBcount($dbResult));
+
+			foreach ($groups as $group) {
+				if (array_key_exists('name', $group) && array_key_exists('usrgrpid', $group)){
+					$dbResult = "select * from usrgrp where usrgrpid=".$group['usrgrpid'].
+							" and name='".$group['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
+				}
 			}
 		}
 	}
 
-	public function testUserGroup_UpdateUsersAndGroupProperty() {
-		$group = [
-					'usrgrpid' => '13',
-					'name' => 'Api user group with users updated',
+	public static function usergroup_properties() {
+		return [
+			// Check user group not required properties.
+			[
+				'group' => [
+					'name' => 'gui_access non existent value',
+					'gui_access' => 3
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/gui_access": value must be one of 0, 1, 2.'
+			],
+			[
+				'group' => [
+					'name' => 'gui_access not valid value',
+					'gui_access' => 1.2
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/gui_access": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'users_status non existent value',
+					'users_status' => 2
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/users_status": value must be one of 0, 1.'
+			],
+			[
+				'group' => [
+					'name' => 'users_status not valid value',
+					'users_status' => 'abc'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/users_status": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'debug_mode non existent value',
+					'debug_mode' => 2
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/debug_mode": value must be one of 0, 1.'
+			],
+			[
+				'group' => [
+					'name' => 'debug_mode not valid value',
+					'debug_mode' => 0.1
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/debug_mode": a number is expected.'
+			],
+			// Check group users.
+			[
+				'group' => [
+					'name' => 'Empty user id',
+					'userids' => ''
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Empty user id',
+					'userids' => ['']
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userids/1": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Non existent user',
+					'userids' => '123456'
+				],
+				'success_expected' => false,
+				'expected_error' => 'User with ID "123456" is not available.'
+			],
+			[
+				'group' => [
+					'name' => 'Non existent user, string',
+					'userids' => 'abc'
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
+			],
+			// Check user group permissions, host group id.
+			[
+				'group' => [
+					'name' => 'Check rights, without host group id',
+					'rights' => [
+						'permission' => '0'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "id" is missing.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, with empty host group id',
+					'rights' => [
+						'id' => '',
+						'permission' => '0'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, id not number',
+					'rights' => [
+						'id' => 'abc',
+						'permission' => '0'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, id not valid',
+					'rights' => [
+						'id' => '1.1',
+						'permission' => '0'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, non existen host group id',
+					'rights' => [
+						'id' => '123456',
+						'permission' => '0'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Host group with ID "123456" is not available.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, unexpected parameter',
+					'rights' => [
+						'id' => '4',
+						'permission' => '0',
+						'usrgrpid' => '7'
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1": unexpected parameter "usrgrpid".'
+			],
+			// Check user group permissions, host group permission.
+			[
+				'group' => [
+					'name' => 'Check rights, without permission',
+					'rights' => [
+						'id' => '4',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "permission" is missing.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, with empty permission',
+					'rights' => [
+						'id' => '4',
+						'permission' => '',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, permission not valid number',
+					'rights' => [
+						'id' => '4',
+						'permission' => '1.1',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, incorrect permission value',
+					'rights' => [
+						'id' => '4',
+						'permission' => '1',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, incorrect permission value',
+					'rights' => [
+						'id' => '4',
+						'permission' => '4',
+					]
+				],
+				'success_expected' => false,
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
+			],
+			// Check successfully update and create of user group with all properties.
+			[
+				'group' => [
+					'name' => 'Api user group with users and rights',
 					'gui_access' => 1,
 					'users_status' => 1,
 					'debug_mode' => 1,
-					'userids' => '2'
-				];
-		$result = $this->api_acall('usergroup.update', $group, $debug);
+					'rights' => [
+						'id' => '50012',
+						'permission' => '3',
+					],
+					'userids' => ['2', '8']
+				],
+				'success_expected' => true,
+				'expected_error' => null
+			]
+		];
+	}
 
-		$this->assertTrue(array_key_exists('result', $result));
-		$this->assertFalse(array_key_exists('error', $result));
+	/**
+	* @dataProvider usergroup_properties
+	*/
+	public function testUserGroups_Properties($groups, $success_expected, $expected_error) {
+		$methods = ['usergroup.create', 'usergroup.update'];
 
-		$dbResult = DBSelect('select * from usrgrp where usrgrpid='.$result['result']['usrgrpids'][0]);
-		$dbRow = DBFetch($dbResult);
-		$this->assertEquals($dbRow['name'], $group['name']);
-		$this->assertEquals($dbRow['gui_access'], $group['gui_access']);
-		$this->assertEquals($dbRow['users_status'], $group['users_status']);
-		$this->assertEquals($dbRow['debug_mode'], $group['debug_mode']);
+		foreach ($methods as $method) {
+			if ($method == 'usergroup.update') {
+				$groups['usrgrpid'] = '13';
+				$groups['name'] = 'Updated '.$groups['name'];
+			}
+			$result = $this->api_acall($method, $groups, $debug);
 
-		$sqlUsersGroup = "select * from users_groups where userid='".$group['userids']."' and usrgrpid=".$result['result']['usrgrpids'][0];
-		$this->assertEquals(1, DBcount($sqlUsersGroup));
+			if ($success_expected) {
+				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.$result['result']['usrgrpids'][0]);
+				$dbRow = DBFetch($dbResult);
+				$this->assertEquals($dbRow['name'], $groups['name']);
+				$this->assertEquals($dbRow['gui_access'], $groups['gui_access']);
+				$this->assertEquals($dbRow['users_status'], $groups['users_status']);
+				$this->assertEquals($dbRow['debug_mode'], $groups['debug_mode']);
+
+				foreach ($groups['userids'] as $user) {
+					$sqlUsersGroup = "select * from users_groups where userid='".$user."' and usrgrpid=".$result['result']['usrgrpids'][0];
+					$this->assertEquals(1, DBcount($sqlUsersGroup));
+				}
+
+				$dbRight = DBSelect('select * from rights where groupid='.$result['result']['usrgrpids'][0]);
+				$dbRowRight = DBFetch($dbRight);
+				$this->assertEquals($dbRowRight['id'], $groups['rights']['id']);
+				$this->assertEquals($dbRowRight['permission'], $groups['rights']['permission']);
+			}
+			else {
+				$this->assertFalse(array_key_exists('result', $result));
+				$this->assertTrue(array_key_exists('error', $result));
+				$this->assertSame($expected_error, $result['error']['data']);
+
+				if (array_key_exists('name', $groups) && array_key_exists('usrgrpid', $groups)){
+					$dbResult = "select * from usrgrp where usrgrpid=".$groups['usrgrpid'].
+						" and name='".$groups['name']."'";
+					$this->assertEquals(0, DBcount($dbResult));
+				}
+			}
+		}
 	}
 
 	public static function usergroup_delete() {

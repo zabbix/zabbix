@@ -112,7 +112,7 @@ class testUserMacro extends CZabbixTest {
 					],
 					[
 						'macro' => '{$TWO.MACRO}',
-						'value' => 'two'
+						'value' => 'æų'
 					]
 				],
 				'success_expected' => true,
@@ -227,6 +227,20 @@ class testUserMacro extends CZabbixTest {
 					'value' => 'test'
 				],
 				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$SUSPENDISSE_CONDIMENTUM_VELIT_EU_SAPIENAPELLENTESQUEFPRETIUMTVELHACAAUGUEU_FFUSCE_ET_ANTE_IN_SEM_PHARETRA_PRETIUMMMMAURIS_DAPIBUS_FERMENTUM_URNA_SSCELERISQUE_ACCUMSAN_NULL_GCOMMODO_SIT_AMET_NNULLA_DAPIBUS_ID_PURUS_VITAE_MOLLIS_UPROIN_ET_SAPIEN_ET_TELLUS1}',
+					'value' => 'long macro'
+				],
+				'expected_error' => 'Invalid parameter "/1/macro": value is too long.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$LONG_VALUE}',
+					'value' => 'Aliquam erat volutpat. Suspendisse lorem libero, efficitur a ornare non, interdum et nulla. Maecenas at massa at lacus aliquam pretium sit amet vel ligula. In ultricies dignissim sapien sit amet eleifend. Nullam consectetur sem eget arcu interdum, at so256'
+				],
+				'expected_error' => 'Invalid parameter "/1/value": value is too long.'
 			]
 		];
 	}
@@ -243,11 +257,10 @@ class testUserMacro extends CZabbixTest {
 			}
 
 			$result = $this->api_acall($method, $globalmacro, $debug);
-
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
 
-			$this->assertSame($expected_error, $result['error']['data']);
+			$this->assertEquals($expected_error, $result['error']['data']);
 			if (array_key_exists('macro', $globalmacro)) {
 				$dbResult = 'select * from globalmacro where macro='.$globalmacro['macro'];
 				$this->assertEquals(0, DBcount($dbResult));
@@ -259,42 +272,42 @@ class testUserMacro extends CZabbixTest {
 		return [
 			// Check macro id
 			[
-				'globalmacro' => [
+				'globalmacro' => [[
 					'value' => 'test'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "globalmacroid" is missing.'
 			],
 			[
-				'globalmacro' => [
+				'globalmacro' => [[
 					'globalmacroid' => '',
 					'value' => 'test'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/globalmacroid": a number is expected.'
 			],
 			[
-				'globalmacro' => [
+				'globalmacro' => [[
 					'globalmacroid' => 'abc',
 					'value' => 'test'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/globalmacroid": a number is expected.'
 			],
 			[
-				'globalmacro' => [
+				'globalmacro' => [[
 					'globalmacroid' => '123456',
 					'value' => 'test'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			// Check existing macro
 			[
-				'globalmacro' => [
+				'globalmacro' => [[
 					'globalmacroid' => '13',
 					'macro' => '{$SNMP_COMMUNITY}'
-				],
+				]],
 				'success_expected' => false,
 				'expected_error' => 'Macro "{$SNMP_COMMUNITY}" already exists.'
 			],
@@ -346,8 +359,8 @@ class testUserMacro extends CZabbixTest {
 	/**
 	* @dataProvider globalmacro_update
 	*/
-	public function testUserMacro_UpdateGlobal($globalmacro, $success_expected, $expected_error) {
-		$result = $this->api_acall('usermacro.updateglobal', $globalmacro, $debug);
+	public function testUserMacro_UpdateGlobal($globalmacros, $success_expected, $expected_error) {
+		$result = $this->api_acall('usermacro.updateglobal', $globalmacros, $debug);
 
 		if ($success_expected) {
 			$this->assertTrue(array_key_exists('result', $result));
@@ -356,18 +369,20 @@ class testUserMacro extends CZabbixTest {
 			foreach ($result['result']['globalmacroids'] as $key => $id) {
 				$dbResult = DBSelect('select * from globalmacro where globalmacroid='.$id);
 				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['macro'], $globalmacro[$key]['macro']);
-				$this->assertEquals($dbRow['value'], $globalmacro[$key]['value']);
+				$this->assertEquals($dbRow['macro'], $globalmacros[$key]['macro']);
+				$this->assertEquals($dbRow['value'], $globalmacros[$key]['value']);
 			}
 		}
 		else {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
-
 			$this->assertSame($expected_error, $result['error']['data']);
-			if (array_key_exists('macro', $globalmacro)) {
-				$dbResult = 'select * from globalmacro where macro='.$globalmacro['macro'];
-				$this->assertEquals(0, DBcount($dbResult));
+
+			foreach ($globalmacros as $globalmacro) {
+				if (array_key_exists('macro', $globalmacro)) {
+					$dbResult = 'select * from globalmacro where macro='.$globalmacro['macro'];
+					$this->assertEquals(0, DBcount($dbResult));
+				}
 			}
 		}
 	}

@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/APIInfo.php';
 require_once dirname(__FILE__).'/CHost.php';
 require_once dirname(__FILE__).'/CItem.php';
+require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
@@ -35,9 +35,9 @@ class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
-		$suite->addTestSuite('API_JSON_APIInfo');
-		$suite->addTestSuite('API_JSON_Host');
-		$suite->addTestSuite('API_JSON_Item');
+//		$suite->addTestSuite('API_JSON_Host');
+//		$suite->addTestSuite('API_JSON_Item');
+		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testHostGroup');
