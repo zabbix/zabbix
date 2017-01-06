@@ -82,14 +82,16 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 	$screen = getSlideshowScreens($elementId, getRequest('upd_counter'));
 
 	// display screens
-	$dbScreens = API::Screen()->get([
-		'screenids' => $screen['screenid'],
-		'output' => API_OUTPUT_EXTEND,
-		'selectScreenItems' => API_OUTPUT_EXTEND
-	]);
+	$dbScreens = $screen
+		? API::Screen()->get([
+			'screenids' => $screen['screenid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND
+		])
+		: [];
 
 	if (!$dbScreens) {
-		insert_js('alert("'._('No permissions').'");');
+		echo (new CTableInfo());
 	}
 	else {
 		$dbScreen = reset($dbScreens);
