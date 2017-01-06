@@ -426,9 +426,9 @@ static int	check_application_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
  *                                                                            *
  * Purpose: allocate sql query for trigger id condition                       *
  *                                                                            *
- * Parameters: sql           [IN/OUT] - allocated sql query                   *
- *             sql_alloc     [IN/OUT] - how much bytes allocated              *
- *             objectids_tmp [IN/OUT] - uses to allocate query, removes       *
+ * Parameters: sql           - [IN/OUT] allocated sql query                   *
+ *             sql_alloc     - [IN/OUT] how much bytes allocated              *
+ *             objectids_tmp - [IN/OUT] uses to allocate query, removes       *
  *                                      duplicates                            *
  *                                                                            *
  ******************************************************************************/
@@ -456,10 +456,10 @@ static void	check_trigger_id_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector
  *                                                                            *
  * Purpose: check trigger id row and set value to compare, to condition       *
  *                                                                            *
- * Parameters: row        [IN]  - fetched row                                 *
- *             objectid   [OUT] - trigger id                                  *
- *             templateid [OUT] - template id                                 *
- *             value      [OUT] - value to compare to condition               *
+ * Parameters: row        - [IN]  fetched row                                 *
+ *             objectid   - [OUT] trigger id                                  *
+ *             templateid - [OUT] template id                                 *
+ *             value      - [OUT] value to compare to condition               *
  *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - new template id obtained                           *
@@ -708,9 +708,9 @@ static int	check_trigger_id_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION
  *                                                                            *
  * Purpose: allocate sql query for template id condition                      *
  *                                                                            *
- * Parameters: sql           [IN/OUT] - allocated sql query                   *
- *             sql_alloc     [IN/OUT] - how much bytes allocated              *
- *             objectids_tmp [IN/OUT] - uses to allocate query, removes       *
+ * Parameters: sql           - [IN/OUT] allocated sql query                   *
+ *             sql_alloc     - [IN/OUT] how much bytes allocated              *
+ *             objectids_tmp - [IN/OUT] uses to allocate query, removes       *
  *                                      duplicates                            *
  *                                                                            *
  ******************************************************************************/
@@ -1137,8 +1137,8 @@ static int	check_trigger_condition(zbx_vector_ptr_t *esc_events, DB_CONDITION *c
  *                                                                            *
  * Purpose: get objectids for dhost                                           *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             objectids  [OUT] - event objectids to be used in condition     *
+ * Parameters: esc_events - [IN]  events to check                             *
+ *             objectids  - [OUT] event objectids to be used in condition     *
  *                                allocation 2 vectors where first one is     *
  *                                dhost ids, second is dservice               *
 *                                                                             *
@@ -2215,9 +2215,9 @@ static int	check_auto_registration_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Purpose: not all event objects are supported for internal events           *
  *                                                                            *
- * Parameters: events     [IN]  - events to check                             *
- *             events_num [IN]  - events count to check                       *
- *             condition  [IN/OUT] - condition for matching, outputs          *
+ * Parameters: events     - [IN]  events to check                             *
+ *             events_num - [IN]  events count to check                       *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
  * Return value: SUCCEED - supported                                          *
@@ -2295,8 +2295,8 @@ static int	check_intern_event_type_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Purpose: get objectids of escalation internal events                       *
  *                                                                            *
- * Parameters: esc_events [IN]  - events to check                             *
- *             objectids  [OUT] - event objectids to be used in condition     *
+ * Parameters: esc_events - [IN]  events to check                             *
+ *             objectids  - [OUT] event objectids to be used in condition     *
  *                                allocation 2 vectors where first one is     *
  *                                trigger object ids, second is rest          *
  *                                                                            *
@@ -2426,9 +2426,9 @@ static int	check_intern_host_group_condition(zbx_vector_ptr_t *esc_events, DB_CO
  *                                                                            *
  * Purpose: allocate sql query for template id condition                      *
  *                                                                            *
- * Parameters: sql           [IN/OUT] - allocated sql query                   *
- *             sql_alloc     [IN/OUT] - how much bytes allocated              *
- *             objectids_tmp [IN/OUT] - uses to allocate query, removes       *
+ * Parameters: sql           - [IN/OUT] allocated sql query                   *
+ *             sql_alloc     - [IN/OUT] how much bytes allocated              *
+ *             objectids_tmp - [IN/OUT] uses to allocate query, removes       *
  *                                      duplicates                            *
  *                                                                            *
  ******************************************************************************/
@@ -3317,6 +3317,18 @@ static int	is_recovery_event(const DB_EVENT *event)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_escalation_event                                              *
+ *                                                                            *
+ * Purpose: to determine if event needs condition checks                      *
+ *                                                                            *
+ * Parameters: event - [IN] event to validate                                 *
+ *                                                                            *
+ * Return value: SUCCEED - escalations possible for event                     *
+ *               FAIL    - escalations not possible for event                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	is_escalation_event(const DB_EVENT *event)
 {
 	/* OK events can't start escalations - skip them */
