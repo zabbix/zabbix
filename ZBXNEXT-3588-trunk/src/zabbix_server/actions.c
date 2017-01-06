@@ -1716,7 +1716,6 @@ static int	check_dservice_type_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
 			}
-
 		}
 		DBfree_result(result);
 	}
@@ -1927,7 +1926,6 @@ static int	check_dservice_port_condition(zbx_vector_ptr_t *esc_events, DB_CONDIT
 						zbx_vector_uint64_append(&condition->objectids, objectid);
 					break;
 			}
-
 		}
 		DBfree_result(result);
 	}
@@ -2637,7 +2635,7 @@ static int	check_intern_host_condition(zbx_vector_ptr_t *esc_events, DB_CONDITIO
 		else
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct itemid"
+					"select itemid"
 					" from items"
 					"%s hostid=" ZBX_FS_UI64
 						" and",
