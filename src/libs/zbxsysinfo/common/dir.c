@@ -25,7 +25,6 @@
 
 #ifdef _WINDOWS
 #	include "disk.h"
-#	include "gnuregex.h"
 #endif
 
 /******************************************************************************
@@ -221,7 +220,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*dir = NULL, *path = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		size = 0;
-	zbx_vector_ptr_t	list, descriptors;
+	zbx_vector_ptr_t	list;
 	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
@@ -237,6 +236,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR 			*directory;
 	struct dirent 		*entry;
 	zbx_file_descriptor_t	*file;
+	zbx_vector_ptr_t	descriptors;
 #endif
 	if (SUCCEED != prepare_parameters(request, result, &regex_incl, &regex_excl, &mode, &max_depth, &dir, &status))
 	{
