@@ -2444,7 +2444,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, const zbx_timespec_t 
 		item_value->value.value_uint = value_orig;
 }
 
-static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
+static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_item_value_t	*item_value;
@@ -2645,12 +2645,12 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		}
 		else if (ISSET_STR(result))
 		{
-			dc_local_add_history_str(itemid, ts, result->str, result->lastlogsize, result->mtime,
+			dc_local_add_history_text(itemid, ts, result->str, result->lastlogsize, result->mtime,
 					value_flags);
 		}
 		else if (ISSET_TEXT(result))
 		{
-			dc_local_add_history_str(itemid, ts, result->text, result->lastlogsize, result->mtime,
+			dc_local_add_history_text(itemid, ts, result->text, result->lastlogsize, result->mtime,
 					value_flags);
 		}
 		else
