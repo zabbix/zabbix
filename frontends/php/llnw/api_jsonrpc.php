@@ -39,7 +39,9 @@ elseif ($json['method'] == 'hostlist.get' || $json['method'] == 'hostlist.pull')
 elseif ($json['method'] == 'proxymap.get') {
    include($base_dir.'proxy.php');
 }
-elseif ($json['method'] == 'alertqueue.create') {
+elseif ($json['method'] == 'alertqueue.create'
+   || $json['method'] == 'alertqueue.size'
+   || $json['method'] == 'alertqueue.old') {
    include($base_dir.'alert-queue.php');
 }
 elseif ($json['method'] == 'proxy.status' || $json['method'] == 'proxy.reassign') {
