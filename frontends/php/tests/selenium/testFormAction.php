@@ -1986,7 +1986,7 @@ class testFormAction extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Trigger severity');
 		$this->zbxTestDropdownSelect('new_condition_value', 'Average');
-		$this->zbxTestClickXpathWait("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]");
+		$this->zbxTestDoubleClickXpath("//div[@id='conditionTab']//button[contains(@onclick, 'add_condition')]", 'conditions_3');
 		$this->zbxTestAssertElementText("//tr[@id='conditions_3']/td[2]", 'Trigger severity = Average');
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Application');
