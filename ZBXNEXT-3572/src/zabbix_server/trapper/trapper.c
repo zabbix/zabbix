@@ -476,8 +476,6 @@ err:
 	zbx_vector_ptr_destroy(&queue);
 
 	zbx_json_free(&json);
-
-	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
