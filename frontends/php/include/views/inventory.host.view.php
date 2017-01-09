@@ -87,23 +87,25 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 		$ifTab = (new CTable());
 
 		if (!$header_is_set) {
-			$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+			$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port'), _('Default')]);
 			$header_is_set = true;
 		}
 
 		foreach ($interfaces[$type] as $interface) {
-			$connect_to = ($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS');
+			$connect_to = ($interface['useip'] == INTERFACE_USE_IP) ? INTERFACE_USE_IP : INTERFACE_USE_DNS;
 
 			$ifTab->addRow([
-				(new CDiv($interface['main'] ? bold($interface['ip']) : $interface['ip']))
-					->setWidth(175),
-				(new CDiv($interface['main'] ? bold($interface['dns']) : $interface['dns']))
-					->setWidth(295)
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				(new CDiv($interface['main'] ? bold($connect_to) : $connect_to))
-					->setWidth(80),
-				(new CDiv($interface['main'] ? bold($interface['port']) : $interface['port']))
-					->setWidth(50)
+				(new CTextBox('ip', $interface['ip'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+				(new CTextBox('dns', $interface['dns'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
+				(new CRadioButtonList('useip['.$interface['interfaceid'].']', $connect_to))
+					->addValue(_('IP'), INTERFACE_USE_IP)
+					->addValue(_('DNS'), INTERFACE_USE_DNS)
+					->setModern(true)
+					->setEnabled(false),
+				(new CTextBox('port', $interface['port'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH),
+				(new CRadioButtonList('main['.$interface['type'].']', (int) $interface['main']))
+					->addValue(null, INTERFACE_PRIMARY)
+					->setEnabled(false)
 			]);
 		}
 
