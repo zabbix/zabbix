@@ -3981,7 +3981,7 @@ static void	vmware_service_remove(zbx_vmware_service_t *service)
 
 	zbx_vmware_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /*
