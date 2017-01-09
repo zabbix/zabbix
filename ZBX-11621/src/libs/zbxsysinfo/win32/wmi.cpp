@@ -94,7 +94,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
 	IEnumWbemClassObject	*pEnumerator = 0;
-	int			ret = SYSINFO_RET_FAIL, first_value = 0;
+	int			ret = SYSINFO_RET_FAIL, obj_num = 0;
 	HRESULT			hres;
 	wchar_t			*wmi_namespace_wide;
 	wchar_t			*wmi_query_wide;
@@ -149,10 +149,10 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		if (0 == uReturn)
 			goto exit;
 
-		if (0 == first_value)
-		{
-			first_value++;
+		obj_num += uReturn;
 
+		if (1 == obj_num)
+		{
 			hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 			if (FAILED(hres))
