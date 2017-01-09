@@ -2569,9 +2569,7 @@ $form-icon-btn: (
 }
 
 .ui-resizable-n {
-	z-index: 90;
-	position: absolute;
-	display: flex;
+	@extend %ui-resizable;
 	align-items: center;
 	cursor: s-resize;
 	height: 5px;
@@ -2581,9 +2579,7 @@ $form-icon-btn: (
 }
 
 .ui-resizable-e {
-	z-index: 90;
-	position: absolute;
-	display: flex;
+	@extend %ui-resizable;
 	cursor: e-resize;
 	width: 5px;
 	right: 0;
@@ -2592,9 +2588,7 @@ $form-icon-btn: (
 }
 
 .ui-resizable-s {
-	z-index: 90;
-	position: absolute;
-	display: flex;
+	@extend %ui-resizable;
 	align-items: center;
 	justify-content: center;
 	cursor: s-resize;
@@ -2605,14 +2599,19 @@ $form-icon-btn: (
 }
 
 .ui-resizable-w {
-	z-index: 90;
-	position: absolute;
-	display: flex;
+	@extend %ui-resizable;
 	cursor: e-resize;
 	width: 5px;
 	left: 0;
 	top: 0;
 	height: 100%;
+}
+
+%ui-resizable {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+
 }
 
 .dashbrd-widget-placeholder {
