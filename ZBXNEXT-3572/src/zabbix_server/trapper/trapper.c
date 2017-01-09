@@ -447,15 +447,6 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)))
-			{
-				if (FAIL == is_uint32(limit_str, &limit))
-				{
-					zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
-					goto err;
-				}
-			}
-
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
