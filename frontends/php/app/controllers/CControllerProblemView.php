@@ -90,7 +90,7 @@ class CControllerProblemView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
