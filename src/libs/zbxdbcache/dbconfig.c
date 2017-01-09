@@ -137,8 +137,8 @@ typedef struct
 	const char	*port;
 	const char	*units;
 	const char	*db_error;
+	const char	*delay;
 	ZBX_DC_TRIGGER	**triggers;
-	int		delay;
 	int		nextcheck;
 	int		lastclock;
 	int		mtime;
@@ -199,13 +199,6 @@ typedef struct
 	const char	*ipmi_sensor;
 }
 ZBX_DC_IPMIITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*delay_flex;
-}
-ZBX_DC_FLEXITEM;
 
 typedef struct
 {
@@ -596,7 +589,6 @@ typedef struct
 	zbx_hashset_t		numitems;
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;
-	zbx_hashset_t		flexitems;
 	zbx_hashset_t		trapitems;
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		dbitems;
@@ -655,6 +647,8 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
+		zbx_value_validator_func_t validator_func, char **error);
 static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error);
 
 /******************************************************************************
@@ -876,13 +870,32 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 	}
 	else
 	{
-		const ZBX_DC_FLEXITEM	*flexitem;
-		const char		*delay_flex;
+		int			simple_interval;
+		zbx_custom_interval_t	*custom_intervals;
+		char			*error = NULL;
 
-		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		delay_flex = (NULL != flexitem ? flexitem->delay_flex : NULL);
+		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, &error))
+		{
+			zbx_timespec_t	ts = {now, 0};
 
-		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now);
+			/* Usual way for an item to become not supported is to receive an error instead of value. */
+			/* Item state and error will be updated by history syncer during history sync following a */
+			/* regular procedure with item update in database and config cache, logging etc. There is */
+			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
+
+			dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
+			zbx_free(error);
+
+			/* Polling items with invalid update intervals repeatedly does not make sense because they */
+			/* can only be healed by editing configuration (either update interval or macros involved) */
+			/* and such changes will be detected during configuration synchronization. Items with new  */
+			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
+
+			return ZBX_JAN_2038;
+		}
+
+		nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+		zbx_custom_interval_free(custom_intervals);
 	}
 
 	if (NULL != proxy)
@@ -1242,7 +1255,10 @@ static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACR
  ******************************************************************************/
 static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value_raw)
 {
-	if (SUCCEED != is_time_suffix(value_raw, value) || (0 != non_zero && 0 == *value) || value_min > *value)
+	if (SUCCEED != is_time_suffix(value_raw, value, ZBX_LENGTH_UNLIMITED))
+		return FAIL;
+
+	if ((0 != non_zero && 0 == *value) || value_min > *value)
 		return FAIL;
 
 	return SUCCEED;
@@ -1317,7 +1333,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 		/* store the config data */
 
-		if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported))
+		if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid unsupported item refresh interval, restoring default");
 			refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
@@ -2462,7 +2478,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	ZBX_DC_NUMITEM		*numitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_IPMIITEM		*ipmiitem;
-	ZBX_DC_FLEXITEM		*flexitem;
 	ZBX_DC_TRAPITEM		*trapitem;
 	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_DBITEM		*dbitem;
@@ -2477,7 +2492,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 	time_t			now;
 	unsigned char		old_poller_type, status, type;
-	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
+	int			old_nextcheck, delay_changed, delay_macros_expanded, key_changed, found, update_index;
+	char			*delay = NULL;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -2547,14 +2563,14 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		item->hostid = hostid;
 		item->data_type = (unsigned char)atoi(row[4]);
 		DCstrpool_replace(found, &item->port, row[9]);
-		item->flags = (unsigned char)atoi(row[26]);
-		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
+		item->flags = (unsigned char)atoi(row[25]);
+		ZBX_DBROW2UINT64(item->interfaceid, row[26]);
 		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
 			item->history = config->config->hk.history;
 		else
-			item->history = atoi(row[36]);
-		ZBX_STR2UCHAR(item->inventory_link, row[38]);
-		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
+			item->history = atoi(row[35]);
+		ZBX_STR2UCHAR(item->inventory_link, row[37]);
+		ZBX_DBROW2UINT64(item->valuemapid, row[38]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
@@ -2568,11 +2584,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->triggers = NULL;
 			item->nextcheck = 0;
 			item->lastclock = 0;
-			item->state = (unsigned char)atoi(row[20]);
+			item->state = (unsigned char)atoi(row[19]);
 			item->db_state = item->state;
-			ZBX_STR2UINT64(item->lastlogsize, row[31]);
-			item->mtime = atoi(row[32]);
-			DCstrpool_replace(found, &item->db_error, row[41]);
+			ZBX_STR2UINT64(item->lastlogsize, row[30]);
+			item->mtime = atoi(row[31]);
+			DCstrpool_replace(found, &item->db_error, row[40]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
@@ -2614,33 +2630,36 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		/* update item nextcheck and process items with flexible intervals */
+		/* process item intervals and update item nextcheck */
 
-		delay = atoi(row[15]);
-
-		if ('\0' != *row[16])
+		zbx_free(delay);
+		if (NULL == (delay = dc_expand_user_macros(row[15], NULL, 0, NULL, NULL)))
 		{
-			int	found1;
+			zbx_timespec_t	ts = {now, 0};
 
-			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found1);
+			/* Usual way for an item to become not supported is to receive an error instead of value. */
+			/* Item state and error will be updated by history syncer during history sync following a */
+			/* regular procedure with item update in database and config cache, logging etc. There is */
+			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-			delay_flex_changed = (SUCCEED == DCstrpool_replace(found1, &flexitem->delay_flex, row[16]));
+			dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, "cannot resolve macros"
+					" in update interval");
+
+			/* Polling items with invalid update intervals repeatedly does not make sense because they */
+			/* can only be healed by editing configuration (either update interval or macros involved) */
+			/* and such changes will be detected during configuration synchronization. Items with new  */
+			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
+
+			item->nextcheck = ZBX_JAN_2038;
+
+			delay_macros_expanded = 0;
 		}
 		else
 		{
-			if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-			{
-				/* remove delay_flex parameter for non-flexible item */
+			delay_changed = (SUCCEED == DCstrpool_replace(found, &item->delay, delay));
+			zbx_free(delay);
 
-				zbx_strpool_release(flexitem->delay_flex);
-				zbx_hashset_remove_direct(&config->flexitems, flexitem);
-
-				flexitem = NULL;
-
-				delay_flex_changed = 1;
-			}
-			else
-				delay_flex_changed = 0;
+			delay_macros_expanded = 1;
 		}
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
@@ -2655,11 +2674,10 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (SUCCEED == is_counted_in_item_queue(type, item->key) &&
+			if (SUCCEED == is_counted_in_item_queue(type, item->key) && 0 != delay_macros_expanded &&
 					(0 == item->nextcheck || 0 != key_changed || item->type != type ||
 					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
-					(ITEM_STATE_NORMAL == item->state &&
-					(item->delay != delay || 0 != delay_flex_changed))))
+					(ITEM_STATE_NORMAL == item->state && 0 != delay_changed)))
 			{
 				ZBX_DC_PROXY	*proxy = NULL;
 				zbx_uint64_t	seed;
@@ -2681,9 +2699,41 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				}
 				else
 				{
-					item->nextcheck = calculate_item_nextcheck(seed, type, delay,
-							(NULL == flexitem ? NULL : row[16]), now - proxy_timediff);
-					item->nextcheck += proxy_timediff + (NULL != proxy);
+					int			simple_interval;
+					zbx_custom_interval_t	*custom_intervals;
+					char			*error = NULL;
+
+					if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval,
+							&custom_intervals, &error))
+					{
+						zbx_timespec_t	ts = {now, 0};
+
+						/* Usual way for an item to become not supported is to receive an    */
+						/* error instead of value. Item state and error will be updated by   */
+						/* history syncer during history sync following a regular procedure  */
+						/* with item update in database and config cache, logging etc. There */
+						/* is no need to set ITEM_STATE_NOTSUPPORTED here. */
+
+						dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+								error);
+						zbx_free(error);
+
+						/* Polling items with invalid update intervals repeatedly does not    */
+						/* make sense because they can only be healed by editing              */
+						/* configuration (either update interval or macros involved) and such */
+						/* changes will be detected during configuration synchronization.     */
+						/* Items with new update intervals or with macros in them are         */
+						/* requeued automatically. */
+
+						item->nextcheck = ZBX_JAN_2038;
+					}
+					else
+					{
+						item->nextcheck = calculate_item_nextcheck(seed, type, simple_interval,
+								custom_intervals, now - proxy_timediff);
+						item->nextcheck += proxy_timediff + (NULL != proxy);
+						zbx_custom_interval_free(custom_intervals);
+					}
 				}
 			}
 
@@ -2716,7 +2766,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->unreachable = 0;
 		}
 
-		item->delay = delay;
 		item->type = type;
 
 		/* numeric items */
@@ -2725,14 +2774,14 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			numitem = DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
 
-			ZBX_STR2UCHAR(numitem->delta, row[33]);
-			ZBX_STR2UCHAR(numitem->multiplier, row[34]);
-			DCstrpool_replace(found, &numitem->formula, row[35]);
+			ZBX_STR2UCHAR(numitem->delta, row[32]);
+			ZBX_STR2UCHAR(numitem->multiplier, row[33]);
+			DCstrpool_replace(found, &numitem->formula, row[34]);
 			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
 				numitem->trends = config->config->hk.trends;
 			else
-				numitem->trends = atoi(row[37]);
-			DCstrpool_replace(found, &numitem->units, row[40]);
+				numitem->trends = atoi(row[36]);
+			DCstrpool_replace(found, &numitem->units, row[39]);
 		}
 		else if (NULL != (numitem = zbx_hashset_search(&config->numitems, &itemid)))
 		{
@@ -2755,9 +2804,9 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_privpassphrase, row[13]);
-			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[28]);
-			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[29]);
-			DCstrpool_replace(found, &snmpitem->snmpv3_contextname, row[30]);
+			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[27]);
+			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[28]);
+			DCstrpool_replace(found, &snmpitem->snmpv3_contextname, row[29]);
 
 			if (SUCCEED == DCstrpool_replace(found, &snmpitem->snmp_oid, row[8]))
 			{
@@ -2800,11 +2849,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		/* trapper items */
 
-		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[17])
+		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[16])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
-			zbx_trim_str_list(row[17], ',');
-			DCstrpool_replace(found, &trapitem->trapper_hosts, row[17]);
+			zbx_trim_str_list(row[16], ',');
+			DCstrpool_replace(found, &trapitem->trapper_hosts, row[16]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
 		{
@@ -2815,11 +2864,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		/* log items */
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[18])
+		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[17])
 		{
 			logitem = DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
 
-			DCstrpool_replace(found, &logitem->logtimefmt, row[18]);
+			DCstrpool_replace(found, &logitem->logtimefmt, row[17]);
 		}
 		else if (NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
 		{
@@ -2830,13 +2879,13 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		/* db items */
 
-		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[19])
+		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[18])
 		{
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
-			DCstrpool_replace(found, &dbitem->params, row[19]);
-			DCstrpool_replace(found, &dbitem->username, row[22]);
-			DCstrpool_replace(found, &dbitem->password, row[23]);
+			DCstrpool_replace(found, &dbitem->params, row[18]);
+			DCstrpool_replace(found, &dbitem->username, row[21]);
+			DCstrpool_replace(found, &dbitem->password, row[22]);
 		}
 		else if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
 		{
@@ -2854,12 +2903,12 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			sshitem = DCfind_id(&config->sshitems, itemid, sizeof(ZBX_DC_SSHITEM), &found);
 
-			sshitem->authtype = (unsigned short)atoi(row[21]);
-			DCstrpool_replace(found, &sshitem->username, row[22]);
-			DCstrpool_replace(found, &sshitem->password, row[23]);
-			DCstrpool_replace(found, &sshitem->publickey, row[24]);
-			DCstrpool_replace(found, &sshitem->privatekey, row[25]);
-			DCstrpool_replace(found, &sshitem->params, row[19]);
+			sshitem->authtype = (unsigned short)atoi(row[20]);
+			DCstrpool_replace(found, &sshitem->username, row[21]);
+			DCstrpool_replace(found, &sshitem->password, row[22]);
+			DCstrpool_replace(found, &sshitem->publickey, row[23]);
+			DCstrpool_replace(found, &sshitem->privatekey, row[24]);
+			DCstrpool_replace(found, &sshitem->params, row[18]);
 		}
 		else if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &itemid)))
 		{
@@ -2880,9 +2929,9 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			telnetitem = DCfind_id(&config->telnetitems, itemid, sizeof(ZBX_DC_TELNETITEM), &found);
 
-			DCstrpool_replace(found, &telnetitem->username, row[22]);
-			DCstrpool_replace(found, &telnetitem->password, row[23]);
-			DCstrpool_replace(found, &telnetitem->params, row[19]);
+			DCstrpool_replace(found, &telnetitem->username, row[21]);
+			DCstrpool_replace(found, &telnetitem->password, row[22]);
+			DCstrpool_replace(found, &telnetitem->params, row[18]);
 		}
 		else if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &itemid)))
 		{
@@ -2901,8 +2950,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			simpleitem = DCfind_id(&config->simpleitems, itemid, sizeof(ZBX_DC_SIMPLEITEM), &found);
 
-			DCstrpool_replace(found, &simpleitem->username, row[22]);
-			DCstrpool_replace(found, &simpleitem->password, row[23]);
+			DCstrpool_replace(found, &simpleitem->username, row[21]);
+			DCstrpool_replace(found, &simpleitem->password, row[22]);
 		}
 		else if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &itemid)))
 		{
@@ -2920,8 +2969,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			jmxitem = DCfind_id(&config->jmxitems, itemid, sizeof(ZBX_DC_JMXITEM), &found);
 
-			DCstrpool_replace(found, &jmxitem->username, row[22]);
-			DCstrpool_replace(found, &jmxitem->password, row[23]);
+			DCstrpool_replace(found, &jmxitem->username, row[21]);
+			DCstrpool_replace(found, &jmxitem->password, row[22]);
 		}
 		else if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &itemid)))
 		{
@@ -2957,7 +3006,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			calcitem = DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM), &found);
 
-			DCstrpool_replace(found, &calcitem->params, row[19]);
+			DCstrpool_replace(found, &calcitem->params, row[18]);
 		}
 		else if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &itemid)))
 		{
@@ -3018,14 +3067,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			ipmiitem = zbx_hashset_search(&config->ipmiitems, &itemid);
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
 			zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
-		}
-
-		/* items with flexible intervals */
-
-		if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-		{
-			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove_direct(&config->flexitems, flexitem);
 		}
 
 		/* trapper items */
@@ -3150,6 +3191,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	}
 
 	zbx_vector_uint64_destroy(&ids);
+	zbx_free(delay);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4529,7 +4571,7 @@ void	DCsync_configuration(void)
 	if (NULL == (item_result = DBselect(
 			"select i.itemid,i.hostid,i.status,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
-				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,i.delay_flex,"
+				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,"
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,i.delta,i.multiplier,"
@@ -4855,8 +4897,6 @@ void	DCsync_configuration(void)
 			config->snmpitems.num_data, config->snmpitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,
 			config->ipmiitems.num_data, config->ipmiitems.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() flexitems  : %d (%d slots)", __function_name,
-			config->flexitems.num_data, config->flexitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
 			config->trapitems.num_data, config->trapitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
@@ -5295,7 +5335,6 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->numitems, 0);
 	CREATE_HASHSET(config->snmpitems, 0);
 	CREATE_HASHSET(config->ipmiitems, 0);
-	CREATE_HASHSET(config->flexitems, 0);
 	CREATE_HASHSET(config->trapitems, 0);
 	CREATE_HASHSET(config->logitems, 0);
 	CREATE_HASHSET(config->dbitems, 0);
@@ -5792,7 +5831,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_TRAPITEM		*trapitem;
 	const ZBX_DC_IPMIITEM		*ipmiitem;
 	const ZBX_DC_DBITEM		*dbitem;
-	const ZBX_DC_FLEXITEM		*flexitem;
 	const ZBX_DC_SSHITEM		*sshitem;
 	const ZBX_DC_TELNETITEM		*telnetitem;
 	const ZBX_DC_SIMPLEITEM		*simpleitem;
@@ -5806,7 +5844,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->value_type = src_item->value_type;
 	strscpy(dst_item->key_orig, src_item->key);
 	dst_item->key = NULL;
-	dst_item->delay = src_item->delay;
+	dst_item->delay = zbx_strdup(NULL, src_item->delay);
 	dst_item->nextcheck = src_item->nextcheck;
 	dst_item->state = src_item->state;
 	dst_item->lastclock = src_item->lastclock;
@@ -5821,11 +5859,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
-
-	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
-		strscpy(dst_item->delay_flex, flexitem->delay_flex);
-	else
-		*dst_item->delay_flex = '\0';
 
 	switch (src_item->value_type)
 	{
@@ -6020,6 +6053,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				break;
 		}
 
+		zbx_free(items[i].delay);
 		zbx_free(items[i].db_error);
 	}
 }
@@ -8759,7 +8793,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	int			now, nitems = 0, data_expected_from;
+	int			now, nitems = 0, data_expected_from, delay;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -8796,7 +8830,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
 					data_expected_from = dc_host->data_expected_from;
-				if (data_expected_from + dc_item->delay > now)
+				if (SUCCEED != zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL))
+					continue;
+				if (data_expected_from + delay > now)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
@@ -9049,6 +9085,7 @@ double	DCget_required_performance(void)
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
+	int			delay;
 
 	LOCK_CACHE;
 
@@ -9058,7 +9095,7 @@ double	DCget_required_performance(void)
 	{
 		const ZBX_DC_HOST	*dc_host;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->delay)
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -9067,7 +9104,8 @@ double	DCget_required_performance(void)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		nvps += 1.0 / dc_item->delay;
+		if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) && 0 != delay)
+			nvps += 1.0 / delay;
 	}
 
 	UNLOCK_CACHE;

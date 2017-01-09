@@ -868,7 +868,8 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
-int	is_time_suffix(const char *c, int *value);
+#define ZBX_LENGTH_UNLIMITED	0x7fffffff
+int	is_time_suffix(const char *c, int *value, int length);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
@@ -947,9 +948,14 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now);
+
+typedef struct zbx_custom_interval	zbx_custom_interval_t;
+int	zbx_interval_preproc(const char *interval_str, int *simple_interval,
+		zbx_custom_interval_t **custom_intervals, char **error);
+void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
+		const zbx_custom_interval_t *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
-int	check_time_period(const char *period, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, int *res);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);

@@ -766,7 +766,7 @@ clean:
 	delay_str = zbx_strdup(NULL, httptest->httptest.delay);
 	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON, NULL, 0);
 
-	if (SUCCEED != is_time_suffix(delay_str, &delay))
+	if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid update interval \"%s\" configured for web scenario \"%s\""
 				" on host \"%s\"", delay_str, httptest->httptest.name, host->name);

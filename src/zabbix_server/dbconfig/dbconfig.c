@@ -92,6 +92,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		sec = zbx_time();
 		DCsync_configuration();
 		DCupdate_hosts_availability();
+		dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",

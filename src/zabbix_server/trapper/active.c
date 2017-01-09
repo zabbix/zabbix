@@ -479,7 +479,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM		*dc_items;
-		int		*errcodes, now;
+		int		*errcodes, now, delay;
 		zbx_config_t	cfg;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
@@ -514,6 +514,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 					continue;
 			}
 
+			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
+				continue;
+
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			substitute_key_macros(&dc_items[i].key, NULL, &dc_items[i], NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
@@ -524,7 +527,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
 						dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
 			}
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay);
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			/* The agent expects ALWAYS to have lastlogsize and mtime tags. */
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);

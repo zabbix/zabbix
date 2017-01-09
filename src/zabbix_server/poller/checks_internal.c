@@ -158,13 +158,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp && FAIL == is_time_suffix(tmp, &from))
+		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp &&
+				FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 		{
 			error = zbx_strdup(error, "Invalid second parameter.");
 			goto out;
 		}
 
-		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp && FAIL == is_time_suffix(tmp, &to))
+		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp &&
+				FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
 		{
 			error = zbx_strdup(error, "Invalid third parameter.");
 			goto out;

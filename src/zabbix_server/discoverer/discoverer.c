@@ -729,7 +729,7 @@ static int	process_discovery(int now)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON,
 				NULL, 0);
 
-		if (SUCCEED != is_time_suffix(delay_str, &delay))
+		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					drule.name, delay_str);
