@@ -715,7 +715,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_regexp_sub(value->data.str, pattern, output, &new_value))
+	if (FAIL == zbx_mregexp_sub(value->data.str, pattern, output, &new_value))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
 		return FAIL;
