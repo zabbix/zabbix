@@ -289,6 +289,9 @@ elseif ($config == QUEUE_DETAILS) {
 			(count($queueData) > QUEUE_DETAIL_ITEM_COUNT ? ' ('._('Truncated').')' : '');
 	}
 }
+else {
+	$total = null;
+}
 
 $widget
 	->addItem($table)
