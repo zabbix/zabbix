@@ -1139,7 +1139,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 		tmp = zbx_strdup(tmp, row[2]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_time_suffix(tmp, &esc_period))
+		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
 					" using default operation step duration of the action", tmp, action->name);
@@ -1874,7 +1874,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 
 		tmp = zbx_strdup(tmp, row[4]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_time_suffix(tmp, &action->esc_period))
+		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
 					" \"%s\", using default value of 1 hour", tmp, row[1]);

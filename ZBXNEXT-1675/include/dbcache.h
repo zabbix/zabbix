@@ -148,7 +148,7 @@ typedef struct
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
-	int		delay;
+	char		*delay;
 	int		nextcheck;
 	int		lastclock;
 	int		mtime;
@@ -163,7 +163,6 @@ typedef struct
 	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
 	char		*params;
-	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
 	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
 	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;

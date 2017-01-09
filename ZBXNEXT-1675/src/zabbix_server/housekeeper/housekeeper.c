@@ -386,7 +386,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
-				if (SUCCEED != is_time_suffix(tmp, &history))
+				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "invalid history storage '%s' for itemid '%s'", tmp,
 							row[0]);
@@ -413,7 +413,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
-				if (SUCCEED != is_time_suffix(tmp, &trends))
+				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "invalid trends storage '%s' for itemid '%s'", tmp,
 							row[0]);
