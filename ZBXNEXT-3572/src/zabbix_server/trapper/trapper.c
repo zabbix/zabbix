@@ -368,7 +368,18 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
 			request_type = ZBX_GET_QUEUE_PROXY;
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
+		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
+
+			if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)))
+			{
+				if (FAIL == is_uint32(limit_str, &limit))
+				{
+					zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+					goto out;
+				}
+			}
+		}
 	}
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
@@ -471,7 +482,6 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zbx_tcp_send_raw(sock, json.buffer);
 
 	ret = SUCCEED;
-err:
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
 
