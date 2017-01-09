@@ -38,7 +38,7 @@
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
-#define MAX_QUEUE_DETAILS_ITEMS	500
+#define MAX_QUEUE_DETAILS_ITEMS	501
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
