@@ -611,108 +611,22 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  * Purpose: check if current time is within given period                      *
  *                                                                            *
  * Parameters: period - [IN] preprocessed time period                         *
- *             now    - [IN] timestamp for comparison                         *
+ *             tm     - [IN] broken-down time for comparison                  *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_time_period(const zbx_time_period_t period, time_t now)
+static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
 {
 	int		day, time;
-	struct tm	*tm;
 
-	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
 	time = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
 	return period.start_day <= day && day <= period.end_day && period.start_time <= time && time < period.end_time ?
 			SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_check_period_single                                          *
- *                                                                            *
- * Comments: helper function for zbx_check_time_period()                      *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_check_period_single(const char *period, struct tm *tm, int *res)
-{
-#define SEC(h, m)	(SEC_PER_HOUR * (h) + SEC_PER_MIN * (m))
-
-	int	d1, d2, h1, h2, m1, m2, sec;
-
-	if (NULL == period || '\0' == *period)
-		return FAIL;
-
-	if (6 != sscanf(period, "%d-%d,%d:%d-%d:%d", &d1, &d2, &h1, &m1, &h2, &m2))
-	{
-		if (5 != sscanf(period, "%d,%d:%d-%d:%d", &d1, &h1, &m1, &h2, &m2))
-			return FAIL;
-
-		d2 = d1;
-	}
-
-	if (1 > d1 || 7 < d2 || d1 > d2 || 0 > h1 || 24 < h2 || h1 > h2 || 0 > m1 || 59 < m1 || 0 > m2 || 59 < m2)
-		return FAIL;
-
-	if (24 == h1 || (24 == h2 && 0 != m2))
-		return FAIL;
-
-	if (0 != (0x81 << tm->tm_wday & 0xff << d1 & 0xff >> (7 - d2)))
-		*res = (SEC(h1, m1) <= (sec = SEC(tm->tm_hour, tm->tm_min)) && sec < SEC(h2, m2) ? SUCCEED : FAIL);
-	else
-		*res = FAIL;
-
-	return SUCCEED;
-
-#undef SEC
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_check_time_period                                            *
- *                                                                            *
- * Purpose: validate time period and check if specified time is within it     *
- *                                                                            *
- * Parameters: period - [IN] semicolon-separated list of time periods in one  *
- *                           of the following formats:                        *
- *                             d1-d2,h1:m1-h2:m2                              *
- *                             or d1,h1:m1-h2:m2                              *
- *             time   - [IN] time to check                                    *
- *             res    - [OUT] check result:                                   *
- *                              SUCCEED - if time is within period            *
- *                              FAIL    - otherwise                           *
- *                                                                            *
- * Return value: validation result (SUCCEED - valid, FAIL - invalid)          *
- *                                                                            *
- * Comments:   !!! Don't forget to sync code with PHP !!!                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_time_period(const char *period, time_t time, int *res)
-{
-	int		res_single, res_total = FAIL;
-	struct tm	*tm;
-
-	tm = localtime(&time);
-
-	while (SUCCEED == zbx_check_period_single(period, tm, &res_single))
-	{
-		if (SUCCEED == res_single)
-			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
-
-		if (NULL == (period = strchr(period, ';')))
-		{
-			*res = res_total;
-			return SUCCEED;
-		}
-
-		period++;
-	}
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -738,7 +652,7 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 	while (NULL != flex_intervals)
 	{
 		if ((-1 == current_delay || flex_intervals->delay < current_delay) &&
-				SUCCEED == check_time_period(flex_intervals->period, now))
+				SUCCEED == check_time_period(flex_intervals->period, localtime(&now)))
 		{
 			current_delay = flex_intervals->delay;
 		}
@@ -928,6 +842,54 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
 		return FAIL;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_time_period                                            *
+ *                                                                            *
+ * Purpose: validate time period and check if specified time is within it     *
+ *                                                                            *
+ * Parameters: period - [IN] semicolon-separated list of time periods in one  *
+ *                           of the following formats:                        *
+ *                             d1-d2,h1:m1-h2:m2                              *
+ *                             or d1,h1:m1-h2:m2                              *
+ *             time   - [IN] time to check                                    *
+ *             res    - [OUT] check result:                                   *
+ *                              SUCCEED - if time is within period            *
+ *                              FAIL    - otherwise                           *
+ *                                                                            *
+ * Return value: validation result (SUCCEED - valid, FAIL - invalid)          *
+ *                                                                            *
+ * Comments:   !!! Don't forget to sync code with PHP !!!                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_time_period(const char *period, time_t time, int *res)
+{
+	int			res_total = FAIL;
+	const char		*next;
+	struct tm		*tm;
+	zbx_time_period_t	tp;
+
+	tm = localtime(&time);
+
+	next = strchr(period, ';');
+	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : next - period)))
+	{
+		if (SUCCEED == check_time_period(tp, tm))
+			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
+
+		if (NULL == next)
+		{
+			*res = res_total;
+			return SUCCEED;
+		}
+
+		period = next + 1;
+		next = strchr(period, ';');
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
