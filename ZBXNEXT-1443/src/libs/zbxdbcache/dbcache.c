@@ -1211,9 +1211,14 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 			hdata->value.ui64 = value->data.ui64;
 			break;
 		case ITEM_VALUE_TYPE_STR:
+			dc_history_clean_value(hdata);
+			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
@@ -1223,6 +1228,7 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
 			}
 			hdata->value.log->value = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_LOG_VALUE_LEN)] = '\0';
 	}
 
 	hdata->value_type = value_type;
@@ -1265,7 +1271,22 @@ static int	preprocess_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata, zbx
 		return FAIL;
 
 	if (0 == item->preproc_ops_num && item->value_type == hdata->value_type)
+	{
+		/* truncate text based values if necessary */
+		switch (hdata->value_type)
+		{
+			case ITEM_VALUE_TYPE_STR:
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_LOG_VALUE_LEN)] = '\0';
+				break;
+		}
 		return SUCCEED;
+	}
 
 	switch (hdata->value_type)
 	{
