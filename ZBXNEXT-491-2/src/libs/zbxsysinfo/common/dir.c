@@ -40,7 +40,7 @@
  *             regex_excl - [IN] regexp for filenames to exclude (NULL means  *
  *                               exclude none)                                *
  *                                                                            *
- * Return value: If filename passes both checks, nonzero value is returned    *
+ * Return value: If filename passes both checks, nonzero value is returned.   *
  *               If filename fails to pass, 0 is returned.                    *
  *                                                                            *
  ******************************************************************************/
@@ -57,17 +57,20 @@ static int	filename_matches(const char *fname, const regex_t *regex_incl, const 
  * Function: queue_directory                                                  *
  *                                                                            *
  * Purpose: adds directory to processing queue after checking if current      *
- *          depth is less than max_depth                                      *
+ *          depth is less than 'max_depth'                                    *
  *                                                                            *
  * Parameters: list      - [IN/OUT] vector used to replace reccursion         *
  *                                  with iterative approach		      *
  *	       path      - [IN] directory path		                      *
  *             depth     - [IN] current traversal depth of directory          *
  *             max_depth - [IN] maximal traversal depth allowed (use -1       *
- *                              for unlimited directory traversal)	      *
+ *                              for unlimited directory traversal)            *
+ *                                                                            *
+ * Return value: SUCCEED - directory is queued,                               *
+ *               FAIL - directory depth is more than allowed traversal depth. *
  *                                                                            *
  ******************************************************************************/
-static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth, int max_depth)
+static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int max_depth)
 {
 	zbx_directory_item_t	*item;
 
@@ -75,10 +78,14 @@ static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth,
 	{
 		item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
 		item->depth = depth + 1;
-		item->path = zbx_strdup(NULL, path);
+		item->path = path;
 
 		zbx_vector_ptr_append(list, item);
+
+		return SUCCEED;
 	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -248,12 +255,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 	zbx_vector_ptr_create(&list);
 
-	/* put top directory into list */
-
-	item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
-	item->depth = 0;
-	item->path = dir;
-	zbx_vector_ptr_append(&list, item);
+	queue_directory(&list, dir, -1, max_depth);	/* put top directory into list */
 
 #ifndef _WINDOWS
 	/* on UNIX count top directory size */
@@ -338,7 +340,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 			}
 			else
-				queue_directory(&list, path, item->depth, max_depth);
+			{
+				if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
+					path = NULL;
+			}
 
 			zbx_free(name);
 
@@ -413,7 +418,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 
 				if (0 != S_ISDIR(status.st_mode))
-					queue_directory(&list, path, item->depth, max_depth);
+				{
+					if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
+						path = NULL;
+				}
 			}
 			else
 			{
