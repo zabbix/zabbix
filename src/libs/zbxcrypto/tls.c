@@ -1406,7 +1406,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		unsigned int max_psk_len)
 {
 	const char	*__function_name = "zbx_psk_server_cb";
-	char		*psk_loc;
+	char		*psk_loc = NULL;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
 	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
