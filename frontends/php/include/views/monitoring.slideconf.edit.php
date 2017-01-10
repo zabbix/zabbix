@@ -260,7 +260,7 @@ if (isset($data['slideshow']['slideshowid'])) {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CSubmit('clone', _('Clone')),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
 			new CButtonDelete(_('Delete slide show?'), url_params(['form', 'slideshowid'])),
 			new CRedirectButton(_('Cancel'), 'slides.php')
 		]
