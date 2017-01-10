@@ -781,6 +781,9 @@ int	zbx_db_commit(void)
 int	zbx_db_rollback(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
+#ifdef HAVE_ORACLE
+	sword	err;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -811,7 +814,8 @@ int	zbx_db_rollback(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
-	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
 	zbx_mutex_unlock(&sqlite_access);
