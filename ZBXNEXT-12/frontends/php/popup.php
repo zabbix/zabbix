@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -226,18 +227,27 @@ check_fields($fields);
 
 // validate permissions
 if (getRequest('only_hostid')) {
-	if (!API::Host()->isReadable([$_REQUEST['only_hostid']])) {
+	if (!isReadableHostTemplates([getRequest('only_hostid')])) {
 		access_deny();
 	}
 }
 else {
-	if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']]) ||
-			getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
+	if (getRequest('hostid') && !isReadableHostTemplates([getRequest('hostid')])) {
+		access_deny();
+	}
+	if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 		access_deny();
 	}
 }
-if (getRequest('parent_discoveryid') && !API::DiscoveryRule()->isReadable([$_REQUEST['parent_discoveryid']])) {
-	access_deny();
+if (getRequest('parent_discoveryid')) {
+	$lld_rules = API::DiscoveryRule()->get([
+		'output' => [],
+		'itemids' => getRequest('parent_discoveryid')
+	]);
+
+	if (!$lld_rules) {
+		access_deny();
+	}
 }
 
 $dstfrm = getRequest('dstfrm', ''); // destination form
@@ -376,16 +386,7 @@ elseif ($withMonitoredTriggers) {
 
 $pageFilter = new CPageFilter($options);
 
-// get groupid
-$groupid = null;
-if ($pageFilter->groupsSelected) {
-	if ($pageFilter->groupid > 0) {
-		$groupid = $pageFilter->groupid;
-	}
-}
-else {
-	$groupid = 0;
-}
+$groupids = $pageFilter->groupids;
 
 // get hostid
 $hostid = null;
@@ -731,7 +732,7 @@ elseif ($srctbl == 'templates') {
 
 	$options = [
 		'output' => ['templateid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'preservekeys' => true
 	];
 
@@ -817,7 +818,7 @@ elseif ($srctbl == 'hosts') {
 
 	$options = [
 		'output' => ['hostid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'preservekeys' => true
 	];
 
@@ -898,7 +899,7 @@ elseif ($srctbl == 'host_templates') {
 
 	$options = [
 		'output' => ['hostid', 'name'],
-		'groupids' => $groupid,
+		'groupids' => $groupids,
 		'templated_hosts' => true,
 		'preservekeys' => true
 	];
@@ -1101,7 +1102,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	}
 	else {
 		if ($hostid === null) {
-			$options['groupids'] = $groupid;
+			$options['groupids'] = $groupids;
 		}
 		else {
 			$options['hostids'] = [$hostid];
@@ -1374,7 +1375,7 @@ elseif ($srctbl == 'applications') {
 		'hostids' => $hostid
 	];
 	if (is_null($hostid)) {
-		$options['groupids'] = $groupid;
+		$options['groupids'] = $groupids;
 	}
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;
@@ -1847,7 +1848,7 @@ elseif ($srctbl == 'scripts') {
 		'preservekeys' => true
 	];
 	if (is_null($hostid)) {
-		$options['groupids'] = $groupid;
+		$options['groupids'] = $groupids;
 	}
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;

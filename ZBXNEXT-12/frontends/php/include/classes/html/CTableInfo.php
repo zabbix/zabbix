@@ -72,7 +72,7 @@ class CTableInfo extends CTable {
 		return $this;
 	}
 
-	public function endToString() {
+	protected function endToString() {
 		$ret = '';
 		if ($this->rownum == 0 && $this->message !== null) {
 			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();

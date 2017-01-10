@@ -30,22 +30,22 @@ abstract class ItemChecker
 {
 	private static final Logger logger = LoggerFactory.getLogger(ItemChecker.class);
 
-	public static final String JSON_TAG_CONN = "conn";
-	public static final String JSON_TAG_DATA = "data";
-	public static final String JSON_TAG_ERROR = "error";
-	public static final String JSON_TAG_KEYS = "keys";
-	public static final String JSON_TAG_PASSWORD = "password";
-	public static final String JSON_TAG_PORT = "port";
-	public static final String JSON_TAG_REQUEST = "request";
-	public static final String JSON_TAG_RESPONSE = "response";
-	public static final String JSON_TAG_USERNAME = "username";
-	public static final String JSON_TAG_VALUE = "value";
+	static final String JSON_TAG_CONN = "conn";
+	static final String JSON_TAG_DATA = "data";
+	static final String JSON_TAG_ERROR = "error";
+	static final String JSON_TAG_KEYS = "keys";
+	static final String JSON_TAG_PASSWORD = "password";
+	static final String JSON_TAG_PORT = "port";
+	static final String JSON_TAG_REQUEST = "request";
+	static final String JSON_TAG_RESPONSE = "response";
+	static final String JSON_TAG_USERNAME = "username";
+	static final String JSON_TAG_VALUE = "value";
 
-	public static final String JSON_REQUEST_INTERNAL = "java gateway internal";
-	public static final String JSON_REQUEST_JMX = "java gateway jmx";
+	static final String JSON_REQUEST_INTERNAL = "java gateway internal";
+	static final String JSON_REQUEST_JMX = "java gateway jmx";
 
-	public static final String JSON_RESPONSE_FAILED = "failed";
-	public static final String JSON_RESPONSE_SUCCESS = "success";
+	static final String JSON_RESPONSE_FAILED = "failed";
+	static final String JSON_RESPONSE_SUCCESS = "success";
 
 	protected JSONObject request;
 	protected ArrayList<String> keys;
@@ -68,7 +68,7 @@ abstract class ItemChecker
 		}
 	}
 
-	public JSONArray getValues() throws ZabbixException
+	JSONArray getValues() throws ZabbixException
 	{
 		JSONArray values = new JSONArray();
 

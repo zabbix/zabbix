@@ -29,11 +29,11 @@ class ConfigurationManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
 
-	public static final String PID_FILE = "pidFile"; // has to be parsed first so that we remove the file if other parameters are bad
-	public static final String LISTEN_IP = "listenIP";
-	public static final String LISTEN_PORT = "listenPort";
-	public static final String START_POLLERS = "startPollers";
-	public static final String TIMEOUT = "timeout";
+	static final String PID_FILE = "pidFile"; // has to be parsed first so that we remove the file if other parameters are bad
+	static final String LISTEN_IP = "listenIP";
+	static final String LISTEN_PORT = "listenPort";
+	static final String START_POLLERS = "startPollers";
+	static final String TIMEOUT = "timeout";
 
 	private static ConfigurationParameter[] parameters =
 	{
@@ -41,6 +41,7 @@ class ConfigurationManager
 				null,
 				new PostInputValidator()
 				{
+					@Override
 					public void execute(Object value)
 					{
 						logger.debug("received {} configuration parameter, daemonizing", PID_FILE);
@@ -75,7 +76,7 @@ class ConfigurationManager
 				null)
 	};
 
-	public static void parseConfiguration()
+	static void parseConfiguration()
 	{
 		logger.debug("starting to parse configuration parameters");
 
@@ -93,7 +94,7 @@ class ConfigurationManager
 		logger.debug("finished parsing configuration parameters");
 	}
 
-	public static ConfigurationParameter getParameter(String name)
+	static ConfigurationParameter getParameter(String name)
 	{
 		for (ConfigurationParameter parameter : parameters)
 			if (parameter.getName().equals(name))
@@ -102,12 +103,12 @@ class ConfigurationManager
 		throw new IllegalArgumentException("unknown configuration parameter: '" + name + "'");
 	}
 
-	public static int getIntegerParameterValue(String name)
+	static int getIntegerParameterValue(String name)
 	{
 		return (Integer)getParameter(name).getValue();
 	}
 
-	public static String getPackage()
+	static String getPackage()
 	{
 		return "com.zabbix.gateway";
 	}

@@ -39,11 +39,6 @@ check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
-	DBstart();
-	add_audit_details(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', _('Manual Logout'),
-		CWebUser::$data['userid']
-	);
-	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
 }
@@ -71,10 +66,11 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 
 	if ($loginSuccess) {
 		// save remember login preference
-		$user = ['autologin' => $autoLogin];
-
 		if (CWebUser::$data['autologin'] != $autoLogin) {
-			API::User()->updateProfile($user);
+			API::User()->update([
+				'userid' => CWebUser::$data['userid'],
+				'autologin' => $autoLogin
+			]);
 		}
 
 		$request = getRequest('request');

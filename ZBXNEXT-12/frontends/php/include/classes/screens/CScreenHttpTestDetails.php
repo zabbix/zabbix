@@ -103,8 +103,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 			$status['afterError'] = false;
 
 			if (!array_key_exists('lastfailedstep', $httptest_data)) {
-				$status['msg'] = _('Never executed');
-				$status['style'] = ZBX_STYLE_GREY;
+				$status['msg'] = '';
 			}
 			elseif ($httptest_data['lastfailedstep'] != 0) {
 				if ($httptest_data['lastfailedstep'] == $step_data['no']) {
@@ -175,19 +174,17 @@ class CScreenHttpTestDetails extends CScreenBase {
 			]);
 		}
 
+
 		if (!array_key_exists('lastfailedstep', $httptest_data)) {
-			$status['msg'] = _('Never executed');
-			$status['style'] = ZBX_STYLE_GREY;
+			$status_info = '';
 		}
 		elseif ($httptest_data['lastfailedstep'] != 0) {
-			$status['msg'] = ($httptest_data['error'] === null)
-				? _('Unknown error')
-				: _s('Error: %1$s', $httptest_data['error']);
-			$status['style'] = ZBX_STYLE_RED;
+			$status_info = (new CSpan(
+				($httptest_data['error'] === null) ? _('Unknown error') : _s('Error: %1$s', $httptest_data['error'])
+			))->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$status['msg'] = _('OK');
-			$status['style'] = ZBX_STYLE_GREEN;
+			$status_info = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
 		}
 
 		$table->addRow([
@@ -195,7 +192,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 			'',
 			bold(($total_time['value']) ? formatHistoryValue($total_time['value'], $total_time) : UNKNOWN_VALUE),
 			'',
-			(new CSpan($status['msg']))->addClass($status['style'])
+			$status_info
 		]);
 
 		return $this->getOutput($table);

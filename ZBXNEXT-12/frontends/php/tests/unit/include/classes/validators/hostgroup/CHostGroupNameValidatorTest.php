@@ -94,22 +94,6 @@ class CHostGroupNameValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				'name' => 'AAAA/BBBB/////CCC',
 				'message' => 'invalid group name "AAAA/BBBB/////CCC"'
-			],
-			[
-				'name' => '*',
-				'message' => 'invalid group name "*"'
-			],
-			[
-				'name' => 'A*',
-				'message' => 'invalid group name "A*"'
-			],
-			[
-				'name' => 'A/*',
-				'message' => 'invalid group name "A/*"'
-			],
-			[
-				'name' => '*A',
-				'message' => 'invalid group name "*A"'
 			]
 		];
 	}

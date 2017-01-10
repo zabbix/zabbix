@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="delayFlexRow">
 	<tr class="form_row">
 		<td>
-			<ul class="radio-segmented" id="delay_flex_#{rowNum}_type">
+			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
 				<li>
 					<input type="radio" id="delay_flex_#{rowNum}_type_0" name="delay_flex[#{rowNum}][type]" value="0" checked="checked">
 					<label for="delay_flex_#{rowNum}_type_0"><?= _('Flexible') ?></label>

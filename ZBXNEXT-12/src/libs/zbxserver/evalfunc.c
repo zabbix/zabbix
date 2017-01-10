@@ -2881,10 +2881,12 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *                                                                            *
  * Purpose: evaluate function used as a macro (e.g., in notifications)        *
  *                                                                            *
- * Parameters: host - host the key belongs to                                 *
- *             key - item's key (for example, 'system.cpu.load[,avg1]')       *
- *             function - function (for example, 'max')                       *
- *             parameter - parameter of the function                          *
+ * Parameters: value     - [OUT] evaluation result (if it's successful)       *
+ *             host      - [IN] host the key belongs to                       *
+ *             key       - [IN] item's key                                    *
+ *                              (for example, 'system.cpu.load[,avg1]')       *
+ *             function  - [IN] function name (for example, 'max')            *
+ *             parameter - [IN] function parameter list                       *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
@@ -2897,7 +2899,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 {
 	const char	*__function_name = "evaluate_macro_function";
 
-	zbx_host_key_t	host_key = {host, key};
+	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
 	char		*error = NULL;
 	int		ret = FAIL, errcode;

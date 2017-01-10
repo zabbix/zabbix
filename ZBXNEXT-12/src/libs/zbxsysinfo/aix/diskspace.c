@@ -161,7 +161,7 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*fsname, *mode;
 
@@ -194,6 +194,11 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 
 	return SYSINFO_RET_FAIL;
+}
+
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
 }
 
 static const char	*zbx_get_vfs_name_by_type(int type)

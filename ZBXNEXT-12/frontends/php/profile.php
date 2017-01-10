@@ -119,18 +119,33 @@ elseif (hasRequest('update')) {
 		show_error_message(_('Password should not be empty'));
 	}
 	else {
-		$user = [];
-		$user['userid'] = CWebUser::$data['userid'];
-		$user['alias'] = CWebUser::$data['alias'];
-		$user['passwd'] = getRequest('password1');
-		$user['url'] = getRequest('url');
-		$user['autologin'] = getRequest('autologin', 0);
-		$user['autologout'] = hasRequest('autologout_visible') ? getRequest('autologout') : 0;
-		$user['theme'] = getRequest('theme');
-		$user['refresh'] = getRequest('refresh');
-		$user['rows_per_page'] = getRequest('rows_per_page');
-		$user['user_groups'] = null;
-		$user['user_medias'] = getRequest('user_medias', []);
+		$user = [
+			'userid' => CWebUser::$data['userid'],
+			'url' => getRequest('url'),
+			'autologin' => getRequest('autologin', 0),
+			'autologout' => hasRequest('autologout_visible') ? getRequest('autologout') : 0,
+			'theme' => getRequest('theme'),
+			'refresh' => getRequest('refresh'),
+			'rows_per_page' => getRequest('rows_per_page')
+		];
+
+		if (hasRequest('password1')) {
+			$user['passwd'] = getRequest('password1');
+		}
+
+		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$user['user_medias'] = [];
+
+			foreach (getRequest('user_medias', []) as $media) {
+				$user['user_medias'][] = [
+					'mediatypeid' => $media['mediatypeid'],
+					'sendto' => $media['sendto'],
+					'active' => $media['active'],
+					'severity' => $media['severity'],
+					'period' => $media['period']
+				];
+			}
+		}
 
 		if (hasRequest('lang')) {
 			$user['lang'] = getRequest('lang');
@@ -150,14 +165,7 @@ elseif (hasRequest('update')) {
 		DBstart();
 		updateMessageSettings($messages);
 
-		$result = API::User()->updateProfile($user);
-
-		if ($result && CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$result = API::User()->updateMedia([
-				'users' => $user,
-				'medias' => $user['user_medias']
-			]);
-		}
+		$result = (bool) API::User()->update($user);
 
 		$result = DBend($result);
 		if (!$result) {
@@ -165,12 +173,6 @@ elseif (hasRequest('update')) {
 		}
 
 		if ($result) {
-			DBstart();
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
-				'User alias ['.CWebUser::$data['alias'].'] Name ['.CWebUser::$data['name'].']'.
-				' Surname ['.CWebUser::$data['surname'].'] profile id ['.CWebUser::$data['userid'].']'
-			);
-			DBend(true);
 			ob_end_clean();
 
 			redirect(ZBX_DEFAULT_URL);

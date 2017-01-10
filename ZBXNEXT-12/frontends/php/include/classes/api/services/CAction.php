@@ -1392,6 +1392,7 @@ class CAction extends CApiService {
 
 		$all_groupids = [];
 		$all_hostids = [];
+		$all_templateids = [];
 		$all_userids = [];
 		$all_usrgrpids = [];
 
@@ -1645,7 +1646,7 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
 					}
 
-					$all_hostids = array_merge($all_hostids, $templateids);
+					$all_templateids = array_merge($all_templateids, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1668,26 +1669,21 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($all_groupids && !API::HostGroup()->isWritable($all_groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
-			));
-		}
-		if ($all_hostids && !API::Host()->isWritable($all_hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation host. Host does not exist or you have no access to this host.'
-			));
-		}
-		if ($all_userids && !API::User()->isReadable($all_userids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation user. User does not exist or you have no access to this user.'
-			));
-		}
-		if ($all_usrgrpids && !API::UserGroup()->isReadable($all_usrgrpids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _(
-				'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
-			));
-		}
+		$this->checkHostGroupsPermissions($all_groupids, _(
+			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
+		));
+		$this->checkHostsPermissions($all_hostids,
+			_('Incorrect action operation host. Host does not exist or you have no access to this host.')
+		);
+		$this->checkTemplatesPermissions($all_templateids,
+			_('Incorrect action operation template. Template does not exist or you have no access to this template.')
+		);
+		$this->checkUsersPermissions($all_userids,
+			_('Incorrect action operation user. User does not exist or you have no access to this user.')
+		);
+		$this->checkUserGroupsPermissions($all_usrgrpids, _(
+			'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
+		));
 
 		return true;
 	}
@@ -2668,47 +2664,240 @@ class CAction extends CApiService {
 			}
 		}
 
-		if (!API::HostGroup()->isWritable($hostGroupIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
-			);
+		$this->checkHostGroupsPermissions($hostGroupIdsAll,
+			_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
+		);
+		$this->checkHostsPermissions($hostIdsAll,
+			_('Incorrect action condition host. Host does not exist or you have no access to it.')
+		);
+		$this->checkTemplatesPermissions($templateIdsAll,
+			_('Incorrect action condition template. Template does not exist or you have no access to it.')
+		);
+		$this->checkTriggersPermissions($triggerIdsAll,
+			_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
+		);
+		$this->checkDRulesPermissions($discoveryRuleIdsAll,
+			_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
+		);
+		$this->checkDChecksPermissions($discoveryCheckIdsAll,
+			_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
+		);
+		$this->checkProxiesPermissions($proxyIdsAll,
+			_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
+		);
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 *
+	 * @param array $groupids
+	 * @param tring $error
+	 */
+	private function checkHostGroupsPermissions(array $groupids, $error) {
+		if ($groupids) {
+			$groupids = array_unique($groupids);
+
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids,
+				'editable' => true
+			]);
+
+			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::Host()->isWritable($hostIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition host. Host does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts
+	 *
+	 * @param array $hostids
+	 * @param tring $error
+	 */
+	private function checkHostsPermissions(array $hostids, $error) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::Template()->isWritable($templateIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition template. Template does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given users.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given users
+	 *
+	 * @param array  $userids
+	 * @param string $error
+	 */
+	protected function checkUsersPermissions(array $userids, $error) {
+		if ($userids) {
+			$userids = array_unique($userids);
+
+			$count = API::User()->get([
+				'countOutput' => true,
+				'userids' => $userids
+			]);
+
+			if ($count != count($userids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::Trigger()->isWritable($triggerIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given user groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given user groups
+	 *
+	 * @param array  $usrgrpids
+	 * @param string $error
+	 */
+	protected function checkUserGroupsPermissions(array $usrgrpids, $error) {
+		if ($usrgrpids) {
+			$usrgrpids = array_unique($usrgrpids);
+
+			$count = API::UserGroup()->get([
+				'countOutput' => true,
+				'usrgrpids' => $usrgrpids
+			]);
+
+			if ($count != count($usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given templates.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given templates
+	 *
+	 * @param array  $templateids
+	 * @param string $error
+	 */
+	protected function checkTemplatesPermissions(array $templateids, $error) {
+		if ($templateids) {
+			$templateids = array_unique($templateids);
+
+			$count = API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
+
+			if ($count != count($templateids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given triggers.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given triggers
+	 *
+	 * @param array  $triggerids
+	 * @param string $error
+	 */
+	protected function checkTriggersPermissions(array $triggerids, $error) {
+		if ($triggerids) {
+			$triggerids = array_unique($triggerids);
+
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids,
+				'editable' => true
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
-		if (!API::Proxy()->isWritable($proxyIdsAll)) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-			);
+	}
+
+	/**
+	 * Checks if the current user has access to the given discovery rules.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given discovery rules
+	 *
+	 * @param array  $druleids
+	 * @param string $error
+	 */
+	protected function checkDRulesPermissions(array $druleids, $error) {
+		if ($druleids) {
+			$druleids = array_unique($druleids);
+
+			$count = API::DRule()->get([
+				'countOutput' => true,
+				'druleids' => $druleids,
+				'editable' => true
+			]);
+
+			if ($count != count($druleids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given discovery checks.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given discovery checks
+	 *
+	 * @param array  $dcheckids
+	 * @param string $error
+	 */
+	protected function checkDChecksPermissions(array $dcheckids, $error) {
+		if ($dcheckids) {
+			$dcheckids = array_unique($dcheckids);
+
+			$count = API::DCheck()->get([
+				'countOutput' => true,
+				'dcheckids' => $dcheckids,
+				'editable' => true
+			]);
+
+			if ($count != count($dcheckids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given proxies.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given proxies
+	 *
+	 * @param array  $proxyids
+	 * @param string $error
+	 */
+	protected function checkProxiesPermissions(array $proxyids, $error) {
+		if ($proxyids) {
+			$proxyids = array_unique($proxyids);
+
+			$count = API::Proxy()->get([
+				'countOutput' => true,
+				'proxyids' => $proxyids,
+				'editable' => true
+			]);
+
+			if ($count != count($proxyids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 	}
 }

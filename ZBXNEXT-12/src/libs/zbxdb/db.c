@@ -95,13 +95,16 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 #elif defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
+#include "zbxalgo.h"
+
 typedef struct
 {
-	OCIEnv		*envhp;
-	OCIError	*errhp;
-	OCISvcCtx	*svchp;
-	OCIServer	*srvhp;
-	OCIStmt		*stmthp;	/* the statement handle for execute operations */
+	OCIEnv			*envhp;
+	OCIError		*errhp;
+	OCISvcCtx		*svchp;
+	OCIServer		*srvhp;
+	OCIStmt			*stmthp;	/* the statement handle for execute operations */
+	zbx_vector_ptr_t	db_results;
 }
 zbx_oracle_db_handle_t;
 
@@ -127,6 +130,8 @@ static ZBX_MUTEX		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result(DB_RESULT result);
+
 static const char	*zbx_oci_error(sword status, sb4 *err)
 {
 	static char	errbuf[512];
@@ -288,6 +293,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
+	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
 	int		rc;
 	char		*cport = NULL;
@@ -434,11 +440,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
-	if (NULL == getenv("NLS_LANG"))
-		putenv("NLS_LANG=.UTF8");
-#endif
 	memset(&oracle, 0, sizeof(oracle));
+
+	zbx_vector_ptr_create(&oracle.db_results);
 
 	/* connection string format: [//]host[:port][/service name] */
 
@@ -453,15 +457,29 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	else
 		ret = ZBX_DB_FAIL;
 
-	if (ZBX_DB_OK == ret)
+	while (ZBX_DB_OK == ret)
 	{
 		/* initialize environment */
-		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+		if (OCI_SUCCESS == (err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT, (dvoid *)0,
+				(dvoid * (*)(dvoid *,size_t))0, (dvoid * (*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0, csid, csid)))
+		{
+			if (0 != csid)
+				break;	/* environment with UTF8 character set successfully created */
 
-		if (OCI_SUCCESS != err)
+			/* try to find out the id of UTF8 character set */
+			if (0 == (csid = OCINlsCharSetNameToId(oracle.envhp, (const oratext *)"UTF8")))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Cannot find out the ID of \"UTF8\" character set."
+						" Relying on current \"NLS_LANG\" settings.");
+				break;	/* use default environment with character set derived from NLS_LANG */
+			}
+
+			/* get rid of this environment to create a better one on the next iteration */
+			OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+			oracle.envhp = NULL;
+		}
+		else
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
 			ret = ZBX_DB_FAIL;
@@ -700,6 +718,19 @@ void	zbx_db_close(void)
 		conn = NULL;
 	}
 #elif defined(HAVE_ORACLE)
+	if (0 != oracle.db_results.values_num)
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
+
+		for (i = 0; i < oracle.db_results.values_num; i++)
+		{
+			/* deallocate all handles before environment is deallocated */
+			OCI_DBclean_result(oracle.db_results.values[i]);
+		}
+	}
+
 	/* deallocate statement handle */
 	if (NULL != oracle.stmthp)
 	{
@@ -719,17 +750,20 @@ void	zbx_db_close(void)
 		oracle.errhp = NULL;
 	}
 
-	if (NULL != oracle.envhp)
-	{
-		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-		oracle.envhp = NULL;
-	}
-
 	if (NULL != oracle.srvhp)
 	{
 		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
 		oracle.srvhp = NULL;
 	}
+
+	if (NULL != oracle.envhp)
+	{
+		/* delete the environment handle, which deallocates all other handles associated with it */
+		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+		oracle.envhp = NULL;
+	}
+
+	zbx_vector_ptr_destroy(&oracle.db_results);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != conn)
 	{
@@ -1410,6 +1444,7 @@ error:
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	memset(result, 0, sizeof(struct zbx_db_result));
+	zbx_vector_ptr_append(&oracle.db_results, result);
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
@@ -1727,8 +1762,31 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return (DB_ROW)mysql_fetch_row(result->result);
 #elif defined(HAVE_ORACLE)
+	if (NULL == result->stmthp)
+		return NULL;
+
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
+
+	if (OCI_SUCCESS != rc)
+	{
+		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
+				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
+		{
+			zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
+			return NULL;
+		}
+
+		switch (errcode)
+		{
+			case 1012:	/* ORA-01012: not logged on */
+			case 2396:	/* ORA-02396: exceeded maximum idle time */
+			case 3113:	/* ORA-03113: end-of-file on communication channel */
+			case 3114:	/* ORA-03114: not connected to ORACLE */
+				zabbix_errlog(ERR_Z3006, errcode, errbuf);
+				return NULL;
+		}
+	}
 
 	for (i = 0; i < result->ncolumn; i++)
 	{
@@ -1775,26 +1833,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		}
 
 		result->values[i][amount] = '\0';
-	}
-
-	if (OCI_SUCCESS == rc)
-		return result->values;
-
-	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
-			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
-	{
-		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
-		return NULL;
-	}
-
-	switch (errcode)
-	{
-		case 1012:	/* ORA-01012: not logged on */
-		case 2396:	/* ORA-02396: exceeded maximum idle time */
-		case 3113:	/* ORA-03113: end-of-file on communication channel */
-		case 3114:	/* ORA-03114: not connected to ORACLE */
-			zabbix_errlog(ERR_Z3006, errcode, errbuf);
-			return NULL;
 	}
 
 	return result->values;
@@ -1859,6 +1897,41 @@ int	zbx_db_is_null(const char *field)
 	return FAIL;
 }
 
+#if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+		{
+			zbx_free(result->values[i]);
+
+			/* deallocate the lob locator variable */
+			if (NULL != result->clobs[i])
+			{
+				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
+				result->clobs[i] = NULL;
+			}
+		}
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
+	}
+
+	if (result->stmthp)
+	{
+		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
+		result->stmthp = NULL;
+	}
+}
+#endif
+
 void	DBfree_result(DB_RESULT result)
 {
 #if defined(HAVE_IBM_DB2)
@@ -1890,32 +1963,21 @@ void	DBfree_result(DB_RESULT result)
 	mysql_free_result(result->result);
 	zbx_free(result);
 #elif defined(HAVE_ORACLE)
+	int i;
+
 	if (NULL == result)
 		return;
 
-	if (NULL != result->values)
+	OCI_DBclean_result(result);
+
+	for (i = 0; i < oracle.db_results.values_num; i++)
 	{
-		int	i;
-
-		for (i = 0; i < result->ncolumn; i++)
+		if (oracle.db_results.values[i] == result)
 		{
-			zbx_free(result->values[i]);
-
-			/* deallocate the lob locator variable */
-			if (NULL != result->clobs[i])
-			{
-				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
-				result->clobs[i] = NULL;
-			}
+			zbx_vector_ptr_remove_noorder(&oracle.db_results, i);
+			break;
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
-
-	if (result->stmthp)
-		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 
 	zbx_free(result);
 #elif defined(HAVE_POSTGRESQL)
@@ -2114,7 +2176,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return dst;
 }
 
-#ifndef HAVE_IBM_DB2
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_MYSQL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_dyn_escape_string_len                                     *
@@ -2139,9 +2201,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
 			break;
 
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
@@ -2164,8 +2224,8 @@ out:
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Comments: This function is used to escape strings for IBM DB2 where fields *
- *           are limited by bytes rather than characters.                     *
+ * Comments: This function is used to escape strings where fields are         *
+ *           limited by bytes rather than characters.                         *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
@@ -2188,7 +2248,11 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (max_src_len < csize)
 			break;
 
+#ifdef HAVE_MYSQL
+		if ('\'' == *s || '\\' == *s)
+#else
 		if ('\'' == *s)
+#endif
 			len++;
 
 		s += csize;

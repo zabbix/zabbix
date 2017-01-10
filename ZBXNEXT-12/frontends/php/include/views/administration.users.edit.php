@@ -242,7 +242,9 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			(new CRow([
 				$media['description'],
 				$media['sendto'],
-				$media['period'],
+				(new CDiv($media['period']))
+					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 				$mediaSeverity,
 				$status,
 				(new CCol(
@@ -304,11 +306,9 @@ if ($this->data['is_profile']) {
 
 	$triggersTable = (new CTable())
 		->addRow([
-			new CLabel([
-				(new CCheckBox('messages[triggers.recovery]'))
-					->setChecked($this->data['messages']['triggers.recovery'] == 1),
-				_('Recovery')], 'messages[triggers.recovery]'
-			),
+			(new CCheckBox('messages[triggers.recovery]'))
+				->setLabel(_('Recovery'))
+				->setChecked($this->data['messages']['triggers.recovery'] == 1),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -340,11 +340,9 @@ if ($this->data['is_profile']) {
 		}
 
 		$triggersTable->addRow([
-			new CLabel([
-				(new CCheckBox('messages[triggers.severities]['.$severity.']'))
-					->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
-				getSeverityName($severity, $this->data['config'])], 'messages[triggers.severities]['.$severity.']'
-			),
+			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
+				->setLabel(getSeverityName($severity, $this->data['config']))
+				->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -399,13 +397,17 @@ if (!$data['is_profile']) {
 		->setHeader([_('Host group'), _('Permissions')]);
 
 	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-		$permissions_table->addRow(['*', permissionText(PERM_READ_WRITE)]);
+		$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
 	}
 	else {
 		foreach ($data['groups_rights'] as $groupid => $group_rights) {
-			$group_name = $group_rights['name'];
 			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
-				$group_name .= ($groupid == 0) ? '*' : '/*';
+				$group_name = ($groupid == 0)
+					? italic(_('All groups'))
+					: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
+			}
+			else {
+				$group_name = $group_rights['name'];
 			}
 			$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
 		}

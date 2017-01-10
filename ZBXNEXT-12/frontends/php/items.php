@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -33,7 +34,6 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
@@ -200,7 +200,7 @@ $itemId = getRequest('itemid');
 if ($itemId) {
 	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['status'],
+		'selectHosts' => ['hostid', 'status'],
 		'itemids' => $itemId,
 		'editable' => true
 	]);
@@ -213,7 +213,7 @@ else {
 	$hostId = getRequest('hostid');
 	if ($hostId) {
 		$hosts = API::Host()->get([
-			'output' => ['status'],
+			'output' => ['hostid', 'status'],
 			'hostids' => $hostId,
 			'templated_hosts' => true,
 			'editable' => true
@@ -224,13 +224,10 @@ else {
 	}
 }
 
-$filterGroupId = getRequest('filter_groupid');
-if ($filterGroupId && !API::HostGroup()->isWritable([$filterGroupId])) {
+if (getRequest('filter_groupid') && !isWritableHostGroups([getRequest('filter_groupid')])) {
 	access_deny();
 }
-
-$filterHostId = getRequest('filter_hostid');
-if ($filterHostId && !API::Host()->isWritable([$filterHostId])) {
+if (getRequest('filter_hostid') && !isWritableHostTemplates([getRequest('filter_hostid')])) {
 	access_deny();
 }
 
@@ -1157,7 +1154,6 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['itemids'],
-		'selectItems' => ['itemid'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	]);
 	$hostCount = count($data['hosts']);
@@ -1200,7 +1196,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 			// set the initial chosen interface to one of the interfaces the items use
 			$items = API::Item()->get([
-				'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+				'itemids' => $data['itemids'],
 				'output' => ['itemid', 'type']
 			]);
 			$usedInterfacesTypes = [];

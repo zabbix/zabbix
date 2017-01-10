@@ -45,7 +45,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
-	'screenid' =>		[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
+	'screenid' =>		[T_ZBX_INT, O_NO,  P_SYS,	DB_ID,
+		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
+	],
 	'templateid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'hsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_MIN_SIZE, SCREEN_MAX_SIZE),
@@ -204,6 +206,36 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Screen added');
 		$messageFailed = _('Cannot add screen');
+
+		if (getRequest('form') === 'full_clone') {
+			$output = ['resourcetype', 'resourceid', 'width', 'height', 'x', 'y', 'colspan', 'rowspan', 'elements',
+				'valign', 'haligh', 'style', 'url', 'max_columns'
+			];
+
+			if (hasRequest('templateid')) {
+				$screen['screenitems'] = API::TemplateScreenItem()->get([
+					'output' => $output,
+					'screenids' => [getRequest('screenid')]
+				]);
+			}
+			else {
+				array_push($output, 'dynamic', 'sort_triggers', 'application');
+
+				$screen['screenitems'] = API::ScreenItem()->get([
+					'output' => $output,
+					'screenids' => [getRequest('screenid')]
+				]);
+			}
+
+			$max_x = $screen['hsize'] - 1;
+			$max_y = $screen['vsize'] - 1;
+
+			foreach ($screen['screenitems'] as $key => $screen_item) {
+				if ($screen_item['x'] > $max_x || $screen_item['y'] > $max_y) {
+					unset($screen['screenitems'][$key]);
+				}
+			}
+		}
 
 		if (hasRequest('templateid')) {
 			$screen['templateid'] = getRequest('templateid');

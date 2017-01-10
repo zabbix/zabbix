@@ -158,13 +158,13 @@ class CFilter extends CTag {
 		return $buttons;
 	}
 
-	public function startToString() {
+	protected function startToString() {
 		$ret = $this->getHeader()->toString();
 		$ret .= parent::startToString();
 		return $ret;
 	}
 
-	public function endToString() {
+	protected function endToString() {
 		$this->form->addItem($this->getTable());
 
 		if ($this->show_buttons) {

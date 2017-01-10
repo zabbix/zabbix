@@ -25,6 +25,7 @@
 #define SMBIOS_STATUS_OK	3
 
 #define DEV_MEM			"/dev/mem"
+#define SYS_TABLE_FILE		"/sys/firmware/dmi/tables/DMI"
 #define SMBIOS_ENTRY_POINT_SIZE	0x20
 #define DMI_HEADER_SIZE		4
 

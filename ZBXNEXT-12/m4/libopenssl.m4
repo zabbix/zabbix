@@ -28,7 +28,10 @@ AC_TRY_LINK(
 ],
 [
 	/* check that both libssl and libcrypto are available */
-	SSL_library_init();	/* a function from libssl */
+
+	SSL	*ssl = NULL;
+
+	SSL_connect(ssl);	/* a function from libssl, present in both OpenSSL 1.0.1 and 1.1.0 */
 	BIO_new(BIO_s_mem());	/* a function from libcrypto */
 ],
 found_openssl="yes",)

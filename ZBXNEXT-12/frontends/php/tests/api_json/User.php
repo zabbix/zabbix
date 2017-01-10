@@ -42,14 +42,14 @@ class API_JSON_User extends CZabbixTest {
 				'user' => [
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user "".'
+				'expected_error' => 'Invalid parameter "/1": the parameter "alias" is missing.'
 			],
 			[
 				'user' => [
 					'alias' => 'Test User 1'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user "Test User 1".'
+				'expected_error' => 'Invalid parameter "/1": the parameter "passwd" is missing.'
 			],
 			[
 				'user' => [
@@ -57,14 +57,14 @@ class API_JSON_User extends CZabbixTest {
 					'passwd' => 'zabbix'
 				],
 				'success_expected' => false,
-				'expected_error' => 'Wrong fields for user "Test User 1".'
+				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
 			],
 			[
 				'user' => [
 					'alias' => 'Test User 1',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
-						'usrgrpid' => 7 // Zabbix administrators
+						['usrgrpid' => 7] // Zabbix administrators
 					]
 				],
 				'success_expected' => true,
@@ -75,7 +75,7 @@ class API_JSON_User extends CZabbixTest {
 					'alias' => 'УТФ Юзер',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
-						'usrgrpid' => 7 // Zabbix administrators
+						['usrgrpid' => 7] // Zabbix administrators
 					]
 				],
 				'success_expected' => true,
@@ -86,7 +86,7 @@ class API_JSON_User extends CZabbixTest {
 					'alias' => 'Admin',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
-						'usrgrpid' => 7 // Zabbix administrators
+						['usrgrpid' => 7] // Zabbix administrators
 					]
 				],
 				'success_expected' => false,
@@ -97,7 +97,7 @@ class API_JSON_User extends CZabbixTest {
 					'alias' => 'Test User 2',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
-						'usrgrpid' => 7 // Zabbix administrators
+						['usrgrpid' => 7] // Zabbix administrators
 					],
 					'name' => 'Test User 2 Name',
 					'surname' => 'Test User 2 Surname',
@@ -122,7 +122,7 @@ class API_JSON_User extends CZabbixTest {
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => 'Value "qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm" is too long for field "alias" - 104 characters. Allowed length is 100 characters.'
+				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
 			]
 		];
 	}

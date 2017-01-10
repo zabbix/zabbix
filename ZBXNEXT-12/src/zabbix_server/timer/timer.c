@@ -199,14 +199,47 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	return &(*hm)[hm_index];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_maintenance_groups                                           *
+ *                                                                            *
+ * Purpose: get groups (including nested groups) assigned to a maintenance    *
+ *          period                                                            *
+ *                                                                            *
+ * Parameters: maintenanceid - [IN] the maintenance period id                 *
+ *             groupids      - [OUT] the group ids                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_maintenance_groups(zbx_uint64_t maintenanceid, zbx_vector_uint64_t *groupids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	parent_groupids;
+
+	zbx_vector_uint64_create(&parent_groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select groupid from maintenances_groups where maintenanceid=" ZBX_FS_UI64, maintenanceid);
+
+	DBselect_uint64(sql, &parent_groupids);
+
+	zbx_dc_get_nested_hostgroupids(parent_groupids.values, parent_groupids.values_num, groupids);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&parent_groupids);
+}
+
 static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
 		time_t maintenance_from, zbx_uint64_t maintenanceid, int maintenance_type)
 {
-	const char	*__function_name = "process_maintenance_hosts";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	host_hostid, host_maintenanceid;
-	int		host_maintenance_status, host_maintenance_type, host_maintenance_from;
+	const char		*__function_name = "process_maintenance_hosts";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		host_hostid, host_maintenanceid;
+	int			host_maintenance_status, host_maintenance_type, host_maintenance_from;
+	zbx_vector_uint64_t	groupids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -236,30 +269,44 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	}
 	DBfree_result(result);
 
-	result = DBselect(
-			"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
-				"h.maintenance_type,h.maintenance_from"
-			" from maintenances_groups mg,hosts_groups hg,hosts h"
-			" where mg.groupid=hg.groupid"
-				" and hg.hostid=h.hostid"
-				" and h.status in (%d,%d)"
-				" and mg.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			maintenanceid);
+	/* get hosts by assigned maintenance groups */
 
-	while (NULL != (row = DBfetch(result)))
+	zbx_vector_uint64_create(&groupids);
+	get_maintenance_groups(maintenanceid, &groupids);
+
+	if (0 != groupids.values_num)
 	{
-		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_DBROW2UINT64(host_maintenanceid, row[2]);
-		host_maintenance_status = atoi(row[3]);
-		host_maintenance_type = atoi(row[4]);
-		host_maintenance_from = atoi(row[5]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
+					"h.maintenance_type,h.maintenance_from"
+				" from hosts_groups hg,hosts h"
+				" where hg.hostid=h.hostid"
+					" and h.status in (%d,%d)"
+					" and",
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
-		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
-				maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
-				host_maintenance_from);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
+				groupids.values_num);
+
+		result = DBselect("%s", sql);
+
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&groupids);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(host_hostid, row[0]);
+			ZBX_DBROW2UINT64(host_maintenanceid, row[2]);
+			host_maintenance_status = atoi(row[3]);
+			host_maintenance_type = atoi(row[4]);
+			host_maintenance_from = atoi(row[5]);
+
+			get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
+					maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
+					host_maintenance_from);
+		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

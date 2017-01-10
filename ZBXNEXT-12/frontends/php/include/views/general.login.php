@@ -53,10 +53,9 @@ global $ZBX_SERVER_NAME;
 					])
 					->addItem([new CLabel(_('Password'), 'password'), (new CTextBox('password'))->setType('password')])
 					->addItem(
-						new CLabel([
-							(new CCheckBox('autologin'))->setChecked(getRequest('autologin', 1) == 1),
-							_('Remember me for 30 days')
-						], 'autologin')
+						(new CCheckBox('autologin'))
+							->setLabel(_('Remember me for 30 days'))
+							->setChecked(getRequest('autologin', 1) == 1)
 					)
 					->addItem(new CSubmit('enter', _('Sign in')))
 					->addItem($guest)

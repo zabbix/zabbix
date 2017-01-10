@@ -60,6 +60,9 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int 
 	if (NULL != info && '\0' != *info)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
 
+	if (0 != (protocol & ZBX_TCP_COMPONENT_VERSION))
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))

@@ -107,9 +107,7 @@ class testFormMap extends CWebTest {
 			$this->zbxTestClickWait('gridautoalign');
 		}
 
-		$this->zbxTestClickWait('sysmap_update');
-		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::alertIsPresent());
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestClickAndAcceptAlert('sysmap_update');
 
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
 		$db_map = DBfetch($db_result);

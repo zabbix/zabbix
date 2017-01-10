@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -140,19 +141,24 @@ if ($triggerId !== null) {
 $triggerIds = getRequest('g_triggerid', []);
 $triggerIds = zbx_toArray($triggerIds);
 
-if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
-	access_deny();
+if ($triggerIds) {
+	$triggerIds = array_unique($triggerIds);
+
+	$count = API::Trigger()->get([
+		'countOutput' => true,
+		'triggerids' => $triggerIds,
+		'editable' => true
+	]);
+
+	if ($count != count($triggerIds)) {
+		access_deny();
+	}
 }
 
-// Validate permissions to group.
-$groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable([$groupId])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-
-// Validate permissions to host.
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable([$hostId])) {
+if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -665,7 +671,7 @@ else {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
 		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
+			$options['groupids'] = $data['pageFilter']->groupids;
 		}
 		$data['triggers'] = API::Trigger()->get($options);
 	}

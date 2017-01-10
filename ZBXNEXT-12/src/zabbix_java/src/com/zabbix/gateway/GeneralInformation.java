@@ -21,12 +21,12 @@ package com.zabbix.gateway;
 
 class GeneralInformation
 {
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "13 September 2016";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "3.3.0";
+	static final String APPLICATION_NAME = "Zabbix Java Gateway";
+	static final String REVISION_DATE = "13 September 2016";
+	static final String REVISION = "{ZABBIX_REVISION}";
+	static final String VERSION = "3.3.0";
 
-	public static void printVersion()
+	static void printVersion()
 	{
 		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
 	}
