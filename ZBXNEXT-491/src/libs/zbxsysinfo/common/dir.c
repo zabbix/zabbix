@@ -43,7 +43,7 @@
  *             regex_excl_used - [IN] flag: 0 - ignore 'regex_incl'           *
  *                                                                            *
  * Return value: If filename passes both checks, nonzero value is returned    *
- *               If filename fails to pass, 0 is returned.                    *
+ *               If filename fails to pass, 0 is returned                     *
  *                                                                            *
  ******************************************************************************/
 static int	filename_matches(const char *name, const regex_t *regex_incl, const regex_t *regex_excl,
@@ -69,8 +69,12 @@ static int	filename_matches(const char *name, const regex_t *regex_incl, const r
  *             max_depth - [IN] maximal traversal depth allowed (use -1       *
  *                              for unlimited directory traversal)	      *
  *                                                                            *
+ * Return value: If directory is queued, SUCCEED is returned                  *
+ *               If directory depth is more than allowed traversal depth,     *
+ *               FAIL is returned                                             *
+ *                                                                            *
  ******************************************************************************/
-static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth, int max_depth)
+static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int max_depth)
 {
 	zbx_directory_item_t	*item;
 
@@ -78,10 +82,14 @@ static void	queue_directory(zbx_vector_ptr_t *list, const char *path, int depth,
 	{
 		item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
 		item->depth = depth + 1;
-		item->path = zbx_strdup(NULL, path);
+		item->path = path;
 
 		zbx_vector_ptr_append(list, item);
+
+		return SUCCEED;
 	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -239,10 +247,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
-	item->depth = 0;
-	item->path = dir;
-	zbx_vector_ptr_append(&list, item);
+	queue_directory(&list, dir, -1, max_depth);
 
 #ifndef _WINDOWS
 	if (0 != filename_matches(dir, &regex_incl, &regex_excl, regex_incl_used, regex_excl_used))
@@ -326,7 +331,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 			}
 			else
-				queue_directory(&list, path, item->depth, max_depth);
+			{
+				if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
+					path = NULL;
+			}
 
 			zbx_free(name);
 
@@ -400,7 +408,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 
 				if (0 != S_ISDIR(status.st_mode))
-					queue_directory(&list, path, item->depth, max_depth);
+				{
+					if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
+						path = NULL;
+				}
 			}
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot process directory entry '%s': %s", path,
