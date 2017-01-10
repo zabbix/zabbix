@@ -1276,7 +1276,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 #ifdef _WINDOWS
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *key_severity, *key_source, *key_logeventid, *maxlines_persec, *skip,
-			*str_severity;
+			*str_severity = NULL;
 	int		rate, s_count, p_count, match = SUCCEED, send_err = SUCCEED;
 	char		*value = NULL, *provider = NULL, *source = NULL, str_logeventid[8];
 	zbx_uint64_t	lastlogsize;
