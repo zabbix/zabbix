@@ -97,7 +97,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			if (0 == (tls_accept & sock->connection_type))
 			{
 				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
-						" \"%s\"", zbx_tls_connection_type_name(sock->connection_type), host);
+						" \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host);
 				goto done;
 			}
 
