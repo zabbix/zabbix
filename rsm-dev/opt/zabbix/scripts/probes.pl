@@ -53,6 +53,7 @@ elsif ($OPTS{'disable'}) {
     disable_probe($OPTS{'probe'});
 }
 elsif ($OPTS{'add'}) {
+    create_macro('{$RSM.PROBE.MAX.OFFLINE}', '1h', undef);
     add_probe($OPTS{'probe'}, $OPTS{'ip'});
 }
 
@@ -401,7 +402,7 @@ sub check_probe_data($) {
 
     unless (keys %{$data}) {
 	print $message."\n";
-	exit if !defined($do_exit) or $do_exit != false;
+	exit(1) if !defined($do_exit) or $do_exit != false;
     }
 
     return true;
@@ -418,7 +419,7 @@ sub is_not_empty($$) {
     }
     else {
         print "failed\n";
-        exit if !defined($do_exit) or $do_exit != false;
+        exit(1) if !defined($do_exit) or $do_exit != false;
     }
 }
 

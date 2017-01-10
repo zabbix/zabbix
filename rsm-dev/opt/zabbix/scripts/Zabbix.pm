@@ -27,7 +27,12 @@ sub to_utf8($);
 sub get_authid($);
 sub set_authid($$);
 
-use constant ATTEMPTS => 10;
+use constant _LOGIN_TIMEOUT => 5;
+
+use constant _DEFAULT_REQUEST_TIMEOUT => 60;
+use constant _DEFAULT_REQUEST_ATTEMPTS => 10;
+
+my ($REQUEST_TIMEOUT, $REQUEST_ATTEMPTS);
 
 sub new($$) {
     my ($class, $options) = @_;
@@ -36,7 +41,8 @@ sub new($$) {
 
 #    $ua->ssl_opts(verify_hostname => 0);
 
-    $ua->timeout(60);
+    $REQUEST_TIMEOUT = (defined($options->{request_timeout}) ? $options->{request_timeout} : _DEFAULT_REQUEST_TIMEOUT);
+    $REQUEST_ATTEMPTS = (defined($options->{request_attempts}) ? $options->{request_attempts} : _DEFAULT_REQUEST_ATTEMPTS);
 
     $ua->agent("Net::Zabbix");
 
@@ -50,6 +56,9 @@ sub new($$) {
     $domain =~ s/^https*\:\/\/(.+)\/*$/$1/;
 
     if (my $authid = get_authid($domain)) {
+
+    $ua->timeout($REQUEST_TIMEOUT);
+
 	my $self = {
             UserAgent => $ua,
             request   => $req,
@@ -65,7 +74,7 @@ sub new($$) {
 
     $req->content(encode_json( {
 	    jsonrpc => "2.0",
-    	method => "user.authenticate",
+       method => "user.login",
         params => {
             user => $options->{user},
             password => $options->{password},
@@ -73,26 +82,21 @@ sub new($$) {
         id => 1,
     }));
 
-    my $res;
-    my $attempts = ATTEMPTS;
-    my $sleep = 1;
+    $ua->timeout(_LOGIN_TIMEOUT);
 
-    while ($attempts-- > 0) {
-	$res = $ua->request($req);
+    my $res = $ua->request($req);
 
-	last if ($res->is_success);
-
-	sleep($sleep);
-
-	$sleep *= 1.3;
-	$sleep = 3 if ($sleep > 3);
-    }
+    $ua->timeout($REQUEST_TIMEOUT);
 
     croak "cannot connect to Zabbix: " . $res->status_line unless ($res->is_success);
 
-    my $auth;
-    eval { $auth = decode_json($res->content)->{'result'} };
+    my $result;
+    eval { $result = decode_json($res->content) };
     croak "Zabbix API returned invalid JSON: " . $@ if $@;
+
+    croak "cannot connect to Zabbix: " . $result->{'error'}->{'message'} . ' ' . $result->{'error'}->{'data'} if (defined($result->{'error'}));
+
+    my $auth = $result->{'result'};
 
     set_authid($domain, $auth);
 
@@ -205,7 +209,9 @@ sub objects {
 sub exist {
     my ($self, $class, $params) = @_;
 
-    return $self->__fetch_bool($class, 'exists', $params);
+    $params->{'countOutput'} = true;
+
+    return $self->__fetch_bool($class, 'get', $params);
 }
 
 sub is_readable {
@@ -431,7 +437,7 @@ sub __fetch_bool($$$) {
 
     $self->set_last_error();
 
-    return true if $result->{'result'};
+    return true if ($result->{'result'} != 0);
 
     return false;
 
@@ -450,8 +456,12 @@ sub __send_request {
         id => $self->next_id,
     })));
 
+#    use Data::Dumper;
+#
+#    print("REQUEST:\n", Dumper($req), "\n");
+
     my $res;
-    my $attempts = ATTEMPTS;
+    my $attempts = $REQUEST_ATTEMPTS;
     my $sleep = 1;
 
     while ($attempts-- > 0) {
@@ -467,7 +477,11 @@ sub __send_request {
 
     die("Can't connect to Zabbix: " . $res->status_line) unless ($res->is_success);
 
-    return decode_json($res->content);
+    my $result = decode_json($res->content);
+
+#    print("REPLY:\n", Dumper($result), "\n");
+
+    return $result;
 }
 
 1;

@@ -864,8 +864,8 @@ sub create_main_template {
     foreach my $ns_name (sort keys %{$ns_servers}) {
 	print $ns_name."\n";
 
-        my @ipv4 = defined(@{$ns_servers->{$ns_name}{'v4'}}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
-	my @ipv6 = defined(@{$ns_servers->{$ns_name}{'v6'}}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
+        my @ipv4 = defined($ns_servers->{$ns_name}{'v4'}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
+	my @ipv6 = defined($ns_servers->{$ns_name}{'v6'}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
 
         foreach (my $i_ipv4 = 0; $i_ipv4 <= $#ipv4; $i_ipv4++) {
 	    next unless defined $ipv4[$i_ipv4];
@@ -955,8 +955,8 @@ sub create_slv_ns_items {
     my $hostid = shift;
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
-        my @ipv4 = defined(@{$ns_servers->{$ns_name}{'v4'}}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
-	my @ipv6 = defined(@{$ns_servers->{$ns_name}{'v6'}}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
+        my @ipv4 = defined($ns_servers->{$ns_name}{'v4'}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
+	my @ipv6 = defined($ns_servers->{$ns_name}{'v6'}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
 
         foreach (my $i_ipv4 = 0; $i_ipv4 <= $#ipv4; $i_ipv4++) {
 	    next unless defined $ipv4[$i_ipv4];
@@ -984,17 +984,7 @@ sub create_slv_items {
 
     my $options;
 
-    # NB! Configuration trigger that is used in PHP and C code to detect incident!
-    # priority must be set to 0!
-    $options = { 'description' => 'DNS-AVAIL {HOST.NAME}: 5.2.4 - The service is not available',
-                         'expression' => '({TRIGGER.VALUE}=0&'.
-						'{'.$host_name.':rsm.slv.dns.avail.count(#{$RSM.INCIDENT.DNS.FAIL},0,"eq")}={$RSM.INCIDENT.DNS.FAIL})|'.
-					 '({TRIGGER.VALUE}=1&'.
-						'{'.$host_name.':rsm.slv.dns.avail.count(#{$RSM.INCIDENT.DNS.RECOVER},0,"ne")}<{$RSM.INCIDENT.DNS.RECOVER})',
-                        'priority' => '0',
-                };
-
-    create_trigger($options);
+    create_avail_trigger('dns', '5.2.4', $host_name);
 
     create_slv_item('DNS weekly unavailability', 'rsm.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
@@ -1006,8 +996,7 @@ sub create_slv_items {
         next if ($threshold eq 0);
 
         $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > '.$threshold.'%',
-                         'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}='.$threshold.'|'.
-                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>'.$threshold,
+                         'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>='.$threshold,
                         'priority' => $priority,
                 };
 
@@ -1027,17 +1016,7 @@ sub create_slv_items {
     if (defined($OPTS{'dnssec'})) {
 	create_slv_item('DNSSEC availability', 'rsm.slv.dnssec.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
-	# NB! Configuration trigger that is used in PHP and C code to detect incident!
-	# priority must be set to 0!
-	$options = { 'description' => 'DNSSEC-AVAIL {HOST.NAME}: 5.3.3 - The service is not available',
-		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$RSM.INCIDENT.DNSSEC.FAIL},0,"eq")}={$RSM.INCIDENT.DNSSEC.FAIL})|'.
-			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$RSM.INCIDENT.DNSSEC.RECOVER},0,"ne")}<{$RSM.INCIDENT.DNSSEC.RECOVER})',
-			 'priority' => '0',
-	};
-
-	create_trigger($options);
+	create_avail_trigger('dnssec', '5.3.3', $host_name);
 
 	create_slv_item('DNSSEC weekly unavailability', 'rsm.slv.dnssec.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
@@ -1049,8 +1028,7 @@ sub create_slv_items {
     	    next if ($threshold eq 0);
 
             $options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-                         'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>'.$threshold.'|'.
-					    '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}='.$threshold,
+                         'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>='.$threshold,
                         'priority' => $priority,
                 };
 
@@ -1073,17 +1051,7 @@ sub create_slv_items {
 	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);
 
-	# NB! Configuration trigger that is used in PHP and C code to detect incident!
-	# priority must be set to 0!
-	$options = { 'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
-		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.FAIL},0,"eq")}={$RSM.INCIDENT.RDDS.FAIL})|'.
-			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.RECOVER},0,"ne")}<{$RSM.INCIDENT.RDDS.RECOVER})',
-			 'priority' => '0',
-	};
-
-	create_trigger($options);
+	create_avail_trigger('rdds', '6.2.3', $host_name);
 
 	create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
@@ -1095,8 +1063,7 @@ sub create_slv_items {
     	    next if ($threshold eq 0);
 
             $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-                         'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>'.$threshold.'|'.
-					    '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}='.$threshold,
+                         'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>='.$threshold,
                         'priority' => $priority,
                 };
 
@@ -1128,17 +1095,7 @@ sub create_slv_items {
 	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'rsm.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'rsm.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 
-	# NB! Configuration trigger that is used in PHP and C code to detect incident!
-	# priority must be set to 0!
-	$options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
-		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
-			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
-			 'priority' => '0',
-	};
-
-	create_trigger($options);
+	create_avail_trigger('epp', '7.2.3', $host_name);
 
         my $depend_down;
 
@@ -1148,8 +1105,7 @@ sub create_slv_items {
     	    next if ($threshold eq 0);
 
             $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
-					    '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
+                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>='.$threshold,
                         'priority' => $priority,
                 };
 
@@ -1394,6 +1350,8 @@ sub create_global_macros() {
     create_macro('{$RSM.IP4.MIN.PROBE.ONLINE}', 2, undef);
     create_macro('{$RSM.IP6.MIN.PROBE.ONLINE}', 2, undef);
 
+    create_macro('{$RSM.PROBE.MAX.OFFLINE}', '1h', undef);
+
     create_macro('{$RSM.IP4.MIN.SERVERS}', 4, undef);
     create_macro('{$RSM.IP6.MIN.SERVERS}', 4, undef);
     create_macro('{$RSM.IP4.REPLY.MS}', 500, undef);
@@ -1433,14 +1391,14 @@ sub create_global_macros() {
     create_macro('{$RSM.TRIG.DOWNCOUNT}', '#1', undef);
     create_macro('{$RSM.TRIG.UPCOUNT}', '#3', undef);
 
-    create_macro('{$RSM.INCIDENT.DNS.FAIL}', 3, undef);
-    create_macro('{$RSM.INCIDENT.DNS.RECOVER}', 3, undef);
-    create_macro('{$RSM.INCIDENT.DNSSEC.FAIL}', 3, undef);
-    create_macro('{$RSM.INCIDENT.DNSSEC.RECOVER}', 3, undef);
-    create_macro('{$RSM.INCIDENT.RDDS.FAIL}', 2, undef);
-    create_macro('{$RSM.INCIDENT.RDDS.RECOVER}', 2, undef);
-    create_macro('{$RSM.INCIDENT.EPP.FAIL}', 2, undef);
-    create_macro('{$RSM.INCIDENT.EPP.RECOVER}', 2, undef);
+    create_macro('{$RSM.INCIDENT.DNS.FAIL}', '#3', undef);
+    create_macro('{$RSM.INCIDENT.DNS.RECOVER}', '#3', undef);
+    create_macro('{$RSM.INCIDENT.DNSSEC.FAIL}', '#3', undef);
+    create_macro('{$RSM.INCIDENT.DNSSEC.RECOVER}', '#3', undef);
+    create_macro('{$RSM.INCIDENT.RDDS.FAIL}', '#2', undef);
+    create_macro('{$RSM.INCIDENT.RDDS.RECOVER}', '#2', undef);
+    create_macro('{$RSM.INCIDENT.EPP.FAIL}', '#2', undef);
+    create_macro('{$RSM.INCIDENT.EPP.RECOVER}', '#2', undef);
 
     create_macro('{$RSM.SLV.DNS.UDP.RTT}', 99, undef);
     create_macro('{$RSM.SLV.DNS.TCP.RTT}', 99, undef);
@@ -1866,3 +1824,24 @@ sub get_services($) {
     return $result;
 }
 
+sub create_avail_trigger($) {
+	my $service = shift;
+	my $number = shift;
+	my $host_name = shift;
+
+	my $service_uc = uc($service);
+
+	# NB! Configuration trigger that is used in PHP and C code to detect incident!
+	# priority must be set to 0!
+	my $options =
+	{
+		'description' => $service_uc.'-AVAIL {HOST.NAME}: '.$number.' - Service is down',
+		'expression' => '({TRIGGER.VALUE}=0 and '.
+			'{'.$host_name.':rsm.slv.'.$service.'.avail.max({$RSM.INCIDENT.'.$service_uc.'.FAIL})}=0) or '.
+			'({TRIGGER.VALUE}=1 and '.
+			'{'.$host_name.':rsm.slv.'.$service.'.avail.count({$RSM.INCIDENT.'.$service_uc.'.RECOVER},0,"eq")}>0)',
+		'priority' => '0',
+	};
+
+	create_trigger($options);
+}

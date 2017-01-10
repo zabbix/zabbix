@@ -281,7 +281,7 @@ sub update_root_servers {
 sub create_host {
     my $options = shift;
 
-    unless ($zabbix->exist('host',{'name' => $options->{'host'}})) {
+    unless ($zabbix->exist('host',{'filter' => {'host' => $options->{'host'}}})) {
         my $result = $zabbix->create('host', $options);
 
         return $result->{'hostids'}[0];
@@ -306,7 +306,7 @@ sub create_group {
 
     my $groupid;
 
-    unless ($zabbix->exist('hostgroup',{'name' => $name})) {
+    unless ($zabbix->exist('hostgroup',{'filter' => {'name' => $name}})) {
         my $result = $zabbix->create('hostgroup', {'name' => $name});
 	$groupid = $result->{'groupids'}[0];
     }
@@ -324,7 +324,7 @@ sub create_template {
 
     my ($result, $templateid, $options, $groupid);
 
-    unless ($zabbix->exist('hostgroup', {'name' => 'Templates - TLD'})) {
+    unless ($zabbix->exist('hostgroup', {'filter' => {'name' => 'Templates - TLD'}})) {
         $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
         $groupid = $result->{'groupids'}[0];
     }
@@ -335,7 +335,7 @@ sub create_template {
 
     return $zabbix->last_error if defined $zabbix->last_error;
 
-    unless ($zabbix->exist('template',{'host' => $name})) {
+    unless ($zabbix->exist('template',{'filter' => {'host' => $name}})) {
         $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
 
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
@@ -364,7 +364,7 @@ sub create_item {
     my $options = shift;
     my $result;
 
-    if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}})) {
+    if ($zabbix->exist('item', {'filter' => {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}}})) {
 	$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
 
 	if ('ARRAY' eq ref($result))
@@ -395,7 +395,7 @@ sub create_trigger {
     my $options = shift;
     my $result;
 
-    if ($zabbix->exist('trigger',{'expression' => $options->{'expression'}})) {
+    if ($zabbix->exist('trigger',{'filter' => {'expression' => $options->{'expression'}}})) {
         $result = $zabbix->update('trigger', $options);
     }
     else {
@@ -483,7 +483,7 @@ sub get_application_id {
     my $name = shift;
     my $templateid = shift;
 
-    unless ($zabbix->exist('application',{'name' => $name, 'hostid' => $templateid})) {
+    unless ($zabbix->exist('application',{'filter' => {'name' => $name, 'hostid' => $templateid}})) {
 	my $result = $zabbix->create('application', {'name' => $name, 'hostid' => $templateid});
 	return $result->{'applicationids'}[0];
     }
@@ -531,14 +531,6 @@ sub create_probe_status_template {
 
     create_item($options);
 
-    $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago',
-                         'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
-                        'priority' => '3',
-                };
-
-    create_trigger($options);
-
-
     $options = {'name' => 'Probe status ($1)',
                                               'key_'=> 'rsm.probe.status[manual]',
                                               'hostid' => $templateid,
@@ -547,6 +539,14 @@ sub create_probe_status_template {
                                               'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
 
     create_item($options);
+
+    $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for more than {$RSM.PROBE.MAX.OFFLINE}',
+                         'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$RSM.PROBE.MAX.OFFLINE})}=0',
+                        'priority' => '3',
+                };
+
+    create_trigger($options);
+
 
     $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
                          'expression' => '{'.$template_name.':rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"].last(0)}=0',
