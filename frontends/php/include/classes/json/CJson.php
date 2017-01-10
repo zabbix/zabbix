@@ -121,38 +121,52 @@ class CJson {
 	public function __destruct() {
 	}
 
-	// used for fallback _json_encode
-	private static $forceObject = null;
+	/**
+	 * Used for fallback _json_encode().
+	 * If true then non-associative array is encoded as object.
+	 *
+	 * @var bool
+	 */
+	private $force_object = false;
 
 	/**
+	 * Used for fallback _json_encode().
+	 * If true then forward slashes are escaped.
 	 *
+	 * @var bool
+	 */
+	private $escape_slashes = true;
+
+	/**
 	 * Encodes the mixed $valueToEncode into JSON format.
 	 *
-	 * @param mixed $valueToEncode Value to be encoded into JSON format
-	 *
-	 * @param array $deQuote Array of keys whose values should **not** be
-	 * quoted in encoded string.
-	 *
-	 * @param bool $forceObject force all arrays to objects
+	 * @param mixed  $valueToEncode    Value to be encoded into JSON format.
+	 * @param array  $deQuote          Array of keys whose values should **not** be quoted in encoded string.
+	 * @param bool   $force_object     Force all arrays to objects.
+	 * @param bool   $escape_slashes
 	 *
 	 * @return string JSON encoded value
-	 *
 	 */
-	public function encode($valueToEncode, $deQuote = [], $forceObject = false) {
-		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')) {
+	public function encode($valueToEncode, $deQuote = [], $force_object = false, $escape_slashes = true) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')
+				&& defined('JSON_UNESCAPED_SLASHES')) {
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
 
-			$encoded = json_encode($valueToEncode, $forceObject ? JSON_FORCE_OBJECT : null);
+			$encoded = json_encode($valueToEncode,
+				($escape_slashes ? 0 : JSON_UNESCAPED_SLASHES) | ($force_object ? JSON_FORCE_OBJECT : 0)
+			);
 
 			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
 			}
 		}
 		else {
-			// fall back to php-only method
-			self::$forceObject = $forceObject ? true : null;
+			// Fall back to php-only method.
+
+			$this->force_object = $force_object;
+			$this->escape_slashes = $escape_slashes;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
@@ -230,31 +244,28 @@ class CJson {
 	 *
 	 */
 	public function decode($encodedValue, $asArray = false) {
-		if (!$this->_config['bypass_ext'] && function_exists('json_decode')) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_decode') && function_exists('json_last_error')) {
 			$result = json_decode($encodedValue, $asArray);
 			$this->last_error = json_last_error();
+
 			return $result;
 		}
 
-		$this->last_error = JSON_ERROR_NONE;
-
 		$first_char = substr(ltrim($encodedValue), 0, 1);
+
 		if ($first_char != '{' && $first_char != '[') {
-			$this->last_error = JSON_ERROR_SYNTAX;
-			return null;
+			$result = null;
+		}
+		else {
+			ini_set('pcre.backtrack_limit', '10000000');
+
+			$this->_level = 0;
+
+			$result = $this->isValid($encodedValue) ? $this->_json_decode($encodedValue, $asArray) : null;
 		}
 
-		// fall back to php-only method
-		ini_set('pcre.backtrack_limit', '10000000');
+		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : JSON_ERROR_NONE;
 
-		$this->_level = 0;
-		$result = null;
-
-		if ($this->isValid($encodedValue)) {
-			$result = $this->_json_decode($encodedValue, $asArray);
-		}
-
-		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : $result;
 		return $result;
 	}
 
@@ -323,7 +334,9 @@ class CJson {
 							$ascii .= '\r';
 							break;
 						case $ord_var_c == 0x22:
-						case $ord_var_c == 0x2F:
+							// falls through
+						case ($ord_var_c == 0x2F && $this->escape_slashes):
+							// falls through
 						case $ord_var_c == 0x5C:
 							// double quote, slash, slosh
 							$ascii .= '\\'.$var{$c};
@@ -404,7 +417,8 @@ class CJson {
 				 */
 
 				// treat as a JSON object
-				if (self::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
+				if ($this->force_object || is_array($var) && count($var)
+						&& array_keys($var) !== range(0, sizeof($var) - 1)) {
 					$properties = array_map([$this, '_name_value'], array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}

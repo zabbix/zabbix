@@ -1451,7 +1451,7 @@ return [
 			'delay_flex' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 1024,
 				'default' => '',
 			],
 			'params' => [
@@ -3327,7 +3327,7 @@ return [
 			'period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
+				'length' => 1024,
 				'default' => '1-7,00:00-24:00',
 			],
 		],
@@ -5259,8 +5259,8 @@ return [
 			],
 			'snmp_lastsize' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_UINT,
+				'length' => 20,
 				'default' => '0',
 			],
 		],

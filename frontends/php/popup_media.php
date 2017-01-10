@@ -66,12 +66,12 @@ if (isset($_REQUEST['add'])) {
 		}
 
 		echo '<script type="text/javascript">
-				add_media("'.$_REQUEST['dstfrm'].'",'.
-				$_REQUEST['media'].','.
-				zbx_jsvalue($_REQUEST['mediatypeid']).','.
-				CJs::encodeJson($_REQUEST['sendto']).',"'.
-				$_REQUEST['period'].'",'.
-				getRequest('active', MEDIA_STATUS_DISABLED).','.
+				add_media('.CJs::encodeJson($_REQUEST['dstfrm']).','.
+				CJs::encodeJson($_REQUEST['media']).','.
+				CJs::encodeJson($_REQUEST['mediatypeid']).','.
+				CJs::encodeJson($_REQUEST['sendto']).','.
+				CJs::encodeJson($_REQUEST['period']).','.
+				CJs::encodeJson(getRequest('active', MEDIA_STATUS_DISABLED)).','.
 				$severity.');'.
 				'</script>';
 	}
@@ -118,21 +118,20 @@ foreach ($mediatypes as &$mediatype) {
 }
 unset($mediatype);
 
-$frm_row = [];
+$frm_row = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$frm_row[] = new CLabel([
-		(new CCheckBox('severity['.$severity.']', $severity))->setChecked(str_in_array($severity, $severities)),
-		getSeverityName($severity, $config)
-	], 'severity['.$severity.']');
-	$frm_row[] = BR();
+	$frm_row->addItem(
+		(new CCheckBox('severity['.$severity.']', $severity))
+			->setLabel(getSeverityName($severity, $config))
+			->setChecked(str_in_array($severity, $severities))
+	);
 }
-array_pop($frm_row);
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
 	->addRow(_('Send to'), (new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('When active'), (new CTextBox('period', $period, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('When active'), (new CTextBox('period', $period, false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Use if severity'), $frm_row)
 	->addRow(_('Enabled'), (new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($active == MEDIA_STATUS_ACTIVE));
 

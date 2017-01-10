@@ -259,6 +259,7 @@ class testPageActions extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdisable');
@@ -288,6 +289,7 @@ class testPageActions extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massenable');
@@ -295,7 +297,7 @@ class testPageActions extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Action enabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
 		$this->zbxTestTextPresent('Enabled');
 
 		$this->assertEquals(1, DBcount(
@@ -321,6 +323,7 @@ class testPageActions extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader('Actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdelete');

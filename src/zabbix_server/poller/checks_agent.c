@@ -24,8 +24,6 @@
 
 #include "checks_agent.h"
 
-extern volatile sig_atomic_t	zbx_timed_out;
-
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
 #endif
@@ -62,7 +60,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __function_name,
 				item->host.host, item->interface.addr, item->key,
-				zbx_tls_connection_type_name(item->host.tls_connect));
+				zbx_tcp_connection_type_name(item->host.tls_connect));
 	}
 
 	switch (item->host.tls_connect)
@@ -107,7 +105,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			ret = SUCCEED;
-		else if (1 == zbx_timed_out)
+		else if (SUCCEED == zbx_alarm_timed_out())
 			ret = TIMEOUT_ERROR;
 		else
 			ret = NETWORK_ERROR;

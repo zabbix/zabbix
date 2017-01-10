@@ -1145,8 +1145,8 @@ class testFormItemPrototype extends CWebTest {
 
 			$this->zbxTestTextPresent('Use custom multiplier');
 			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('multiplier');
-				$this->zbxTestAssertVisibleXpath("//input[@type='checkbox' and @id='multiplier']");
+				$this->zbxTestAssertElementPresentId('multiplier');
+				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier']");
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
@@ -1315,7 +1315,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
 		$this->zbxTestTextPresent('Create enabled');
-		$this->zbxTestAssertVisibleId('status');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestAssertVisibleId('cancel');
@@ -1336,6 +1336,9 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestAssertElementValue('delete', 'Delete');
 			$this->zbxTestAssertVisibleId('update');
 			$this->zbxTestAssertElementValue('update', 'Update');
+		}
+		elseif (isset($templateid)) {
+			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentId('delete');

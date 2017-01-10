@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/groups.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('100 busiest triggers');
@@ -32,7 +31,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR					TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupids' =>				[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
-	'groupids_subgroupids' =>	[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
 	'hostids' =>				[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
 	'severities'=>				[T_ZBX_INT,	O_OPT,	P_SYS,			null,	null],
 	'filter_from' =>			[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
@@ -59,9 +57,6 @@ if (hasRequest('filter_set')) {
 
 	CProfile::updateArray('web.toptriggers.filter.severities', $severities, PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.toptriggers.filter.subgroupids', getRequest('groupids_subgroupids', []),
-		PROFILE_TYPE_STR
-	);
 	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 	CProfile::update('web.toptriggers.filter.from', $timeFrom, PROFILE_TYPE_STR);
 	CProfile::update('web.toptriggers.filter.till', $timeTill, PROFILE_TYPE_STR);
@@ -70,7 +65,6 @@ elseif (hasRequest('filter_rst')) {
 	DBstart();
 	CProfile::deleteIdx('web.toptriggers.filter.severities');
 	CProfile::deleteIdx('web.toptriggers.filter.groupids');
-	CProfile::deleteIdx('web.toptriggers.filter.subgroupids');
 	CProfile::deleteIdx('web.toptriggers.filter.hostids');
 	CProfile::delete('web.toptriggers.filter.from');
 	CProfile::delete('web.toptriggers.filter.till');
@@ -96,7 +90,6 @@ $data['filter'] = [
 // multiselect host groups
 $data['multiSelectHostGroupData'] = [];
 $groupids = CProfile::getArray('web.toptriggers.filter.groupids', []);
-$subgroupids = CProfile::getArray('web.toptriggers.filter.subgroupids', []);
 
 if ($groupids) {
 	$filterGroups = API::HostGroup()->get([
@@ -104,12 +97,6 @@ if ($groupids) {
 		'groupids' => $groupids,
 		'preservekeys' => true
 	]);
-
-	foreach ($subgroupids as $groupid) {
-		if (array_key_exists($groupid, $filterGroups)) {
-			$filterGroups[$groupid]['name'] .= '/*';
-		}
-	}
 
 	foreach ($filterGroups as $filterGroup) {
 		$data['multiSelectHostGroupData'][] = [
@@ -155,7 +142,6 @@ if ($hostids) {
 }
 
 if ($groupids) {
-	$groupids = getMultiselectGroupIds($groupids, $subgroupids);
 	$inGroups = ' AND '.dbConditionInt('hgg.groupid', $groupids);
 }
 

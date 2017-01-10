@@ -46,7 +46,7 @@ class JMXItemChecker extends ItemChecker
 	private String username;
 	private String password;
 
-	public JMXItemChecker(JSONObject request) throws ZabbixException
+	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
 
@@ -72,7 +72,7 @@ class JMXItemChecker extends ItemChecker
 	}
 
 	@Override
-	public JSONArray getValues() throws ZabbixException
+	JSONArray getValues() throws ZabbixException
 	{
 		JSONArray values = new JSONArray();
 
@@ -272,7 +272,8 @@ class JMXItemChecker extends ItemChecker
 	{
 		Class<?>[] clazzez = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
 			Float.class, Double.class, String.class, java.math.BigDecimal.class, java.math.BigInteger.class,
-			java.util.Date.class, javax.management.ObjectName.class};
+			java.util.Date.class, javax.management.ObjectName.class, java.util.concurrent.atomic.AtomicBoolean.class,
+			java.util.concurrent.atomic.AtomicInteger.class, java.util.concurrent.atomic.AtomicLong.class};
 
 		return HelperFunctionChest.arrayContains(clazzez, clazz);
 	}

@@ -1045,10 +1045,6 @@ static int	lld_validate_group_name(const char *name)
 	if (GROUP_NAME_LEN < zbx_strlen_utf8(name))
 		return FAIL;
 
-	/* group name contain an asterisk (*) */
-	if (NULL != strchr(name, '*'))
-		return FAIL;
-
 	/* group name cannot contain trailing and leading slashes (/) */
 	if ('/' == *name || '/' == name[strlen(name) - 1])
 		return FAIL;

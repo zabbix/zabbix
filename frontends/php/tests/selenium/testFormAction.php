@@ -1190,8 +1190,8 @@ class testFormAction extends CWebTest {
 			]);
 
 			$this->zbxTestTextPresent('Default message');
-			$this->zbxTestAssertVisibleId('new_operation_opmessage_default_msg');
-			$this->zbxTestAssertVisibleXpath('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
+			$this->zbxTestAssertElementPresentId('new_operation_opmessage_default_msg');
+			$this->zbxTestAssertElementPresentXpath('//input[@type=\'checkbox\' and @id=\'new_operation_opmessage_default_msg\']');
 			if ($new_operation_opmessage_default_msg == 'checked') {
 				$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opmessage_default_msg'));
 			}
@@ -1345,9 +1345,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTextPresent ([
 				'Execute on', 'Zabbix agent', 'Zabbix server']
 			);
-			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
+			$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
 			$this->assertTrue($this->zbxTestCheckboxSelected('new_operation_opcommand_execute_on_0'));
-			$this->zbxTestAssertVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
+			$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 		}
 		elseif ($new_operation_opcommand_type != null) {
 			$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_operation_opcommand_execute_on_0\']');
@@ -1901,13 +1901,13 @@ class testFormAction extends CWebTest {
 					case 'Send message':
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 						$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
-						$this->zbxTestClickWait('all_usrgrps');
+						$this->zbxTestCheckboxSelect('all_usrgrps');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
 
 						$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
 						$this->zbxTestSwitchToNewWindow();
-						$this->zbxTestClickWait('all_users');
+						$this->zbxTestCheckboxSelect('all_users');
 						$this->zbxTestClick('select');
 						$this->zbxTestWaitWindowClose();
 
@@ -1927,7 +1927,6 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			$this->zbxTestAssertElementValue('esc_period', $data['esc_period']);
 		}
 
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
@@ -1981,14 +1980,14 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestClickWait('usrgrps_7');
-		$this->zbxTestClickWait('usrgrps_11');
+		$this->zbxTestCheckboxSelect('usrgrps_7');
+		$this->zbxTestCheckboxSelect('usrgrps_11');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUserListFooter"]//button');
 		$this->zbxTestSwitchToNewWindow();
-		$this->zbxTestClickWait('users_1');
+		$this->zbxTestCheckboxSelect('users_1');
 		$this->zbxTestClick('select');
 		$this->zbxTestWaitWindowClose();
 
@@ -2012,8 +2011,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait('Simple form test host');
 		$this->zbxTestWaitWindowClose();
@@ -2025,8 +2023,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		$this->zbxTestAssertElementPresentXpath("//div[@id='opCmdTargetObject']/input");
 
-		$this->zbxTestClickButtonText('Select');
-		$this->zbxTestSwitchToNewWindow();
+		$this->zbxTestClickAndSwitchToNewWindow("//button[text()='Select']");
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 		$this->zbxTestWaitWindowClose();
 		$this->zbxTestClickXpath('//*[@id="opcmdEditForm"]//button[@id="save"]');
@@ -2068,7 +2065,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementValue('esc_period', '123');
 		$this->zbxTestDoubleClickXpath("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]", 'new_operation_esc_step_from');
 
-		$this->zbxTestClickWait('add');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";

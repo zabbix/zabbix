@@ -516,6 +516,8 @@ class CCorrelation extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$required_fields = ['name', 'filter', 'operations'];
+
 		// Validate required fields and check if "name" is not empty.
 		foreach ($correlations as $correlation) {
 			if (!is_array($correlation)) {
@@ -523,7 +525,8 @@ class CCorrelation extends CApiService {
 			}
 
 			// Check required parameters.
-			$missing_keys = checkRequiredKeys($correlation, ['name', 'filter', 'operations']);
+			$missing_keys = array_diff($required_fields, array_keys($correlation));
+
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Correlation is missing parameters: %1$s', implode(', ', $missing_keys))
@@ -659,10 +662,17 @@ class CCorrelation extends CApiService {
 		}
 
 		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids && !API::HostGroup()->isReadable(array_keys($groupids))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupids) {
+			$groups_count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($groupids)
+			]);
+
+			if ($groups_count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -906,10 +916,17 @@ class CCorrelation extends CApiService {
 		}
 
 		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids && !API::HostGroup()->isReadable(array_keys($groupids))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if ($groupids) {
+			$groups_count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($groupids)
+			]);
+
+			if ($groups_count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 

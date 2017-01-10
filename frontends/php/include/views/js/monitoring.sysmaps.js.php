@@ -217,17 +217,18 @@
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					)
 					->addRow(
-						new CLabel([(new CCheckBox('chkbox_label'))->setId('chkboxLabel'), _('Label')], 'chkboxLabel'),
+						(new CCheckBox('chkbox_label'))
+							->setId('chkboxLabel')
+							->setLabel(_('Label')),
 						(new CTextArea('label'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
 							->setId('massLabel')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_label_location'))->setId('chkboxLabelLocation'),
-							_('Label location')
-						], 'chkboxLabelLocation'),
+						(new CCheckBox('chkbox_label_location'))
+							->setId('chkboxLabelLocation')
+							->setLabel(_('Label location')),
 						(new CComboBox('label_location', null, null, [
 							MAP_LABEL_LOC_DEFAULT => _('Default'),
 							MAP_LABEL_LOC_BOTTOM => _('Bottom'),
@@ -237,40 +238,34 @@
 						]))->setId('massLabelLocation')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_use_iconmap'))
-								->setEnabled($data['sysmap']['iconmapid'] !== '0')
-								->setId('chkboxMassUseIconmap'),
-							_('Automatic icon selection')
-						], 'chkboxMassUseIconmap'),
+						(new CCheckBox('chkbox_use_iconmap'))
+							->setId('chkboxMassUseIconmap')
+							->setLabel(_('Automatic icon selection'))
+							->setEnabled($data['sysmap']['iconmapid'] !== '0'),
 						(new CCheckBox('use_iconmap'))->setId('massUseIconmap')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_iconid_off'))->setId('chkboxMassIconidOff'),
-							_('Icon (default)')
-						], 'chkboxMassIconidOff'),
+						(new CCheckBox('chkbox_iconid_off'))
+							->setId('chkboxMassIconidOff')
+							->setLabel(_('Icon (default)')),
 						(new CComboBox('iconid_off'))->setId('massIconidOff')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_iconid_on'))->setId('chkboxMassIconidOn'),
-							_('Icon (problem)')
-						], 'chkboxMassIconidOn'),
+						(new CCheckBox('chkbox_iconid_on'))
+							->setId('chkboxMassIconidOn')
+							->setLabel(_('Icon (problem)')),
 						(new CComboBox('iconid_on'))->setId('massIconidOn')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_iconid_maintenance'))->setId('chkboxMassIconidMaintenance'),
-							_('Icon (maintenance)')
-						], 'chkboxMassIconidMaintenance'),
+						(new CCheckBox('chkbox_iconid_maintenance'))
+							->setId('chkboxMassIconidMaintenance')
+							->setLabel(_('Icon (maintenance)')),
 						(new CComboBox('iconid_maintenance'))->setId('massIconidMaintenance')
 					)
 					->addRow(
-						new CLabel([
-							(new CCheckBox('chkbox_iconid_disabled'))->setId('chkboxMassIconidDisabled'),
-							_('Icon (disabled)')
-						], 'chkboxMassIconidDisabled'),
+						(new CCheckBox('chkbox_iconid_disabled'))
+							->setId('chkboxMassIconidDisabled')
+							->setLabel(_('Icon (disabled)')),
 						(new CComboBox('iconid_disabled'))->setId('massIconidDisabled')
 					)
 					->addItem([

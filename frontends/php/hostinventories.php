@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -50,10 +51,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])) {
+if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
+if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -196,11 +197,9 @@ else {
 				'output' => ['hostid', 'name', 'status'],
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
-				'selectGroups' => API_OUTPUT_EXTEND
+				'selectGroups' => API_OUTPUT_EXTEND,
+				'groupids' => $data['pageFilter']->groupids
 			];
-			if ($data['pageFilter']->groupid > 0) {
-				$options['groupids'] = $data['pageFilter']->groupid;
-			}
 
 			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
 				$options['searchInventory'] = [

@@ -32,34 +32,30 @@ $triggerDOFormList = (new CFormList())
 	->addRow(_('Unacknowledged PROBLEM events'), [
 		new CColor('problem_unack_color', $data['problem_unack_color']),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CLabel([
-			(new CCheckBox('problem_unack_style'))->setChecked($data['problem_unack_style'] == 1),
-			_('blinking')
-		], 'problem_unack_style')
+		(new CCheckBox('problem_unack_style'))
+			->setLabel(_('blinking'))
+			->setChecked($data['problem_unack_style'] == 1)
 	])
 	->addRow(_('Acknowledged PROBLEM events'), [
 		new CColor('problem_ack_color', $data['problem_ack_color']),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CLabel([
-			(new CCheckBox('problem_ack_style'))->setChecked($data['problem_ack_style'] == 1),
-			_('blinking')
-		], 'problem_ack_style')
+		(new CCheckBox('problem_ack_style'))
+			->setLabel(_('blinking'))
+			->setChecked($data['problem_ack_style'] == 1)
 	])
 	->addRow(_('Unacknowledged OK events'), [
 		new CColor('ok_unack_color', $data['ok_unack_color']),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CLabel([
-			(new CCheckBox('ok_unack_style'))->setChecked($data['ok_unack_style'] == 1),
-			_('blinking')
-		], 'ok_unack_style')
+		(new CCheckBox('ok_unack_style'))
+			->setLabel(_('blinking'))
+			->setChecked($data['ok_unack_style'] == 1)
 	])
 	->addRow(_('Acknowledged OK events'), [
 		new CColor('ok_ack_color', $data['ok_ack_color']),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CLabel([
-			(new CCheckBox('ok_ack_style'))->setChecked($data['ok_ack_style'] == 1),
-			_('blinking')
-		], 'ok_ack_style')
+		(new CCheckBox('ok_ack_style'))
+			->setLabel(_('blinking'))
+			->setChecked($data['ok_ack_style'] == 1)
 	])
 	->addRow(null)
 	->addRow(_('Display OK triggers for'), [

@@ -25,9 +25,9 @@
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, min_instance = -1;
 	kstat_ctl_t	*kc;
-	kstat_t		*kp;
+	kstat_t		*kp, *min_kp;
 	kstat_named_t	*kn;
 
 	if (NULL == (kc = kstat_open()))
@@ -41,14 +41,23 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 		if (0 != strcmp(name, kp->ks_name))		/* network interface name */
 			continue;
 
-		/* Assume that interfaces in our zone have instance 0. If instance > 0 then it belongs to other zone */
-		/* and should be monitored by Zabbix agent running in that zone where it will have instance number 0. */
-		if (0 != kp->ks_instance)
+		if (0 != strcmp("net", kp->ks_class))
 			continue;
 
-		if (0 == strcmp("net", kp->ks_class))
+		/* find instance with the smallest number */
+
+		if (-1 == min_instance || kp->ks_instance < min_instance)
+		{
+			min_instance = kp->ks_instance;
+			min_kp = kp;
+		}
+
+		if (0 == min_instance)
 			break;
 	}
+
+	if (-1 != min_instance)
+		kp = min_kp;
 
 	if (NULL == kp)
 	{

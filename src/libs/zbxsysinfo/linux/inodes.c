@@ -36,7 +36,7 @@ do													\
 }													\
 while(0)
 
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -136,4 +136,9 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_fs_inode, request, result);
 }

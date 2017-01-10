@@ -60,9 +60,28 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('itemid') && !API::Item()->isWritable([$_REQUEST['itemid']])
-		|| getRequest('triggerid') && !API::Trigger()->isWritable([$_REQUEST['triggerid']])) {
-	access_deny();
+if (getRequest('itemid')) {
+	$items = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('itemid'),
+		'editable' => true
+	]);
+
+	if (!$items) {
+		access_deny();
+	}
+}
+
+if (getRequest('triggerid')) {
+	$triggers = API::Trigger()->get([
+		'output' => [],
+		'triggerids' => getRequest('triggerid'),
+		'editable' => true
+	]);
+
+	if (!$triggers) {
+		access_deny();
+	}
 }
 
 $itemid = getRequest('itemid', 0);
@@ -336,7 +355,7 @@ if (hasRequest('sform')) {
 							->setId('logexpr')
 					)
 					->addRow(null, [
-						new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
+						(new CCheckBox('iregexp'))->setLabel('iregexp'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton('add_key_and', _('AND')))
 							->addClass(ZBX_STYLE_BTN_GREY)

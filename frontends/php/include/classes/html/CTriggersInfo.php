@@ -36,7 +36,7 @@ class CTriggersInfo extends CTable {
 		return $this;
 	}
 
-	public function bodyToString() {
+	protected function bodyToString() {
 		$this->cleanItems();
 
 		$config = select_config();

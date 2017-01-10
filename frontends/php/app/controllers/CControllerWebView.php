@@ -98,7 +98,7 @@ class CControllerWebView extends CController {
 				'with_httptests' => true
 			],
 			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
-			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
 		]);
 
 		$response = new CControllerResponseData($data);

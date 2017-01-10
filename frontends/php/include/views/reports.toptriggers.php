@@ -29,11 +29,9 @@ $filterForm = (new CFilter('web.toptriggers.filter.state'))
 $severity_columns = [0 => [], 1 => []];
 
 foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
-	$severity_columns[$severity % 2][] = new CLabel([
-		(new CCheckBox('severities['.$severity.']'))
-			->setChecked(in_array($severity, $this->data['filter']['severities'])),
-		getSeverityName($severity, $this->data['config'])
-	], 'severities['.$severity.']');
+	$severity_columns[$severity % 2][] = (new CCheckBox('severities['.$severity.']'))
+		->setLabel(getSeverityName($severity, $this->data['config']))
+		->setChecked(in_array($severity, $this->data['filter']['severities']));
 }
 
 $filterColumn1 = (new CFormList())
@@ -42,7 +40,6 @@ $filterColumn1 = (new CFormList())
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $this->data['multiSelectHostGroupData'],
-			'nested' => true,
 			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'

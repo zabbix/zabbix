@@ -33,8 +33,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-define('PAGE_SIZE', 100);
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
@@ -75,24 +73,60 @@ if (!$triggers) {
 
 $trigger = reset($triggers);
 
-// events
-$events = API::Event()->get([
-	'output' => API_OUTPUT_EXTEND,
-	'select_alerts' => API_OUTPUT_EXTEND,
-	'select_acknowledges' => API_OUTPUT_EXTEND,
-	'selectHosts' => API_OUTPUT_EXTEND,
+$alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
+	'clock', 'subject', 'message'
+];
+$options = [
+	'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'value'],
+	'select_alerts' => $alert_options,
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
-]);
+];
 
+if ($config['event_ack_enable']) {
+	$options['output'][] = 'acknowledged';
+	$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
+}
+
+$events = API::Event()->get($options);
 if (!$events) {
 	access_deny();
 }
-
 $event = reset($events);
+
+$alerts = [];
+$r_alerts = [];
+
+if ($event['alerts']) {
+	$alerts = $event['alerts'];
+	CArrayHelper::sort($event['alerts'], [['field' => 'alertid', 'order' => SORT_DESC]]);
+}
+
+if ($event['r_eventid'] != 0) {
+	$r_events = API::Event()->get([
+		'output' => ['correlationid', 'userid'],
+		'select_alerts' => $alert_options,
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
+		'eventids' => [$event['r_eventid']],
+		'objectids' => getRequest('triggerid')
+	]);
+
+	if ($r_events) {
+		$r_event = reset($r_events);
+
+		$event['correlationid'] = $r_event['correlationid'];
+		$event['userid'] = $r_event['userid'];
+
+		if ($r_event['alerts']) {
+			$r_alerts = $r_event['alerts'];
+			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => SORT_DESC]]);
+		}
+	}
+}
 
 /*
  * Display
@@ -116,10 +150,10 @@ $eventTab = (new CTable())
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
 				: null,
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($event['alerts'])))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
 				->setHeader(_('Message actions'), [], false, 'tr_events.php'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($event['alerts'])))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($alerts, $r_alerts)))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
 				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,

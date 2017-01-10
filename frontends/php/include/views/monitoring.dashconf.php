@@ -63,7 +63,6 @@ if ($this->data['grpswitch']) {
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'nested' => true,
 		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=groupids_'.
 				'&srcfld1=groupid&multiselect=1'
@@ -74,7 +73,6 @@ if ($this->data['grpswitch']) {
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'nested' => true,
 		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=hidegroupids_'.
 				'&srcfld1=groupid&multiselect=1'
@@ -83,26 +81,25 @@ if ($this->data['grpswitch']) {
 }
 
 // append host in maintenance checkbox to form list
-$maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['maintenance'] == 1);
+$maintenanceCheckBox = (new CCheckBox('maintenance'))
+	->setLabel(_('Show hosts in maintenance'))
+	->setChecked($this->data['maintenance'] == 1);
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
-$form_list->addRow(_('Hosts'),
-	new CLabel([$maintenanceCheckBox, _('Show hosts in maintenance')], 'maintenance')
-);
+$form_list->addRow(_('Hosts'), $maintenanceCheckBox);
 
 // append trigger severities to form list
-$severities = [];
+$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
-		->setChecked(isset($this->data['severity'][$severity]))
-		->setEnabled($this->data['isFilterEnable']);
-	$severities[] = new CLabel([$serverityCheckBox, getSeverityName($severity, $this->data['config'])],
-		'trgSeverity['.$severity.']'
+	$severities->addItem(
+		(new CCheckBox('trgSeverity['.$severity.']'))
+			->setLabel(getSeverityName($severity, $this->data['config']))
+			->setChecked(isset($this->data['severity'][$severity]))
+			->setEnabled($this->data['isFilterEnable'])
 	);
-	$severities[] = BR();
 }
-array_pop($severities);
 
 $form_list->addRow(_('Triggers with severity'), $severities);
 

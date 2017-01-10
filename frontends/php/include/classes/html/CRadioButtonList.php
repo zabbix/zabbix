@@ -92,6 +92,7 @@ class CRadioButtonList extends CList {
 				->setEnabled($this->enabled)
 				->onChange($value['on_change'])
 				->setId($value['id']);
+
 			if ($value['value'] === $this->value) {
 				$radio->setAttribute('checked', 'checked');
 			}
@@ -100,7 +101,8 @@ class CRadioButtonList extends CList {
 				parent::addItem([$radio, new CLabel($value['name'], $value['id'])]);
 			}
 			else {
-				parent::addItem(new CLabel([$radio, $value['name']], $value['id']));
+				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
+				parent::addItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]);
 			}
 		}
 

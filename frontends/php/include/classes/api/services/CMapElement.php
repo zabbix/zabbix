@@ -88,33 +88,126 @@ abstract class CMapElement extends CApiService {
 	 * @param array $selements
 	 */
 	protected function checkSelementPermissions(array $selements) {
-		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			return;
 		}
 
-		$hostIds = $groupIds = $triggerIds = $mapIds = [];
+		$groupids = [];
+		$hostids = [];
+		$triggerids = [];
+		$sysmapids = [];
+
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					$hostIds[$selement['elementid']] = $selement['elementid'];
-					break;
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$groupIds[$selement['elementid']] = $selement['elementid'];
+					$groupids[$selement['elementid']] = true;
 					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$hostids[$selement['elementid']] = true;
+					break;
+
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$triggerIds[$selement['elementid']] = $selement['elementid'];
+					$triggerids[$selement['elementid']] = true;
 					break;
+
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$mapIds[$selement['elementid']] = $selement['elementid'];
+					$sysmapids[$selement['elementid']] = true;
 					break;
 			}
 		}
 
-		if (($hostIds && !API::Host()->isReadable($hostIds))
-				|| ($groupIds && !API::HostGroup()->isReadable($groupIds))
-				|| ($triggerIds && !API::Trigger()->isReadable($triggerIds))
-				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		$this->checkHostGroupsPermissions(array_keys($groupids));
+		$this->checkHostsPermissions(array_keys($hostids));
+		$this->checkTriggersPermissions(array_keys($triggerids));
+		$this->checkMapsPermissions(array_keys($sysmapids));
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 *
+	 * @param array $groupids
+	 */
+	private function checkHostGroupsPermissions(array $groupids) {
+		if ($groupids) {
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $groupids
+			]);
+
+			if ($count != count($groupids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given hosts.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts
+	 *
+	 * @param array $hostids
+	 */
+	private function checkHostsPermissions(array $hostids) {
+		if ($hostids) {
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given triggers.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given triggers
+	 *
+	 * @param array $triggerids
+	 */
+	private function checkTriggersPermissions(array $triggerids) {
+		if ($triggerids) {
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given maps.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given maps
+	 *
+	 * @param array $sysmapids
+	 */
+	private function checkMapsPermissions(array $sysmapids) {
+		if ($sysmapids) {
+			$count = API::Map()->get([
+				'countOutput' => true,
+				'sysmapids' => $sysmapids
+			]);
+
+			if ($count != count($sysmapids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 

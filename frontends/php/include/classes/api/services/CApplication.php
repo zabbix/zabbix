@@ -236,109 +236,149 @@ class CApplication extends CApiService {
 		return $result;
 	}
 
-	public function checkInput(&$applications, $method) {
-		if (empty($applications)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	/**
+	 * Returns true if one or more applications is templated.
+	 *
+	 * @param array  $applicationids
+	 */
+	private function hasTemplatedApplications(array $applicationids) {
+		return (bool) DBfetchArray(DBselect(
+			'SELECT NULL FROM application_template at WHERE '.dbConditionInt('at.applicationid', $applicationids), 1
+		));
+	}
+
+	/**
+	 * Check for duplicated applications.
+	 *
+	 * @param array  $names_by_hostid
+	 *
+	 * @throws APIException  if application already exists.
+	 */
+	private function checkDuplicates(array $names_by_hostid) {
+		$sql_where = [];
+		foreach ($names_by_hostid as $hostid => $names) {
+			$sql_where[] = '(a.hostid='.$hostid.' AND '.dbConditionString('a.name', $names).')';
 		}
 
-		$create = ($method == 'create');
-		$update = ($method == 'update');
-		$delete = ($method == 'delete');
+		$db_applications = DBfetchArray(
+			DBselect('SELECT a.name FROM applications a WHERE '.implode(' OR ', $sql_where), 1)
+		);
+
+		if ($db_applications) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Application "%1$s" already exists.', $db_applications[0]['name'])
+			);
+		}
+	}
+
+	/**
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @param array $applications
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateCreate(array &$applications) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
+			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('applications', 'name')]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $applications, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$hostids = [];
+		foreach ($applications as $application) {
+			$hostids[$application['hostid']] = true;
+		}
+
+		$dbHosts = API::Host()->get([
+			'output' => [],
+			'hostids' => array_keys($hostids),
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$names_by_hostid = [];
+
+		foreach ($applications as $application) {
+			// check permissions by hostid
+			if (!array_key_exists($application['hostid'], $dbHosts)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$names_by_hostid[$application['hostid']][] = $application['name'];
+		}
+
+		$this->checkDuplicates($names_by_hostid);
+	}
+
+	/**
+	 * Validates the input parameters for the update() method.
+	 *
+	 * @param array $applications
+	 * @param array $db_applications
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateUpdate(array &$applications, array &$db_applications = null) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['applicationid']], 'fields' => [
+			'applicationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('applications', 'name')]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $applications, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// permissions
-		if ($update || $delete) {
-			$itemDbFields = ['applicationid' => null];
-			$dbApplications = $this->get([
-				'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-				'applicationids' => zbx_objectValues($applications, 'applicationid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-		else {
-			$itemDbFields = ['name' => null, 'hostid' => null];
-			$dbHosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'status'],
-				'hostids' => zbx_objectValues($applications, 'hostid'),
-				'templated_hosts' => true,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
+		$db_applications = $this->get([
+			'output' => ['applicationid', 'hostid', 'name', 'flags'],
+			'applicationids' => zbx_objectValues($applications, 'applicationid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		if ($update){
-			$applications = $this->extendObjects($this->tableName(), $applications, ['name']);
-		}
-
-		foreach ($applications as &$application) {
-			if (!check_db_fields($itemDbFields, $application)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// check permissions by hostid
-			if ($create) {
-				if (!isset($dbHosts[$application['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-			}
-
-			// check permissions by applicationid
-			if ($delete || $update) {
-				if (!isset($dbApplications[$application['applicationid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-			}
-
-			if ($update) {
-				$this->checkNoParameters(
-					$application, ['templateid', 'flags'], _('Cannot update "%1$s" for application "%2$s".'),
-					$application['name']
+		foreach ($applications as $application) {
+			if (!array_key_exists($application['applicationid'], $db_applications)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
 				);
 			}
-			elseif ($create) {
-				$this->checkNoParameters(
-					$application, ['templateid', 'flags'], _('Cannot set "%1$s" for application "%2$s".'),
-					$application['name']
+		}
+
+		if ($this->hasTemplatedApplications(zbx_objectValues($applications, 'applicationid'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
+		}
+
+		$applications = $this->extendObjectsByKey($applications, $db_applications, 'applicationid', ['hostid']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']]];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $applications, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$names_by_hostid = [];
+
+		foreach ($applications as $application) {
+			$db_application = $db_applications[$application['applicationid']];
+
+			if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update discovered application "%1$s".', $db_application['name'])
 				);
 			}
 
-			// Check on operating with templated and discovered applications.
-			if ($delete || $update) {
-				if ($dbApplications[$application['applicationid']]['templateids']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
-				}
-
-				if ($dbApplications[$application['applicationid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update discovered application "%1$s".',
-						$dbApplications[$application['applicationid']]['name']
-					));
-				}
-			}
-
-			if ($update) {
-				if (!isset($application['hostid'])) {
-					$application['hostid'] = $dbApplications[$application['applicationid']]['hostid'];
-				}
-			}
-
-			// check existence
-			if ($update || $create) {
-				$applicationsExists = $this->get([
-					'output' => API_OUTPUT_EXTEND,
-					'filter' => [
-						'hostid' => $application['hostid'],
-						'name' => $application['name']
-					],
-					'nopermissions' => 1
-				]);
-				foreach ($applicationsExists as $applicationExists) {
-					if (!$update || (bccomp($applicationExists['applicationid'], $application['applicationid']) != 0)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists.', $application['name']));
-					}
-				}
+			if (array_key_exists('name', $application) && $application['name'] !== $db_application['name']) {
+				$names_by_hostid[$db_application['hostid']][] = $application['name'];
 			}
 		}
-		unset($application);
+
+		if ($names_by_hostid) {
+			$this->checkDuplicates($names_by_hostid);
+		}
 	}
 
 	/**
@@ -349,19 +389,20 @@ class CApplication extends CApiService {
 	 * @return array
 	 */
 	public function create(array $applications) {
-		$applications = zbx_toArray($applications);
-		$this->checkInput($applications, __FUNCTION__);
+		$this->validateCreate($applications);
 
-		foreach ($applications as &$application) {
-			$application['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		$applicationids = DB::insertBatch('applications', $applications);
+
+		foreach ($applications as $index => &$application) {
+			$application['applicationid'] = $applicationids[$index];
 		}
 		unset($application);
 
-		$appManager = new CApplicationManager();
-		$applications = $appManager->create($applications);
-		$appManager->inherit($applications);
+		(new CApplicationManager())->inherit($applications);
 
-		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
+
+		return ['applicationids' => $applicationids];
 	}
 
 	/**
@@ -372,12 +413,26 @@ class CApplication extends CApiService {
 	 * @return array
 	 */
 	public function update(array $applications) {
-		$applications = zbx_toArray($applications);
-		$this->checkInput($applications, __FUNCTION__);
+		$this->validateUpdate($applications, $db_applications);
 
-		$appManager = new CApplicationManager();
-		$appManager->update($applications);
-		$appManager->inherit($applications);
+		$upd_applications = [];
+
+		foreach ($applications as $application) {
+			$db_application = $db_applications[$application['applicationid']];
+
+			if (array_key_exists('name', $application) && $application['name'] !== $db_application['name']) {
+				$upd_applications[] = [
+					'values' => ['name' => $application['name']],
+					'where' => ['applicationid' => $application['applicationid']]
+				];
+			}
+		}
+
+		DB::update('applications', $upd_applications);
+
+		(new CApplicationManager())->inherit($applications);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
 
 		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
@@ -392,9 +447,14 @@ class CApplication extends CApiService {
 	 */
 	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
-		$delApplications = $this->get([
-			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-			'selectHost' => ['name', 'hostid'],
+
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $applicationids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_applications = $this->get([
+			'output' => ['name', 'flags'],
 			'applicationids' => $applicationids,
 			'editable' => true,
 			'preservekeys' => true
@@ -402,18 +462,23 @@ class CApplication extends CApiService {
 
 		if (!$nopermissions) {
 			foreach ($applicationids as $applicationid) {
-				if (!isset($delApplications[$applicationid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delApplications[$applicationid]['templateids']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated application.'));
+				if (!array_key_exists($applicationid, $db_applications)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 
-				if ($delApplications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_application = $db_applications[$applicationid];
+
+				if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete discovered application "%1$s".',
-						$delApplications[$applicationid]['name']
+						$db_application['name']
 					));
 				}
+			}
+
+			if ($this->hasTemplatedApplications($applicationids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated application.'));
 			}
 		}
 
@@ -434,22 +499,9 @@ class CApplication extends CApiService {
 			$childApplicationIds = $appManager->fetchEmptyIds($childApplicationIds);
 		}
 
-		$childApplications = $this->get([
-			'applicationids' => $childApplicationIds,
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'selectHost' => ['name', 'hostid']
-		]);
-
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
-		// TODO: remove info from API
-		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
-			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'],
-				$delApplication['host']['name']
-			));
-		}
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $db_applications);
 
 		return ['applicationids' => $applicationids];
 	}

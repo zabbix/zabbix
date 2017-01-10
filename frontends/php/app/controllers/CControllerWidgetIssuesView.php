@@ -47,14 +47,8 @@ class CControllerWidgetIssuesView extends CController {
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
 			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
-				$filter['groupids'] = getMultiselectGroupIds(
-					zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value'),
-					zbx_objectValues(CFavorite::get('web.dashconf.groups.subgroupids'), 'value')
-				);
-				$hide_groupids = getMultiselectGroupIds(
-					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value'),
-					zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.subgroupids'), 'value')
-				);
+				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
+				$hide_groupids = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 
 				if (!$filter['groupids']) {
 					// null mean all groups

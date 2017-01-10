@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -78,10 +79,10 @@ if (hasRequest('action')) {
 		}
 	}
 }
-if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']])) {
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
+if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -96,116 +97,52 @@ $pageFilter = new CPageFilter([
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	DBstart();
+	if (hasRequest('applicationid')) {
+		$result = (bool) API::Application()->update([
+			'applicationid' => $_REQUEST['applicationid'],
+			'name' => $_REQUEST['appname']
+		]);
 
-	$application = [
-		'name' => $_REQUEST['appname'],
-		'hostid' => $_REQUEST['hostid']
-	];
-
-	if (isset($_REQUEST['applicationid'])) {
-		$application['applicationid'] = $_REQUEST['applicationid'];
-		$dbApplications = API::Application()->update($application);
-
-		$messageSuccess = _('Application updated');
-		$messageFailed = _('Cannot update application');
-		$auditAction = AUDIT_ACTION_UPDATE;
+		show_messages($result, _('Application updated'), _('Cannot update application'));
 	}
 	else {
-		$dbApplications = API::Application()->create($application);
+		$result = (bool) API::Application()->create([
+			'hostid' => $_REQUEST['hostid'],
+			'name' => $_REQUEST['appname']
+		]);
 
-		$messageSuccess = _('Application added');
-		$messageFailed = _('Cannot add application');
-		$auditAction = AUDIT_ACTION_ADD;
+		show_messages($result, _('Application added'), _('Cannot add application'));
 	}
-
-	if ($dbApplications) {
-		$applicationId = reset($dbApplications['applicationids']);
-
-		add_audit($auditAction, AUDIT_RESOURCE_APPLICATION,
-			_('Application').' ['.$_REQUEST['appname'].'] ['.$applicationId.']'
-		);
-		unset($_REQUEST['form']);
-	}
-
-	$result = DBend($dbApplications);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
+		unset($_REQUEST['form']);
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
 	unset($_REQUEST['applicationid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['delete'])) {
-	if (isset($_REQUEST['applicationid'])) {
-		$result = false;
+elseif (hasRequest('delete') && hasRequest('applicationid')) {
+	$result = (bool) API::Application()->delete([getRequest('applicationid')]);
 
-		DBstart();
-
-		if ($app = get_application_by_applicationid($_REQUEST['applicationid'])) {
-			$host = get_host_by_hostid($app['hostid']);
-
-			$result = API::Application()->delete([getRequest('applicationid')]);
-		}
-
-		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
-				'Application ['.$app['name'].'] from host ['.$host['host'].']'
-			);
-		}
-
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
-		}
-		show_messages($result, _('Application deleted'), _('Cannot delete application'));
 	}
+	show_messages($result, _('Application deleted'), _('Cannot delete application'));
 }
 elseif (hasRequest('action') && getRequest('action') == 'application.massdelete' && hasRequest('applications')) {
-	$result = true;
-	$applications = getRequest('applications');
-	$deleted = 0;
+	$applicationids = getRequest('applications');
 
-	DBstart();
-
-	$dbApplications = DBselect(
-		'SELECT a.applicationid,a.name,a.hostid'.
-		' FROM applications a'.
-		' WHERE '.dbConditionInt('a.applicationid', $applications)
-	);
-
-	while ($dbApplication = DBfetch($dbApplications)) {
-		if (!isset($applications[$dbApplication['applicationid']])) {
-			continue;
-		}
-
-		$result &= (bool) API::Application()->delete([$dbApplication['applicationid']]);
-
-		if ($result) {
-			$host = get_host_by_hostid($dbApplication['hostid']);
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
-				'Application ['.$dbApplication['name'].'] from host ['.$host['host'].']'
-			);
-		}
-
-		$deleted++;
-	}
-
-	$result = DBend($result);
+	$result = (bool) API::Application()->delete($applicationids);
 
 	if ($result) {
 		uncheckTableRows($pageFilter->hostid);
 	}
 	show_messages($result,
-		_n('Application deleted', 'Applications deleted', $deleted),
-		_n('Cannot delete application', 'Cannot delete applications', $deleted)
+		_n('Application deleted', 'Applications deleted', count($applicationids)),
+		_n('Cannot delete application', 'Cannot delete applications', count($applicationids))
 	);
 }
 elseif (hasRequest('applications')
@@ -297,7 +234,7 @@ else {
 		$applications = API::Application()->get([
 			'output' => ['applicationid'],
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1

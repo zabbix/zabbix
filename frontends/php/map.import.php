@@ -130,32 +130,19 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 if (hasRequest('rules')) {
 	$requestRules = getRequest('rules', []);
 	// if form was submitted with some checkboxes unchecked, those values are not submitted
-	// so that we set missing values to false
+	// so that we set missing values to false, existing to true
 	foreach ($data['rules'] as $ruleName => $rule) {
 		if (!array_key_exists($ruleName, $requestRules)) {
-			if (array_key_exists('updateExisting', $rule)) {
-				$requestRules[$ruleName]['updateExisting'] = false;
-			}
-
-			if (array_key_exists('createMissing', $rule)) {
-				$requestRules[$ruleName]['createMissing'] = false;
-			}
-
-			if (array_key_exists('deleteMissing', $rule)) {
-				$requestRules[$ruleName]['deleteMissing'] = false;
-			}
+			$requestRules[$ruleName] = [];
 		}
 
-		if (!isset($requestRules[$ruleName]['updateExisting']) && isset($rule['updateExisting'])) {
-			$requestRules[$ruleName]['updateExisting'] = false;
-		}
-
-		if (!isset($requestRules[$ruleName]['createMissing']) && isset($rule['createMissing'])) {
-			$requestRules[$ruleName]['createMissing'] = false;
-		}
-
-		if (!isset($requestRules[$ruleName]['deleteMissing']) && isset($rule['deleteMissing'])) {
-			$requestRules[$ruleName]['deleteMissing'] = false;
+		foreach (['updateExisting', 'createMissing', 'deleteMissing'] as $option) {
+			if (array_key_exists($option, $requestRules[$ruleName])) {
+				$requestRules[$ruleName][$option] = true;
+			}
+			elseif (array_key_exists($option, $rule)) {
+				$requestRules[$ruleName][$option] = false;
+			}
 		}
 	}
 

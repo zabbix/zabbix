@@ -23,7 +23,7 @@
 			<?php endforeach ?>
 		</select>
 	</td>
-	<td>
+	<td style="vertical-align: middle;">
 		<?php reset($this->data['iconList']) ?>
 		<?php $iconid = key($this->data['iconList']) ?>
 		<img class="pointer preview" name="Preview" alt="Preview" src="imgstore.php?iconid=<?= $iconid ?>&width=24&height=24" data-image-full="imgstore.php?iconid=<?= $iconid ?>" border="0">

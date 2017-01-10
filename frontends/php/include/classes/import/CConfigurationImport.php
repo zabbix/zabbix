@@ -70,7 +70,7 @@ class CConfigurationImport {
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'applications' => ['updateExisting' => false, 'createMissing' => false],
+			'applications' => ['createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -117,6 +117,7 @@ class CConfigurationImport {
 		$this->processApplications();
 		$this->processValueMaps();
 		$this->processItems();
+		$this->processHttpTests();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
 		$this->processGraphs();
@@ -124,7 +125,6 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
-		$this->processHttpTests();
 
 		return true;
 	}
