@@ -1258,7 +1258,10 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (SUCCEED != is_time_suffix(value_raw, value, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
-	if ((0 != non_zero && 0 == *value) || value_min > *value)
+	if (0 != non_zero && 0 == *value)
+		return FAIL;
+
+	if (0 != value && value_min > *value)
 		return FAIL;
 
 	return SUCCEED;
@@ -2565,10 +2568,22 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[25]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[26]);
-		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-			item->history = config->config->hk.history;
+
+		if (ZBX_HK_OPTION_ENABLED != config->config->hk.history_global)
+		{
+			char	*history = NULL;
+
+			if (NULL == (history = dc_expand_user_macros(row[35], NULL, 0, NULL, NULL)) ||
+					SUCCEED != is_time_suffix(history, &item->history, ZBX_LENGTH_UNLIMITED))
+			{
+				item->history = 1;	/* just enough to make 0 == items[i].history condition fail */
+			}
+
+			zbx_free(history);
+		}
 		else
-			item->history = atoi(row[35]);
+			item->history = config->config->hk.history;
+
 		ZBX_STR2UCHAR(item->inventory_link, row[37]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[38]);
 
@@ -2777,10 +2792,22 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			ZBX_STR2UCHAR(numitem->delta, row[32]);
 			ZBX_STR2UCHAR(numitem->multiplier, row[33]);
 			DCstrpool_replace(found, &numitem->formula, row[34]);
-			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				numitem->trends = config->config->hk.trends;
+
+			if (ZBX_HK_OPTION_ENABLED != config->config->hk.trends_global)
+			{
+				char	*trends = NULL;
+
+				if (NULL == (trends = dc_expand_user_macros(row[36], NULL, 0, NULL, NULL)) ||
+						SUCCEED != is_time_suffix(trends, &numitem->trends, ZBX_LENGTH_UNLIMITED))
+				{
+					numitem->trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
+				}
+
+				zbx_free(trends);
+			}
 			else
-				numitem->trends = atoi(row[36]);
+				numitem->trends = config->config->hk.trends;
+
 			DCstrpool_replace(found, &numitem->units, row[39]);
 		}
 		else if (NULL != (numitem = zbx_hashset_search(&config->numitems, &itemid)))
