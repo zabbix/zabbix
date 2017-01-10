@@ -4033,6 +4033,7 @@ typedef struct
 	zbx_uint64_t		t_applicationid;
 	zbx_uint64_t		h_applicationid;
 	char			*name;
+	char			*delay;
 	char			*variables;
 	char			*agent;
 	char			*http_user;
@@ -4040,7 +4041,6 @@ typedef struct
 	char			*http_proxy;
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
-	int			delay;
 	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
@@ -4108,7 +4108,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		{
 			httptest->name = zbx_strdup(NULL, row[1]);
 			ZBX_DBROW2UINT64(httptest->t_applicationid, row[2]);
-			httptest->delay = atoi(row[3]);
+			httptest->delay = zbx_strdup(NULL, row[3]);
 			httptest->status = (unsigned char)atoi(row[4]);
 			httptest->variables = zbx_strdup(NULL, row[5]);
 			httptest->agent = zbx_strdup(NULL, row[6]);
@@ -4570,6 +4570,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 		zbx_free(httptest->http_user);
 		zbx_free(httptest->agent);
 		zbx_free(httptest->variables);
+		zbx_free(httptest->delay);
 		zbx_free(httptest->name);
 
 		for (j = 0; j < httptest->httpsteps.values_num; j++)

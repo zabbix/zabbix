@@ -32,7 +32,9 @@ typedef struct
 	zbx_uint64_t	templateid;
 	char		*name;
 	char		*key;
-	char		*delay_flex;
+	char		*delay;
+	char		*history;
+	char		*trends;
 	char		*trapper_hosts;
 	char		*units;
 	char		*formula;
@@ -52,9 +54,6 @@ typedef struct
 	char		*description;
 	char		*lifetime;
 	char		*port;
-	int		delay;
-	int		history;
-	int		trends;
 	unsigned char	type;
 	unsigned char	value_type;
 	unsigned char	data_type;
@@ -153,7 +152,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	DBget_interfaces_by_hostid(hostid, interfaceids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.data_type,ti.delay,ti.delay_flex,"
+			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.data_type,ti.delay,"
 				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,ti.multiplier,ti.delta,"
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
@@ -177,20 +176,17 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->type, row[3]);
 		ZBX_STR2UCHAR(item->value_type, row[4]);
 		ZBX_STR2UCHAR(item->data_type, row[5]);
-		item->delay = atoi(row[6]);
-		item->history = atoi(row[8]);
-		item->trends = atoi(row[9]);
-		ZBX_STR2UCHAR(item->status, row[10]);
-		ZBX_STR2UCHAR(item->multiplier, row[13]);
-		ZBX_STR2UCHAR(item->delta, row[14]);
-		ZBX_DBROW2UINT64(item->valuemapid, row[17]);
-		ZBX_STR2UCHAR(item->snmpv3_securitylevel, row[23]);
-		ZBX_STR2UCHAR(item->snmpv3_authprotocol, row[24]);
-		ZBX_STR2UCHAR(item->snmpv3_privprotocol, row[26]);
-		ZBX_STR2UCHAR(item->authtype, row[28]);
-		ZBX_STR2UCHAR(item->flags, row[33]);
-		ZBX_STR2UCHAR(item->inventory_link, row[35]);
-		ZBX_STR2UCHAR(item->evaltype, row[39]);
+		ZBX_STR2UCHAR(item->status, row[9]);
+		ZBX_STR2UCHAR(item->multiplier, row[12]);
+		ZBX_STR2UCHAR(item->delta, row[13]);
+		ZBX_DBROW2UINT64(item->valuemapid, row[16]);
+		ZBX_STR2UCHAR(item->snmpv3_securitylevel, row[22]);
+		ZBX_STR2UCHAR(item->snmpv3_authprotocol, row[23]);
+		ZBX_STR2UCHAR(item->snmpv3_privprotocol, row[25]);
+		ZBX_STR2UCHAR(item->authtype, row[27]);
+		ZBX_STR2UCHAR(item->flags, row[32]);
+		ZBX_STR2UCHAR(item->inventory_link, row[34]);
+		ZBX_STR2UCHAR(item->evaltype, row[38]);
 
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
@@ -210,31 +206,33 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		}
 
 		item->name = zbx_strdup(NULL, row[1]);
-		item->delay_flex = zbx_strdup(NULL, row[7]);
-		item->trapper_hosts = zbx_strdup(NULL, row[11]);
-		item->units = zbx_strdup(NULL, row[12]);
-		item->formula = zbx_strdup(NULL, row[15]);
-		item->logtimefmt = zbx_strdup(NULL, row[16]);
-		item->params = zbx_strdup(NULL, row[18]);
-		item->ipmi_sensor = zbx_strdup(NULL, row[19]);
-		item->snmp_community = zbx_strdup(NULL, row[20]);
-		item->snmp_oid = zbx_strdup(NULL, row[21]);
-		item->snmpv3_securityname = zbx_strdup(NULL, row[22]);
-		item->snmpv3_authpassphrase = zbx_strdup(NULL, row[25]);
-		item->snmpv3_privpassphrase = zbx_strdup(NULL, row[27]);
-		item->username = zbx_strdup(NULL, row[29]);
-		item->password = zbx_strdup(NULL, row[30]);
-		item->publickey = zbx_strdup(NULL, row[31]);
-		item->privatekey = zbx_strdup(NULL, row[32]);
-		item->description = zbx_strdup(NULL, row[34]);
-		item->lifetime = zbx_strdup(NULL, row[36]);
-		item->snmpv3_contextname = zbx_strdup(NULL, row[37]);
-		item->port = zbx_strdup(NULL, row[40]);
+		item->delay = zbx_strdup(NULL, row[6]);
+		item->history = zbx_strdup(NULL, row[7]);
+		item->trends = zbx_strdup(NULL, row[8]);
+		item->trapper_hosts = zbx_strdup(NULL, row[10]);
+		item->units = zbx_strdup(NULL, row[11]);
+		item->formula = zbx_strdup(NULL, row[14]);
+		item->logtimefmt = zbx_strdup(NULL, row[15]);
+		item->params = zbx_strdup(NULL, row[17]);
+		item->ipmi_sensor = zbx_strdup(NULL, row[18]);
+		item->snmp_community = zbx_strdup(NULL, row[19]);
+		item->snmp_oid = zbx_strdup(NULL, row[20]);
+		item->snmpv3_securityname = zbx_strdup(NULL, row[21]);
+		item->snmpv3_authpassphrase = zbx_strdup(NULL, row[24]);
+		item->snmpv3_privpassphrase = zbx_strdup(NULL, row[26]);
+		item->username = zbx_strdup(NULL, row[28]);
+		item->password = zbx_strdup(NULL, row[29]);
+		item->publickey = zbx_strdup(NULL, row[30]);
+		item->privatekey = zbx_strdup(NULL, row[31]);
+		item->description = zbx_strdup(NULL, row[33]);
+		item->lifetime = zbx_strdup(NULL, row[35]);
+		item->snmpv3_contextname = zbx_strdup(NULL, row[36]);
+		item->port = zbx_strdup(NULL, row[39]);
 
-		if (SUCCEED != DBis_null(row[38]))
+		if (SUCCEED != DBis_null(row[37]))
 		{
 			item->key = NULL;
-			ZBX_STR2UINT64(item->itemid, row[38]);
+			ZBX_STR2UINT64(item->itemid, row[37]);
 		}
 		else
 		{
@@ -502,12 +500,12 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		char			*name_esc, *delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
-					*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *snmp_community_esc,
-					*snmp_oid_esc, *snmpv3_securityname_esc, *snmpv3_authpassphrase_esc,
-					*snmpv3_privpassphrase_esc, *username_esc, *password_esc, *publickey_esc,
-					*privatekey_esc, *description_esc, *lifetime_esc, *snmpv3_contextname_esc,
-					*port_esc;
+		char			*name_esc, *delay_esc, *history_esc, *trends_esc, *trapper_hosts_esc,
+					*units_esc, *formula_esc, *logtimefmt_esc, *params_esc, *ipmi_sensor_esc,
+					*snmp_community_esc, *snmp_oid_esc, *snmpv3_securityname_esc,
+					*snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc, *username_esc,
+					*password_esc, *publickey_esc, *privatekey_esc, *description_esc, *lifetime_esc,
+					*snmpv3_contextname_esc, *port_esc;
 		zbx_template_item_t	*item = items->values[i];
 
 		/* skip new items */
@@ -515,7 +513,9 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 			continue;
 
 		name_esc = DBdyn_escape_string(item->name);
-		delay_flex_esc = DBdyn_escape_string(item->delay_flex);
+		delay_esc = DBdyn_escape_string(item->delay);
+		history_esc = DBdyn_escape_string(item->history);
+		trends_esc = DBdyn_escape_string(item->trends);
 		trapper_hosts_esc = DBdyn_escape_string(item->trapper_hosts);
 		units_esc = DBdyn_escape_string(item->units);
 		formula_esc = DBdyn_escape_string(item->formula);
@@ -542,10 +542,9 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					"type=%d,"
 					"value_type=%d,"
 					"data_type=%d,"
-					"delay=%d,"
-					"delay_flex='%s',"
-					"history=%d,"
-					"trends=%d,"
+					"delay='%s',"
+					"history='%s',"
+					"trends='%s',"
 					"status=%d,"
 					"trapper_hosts='%s',"
 					"units='%s',"
@@ -580,8 +579,8 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 					"port='%s'"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type,
-				(int)item->data_type, item->delay, delay_flex_esc,
-				item->history, item->trends, (int)item->status, trapper_hosts_esc,
+				(int)item->data_type, delay_esc,
+				history_esc, trends_esc, (int)item->status, trapper_hosts_esc,
 				units_esc, (int)item->multiplier, (int)item->delta, formula_esc,
 				logtimefmt_esc, DBsql_id_ins(item->valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc,
@@ -615,7 +614,9 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		zbx_free(formula_esc);
 		zbx_free(units_esc);
 		zbx_free(trapper_hosts_esc);
-		zbx_free(delay_flex_esc);
+		zbx_free(trends_esc);
+		zbx_free(history_esc);
+		zbx_free(delay_esc);
 		zbx_free(name_esc);
 	}
 
@@ -632,7 +633,7 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	itemid = DBget_maxid_num("items", new_items);
 
 	zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
-			"data_type", "delay", "delay_flex", "history", "trends", "status", "trapper_hosts", "units",
+			"data_type", "delay", "history", "trends", "status", "trapper_hosts", "units",
 			"multiplier", "delta", "formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
 			"snmp_community", "snmp_oid", "snmpv3_securityname", "snmpv3_securitylevel",
 			"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol", "snmpv3_privpassphrase",
@@ -649,7 +650,7 @@ void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, itemid, item->name, item->key, hostid, (int)item->type,
-				(int)item->value_type, (int)item->data_type, item->delay, item->delay_flex,
+				(int)item->value_type, (int)item->data_type, item->delay,
 				item->history, item->trends, (int)item->status, item->trapper_hosts, item->units,
 				(int)item->multiplier, (int)item->delta, item->formula, item->logtimefmt,
 				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_community, item->snmp_oid,
@@ -1019,7 +1020,9 @@ void	free_template_item(zbx_template_item_t *item)
 	zbx_free(item->formula);
 	zbx_free(item->units);
 	zbx_free(item->trapper_hosts);
-	zbx_free(item->delay_flex);
+	zbx_free(item->trends);
+	zbx_free(item->history);
+	zbx_free(item->delay);
 	zbx_free(item->name);
 	zbx_free(item->key);
 
