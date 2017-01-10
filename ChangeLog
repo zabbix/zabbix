@@ -7,7 +7,6 @@ Bug fixes:
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 ..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
-.......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ........S. [ZBX-11628] fixed global regexps to be extracted from log.count[] and logrt.count[] keys (vso)
 A.F....... [ZBX-11482] improved performance for getting last value of web items by limiting query results for values in last 24h; thanks to D.Spindel Ljungmark for patch (Cemeris)
@@ -318,7 +317,6 @@ Bug fixes:
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 ..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
-.......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 A.F....... [ZBX-11482] improved performance for getting last value of web items by limiting query results for values in last 24h; thanks to D.Spindel Ljungmark for patch (Cemeris)
 .......PS. [ZBX-11630] added escaping '"', ''', '&', '<' and '>' characters in SOAP XML for VMware requests (Sergejs)
@@ -1921,7 +1919,6 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
-.......PS. [ZBX-11655] fixed mysql column limit calculation when using UTF-8 (vso) 
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
 ..F....... [ZBX-11354] fixed applications being reset in templated items and item prototypes when modifying its parent (Ivo)
