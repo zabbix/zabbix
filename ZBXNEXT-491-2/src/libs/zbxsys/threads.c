@@ -193,7 +193,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	return status;
 }
 
-long int	zbx_get_thread_id()
+long int	zbx_get_thread_id(void)
 {
 #ifdef _WINDOWS
 	return (long int)GetCurrentThreadId();
