@@ -2165,7 +2165,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return dst;
 }
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_MYSQL)
+#ifndef HAVE_IBM_DB2
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_dyn_escape_string_len                                     *
@@ -2190,7 +2190,9 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
 			break;
 
-#ifdef HAVE_POSTGRESQL
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
 		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
@@ -2213,8 +2215,8 @@ out:
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Comments: This function is used to escape strings where fields are         *
- *           limited by bytes rather than characters.                         *
+ * Comments: This function is used to escape strings for IBM DB2 where fields *
+ *           are limited by bytes rather than characters.                     *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
@@ -2237,11 +2239,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (max_src_len < csize)
 			break;
 
-#ifdef HAVE_MYSQL
-		if ('\'' == *s || '\\' == *s)
-#else
 		if ('\'' == *s)
-#endif
 			len++;
 
 		s += csize;
