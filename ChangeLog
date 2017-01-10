@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
 ..F....... [ZBX-11642] fixed undefined index on Problem page with disabled guest user (Ivo)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 ..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
