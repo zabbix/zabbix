@@ -26,7 +26,7 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-
+#include "zbxtasks.h"
 #include "scripts.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
@@ -190,15 +190,6 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, zbx_script_t *scr
 			item.username = script->username;
 			item.password = script->password;
 			break;
-	}
-
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-			&script->port, MACRO_TYPE_COMMON, NULL, 0);
-
-	if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
-	{
-		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", script->port);
-		goto fail;
 	}
 
 #ifdef HAVE_SSH2
@@ -410,6 +401,15 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			/* break; is not missing here */
 		case ZBX_SCRIPT_TYPE_TELNET:
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+					&script->port, MACRO_TYPE_COMMON, NULL, 0);
+
+			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
+			{
+				zbx_snprintf(error, max_error_len, "Invalid port number \"%s\"", script->port);
+				goto out;
+			}
+
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
 					&script->username, MACRO_TYPE_COMMON, NULL, 0);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
 					&script->password, MACRO_TYPE_COMMON, NULL, 0);
@@ -518,6 +518,42 @@ int	zbx_script_execute(zbx_script_t *script, const DC_HOST *host, char **result,
 		*result = zbx_strdup(*result, "");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_script_create_task                                           *
+ *                                                                            *
+ * Purpose: creates remote command task from a script                         *
+ *                                                                            *
+ * Return value:  SUCCEED - the task was created successfully                 *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
+{
+	zbx_task_remote_command_t	*task;
+	int				ret;
+	unsigned short			port;
+
+	if (NULL != script->port && '\0' != script->port[0])
+		is_ushort(script->port, &port);
+	else
+		port = 0;
+
+	task = zbx_task_remote_command_new();
+
+	zbx_task_remote_command_init(task, 0, ZBX_TM_TASK_SEND_REMOTE_COMMAND, ZBX_TM_STATUS_INPROGRESS, now,
+			ZBX_REMOTE_COMMAND_TTL, script->type, script->command, script->execute_on, port,
+			script->authtype, script->username, script->password, script->publickey, script->privatekey,
+			0, host->hostid, alertid);
+
+	ret = zbx_task_remote_command_save(task, 1);
+
+	zbx_task_remote_command_clear(task);
+	zbx_task_remote_command_free(task);
 
 	return ret;
 }

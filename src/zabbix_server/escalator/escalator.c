@@ -852,7 +852,12 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 			}
 
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, error, sizeof(error))))
-				rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
+			{
+				if (0 == host.proxy_hostid)
+					rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
+				else
+					rc = zbx_script_create_task(&script, &host, alertid, time(NULL));
+			}
 		}
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
