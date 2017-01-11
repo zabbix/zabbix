@@ -92,12 +92,10 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 		}
 
 		foreach ($interfaces[$type] as $interface) {
-			$connect_to = ($interface['useip'] == INTERFACE_USE_IP) ? INTERFACE_USE_IP : INTERFACE_USE_DNS;
-
 			$ifTab->addRow([
 				(new CTextBox('ip', $interface['ip'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
 				(new CTextBox('dns', $interface['dns'], true, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
-				(new CRadioButtonList('useip['.$interface['interfaceid'].']', $connect_to))
+				(new CRadioButtonList('useip['.$interface['interfaceid'].']', (int) $interface['useip']))
 					->addValue(_('IP'), INTERFACE_USE_IP)
 					->addValue(_('DNS'), INTERFACE_USE_DNS)
 					->setModern(true)
@@ -110,7 +108,9 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 		}
 
 		$overviewFormList->addRow($interface_names[$type],
-			(new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			(new CDiv($ifTab))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 		);
 	}
 }
