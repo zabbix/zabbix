@@ -23,19 +23,19 @@
 #include "db.h"
 #include "zbxjson.h"
 
-#define	ZBX_REMOTE_COMMAND_TTL	600
+#define	ZBX_REMOTE_COMMAND_TTL	(SEC_PER_MIN * 10)
 
 /******************/
 /*                */
 /* remote command */
 /*                */
 /******************/
-struct zbx_task_remote_command;
+typedef struct zbx_task_remote_command zbx_task_remote_command_t;
 
 struct zbx_task_remote_command	*zbx_task_remote_command_new(void);
-void				zbx_task_remote_command_free(struct zbx_task_remote_command *cmd);
+void				zbx_task_remote_command_free(zbx_task_remote_command_t*cmd);
 
-int	zbx_task_remote_command_init(struct zbx_task_remote_command *cmd,
+int	zbx_task_remote_command_init(zbx_task_remote_command_t *cmd,
 		zbx_uint64_t	taskid,
 		int		type,
 		int		status,
@@ -53,26 +53,28 @@ int	zbx_task_remote_command_init(struct zbx_task_remote_command *cmd,
 		zbx_uint64_t	parent_taskid,
 		zbx_uint64_t	hostid,
 		zbx_uint64_t	alertid);
-int	zbx_task_remote_command_init_from_json(struct zbx_task_remote_command *cmd,
+int	zbx_task_remote_command_init_from_json(zbx_task_remote_command_t *cmd,
 		zbx_uint64_t	taskid,
 		const char	*opening_brace);
-void	zbx_task_remote_command_clear(struct zbx_task_remote_command *cmd);
+void	zbx_task_remote_command_clear(zbx_task_remote_command_t *cmd);
 
 void	zbx_task_remote_command_db_insert_prepare(zbx_db_insert_t *db_task_insert, zbx_db_insert_t *db_task_remote_command_insert);
-void	zbx_task_remote_command_db_insert_add_values(const struct zbx_task_remote_command *cmd,
+void	zbx_task_remote_command_db_insert_add_values(const zbx_task_remote_command_t*cmd,
 		zbx_db_insert_t *db_task_insert,
 		zbx_db_insert_t *db_task_remote_command_insert);
-void	zbx_task_remote_command_serialize_json(const struct zbx_task_remote_command *cmd, struct zbx_json *json);
+void	zbx_task_remote_command_serialize_json(const zbx_task_remote_command_t*cmd, struct zbx_json *json);
 
-void	zbx_task_remote_command_process_task(struct zbx_task_remote_command *cmd);
-void	zbx_task_remote_command_log(const struct zbx_task_remote_command *cmd);
+void	zbx_task_remote_command_process_task(zbx_task_remote_command_t*cmd);
+void	zbx_task_remote_command_log(const zbx_task_remote_command_t*cmd);
+
+int	zbx_task_remote_command_save(zbx_task_remote_command_t *tasks, int tasks_num);
 
 /*************************/
 /*                       */
 /* remote command result */
 /*                       */
 /*************************/
-struct zbx_task_remote_command_result;
+typedef struct zbx_task_remote_command_result zbx_task_remote_command_result_t;
 
 struct zbx_task_remote_command_result	*zbx_task_remote_command_result_new(void);
 void					zbx_task_remote_command_result_free(struct zbx_task_remote_command_result *res);

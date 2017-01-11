@@ -63,7 +63,7 @@ struct zbx_task_remote_command	*zbx_task_remote_command_new(void)
 	return cmd;
 }
 
-void	zbx_task_remote_command_free(struct zbx_task_remote_command *cmd)
+void	zbx_task_remote_command_free(zbx_task_remote_command_t*cmd)
 {
 	assert(NULL != cmd);
 
@@ -77,7 +77,7 @@ void	zbx_task_remote_command_free(struct zbx_task_remote_command *cmd)
 	zbx_free(cmd);
 }
 
-static int	zbx_task_remote_command_validate(const struct zbx_task_remote_command *cmd)
+static int	zbx_task_remote_command_validate(const zbx_task_remote_command_t*cmd)
 {
 	int	ret = FAIL;
 
@@ -161,7 +161,7 @@ err:
 	return ret;
 }
 
-int	zbx_task_remote_command_init(struct zbx_task_remote_command *cmd,
+int	zbx_task_remote_command_init(zbx_task_remote_command_t*cmd,
 		zbx_uint64_t	taskid,
 		int		type,
 		int		status,
@@ -182,33 +182,20 @@ int	zbx_task_remote_command_init(struct zbx_task_remote_command *cmd,
 {
 	int	ret = FAIL;
 
-	assert(NULL != cmd);
-	assert(NULL == cmd->command); /* the cmd is cleared - detect memory leak */
-	assert(NULL == cmd->username);
-	assert(NULL == cmd->password);
-	assert(NULL == cmd->publickey);
-	assert(NULL == cmd->privatekey);
-
-	assert(NULL != command);
-	assert(NULL != username);
-	assert(NULL != password);
-	assert(NULL != publickey);
-	assert(NULL != privatekey);
-
 	cmd->task.taskid = taskid,
 	cmd->task.type = type,
 	cmd->task.status = status;
 	cmd->task.clock = clock;
 	cmd->task.ttl = ttl;
 	cmd->commandtype = commandtype;
-	cmd->command = zbx_strdup(cmd->command, command);
+	cmd->command = zbx_strdup(cmd->command, ZBX_NULL2EMPTY_STR(command));
 	cmd->execute_on = execute_on;
 	cmd->port = port;
 	cmd->authtype = authtype;
-	cmd->username = zbx_strdup(cmd->username, username);
-	cmd->password = zbx_strdup(cmd->password, password);
-	cmd->publickey = zbx_strdup(cmd->publickey, publickey);
-	cmd->privatekey = zbx_strdup(cmd->privatekey, privatekey);
+	cmd->username = zbx_strdup(cmd->username, ZBX_NULL2EMPTY_STR(username));
+	cmd->password = zbx_strdup(cmd->password, ZBX_NULL2EMPTY_STR(password));
+	cmd->publickey = zbx_strdup(cmd->publickey, ZBX_NULL2EMPTY_STR(publickey));
+	cmd->privatekey = zbx_strdup(cmd->privatekey, ZBX_NULL2EMPTY_STR(privatekey));
 	cmd->parent_taskid = parent_taskid;
 	cmd->hostid = hostid;
 	cmd->alertid = alertid;
@@ -218,7 +205,7 @@ int	zbx_task_remote_command_init(struct zbx_task_remote_command *cmd,
 	return ret;
 }
 
-int     zbx_task_remote_command_init_from_json(struct zbx_task_remote_command *cmd,
+int     zbx_task_remote_command_init_from_json(zbx_task_remote_command_t*cmd,
 		zbx_uint64_t	taskid,
 		const char	*opening_brace)
 {
@@ -353,7 +340,7 @@ err:
 	return ret;
 }
 
-void	zbx_task_remote_command_clear(struct zbx_task_remote_command *cmd)
+void	zbx_task_remote_command_clear(zbx_task_remote_command_t*cmd)
 {
 	assert(NULL != cmd);
 	/* not asserting that members are not NULL since partially initialized cmd can be cleared as well */
@@ -399,7 +386,7 @@ void	zbx_task_remote_command_db_insert_prepare(zbx_db_insert_t *db_task_insert,
 		NULL);
 }
 
-void	zbx_task_remote_command_db_insert_add_values(const struct zbx_task_remote_command *cmd,
+void	zbx_task_remote_command_db_insert_add_values(const zbx_task_remote_command_t*cmd,
 		zbx_db_insert_t *db_task_insert,
 		zbx_db_insert_t *db_task_remote_command_insert)
 {
@@ -436,7 +423,7 @@ void	zbx_task_remote_command_db_insert_add_values(const struct zbx_task_remote_c
 		cmd->hostid);
 }
 
-void	zbx_task_remote_command_serialize_json(const struct zbx_task_remote_command *cmd, struct zbx_json *json)
+void	zbx_task_remote_command_serialize_json(const zbx_task_remote_command_t*cmd, struct zbx_json *json)
 {
 	assert(NULL != cmd);
 	assert(NULL != json);
@@ -467,7 +454,7 @@ void	zbx_task_remote_command_serialize_json(const struct zbx_task_remote_command
 	zbx_json_close(json);
 }
 
-static void	zbx_task_remote_command_process_new_task(struct zbx_task_remote_command *cmd)
+static void	zbx_task_remote_command_process_new_task(zbx_task_remote_command_t*cmd)
 {
 	zbx_uint64_t				taskid;
 	struct zbx_task_remote_command_result	*res;
@@ -530,7 +517,7 @@ err:
 	zbx_task_remote_command_result_free(res);
 }
 
-void	zbx_task_remote_command_process_task(struct zbx_task_remote_command *cmd)
+void	zbx_task_remote_command_process_task(zbx_task_remote_command_t*cmd)
 {
 	/* TODO: not finished yet */
 
@@ -543,7 +530,7 @@ void	zbx_task_remote_command_process_task(struct zbx_task_remote_command *cmd)
 	}
 }
 
-void	zbx_task_remote_command_log(const struct zbx_task_remote_command *cmd)
+void	zbx_task_remote_command_log(const zbx_task_remote_command_t*cmd)
 {
 	assert(NULL != cmd);
 	assert(NULL != cmd->command); /* cmd is initialized */
@@ -569,4 +556,42 @@ void	zbx_task_remote_command_log(const struct zbx_task_remote_command *cmd)
 	zabbix_log(LOG_LEVEL_ERR, "cmd->parent_taskid: " ZBX_FS_UI64, cmd->parent_taskid);
 	zabbix_log(LOG_LEVEL_ERR, "cmd->hostid: " ZBX_FS_UI64, cmd->hostid);
 	zabbix_log(LOG_LEVEL_ERR, "cmd->alertid: " ZBX_FS_UI64, cmd->hostid);
+}
+
+int	zbx_task_remote_command_save(zbx_task_remote_command_t *tasks, int tasks_num)
+{
+	const char	*__function_name = "zbx_task_remote_command_save";
+	int		i, ret;
+	zbx_uint64_t	taskid;
+	zbx_db_insert_t	db_insert_task, db_insert_data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, tasks_num);
+
+	zbx_db_insert_prepare(&db_insert_task, "task", "taskid", "type", "status", "clock", "ttl", NULL);
+	zbx_db_insert_prepare(&db_insert_data, "task_remote_command", "taskid", "command_type", "execute_on", "port",
+			"authtype", "username", "password", "publickey", "privatekey", "command", "alertid",
+			"parent_taskid", "hostid", NULL);
+
+	taskid = DBget_maxid_num("task", tasks_num);
+
+	for (i = 0; i < tasks_num; i++)
+	{
+		zbx_db_insert_add_values(&db_insert_task, taskid, tasks[i].task.type, tasks[i].task.status,
+				tasks[i].task.clock, tasks[i].task.clock);
+
+		zbx_db_insert_add_values(&db_insert_data, taskid++, (int)tasks[i].commandtype, (int)tasks[i].execute_on,
+				(int)tasks[i].port, (int)tasks[i].authtype, tasks[i].username, tasks[i].password,
+				tasks[i].publickey, tasks[i].privatekey, tasks[i].command, tasks[i].alertid,
+				tasks[i].parent_taskid, tasks[i].hostid);
+	}
+
+	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert_task)))
+		ret = zbx_db_insert_execute(&db_insert_data);
+
+	zbx_db_insert_clean(&db_insert_task);
+	zbx_db_insert_clean(&db_insert_data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
