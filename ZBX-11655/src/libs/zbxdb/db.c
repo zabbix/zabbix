@@ -2009,6 +2009,20 @@ ub4	OCI_DBserver_status()
 }
 #endif	/* HAVE_ORACLE */
 
+static int	zbx_db_is_escape_sequence(char c)
+{
+#if defined(HAVE_MYSQL)
+		if ('\'' == c || '\\' == c)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == c || ('\\' == c && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == c)
+#endif
+			return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_get_escape_string_len                                     *
@@ -2017,7 +2031,7 @@ ub4	OCI_DBserver_status()
  *               with terminating '\0'                                        *
  *                                                                            *
  * Comments: sync changes with 'zbx_db_escape_string'                         *
- *           and 'zbx_db_dyn_escape_string_len'                               *
+ *           and 'zbx_db_dyn_escape_string_size_len'                          *
  *                                                                            *
  ******************************************************************************/
 static size_t	zbx_db_get_escape_string_len(const char *src)
@@ -2029,13 +2043,8 @@ static size_t	zbx_db_get_escape_string_len(const char *src)
 	{
 		if ('\r' == *s)
 			continue;
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
+
+		if (SUCCEED == zbx_db_is_escape_sequence(*s))
 			len++;
 
 		len++;
@@ -2051,7 +2060,7 @@ static size_t	zbx_db_get_escape_string_len(const char *src)
  * Return value: escaped string                                               *
  *                                                                            *
  * Comments: sync changes with 'zbx_db_get_escape_string_len'                 *
- *           and 'zbx_db_dyn_escape_string_len'                               *
+ *           and 'zbx_db_dyn_escape_string_size_len'                          *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
@@ -2072,13 +2081,7 @@ static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
+		if (SUCCEED == zbx_db_is_escape_sequence(*s))
 		{
 			if (2 > len)
 				break;
@@ -2118,28 +2121,26 @@ char	*zbx_db_dyn_escape_string(const char *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_dyn_escape_string_size_len                                *
+ * Function: zbx_db_calculate_escape_len                                      *
  *                                                                            *
- * Purpose: to escape string limited by bytes or characters, whichever limit  *
- *          is reached first.                                                 *
+ * Purpose: to calculate escaped string length limited by bytes or characters *
+ *          whichever is reached first.                                       *
  *                                                                            *
- * Parameters: src       - [IN] string to escape                              *
+ * Parameters: s         - [IN] string to escape                              *
  *             max_bytes - [IN] limit in bytes                                *
  *             max_chars - [IN] limit in characters                           *
  *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
+ * Return value: escaped string length + 1 , can be bigger than s length      *
+ *               because escape sequences take 2 bytes                        *
  ******************************************************************************/
-char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars)
+static size_t	zbx_db_calculate_escape_len(const char *s, size_t max_bytes, size_t max_chars)
 {
-	const char	*s;
-	char		*dst = NULL;
 	size_t		csize, len = 1;	/* '\0' */
 
-	if (NULL == src)
-		goto out;
+	if (NULL == s)
+		return len;
 
-	for (s = src; '\0' != *s && 0 < max_chars;)
+	while ('\0' != *s && 0 < max_chars)
 	{
 		if ('\r' == *s)
 		{
@@ -2156,13 +2157,7 @@ char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_
 		if (max_bytes < csize)
 			break;
 
-#if defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#elif defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#else
-		if ('\'' == *s)
-#endif
+		if (SUCCEED == zbx_db_is_escape_sequence(*s))
 			len++;
 
 		s += csize;
@@ -2170,7 +2165,31 @@ char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_
 		max_bytes -= csize;
 		max_chars--;
 	}
-out:
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string_size_len                                *
+ *                                                                            *
+ * Purpose: to escape string limited by bytes or characters, whichever limit  *
+ *          is reached first.                                                 *
+ *                                                                            *
+ * Parameters: src       - [IN] string to escape                              *
+ *             max_bytes - [IN] limit in bytes                                *
+ *             max_chars - [IN] limit in characters                           *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars)
+{
+	char		*dst = NULL;
+	size_t		len;
+
+	len = zbx_db_calculate_escape_len(src, max_bytes, max_chars);
+
 	dst = zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len);
