@@ -2553,8 +2553,6 @@ $form-icon-btn: (
 	z-index: 1000;
 }
 
-
-
 .dashbrd-grid-widget-content {
 	flex: 1;
 	padding: .5rem;
@@ -2566,6 +2564,34 @@ $form-icon-btn: (
 .dashbrd-grid-widget {
 	display: flex;
 	position: absolute;
+}
+
+.ui-resizable-border-n {
+	border-bottom: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-e {
+	border-left: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-border-s {
+	border-top: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-w {
+	border-right: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
 }
 
 .ui-resizable-n {
