@@ -18,10 +18,10 @@
 **/
 
 #include "common.h"
-#include "poller/checks_agent.h"
-#include "poller/checks_ipmi.h"
-#include "poller/checks_ssh.h"
-#include "poller/checks_telnet.h"
+#include "../poller/checks_agent.h"
+#include "../poller/checks_ipmi.h"
+#include "../poller/checks_ssh.h"
+#include "../poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxserver.h"
 #include "db.h"
@@ -31,7 +31,7 @@
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char **result,
+static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_agent";
@@ -143,7 +143,7 @@ fail:
 }
 #endif
 
-static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, char **result,
+static int	zbx_execute_script_on_terminal(const DC_HOST *host, zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
@@ -317,7 +317,7 @@ exit:
 	return ret;
 }
 
-static int	check_user_permissions(zbx_uint64_t userid, DC_HOST *host, zbx_script_t *script)
+static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_script_t *script)
 {
 	const char	*__function_name = "check_user_permissions";
 	int		ret = SUCCEED;
@@ -369,7 +369,93 @@ void	zbx_script_clean(zbx_script_t *script)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_execute_script                                               *
+ * Function: zbx_script_prepare                                               *
+ *                                                                            *
+ * Purpose: prepares user script                                              *
+ *                                                                            *
+ * Parameters: host          - [IN] the host the script will be executed on   *
+ *             script        - [IN/OUT] the script to prepare                 *
+ *             user          - [IN] the user executing script                 *
+ *             error         - [OUT] the error message output buffer          *
+ *             mas_error_len - [IN] the size of error message output buffer   *
+ *                                                                            *
+ * Return value:  SUCCEED - the script has been prepared successfully         *
+ *                FAIL    - otherwise, error contains error message           *
+ *                                                                            *
+ * Comments: This function prepares script for execution by loading global    *
+ *           script/expanding macros.                                         *
+ *           Prepared scripts must be always freed with zbx_script_clean()    *
+ *           function.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
+		size_t max_error_len)
+{
+	const char	*__function_name = "zbx_script_prepare";
+	int		ret = FAIL;
+	zbx_uint64_t	groupid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	switch (script->type)
+	{
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
+			break;
+		case ZBX_SCRIPT_TYPE_SSH:
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
+			/* break; is not missing here */
+		case ZBX_SCRIPT_TYPE_TELNET:
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+					&script->username, MACRO_TYPE_COMMON, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+					&script->password, MACRO_TYPE_COMMON, NULL, 0);
+			break;
+		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
+			{
+				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
+				goto out;
+			}
+			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
+			{
+				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+						max_error_len);
+				goto out;
+			}
+			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
+				SUCCEED != check_user_permissions(user->userid, host, script))
+			{
+				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
+						max_error_len);
+				goto out;
+			}
+
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, &script->command,
+					MACRO_TYPE_SCRIPT, NULL, 0);
+
+			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len))
+				goto out;
+
+			break;
+		default:
+			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_script_execute                                               *
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
@@ -377,16 +463,11 @@ void	zbx_script_clean(zbx_script_t *script)
  *                FAIL - an error occurred                                    *
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
- * Comments: !!! always call 'zbx_script_clean' function after                *
- *           'zbx_execute_script' to clear allocated memory                   *
- *                                                                            *
  ******************************************************************************/
-int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, char **result, char *error,
-		size_t max_error_len)
+int	zbx_script_execute(zbx_script_t *script, const DC_HOST *host, char **result, char *error, size_t max_error_len)
 {
-	const char	*__function_name = "zbx_execute_script";
+	const char	*__function_name = "zbx_script_execute";
 	int		ret = FAIL;
-	zbx_uint64_t	groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -395,13 +476,11 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
-
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-					ret = zbx_execute_script_on_agent(host, script->command, result,
-							error, max_error_len);
+					ret = zbx_execute_script_on_agent(host, script->command, result, error,
+							max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 					ret = zbx_execute(script->command, result, error, max_error_len,
@@ -424,49 +503,12 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 #endif
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-#ifdef HAVE_SSH2
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
-			/* break; is not missing here */
-#else
+#ifndef HAVE_SSH2
 			zbx_strlcpy(error, "Support for SSH script was not compiled in.", max_error_len);
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-					&script->username, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-					&script->password, MACRO_TYPE_COMMON, NULL, 0);
-
 			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
-			break;
-		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
-			{
-				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
-				break;
-			}
-			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
-			{
-				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
-						max_error_len);
-				break;
-			}
-			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
-				SUCCEED != check_user_permissions(user->userid, host, script))
-			{
-				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
-						max_error_len);
-				break;
-			}
-
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
-			&script->command, MACRO_TYPE_SCRIPT, NULL, 0);
-
-			ret = zbx_execute_script(host, script, user, result, error, max_error_len);	/* recursion */
-
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);

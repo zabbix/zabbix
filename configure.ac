@@ -1594,6 +1594,7 @@ AC_OUTPUT([
 	src/zabbix_server/selfmon/Makefile
 	src/zabbix_server/vmware/Makefile
 	src/zabbix_server/taskmanager/Makefile
+	src/zabbix_server/scripts/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
