@@ -2485,11 +2485,9 @@ static size_t	get_field_size(unsigned char type)
 		case ZBX_TYPE_LONGTEXT:
 			return ULONG_MAX;
 		case ZBX_TYPE_CHAR:
-			return USHRT_MAX;
 		case ZBX_TYPE_TEXT:
-			return USHRT_MAX;
 		case ZBX_TYPE_SHORTTEXT:
-			return UCHAR_MAX;
+			return USHRT_MAX;
 		default:
 			return 0;
 	}
