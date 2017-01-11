@@ -1446,7 +1446,7 @@ int	is_double(const char *str)
  ******************************************************************************/
 int	is_uint_suffix(const char *str, unsigned int *value)
 {
-	const unsigned int	max_uint = ~0U;
+	const unsigned int	max_uint = ZBX_MAX_UINT;
 	unsigned int		value_uint = 0, c, factor = 1;
 
 	if ('\0' == *str || '0' > *str || *str > '9')

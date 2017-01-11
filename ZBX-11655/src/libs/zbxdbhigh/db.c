@@ -882,9 +882,9 @@ char	*DBdyn_escape_string(const char *src)
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 #ifdef HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string_size_len(src, max_src_len, ~0U);
+	return zbx_db_dyn_escape_string_size_len(src, max_src_len, ZBX_MAX_UINT);
 #else
-	return zbx_db_dyn_escape_string_size_len(src, ~0U, max_src_len);
+	return zbx_db_dyn_escape_string_size_len(src, ZBX_MAX_UINT, max_src_len);
 #endif
 }
 
@@ -2483,7 +2483,7 @@ static size_t	get_field_size(unsigned char type)
 	switch(type)
 	{
 		case ZBX_TYPE_LONGTEXT:
-			return ~0U;
+			return ZBX_MAX_UINT;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:

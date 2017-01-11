@@ -94,6 +94,8 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
+#define ZBX_MAX_UINT		(~0U)
+
 typedef struct
 {
 	int	sec;	/* seconds */
