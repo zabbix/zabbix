@@ -2116,64 +2116,21 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return dst;
 }
 
-#ifndef HAVE_IBM_DB2
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_dyn_escape_string_len                                     *
+ * Function: zbx_db_dyn_escape_string_size_len                                *
+ *                                                                            *
+ * Purpose: to escape string limited by bytes or characters, whichever limit  *
+ *          is reached first.                                                 *
+ *                                                                            *
+ * Parameters: src       - [IN] string to escape                              *
+ *             max_bytes - [IN] limit in bytes                                *
+ *             max_chars - [IN] limit in characters                           *
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
-{
-	const char	*s;
-	char		*dst = NULL;
-	size_t		len = 1;	/* '\0' */
-
-	if (NULL == src)
-		goto out;
-
-	max_src_len++;
-
-	for (s = src; '\0' != *s && 0 < max_src_len; s++)
-	{
-		if ('\r' == *s)
-			continue;
-
-		/* only UTF-8 characters should reduce a variable max_src_len */
-		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
-			break;
-
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
-			len++;
-
-		len++;
-	}
-out:
-	dst = zbx_malloc(dst, len);
-
-	zbx_db_escape_string(src, dst, len);
-
-	return dst;
-}
-#else
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_dyn_escape_string_len                                     *
- *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
- * Comments: This function is used to escape strings for IBM DB2 where fields *
- *           are limited by bytes rather than characters.                     *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
+char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars)
 {
 	const char	*s;
 	char		*dst = NULL;
@@ -2182,7 +2139,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 	if (NULL == src)
 		goto out;
 
-	for (s = src; '\0' != *s;)
+	for (s = src; '\0' != *s && 0 < max_chars;)
 	{
 		if ('\r' == *s)
 		{
@@ -2196,15 +2153,22 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 		if (0 == csize)
 			csize = 1;
 
-		if (max_src_len < csize)
+		if (max_bytes < csize)
 			break;
 
+#if defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#elif defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#else
 		if ('\'' == *s)
+#endif
 			len++;
 
 		s += csize;
 		len += csize;
-		max_src_len -= csize;
+		max_bytes -= csize;
+		max_chars--;
 	}
 out:
 	dst = zbx_malloc(dst, len);
@@ -2213,7 +2177,6 @@ out:
 
 	return dst;
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
