@@ -94,12 +94,11 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
 	IEnumWbemClassObject	*pEnumerator = 0;
-	IWbemClassObject	*pclsObj = 0;
-	ULONG			uReturn = 0;
 	int			ret = SYSINFO_RET_FAIL;
 	HRESULT			hres;
 	wchar_t			*wmi_namespace_wide;
 	wchar_t			*wmi_query_wide;
+	ULONG			obj_num = 0;
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
 	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
@@ -107,7 +106,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain WMI locator service");
-		goto out;
+		goto exit;
 	}
 
 	wmi_namespace_wide = zbx_utf8_to_unicode(wmi_namespace);
@@ -117,7 +116,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain %s WMI service", wmi_namespace);
-		goto out;
+		goto exit;
 	}
 
 	/* set the IWbemServices proxy so that impersonation of the user (client) occurs */
@@ -127,7 +126,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot set IWbemServices proxy");
-		goto out;
+		goto exit;
 	}
 
 	wmi_query_wide = zbx_utf8_to_unicode(wmi_query);
@@ -138,34 +137,54 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to execute WMI query %s", wmi_query);
-		goto out;
+		goto exit;
 	}
 
-	hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-
-	if (0 == uReturn)
-		goto out;
-
-	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
-
-	if (FAILED(hres))
+	while (pEnumerator)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
-		goto out;
+		IWbemClassObject	*pclsObj = 0;
+		ULONG			uReturn = 0;
+
+		hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+
+		if (0 == uReturn)
+			goto exit;
+
+		obj_num += uReturn;
+
+		if (1 == obj_num)
+		{
+			hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+
+			if (FAILED(hres))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+				goto out;
+			}
+
+			hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
+
+			if (FAILED(hres))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR",
+						vtProp->vt);
+				goto out;
+			}
+
+			pclsObj->EndEnumeration();
+
+			if (FAILED(hres) || hres == WBEM_S_NO_MORE_DATA)
+				goto out;
+			else
+				ret = SYSINFO_RET_OK;
+		}
+
+out:
+		if (0 != pclsObj)
+			pclsObj->Release();
 	}
 
-	hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
-
-	pclsObj->EndEnumeration();
-
-	if (FAILED(hres) || hres == WBEM_S_NO_MORE_DATA)
-		goto out;
-
-	ret = SYSINFO_RET_OK;
-out:
-	if (0 != pclsObj)
-		pclsObj->Release();
-
+exit:
 	if (0 != pEnumerator)
 		pEnumerator->Release();
 
@@ -176,7 +195,7 @@ out:
 		pLoc->Release();
 
 	return ret;
-}	
+}
 
 /******************************************************************************
  *                                                                            *
