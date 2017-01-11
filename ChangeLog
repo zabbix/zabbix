@@ -1922,6 +1922,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-9889,ZBX-11674] fixed vmware.eventlog item values to have unique timestamps in history table (dimir)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)
 ..F....... [ZBX-11527] fixed displaying maintenance icon for trigger element in maps (Cemeris)
