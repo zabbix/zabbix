@@ -94,10 +94,11 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
 	IEnumWbemClassObject	*pEnumerator = 0;
-	int			ret = SYSINFO_RET_FAIL, obj_num = 0;
+	int			ret = SYSINFO_RET_FAIL;
 	HRESULT			hres;
 	wchar_t			*wmi_namespace_wide;
 	wchar_t			*wmi_query_wide;
+	ULONG			obj_num = 0;
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
 	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
@@ -165,7 +166,8 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 
 			if (FAILED(hres))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", vtProp->vt);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR",
+						vtProp->vt);
 				goto out;
 			}
 
