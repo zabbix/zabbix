@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
 ..F....... [ZBX-11642] fixed undefined index on Problem page with disabled guest user (Ivo)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
@@ -315,6 +316,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 ..F....... [ZBX-11661] prevented requesting all screens in slide show when slide show screens are deleted (Cemeris)
