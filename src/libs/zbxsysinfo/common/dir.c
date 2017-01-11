@@ -96,7 +96,7 @@ static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int ma
  *          within descriptor vector                                          *
  *                                                                            *
  * Parameters: file_a - [IN] file descriptor A                                *
- * Parameters: file_b - [IN] file descriptor B                                *
+ *             file_b - [IN] file descriptor B                                *
  *                                                                            *
  * Return value: If file descriptor values are the same, 0 is returned        *
  *               otherwise nonzero value is returned.                         *
@@ -246,9 +246,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	descriptors;
 #endif
 	if (SUCCEED != prepare_parameters(request, result, &regex_incl, &regex_excl, &mode, &max_depth, &dir, &status))
-	{
 		goto err1;
-	}
 
 #ifndef _WINDOWS
 	zbx_vector_ptr_create(&descriptors);
@@ -272,7 +270,6 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (0 < list.values_num)
 	{
 		item = list.values[--list.values_num];
-
 #ifdef _WINDOWS
 		name = zbx_dsprintf(NULL, "%s\\*", item->path);
 		wpath = zbx_utf8_to_unicode(name);
@@ -283,7 +280,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (-1 == handle)
 		{
-			if (item->depth > 0)
+			if (0 < item->depth)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot open directory listing '%s': %s", item->path,
 					zbx_strerror(errno));
@@ -295,16 +292,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err2;
 		}
 
-		if (SIZE_MODE_DISK == mode)
+		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = get_cluster_size(item->path)))
 		{
-			cluster_size = get_cluster_size(item->path);
-
-			if (0 == cluster_size)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file system cluster size."));
-				list.values_num++;
-				goto err2;
-			}
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file system cluster size."));
+			list.values_num++;
+			goto err2;
 		}
 
 		do
@@ -328,11 +320,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					{
 						file_size = ((zbx_uint64_t)size_high << 32) | size_low;
 
-						if (SIZE_MODE_DISK == mode)
-						{
-							if (0 != (mod = size % cluster_size))
-								file_size += cluster_size - mod;
-						}
+						if (SIZE_MODE_DISK == mode && 0 != (mod = size % cluster_size))
+							file_size += cluster_size - mod;
 
 						size += file_size;
 					}
@@ -357,7 +346,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else /* not _WINDOWS */
 		if (NULL == (directory = opendir(item->path)))
 		{
-			if (item->depth > 0)	/* unreadable subdirectory - skip */
+			if (0 < item->depth)	/* unreadable subdirectory - skip */
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot open directory listing '%s': %s", item->path,
 					zbx_strerror(errno));
@@ -417,10 +406,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					}
 				}
 
-				if (0 != S_ISDIR(status.st_mode))
+				if (0 != S_ISDIR(status.st_mode) && SUCCEED == queue_directory(&list, path, item->depth,
+						max_depth))
 				{
-					if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
-						path = NULL;
+					path = NULL;
 				}
 			}
 			else
