@@ -279,11 +279,6 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-			// set default formula value
-			if (!$update && !isset($item['formula'])) {
-				$item['formula'] = '1';
-			}
-
 			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
 					&& $item['applicationPrototypes']) {
 				// Check that "name" field exists for application prototypes.
