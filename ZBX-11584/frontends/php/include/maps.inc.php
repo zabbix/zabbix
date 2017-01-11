@@ -461,11 +461,25 @@ function getTriggersInfo($selement, $i, $showUnack) {
 
 	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
 			|| in_array($showUnack, [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH]))) {
-		$info['iconid'] = $selement['iconid_on'];
-		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info']['unack'] = [
 			'msg' => _('PROBLEM'),
 			'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
+		];
+
+		if (!array_key_exists('maintenance_title', $i)) {
+			$info['iconid'] = $selement['iconid_on'];
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+
+			return $info;
+		}
+	}
+
+	if (array_key_exists('maintenance_title', $i)) {
+		$info['iconid'] = $selement['iconid_maintenance'];
+		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+		$info['info']['maintenance'] = [
+			'msg' => _('MAINTENANCE').' ('.$i['maintenance_title'].')',
+			'color' => 'EE9600'
 		];
 	}
 	elseif ($i['trigger_disabled']) {
@@ -540,7 +554,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		}
 	}
 
-	if ($i['maintenance']) {
+	if (array_key_exists('maintenance_title', $i)) {
 		$info['iconid'] = $selement['iconid_maintenance'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		$info['info']['maintenance'] = [
@@ -920,23 +934,19 @@ function getSelementsInfo($sysmap, array $options = []) {
 	$allHosts = zbx_toHash($allHosts, 'hostid');
 
 	// get triggers data, triggers from current map, select all
-	$allTriggers = [];
-
 	if (!empty($triggerIdToSelementIds)) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
+			'selectHosts' => ['maintenance_status', 'maintenanceid'],
 			'selectLastEvent' => ['acknowledged'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => ['state' => null],
-			'nopermissions' => true,
-			'preservekeys' => true
+			'nopermissions' => true
 		]);
 
-		$allTriggers = array_merge($allTriggers, $triggers);
-
-		foreach ($triggers as $triggerId => $trigger) {
-			foreach ($triggerIdToSelementIds[$triggerId] as $selementId) {
-				$selements[$selementId]['triggers'][$triggerId] = $triggerId;
+		foreach ($triggers as $trigger) {
+			foreach ($triggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
 	}
@@ -954,11 +964,9 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'only_true' => true
 		]);
 
-		$allTriggers = array_merge($allTriggers, $triggers);
-
-		foreach ($triggers as $triggerId => $trigger) {
-			foreach ($subSysmapTriggerIdToSelementIds[$triggerId] as $selementId) {
-				$selements[$selementId]['triggers'][$triggerId] = $triggerId;
+		foreach ($triggers as $trigger) {
+			foreach ($subSysmapTriggerIdToSelementIds[$trigger['triggerid']] as $belongs_to_sel) {
+				$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 			}
 		}
 	}
@@ -972,7 +980,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if ($monitored_hostids) {
-		$triggersFromMonitoredHosts = API::Trigger()->get([
+		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
@@ -986,13 +994,11 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'only_true' => true
 		]);
 
-		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
+		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				$hostId = $host['hostid'];
-
-				if (isset($hostIdToSelementIds[$hostId])) {
-					foreach ($hostIdToSelementIds[$hostId] as $selementId) {
-						$selements[$selementId]['triggers'][$triggerId] = $triggerId;
+				if (isset($hostIdToSelementIds[$host['hostid']])) {
+					foreach ($hostIdToSelementIds[$host['hostid']] as $belongs_to_sel) {
+						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 					}
 				}
 			}
@@ -1001,14 +1007,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$subSysmapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
 			$hostsFromHostGroups
 		);
-		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggersFromMonitoredHosts,
+		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggers,
 			$subSysmapTriggerIdToSelementIds
 		);
-
-		$allTriggers = array_merge($allTriggers, $triggersFromMonitoredHosts);
 	}
-
-	$allTriggers = zbx_toHash($allTriggers, 'triggerid');
 
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
@@ -1037,9 +1039,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 
 		$last_event = false;
 
-		foreach ($selement['triggers'] as $triggerId) {
-			$trigger = $allTriggers[$triggerId];
-
+		foreach ($selement['triggers'] as $trigger) {
 			if ($options['severity_min'] <= $trigger['priority']) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
 					$i['trigger_disabled']++;
@@ -1047,7 +1047,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 				else {
 					if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 						$i['problem']++;
-						$lastProblemId = $triggerId;
+						$lastProblemId = $trigger['triggerid'];
 
 						if ($i['priority'] < $trigger['priority']) {
 							$i['priority'] = $trigger['priority'];
@@ -1071,16 +1071,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
 		if ($sysmap['expandproblem'] && $i['problem'] == 1) {
-			if (!isset($lastProblemId)) {
-				$lastProblemId = null;
-			}
-
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($allTriggers[$lastProblemId]);
-		}
-
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST && $i['maintenance'] == 1) {
-			$mnt = get_maintenance_by_maintenanceid($allHosts[$last_hostid]['maintenanceid']);
-			$i['maintenance_title'] = $mnt['name'];
+			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
 		}
 
 		// replace default icons
@@ -1104,6 +1095,11 @@ function getSelementsInfo($sysmap, array $options = []) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
+				if ($i['maintenance'] == 1) {
+					$mnt = get_maintenance_by_maintenanceid($allHosts[$last_hostid]['maintenanceid']);
+					$i['maintenance_title'] = $mnt['name'];
+				}
+
 				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap, $hostInventories[$selement['elementid']]);
@@ -1111,6 +1107,16 @@ function getSelementsInfo($sysmap, array $options = []) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				foreach ($trigger['hosts'] as $host) {
+					if (array_key_exists('maintenance_status', $host)
+							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+						$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
+						$i['maintenance_title'] = $maintenance['name'];
+
+						break;
+					}
+				}
+
 				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
 				break;
 
@@ -1158,8 +1164,9 @@ function getSelementsInfo($sysmap, array $options = []) {
 	}
 
 	if (!empty($elems['triggers']) && $tlabel) {
-		foreach ($elems['triggers'] as $elem) {
-			$info[$elem['selementid']]['name'] = CMacrosResolverHelper::resolveTriggerName($allTriggers[$elem['elementid']]);
+		foreach ($elems['triggers'] as $selementid => $elem) {
+			$trigger = $selements[$selementid]['triggers'][$elem['elementid']];
+			$info[$elem['selementid']]['name'] = CMacrosResolverHelper::resolveTriggerName($trigger);
 		}
 	}
 	if (!empty($elems['hosts']) && $hlabel) {
@@ -1195,15 +1202,15 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
 	// calculate list of triggers that might get removed from $selement['triggers']
 	$triggersToFilter = [];
 	foreach ($filterableSelements as $selementId => $selement) {
-		foreach ($selement['triggers'] as $triggerId) {
-			if (!isset($triggersFromMonitoredHosts[$triggerId])) {
+		foreach ($selement['triggers'] as $trigger) {
+			if (!isset($triggersFromMonitoredHosts[$trigger['triggerid']])) {
 				continue;
 			}
-			$trigger = $triggersFromMonitoredHosts[$triggerId];
+			$trigger = $triggersFromMonitoredHosts[$trigger['triggerid']];
 			foreach ($trigger['hosts'] as $host) {
 				$hostId = $host['hostid'];
 				if (isset($selementHostApplicationFilters[$selementId][$hostId])) {
-					$triggersToFilter[$triggerId] = $trigger;
+					$triggersToFilter[$trigger['triggerid']] = $trigger;
 				}
 			}
 		}
