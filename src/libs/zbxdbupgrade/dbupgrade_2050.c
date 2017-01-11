@@ -250,7 +250,7 @@ static int	DBpatch_2050013(void)
 	return DBdrop_table("user_history");
 }
 
-static int      DBpatch_2050014(void)
+static int	DBpatch_2050014(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 		"update config"
@@ -265,7 +265,7 @@ static int      DBpatch_2050014(void)
 	return FAIL;
 }
 
-static int      DBpatch_2050015(void)
+static int	DBpatch_2050015(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 		"update users"
