@@ -882,7 +882,7 @@ char	*DBdyn_escape_string(const char *src)
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 #ifdef HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
-	return zbx_db_dyn_escape_string_size_len(src, max_src_len, max_src_len);
+	return zbx_db_dyn_escape_string_size_len(src, max_src_len, ~0U);
 #else
 	return zbx_db_dyn_escape_string_size_len(src, ~0U, max_src_len);
 #endif
