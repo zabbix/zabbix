@@ -17,7 +17,8 @@ SUBDIRS = \
 	proxypoller \
 	selfmon \
 	vmware \
-	taskmanager
+	taskmanager \
+	scripts
 
 sbin_PROGRAMS = zabbix_server
 
@@ -25,7 +26,6 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
-	scripts.c scripts.h \
 	server.c
 
 zabbix_server_LDADD = \
@@ -46,6 +46,7 @@ zabbix_server_LDADD = \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
+	scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \

@@ -23,7 +23,7 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-#include "../scripts.h"
+#include "../scripts/scripts.h"
 
 /******************************************************************************
  *                                                                            *
@@ -65,7 +65,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
-	ret = zbx_execute_script(&host, &script, &user, result, error, sizeof(error));
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, error, sizeof(error))))
+		ret = zbx_script_execute(&script, &host, result, error, sizeof(error));
 
 	zbx_script_clean(&script);
 fail:

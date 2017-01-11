@@ -8252,7 +8252,7 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 	UNLOCK_CACHE;
 }
 
-static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
+static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
 	int			i, j;
@@ -8341,7 +8341,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	}
 }
 
-static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
+static void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
 		char **replace_to)
 {
 	char	*value = NULL, *value_default = NULL;
@@ -8376,7 +8376,7 @@ static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char
 	}
 }
 
-void	DCget_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
+void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
 	char		*name = NULL, *context = NULL;

@@ -28,7 +28,7 @@
 #include "escalator.h"
 #include "../operations.h"
 #include "../actions.h"
-#include "../scripts.h"
+#include "../scripts/scripts.h"
 #include "../../libs/zbxcrypto/tls.h"
 #include "comms.h"
 
@@ -605,18 +605,16 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 		}
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
-
-		if (NULL != row[1])
-			ZBX_STR2UINT64(host->proxy_hostid, row[1]);
-
+		ZBX_DBROW2UINT64(host->proxy_hostid, row[1]);
 		strscpy(host->host, row[2]);
+		ZBX_STR2UCHAR(host->tls_connect, row[3]);
+
 #ifdef HAVE_OPENIPMI
 		host->ipmi_authtype = (signed char)atoi(row[4]);
 		host->ipmi_privilege = (unsigned char)atoi(row[5]);
 		strscpy(host->ipmi_username, row[6]);
 		strscpy(host->ipmi_password, row[7]);
 #endif
-		host->tls_connect = (unsigned char)atoi(row[2]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
 		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
@@ -853,7 +851,8 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 					break;
 			}
 
-			rc = zbx_execute_script(&host, &script, NULL, NULL, error, sizeof(error));
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, error, sizeof(error))))
+				rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
 		}
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
