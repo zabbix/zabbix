@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
 ..F....... [ZBX-11642] fixed undefined index on Problem page with disabled guest user (Ivo)
@@ -316,6 +317,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
