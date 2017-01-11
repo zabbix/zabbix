@@ -47,7 +47,7 @@
 int	zbx_regexp_compile(const char *regex_txt, int flags, regex_t *regex_compiled, char **error)
 {
 	int	re_error = 0;
-	regex_t	re;
+	regex_t	re = {0};
 
 	if (0 == (re_error = regcomp(&re, regex_txt, flags)))
 	{
