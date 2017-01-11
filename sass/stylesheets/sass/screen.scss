@@ -2604,12 +2604,18 @@ $form-icon-btn: (
 
 .ui-resizable-n {
 	@extend %ui-resizable;
-	align-items: center;
+	//align-items: center;
 	cursor: s-resize;
 	height: 5px;
 	width: 100%;
 	top: -1px;
 	left: 0;
+
+	.ui-drag-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+	}
 }
 
 .ui-resizable-e {
@@ -2623,13 +2629,19 @@ $form-icon-btn: (
 
 .ui-resizable-s {
 	@extend %ui-resizable;
-	align-items: center;
-	justify-content: center;
+	//align-items: center;
+	//justify-content: center;
 	cursor: s-resize;
 	height: 5px;
 	width: 100%;
 	bottom: 0;
 	left: 0;
+
+	.ui-drag-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+	}
 }
 
 .ui-resizable-w {
