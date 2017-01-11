@@ -467,7 +467,7 @@ static int	DBpatch_3030037(void)
 		if (0 != isdigit(*row[1]))
 		{
 			value = atoi(row[1]);
-			DBpatch_conv_sec(&value, &suffix);
+			DBpatch_conv_day(&value, &suffix);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d%c", value, suffix);
 		}
 		else	/* items.lifetime may be a macro, in such case simply append days unit */
