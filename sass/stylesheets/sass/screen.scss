@@ -2566,6 +2566,14 @@ $form-icon-btn: (
 	position: absolute;
 }
 
+.ui-drag-dot {
+	width: 8px;
+	height: 8px;
+	background-color: $form-border-focus-color;
+	@include border-radius(2px);
+	position: absolute;
+}
+
 .ui-resizable-border-n {
 	border-bottom: 1px solid $form-border-focus-color;
 	height: 5px;
