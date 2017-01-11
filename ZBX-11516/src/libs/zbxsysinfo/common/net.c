@@ -69,7 +69,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	}
 
 	if (NULL != sendtoclose && SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
-		zbx_tcp_send_raw(&s, sendtoclose);
+		(void)zbx_tcp_send_raw(&s, sendtoclose);
 
 	if (SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
 		*value_int = 1;
