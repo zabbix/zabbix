@@ -46,6 +46,7 @@ zbx_uint64_t	get_cluster_size(const char *path)
 			0 == GetDiskFreeSpace(disk, &sectors_per_cluster, &bytes_per_sector, NULL, NULL))
 	{
 		sectors_per_cluster = 0;
+		bytes_per_sector = 0;
 	}
 
 	zbx_free(wpath);
