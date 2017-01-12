@@ -1902,7 +1902,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
  * Purpose: check if connection initiator is in list of IP addresses          *
  *                                                                            *
  * Parameters: s - socket descriptor                                          *
- *             ip_list - comma-delimited list of IP addresses                 *
+ *             host_list - comma-delimited list of hosts                      *
  *             allow_if_empty - allow connection if no IP given               *
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
@@ -1914,7 +1914,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_empty)
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
@@ -1928,7 +1928,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
-	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
+	if (1 == allow_if_empty && (NULL == host_list || '\0' == *host_list))
 		return SUCCEED;
 
 	nlen = sizeof(name);
@@ -1940,7 +1940,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 		return FAIL;
 	}
 
-	strscpy(tmp, ip_list);
+	strscpy(tmp, host_list);
 
 	for (start = tmp; '\0' != *start;)
 	{
@@ -2016,12 +2016,12 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_em
 
 #if defined(HAVE_IPV6)
 	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
-		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, ip_list);
+		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, host_list);
 	else
-		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", ip_list);
+		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", host_list);
 #else
 	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"",
-			inet_ntoa(name.sin_addr), ip_list);
+			inet_ntoa(name.sin_addr), host_list);
 #endif
 	return FAIL;
 }
