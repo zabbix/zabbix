@@ -2012,13 +2012,13 @@ ub4	OCI_DBserver_status()
 static int	zbx_db_is_escape_sequence(char c)
 {
 #if defined(HAVE_MYSQL)
-		if ('\'' == c || '\\' == c)
+	if ('\'' == c || '\\' == c)
 #elif defined(HAVE_POSTGRESQL)
-		if ('\'' == c || ('\\' == c && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+	if ('\'' == c || ('\\' == c && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
-		if ('\'' == c)
+	if ('\'' == c)
 #endif
-			return SUCCEED;
+		return SUCCEED;
 
 	return FAIL;
 }
@@ -2085,7 +2085,7 @@ static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
  ******************************************************************************/
 static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size_t max_chars)
 {
-	size_t		csize, len = 1;	/* '\0' */
+	size_t	csize, len = 1;	/* '\0' */
 
 	if (NULL == s)
 		return len;
@@ -2156,8 +2156,8 @@ char	*zbx_db_dyn_escape_string(const char *src)
  ******************************************************************************/
 char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars)
 {
-	char		*dst = NULL;
-	size_t		len;
+	char	*dst = NULL;
+	size_t	len;
 
 	len = zbx_db_get_escape_string_len(src, max_bytes, max_chars);
 
