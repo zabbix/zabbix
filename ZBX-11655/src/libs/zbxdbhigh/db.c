@@ -888,18 +888,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 #endif
 }
 
-#ifdef HAVE_MYSQL
-/******************************************************************************
- *                                                                            *
- * Function: DBdyn_escape_string_size_len                                     *
- *                                                                            *
- ******************************************************************************/
-char	*DBdyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_src_len)
-{
-	return zbx_db_dyn_escape_string(src, max_bytes, max_src_len);
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_like_pattern                                        *
@@ -2549,7 +2537,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
 						zbx_strlen_utf8_nchars(value->str, field->length));
 #elif HAVE_MYSQL
-				row[i].str = DBdyn_escape_string_size_len(value->str, get_field_size(field->type),
+				row[i].str = zbx_db_dyn_escape_string(value->str, get_field_size(field->type),
 						field->length);
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
