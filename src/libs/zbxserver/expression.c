@@ -201,23 +201,22 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 static void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
 		const char **constant, size_t *length)
 {
-	size_t		pos = 0;
+	size_t		pos;
 	zbx_strloc_t	number;
-	int		count = 0, ret = SUCCEED;
+	int		count;
 
-	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number)) && ++count < reference->number)
-		pos = number.r + 1;
-
-	if (SUCCEED == ret)
+	for (pos = 0, count = 1; SUCCEED == zbx_number_find(expression, pos, &number); pos = number.r + 1, count++)
 	{
+		if (count < reference->number)
+			continue;
+
 		*length = number.r - number.l + 1;
 		*constant = expression + number.l;
+		return;
 	}
-	else
-	{
-		*length = 0;
-		*constant = "";
-	}
+
+	*length = 0;
+	*constant = "";
 }
 
 static void	DCexpand_trigger_expression(char **expression)
