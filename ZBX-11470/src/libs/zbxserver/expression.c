@@ -185,40 +185,38 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: find_trigger_description_constant                                *
+ * Function: get_trigger_expression_constant                                  *
  *                                                                            *
- * Purpose: substitute constant macros with real values from expression       *
+ * Purpose: get constant from a trigger expression corresponding a given      *
+ *          reference from trigger name                                       *
  *                                                                            *
- * Parameters: number     - [OUT] point to number from expression or          *
- *                                empty string if number not found            *
- *             len        - [OUT] length of number                            *
- *             number_ref - [IN] can be used to refer to the first, second    *
- *                               and up to ninth constant of the expression   *
- *             expression - [IN] trigger expression, source of constants      *
+ * Parameters: expression - [IN] trigger expression, source of constants      *
+ *             reference  - [IN] reference from a trigger name ($1, $2, ...)  *
+ *             constant   - [OUT] pointer to the constant's location in       *
+ *                            trigger expression or empty string if there is  *
+ *                            no corresponding constant                       *
+ *             length     - [OUT] length of constant                          *
  *                                                                            *
- * Return value: trigger description constant is expanded and allocated       *
- *               if no such number found then empty string is allocated       *
- *               must be freed                                                *
  ******************************************************************************/
-static void	find_trigger_description_constant(const char **number, size_t *len,
-		int number_ref, const char *expression)
+static void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
+		const char **constant, size_t *length)
 {
-	int		ret = SUCCEED;
-	size_t		pos = 0, number_cnt = 0;
-	zbx_strloc_t	number_loc;
+	size_t		pos = 0;
+	zbx_strloc_t	number;
+	int		count = 0, ret = SUCCEED;
 
-	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number_loc)) && ++number_cnt < number_ref)
-		pos = number_loc.r + 1;
+	while (SUCCEED == (ret = zbx_number_find(expression, pos, &number)) && ++count < reference->number)
+		pos = number.r + 1;
 
 	if (SUCCEED == ret)
 	{
-		*len = number_loc.r - number_loc.l + 1;
-		*number = expression + number_loc.l;
+		*length = number.r - number.l + 1;
+		*constant = expression + number.l;
 	}
 	else
 	{
-		*len = 0;
-		*number = "";
+		*length = 0;
+		*constant = "";
 	}
 }
 
@@ -3413,8 +3411,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					}
 
 					if (NULL != expression)
-						find_trigger_description_constant(&replace, &replace_len,
-								token.data.reference.number, expression);
+					{
+						get_trigger_expression_constant(expression, &token.data.reference,
+								&replace, &replace_len);
+					}
 
 					pos = token.token.r;
 				}
