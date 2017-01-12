@@ -933,7 +933,7 @@ static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char
 {
 	const char	*ptr;
 
-	for (ptr = text; 0 < len && 0 != isdigit(*ptr); len--, ptr++)
+	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
 		;
 
 	if (SUCCEED != is_time_suffix(text, &interval->delay, ptr - text))
