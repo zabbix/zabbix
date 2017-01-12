@@ -368,3 +368,54 @@ function permissionText($perm) {
 		case PERM_NONE: return _('None');
 	}
 }
+
+/**
+ * Apply host group rights to all subgroups
+ *
+ * @param int $hostgroupid
+ *
+ * @return array			Permissions for update.
+ */
+function applyHostgroupRightsToAllSubgroups($hostgroupid) {
+	$user_groups = API::UserGroup()->get([
+		'output' => [],
+		'selectRights' => 1
+	]);
+
+	$upd_user_groups = [];
+	foreach ($user_groups as $user_group) {
+		foreach ($user_group['rights'] as $group_rights) {
+			if ($group_rights['id'] == $hostgroupid) {
+				$upd_user_groups[] = [
+					'usrgrpid' => $user_group['usrgrpid'],
+					'permission' => $group_rights['permission']
+				];
+
+				continue 2;
+			}
+		}
+	}
+
+	$upd_groups_rights = [];
+	foreach ($upd_user_groups as $upd_user_group) {
+		$groups_rights = collapseHostGroupRights(getHostGroupsRights([$upd_user_group['usrgrpid']]));
+		$groups_rights = applyHostGroupRights($groups_rights, [], [$hostgroupid], $upd_user_group['permission']);
+
+		$user_group_rights = [];
+		foreach ($groups_rights as $groupid => $group_rights) {
+			if ($groupid != 0 && $group_rights['permission'] != PERM_NONE) {
+				$user_group_rights[] = [
+					'id' => $groupid,
+					'permission' => $group_rights['permission']
+				];
+			}
+		}
+
+		$upd_groups_rights[] = [
+			'usrgrpid' => $upd_user_group['usrgrpid'],
+			'rights' => $user_group_rights
+		];
+	}
+
+	return $upd_groups_rights;
+}

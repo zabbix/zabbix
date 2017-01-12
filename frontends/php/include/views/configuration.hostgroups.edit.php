@@ -61,6 +61,10 @@ foreach ($this->data['r_hosts'] as $host) {
 }
 $hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 
+if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+	$hostGroupFormList->addRow(null, (new CCheckBox('subgroups'))->setLabel(_('Apply permissions to all subgroups')));
+}
+
 // append tabs to form
 $hostGroupTab = new CTabView();
 $hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
