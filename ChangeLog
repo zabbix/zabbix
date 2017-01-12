@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+..F....... [ZBXNEXT-830] implemented full clone of maps (Cemeris, Sasha)
 ...G...... [ZBXNEXT-12] added support of CIDR subnet mask notations for Server option on agent config (vso)
 A.F....PS. [ZBXNEXT-12] added support of CIDR subnet mask notations for Allowed hosts of trapper items (Sasha, vso)
 A.F....PS. [ZBXNEXT-3576] increased user media periods and item flexible intervals to 1024 characters (Sasha, wiper)

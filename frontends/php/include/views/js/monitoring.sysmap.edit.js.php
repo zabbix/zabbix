@@ -84,18 +84,24 @@
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
 
-		$('#clone').click(function() {
-			$('#sysmapid, #delete, #clone, #inaccessible_user').remove();
+		$('#clone, #full_clone').click(function() {
+			var form = $(this).attr('id');
+
+			$('#form').val(form);
+
+			if (form === 'clone') {
+				$('#sysmapid').remove();
+			}
+
+			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
+
 			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
-			// Switch to first tab so multiselect is visible and only then add data and resize.
 			$('#tab_sysmap_tab').trigger('click');
-
 			$('#multiselect_userid_wrapper').show();
 
-			// Set current user as owner.
 			$('#userid').multiSelect('addData', {
 				'id': $('#current_user_userid').val(),
 				'name': $('#current_user_fullname').val()
