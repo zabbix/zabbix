@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -26,31 +27,54 @@
  * Purpose: get file system cluster size for specified path (for cases when   *
  *          the file system is mounted on empty NTFS directory)               *
  *                                                                            *
- * Parameters: path - [IN] file system path                                   *
+ * Parameters: path  - [IN] file system path                                  *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: On success, nonzero cluster size is returned                 *
  *               On error, 0 is returned.                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	get_cluster_size(const char *path)
+zbx_uint64_t	get_cluster_size(const char *path, char **error)
 {
-	wchar_t 	*disk = NULL, *wpath;
+	wchar_t 	*disk = NULL, *wpath = NULL;
 	unsigned long	sectors_per_cluster, bytes_per_sector, path_length;
+	zbx_uint64_t	res = 0;
+	char		*err_msg = "Cannot obtain file system cluster size:";
 
 	wpath = zbx_utf8_to_unicode(path);
 
-	path_length = GetFullPathName(wpath, 0, NULL, NULL) + 1;
-	disk = (wchar_t *)zbx_malloc(NULL, path_length * sizeof(wchar_t));
+	/* Here GetFullPathName() is used in multithreaded application. */
+	/* We assume it is safe because: */
+	/*   - only file names with absolute paths are used (i.e. no relative paths) and */
+	/*   - SetCurrentDirectory() is not used in Zabbix agent. */
 
-	if (0 == GetVolumePathName(wpath, disk, path_length) ||
-			0 == GetDiskFreeSpace(disk, &sectors_per_cluster, &bytes_per_sector, NULL, NULL))
+	if (0 == (path_length = GetFullPathName(wpath, 0, NULL, NULL) + 1))
 	{
-		sectors_per_cluster = 0;
-		bytes_per_sector = 0;
+		*error = zbx_dsprintf(*error, "%s GetFullPathName() failed: %s", err_msg,
+				strerror_from_system(GetLastError()));
+		goto err;
 	}
 
-	zbx_free(wpath);
-	zbx_free(disk);
+	disk = (wchar_t *)zbx_malloc(NULL, path_length * sizeof(wchar_t));
 
-	return (zbx_uint64_t)sectors_per_cluster * bytes_per_sector;
+	if (0 == GetVolumePathName(wpath, disk, path_length))
+	{
+		*error = zbx_dsprintf(*error, "%s GetVolumePathName() failed: %s", err_msg,
+				strerror_from_system(GetLastError()));
+		goto err;
+	}
+
+	if (0 == GetDiskFreeSpace(disk, &sectors_per_cluster, &bytes_per_sector, NULL, NULL))
+	{
+		*error = zbx_dsprintf(*error, "%s GetDiskFreeSpace() failed: %s", err_msg,
+				strerror_from_system(GetLastError()));
+		goto err;
+	}
+
+	res = (zbx_uint64_t)sectors_per_cluster * bytes_per_sector;
+err:
+	zbx_free(disk);
+	zbx_free(wpath);
+
+	return res;
 }
