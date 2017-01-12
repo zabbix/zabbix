@@ -222,55 +222,35 @@ static int	prepare_parameters(AGENT_REQUEST *request, AGENT_RESULT *result, rege
  * sockets, etc.).                                                            *
  *                                                                            *
  *****************************************************************************/
+#ifdef _WINDOWS
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "vfs_dir_size";
-	char			*dir = NULL, *path = NULL;
+	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list;
-	zbx_directory_item_t	*item;
 	zbx_stat_t		status;
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
+	zbx_directory_item_t	*item;
 
-#ifdef _WINDOWS
-	char			*name = NULL, *error = NULL;
-	wchar_t	 		*wpath = NULL;
-	intptr_t		handle;
-	zbx_uint64_t		cluster_size = 0;
-	struct _wfinddata_t	data;
-#else
-	DIR 			*directory;
-	struct dirent 		*entry;
-	zbx_file_descriptor_t	*file;
-	zbx_vector_ptr_t	descriptors;
-#endif
 	if (SUCCEED != prepare_parameters(request, result, &regex_incl, &regex_excl, &mode, &max_depth, &dir, &status))
 		goto err1;
 
-#ifndef _WINDOWS
-	zbx_vector_ptr_create(&descriptors);
-#endif
 	zbx_vector_ptr_create(&list);
 
 	queue_directory(&list, dir, -1, max_depth);	/* put top directory into list */
 
-#ifndef _WINDOWS
-	/* on UNIX count top directory size */
-
-	if (0 != filename_matches(dir, regex_incl, regex_excl))
-	{
-		if (SIZE_MODE_APPARENT == mode)
-			size += (zbx_uint64_t)status.st_size;
-		else		/* must be SIZE_MODE_DISK */
-			size += (zbx_uint64_t)status.st_blocks * DISK_BLOCK_SIZE;
-	}
-#endif /* not _WINDOWS */
-
 	while (0 < list.values_num)
 	{
+		char			*name, *error = NULL;
+		wchar_t			*wpath;
+		zbx_uint64_t		cluster_size = 0;
+		intptr_t		handle;
+		struct _wfinddata_t	data;
+
 		item = list.values[--list.values_num];
-#ifdef _WINDOWS
+
 		name = zbx_dsprintf(NULL, "%s\\*", item->path);
 
 		if (NULL == (wpath = zbx_utf8_to_unicode(name)))
@@ -317,6 +297,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		do
 		{
+			char	*path = NULL;
+
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
 
@@ -330,6 +312,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					DWORD	size_high, size_low;
 
 					wpath = zbx_utf8_to_unicode(path);
+					zbx_free(path);
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
 					size_low = GetCompressedFileSize(wpath, &size_high);
@@ -352,6 +335,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
 					path = NULL;
+				else
+					zbx_free(path);
 			}
 
 			zbx_free(name);
@@ -363,7 +348,73 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close directory listing '%s': %s", __function_name,
 					item->path, zbx_strerror(errno));
 		}
+skip:
+		zbx_free(item->path);
+		zbx_free(item);
+	}
+
+	SET_UI64_RESULT(result, size);
+	ret = SYSINFO_RET_OK;
+err2:
+	while (0 < list.values_num)
+	{
+		item = list.values[--list.values_num];
+		zbx_free(item->path);
+		zbx_free(item);
+	}
+	zbx_vector_ptr_destroy(&list);
+err1:
+	if (NULL != regex_incl)
+	{
+		zbx_regexp_free(regex_incl);
+		zbx_free(regex_incl);
+	}
+
+	if (NULL != regex_excl)
+	{
+		zbx_regexp_free(regex_excl);
+		zbx_free(regex_excl);
+	}
+
+	return ret;
+}
 #else /* not _WINDOWS */
+static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "vfs_dir_size";
+	char			*dir = NULL, *path = NULL;
+	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t		size = 0;
+	zbx_vector_ptr_t	list, descriptors;
+	zbx_directory_item_t	*item;
+	zbx_stat_t		status;
+	regex_t			*regex_incl = NULL, *regex_excl = NULL;
+	DIR 			*directory;
+	struct dirent 		*entry;
+	zbx_file_descriptor_t	*file;
+
+	if (SUCCEED != prepare_parameters(request, result, &regex_incl, &regex_excl, &mode, &max_depth, &dir, &status))
+		goto err1;
+
+	zbx_vector_ptr_create(&descriptors);
+	zbx_vector_ptr_create(&list);
+
+	queue_directory(&list, dir, -1, max_depth);	/* put top directory into list */
+
+	/* on UNIX count top directory size */
+
+	if (0 != filename_matches(dir, regex_incl, regex_excl))
+	{
+		if (SIZE_MODE_APPARENT == mode)
+			size += (zbx_uint64_t)status.st_size;
+		else		/* must be SIZE_MODE_DISK */
+			size += (zbx_uint64_t)status.st_blocks * DISK_BLOCK_SIZE;
+	}
+
+	while (0 < list.values_num)
+	{
+		item = list.values[--list.values_num];
+
 		if (NULL == (directory = opendir(item->path)))
 		{
 			if (0 < item->depth)	/* unreadable subdirectory - skip */
@@ -440,8 +491,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		closedir(directory);
-#endif /* _WINDOWS */
-	skip:
+skip:
 		zbx_free(item->path);
 		zbx_free(item);
 	}
@@ -457,14 +507,13 @@ err2:
 	}
 	zbx_vector_ptr_destroy(&list);
 
-#ifndef _WINDOWS
 	while (0 < descriptors.values_num)
 	{
 		file = descriptors.values[--descriptors.values_num];
 		zbx_free(file);
 	}
 	zbx_vector_ptr_destroy(&descriptors);
-#endif
+
 	zbx_free(path);
 err1:
 	if (NULL != regex_incl)
@@ -481,6 +530,7 @@ err1:
 
 	return ret;
 }
+#endif
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
