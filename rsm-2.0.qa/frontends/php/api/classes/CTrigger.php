@@ -848,7 +848,7 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['expandExpression'] !== null) {
 			foreach ($result as &$trigger) {
 				if ($trigger['expression']) {
-					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
+					$trigger['expression'] = explode_exp($trigger['expression'], false, $options['expandExpression']);
 				}
 			}
 			unset($trigger);

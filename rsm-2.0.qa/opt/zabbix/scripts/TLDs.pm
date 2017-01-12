@@ -12,8 +12,8 @@ our @EXPORT = qw(zbx_connect check_api_error get_proxies_list
 		create_probe_template create_probe_status_template create_host create_group create_template create_item create_trigger create_macro update_root_servers
 		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host
 		remove_templates remove_hosts remove_hostgroups remove_probes remove_items
-		disable_host disable_hosts
-		disable_items disable_triggers
+		disable_host disable_hosts bulk_macro_create get_global_macros
+		disable_items disable_triggers get_triggers_by_itemid
 		macro_value get_global_macro_value get_host_macro
 		set_proxy_status
 		get_application_id get_items_like set_tld_type get_triggers_by_items
@@ -44,10 +44,17 @@ sub check_api_error($) {
 }
 
 sub get_proxies_list {
+    my $ignore_interfaces = shift;
+
     my $proxies_list;
 
-    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host', 'status'], 'selectInterfaces' => ['ip'],
-					  'preservekeys' => 1 });
+    my $options = {'output' => ['proxyid', 'host', 'status'], 'preservekeys' => 1 };
+
+    if ($ignore_interfaces eq false) {
+	$options->{'selectInterfaces'} = ['ip'];
+    }
+
+    $proxies_list = $zabbix->get('proxy',$options);
 
     return $proxies_list;
 }
@@ -238,6 +245,27 @@ sub get_host($$) {
     return $result;
 }
 
+sub get_global_macros {
+    my @macros = shift;
+    my $result = {};
+    my $options = {'globalmacro' => true, output => 'extend', 'filter' => {'macro' => @macros}, 'preservekeys' => 1};
+    
+    my $data = $zabbix->get('usermacro', $options);
+
+    return $result unless defined($data);
+
+    foreach my $globalmacroid (keys %{$data}) {
+	my $macro = $data->{$globalmacroid}->{'macro'};
+	my $value = $data->{$globalmacroid}->{'value'};
+
+	$result->{$macro}->{'value'} = $value;
+	$result->{$macro}->{'globalmacroid'} = $globalmacroid;
+    }
+
+    return $result;
+}
+
+
 sub get_global_macro_value($) {
     my $macro_name = shift;
 
@@ -250,53 +278,57 @@ sub get_global_macro_value($) {
 
 
 sub update_root_servers {
-    my $content = LWP::UserAgent->new->get('http://www.internic.net/zones/named.root')->{'_content'};
+    my $ignore_update = shift;
 
-    my $macro_value_v4 = "";
-    my $macro_value_v6 = "";
+    if ($ignore_update eq false) {
+        my $content = LWP::UserAgent->new->get('http://www.internic.net/zones/named.root')->{'_content'};
 
-    return unless defined $content;
+        my $macro_value_v4 = "";
+        my $macro_value_v6 = "";
 
-    for my $str (split("\n", $content)) {
-	if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/) {
-	    $macro_value_v4 .= ',' if ($macro_value_v4 ne "");
-	    $macro_value_v4 .= $1;
-	}
+        return unless defined $content;
 
-	if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/) {
-	    $macro_value_v6 .= ',' if ($macro_value_v6 ne "");
-	    $macro_value_v6 .= $1;
+        for my $str (split("\n", $content)) {
+    	    if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/) {
+		$macro_value_v4 .= ',' if ($macro_value_v4 ne "");
+		$macro_value_v4 .= $1;
+	    }
+
+	    if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/) {
+		$macro_value_v6 .= ',' if ($macro_value_v6 ne "");
+		$macro_value_v6 .= $1;
+    	    }
         }
-    }
 
 # Temporary disable the check
 #    return unless create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4) eq true;
 #    return unless create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6) eq true;
-    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
-    create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
+	create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
+	create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
+    }
 
     return '"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"';
 }
 
 sub create_host {
     my $options = shift;
+    my $hostid;
 
-    unless ($zabbix->exist('host',{'name' => $options->{'host'}})) {
-        my $result = $zabbix->create('host', $options);
-
-        return $result->{'hostids'}[0];
-    }
-
-    my $result = $zabbix->get('host', {'output' => ['hostid'], 'filter' => {'host' => [$options->{'host'}]}});
+    my $result = $zabbix->get('host', {'output' => ['hostid'], 'filter' => {'host' => [ $options->{'host'} ] } } );
 
     pfail("more than one host named \"", $options->{'host'}, "\" found") if ('ARRAY' eq ref($result));
-    pfail("host \"", $options->{'host'}, "\" not found") unless (defined($result->{'hostid'}));
 
-    $options->{'hostid'} = $result->{'hostid'};
-    delete($options->{'interfaces'});
-    $result = $zabbix->update('host', $options);
+    if (exists($result->{'hostid'})) {
+	$hostid = $result->{'hostid'};
+	$options->{'hostid'} = $hostid;
+        delete($options->{'interfaces'});
+        $result = $zabbix->update('host', $options);
+    }
+    else {
+        my $result = $zabbix->create('host', $options);
 
-    my $hostid = $result->{'hostid'} ? $result->{'hostid'} : $options->{'hostid'};
+        $hostid = pop(@{$result->{'hostids'}});
+    }
 
     return $hostid;
 }
@@ -306,12 +338,13 @@ sub create_group {
 
     my $groupid;
 
-    unless ($zabbix->exist('hostgroup',{'name' => $name})) {
+    my $result = $zabbix->get('hostgroup', {'filter' => {'name' => [$name]}});
+
+    unless (exists($result->{'groupid'})) {
         my $result = $zabbix->create('hostgroup', {'name' => $name});
-	$groupid = $result->{'groupids'}[0];
+	$groupid = pop(@{$result->{'groupids'}});
     }
     else {
-	my $result = $zabbix->get('hostgroup', {'filter' => {'name' => [$name]}});
         $groupid = $result->{'groupid'};
     }
 
@@ -322,84 +355,159 @@ sub create_template {
     my $name = shift;
     my $child_templateid = shift;
 
-    my ($result, $templateid, $options, $groupid);
+    my ($result, $templateid, $is_new, $options, $groupid);
 
-    unless ($zabbix->exist('hostgroup', {'name' => 'Templates - TLD'})) {
-        $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
-        $groupid = $result->{'groupids'}[0];
+    $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates - TLD'}});
+
+    if (exists($result->{'groupid'})) {
+	$groupid = $result->{'groupid'};
     }
     else {
-        $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates - TLD'}});
-        $groupid = $result->{'groupid'};
+        $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
+        $groupid = pop(@{$result->{'groupids'}});
     }
 
     return $zabbix->last_error if defined $zabbix->last_error;
 
-    unless ($zabbix->exist('template',{'host' => $name})) {
+    $result = $zabbix->get('template', {'filter' => {'host' => $name}});
+
+    if (exists($result->{'templateid'})) {
+	$templateid = $result->{'templateid'};
+
+        $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
+        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
+
+        $result = $zabbix->update('template', $options);
+
+	$is_new = false;
+    }
+    else {
         $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
 
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
 
         $result = $zabbix->create('template', $options);
 
-        $templateid = $result->{'templateids'}[0];
-    }
-    else {
-        $result = $zabbix->get('template', {'filter' => {'host' => $name}});
-        $templateid = $result->{'templateid'};
+        $templateid = pop(@{$result->{'templateids'}});
 
-        $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
-        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-
-        $result = $zabbix->update('template', $options);
-        $templateid = $result->{'templateids'}[0];
+	$is_new = true;
     }
 
     return $zabbix->last_error if defined $zabbix->last_error;
 
-    return $templateid;
+    return {'templateid' => $templateid, 'is_new' => $is_new };
+}
+
+sub item_update_require {
+    my $zbx_data = shift;
+    my $data = shift;
+
+    my $result = false;
+
+    foreach my $opt (keys %{$data}) {
+	my $opt_data = $data->{$opt};
+
+	unless (exists($zbx_data->{$opt})) {
+            $result = true;
+	    last;
+        }
+
+	if(ref($opt_data) eq 'ARRAY'){
+	    my @data = @{$opt_data};
+
+	    if ($opt eq 'applications') {
+		my @zbx_data = @{$zbx_data->{$opt}};
+
+		my @tmp_data;
+
+		foreach my $application (@zbx_data) {
+		    push @tmp_data, $application->{'applicationid'} if exists $application->{'applicationid'};
+		}
+
+		if (compare_arrays(\@data, \@tmp_data) eq false) {
+		    $result = true;                                                         
+	            last; 
+		}
+	    }
+	}
+
+    }
+
+    return $result;
 }
 
 sub create_item {
     my $options = shift;
-    my $result;
+    my $is_new = shift;
 
-    if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}})) {
-	$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
+    my ($result, $itemid);
 
-	if ('ARRAY' eq ref($result))
-	{
-	    pfail("Request: ", Dumper($options),
-		  "returned more than one item with key ", $options->{'key_'}, ":\n",
-		  Dumper($result));
+    my @fields = keys %{$options};
+
+    $is_new = false unless defined $is_new;
+    
+    if ($is_new eq false) {
+	$result = $zabbix->get('item', {'output' => [@fields], 'selectApplications' => 'refer', 'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
+    }
+
+    if ('ARRAY' eq ref($result)) {
+            pfail("Request: ", Dumper($options),
+                  "returned more than one item with key ", $options->{'key_'}, ":\n",
+                  Dumper($result));
+    }
+
+    if (exists($result->{'itemid'})) {
+	$itemid = $result->{'itemid'};
+
+	$options->{'itemid'} = $itemid;
+
+	if (item_update_require($result, $options) eq true) {
+	    $result = $zabbix->update('item', $options);
 	}
-
-	$options->{'itemid'} = $result->{'itemid'};
-
-	$result = $zabbix->update('item', $options);
     }
     else {
         $result = $zabbix->create('item', $options);
+
+	$itemid = pop(@{$result->{'itemids'}});
     }
 
-    return $zabbix->last_error if defined $zabbix->last_error;
-
-    $result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
-
 #    pfail("cannot create item:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
+
+    return $itemid;
+}
+
+sub get_triggers_by_itemid {
+    my $itemid = shift;
+    my $is_new = shift;
+
+    my $result;
+
+    $is_new = false unless defined $is_new;
+
+    if ($is_new eq false) {
+        $result = $zabbix->get('trigger', {'itemids' => [$itemid], 'expandExpression' => false, 'output' => ['triggerid', 'expression', 'description', 'priority', 'status'], 'preservekeys' => true});
+    }
 
     return $result;
 }
 
 sub create_trigger {
     my $options = shift;
+    my $is_new = shift;
     my $result;
 
-    if ($zabbix->exist('trigger',{'expression' => $options->{'expression'}})) {
-        $result = $zabbix->update('trigger', $options);
+    $is_new = false unless defined $is_new;
+
+    if ($is_new eq false) {
+        if ($zabbix->exist('trigger',{'expression' => $options->{'expression'}})) {
+#            $result = $zabbix->update('trigger', $options);
+        }
+        else {
+            $result = $zabbix->create('trigger', $options);
+        }
     }
     else {
-        $result = $zabbix->create('trigger', $options);
+	$result = $zabbix->create('trigger', $options);
     }
 
 #    pfail("cannot create trigger:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
@@ -412,34 +520,91 @@ sub create_macro {
     my $value = shift;
     my $templateid = shift;
     my $force_update = shift;
+    my $is_new = shift;
+
+    my $macroid;
 
     my $result;
 
+    $is_new = false unless defined $is_new;
+
     if (defined($templateid)) {
-	if ($zabbix->get('usermacro',{'countOutput' => 1, 'hostids' => $templateid, 'filter' => {'macro' => $name}})) {
-	    $result = $zabbix->get('usermacro',{'output' => 'hostmacroid', 'hostids' => $templateid, 'filter' => {'macro' => $name}} );
-    	    $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'}
-														     and defined($force_update);
+	if ($is_new eq false) {
+	    $result = $zabbix->get('usermacro',{'output' => 'extend', 'hostids' => $templateid, 'filter' => {'macro' => $name}});
+	}
+
+	if (exists($result->{'hostmacroid'})) {
+	    $macroid = $result->{'hostmacroid'};
+	    my $zbx_value = $result->{'value'};
+
+	    if ($value ne $zbx_value) {
+        	$zabbix->update('usermacro',{'hostmacroid' => $macroid, 'value' => $value}) if defined($force_update);
+	    }
 	}
 	else {
 	    $result = $zabbix->create('usermacro',{'hostid' => $templateid, 'macro' => $name, 'value' => $value});
+	    $macroid = pop(@{$result->{'hostmacroids'}});
         }
-
-	return $result->{'hostmacroids'}[0];
     }
     else {
-	if ($zabbix->get('usermacro',{'countOutput' => 1, 'globalmacro' => 1, 'filter' => {'macro' => $name}})) {
-            $result = $zabbix->get('usermacro',{'output' => 'globalmacroid', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
-            $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'}
-															and defined($force_update);
+	if ($is_new eq false) {
+    	    $result = $zabbix->get('usermacro',{'output' => 'extend', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
+	}
+
+	if (exists($result->{'globalmacroid'})) {
+	    $macroid = $result->{'globalmacroid'};
+	    my $zbx_value = $result->{'value'};
+
+	    if ($value ne $zbx_value) {
+    		$zabbix->macro_global_update({'globalmacroid' => $macroid, 'value' => $value}) if defined($force_update);
+	    }
         }
         else {
             $result = $zabbix->macro_global_create({'macro' => $name, 'value' => $value});
+	    $macroid = pop(@{$result->{'globalmacroids'}});
         }
-
-	return $result->{'globalmacroids'}[0];
     }
 
+    return $result;
+}
+
+sub bulk_macro_create {
+    my $macros = shift;
+    my $force_update = shift;
+
+    my $macro_to_update = {};
+    my @data;
+
+    my $zbx_macros = $zabbix->get('usermacro',{'output' => 'extend', 'globalmacro' => 1, 'preservekeys' => 1} );
+
+    foreach my $globalmacroid (keys %{$zbx_macros}) {
+	my $value = $zbx_macros->{$globalmacroid}->{'value'};
+	my $macro = $zbx_macros->{$globalmacroid}->{'macro'};
+
+	next unless exists $macros->{$macro};
+
+	if ($value eq $macros->{$macro}) {
+            delete $macros->{$macro};
+	}
+	else {
+	    $macro_to_update->{$macro} = $globalmacroid;
+	}
+    }
+
+    foreach my $macro (keys %{$macros}){
+	my $value = $macros->{$macro};
+	if (exists($macro_to_update->{$macro})) {
+	    my $globalmacroid = $macro_to_update->{$macro};
+	    $zabbix->macro_global_update({'globalmacroid' => $globalmacroid, 'value' => $value}) if defined($force_update);
+	}
+	else {
+	    push @data, {'macro' => $macro, 'value' => $value};
+	}
+    }
+
+    if (scalar(@data)) {
+	$zabbix->macro_global_create(\@data);
+    }
 }
 
 sub get_host_macro {
@@ -482,17 +647,26 @@ sub create_passive_proxy($$) {
 sub get_application_id {
     my $name = shift;
     my $templateid = shift;
+    my $is_new = shift;
 
-    unless ($zabbix->exist('application',{'name' => $name, 'hostid' => $templateid})) {
-	my $result = $zabbix->create('application', {'name' => $name, 'hostid' => $templateid});
-	return $result->{'applicationids'}[0];
+    my ($result, $applicationid);
+
+    $is_new = false unless defined $is_new;
+
+    if ($is_new eq false) {
+        $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $name}});
     }
 
-    my $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $name}});
-    return $result->{'applicationid'};
+    if (exists($result->{'applicationid'})) {
+	$applicationid = $result->{'applicationid'};
+    }
+    else {
+	$result = $zabbix->create('application', {'name' => $name, 'hostid' => $templateid});
+	$applicationid = pop(@{$result->{'applicationids'}});
+    }
+
+    return $applicationid;
 }
-
-
 
 sub create_probe_template {
     my $root_name = shift;
@@ -502,7 +676,9 @@ sub create_probe_template {
     my $rdds = shift;
     my $resolver = shift;
 
-    my $templateid = create_template('Template '.$root_name);
+    my $template_data = create_template('Template '.$root_name);
+    my $templateid = $template_data->{'templateid'};
+    my $is_new = $template_data->{'is_new'};
 
     create_macro('{$RSM.IP4.ENABLED}', defined($ipv4) ? $ipv4 : '1', $templateid);
     create_macro('{$RSM.IP6.ENABLED}', defined($ipv6) ? $ipv6 : '1', $templateid);
@@ -520,40 +696,44 @@ sub create_probe_status_template {
 
     my $template_name = 'Template '.$probe_name.' Status';
 
-    my $templateid = create_template($template_name, $child_templateid);
+    my $template_data = create_template($template_name, $child_templateid);
+    my $templateid = $template_data->{'templateid'};
+    my $is_new = $template_data->{'is_new'};
+
+    my $applicationid = get_application_id('Probe status', $templateid, $is_new);
 
     my $options = {'name' => 'Probe status ($1)',
                                               'key_'=> 'rsm.probe.status[automatic,'.$root_servers_macros.']',
                                               'hostid' => $templateid,
-                                              'applications' => [get_application_id('Probe status', $templateid)],
+                                              'applications' => [$applicationid],
                                               'type' => 3, 'value_type' => 3, 'delay' => cfg_probe_status_delay,
                                               'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
 
-    create_item($options);
+    create_item($options, $is_new);
 
     $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago',
                          'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
                         'priority' => '3',
                 };
 
-    create_trigger($options);
+    create_trigger($options, $is_new);
 
 
     $options = {'name' => 'Probe status ($1)',
                                               'key_'=> 'rsm.probe.status[manual]',
                                               'hostid' => $templateid,
-                                              'applications' => [get_application_id('Probe status', $templateid)],
+                                              'applications' => [$applicationid],
                                               'type' => 2, 'value_type' => 3,
                                               'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
 
-    create_item($options);
+    create_item($options, $is_new);
 
     $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
                          'expression' => '{'.$template_name.':rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"].last(0)}=0',
                         'priority' => '4',
                 };
 
-    create_trigger($options);
+    create_trigger($options, $is_new);
 
 
 
@@ -581,13 +761,15 @@ sub create_probe_status_host {
                                                             'dns' => '', 'port' => '10050'}]
                 });
 
+    my $applicationid = get_application_id('Probes availability', $hostid);
+
     my $interfaceid = $zabbix->get('hostinterface', {'hostids' => $hostid, 'output' => ['interfaceid']});
 
     my $options = {'name' => 'Total number of probes for DNS tests',
                                               'key_'=> 'online.nodes.pl[total,dns]',
                                               'hostid' => $hostid,
 					      'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
 					      'delay' => 300,
                                               };
@@ -597,7 +779,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[online,dns]',
                                               'hostid' => $hostid,
 					      'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
 					      'delay' => 60,
                                               };
@@ -607,7 +789,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[total,epp]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
@@ -617,7 +799,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[online,epp]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 60,
                                               };
@@ -627,7 +809,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[total,rdds]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
@@ -637,7 +819,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[online,rdds]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 60,
                                               };
@@ -647,7 +829,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[total,ipv4]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
@@ -657,7 +839,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[online,ipv4]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 60,
                                               };
@@ -667,7 +849,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[total,ipv6]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
@@ -677,7 +859,7 @@ sub create_probe_status_host {
                                               'key_'=> 'online.nodes.pl[online,ipv6]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'applications' => [$applicationid],
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 60,
                                               };
@@ -876,6 +1058,33 @@ sub create_cron_jobs($) {
 sub pfail {
     print("Error: ", @_, "\n");
     exit -1;
+}
+
+sub compare_arrays {
+    my $arr1 = shift;
+    my $arr2 = shift;
+
+    foreach my $val1 (@{$arr1}) {
+	my $found = false;
+
+	foreach my $val2 (@{$arr2}) {
+	    $found = true if $val1 eq $val2;
+	}
+
+	return false if $found eq false;
+    }
+
+    foreach my $val2 (@{$arr2}) {
+        my $found = false;
+    
+        foreach my $val1 (@{$arr1}) {
+            $found = true if $val1 eq $val2;
+        }
+    
+        return false if $found eq false;
+    }
+
+    return true;
 }
 
 1;
