@@ -224,6 +224,7 @@ static int	prepare_parameters(AGENT_REQUEST *request, AGENT_RESULT *result, rege
  *****************************************************************************/
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	const char		*__function_name = "vfs_dir_size";
 	char			*dir = NULL, *path = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		size = 0;
@@ -233,12 +234,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	regex_t			*regex_incl = NULL, *regex_excl = NULL;
 
 #ifdef _WINDOWS
-	char			*name = NULL;
+	char			*name = NULL, *error = NULL;
 	wchar_t	 		*wpath = NULL;
 	intptr_t		handle;
+	zbx_uint64_t		cluster_size = 0;
 	struct _wfinddata_t	data;
-	zbx_uint64_t		file_size, cluster_size, mod;
-	DWORD			size_high, size_low;
 #else
 	DIR 			*directory;
 	struct dirent 		*entry;
@@ -272,7 +272,23 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		item = list.values[--list.values_num];
 #ifdef _WINDOWS
 		name = zbx_dsprintf(NULL, "%s\\*", item->path);
-		wpath = zbx_utf8_to_unicode(name);
+
+		if (NULL == (wpath = zbx_utf8_to_unicode(name)))
+		{
+			zbx_free(name);
+
+			if (0 < item->depth)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot convert directory name to UTF-16: '%s'",
+						__function_name, item->path);
+				goto skip;
+			}
+
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert directory name to UTF-16."));
+			list.values_num++;
+			goto err2;
+		}
+
 		zbx_free(name);
 
 		handle = _wfindfirst(wpath, &data);
@@ -282,8 +298,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 < item->depth)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot open directory listing '%s': %s", item->path,
-					zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot open directory listing '%s': %s",
+						__function_name, item->path, zbx_strerror(errno));
 				goto skip;
 			}
 
@@ -292,9 +308,9 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err2;
 		}
 
-		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = get_cluster_size(item->path)))
+		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = get_cluster_size(item->path, &error)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file system cluster size."));
+			SET_MSG_RESULT(result, error);
 			list.values_num++;
 			goto err2;
 		}
@@ -311,6 +327,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
+					DWORD	size_high, size_low;
+
 					wpath = zbx_utf8_to_unicode(path);
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
@@ -318,6 +336,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 					if (size_low != INVALID_FILE_SIZE || NO_ERROR == GetLastError())
 					{
+						zbx_uint64_t	file_size, mod;
+
 						file_size = ((zbx_uint64_t)size_high << 32) | size_low;
 
 						if (SIZE_MODE_DISK == mode && 0 != (mod = size % cluster_size))
@@ -340,16 +360,16 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (-1 == _findclose(handle))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot close directory listing '%s': %s", item->path,
-				zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close directory listing '%s': %s", __function_name,
+					item->path, zbx_strerror(errno));
 		}
 #else /* not _WINDOWS */
 		if (NULL == (directory = opendir(item->path)))
 		{
 			if (0 < item->depth)	/* unreadable subdirectory - skip */
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot open directory listing '%s': %s", item->path,
-					zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot open directory listing '%s': %s",
+						__function_name, item->path, zbx_strerror(errno));
 				goto skip;
 			}
 
@@ -414,8 +434,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot process directory entry '%s': %s", path,
-						zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot process directory entry '%s': %s",
+						__function_name, path, zbx_strerror(errno));
 			}
 		}
 
