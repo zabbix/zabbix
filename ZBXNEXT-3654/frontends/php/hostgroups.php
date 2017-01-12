@@ -36,6 +36,7 @@ $fields = [
 	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
 	'twb_groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'subgroups' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"hostgroup.massdelete","hostgroup.massdisable","hostgroup.massenable"'),
@@ -172,6 +173,14 @@ if (hasRequest('form')) {
 					}
 
 					$result &= (bool) API::HostGroup()->massRemove($massRemove);
+				}
+
+				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+					$groups_rights = applyHostgroupRightsToAllSubgroups($groupId);
+
+					if ($groups_rights) {
+						API::UserGroup()->update($groups_rights);
+					}
 				}
 			}
 		}
