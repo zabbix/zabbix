@@ -189,8 +189,7 @@ DB_RESULT	zbx_db_select_n(const char *query, int n);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 int		zbx_db_is_null(const char *field);
 
-char		*zbx_db_dyn_escape_string(const char *src);
-char		*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars);
+char		*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars);
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
 

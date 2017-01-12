@@ -296,7 +296,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_MAX_UINT, ZBX_MAX_UINT);
 		if (0 < (ret = zbx_db_execute("set current schema='%s'", dbschema_esc)))
 			ret = ZBX_DB_OK;
 		zbx_free(dbschema_esc);
@@ -2030,7 +2030,7 @@ static int	zbx_db_is_escape_sequence(char c)
  * Return value: escaped string                                               *
  *                                                                            *
  * Comments: sync changes with 'zbx_db_get_escape_string_len'                 *
- *           and 'zbx_db_dyn_escape_string_size_len'                          *
+ *           and 'zbx_db_dyn_escape_string'                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
@@ -2123,27 +2123,6 @@ static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size
  *                                                                            *
  * Function: zbx_db_dyn_escape_string                                         *
  *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_db_dyn_escape_string(const char *src)
-{
-	size_t	len;
-	char	*dst = NULL;
-
-	len = zbx_db_get_escape_string_len(src, ZBX_MAX_UINT, ZBX_MAX_UINT);
-
-	dst = zbx_malloc(dst, len);
-
-	zbx_db_escape_string(src, dst, len);
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_dyn_escape_string_size_len                                *
- *                                                                            *
  * Purpose: to escape string limited by bytes or characters, whichever limit  *
  *          is reached first.                                                 *
  *                                                                            *
@@ -2154,7 +2133,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
  * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_db_dyn_escape_string_size_len(const char *src, size_t max_bytes, size_t max_chars)
+char	*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars)
 {
 	char	*dst = NULL;
 	size_t	len;
