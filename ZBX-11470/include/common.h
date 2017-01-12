@@ -1301,10 +1301,11 @@ typedef struct
 }
 zbx_token_simple_macro_t;
 
-/* reference to second…ninth constant of the expression. */
+/* data used by references */
 typedef struct
 {
-	int	number;
+	/* index of constant being referenced (1 for $1, 2 for $2, ..., 9 for $9) */
+	int	index;
 }
 zbx_token_reference_t;
 
