@@ -2566,13 +2566,8 @@ $form-icon-btn: (
 	position: absolute;
 }
 
-.ui-drag-dot {
-	width: 7px;
-	height: 7px;
-	position: absolute;
-	background-color: $ui-bg-color;
-	border: 2px solid $form-border-focus-color;
-	@include border-radius(100%);
+.ui-resize-dot {
+	@extend %ui-resize-dot;
 }
 
 .ui-resizable-border-n {
@@ -2611,12 +2606,28 @@ $form-icon-btn: (
 	top: -1px;
 	left: 0;
 
-	.ui-drag-dot {
+	.ui-resize-dot {
 		left: 0;
 		right: 0;
 		margin: auto;
 		bottom: -6px;
 	}
+}
+
+.ui-resizable-ne {
+	@extend %ui-resize-dot;
+	z-index: 90;
+	cursor: ne-resize;
+	right: -1px;
+	top: -1px;
+}
+
+.ui-resizable-nw {
+	@extend %ui-resize-dot;
+	z-index: 90;
+	cursor: nw-resize;
+	left: -1px;
+	top: -1px;
 }
 
 .ui-resizable-e {
@@ -2627,7 +2638,7 @@ $form-icon-btn: (
 	top: 0;
 	height: 100%;
 
-	.ui-drag-dot {
+	.ui-resize-dot {
 		left: -5px;
 		top: 50%;
 		@include transform(translateY(-50%));
@@ -2642,12 +2653,28 @@ $form-icon-btn: (
 	bottom: 0;
 	left: 0;
 
-	.ui-drag-dot {
+	.ui-resize-dot {
 		left: 0;
 		right: 0;
 		margin: auto;
 		top: -5px;
 	}
+}
+
+.ui-resizable-se {
+	@extend %ui-resize-dot;
+	z-index: 90;
+	cursor: se-resize;
+	right: -1px;
+	bottom: -1px;
+}
+
+.ui-resizable-sw {
+	@extend %ui-resize-dot;
+	z-index: 90;
+	cursor: sw-resize;
+	left: -1px;
+	bottom: -1px;
 }
 
 .ui-resizable-w {
@@ -2658,11 +2685,20 @@ $form-icon-btn: (
 	top: 0;
 	height: 100%;
 
-	.ui-drag-dot {
+	.ui-resize-dot {
 		right: -5px;
 		top: 50%;
 		@include transform(translateY(-50%));
 	}
+}
+
+%ui-resize-dot {
+	width: 7px;
+	height: 7px;
+	position: absolute;
+	background-color: $ui-bg-color;
+	border: 2px solid $form-border-focus-color;
+	@include border-radius(100%);
 }
 
 %ui-resizable {
