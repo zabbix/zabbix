@@ -203,11 +203,11 @@ static void	get_trigger_expression_constant(const char *expression, const zbx_to
 {
 	size_t		pos;
 	zbx_strloc_t	number;
-	int		count;
+	int		index;
 
-	for (pos = 0, count = 1; SUCCEED == zbx_number_find(expression, pos, &number); pos = number.r + 1, count++)
+	for (pos = 0, index = 1; SUCCEED == zbx_number_find(expression, pos, &number); pos = number.r + 1, index++)
 	{
-		if (count < reference->number)
+		if (index < reference->index)
 			continue;
 
 		*length = number.r - number.l + 1;
