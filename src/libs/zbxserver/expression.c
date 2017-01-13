@@ -2532,7 +2532,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_trigger_hostids(&hostids, c_event->trigger.expression,
 							c_event->trigger.recovery_expression);
@@ -2792,7 +2792,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_trigger_hostids(&hostids, c_event->trigger.expression,
 							c_event->trigger.recovery_expression);
@@ -2973,7 +2973,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					DCget_user_macro(NULL, 0, m, &replace_to);
 					pos = token.token.r;
@@ -3097,7 +3097,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					DCget_user_macro(NULL, 0, m, &replace_to);
 					pos = token.token.r;
@@ -3173,7 +3173,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
 					EVENT_OBJECT_ITEM == c_event->object)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_item_hostid(&hostids, c_event->objectid);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
@@ -3282,7 +3282,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
 					EVENT_OBJECT_LLDRULE == c_event->object)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_item_hostid(&hostids, c_event->objectid);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
@@ -3449,7 +3449,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
-				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				else if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_trigger_hostids(&hostids, event->trigger.expression,
 							event->trigger.recovery_expression);
@@ -3472,7 +3472,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_trigger_hostids(&hostids, event->trigger.expression,
 							event->trigger.recovery_expression);
@@ -3523,7 +3523,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		else if (0 == indexed_macro &&
 				0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 				pos = token.token.r;
@@ -3571,7 +3571,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 				pos = token.token.r;
@@ -3607,7 +3607,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR_DB))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 				pos = token.token.r;
@@ -3625,7 +3625,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 != (macro_type & (MACRO_TYPE_COMMON | MACRO_TYPE_SNMP_OID)))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				if (NULL != hostid)
 					DCget_user_macro(hostid, 1, m, &replace_to);
@@ -3637,7 +3637,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 != (macro_type & MACRO_TYPE_ITEM_EXPRESSION))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				require_numeric = 1;
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
@@ -3646,7 +3646,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_SCRIPT))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 				pos = token.token.r;
@@ -3664,7 +3664,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
 		{
-			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
 				pos = token.token.r;
@@ -3705,7 +3705,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
-				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				else if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
 					cache_trigger_hostids(&hostids, event->trigger.expression,
 							event->trigger.recovery_expression);
