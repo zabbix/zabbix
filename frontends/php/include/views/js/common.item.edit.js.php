@@ -23,6 +23,30 @@
 		</td>
 	</tr>
 </script>
+<?php if (!$data['is_discovery_rule']) : ?>
+	<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
+	<?=
+		(new CRow([
+			$readonly
+				? null
+				: (new CCol(
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
+				(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+					->setAttribute('placeholder', _('number')),
+				(new CTextBox('preprocessing[#{rowNum}][params][1]'))
+					->setAttribute('placeholder', _('output'))
+					->addStyle('display: none;'),
+				(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+		]))
+			->addClass('sortable')
+			->toString()
+	?>
+	</script>
+<?php endif ?>
 <script type="text/javascript">
 	jQuery(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
@@ -43,6 +67,89 @@
 		$('#delayFlexTable').dynamicRows({
 			template: '#delayFlexRow'
 		});
+
+		<?php if (!$data['is_discovery_rule']) : ?>
+			var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
+				preprocessing = $('#preprocessing');
+
+			preprocessing.sortable({
+				disabled: (preprocessing.find('tr.sortable') < 2),
+				items: 'tr.sortable',
+				axis: 'y',
+				cursor: 'move',
+				containment: 'parent',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						var td = $(this);
+
+						td.width(td.width());
+					});
+
+					return ui;
+				},
+				start: function(e, ui) {
+					$(ui.placeholder).height($(ui.helper).height());
+				}
+			});
+
+			preprocessing
+				.on('click', '.element-table-add', function() {
+					var row = $(this).parent().parent();
+					row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('tr.sortable').length}));
+
+					if (preprocessing.find('tr.sortable').length > 1) {
+						preprocessing.sortable('enable');
+					}
+				})
+				.on('click', '.element-table-remove', function() {
+					var row = $(this).parent().parent();
+					row.remove();
+
+					if (preprocessing.find('tr.sortable').length < 2) {
+						preprocessing.sortable('disable');
+					}
+				})
+				.on('change', 'select[name*="type"]', function() {
+					var inputs = $(this).parent().parent().find('[name*="params"]');
+
+					switch ($(this).val()) {
+						case '<?= ZBX_PREPROC_MULTIPLIER ?>':
+							$(inputs[0])
+								.show()
+								.attr('placeholder', '<?= _('number') ?>');
+							$(inputs[1]).hide();
+							break;
+
+						case '<?= ZBX_PREPROC_RTRIM ?>':
+						case '<?= ZBX_PREPROC_LTRIM ?>':
+						case '<?= ZBX_PREPROC_TRIM ?>':
+							$(inputs[0])
+								.show()
+								.attr('placeholder', '<?= _('list of characters') ?>');
+							$(inputs[1]).hide();
+							break;
+
+						case '<?= ZBX_PREPROC_REGSUB ?>':
+							$(inputs[0])
+								.show()
+								.attr('placeholder', '<?= _('pattern') ?>');
+							$(inputs[1]).show();
+							break;
+
+						case '<?= ZBX_PREPROC_BOOL2DEC ?>':
+						case '<?= ZBX_PREPROC_OCT2DEC ?>':
+						case '<?= ZBX_PREPROC_HEX2DEC ?>':
+						case '<?= ZBX_PREPROC_DELTA_VALUE ?>':
+						case '<?= ZBX_PREPROC_DELTA_SPEED ?>':
+							$(inputs[0]).hide();
+							$(inputs[1]).hide();
+							break;
+					}
+				});
+		<?php endif ?>
 	});
 </script>
 <?php
@@ -203,9 +310,6 @@ foreach ($this->data['types'] as $type => $label) {
 foreach ([ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE] as $type) {
 	// set to disable character, log and text items in value type
 	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
-
-	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
-	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN], 'data_type');
 }
 
 $this->data['securityLevelVisibility'] = [];
@@ -227,9 +331,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'p
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
-
 ?>
-
 <script type="text/javascript">
 	function setAuthTypeLabel() {
 		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>

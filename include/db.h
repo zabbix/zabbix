@@ -171,6 +171,8 @@ struct	_DC_TRIGGER;
 
 #define PROXY_DHISTORY_VALUE_LEN	255
 
+#define ITEM_PREPROC_PARAMS_LEN		255
+
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"

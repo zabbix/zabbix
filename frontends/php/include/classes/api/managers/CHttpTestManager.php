@@ -713,7 +713,6 @@ class CHttpTestManager {
 		$insertItems = [];
 
 		foreach ($checkitems as $item) {
-			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $httpTest['hostid'];
 			$item['delay'] = $httpTest['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
@@ -817,7 +816,6 @@ class CHttpTestManager {
 				$item['hostid'] = $httpTest['hostid'];
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
-				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['history'] = self::ITEM_HISTORY;
 				$item['trends'] = self::ITEM_TRENDS;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;

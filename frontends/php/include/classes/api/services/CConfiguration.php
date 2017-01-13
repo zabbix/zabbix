@@ -150,6 +150,7 @@ class CConfiguration extends CApiService {
 		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
 		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
 		$converterChain->addConverter('3.0', $importConverterFactory->getObject('3.0'));
+		$converterChain->addConverter('3.2', $importConverterFactory->getObject('3.2'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($data);
