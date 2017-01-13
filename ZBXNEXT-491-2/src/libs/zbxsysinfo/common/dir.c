@@ -227,6 +227,31 @@ static void	regex_incl_excl_free(regex_t *regex_incl, regex_t *regex_excl)
 	}
 }
 
+static void	list_vector_destroy(zbx_vector_ptr_t *list)
+{
+	zbx_directory_item_t	*item;
+
+	while (0 < list->values_num)
+	{
+		item = list->values[--list->values_num];
+		zbx_free(item->path);
+		zbx_free(item);
+	}
+	zbx_vector_ptr_destroy(list);
+}
+
+static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
+{
+	zbx_file_descriptor_t	*file;
+
+	while (0 < descriptors->values_num)
+	{
+		file = descriptors->values[--descriptors->values_num];
+		zbx_free(file);
+	}
+	zbx_vector_ptr_destroy(descriptors);
+}
+
 /******************************************************************************
  *                                                                            *
  * Different approach is used for Windows implementation as Windows is not    *
@@ -371,13 +396,7 @@ skip:
 	SET_UI64_RESULT(result, size);
 	ret = SYSINFO_RET_OK;
 err2:
-	while (0 < list.values_num)
-	{
-		item = list.values[--list.values_num];
-		zbx_free(item->path);
-		zbx_free(item);
-	}
-	zbx_vector_ptr_destroy(&list);
+	list_vector_destroy(&list);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
 
@@ -504,21 +523,8 @@ skip:
 	SET_UI64_RESULT(result, size);
 	ret = SYSINFO_RET_OK;
 err2:
-	while (0 < list.values_num)
-	{
-		item = list.values[--list.values_num];
-		zbx_free(item->path);
-		zbx_free(item);
-	}
-	zbx_vector_ptr_destroy(&list);
-
-	while (0 < descriptors.values_num)
-	{
-		file = descriptors.values[--descriptors.values_num];
-		zbx_free(file);
-	}
-	zbx_vector_ptr_destroy(&descriptors);
-
+	list_vector_destroy(&list);
+	descriptors_vector_destroy(&descriptors);
 	zbx_free(path);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
