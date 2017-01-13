@@ -615,4 +615,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function zbxTestWaitForPageToLoad() {
+		$this->webDriver->wait(10, 2000)->until(function () {
+			return $this->webDriver->executeScript("return document.readyState;") == "complete";
+			}
+		);
+	}
+
 }

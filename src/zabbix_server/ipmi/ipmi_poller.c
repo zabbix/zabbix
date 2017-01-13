@@ -145,8 +145,9 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 			" sensor:%s", __function_name, itemid, addr, (int)port, (int)authtype, (int)privilege,
 			username, sensor);
 
-	errcode = set_ipmi_control_value(itemid, addr, port, authtype, privilege, username, password, sensor, command,
-			&error);
+	errcode = zbx_set_ipmi_control_value(itemid, addr, port, authtype, privilege, username, password, sensor,
+			command, &error);
+
 	ipmi_poller_send_result(socket, ZBX_IPC_IPMI_COMMAND_RESULT, errcode, error);
 
 	zbx_free(error);
@@ -188,7 +189,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	init_ipmi_handler();
+	zbx_init_ipmi_handler();
 
 	ipmi_poller_register(&ipmi_socket);
 
@@ -241,7 +242,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 				ipmi_poller_process_command_request(&ipmi_socket, &message);
 				break;
 			case ZBX_IPC_IPMI_CLEANUP_REQUEST:
-				delete_inactive_ipmi_hosts(time(NULL));
+				zbx_delete_inactive_ipmi_hosts(time(NULL));
 				break;
 		}
 
@@ -250,7 +251,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 	zbx_ipc_socket_close(&ipmi_socket);
 
-	free_ipmi_handler();
+	zbx_free_ipmi_handler();
 
 #undef STAT_INTERVAL
 }

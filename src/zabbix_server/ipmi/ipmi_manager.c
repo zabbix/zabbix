@@ -653,7 +653,7 @@ static void	ipmi_manager_activate_host(zbx_ipmi_manager_t *manager, zbx_uint64_t
 	DC_ITEM	item;
 	int	errcode;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	zbx_activate_item_host(&item, ts);
 	ipmi_manager_update_host(manager, item.host.hostid, &item.host);
@@ -679,7 +679,7 @@ static void	ipmi_manager_deactivate_host(zbx_ipmi_manager_t *manager, zbx_uint64
 	DC_ITEM	item;
 	int	errcode;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	zbx_deactivate_item_host(&item, ts, error);
 	ipmi_manager_update_host(manager, item.host.hostid, &item.host);

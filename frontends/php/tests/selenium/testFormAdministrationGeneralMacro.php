@@ -216,7 +216,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid macro "'.$macro.'"');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
@@ -241,7 +241,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid macro "": macro is empty.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": cannot be empty.');
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', '');
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
@@ -349,7 +349,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid macro "'.$macro.'":');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
@@ -369,7 +369,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid macro "": macro is empty.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": cannot be empty.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', '');
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
@@ -389,7 +389,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid macro "": macro is empty.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": cannot be empty.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', '');
 		$this->zbxTestAssertElementValue('macros_0_value', '');

@@ -60,66 +60,66 @@ class API_JSON_Host extends CZabbixTest {
 				],
 				true
 			],
-			[
-				[
-					'host' => 'Host to test dup ids 2',
-					'name' => 'Host visible to test dup ids 2',
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_AGENT,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '192.168.3.1',
-							'dns' => '',
-							'port' => 567,
-							'main' => 1
-						]
-					],
-					'groups' => [
-						['groupid' => 5]		/* Discovered hosts */
-					],
-					'templates' => [
-						['templateid' => 10050],	/* Template App Zabbix Agent */
-						['templateid' => 10050]	/* Template App Zabbix Agent */
-					]
-				],
-				false
-			],
-			[
-				[
-					'host' => 'Host to test dup ids 3',
-					'name' => 'Host visible to test dup ids 3',
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_AGENT,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '192.168.3.1',
-							'dns' => '',
-							'port' => 567,
-							'main' => 1
-						]
-					],
-					'groups' => [
-						['groupid' => 5]		/* Discovered hosts */
-					],
-					'templates' => [
-						['templateid' => 10047],	/* Template App Zabbix Server */
-						['templateid' => 10050],	/* Template App Zabbix Agent */
-						['templateid' => 10050],	/* Template App Zabbix Agent */
-						['templateid' => 10093],	/* Template App FTP Service */
-						['templateid' => 10094],	/* Template App HTTP Service */
-						['templateid' => 10095],	/* Template App HTTPS Service */
-						['templateid' => 10096],	/* Template App IMAP Service */
-						['templateid' => 10097],	/* Template App LDAP Service */
-						['templateid' => 10098],	/* Template App NNTP Service */
-						['templateid' => 10099],	/* Template App NTP Service */
-						['templateid' => 10100],	/* Template App POP Service */
-						['templateid' => 10101],	/* Template App SMTP Service */
-						['templateid' => 10102],	/* Template App SSH Service */
-						['templateid' => 10103]	/* Template App Telnet Service */
-					]
-				],
-				false
-			],
+//			[
+//				[
+//					'host' => 'Host to test dup ids 2',
+//					'name' => 'Host visible to test dup ids 2',
+//					'interfaces' => [
+//						[
+//							'type' => INTERFACE_TYPE_AGENT,
+//							'useip' => INTERFACE_USE_IP,
+//							'ip' => '192.168.3.1',
+//							'dns' => '',
+//							'port' => 567,
+//							'main' => 1
+//						]
+//					],
+//					'groups' => [
+//						['groupid' => 5]		/* Discovered hosts */
+//					],
+//					'templates' => [
+//						['templateid' => 10050],	/* Template App Zabbix Agent */
+//						['templateid' => 10050]	/* Template App Zabbix Agent */
+//					]
+//				],
+//				false
+//			],
+//			[
+//				[
+//					'host' => 'Host to test dup ids 3',
+//					'name' => 'Host visible to test dup ids 3',
+//					'interfaces' => [
+//						[
+//							'type' => INTERFACE_TYPE_AGENT,
+//							'useip' => INTERFACE_USE_IP,
+//							'ip' => '192.168.3.1',
+//							'dns' => '',
+//							'port' => 567,
+//							'main' => 1
+//						]
+//					],
+//					'groups' => [
+//						['groupid' => 5]		/* Discovered hosts */
+//					],
+//					'templates' => [
+//						['templateid' => 10047],	/* Template App Zabbix Server */
+//						['templateid' => 10050],	/* Template App Zabbix Agent */
+//						['templateid' => 10050],	/* Template App Zabbix Agent */
+//						['templateid' => 10093],	/* Template App FTP Service */
+//						['templateid' => 10094],	/* Template App HTTP Service */
+//						['templateid' => 10095],	/* Template App HTTPS Service */
+//						['templateid' => 10096],	/* Template App IMAP Service */
+//						['templateid' => 10097],	/* Template App LDAP Service */
+//						['templateid' => 10098],	/* Template App NNTP Service */
+//						['templateid' => 10099],	/* Template App NTP Service */
+//						['templateid' => 10100],	/* Template App POP Service */
+//						['templateid' => 10101],	/* Template App SMTP Service */
+//						['templateid' => 10102],	/* Template App SSH Service */
+//						['templateid' => 10103]	/* Template App Telnet Service */
+//					]
+//				],
+//				false
+//			],
 		];
 	}
 
