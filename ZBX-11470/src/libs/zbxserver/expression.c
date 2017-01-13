@@ -2227,7 +2227,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  *                      ^ - bl                             ^ - br             *
  *                                                                            *
  ******************************************************************************/
-static void	get_trigger_function_value(const char *expression, char **replace_to, char *bl, char **br)
+static void	get_trigger_function_value(const char *expression, char **replace_to, char *bl)
 {
 	char	*p, *host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
@@ -2285,7 +2285,6 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	p[par_l] = '(';
 	p[par_r] = ')';
 
-	*br = p + par_r + 2;	/* point to the character after '}' */
 fail:
 	zbx_free(host);
 	zbx_free(key);
@@ -2434,7 +2433,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 {
 	const char		*__function_name = "substitute_simple_macros";
 
-	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
+	char			*p, c, *replace_to = NULL, sql[64];
 	const char		*m, *replace = NULL;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, func_macro,
 				found, raw_value;
@@ -2499,9 +2498,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				m = *data + token.token.l;
 		}
 
-		bl = *data + token.token.l;
-		br = *data + token.token.r;
-
 		if (0 != N_functionid)
 		{
 			int	i, diff;
@@ -2523,8 +2519,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		if (0 == indexed_macro)
 			N_functionid = 1;
 
-		c = *++br;
-		*br = '\0';
+		c = (*data)[token.token.r + 1];
+		(*data)[token.token.r + 1] = '\0';
 
 		ret = SUCCEED;
 
@@ -2790,10 +2786,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else
 				{
-					*br = c;
-					get_trigger_function_value(c_event->trigger.expression, &replace_to, bl, &br);
-					c = *br;
-					*br = '\0';
+					get_trigger_function_value(c_event->trigger.expression, &replace_to,
+							*data + token.token.l);
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -3749,26 +3743,26 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", bl);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", *data + token.token.l);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
-		*br = c;
+		(*data)[token.token.r + 1] = c;
 
 		if (NULL != replace_to)
 		{
 			pos = token.token.r;
 
-			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl - *data, br - bl,
-					replace_to, strlen(replace_to));
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.token.l,
+					token.token.r - token.token.l + 1, replace_to, strlen(replace_to));
 			zbx_free(replace_to);
 		}
 		else if (NULL != replace)
 		{
 			pos = token.token.r;
 
-			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, bl - *data, br - bl,
-					replace, replace_len);
+			pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.token.l,
+					token.token.r - token.token.l + 1, replace, replace_len);
 
 			replace = NULL;
 		}
