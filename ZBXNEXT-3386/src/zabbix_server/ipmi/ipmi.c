@@ -43,7 +43,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%d", __function_name, host->host, command);
 
-	if (SUCCEED != parse_ipmi_command(command, sensor, &op, error, max_error_len))
+	if (SUCCEED != zbx_parse_ipmi_command(command, sensor, &op, error, max_error_len))
 		return FAIL;
 
 	if (FAIL == zbx_ipc_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, 10, &errmsg))

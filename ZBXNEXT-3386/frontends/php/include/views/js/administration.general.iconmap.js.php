@@ -77,7 +77,7 @@
 		});
 
 		iconMapTable.find('tbody')
-			.delegate('.removeMapping', 'click', function() {
+			.on('click', '.removeMapping', function() {
 				$(this).parent().parent().remove();
 
 				if (iconMapTable.find('tr.sortable').length < 2) {
@@ -85,12 +85,12 @@
 				}
 				recalculateSortOrder();
 			})
-			.delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
+			.on('change', 'select.mappingIcon, select#iconmap_default_iconid', function() {
 				$(this).closest('tr').find('.preview')
 					.attr('src', 'imgstore.php?&width=<?= ZBX_ICON_PREVIEW_WIDTH ?>&height=<?= ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + $(this).val())
 					.data('imageFull', 'imgstore.php?iconid=' + $(this).val());
 			})
-			.delegate('img.preview', 'click', function(e) {
+			.on('click', 'img.preview', function(e) {
 				var img = $('<img>', {src: $(this).data('imageFull')});
 				hintBox.showStaticHint(e, this, img, '', true);
 			});

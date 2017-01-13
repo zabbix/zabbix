@@ -616,14 +616,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		if (SUCCEED == errcodes[i])
 		{
-			/* remove formatting symbols from the end of the result */
-			/* so it could be checked by "is_uint64" and "is_double" functions */
-			/* when we try to get "int" or "float" values from "string" result */
-			if (0 != ISSET_STR(&results[i]))
-				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (0 != ISSET_TEXT(&results[i]))
-				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
-
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
@@ -767,6 +759,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
+
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)

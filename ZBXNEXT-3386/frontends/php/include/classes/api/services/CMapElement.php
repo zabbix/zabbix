@@ -88,7 +88,7 @@ abstract class CMapElement extends CApiService {
 	 * @param array $selements
 	 */
 	protected function checkSelementPermissions(array $selements) {
-		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			return;
 		}
 

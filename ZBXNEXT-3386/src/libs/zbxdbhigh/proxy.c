@@ -157,7 +157,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 	if (0 == ((unsigned int)proxy->tls_accept & sock->connection_type))
 	{
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tls_connection_type_name(sock->connection_type), proxy->host);
+				zbx_tcp_connection_type_name(sock->connection_type), proxy->host);
 		return FAIL;
 	}
 
@@ -240,7 +240,7 @@ int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, ch
 	if (0 == ((unsigned int)host->tls_accept & sock->connection_type))
 	{
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
-				zbx_tls_connection_type_name(sock->connection_type), host->host);
+				zbx_tcp_connection_type_name(sock->connection_type), host->host);
 		return FAIL;
 	}
 
@@ -346,7 +346,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
-				zbx_tls_connection_type_name(sock->connection_type));
+				zbx_tcp_connection_type_name(sock->connection_type));
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
 
@@ -2076,7 +2076,7 @@ try_again:
 	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
-	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
+	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < data_num; i++)
 	{
@@ -2325,10 +2325,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		return FAIL;
 
 	/* empty values are only allowed for meta information update packets */
-	if (NULL == value->value && 0 == value->meta)
+	if (NULL == value->value)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", item->key_orig);
-		return FAIL;
+		if (0 == value->meta || ITEM_STATE_NOTSUPPORTED == value->state)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
 	}
 
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
@@ -2340,36 +2343,49 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	}
 	else
 	{
-		int		res = SUCCEED;
 		AGENT_RESULT	result;
 
 		init_result(&result);
 
 		if (NULL != value->value)
-			res = set_result_type(&result, item->value_type, item->data_type, value->value);
-
-		if (SUCCEED == res)
 		{
-			if (ITEM_VALUE_TYPE_LOG == item->value_type && NULL != value->value)
+			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				result.log->timestamp = value->timestamp;
+				zbx_log_t	*log;
+
+				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
+				log->value = zbx_strdup(NULL, value->value);
+
+				if (0 == value->timestamp)
+				{
+					log->timestamp = 0;
+					calc_timestamp(log->value, &log->timestamp, item->logtimefmt);
+				}
+				else
+					log->timestamp = value->timestamp;
+
+				log->logeventid = value->logeventid;
+				log->severity = value->severity;
+
 				if (NULL != value->source)
 				{
-					zbx_replace_invalid_utf8(value->source);
-					result.log->source = zbx_strdup(result.log->source, value->source);
+					log->source = zbx_strdup(NULL, value->source);
+					zbx_replace_invalid_utf8(log->source);
 				}
-				result.log->severity = value->severity;
-				result.log->logeventid = value->logeventid;
+				else
+					log->source = NULL;
 
-				calc_timestamp(result.log->value, &result.log->timestamp, item->logtimefmt);
+				SET_LOG_RESULT(&result, log);
 			}
+			else
+				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
 
 			if (0 != value->meta)
 				set_result_meta(&result, value->lastlogsize, value->mtime);
 
 			item->state = ITEM_STATE_NORMAL;
-			dc_add_history(item->itemid, item->value_type, item->flags, &result,
-					&value->ts, item->state, NULL);
+			dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts,
+					item->state, NULL);
 		}
 		else if (ISSET_MSG(&result))
 		{
@@ -2839,11 +2855,6 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
 		return FAIL;
 
-	/* item has been already converted to decimal format by proxy - */
-	/* reset its data type to decimal to prevent double conversion  */
-	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		item->data_type = ITEM_DATA_TYPE_DECIMAL;
-
 	return SUCCEED;
 }
 
@@ -3156,11 +3167,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_t
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
-		*value = '\0';
-		*dns = '\0';
-		port = 0;
-		status = 0;
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
 
@@ -3184,12 +3190,19 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_t
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 			port = atoi(tmp);
+		else
+			port = 0;
 
-		zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc);
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
+			*value = '\0';
+
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+			*dns = '\0';
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
+		else
+			status = 0;
 
 		if (0 == last_druleid || drule.druleid != last_druleid)
 		{
@@ -3566,7 +3579,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	while (SUCCEED == parse_history_data_33(jp_data, &pnext, values, itemids, &values_num, &read_num, ts_diff,
 			&error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 		for (i = 0; i < values_num; i++)
 		{

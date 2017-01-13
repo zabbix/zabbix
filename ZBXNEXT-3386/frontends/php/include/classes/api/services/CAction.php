@@ -1392,6 +1392,7 @@ class CAction extends CApiService {
 
 		$all_groupids = [];
 		$all_hostids = [];
+		$all_templateids = [];
 		$all_userids = [];
 		$all_usrgrpids = [];
 
@@ -1645,7 +1646,7 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
 					}
 
-					$all_hostids = array_merge($all_hostids, $templateids);
+					$all_templateids = array_merge($all_templateids, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1673,6 +1674,9 @@ class CAction extends CApiService {
 		));
 		$this->checkHostsPermissions($all_hostids,
 			_('Incorrect action operation host. Host does not exist or you have no access to this host.')
+		);
+		$this->checkTemplatesPermissions($all_templateids,
+			_('Incorrect action operation template. Template does not exist or you have no access to this template.')
 		);
 		$this->checkUsersPermissions($all_userids,
 			_('Incorrect action operation user. User does not exist or you have no access to this user.')
