@@ -2253,6 +2253,8 @@ const char	*zbx_alert_status_string(unsigned char type, unsigned char status)
 {
 	switch (status)
 	{
+		case ALERT_STATUS_RAN:
+			return "ran";
 		case ALERT_STATUS_SENT:
 			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
 		case ALERT_STATUS_NOT_SENT:

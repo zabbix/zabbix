@@ -783,50 +783,45 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			script.execute_on = (unsigned char)atoi(row[4]);
 
-		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT != script.type || ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		ZBX_STR2UINT64(host.hostid, row[0]);
+
+		if (0 != host.hostid)
 		{
-			ZBX_STR2UINT64(host.hostid, row[0]);
-
-			if (0 != host.hostid)
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
+				goto skip;
+			}
 
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-				strscpy(host.host, row[1]);
-				host.tls_connect = (unsigned char)atoi(row[12]);
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			strscpy(host.host, row[1]);
+			host.tls_connect = (unsigned char)atoi(row[12]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[13]);
-				host.ipmi_privilege = (unsigned char)atoi(row[14]);
-				strscpy(host.ipmi_username, row[15]);
-				strscpy(host.ipmi_password, row[16]);
+			host.ipmi_authtype = (signed char)atoi(row[13]);
+			host.ipmi_privilege = (unsigned char)atoi(row[14]);
+			strscpy(host.ipmi_username, row[15]);
+			strscpy(host.ipmi_password, row[16]);
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
-			}
-			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+		}
+		else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+		{
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
-
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				goto skip;
 			}
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 		}
 
 		if (SUCCEED == rc)
 		{
-			char	*output = NULL;
-
 			switch (script.type)
 			{
 				case ZBX_SCRIPT_TYPE_SSH:
@@ -844,13 +839,14 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 					break;
 			}
 
-			if (SUCCEED == (rc = zbx_execute_script(&host, &script, NULL, &output, error, sizeof(error))))
-				zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", script.command, output);
-
-			zbx_free(output);
+			rc = zbx_execute_script(&host, &script, NULL, NULL, error, sizeof(error));
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
+
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type && ZBX_SCRIPT_EXECUTE_ON_AGENT == script.execute_on &&
+				ALERT_STATUS_SENT == status)
+			status = ALERT_STATUS_RAN;
 
 		add_command_alert(&db_insert, alerts_num++, &host, event->eventid, actionid, esc_step, script.command,
 				status, error);

@@ -372,8 +372,16 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		{
 			ret = TIMEOUT_ERROR;
 		}
-		else if (WAIT_OBJECT_0 == WaitForSingleObject(pi.hProcess, 0) &&
-				GetExitCodeProcess(pi.hProcess, &code) && 0 != code)
+		else if (WAIT_OBJECT_0 != WaitForSingleObject(pi.hProcess, 0) ||
+				0 == GetExitCodeProcess(pi.hProcess, &code))
+		{
+			ret = FAIL;
+			if (NULL != buffer && '\0' != **buffer)
+				zbx_strlcpy(error, *buffer, max_error_len);
+			else
+				zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
+		}
+		else if (0 != code)
 		{
 			ret = FAIL;
 			if (NULL != buffer && '\0' != **buffer)
@@ -441,12 +449,21 @@ close:
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
-		else if (WIFEXITED(status) && EXIT_SUCCESS != WEXITSTATUS(status))
+		else if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
 		{
-			if (NULL != buffer && '\0' != **buffer)
-				zbx_strlcpy(error, *buffer, max_error_len);
+			if (NULL == buffer || '\0' == **buffer)
+			{
+				if (WIFEXITED(status))
+					zbx_snprintf(error, max_error_len, "process exited with code: %d",
+							WEXITSTATUS(status));
+				else if (WIFSIGNALED(status))
+					zbx_snprintf(error, max_error_len, "process killed by signal %d",
+							WTERMSIG(status));
+				else
+					zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
+			}
 			else
-				zbx_snprintf(error, max_error_len, "process exited with code: %d", WEXITSTATUS(status));
+				zbx_strlcpy(error, *buffer, max_error_len);
 		}
 		else
 			ret = SUCCEED;
