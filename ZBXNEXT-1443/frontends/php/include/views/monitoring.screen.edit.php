@@ -212,7 +212,7 @@ if ($data['form'] === 'update') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButton('clone', _('Clone')),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
 			new CButton('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete screen?'), url_params(['form', 'screenid', 'templateid'])),
 			new CButtonCancel(url_param('templateid'))

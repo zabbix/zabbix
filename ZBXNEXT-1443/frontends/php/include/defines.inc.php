@@ -954,7 +954,7 @@ define('IPMI_PRIVILEGE_OPERATOR',	3);
 define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
-define('ZBX_HAVE_IPV6', 1);
+define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
@@ -1065,7 +1065,6 @@ define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
 define('ZBX_TEXTAREA_4DIGITS_WIDTH',			50);	// please use for date selector only
 define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
-define('ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH',	100);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 

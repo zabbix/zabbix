@@ -914,8 +914,7 @@ class testUrlParameters extends CWebTest {
 						'url' => 'sysmaps.php?sysmapid=-1&severity_min=0',
 						'text_not_present' => 'Maps',
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "sysmapid" field.'
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
