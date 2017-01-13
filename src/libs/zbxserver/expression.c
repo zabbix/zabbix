@@ -847,7 +847,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1,
+						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 				if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
 					DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
