@@ -167,7 +167,8 @@ sub get_probes_count
 		{
 			if ($value_ref->[0] == $item_ref->{'itemid'})
 			{
-				push(@hostids, $item_ref->{'hostid'}) unless ($item_ref->{'hostid'} ~~ @hostids);
+				my $hostid = $item_ref->{'hostid'};
+				push(@hostids, $hostid) unless (grep(/\b$hostid\b/, @hostids));
 				last;
 			}
 		}

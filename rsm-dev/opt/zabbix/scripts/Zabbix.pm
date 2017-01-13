@@ -8,6 +8,9 @@ use Carp;
 use LWP::UserAgent;
 use LWP::Protocol::https;
 
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -32,10 +35,13 @@ use constant _LOGIN_TIMEOUT => 5;
 use constant _DEFAULT_REQUEST_TIMEOUT => 60;
 use constant _DEFAULT_REQUEST_ATTEMPTS => 10;
 
-my ($REQUEST_TIMEOUT, $REQUEST_ATTEMPTS);
+my ($REQUEST_TIMEOUT, $REQUEST_ATTEMPTS, $DEBUG);
 
 sub new($$) {
     my ($class, $options) = @_;
+
+    $DEBUG = $options->{'debug'};
+    undef($options->{'debug'});
 
     my $ua = LWP::UserAgent->new();
 
@@ -205,13 +211,22 @@ sub objects {
     return $self->__fetch($class, 'getobjects', $params);
 }
 
+my $objectids =
+{
+	'trigger' => 'triggerid',
+	'item' => 'itemid',
+	'host' => 'hostid',
+	'template' => 'templateid',
+	'hostgroup' => 'groupid',
+	'application' => 'applicationid'
+};
 
 sub exist {
     my ($self, $class, $params) = @_;
 
-    $params->{'countOutput'} = true;
+    $params->{'output'} = [$objectids->{$class}];
 
-    return $self->__fetch_bool($class, 'get', $params);
+    return $self->__fetch_id($class, 'get', $params);
 }
 
 sub is_readable {
@@ -414,7 +429,7 @@ sub __fetch($$$) {
     my $result = to_utf8($self->__send_request($class, $method, $params));
 
     if (defined($result->{'error'})) {
-        $self->set_last_error($result->{'error'});
+	die($self->set_last_error($result->{'error'}));
     }
 
     $self->set_last_error();
@@ -431,16 +446,38 @@ sub __fetch_bool($$$) {
     my $result = $self->__send_request($class, $method, $params);
 
     if (defined($result->{'error'})) {
-        $self->set_last_error($result->{'error'});
-        return;
+	die($self->set_last_error($result->{'error'}));
+    }
+
+    if (@{$result->{'result'}} > 1) {
+	die('more than one entry found when checking '.$class.':'."\nREQUEST:\n".Dumper($params)."\nREPLY:\n".Dumper($result->{'result'})."\n");
     }
 
     $self->set_last_error();
 
-    return true if ($result->{'result'} != 0);
+    return false if (@{$result->{'result'}} == 0);
 
-    return false;
+    return true;
+}
 
+sub __fetch_id($$$) {
+    my ($self, $class, $method, $params) = @_;
+
+    my $result = $self->__send_request($class, $method, $params);
+
+    if (defined($result->{'error'})) {
+	die($self->set_last_error($result->{'error'}));
+    }
+
+    if (@{$result->{'result'}} > 1) {
+	die('more than one entry found when checking '.$class.':'."\nREQUEST:\n".Dumper($params)."\nREPLY:\n".Dumper($result->{'result'})."\n");
+    }
+
+    $self->set_last_error();
+
+    return 0 if (@{$result->{'result'}} == 0);
+
+    return $result->{'result'}->[0]->{$objectids->{$class}};
 }
 
 sub __send_request {
@@ -455,10 +492,6 @@ sub __send_request {
         auth => $self->auth,
         id => $self->next_id,
     })));
-
-#    use Data::Dumper;
-#
-#    print("REQUEST:\n", Dumper($req), "\n");
 
     my $res;
     my $attempts = $REQUEST_ATTEMPTS;
@@ -479,7 +512,14 @@ sub __send_request {
 
     my $result = decode_json($res->content);
 
-#    print("REPLY:\n", Dumper($result), "\n");
+    if (defined($result->{'error'})) {
+	print("REQUEST FAILED:\n", Dumper($req), "\n");
+	print("REPLY:\n", Dumper($result), "\n");
+    }
+    elsif ($DEBUG) {
+	print("REQUEST:\n", Dumper($req), "\n");
+	print("REPLY:\n", Dumper($result), "\n");
+    }
 
     return $result;
 }

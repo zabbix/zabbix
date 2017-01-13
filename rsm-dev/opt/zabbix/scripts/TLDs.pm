@@ -23,12 +23,13 @@ our @EXPORT = qw(zbx_connect check_api_error get_proxies_list
 
 our ($zabbix, $result);
 
-sub zbx_connect($$$) {
+sub zbx_connect($$$;$) {
     my $url = shift;
     my $user = shift;
     my $password = shift;
+    my $debug = shift;
 
-    $zabbix = Zabbix->new({'url' => $url, user => $user, password => $password});
+    $zabbix = Zabbix->new({'url' => $url, user => $user, password => $password, 'debug' => $debug});
 
     return $zabbix->{'error'} if defined($zabbix->{'error'}) and $zabbix->{'error'} ne '';
 
@@ -281,22 +282,19 @@ sub update_root_servers {
 sub create_host {
     my $options = shift;
 
-    unless ($zabbix->exist('host',{'filter' => {'host' => $options->{'host'}}})) {
+    my $hostid;
+
+    unless ($hostid = $zabbix->exist('host',{'filter' => {'host' => $options->{'host'}}})) {
         my $result = $zabbix->create('host', $options);
 
         return $result->{'hostids'}[0];
     }
 
-    my $result = $zabbix->get('host', {'output' => ['hostid'], 'filter' => {'host' => [$options->{'host'}]}});
-
-    pfail("more than one host named \"", $options->{'host'}, "\" found") if ('ARRAY' eq ref($result));
-    pfail("host \"", $options->{'host'}, "\" not found") unless (defined($result->{'hostid'}));
-
-    $options->{'hostid'} = $result->{'hostid'};
+    $options->{'hostid'} = $hostid;
     delete($options->{'interfaces'});
     $result = $zabbix->update('host', $options);
 
-    my $hostid = $result->{'hostid'} ? $result->{'hostid'} : $options->{'hostid'};
+    $hostid = $result->{'hostids'}[0] ? $result->{'hostids'}[0] : $options->{'hostid'};
 
     return $hostid;
 }
@@ -306,13 +304,9 @@ sub create_group {
 
     my $groupid;
 
-    unless ($zabbix->exist('hostgroup',{'filter' => {'name' => $name}})) {
+    unless ($groupid = $zabbix->exist('hostgroup',{'filter' => {'name' => $name}})) {
         my $result = $zabbix->create('hostgroup', {'name' => $name});
 	$groupid = $result->{'groupids'}[0];
-    }
-    else {
-	my $result = $zabbix->get('hostgroup', {'filter' => {'name' => [$name]}});
-        $groupid = $result->{'groupid'};
     }
 
     return $groupid;
@@ -324,18 +318,14 @@ sub create_template {
 
     my ($result, $templateid, $options, $groupid);
 
-    unless ($zabbix->exist('hostgroup', {'filter' => {'name' => 'Templates - TLD'}})) {
+    unless ($groupid = $zabbix->exist('hostgroup', {'filter' => {'name' => 'Templates - TLD'}})) {
         $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
         $groupid = $result->{'groupids'}[0];
-    }
-    else {
-        $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates - TLD'}});
-        $groupid = $result->{'groupid'};
     }
 
     return $zabbix->last_error if defined $zabbix->last_error;
 
-    unless ($zabbix->exist('template',{'filter' => {'host' => $name}})) {
+    unless ($templateid = $zabbix->exist('template',{'filter' => {'host' => $name}})) {
         $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
 
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
@@ -345,9 +335,6 @@ sub create_template {
         $templateid = $result->{'templateids'}[0];
     }
     else {
-        $result = $zabbix->get('template', {'filter' => {'host' => $name}});
-        $templateid = $result->{'templateid'};
-
         $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
 
@@ -362,20 +349,10 @@ sub create_template {
 
 sub create_item {
     my $options = shift;
-    my $result;
+    my ($result, $itemid);
 
-    if ($zabbix->exist('item', {'filter' => {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}}})) {
-	$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
-
-	if ('ARRAY' eq ref($result))
-	{
-	    pfail("Request: ", Dumper($options),
-		  "returned more than one item with key ", $options->{'key_'}, ":\n",
-		  Dumper($result));
-	}
-
-	$options->{'itemid'} = $result->{'itemid'};
-
+    if ($itemid = $zabbix->exist('item', {'filter' => {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}}})) {
+	$options->{'itemid'} = $itemid;
 	$result = $zabbix->update('item', $options);
     }
     else {
@@ -393,13 +370,22 @@ sub create_item {
 
 sub create_trigger {
     my $options = shift;
-    my $result;
+    my $host_name = shift;
+    my $created_ref = shift;	# optional: 0 - updated, 1 - created
 
-    if ($zabbix->exist('trigger',{'filter' => {'expression' => $options->{'expression'}}})) {
+    my ($result, $filter, $triggerid);
+
+    $filter->{'description'} = $options->{'description'};
+    $filter->{'host'} = $host_name if ($host_name);
+
+    if ($triggerid = $zabbix->exist('trigger',{'filter' => $filter})) {
+	$options->{'triggerid'} = $triggerid;
         $result = $zabbix->update('trigger', $options);
+	$$created_ref = 0 if ($created_ref);
     }
     else {
         $result = $zabbix->create('trigger', $options);
+	$$created_ref = 1 if ($created_ref);
     }
 
 #    pfail("cannot create trigger:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
@@ -483,13 +469,14 @@ sub get_application_id {
     my $name = shift;
     my $templateid = shift;
 
-    unless ($zabbix->exist('application',{'filter' => {'name' => $name, 'hostid' => $templateid}})) {
+    my $applicationid;
+
+    unless ($applicationid = $zabbix->exist('application',{'filter' => {'name' => $name, 'hostid' => $templateid}})) {
 	my $result = $zabbix->create('application', {'name' => $name, 'hostid' => $templateid});
 	return $result->{'applicationids'}[0];
     }
 
-    my $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $name}});
-    return $result->{'applicationid'};
+    return $applicationid;
 }
 
 
@@ -540,20 +527,20 @@ sub create_probe_status_template {
 
     create_item($options);
 
-    $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for more than {$RSM.PROBE.MAX.OFFLINE}',
+    $options = { 'description' => 'Probe {HOST.NAME} has been disabled for more than {$RSM.PROBE.MAX.OFFLINE}',
                          'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$RSM.PROBE.MAX.OFFLINE})}=0',
                         'priority' => '3',
                 };
 
-    create_trigger($options);
+    create_trigger($options, $template_name);
 
 
-    $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
+    $options = { 'description' => 'Probe {HOST.NAME} has been disabled by tests',
                          'expression' => '{'.$template_name.':rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"].last(0)}=0',
                         'priority' => '4',
                 };
 
-    create_trigger($options);
+    create_trigger($options, $template_name);
 
 
 
@@ -683,40 +670,11 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.DNS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$RSM.DNS.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.RDDS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,rdds].last(0)}<{$RSM.RDDS.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.EPP.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$RSM.EPP.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP4.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$RSM.IP4.MIN.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP6.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$RSM.IP6.MIN.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
+    create_online_probes_trigger('DNS', '{$RSM.DNS.PROBE.ONLINE}', $name);
+    create_online_probes_trigger('RDDS', '{$RSM.RDDS.PROBE.ONLINE}', $name);
+    create_online_probes_trigger('EPP', '{$RSM.RDDS.PROBE.ONLINE}', $name);
+    create_online_probes_trigger('IPv4', '{$RSM.IP4.MIN.PROBE.ONLINE}', $name);
+    create_online_probes_trigger('IPv6', '{$RSM.IP6.MIN.PROBE.ONLINE}', $name);
 }
 
 sub get_items_like($$$) {
@@ -876,6 +834,23 @@ sub create_cron_jobs($) {
 sub pfail {
     print("Error: ", @_, "\n");
     exit -1;
+}
+
+sub create_online_probes_trigger {
+	my $feature = shift;
+	my $macro = shift;
+	my $host_name = shift;
+
+	my $feature_lc = lc($feature);
+
+	my $options =
+	{
+		'description' => 'Number of '.$feature.'-enabled online probes is less than '.$macro,
+		'expression' => '{'.$host_name.':online.nodes.pl[online,'.$feature_lc.'].last(0)}<'.$macro,
+		'priority' => '5'
+	};
+
+	return create_trigger($options, $host_name);
 }
 
 1;
