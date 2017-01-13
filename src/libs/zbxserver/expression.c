@@ -2444,7 +2444,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	zbx_token_t		token;
 	zbx_token_search_t	token_search;
 	char			*expression = NULL;
-	unsigned char		macros_expanded = 0;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -3402,20 +3401,17 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			{
 				if (ZBX_TOKEN_REFERENCE == token.type)
 				{
-					if (0 == macros_expanded)
+					/* try to expand trigger expression if it hasn't been done yet */
+					if (NULL == expression && NULL == (expression =
+							DCexpression_expand_user_macros(event->trigger.expression, NULL)))
 					{
-						expression = DCexpression_expand_user_macros(event->trigger.expression,
-								NULL);
-						macros_expanded = 1;
+						/* expansion failed, reference substitution is impossible */
+						token_search = ZBX_TOKEN_SEARCH_BASIC;
+						continue;
 					}
 
-					if (NULL != expression)
-					{
-						get_trigger_expression_constant(expression, &token.data.reference,
-								&replace, &replace_len);
-					}
-
-					pos = token.token.r;
+					get_trigger_expression_constant(expression, &token.data.reference, &replace,
+							&replace_len);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
