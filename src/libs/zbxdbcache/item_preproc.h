@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -18,18 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ITEM_PREPROC_H
+#define ZABBIX_ITEM_PREPROC_H
 
-/**
- * Factory for creating import conversions.
- */
-class CImportConverterFactory extends CRegistryFactory {
+#include "dbcache.h"
 
-	public function __construct() {
-		parent::__construct([
-			'1.0' => new C10ImportConverter(),
-			'2.0' => new C20ImportConverter(),
-			'3.0' => new C30ImportConverter(),
-			'3.2' => new C32ImportConverter()
-		]);
-	}
-}
+int	zbx_item_preproc(const DC_ITEM *item, zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_item_preproc_t *op, zbx_hashset_t *delta_history, char **errmsg);
+
+#endif

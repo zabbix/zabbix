@@ -994,12 +994,24 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 	}
 
-	protected function checkSpecificFields(array $item) {
+	/**
+	 * Check discovery rule specific fields.
+	 *
+	 * @param array  $item			An array of single discovery rule data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
 		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
 					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
 			);
+		}
+
+		if (array_key_exists('preprocessing', $item)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Item pre-processing is not allowed for discovery rules.'));
 		}
 	}
 
@@ -1049,13 +1061,12 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
-				'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-				'lastlogsize', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
-				'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags', 'interfaceid', 'port',
-				'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
+				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+				'privatekey', 'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
+				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'preservekeys' => true
@@ -1149,16 +1160,15 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get([
-			'output' => [
-				'itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-				'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname', 'snmpv3_securitylevel',
+				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'delay_flex', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port',
+				'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
+			'selectPreprocessing' => ['type', 'params'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
@@ -1191,6 +1201,10 @@ class CDiscoveryRule extends CItemGeneral {
 					zbx_objectValues($prototype['applications'], 'applicationid'),
 					$dstHost['hostid']
 				);
+
+				if (!$prototype['preprocessing']) {
+					unset($prototype['preprocessing']);
+				}
 
 				$prototypes[$key] = $prototype;
 			}

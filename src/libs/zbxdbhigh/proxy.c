@@ -2076,7 +2076,7 @@ try_again:
 	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
-	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
+	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < data_num; i++)
 	{
@@ -2343,36 +2343,49 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	}
 	else
 	{
-		int		res = SUCCEED;
 		AGENT_RESULT	result;
 
 		init_result(&result);
 
 		if (NULL != value->value)
-			res = set_result_type(&result, item->value_type, item->data_type, value->value);
-
-		if (SUCCEED == res)
 		{
-			if (ITEM_VALUE_TYPE_LOG == item->value_type && NULL != value->value)
+			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
-				result.log->timestamp = value->timestamp;
+				zbx_log_t	*log;
+
+				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
+				log->value = zbx_strdup(NULL, value->value);
+
+				if (0 == value->timestamp)
+				{
+					log->timestamp = 0;
+					calc_timestamp(log->value, &log->timestamp, item->logtimefmt);
+				}
+				else
+					log->timestamp = value->timestamp;
+
+				log->logeventid = value->logeventid;
+				log->severity = value->severity;
+
 				if (NULL != value->source)
 				{
-					zbx_replace_invalid_utf8(value->source);
-					result.log->source = zbx_strdup(result.log->source, value->source);
+					log->source = zbx_strdup(NULL, value->source);
+					zbx_replace_invalid_utf8(log->source);
 				}
-				result.log->severity = value->severity;
-				result.log->logeventid = value->logeventid;
+				else
+					log->source = NULL;
 
-				calc_timestamp(result.log->value, &result.log->timestamp, item->logtimefmt);
+				SET_LOG_RESULT(&result, log);
 			}
+			else
+				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
 
 			if (0 != value->meta)
 				set_result_meta(&result, value->lastlogsize, value->mtime);
 
 			item->state = ITEM_STATE_NORMAL;
-			dc_add_history(item->itemid, item->value_type, item->flags, &result,
-					&value->ts, item->state, NULL);
+			dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts,
+					item->state, NULL);
 		}
 		else if (ISSET_MSG(&result))
 		{
@@ -2841,11 +2854,6 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 	/* don't process aggregate/calculated items coming from proxy */
 	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
 		return FAIL;
-
-	/* item has been already converted to decimal format by proxy - */
-	/* reset its data type to decimal to prevent double conversion  */
-	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		item->data_type = ITEM_DATA_TYPE_DECIMAL;
 
 	return SUCCEED;
 }
@@ -3571,7 +3579,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	while (SUCCEED == parse_history_data_33(jp_data, &pnext, values, itemids, &values_num, &read_num, ts_diff,
 			&error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 		for (i = 0; i < values_num; i++)
 		{
