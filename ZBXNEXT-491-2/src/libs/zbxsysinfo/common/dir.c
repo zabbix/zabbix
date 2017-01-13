@@ -200,12 +200,14 @@ static int	prepare_parameters(AGENT_REQUEST *request, AGENT_RESULT *result, rege
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain directory information: %s",
 				zbx_strerror(errno)));
+		zbx_free(*dir);
 		return FAIL;
 	}
 
 	if (0 == S_ISDIR(status->st_mode))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "First parameter is not a directory."));
+		zbx_free(*dir);
 		return FAIL;
 	}
 
@@ -528,6 +530,7 @@ err2:
 	zbx_free(path);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
+	zbx_free(dir);
 
 	return ret;
 }
