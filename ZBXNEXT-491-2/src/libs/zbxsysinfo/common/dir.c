@@ -212,6 +212,21 @@ static int	prepare_parameters(AGENT_REQUEST *request, AGENT_RESULT *result, rege
 	return SUCCEED;
 }
 
+static void	regex_incl_excl_free(regex_t *regex_incl, regex_t *regex_excl)
+{
+	if (NULL != regex_incl)
+	{
+		zbx_regexp_free(regex_incl);
+		zbx_free(regex_incl);
+	}
+
+	if (NULL != regex_excl)
+	{
+		zbx_regexp_free(regex_excl);
+		zbx_free(regex_excl);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Different approach is used for Windows implementation as Windows is not    *
@@ -364,17 +379,7 @@ err2:
 	}
 	zbx_vector_ptr_destroy(&list);
 err1:
-	if (NULL != regex_incl)
-	{
-		zbx_regexp_free(regex_incl);
-		zbx_free(regex_incl);
-	}
-
-	if (NULL != regex_excl)
-	{
-		zbx_regexp_free(regex_excl);
-		zbx_free(regex_excl);
-	}
+	regex_incl_excl_free(regex_incl, regex_excl);
 
 	return ret;
 }
@@ -516,17 +521,7 @@ err2:
 
 	zbx_free(path);
 err1:
-	if (NULL != regex_incl)
-	{
-		zbx_regexp_free(regex_incl);
-		zbx_free(regex_incl);
-	}
-
-	if (NULL != regex_excl)
-	{
-		zbx_regexp_free(regex_excl);
-		zbx_free(regex_excl);
-	}
+	regex_incl_excl_free(regex_incl, regex_excl);
 
 	return ret;
 }
