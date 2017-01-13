@@ -887,7 +887,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='value_type_name']", 'readonly');
 		}
 
-		if ($value_type === 'Numeric (float)') {
+	if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
@@ -2247,7 +2247,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99 days)');
+		$this->zbxTestAssertElementText("//li[28]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99 days)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455 days)');
 
 		$this->zbxTestOpen('adm.gui.php');

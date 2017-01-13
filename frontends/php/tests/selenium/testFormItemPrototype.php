@@ -1077,7 +1077,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (float)']");
 		}
 
-		if ($value_type === 'Numeric (float)') {
+		if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
