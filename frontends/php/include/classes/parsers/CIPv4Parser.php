@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,22 +18,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_TCP_ACTIVE_H
-#define ZABBIX_TLS_TCP_ACTIVE_H
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-typedef struct
-{
-	const char	*psk_identity;
-	size_t		psk_identity_len;
-	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		subject[HOST_TLS_SUBJECT_LEN_MAX];
+/**
+ * A parser for IPv4 address.
+ */
+class CIPv4Parser extends CParser {
+
+	/**
+	 * @param string $source
+	 * @param int    $pos
+	 *
+	 * @return int
+	 */
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
+
+		if (!preg_match('/^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/', substr($source, $pos), $matches)) {
+			return self::PARSE_FAIL;
+		}
+
+		for ($i = 1; $i <= 4; $i++) {
+			if (strlen($matches[$i]) > 3 || $matches[$i] > 255) {
+				return self::PARSE_FAIL;
+			}
+		}
+
+		$this->match = $matches[0];
+		$this->length = strlen($this->match);
+
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+	}
 }
-zbx_tls_conn_attr_t;
-
-int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
-#endif
-
-#endif	/* ZABBIX_TLS_TCP_ACTIVE_H */

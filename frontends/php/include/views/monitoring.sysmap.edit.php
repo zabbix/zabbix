@@ -374,7 +374,8 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 		new CSubmit('update', _('Update')),
 		[
 			new	CButton('clone', _('Clone')),
-			new CButtonDelete(_('Delete selected map?'), url_param('form').url_param('sysmapid')),
+			new CButton('full_clone', _('Full clone')),
+			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid'])),
 			new CButtonCancel()
 		]
 	));
