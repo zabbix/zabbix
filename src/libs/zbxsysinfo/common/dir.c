@@ -196,7 +196,11 @@ static int	prepare_parameters(AGENT_REQUEST *request, AGENT_RESULT *result, rege
 	if ('\0' != *(*dir + 1) && ':' != *(*dir + strlen(*dir) - 2))
 		zbx_rtrim(*dir, "/\\");
 
+#ifdef _WINDOWS
 	if (0 != zbx_stat(*dir, status))
+#else
+	if (0 != lstat(*dir, status))
+#endif
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain directory information: %s",
 				zbx_strerror(errno)));
@@ -464,9 +468,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			path = zbx_dsprintf(path, "%s/%s", item->path, entry->d_name);
 
-			if (0 == zbx_stat(path, &status))
+			if (0 == lstat(path, &status))
 			{
-				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISDIR(status.st_mode)) &&
+				if ((0 != S_ISREG(status.st_mode) || 0 != S_ISLNK(status.st_mode) ||
+						0 != S_ISDIR(status.st_mode)) &&
 						0 != filename_matches(entry->d_name, regex_incl, regex_excl))
 				{
 					if (0 != S_ISREG(status.st_mode) && 1 < status.st_nlink)
