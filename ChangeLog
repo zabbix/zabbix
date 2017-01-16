@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+A......... [ZBX-3783] deprecated mappings.sortorder parameter by iconmap.create() and iconmap.update() methods (Sasha)
 A.F.I..PS. [ZBXNEXT-1443] added item pre-processing options (wiper, Ivo)
 ..F....... [ZBXNEXT-830] implemented full clone of maps (Cemeris, Sasha)
 ...G...... [ZBXNEXT-12] added support of CIDR subnet mask notations for Server option on agent config (vso)
