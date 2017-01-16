@@ -369,7 +369,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 						file_size = ((zbx_uint64_t)size_high << 32) | size_low;
 
-						if (SIZE_MODE_DISK == mode && 0 != (mod = size % cluster_size))
+						if (SIZE_MODE_DISK == mode && 0 != (mod = file_size % cluster_size))
 							file_size += cluster_size - mod;
 
 						size += file_size;
