@@ -4629,6 +4629,24 @@ int	is_number_delimiter(unsigned char c)
 	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_parse_number                                                 *
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: iter   - [IN/OUT] start of number, on out is end of number + 1 *
+ *             factor - [IN] number can contain suffix which will be          *
+ *                           translated to factor                             *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_parse_number(const char **iter, zbx_uint64_t *factor)
 {
 	int	digits = 0, dots = 0;
@@ -4678,7 +4696,7 @@ int	zbx_parse_number(const char **iter, zbx_uint64_t *factor)
  *             number_loc - [OUT] the number location                         *
  *                                                                            *
  * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - expression does not contain number     .           *
+ *               FAIL    - expression does not contain number                 *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
