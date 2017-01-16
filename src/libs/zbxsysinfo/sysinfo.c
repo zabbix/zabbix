@@ -697,9 +697,13 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
 			zbx_replace_invalid_utf8(c);
 			SET_STR_RESULT(result, zbx_strdup(NULL, c));
+			ret = SUCCEED;
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_replace_invalid_utf8(c);
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, c));
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
