@@ -31,6 +31,8 @@ struct zbx_task {
 	int		status;
 	int		clock;
 	int		ttl;
+
+	void		*data;
 };
 
 #endif

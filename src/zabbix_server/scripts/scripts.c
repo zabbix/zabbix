@@ -143,7 +143,7 @@ fail:
 }
 #endif
 
-static int	zbx_execute_script_on_terminal(const DC_HOST *host, zbx_script_t *script, char **result,
+static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
@@ -464,7 +464,8 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(zbx_script_t *script, const DC_HOST *host, char **result, char *error, size_t max_error_len)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
+		size_t max_error_len)
 {
 	const char	*__function_name = "zbx_script_execute";
 	int		ret = FAIL;
@@ -534,26 +535,28 @@ int	zbx_script_execute(zbx_script_t *script, const DC_HOST *host, char **result,
  ******************************************************************************/
 int	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
 {
-	zbx_task_remote_command_t	*task;
-	int				ret;
-	unsigned short			port;
+	zbx_tm_task_t	*task;
+	int		ret;
+	unsigned short	port;
+	zbx_uint64_t	taskid;
 
 	if (NULL != script->port && '\0' != script->port[0])
 		is_ushort(script->port, &port);
 	else
 		port = 0;
 
-	task = zbx_task_remote_command_new();
+	taskid = DBget_maxid("task");
 
-	zbx_task_remote_command_init(task, 0, ZBX_TM_TASK_SEND_REMOTE_COMMAND, ZBX_TM_STATUS_INPROGRESS, now,
-			ZBX_REMOTE_COMMAND_TTL, script->type, script->command, script->execute_on, port,
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_STATUS_NEW, now,
+			ZBX_REMOTE_COMMAND_TTL, host->proxy_hostid);
+
+	task->data = zbx_tm_remote_command_create(script->type, script->command, script->execute_on, port,
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,
-			0, host->hostid, alertid);
+			taskid, host->hostid, alertid);
 
-	ret = zbx_task_remote_command_save(task, 1);
+	ret = zbx_tm_save_task(task);
 
-	zbx_task_remote_command_clear(task);
-	zbx_task_remote_command_free(task);
+	zbx_tm_task_free(task);
 
 	return ret;
 }
