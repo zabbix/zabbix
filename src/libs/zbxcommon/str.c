@@ -4621,6 +4621,54 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check whether the character delimits a numeric token              *
+ *                                                                            *
+ ******************************************************************************/
+int	is_number_delimiter(unsigned char c)
+{
+	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
+}
+
+int	zbx_parse_number(const char **iter, zbx_uint64_t *factor)
+{
+	int	digits = 0, dots = 0;
+
+	*factor = 1;
+
+	while (1)
+	{
+		if (0 != isdigit((unsigned char)**iter))
+		{
+			(*iter)++;
+			digits++;
+			continue;
+		}
+
+		if ('.' == **iter)
+		{
+			(*iter)++;
+			dots++;
+			continue;
+		}
+
+		if (1 > digits || 1 < dots)
+			return FAIL;
+
+		if (0 != isalpha((unsigned char)**iter))
+		{
+			if (NULL == strchr(ZBX_UNIT_SYMBOLS, **iter))
+				return FAIL;
+
+			*factor = suffix2factor(**iter);
+			(*iter)++;
+		}
+
+		return is_number_delimiter(**iter);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_number_find                                                  *
  *                                                                            *
  * Purpose: finds number inside expression starting at specified position     *
@@ -4642,6 +4690,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
 	const char	*s, *e;
+	zbx_uint64_t	factor;
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
@@ -4655,24 +4704,10 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		for (e = s; '\0' != *e; e++)	/* find end of number */
-		{
-			int	dot_found = 0;
+		e = s;
 
-			if (0 != isdigit(*e))
-				continue;
-
-			if ('.' == *e && 0 == dot_found)
-			{
-				dot_found = 1;
-				continue;
-			}
-
-			if (NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
-				e++;
-
-			break;
-		}
+		if (SUCCEED != zbx_parse_number(&e, &factor))
+			continue;
 
 		/* number found */
 		number_loc->l = s - str;
@@ -4704,13 +4739,13 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from)
 {
-	int	sz_changed = 0;
-	char	*to = *data + offset;
+	int	sz_changed = sz_from - sz_to;
 
-	if (sz_to != sz_from)
+	if (0 != sz_changed)
 	{
-		sz_changed = sz_from - sz_to;
-		*data_len += sz_from - sz_to;
+		char	*to;
+
+		*data_len += sz_changed;
 
 		if (*data_len > *data_alloc)
 		{
@@ -4718,14 +4753,13 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 				*data_alloc *= 2;
 
 			*data = zbx_realloc(*data, *data_alloc);
-
-			to = *data + offset;
 		}
 
+		to = *data + offset;
 		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
 	}
 
-	memcpy(to, from, sz_from);
+	memcpy(*data + offset, from, sz_from);
 
 	return sz_changed;
 }
