@@ -680,7 +680,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			zbx_ltrim(c, " \"+");
 			del_zeroes(c);
 
-			if (SUCCEED != is_uint64(c, &value_uint64))
+			if (SUCCEED == is_uint64(c, &value_uint64))
 			{
 				SET_UI64_RESULT(result, value_uint64);
 				ret = SUCCEED;
@@ -693,16 +693,13 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			if (SUCCEED == is_double(c))
 			{
 				SET_DBL_RESULT(result, atof(c));
+				ret = SUCCEED;
 			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			zbx_replace_invalid_utf8(c);
-			SET_STR_RESULT(result, zbx_strdup(NULL, c));
-			ret = SUCCEED;
-			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			zbx_replace_invalid_utf8(c);
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, c));
+			SET_STR_RESULT(result, zbx_strdup(NULL, c));
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
