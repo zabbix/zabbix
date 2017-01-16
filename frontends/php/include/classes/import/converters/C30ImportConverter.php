@@ -20,7 +20,7 @@
 
 
 /**
- * Converter for converting import data from 3.0 to 3.2.
+ * Converter for converting import data from 3.0 to 3.2
  */
 class C30ImportConverter extends CConverter {
 
@@ -186,5 +186,4 @@ class C30ImportConverter extends CConverter {
 
 		return $linktriggers;
 	}
-
 }
