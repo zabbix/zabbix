@@ -25,8 +25,6 @@
 class CConfiguration extends CApiService {
 
 	/**
-	 * Export configuration data.
-	 *
 	 * @param array $params
 	 *
 	 * @return string
@@ -58,8 +56,6 @@ class CConfiguration extends CApiService {
 	}
 
 	/**
-	 * Import configuration data.
-	 *
 	 * @param array $params
 	 *
 	 * @return bool
