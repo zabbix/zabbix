@@ -270,7 +270,7 @@ exit:
 int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
-	int			ret = FAIL, status = 0;
+	int			ret = FAIL;
 	char			*buffer = NULL;
 #ifdef _WINDOWS
 	STARTUPINFO		si;
@@ -415,7 +415,7 @@ close:
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
-		int	rc;
+		int	rc, status;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
 
 		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) && MAX_EXECUTE_OUTPUT_LEN > offset + rc)
