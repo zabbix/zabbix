@@ -256,7 +256,7 @@ exit:
  * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
  * Parameters: command       - [IN] command for execution                     *
- *             buffer        - [OUT] buffer for output, if NULL - ignored     *
+ *             output        - [OUT] buffer for output, if NULL - ignored     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *             timeout       - [IN] execution timeout                         *
@@ -267,10 +267,11 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
+int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int			ret = FAIL, status = 0;
+	char			*buffer = NULL;
 #ifdef _WINDOWS
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
@@ -287,11 +288,10 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	*error = '\0';
 
-	if (NULL != buffer)
-	{
-		*buffer = zbx_realloc(*buffer, buf_size);
-		**buffer = '\0';
-	}
+	buffer = zbx_realloc(buffer, buf_size);
+	*buffer = '\0';
+	if (NULL != output)
+		*output = buffer;
 
 #ifdef _WINDOWS
 
@@ -362,7 +362,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
+	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout);
 
 	if (TIMEOUT_ERROR != ret)
 	{
@@ -376,16 +376,16 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
 			ret = FAIL;
-			if (NULL != buffer && '\0' != **buffer)
-				zbx_strlcpy(error, *buffer, max_error_len);
+			if ('\0' != *buffer)
+				zbx_strlcpy(error, buffer, max_error_len);
 			else
 				zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
 		}
 		else if (0 != code)
 		{
 			ret = FAIL;
-			if (NULL != buffer && '\0' != **buffer)
-				zbx_strlcpy(error, *buffer, max_error_len);
+			if ('\0' != *buffer)
+				zbx_strlcpy(error, buffer, max_error_len);
 			else
 				zbx_snprintf(error, max_error_len, "process exited with code: %d", code);
 		}
@@ -425,7 +425,7 @@ close:
 			if (NULL != buffer)
 			{
 				tmp_buf[rc] = '\0';
-				zbx_strcpy_alloc(buffer, &buf_size, &offset, tmp_buf);
+				zbx_strcpy_alloc(&buffer, &buf_size, &offset, tmp_buf);
 			}
 		}
 
@@ -451,7 +451,7 @@ close:
 		}
 		else if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
 		{
-			if (NULL == buffer || '\0' == **buffer)
+			if ('\0' == *buffer)
 			{
 				if (WIFEXITED(status))
 					zbx_snprintf(error, max_error_len, "process exited with code: %d",
@@ -463,7 +463,7 @@ close:
 					zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
 			}
 			else
-				zbx_strlcpy(error, *buffer, max_error_len);
+				zbx_strlcpy(error, buffer, max_error_len);
 		}
 		else
 			ret = SUCCEED;
@@ -480,8 +480,8 @@ close:
 	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
-	if (SUCCEED != ret && NULL != buffer)
-		zbx_free(*buffer);
+	if (SUCCEED != ret || NULL == output)
+		zbx_free(buffer);
 
 	return ret;
 }
