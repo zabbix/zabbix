@@ -290,8 +290,6 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 	buffer = zbx_realloc(buffer, buf_size);
 	*buffer = '\0';
-	if (NULL != output)
-		*output = buffer;
 
 #ifdef _WINDOWS
 
@@ -482,6 +480,9 @@ close:
 
 	if (SUCCEED != ret || NULL == output)
 		zbx_free(buffer);
+
+	if (NULL != output)
+		*output = buffer;
 
 	return ret;
 }
