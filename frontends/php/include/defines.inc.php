@@ -1198,6 +1198,7 @@ define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
+define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');

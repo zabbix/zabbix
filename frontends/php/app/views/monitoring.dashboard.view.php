@@ -163,7 +163,7 @@ foreach ($dashboardGrid as $key => $val) {
 		)
 	)
 	->addItem(
-		(new CDiv())->addClass('dashbrd-grid-container')
+		(new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER)
 	)
 	->addItem(
 		(new CDiv(
@@ -190,7 +190,7 @@ $this->addPostJS('jqBlink.blink();');
 
 // Initialize dashboard grid
 $this->addPostJS(
-	"jQuery('.dashbrd-grid-container')
+	"jQuery('.".ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER."')
 		.dashboardGrid()
 		.dashboardGrid('addWidget', {'row': 1, 'col': 5, 'height': 1, 'width': 1})
 		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2})
@@ -201,66 +201,9 @@ $this->addPostJS(
 ?>
 
 <style>
-.dashbrd-grid-container {
-	width: 100%;
-	position: relative; }
-	.dashbrd-grid-widget {
-		background-color: #3b3b3b;
-		position: absolute; }
-		.dashbrd-grid-widget-dragging {
-			opacity: 0.8;
-			z-index: 1000 }
-		.ui-resizable-handle {
-			border: 1px dotted #707070;
-			position: absolute; }
-		.ui-resizable-n {
-			cursor: n-resize;
-			height: 7px;
-			top: -5px;
-			left: 2px;
-			right: 2px; }
-		.ui-resizable-e {
-			cursor: e-resize;
-			width: 7px;
-			right: -5px;
-			top: 2px;
-			bottom: 2px; }
-		.ui-resizable-s {
-			cursor: s-resize;
-			height: 7px;
-			bottom: -5px;
-			left: 2px;
-			right: 2px; }
-		.ui-resizable-w {
-			cursor: w-resize;
-			width: 7px;
-			left: -5px;
-			top: 2px;
-			bottom: 2px; }
-		.ui-resizable-ne {
-			cursor: ne-resize;
-			height: 7px;
-			width: 7px;
-			top: -5px;
-			right: -5px; }
-		.ui-resizable-nw {
-			cursor: nw-resize;
-			width: 7px;
-			height: 7px;
-			top: -5px;
-			left: -5px; }
-		.ui-resizable-se {
-			cursor: se-resize;
-			height: 7px;
-			width: 7px;
-			bottom: -5px;
-			right: -5px; }
-		.ui-resizable-sw {
-			cursor: sw-resize;
-			width: 7px;
-			height: 7px;
-			bottom: -5px;
-			left: -5px; }
+	.dashbrd-grid-widget-dragging {
+		opacity: 0.8;
+		z-index: 1000 }
 	.dashbrd-grid-placeholder {
 		border: 1px dashed #505050;
 		background-color: #1b1b1b;

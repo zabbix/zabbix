@@ -34,9 +34,7 @@
 			data['options']['rows'] = min_rows;
 		}
 
-		obj.css({
-			'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'
-		});
+		obj.css({ 'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px' });
 	}
 
 	function getWidgetByTarget(widgets, target) {
@@ -99,7 +97,7 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', {'class': 'dashbrd-grid-placeholder'});
+					$placeholder = $('<div>', { 'class': 'dashbrd-grid-placeholder' });
 
 				$this.data('dashboardGrid', {
 					options: options,
@@ -117,9 +115,28 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					$widget = $('<div>', {
-						'class': 'dashbrd-grid-widget'
-					}).data('widget-id', data['widgets'].length);
+					$widget = $('<div>', { 'class': 'dashbrd-grid-widget' })
+						.data('widget-id', data['widgets'].length)
+						.append($('<div>', { 'class': 'dashbrd-grid-widget-content' })),
+					handles = {};
+
+				$.each(['n', 'e', 's', 'w'], function(index, value) {
+					var $handle = $('<div>', { 'class': 'ui-resizable-handle ui-resizable-' + value })
+						.css({ 'display': 'none' })
+						.append($('<div>', { 'class': 'ui-resize-dot' }))
+						.append($('<div>', { 'class': 'ui-resizable-border-' + value }));
+
+					$widget.append($handle);
+					handles[value] = $handle;
+				});
+
+				$.each(['ne', 'se', 'sw', 'nw'], function(index, value) {
+					var $handle = $('<div>', { 'class': 'ui-resizable-handle ui-resizable-' + value })
+						.css({ 'display': 'none' });
+
+					$widget.append($handle);
+					handles[value] = $handle;
+				});
 
 				data['widgets'].push(params);
 
@@ -162,7 +179,7 @@
 				});
 
 				$widget.resizable({
-					handles: 'all',
+					handles: handles,
 					autoHide: true,
 					start: function(event, ui) {
 						data['placeholder'].show();
