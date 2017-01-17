@@ -268,7 +268,6 @@ static int	tm_process_tasks(int now)
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
-				" where proxy_hostid is null"
 				" order by taskid");
 
 	while (NULL != (row = DBfetch(result)))
