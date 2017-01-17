@@ -288,7 +288,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 	*error = '\0';
 
-	buffer = zbx_realloc(buffer, buf_size);
+	buffer = zbx_malloc(buffer, buf_size);
 	*buffer = '\0';
 
 #ifdef _WINDOWS
@@ -420,11 +420,8 @@ close:
 
 		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) && MAX_EXECUTE_OUTPUT_LEN > offset + rc)
 		{
-			if (NULL != buffer)
-			{
-				tmp_buf[rc] = '\0';
-				zbx_strcpy_alloc(&buffer, &buf_size, &offset, tmp_buf);
-			}
+			tmp_buf[rc] = '\0';
+			zbx_strcpy_alloc(&buffer, &buf_size, &offset, tmp_buf);
 		}
 
 		close(fd);
