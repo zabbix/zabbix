@@ -482,7 +482,10 @@ close:
 		zbx_free(buffer);
 
 	if (NULL != output)
+	{
+		zbx_free(*output);
 		*output = buffer;
+	}
 
 	return ret;
 }
