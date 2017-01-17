@@ -272,8 +272,6 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $applications
 	 *
 	 * @throws APIException if the input is invalid.
@@ -317,8 +315,6 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $applications
 	 * @param array $db_applications
 	 *
@@ -382,10 +378,8 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Create new applications.
-	 *
 	 * @param array $applications
-
+	 *
 	 * @return array
 	 */
 	public function create(array $applications) {
@@ -406,8 +400,6 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Update applications.
-	 *
 	 * @param array $applications
 	 *
 	 * @return array
@@ -438,8 +430,6 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Delete Applications.
-	 *
 	 * @param array $applicationids
 	 * @param bool  $nopermissions
 	 *
