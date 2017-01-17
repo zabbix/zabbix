@@ -97,7 +97,7 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', { 'class': 'dashbrd-grid-placeholder' });
+					$placeholder = $('<div>', { 'class': 'dashbrd-grid-widget-placeholder' });
 
 				$this.data('dashboardGrid', {
 					options: options,
@@ -150,7 +150,7 @@
 					start: function(event, ui) {
 						data['placeholder'].show();
 
-						$(event.target).addClass('dashbrd-grid-widget-dragging');
+						$(event.target).addClass('dashbrd-grid-widget-draggable');
 					},
 					drag: function(event, ui) {
 						var	widget = getWidgetByTarget(data['widgets'], event.target),
@@ -172,7 +172,7 @@
 
 						data['placeholder'].hide();
 
-						$(event.target).removeClass('dashbrd-grid-widget-dragging');
+						$(event.target).removeClass('dashbrd-grid-widget-draggable');
 
 						resizeDashboardGrid($this, data);
 					}
@@ -184,7 +184,7 @@
 					start: function(event, ui) {
 						data['placeholder'].show();
 
-						$(event.target).addClass('dashbrd-grid-widget-dragging');
+						$(event.target).addClass('dashbrd-grid-widget-draggable');
 					},
 					resize: function(event, ui) {
 						var	widget = getWidgetByTarget(data['widgets'], event.target),
@@ -206,7 +206,7 @@
 
 						data['placeholder'].hide();
 
-						$(event.target).removeClass('dashbrd-grid-widget-dragging');
+						$(event.target).removeClass('dashbrd-grid-widget-draggable');
 
 						resizeDashboardGrid($this, data);
 					}

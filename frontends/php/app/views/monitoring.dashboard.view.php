@@ -192,24 +192,12 @@ $this->addPostJS('jqBlink.blink();');
 $this->addPostJS(
 	"jQuery('.".ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER."')
 		.dashboardGrid()
-		.dashboardGrid('addWidget', {'row': 1, 'col': 5, 'height': 1, 'width': 1})
-		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2})
-		.dashboardGrid('addWidget', {'row': 2, 'col': 6, 'height': 3, 'width': 6})
-		.dashboardGrid('addWidget', {'row': 1, 'col': 2, 'height': 2, 'width': 1});"
+		.dashboardGrid('addWidget', {'row': 0, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_GRAPHS."})
+		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_SCREENS."})
+		.dashboardGrid('addWidget', {'row': 4, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_MAPS."});"
 );
 
 ?>
-
-<style>
-	.dashbrd-grid-widget-dragging {
-		opacity: 0.8;
-		z-index: 1000 }
-	.dashbrd-grid-placeholder {
-		border: 1px dashed #505050;
-		background-color: #1b1b1b;
-		position: absolute;
-		z-index: 999 }
-</style>
 
 <script type="text/javascript">
 	/**
