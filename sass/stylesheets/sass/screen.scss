@@ -2600,7 +2600,7 @@ $form-icon-btn: (
 
 .ui-resizable-n {
 	@extend %ui-resizable;
-	cursor: s-resize;
+	cursor: n-resize;
 	height: 5px;
 	width: 100%;
 	top: -1px;
@@ -2675,7 +2675,7 @@ $form-icon-btn: (
 
 .ui-resizable-w {
 	@extend %ui-resizable;
-	cursor: e-resize;
+	cursor: w-resize;
 	width: 5px;
 	left: 0;
 	top: 0;
