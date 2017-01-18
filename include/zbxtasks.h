@@ -36,9 +36,6 @@
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1
 #define ZBX_TM_STATUS_INPROGRESS		2
-#define ZBX_TM_STATUS_DONE			3
-#define ZBX_TM_STATUS_EXPIRED			4
-
 
 typedef struct
 {
