@@ -300,6 +300,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'publickey', 'privatekey', 'flags', 'port', 'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
+		'selectPreprocessing' => ['type', 'params'],
 		'itemids' => $src_itemids
 	]);
 
