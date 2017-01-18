@@ -73,9 +73,9 @@ static int	is_operator_delimiter(char c)
  ******************************************************************************/
 static double	evaluate_number(int *unknown_idx)
 {
-	const char	*iter = ptr;
 	double		result;
 	zbx_uint64_t	factor;
+	int		len;
 
 	/* Is it a special token of unknown value (e.g. ZBX_UNKNOWN0, ZBX_UNKNOWN1) ? */
 	if (0 == strncmp(ZBX_UNKNOWN_STR, ptr, ZBX_UNKNOWN_STR_LEN))
@@ -103,10 +103,10 @@ static double	evaluate_number(int *unknown_idx)
 		return ZBX_INFINITY;
 	}
 
-	if (SUCCEED == zbx_parse_number(&iter, &factor))
+	if (SUCCEED == zbx_number_parse(ptr, &len, &factor))
 	{
 		result = atof(ptr) * (double)factor;
-		ptr = iter;
+		ptr += len;
 	}
 	else
 		result = ZBX_INFINITY;

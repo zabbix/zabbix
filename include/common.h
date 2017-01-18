@@ -1181,7 +1181,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
 
-int	zbx_parse_number(const char **iter, zbx_uint64_t *factor);
+int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 

@@ -4631,11 +4631,12 @@ int	is_number_delimiter(unsigned char c)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_parse_number                                                 *
+ * Function: zbx_number_parse                                                 *
  *                                                                            *
  * Purpose: parse a suffixed number like "12.345K"                            *
  *                                                                            *
- * Parameters: iter   - [IN/OUT] start of number, on out is end of number + 1 *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
  *             factor - [IN] number can contain suffix which will be          *
  *                           translated to factor                             *
  *                                                                            *
@@ -4647,24 +4648,25 @@ int	is_number_delimiter(unsigned char c)
  *           beginning of the expression.                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_parse_number(const char **iter, zbx_uint64_t *factor)
+int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor)
 {
 	int	digits = 0, dots = 0;
 
 	*factor = 1;
+	*len = 0;
 
 	while (1)
 	{
-		if (0 != isdigit((unsigned char)**iter))
+		if (0 != isdigit((unsigned char)number[*len]))
 		{
-			(*iter)++;
+			(*len)++;
 			digits++;
 			continue;
 		}
 
-		if ('.' == **iter)
+		if ('.' == number[*len])
 		{
-			(*iter)++;
+			(*len)++;
 			dots++;
 			continue;
 		}
@@ -4672,16 +4674,15 @@ int	zbx_parse_number(const char **iter, zbx_uint64_t *factor)
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
-		if (0 != isalpha((unsigned char)**iter))
+		if (0 != isalpha((unsigned char)number[*len]))
 		{
-			if (NULL == strchr(ZBX_UNIT_SYMBOLS, **iter))
+			if (NULL == strchr(ZBX_UNIT_SYMBOLS, number[*len]))
 				return FAIL;
 
-			*factor = suffix2factor(**iter);
-			(*iter)++;
+			*factor = suffix2factor(number[(*len)++]);
 		}
 
-		return is_number_delimiter(**iter);
+		return is_number_delimiter(number[*len]);
 	}
 }
 
@@ -4709,6 +4710,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
 	const char	*s, *e;
 	zbx_uint64_t	factor;
+	int		len;
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
 	{
@@ -4722,14 +4724,12 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		e = s;
-
-		if (SUCCEED != zbx_parse_number(&e, &factor))
+		if (SUCCEED != zbx_number_parse(s, &len, &factor))
 			continue;
 
 		/* number found */
 		number_loc->l = s - str;
-		number_loc->r = e - str - 1;
+		number_loc->r = s + len - str - 1;
 
 		return SUCCEED;
 	}
