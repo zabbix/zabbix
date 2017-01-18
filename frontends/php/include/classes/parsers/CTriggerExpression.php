@@ -594,6 +594,8 @@ class CTriggerExpression {
 	 * Parses a number constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the number
 	 *
+	 * comments: !!! Don't forget sync code with C !!!
+	 *
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseNumber() {
