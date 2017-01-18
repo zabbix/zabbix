@@ -3393,7 +3393,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (ZBX_TOKEN_REFERENCE == token.type)
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+							event->trigger.recovery_expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					pos = token.token.r;
+				}
+				else if (ZBX_TOKEN_REFERENCE == token.type)
 				{
 					/* try to expand trigger expression if it hasn't been done yet */
 					if (NULL == expression && NULL == (expression =
@@ -3448,13 +3455,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
-				}
-				else if (ZBX_TOKEN_USER_MACRO == token.type)
-				{
-					cache_trigger_hostids(&hostids, event->trigger.expression,
-							event->trigger.recovery_expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-					pos = token.token.r;
 				}
 			}
 		}
@@ -3693,7 +3693,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
-				if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+							event->trigger.recovery_expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					pos = token.token.r;
+				}
+				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
 					func_macro = 1;
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
@@ -3704,13 +3711,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
-				}
-				else if (ZBX_TOKEN_USER_MACRO == token.type)
-				{
-					cache_trigger_hostids(&hostids, event->trigger.expression,
-							event->trigger.recovery_expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-					pos = token.token.r;
 				}
 			}
 		}
