@@ -795,6 +795,7 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 			strscpy(host.host, row[1]);
+
 			if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 			{
 				host.tls_connect = (unsigned char)atoi(row[12]);
