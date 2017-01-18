@@ -65,12 +65,6 @@ typedef unsigned __int32	zbx_uint32_t;
 typedef uint32_t		zbx_uint32_t;
 #	endif
 
-#	ifndef int32_t
-typedef __int32		zbx_int32_t;
-#	else
-typedef int32_t		zbx_int32_t;
-#	endif
-
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'\\'
 #	endif
@@ -136,7 +130,6 @@ typedef __int64	zbx_offset_t;
 #	endif
 
 typedef uint32_t	zbx_uint32_t;
-typedef int32_t		zbx_int32_t;
 
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'/'

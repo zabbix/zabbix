@@ -664,8 +664,6 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
 			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "task") ||
-			0 == strcmp(tablename, "task_close_problem") ||
 			0 == strcmp(tablename, "task_remote_command") ||
 			0 == strcmp(tablename, "task_remote_command_result"))
 		return DCget_nextid(tablename, num);

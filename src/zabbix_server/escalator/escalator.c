@@ -480,29 +480,29 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, DB_ESCALATION *escalation, c
 	}
 }
 
-static void	add_command_alert(zbx_uint64_t alertid, const DC_HOST *host, zbx_uint64_t eventid,
-		zbx_uint64_t actionid, int esc_step, const char *command, zbx_alert_status_t status, const char *error)
+static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const DC_HOST *host,
+		zbx_uint64_t eventid, zbx_uint64_t actionid, int esc_step, const char *command,
+		zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
 	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
 	char		*tmp = NULL;
-	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
+	if (0 == alerts_num)
+	{
+		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
 			"status", "error", "esc_step", "alerttype", NULL);
+	}
 
 	now = (int)time(NULL);
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
 
-	zbx_db_insert_add_values(&db_insert, alertid, actionid, eventid, now, tmp, alert_status, error, esc_step,
+	zbx_db_insert_add_values(db_insert, alertid, actionid, eventid, now, tmp, alert_status, error, esc_step,
 			(int)alerttype);
 
 	zbx_free(tmp);
-
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -676,6 +676,8 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 	const char		*__function_name = "execute_commands";
 	DB_RESULT		result;
 	DB_ROW			row;
+	zbx_db_insert_t         db_insert;
+	int			alerts_num = 0;
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
@@ -865,13 +867,19 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		else
 			status = (SUCCEED == rc ? ALERT_STATUS_NOT_SENT : ALERT_STATUS_FAILED);
 
-		add_command_alert(alertid, &host, event->eventid, actionid, esc_step, script.command,
-				status, error);
+		add_command_alert(&db_insert, alerts_num++, alertid, &host, event->eventid, actionid, esc_step,
+				script.command, status, error);
 skip:
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
 	zbx_vector_uint64_destroy(&executed_on_hosts);
+
+	if (0 < alerts_num)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

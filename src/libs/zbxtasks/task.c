@@ -26,9 +26,6 @@
 #include "zbxjson.h"
 #include "zbxtasks.h"
 
-#include "zbx_task.h"
-
-
 /******************************************************************************
  *                                                                            *
  * Function: tm_remote_command_clear                                          *
