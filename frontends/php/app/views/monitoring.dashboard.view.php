@@ -37,7 +37,8 @@ $widgets = [
 		'links' => [
 			['name' => _('Graphs'), 'url' => 'charts.php']
 		],
-		'defaults' => ['col' => 0, 'row' => 0]
+		'defaults' => ['col' => 0, 'row' => 0],
+		'position' => ['row' => 0, 'col' => 0, 'height' => 4, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_SCREENS => [
 		'id' => 'favouriteScreens',
@@ -48,7 +49,8 @@ $widgets = [
 			['name' => _('Screens'), 'url' => 'screens.php'],
 			['name' => _('Slide shows'), 'url' => 'slides.php']
 		],
-		'defaults' => ['col' => 0, 'row' => 1]
+		'defaults' => ['col' => 0, 'row' => 1],
+		'position' => ['row' => 4, 'col' => 0, 'height' => 3, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_MAPS => [
 		'id' => 'favouriteMaps',
@@ -58,9 +60,12 @@ $widgets = [
 		'links' => [
 			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']
 		],
-		'defaults' => ['col' => 0, 'row' => 2]
+		'defaults' => ['col' => 0, 'row' => 2],
+		'position' => ['row' => 7, 'col' => 0, 'height' => 3, 'width' => 2]
 	]
 ];
+
+$grid_widgets = [];
 
 foreach ($widgets as $widgetid => $widget) {
 	$icon = (new CButton(null))
@@ -81,28 +86,42 @@ foreach ($widgets as $widgetid => $widget) {
 		->setExpanded((bool) CProfile::get('web.dashboard.widget.'.$widgetid.'.state', true))
 		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
 		->setFooter($footer);
+
+// ----------------
+	$grid_widgets[] = [
+		'widgetid' => $widgetid,
+		'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
+		'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
+		'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
+		'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+	];
+// ----------------
 }
 
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
 		'action' => 'widget.system.view',
 		'header' => _('System status'),
-		'defaults' => ['col' => 1, 'row' => 1]
+		'defaults' => ['col' => 1, 'row' => 1],
+		'position' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 5]
 	],
 	WIDGET_HOST_STATUS => [
 		'action' => 'widget.hosts.view',
 		'header' => _('Host status'),
-		'defaults' => ['col' => 1, 'row' => 2]
+		'defaults' => ['col' => 1, 'row' => 2],
+		'position' => ['row' => 3, 'col' => 2, 'height' => 3, 'width' => 5]
 	],
 	WIDGET_LAST_ISSUES => [
 		'action' => 'widget.issues.view',
 		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'defaults' => ['col' => 1, 'row' => 3]
+		'defaults' => ['col' => 1, 'row' => 3],
+		'position' => ['row' => 6, 'col' => 2, 'height' => 4, 'width' => 5]
 	],
 	WIDGET_WEB_OVERVIEW => [
 		'action' => 'widget.web.view',
 		'header' => _('Web monitoring'),
-		'defaults' => ['col' => 1, 'row' => 4]
+		'defaults' => ['col' => 1, 'row' => 4],
+		'position' => ['row' => 7, 'col' => 7, 'height' => 3, 'width' => 5]
 	],
 ];
 
@@ -110,14 +129,16 @@ if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
 		'action' => 'widget.status.view',
 		'header' => _('Status of Zabbix'),
-		'defaults' => ['col' => 1, 'row' => 0]
+		'defaults' => ['col' => 1, 'row' => 0],
+		'position' => ['row' => 0, 'col' => 7, 'height' => 4, 'width' => 5]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
 		'action' => 'widget.discovery.view',
 		'header' => _('Discovery status'),
-		'defaults' => ['col' => 1, 'row' => 5]
+		'defaults' => ['col' => 1, 'row' => 5],
+		'position' => ['row' => 4, 'col' => 7, 'height' => 3, 'width' => 5]
 	];
 }
 
@@ -146,6 +167,16 @@ foreach ($widgets as $widgetid => $widget) {
 		'darken' => 0,
 		'params' => ['widgetRefresh' => $widgetid]
 	];
+
+// ----------------
+	$grid_widgets[] = [
+		'widgetid' => $widgetid,
+		'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
+		'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
+		'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
+		'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+	];
+// ----------------
 }
 
 // sort dashboard grid
@@ -190,11 +221,9 @@ $this->addPostJS('jqBlink.blink();');
 
 // Initialize dashboard grid
 $this->addPostJS(
-	"jQuery('.".ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER."')
-		.dashboardGrid()
-		.dashboardGrid('addWidget', {'row': 0, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_GRAPHS."})
-		.dashboardGrid('addWidget', {'row': 2, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_SCREENS."})
-		.dashboardGrid('addWidget', {'row': 4, 'col': 0, 'height': 2, 'width': 2, 'widgetid': ".WIDGET_FAVOURITE_MAPS."});"
+	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'.dashboardGrid()'.
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($grid_widgets).');'
 );
 
 ?>
