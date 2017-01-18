@@ -887,16 +887,6 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if ($method === 'create' && !$item['preprocessing']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'preprocessing', _('cannot be empty'))
-				);
-			}
-			elseif ($method === 'update' && !$item['preprocessing']) {
-				// In case we want do delete item pre-processing by giving an empty array for update method.
-				return;
-			}
-
 			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types())]);
 
 			$required_fields = ['type', 'params'];
