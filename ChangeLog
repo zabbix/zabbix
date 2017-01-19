@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+...G....S. [ZBXNEXT-1380] added check for exit code of scripts (vjaceslavs)
 A......... [ZBX-3783] deprecated mappings.sortorder parameter by iconmap.create() and iconmap.update() methods (Sasha)
 A.F.I..PS. [ZBXNEXT-1443] added item pre-processing options (wiper, Ivo)
 ..F....... [ZBXNEXT-830] implemented full clone of maps (Cemeris, Sasha)
@@ -22,7 +23,6 @@ A.F....... [ZBXNEXT-3570] removed the deprecated "isReadable" and "isWritable" m
 ..F....... [ZBX-10777] made checkboxes and radio buttons look the same across all browsers (asaveljevs, Pavel)
 A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 bytes; thanks to Patrick Hemmer for patch (Cemeris, Gunars, Oleg, Sasha, viktors)
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
-..FG....S. [ZBXNEXT-1380] added check for exit code of scripts (vjaceslavs)
 
 Bug fixes:
 ..F....PS. [ZBX-7015] forced setting UTF-8 character set for connections to Oracle database (gleb)
