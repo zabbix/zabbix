@@ -379,7 +379,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
-				zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
+				zbx_strlcpy(error, "process terminated unexpectedly", max_error_len);
 
 			ret = FAIL;
 		}
@@ -454,13 +454,17 @@ close:
 			if ('\0' == *buffer)
 			{
 				if (WIFEXITED(status))
+				{
 					zbx_snprintf(error, max_error_len, "process exited with code: %d",
 							WEXITSTATUS(status));
+				}
 				else if (WIFSIGNALED(status))
+				{
 					zbx_snprintf(error, max_error_len, "process killed by signal %d",
 							WTERMSIG(status));
+				}
 				else
-					zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
+					zbx_strlcpy(error, "process terminated unexpectedly", max_error_len);
 			}
 			else
 				zbx_strlcpy(error, buffer, max_error_len);
