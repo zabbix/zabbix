@@ -55,9 +55,9 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'favourite_graphs' => getFavouriteGraphs(),
-			'favourite_maps' => getFavouriteMaps(),
-			'favourite_screens' => getFavouriteScreens(),
+			'favourite_graphs' => getFavouriteGraphsData(),
+			'favourite_maps' => getFavouriteMapsData(),
+			'favourite_screens' => getFavouriteScreensData(),
 			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
 			'show_discovery_widget' => $show_discovery_widget
 		];

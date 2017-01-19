@@ -32,7 +32,7 @@ $widgets = [
 	WIDGET_FAVOURITE_GRAPHS => [
 		'id' => 'favouriteGraphs',
 		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteGraphs'],
-		'data' => $data['favourite_graphs'],
+		'data' => makeFavouriteGraphs($data['favourite_graphs']),
 		'header' => _('Favourite graphs'),
 		'links' => [
 			['name' => _('Graphs'), 'url' => 'charts.php']
@@ -43,7 +43,7 @@ $widgets = [
 	WIDGET_FAVOURITE_SCREENS => [
 		'id' => 'favouriteScreens',
 		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteScreens'],
-		'data' => $data['favourite_screens'],
+		'data' => makeFavouriteScreens($data['favourite_screens']),
 		'header' => _('Favourite screens'),
 		'links' => [
 			['name' => _('Screens'), 'url' => 'screens.php'],
@@ -55,7 +55,7 @@ $widgets = [
 	WIDGET_FAVOURITE_MAPS => [
 		'id' => 'favouriteMaps',
 		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteMaps'],
-		'data' => $data['favourite_maps'],
+		'data' => makeFavouriteMaps($data['favourite_maps']),
 		'header' => _('Favourite maps'),
 		'links' => [
 			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']

@@ -117,7 +117,7 @@
 
 		jQuery.ajax({
 			url: url.getUrl(),
-			type: 'post',
+			method: 'POST',
 			data: {
 				widgetid: widget.widgetid,
 				row: pos.row,
@@ -126,7 +126,7 @@
 				width: pos.width
 			},
 			dataType: 'script',
-			success: function(result) {
+			success: function(resp) {
 				$.extend(widget, pos);
 				setDivPosition($div, data, widget);
 				resizeDashboardGrid($obj, data);
@@ -135,6 +135,46 @@
 				// TODO: gentle message about failed saving of widget size and position
 				setDivPosition($div, data, widget);
 				resizeDashboardGrid($obj, data);
+			}
+		});
+	}
+
+	function updateWidgetContent($div, data) {
+		var	widget = getWidgetByTarget(data['widgets'], $div),
+			url = new Curl('zabbix.php');
+
+		url.setArgument('action', 'widget.' + widget.widgetid + '.view')
+		url.setArgument('output', 'ajax');
+
+		jQuery.ajax({
+			url: url.getUrl(),
+			method: 'GET',
+			dataType: 'json',
+			success: function(resp) {
+				var $content_div = $('.dashbrd-grid-widget-content', $div);
+
+				$content_div.empty();
+
+				if (resp.header !== undefined) {
+					$content_div.append($('<div>', {
+						'class': 'dashbrd-widget-head'
+					}).append($('<h4>').html(resp.header)));
+				}
+				if (resp.messages !== undefined) {
+					$content_div.append($('<div>').html(resp.messages));
+				}
+				$content_div.append($('<div>').html(resp.body));
+				if (resp.debug !== undefined) {
+					$content_div.append($('<div>').html(resp.debug));
+				}
+				if (resp.footer !== undefined) {
+					$content_div.append($('<div>', {
+						'class': 'dashbrd-widget-foot'
+					}).html(resp.footer));
+				}
+			},
+			error: function() {
+				// TODO: gentle message about failed update of widget content
 			},
 		});
 	}
@@ -161,14 +201,14 @@
 		},
 
 		addWidget: function(params) {
-			params = $.extend({}, {'row': 0, 'col': 0, 'height': 1, 'width': 1 }, params);
+			params = $.extend({}, {'widgetid': '', 'row': 0, 'col': 0, 'height': 1, 'width': 1 }, params);
 
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					$widget = $('<div>', {'class': 'dashbrd-grid-widget'})
+					$div = $('<div>', {'class': 'dashbrd-grid-widget'})
 						.data('widget-id', data['widgets'].length)
-						.append($('<div>', {'class': 'dashbrd-grid-widget-content'}).text(params.widgetid)),	// TODO
+						.append($('<div>', {'class': 'dashbrd-grid-widget-content'})),
 					handles = {};
 
 				$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, value) {
@@ -180,19 +220,21 @@
 							.append($('<div>', {'class': 'ui-resizable-border-' + value}));
 					}
 
-					$widget.append($handle);
+					$div.append($handle);
 					handles[value] = $handle;
 				});
 
 				data['widgets'].push(params);
 
-				setDivPosition($widget, data, params);
+				setDivPosition($div, data, params);
 
 				resizeDashboardGrid($this, data);
 
-				$this.append($widget);
+				$this.append($div);
 
-				$widget.draggable({
+				updateWidgetContent($div, data);
+
+				$div.draggable({
 					start: function(event, ui) {
 						startWidgetPositioning($(event.target), data);
 					},
@@ -204,7 +246,7 @@
 					}
 				});
 
-				$widget.resizable({
+				$div.resizable({
 					handles: handles,
 					autoHide: true,
 					start: function(event, ui) {

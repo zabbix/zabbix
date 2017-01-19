@@ -15,25 +15,32 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-list($table, $info) = make_latest_issues($data['filter'], 'zabbix.php?action=dashboard.view');
+require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-$output = [
-	'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-	'body' => $table->toString(),
-	'footer' =>(new CList([$info, _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
-];
+class CControllerWidgetFavGraphsView extends CController {
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
+	protected function checkInput() {
+		return true;
+	}
+
+	protected function checkPermissions() {
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+	}
+
+	protected function doAction() {
+		$this->setResponse(new CControllerResponseData([
+			'data' => getFavouriteGraphsData(),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo (new CJson())->encode($output);

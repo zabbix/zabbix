@@ -71,8 +71,7 @@ class CControllerDashboardFavourite extends CController {
 					}
 				}
 
-				$graphs = getFavouriteGraphs();
-				$graphs = $graphs->toString();
+				$graphs = makeFavouriteGraphs(getFavouriteGraphsData())->toString();
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.CJs::encodeJson($graphs).');'.
@@ -94,8 +93,7 @@ class CControllerDashboardFavourite extends CController {
 					}
 				}
 
-				$maps = getFavouriteMaps();
-				$maps = $maps->toString();
+				$maps = makeFavouriteMaps(getFavouriteMapsData())->toString();
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.CJs::encodeJson($maps).');'.
@@ -118,8 +116,7 @@ class CControllerDashboardFavourite extends CController {
 					}
 				}
 
-				$screens = getFavouriteScreens();
-				$screens = $screens->toString();
+				$screens = makeFavouriteScreens(getFavouriteScreensData())->toString();
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.CJs::encodeJson($screens).');'.
