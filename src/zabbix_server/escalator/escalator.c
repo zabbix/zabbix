@@ -848,10 +848,6 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);
 
-		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type && ZBX_SCRIPT_EXECUTE_ON_AGENT == script.execute_on &&
-				ALERT_STATUS_SENT == status)
-			status = ALERT_STATUS_RAN;
-
 		add_command_alert(&db_insert, alerts_num++, &host, event->eventid, actionid, esc_step, script.command,
 				status, error);
 skip:

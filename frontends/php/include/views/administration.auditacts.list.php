@@ -55,10 +55,7 @@ $auditTable = (new CTableInfo())
 
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
-	if ($alert['status'] == ALERT_STATUS_RAN) {
-		$status = (new CSpan(_('Ran')))->addClass(ZBX_STYLE_GREEN);
-	}
-	elseif ($alert['status'] == ALERT_STATUS_SENT) {
+	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
 			? (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);

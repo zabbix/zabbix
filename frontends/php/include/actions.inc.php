@@ -1397,10 +1397,6 @@ function getActionCommands(array $alerts, array $r_alerts) {
 			}
 
 			switch ($alert['status']) {
-				case ALERT_STATUS_RAN:
-					$status = (new CSpan(_('Ran')))->addClass(ZBX_STYLE_GREEN);
-					break;
-
 				case ALERT_STATUS_SENT:
 					$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 					break;
@@ -1452,11 +1448,6 @@ function makeActionHints($alerts, $r_alerts, $mediatypes, $users, $display_recov
 
 		foreach ($alerts_data as $alert) {
 			switch ($alert['status']) {
-				case ALERT_STATUS_RAN:
-					$status_str = (new CSpan(_('Ran')))
-						->addClass(ZBX_STYLE_GREEN);
-					break;
-
 				case ALERT_STATUS_SENT:
 					$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
 						->addClass(ZBX_STYLE_GREEN);

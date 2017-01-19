@@ -434,8 +434,7 @@ typedef enum
 {
 	ALERT_STATUS_NOT_SENT = 0,
 	ALERT_STATUS_SENT,
-	ALERT_STATUS_FAILED,
-	ALERT_STATUS_RAN
+	ALERT_STATUS_FAILED
 }
 zbx_alert_status_t;
 const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
