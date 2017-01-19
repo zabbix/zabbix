@@ -469,7 +469,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send_raw(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);

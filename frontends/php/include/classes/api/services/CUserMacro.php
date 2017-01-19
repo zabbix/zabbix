@@ -238,8 +238,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Add global macros.
-	 *
 	 * @param array $globalmacros
 	 *
 	 * @return array
@@ -260,8 +258,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the createGlobal() method.
-	 *
 	 * @param array $globalmacros
 	 *
 	 * @throws APIException if the input is invalid.
@@ -283,8 +279,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Updates global macros.
-	 *
 	 * @param array $globalmacros
 	 *
 	 * @return array
@@ -347,8 +341,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the updateGlobal() method.
-	 *
 	 * @param array $globalmacros
 	 * @param array $db_globalmacros
 	 *
@@ -368,7 +360,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro', 'value'],
 			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
@@ -406,7 +398,7 @@ class CUserMacro extends CApiService {
 	private function checkDuplicates(array $macros) {
 		$user_macro_parser = new CUserMacroParser();
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['macro']
 		]);
 
@@ -428,8 +420,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Delete global macros.
-	 *
 	 * @param array $globalmacroids
 	 *
 	 * @return array
@@ -445,8 +435,6 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the deleteGlobal() method.
-	 *
 	 * @param array $globalmacroids
 	 *
 	 * @throws APIException if the input is invalid.
@@ -461,7 +449,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_globalmacros = API::getApiService()->select('globalmacro', [
+		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro'],
 			'globalmacroids' => $globalmacroids,
 			'preservekeys' => true
