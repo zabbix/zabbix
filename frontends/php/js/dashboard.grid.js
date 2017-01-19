@@ -99,8 +99,8 @@
 
 		setDivPosition(data['placeholder'], data, pos);
 
-		if (data['options']['rows'] < pos.row + widget.height) {
-			resizeDashboardGrid($obj, data, pos.row + widget.height);
+		if (data['options']['rows'] < pos.row + pos.height) {
+			resizeDashboardGrid($obj, data, pos.row + pos.height);
 		}
 	}
 
