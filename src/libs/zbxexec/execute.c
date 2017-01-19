@@ -373,19 +373,21 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		else if (WAIT_OBJECT_0 != WaitForSingleObject(pi.hProcess, 0) ||
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
-			ret = FAIL;
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
 				zbx_snprintf(error, max_error_len, "process terminated unexpectedly");
+
+			ret = FAIL;
 		}
 		else if (0 != code)
 		{
-			ret = FAIL;
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
 				zbx_snprintf(error, max_error_len, "process exited with code: %d", code);
+
+			ret = FAIL;
 		}
 	}
 
