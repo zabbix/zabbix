@@ -666,10 +666,9 @@ static void	add_log_result(AGENT_RESULT *result, const char *value)
 	result->type |= AR_LOG;
 }
 
-int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
+int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
-	double		value_double;
 	int		ret = FAIL;
 
 	assert(result);
@@ -681,61 +680,21 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			zbx_ltrim(c, " \"+");
 			del_zeroes(c);
 
-			switch (data_type)
+			if (SUCCEED == is_uint64(c, &value_uint64))
 			{
-				case ITEM_DATA_TYPE_BOOLEAN:
-					if (SUCCEED == is_boolean(c, &value_uint64))
-					{
-						SET_UI64_RESULT(result, value_uint64);
-						ret = SUCCEED;
-					}
-					break;
-				case ITEM_DATA_TYPE_OCTAL:
-					if (SUCCEED == is_uoct(c))
-					{
-						ZBX_OCT2UINT64(value_uint64, c);
-						SET_UI64_RESULT(result, value_uint64);
-						ret = SUCCEED;
-					}
-					break;
-				case ITEM_DATA_TYPE_DECIMAL:
-					if (SUCCEED == is_uint64(c, &value_uint64))
-					{
-						SET_UI64_RESULT(result, value_uint64);
-						ret = SUCCEED;
-					}
-					break;
-				case ITEM_DATA_TYPE_HEXADECIMAL:
-					if (SUCCEED == is_uhex(c))
-					{
-						ZBX_HEX2UINT64(value_uint64, c);
-						SET_UI64_RESULT(result, value_uint64);
-						ret = SUCCEED;
-					}
-					else if (SUCCEED == is_hex_string(c))
-					{
-						zbx_remove_whitespace(c);
-						ZBX_HEX2UINT64(value_uint64, c);
-						SET_UI64_RESULT(result, value_uint64);
-						ret = SUCCEED;
-					}
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					break;
+				SET_UI64_RESULT(result, value_uint64);
+				ret = SUCCEED;
 			}
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_rtrim(c, " \"");
 			zbx_ltrim(c, " \"+");
 
-			if (SUCCEED != is_double(c))
-				break;
-
-			value_double = atof(c);
-
-			SET_DBL_RESULT(result, value_double);
-			ret = SUCCEED;
+			if (SUCCEED == is_double(c))
+			{
+				SET_DBL_RESULT(result, atof(c));
+				ret = SUCCEED;
+			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			zbx_replace_invalid_utf8(c);
@@ -752,26 +711,6 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
-	}
-
-	if (SUCCEED != ret)
-	{
-		char	*error = NULL;
-
-		zbx_remove_chars(c, "\r\n");
-		zbx_replace_invalid_utf8(c);
-
-		if (ITEM_VALUE_TYPE_UINT64 == value_type)
-			error = zbx_dsprintf(error,
-					"Received value [%s] is not suitable for value type [%s] and data type [%s]",
-					c, zbx_item_value_type_string(value_type),
-					zbx_item_data_type_string(data_type));
-		else
-			error = zbx_dsprintf(error,
-					"Received value [%s] is not suitable for value type [%s]",
-					c, zbx_item_value_type_string(value_type));
-
-		SET_MSG_RESULT(result, error);
 	}
 
 	return ret;
@@ -1234,16 +1173,16 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 	switch (type)
 	{
 		case 't':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_TEXT, 0, data);
+			ret = set_result_type(result, ITEM_VALUE_TYPE_TEXT, data);
 			break;
 		case 's':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_STR, 0, data);
+			ret = set_result_type(result, ITEM_VALUE_TYPE_STR, data);
 			break;
 		case 'u':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, data);
+			ret = set_result_type(result, ITEM_VALUE_TYPE_UINT64, data);
 			break;
 		case 'd':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_FLOAT, 0, data);
+			ret = set_result_type(result, ITEM_VALUE_TYPE_FLOAT, data);
 			break;
 		default:
 			ret = SUCCEED;
@@ -1251,6 +1190,38 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 	/* return deserialized return code or SYSINFO_RET_FAIL if setting result data failed */
 	return (FAIL == ret ? SYSINFO_RET_FAIL : agent_ret);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: write_all                                                        *
+ *                                                                            *
+ * Purpose: call write in a loop, iterating until all the data is written.    *
+ *                                                                            *
+ * Parameters: fd      - [IN] descriptor                                      *
+ *             buf     - [IN] buffer to write                                 *
+ *             n       - [IN] bytes count to write                            *
+ *                                                                            *
+ * Return value: SUCCEED - n bytes successfully written                       *
+ *               FAIL    - less than n bytes are written                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	write_all(int fd, const char *buf, size_t n)
+{
+	ssize_t	ret;
+
+	while (0 < n)
+	{
+		if (-1 != (ret = write(fd, buf, n)))
+		{
+			buf += ret;
+			n -= ret;
+		}
+		else if (EINTR != errno)
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1312,14 +1283,14 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		ret = metric_func(request, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		write(fds[1], data, data_offset);
+		ret = write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);
 
 		close(fds[1]);
 
-		exit(EXIT_SUCCESS);
+		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	close(fds[1]);
@@ -1368,6 +1339,11 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated unexpectedly."));
 			kill(pid, SIGKILL);
+			ret = SYSINFO_RET_FAIL;
+		}
+		else if (EXIT_SUCCESS != WEXITSTATUS(status))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Data gathering process terminated with error."));
 			ret = SYSINFO_RET_FAIL;
 		}
 		else

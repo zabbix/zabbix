@@ -249,12 +249,8 @@ class CHelpItems {
 					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
-					'key' => 'vm.vmemory.size[<type>]',
-					'description' => _('Virtual memory statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
-				],
-				[
 					'key' => 'system.uname',
-					'description' => _('Detailed host information. Returns string')
+					'description' => _('Identification of the system. Returns string')
 				],
 				[
 					'key' => 'system.uptime',
@@ -317,6 +313,10 @@ class CHelpItems {
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
 					'key' => 'web.page.get[host,<path>,<port>]',
 					'description' => _('Get content of web page. Returns web page source as text')
 				],
@@ -363,16 +363,16 @@ class CHelpItems {
 					'description' => _('Log file monitoring. Returns log')
 				],
 				[
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'description' => _('Count of matched lines in log file monitoring. Returns integer')
+				],
+				[
 					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>]',
 					'description' => _('Log file monitoring with log rotation support. Returns log')
 				],
 				[
-					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
-					'description' => _('Number of matching lines since the last check of the item. Returns integer')
-				],
-				[
 					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
-					'description' => _('Number of matching lines since the last check of the item with log rotation support. Returns integer')
+					'description' => _('Count of matched lines in log file monitoring with log rotation support. Returns integer')
 				],
 				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
@@ -544,7 +544,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.uname',
-					'description' => _('Detailed host information. Returns string')
+					'description' => _('Identification of the system. Returns string')
 				],
 				[
 					'key' => 'system.uptime',
@@ -605,6 +605,10 @@ class CHelpItems {
 				[
 					'key' => 'vm.memory.size[<mode>]',
 					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
+					'key' => 'vm.vmemory.size[<type>]',
+					'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				],
 				[
 					'key' => 'web.page.get[host,<path>,<port>]',
@@ -776,7 +780,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
-					'description' => _('VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'description' => _('VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',

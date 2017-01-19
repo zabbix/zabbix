@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['file'] = 'tr_status.php';
 $page['title'] = _('Triggers');
@@ -61,10 +62,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])) {
+if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
+if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -357,24 +358,11 @@ if ($config['event_ack_enable']) {
 		}
 	}
 
-	$problem_events = API::Event()->get([
-		'output' => ['eventid', 'objectid'],
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'objectids' => $triggerIds,
-		'value' => TRIGGER_VALUE_TRUE,
-		'sortfield' => 'eventid',
-		'sortorder' => 'DESC'
-	]);
+	$problems = getTriggerLastProblems($triggerIds, ['eventid', 'objectid']);
 
-	if ($problem_events) {
-		foreach ($problem_events as $problem_event) {
-			if ($triggers[$problem_event['objectid']]['last_problem_eventid'] == 0) {
-				$triggers[$problem_event['objectid']]['last_problem_eventid'] = $problem_event['eventid'];
-			}
-		}
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['last_problem_eventid'] = $problem['eventid'];
 	}
-
 }
 
 if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {

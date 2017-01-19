@@ -60,9 +60,28 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('itemid') && !API::Item()->isWritable([$_REQUEST['itemid']])
-		|| getRequest('triggerid') && !API::Trigger()->isWritable([$_REQUEST['triggerid']])) {
-	access_deny();
+if (getRequest('itemid')) {
+	$items = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('itemid'),
+		'editable' => true
+	]);
+
+	if (!$items) {
+		access_deny();
+	}
+}
+
+if (getRequest('triggerid')) {
+	$triggers = API::Trigger()->get([
+		'output' => [],
+		'triggerids' => getRequest('triggerid'),
+		'editable' => true
+	]);
+
+	if (!$triggers) {
+		access_deny();
+	}
 }
 
 $itemid = getRequest('itemid', 0);

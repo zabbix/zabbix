@@ -603,9 +603,10 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		$ipValidator = new CIPValidator();
-		if (!$ipValidator->validate($interface['ip'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ipValidator->getError());
+		$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);
+
+		if ($ip_parser->parse($interface['ip']) != CParser::PARSE_SUCCESS) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid IP address "%1$s".', $interface['ip']));
 		}
 	}
 
@@ -633,8 +634,20 @@ class CHostInterface extends CApiService {
 	 * @param array $hostIds	an array of host IDs
 	 */
 	protected function checkHostPermissions(array $hostIds) {
-		if (!API::Host()->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ($hostids) {
+			$hostids = array_unique($hostids);
+
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 

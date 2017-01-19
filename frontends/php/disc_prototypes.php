@@ -60,10 +60,6 @@ $fields = [
 		'isset({add}) || isset({update})'
 	],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'data_type' =>					[T_ZBX_INT, O_OPT, null,
-		IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
-		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == '.ITEM_VALUE_TYPE_UINT64.'))'
-	],
 	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
 		'(isset({add}) || isset({update})) && isset({value_type})'.
 			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
@@ -139,21 +135,13 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({type}) && ({type} == 2)'
 	],
 	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type})'.
-			' && '.IN('0,3', 'value_type').' (isset({data_type}) && ({data_type} != '.ITEM_DATA_TYPE_BOOLEAN.'))'
-	],
-	'multiplier' =>					[T_ZBX_INT, O_OPT, null,	null,		null],
-	'delta' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-		'(isset({add}) || isset({update})) && isset({value_type})'.
-			' && '.IN('0,3', 'value_type').' (isset({data_type}) && ({data_type} != '.ITEM_DATA_TYPE_BOOLEAN.'))'
-	],
-	'formula' =>					[T_ZBX_DBL_STR, O_OPT, null,
-		'({value_type} == 0 && {} != 0) || ({value_type} == 3 && {} > 0)',
-		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')
+		'(isset({add}) || isset({update})) && isset({value_type}) && '.
+		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 	],
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'
 	],
+	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'applications' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -205,8 +193,16 @@ if (!$discoveryRule) {
 }
 
 $itemPrototypeId = getRequest('itemid');
-if ($itemPrototypeId && !API::ItemPrototype()->isWritable([$itemPrototypeId])) {
-	access_deny();
+if ($itemPrototypeId) {
+	$item_prorotypes = API::ItemPrototype()->get([
+		'output' => [],
+		'itemids' => $itemPrototypeId,
+		'editable' => true
+	]);
+
+	if (!$item_prorotypes) {
+		access_deny();
+	}
 }
 
 /*
@@ -319,6 +315,27 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$application_prototypes[] = ['name' => $new_application_prototype];
 		}
 
+		$preprocessing = getRequest('preprocessing', []);
+
+		foreach ($preprocessing as &$step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_RTRIM:
+				case ZBX_PREPROC_LTRIM:
+				case ZBX_PREPROC_TRIM:
+					$step['params'] = $step['params'][0];
+					break;
+
+				case ZBX_PREPROC_REGSUB:
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				default:
+					$step['params'] = '';
+			}
+		}
+		unset($step);
+
 		$item = [
 			'name'			=> getRequest('name'),
 			'description'	=> getRequest('description'),
@@ -336,8 +353,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'history'		=> getRequest('history'),
 			'trends'		=> getRequest('trends'),
 			'units'			=> getRequest('units'),
-			'multiplier'	=> getRequest('multiplier', 0),
-			'delta'			=> getRequest('delta'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
 			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
@@ -345,7 +360,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula'		=> getRequest('formula', '1'),
 			'logtimefmt'	=> getRequest('logtimefmt'),
 			'valuemapid'	=> getRequest('valuemapid'),
 			'authtype'		=> getRequest('authtype'),
@@ -355,18 +369,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey'	=> getRequest('privatekey'),
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
-			'data_type'		=> getRequest('data_type'),
 			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex,
-			'applications'	=> $applications,
-			'applicationPrototypes' => $application_prototypes
+			'delay_flex'	=> $delay_flex
 		];
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
 
-			$dbItem = get_item_by_itemid_limited($itemId);
-			$dbItem['applications'] = get_applications_by_itemid($itemId);
+			$db_item = API::ItemPrototype()->get([
+				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
+					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
+					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
+					'snmpv3_privprotocol', 'snmpv3_contextname'
+				],
+				'selectApplications' => ['applicationid'],
+				'selectApplicationPrototypes' => ['name'],
+				'selectPreprocessing' => ['type', 'params'],
+				'itemids' => [$itemId]
+			]);
 
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -377,12 +399,46 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
-			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+			$db_item = $db_item[0];
+
+			$item = CArrayHelper::unsetEqualValues($item, $db_item);
 			$item['itemid'] = $itemId;
+
+			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
+
+			// compare applications
+			natsort($db_item['applications']);
+			natsort($applications);
+
+			if (array_values($db_item['applications']) !== array_values($applications)) {
+				$item['applications'] = $applications;
+			}
+
+			// compare application prototypes
+			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
+			natsort($db_application_prototype_names);
+
+			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
+			natsort($application_prototype_names);
+
+			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
+				$item['applicationPrototypes'] = $application_prototypes;
+			}
+
+			if ($db_item['preprocessing'] !== $preprocessing) {
+				$item['preprocessing'] = $preprocessing;
+			}
 
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			$item['applications'] = $applications;
+			$item['applicationPrototypes'] = $application_prototypes;
+
+			if ($preprocessing) {
+				$item['preprocessing'] = $preprocessing;
+			}
+
 			$result = API::ItemPrototype()->create($item);
 		}
 	}
@@ -445,14 +501,19 @@ if (isset($_REQUEST['form'])) {
 			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port',
-				'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
-			]
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
+				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+				'snmpv3_contextname'
+			],
+			'selectPreprocessing' => ['type', 'params']
 		]);
 		$itemPrototype = reset($itemPrototype);
+		foreach ($itemPrototype['preprocessing'] as &$step) {
+			$step['params'] = explode("\n", $step['params']);
+		}
+		unset($step);
 	}
 
 	$data = getItemFormData($itemPrototype);

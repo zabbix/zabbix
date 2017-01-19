@@ -61,9 +61,6 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('maxlength', 64)
 	];
-	if (isset($mapping['iconmappingid'])) {
-		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
-	}
 
 	$iconsComboBox = new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null,
 		$this->data['iconList']

@@ -195,6 +195,7 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTO_REGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
+#define EVENT_SOURCE_COUNT		4
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -1033,6 +1034,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
+char	*xml_escape_dyn(const char *data);
 
 int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
@@ -1347,4 +1349,56 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
+#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+
+#define ZBX_PREPROC_MULTIPLIER		1
+#define ZBX_PREPROC_RTRIM		2
+#define ZBX_PREPROC_LTRIM		3
+#define ZBX_PREPROC_TRIM		4
+#define ZBX_PREPROC_REGSUB		5
+#define ZBX_PREPROC_BOOL2DEC		6
+#define ZBX_PREPROC_OCT2DEC		7
+#define ZBX_PREPROC_HEX2DEC		8
+#define ZBX_PREPROC_DELTA_VALUE		9
+#define ZBX_PREPROC_DELTA_SPEED 	10
+
+zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
+
+typedef union
+{
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_variant_data_t;
+
+typedef struct
+{
+	unsigned char		type;
+	zbx_variant_data_t	data;
+}
+zbx_variant_t;
+
+#define ZBX_VARIANT_NONE	0
+#define ZBX_VARIANT_STR		1
+#define ZBX_VARIANT_DBL		2
+#define ZBX_VARIANT_UI64	3
+
+void	zbx_variant_clear(zbx_variant_t *value);
+void	zbx_variant_set_none(zbx_variant_t *value);
+void	zbx_variant_set_str(zbx_variant_t *value, char *text);
+void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
+void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
+int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
+
+int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_variant_value_desc(const zbx_variant_t *value);
+const char	*zbx_variant_type_desc(const zbx_variant_t *value);
+
+int	zbx_validate_value_dbl(double value);
+
 #endif
+

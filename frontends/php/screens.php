@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/blocks.inc.php';
@@ -57,20 +58,18 @@ check_fields($fields);
  * Permissions
  */
 // Validate group IDs.
-$validate_groupids = array_filter([
-	getRequest('groupid'),
-	getRequest('tr_groupid')
-]);
-if ($validate_groupids && !API::HostGroup()->isReadable($validate_groupids)) {
+if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
+	access_deny();
+}
+if (getRequest('tr_groupid') && !isReadableHostGroups([getRequest('tr_groupid')])) {
 	access_deny();
 }
 
 // Validate host IDs.
-$validate_hostids = array_filter([
-	getRequest('hostid'),
-	getRequest('tr_hostid')
-]);
-if ($validate_hostids && !API::Host()->isReadable($validate_hostids)) {
+if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
+	access_deny();
+}
+if (getRequest('tr_hostid') && !isReadableHosts([getRequest('tr_hostid')])) {
 	access_deny();
 }
 

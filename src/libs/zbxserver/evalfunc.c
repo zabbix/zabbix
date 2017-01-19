@@ -2864,6 +2864,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeroes(value);
+			/* break; is not missing here */
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
 				add_value_suffix(value, max_len, units, value_type);
@@ -2899,7 +2900,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 {
 	const char	*__function_name = "evaluate_macro_function";
 
-	zbx_host_key_t	host_key = {host, key};
+	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
 	char		value[MAX_BUFFER_LEN], *error = NULL;
 	int		ret, errcode;

@@ -555,14 +555,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		if (SUCCEED == errcodes[i])
 		{
-			/* remove formatting symbols from the end of the result */
-			/* so it could be checked by "is_uint64" and "is_double" functions */
-			/* when we try to get "int" or "float" values from "string" result */
-			if (0 != ISSET_STR(&results[i]))
-				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (0 != ISSET_TEXT(&results[i]))
-				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
-
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
@@ -707,10 +699,11 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
 #ifdef HAVE_OPENIPMI
-		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
+		if ((ZBX_POLLER_TYPE_IPMI == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
 		{
 			last_ipmi_host_check = time(NULL);
-			delete_inactive_ipmi_hosts(last_ipmi_host_check);
+			zbx_delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
 #endif
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);

@@ -1129,6 +1129,12 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		esc_period = atoi(row[2]);
 		evaltype = (unsigned char)atoi(row[3]);
 
+		if (0 == esc_period)
+			esc_period = action->esc_period;
+
+		if (0 == next_esc_period || next_esc_period > esc_period)
+			next_esc_period = esc_period;
+
 		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
 		{
 			unsigned char	default_msg;
@@ -1136,9 +1142,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
-
-			if (0 == next_esc_period || next_esc_period > esc_period)
-				next_esc_period = esc_period;
 
 			switch (operationtype)
 			{
@@ -1533,7 +1536,8 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
 	errcodes = zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
 
@@ -1638,7 +1642,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
 			/* item disabled or deleted? */
-			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
+			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1,
+					ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 			if (SUCCEED != errcode)
 			{

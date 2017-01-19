@@ -135,24 +135,6 @@ function itemValueTypeString($valueType) {
 	return _('Unknown');
 }
 
-function item_data_type2str($type = null) {
-	$types = [
-		ITEM_DATA_TYPE_BOOLEAN => _('Boolean'),
-		ITEM_DATA_TYPE_OCTAL => _('Octal'),
-		ITEM_DATA_TYPE_DECIMAL => _('Decimal'),
-		ITEM_DATA_TYPE_HEXADECIMAL => _('Hexadecimal')
-	];
-	if (is_null($type)) {
-		return $types;
-	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
-}
-
 function item_status2str($type = null) {
 	if (is_null($type)) {
 		return [ITEM_STATUS_ACTIVE => _('Enabled'), ITEM_STATUS_DISABLED => _('Disabled')];
@@ -311,15 +293,14 @@ function itemTypeInterface($type = null) {
  */
 function copyItemsToHosts($src_itemids, $dst_hostids) {
 	$items = API::Item()->get([
-		'output' => [
-			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
-			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
-			'description', 'inventory_link'
+		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
+			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+			'publickey', 'privatekey', 'flags', 'port', 'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
+		'selectPreprocessing' => ['type', 'params'],
 		'itemids' => $src_itemids
 	]);
 
@@ -380,18 +361,17 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 function copyItems($srcHostId, $dstHostId) {
 	$srcItems = API::Item()->get([
-		'hostids' => $srcHostId,
-		'output' => [
-			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
-			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
-			'description', 'inventory_link'
+		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
+			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+			'publickey', 'privatekey', 'flags', 'port',	'description', 'inventory_link'
 		],
+		'selectApplications' => ['applicationid'],
+		'selectPreprocessing' => ['type', 'params'],
+		'hostids' => $srcHostId,
 		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-		'selectApplications' => ['applicationid']
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
@@ -419,6 +399,10 @@ function copyItems($srcHostId, $dstHostId) {
 		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
+
+		if (!$srcItem['preprocessing']) {
+			unset($srcItem['preprocessing']);
+		}
 	}
 	unset($srcItem);
 
@@ -466,11 +450,11 @@ function get_item_by_itemid($itemid) {
 function get_item_by_itemid_limited($itemid) {
 	$row = DBfetch(DBselect(
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
-			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,'.
-			'i.delta,i.snmpv3_contextname,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,'.
-			'i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,'.
-			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
-			'i.publickey,i.privatekey,i.flags,i.description,i.inventory_link'.
+			'i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.port,i.units,i.snmpv3_contextname,'.
+			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,'.
+			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,'.
+			'i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,'.
+			'i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
@@ -738,10 +722,14 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 			// Display event acknowledgement.
 			$config = select_config();
 			if ($config['event_ack_enable']) {
-				$ack = get_last_event_by_triggerid($item['triggerid']);
-				$ack = ($ack['acknowledged'] == 1)
-					? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
-					: null;
+				$ack = getTriggerLastProblems([$item['triggerid']], ['acknowledged']);
+
+				if ($ack) {
+					$ack = reset($ack);
+					$ack = ($ack['acknowledged'] == 1)
+						? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+						: null;
+				}
 			}
 		}
 
@@ -1292,6 +1280,35 @@ function getParamFieldLabelByType($itemType) {
 			return _('Formula');
 		default:
 			return 'params';
+	}
+}
+
+/**
+ * Get either one or all item pre-processing types.
+ *
+ * @param int $type
+ *
+ * @return array
+ */
+function get_preprocessing_types($type = null) {
+	$types = [
+		ZBX_PREPROC_MULTIPLIER => _('Custom multiplier'),
+		ZBX_PREPROC_RTRIM => _('Right trim'),
+		ZBX_PREPROC_LTRIM => _('Left trim '),
+		ZBX_PREPROC_TRIM => _('Trim'),
+		ZBX_PREPROC_REGSUB => _('Regular expression'),
+		ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
+		ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
+		ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal'),
+		ZBX_PREPROC_DELTA_VALUE => _('Delta'),
+		ZBX_PREPROC_DELTA_SPEED => _('Delta per second')
+	];
+
+	if ($type !== null && array_key_exists($type, $types)) {
+		return $types[$type];
+	}
+	else {
+		return $types;
 	}
 }
 

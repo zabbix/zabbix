@@ -209,6 +209,20 @@ static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
 }
 
+static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
+
+#if defined(HAVE_MYSQL)
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
+#endif
+}
+
 static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const ZBX_FIELD *field)
 {
@@ -219,6 +233,13 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " ", field->name);
 	DBfield_type_string(sql, sql_alloc, sql_offset, field);
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_TYPE_UINT == field->type && NULL != field->default_value) {
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+		DBset_default_sql(sql, sql_alloc, sql_offset, table_name, field);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	}
+#endif
 #endif
 }
 
@@ -247,20 +268,6 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s not null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set not null", field->name);
-#endif
-}
-
-static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
-{
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
-
-#if defined(HAVE_MYSQL)
-	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
-#elif defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
-#else
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
 #endif
 }
 

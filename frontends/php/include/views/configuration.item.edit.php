@@ -303,47 +303,10 @@ else {
 	]));
 }
 
-// Append data type to form list.
-if ($readonly) {
-	$itemForm->addVar('data_type', $data['data_type']);
-	$dataType = (new CTextBox('data_type_name', item_data_type2str($data['data_type']), true))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-}
-else {
-	$dataType = new CComboBox('data_type', $data['data_type'], null, item_data_type2str());
-}
-$itemFormList->addRow(_('Data type'), $dataType, 'row_data_type');
 $itemFormList->addRow(_('Units'),
 	(new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_units'
 );
-
-// Append multiplier to form list.
-if ($readonly) {
-	$itemForm->addVar('multiplier', $data['multiplier']);
-
-	$multiplier = [
-		(new CCheckBox('multiplier'))
-			->setChecked($data['multiplier'] == 1)
-			->setAttribute('disabled', 'disabled'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('formula', $data['formula'], true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('style', 'text-align: right;')
-	];
-}
-else {
-	$multiplier = [
-		(new CCheckBox('multiplier'))
-			->setChecked($data['multiplier'] == 1)
-			->onClick('var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAttribute('style', 'text-align: right;')
-	];
-}
-$itemFormList->addRow(_('Use custom multiplier'), $multiplier, 'row_multiplier');
 
 $itemFormList->addRow(_('Update interval (in sec)'),
 	(new CNumericBox('delay', $data['delay'], 5, $discovered_item))
@@ -467,22 +430,6 @@ $itemFormList->addRow(_('Log time format'),
 	'row_logtimefmt'
 );
 
-// Append delta to form list.
-$deltaOptions = [
-	0 => _('As is'),
-	1 => _('Delta (speed per second)'),
-	2 => _('Delta (simple change)')
-];
-if ($readonly) {
-	$itemForm->addVar('delta', $data['delta']);
-	$deltaComboBox = (new CTextBox('delta_name', $deltaOptions[$data['delta']], true))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-}
-else {
-	$deltaComboBox = new CComboBox('delta', $data['delta'], null, $deltaOptions);
-}
-$itemFormList->addRow(_('Store value'), $deltaComboBox, 'row_delta');
-
 // Append valuemap to form list.
 if ($readonly) {
 	$itemForm->addVar('valuemapid', $data['valuemapid']);
@@ -577,8 +524,117 @@ $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))
 	->setChecked($data['status'] == ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
+$preprocessing = (new CTable())
+	->setId('preprocessing')
+	->setHeader([
+		$readonly ? null : '',
+		new CColHeader(_('Name')),
+		new CColHeader(_('Parameters')),
+		new CColHeader(null),
+		$readonly ? null : (new CColHeader(_('Action')))->setWidth(50)
+	]);
+
+foreach ($data['preprocessing'] as $i => $step) {
+	// Depeding on preprocessing type, display corresponding params field and placeholders.
+	$params = [];
+
+	// Use numeric box for multiplier, otherwise use text box.
+	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
+		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		))
+			->setAttribute('placeholder', _('number'))
+			->setReadonly($readonly);
+	}
+	else {
+		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		))->setReadonly($readonly);
+	}
+
+	// Create a secondary param text box, so it can be hidden if necessary.
+	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
+		(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+			? $step['params'][1]
+			: ''
+	))
+		->setAttribute('placeholder', _('output'))
+		->setReadonly($readonly);
+
+	// Add corresponding placeholders and show or hide text boxes.
+	switch ($step['type']) {
+		case ZBX_PREPROC_MULTIPLIER:
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_RTRIM:
+		case ZBX_PREPROC_LTRIM:
+		case ZBX_PREPROC_TRIM:
+			$params[0]->setAttribute('placeholder', _('list of characters'));
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_REGSUB:
+			$params[0]->setAttribute('placeholder', _('pattern'));
+				break;
+
+		case ZBX_PREPROC_BOOL2DEC:
+		case ZBX_PREPROC_OCT2DEC:
+		case ZBX_PREPROC_HEX2DEC:
+		case ZBX_PREPROC_DELTA_VALUE:
+		case ZBX_PREPROC_DELTA_SPEED:
+			$params[0]->addStyle('display: none;');
+			$params[1]->addStyle('display: none;');
+			break;
+	}
+
+	if ($readonly) {
+		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
+	}
+
+	$preprocessing->addRow(
+		(new CRow([
+			$readonly
+				? null
+				: (new CCol(
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			$readonly
+				? (new CTextBox('preprocessing['.$i.'][type_name]', get_preprocessing_types($step['type'])))
+						->setReadonly(true)
+				: (new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$params[0],
+			$params[1],
+			$readonly
+				? null
+				: (new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+		]))->addClass('sortable')
+	);
+}
+
+$preprocessing->addRow(
+	$readonly
+		? null
+		: (new CCol(
+			(new CButton('param_add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-add')
+		))->setColSpan(5)
+);
+
+$item_preproc_list = (new CFormList('item_preproc_list'))
+	->addRow(_('Preprocessing'), $preprocessing);
+
 // Append tabs to form.
-$itemTab = (new CTabView())->addTab('itemTab', $data['caption'], $itemFormList);
+$itemTab = (new CTabView())
+	->addTab('itemTab', $data['caption'], $itemFormList)
+	->addTab('preprocTab', _('Preprocessing'), $item_preproc_list);
+
+if (!hasRequest('form_refresh')) {
+	$itemTab->setSelected(0);
+}
 
 // Append buttons to form.
 if ($data['itemid'] != 0) {

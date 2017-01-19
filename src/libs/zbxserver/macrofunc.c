@@ -114,6 +114,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		macrofunc = macrofunc_iregsub;
 	else
 		return FAIL;
+	}
 
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression + func_macro->func_param.l + 1,
 			func_macro->func_param.r - func_macro->func_param.l - 1);

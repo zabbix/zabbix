@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -54,10 +55,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupids') && !API::HostGroup()->isReadable(getRequest('groupids'))) {
+if (getRequest('groupids') && !isReadableHostGroups(getRequest('groupids'))) {
 	access_deny();
 }
-if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
+if (getRequest('hostids') && !isReadableHosts(getRequest('hostids'))) {
 	access_deny();
 }
 

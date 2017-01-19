@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -226,18 +227,27 @@ check_fields($fields);
 
 // validate permissions
 if (getRequest('only_hostid')) {
-	if (!API::Host()->isReadable([$_REQUEST['only_hostid']])) {
+	if (!isReadableHostTemplates([getRequest('only_hostid')])) {
 		access_deny();
 	}
 }
 else {
-	if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']]) ||
-			getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
+	if (getRequest('hostid') && !isReadableHostTemplates([getRequest('hostid')])) {
+		access_deny();
+	}
+	if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
 		access_deny();
 	}
 }
-if (getRequest('parent_discoveryid') && !API::DiscoveryRule()->isReadable([$_REQUEST['parent_discoveryid']])) {
-	access_deny();
+if (getRequest('parent_discoveryid')) {
+	$lld_rules = API::DiscoveryRule()->get([
+		'output' => [],
+		'itemids' => getRequest('parent_discoveryid')
+	]);
+
+	if (!$lld_rules) {
+		access_deny();
+	}
 }
 
 $dstfrm = getRequest('dstfrm', ''); // destination form
