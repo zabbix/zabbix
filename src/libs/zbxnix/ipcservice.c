@@ -143,7 +143,9 @@ static const char	*ipc_make_path(const char *service_name)
  *             size      - [IN] the data size                                 *
  *             size_sent - [IN] the actual size written to socket             *
  *                                                                            *
- * Return value: SUCCEED - the data was successfully written                  *
+ * Return value: SUCCEED - no socket errors were detected. Either the data or *
+ *                         a part of it was written to socket or a write to   *
+ *                         non-blocking socket would block                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -277,8 +279,14 @@ out:
  *             size    - [IN] the data size                                   *
  *             tx_size - [IN] the actual size written to socket               *
  *                                                                            *
- * Return value: SUCCEED - the data was successfully written                  *
+ * Return value: SUCCEED - no socket errors were detected. Either the data or *
+ *                         a part of it was written to socket or a write to   *
+ *                         non-blocking socket would block                    *
  *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: When using non-blocking sockets the tx_size parameter must be    *
+ *           checked in addition to return value to tell if the message was   *
+ *           sent successfully.                                               *
  *                                                                            *
  ******************************************************************************/
 static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const unsigned char *data,
@@ -298,6 +306,10 @@ static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code
 
 	if (FAIL == ipc_write_data(csocket->fd, (unsigned char *)buffer, ZBX_IPC_HEADER_SIZE, tx_size))
 		return FAIL;
+
+	/* in the case of non-blocking sockets only a part of the header might be sent */
+	if (ZBX_IPC_HEADER_SIZE != *tx_size)
+		return SUCCEED;
 
 	ret = ipc_write_data(csocket->fd, data, size, &size_data);
 	*tx_size += size_data;
