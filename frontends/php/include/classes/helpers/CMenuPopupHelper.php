@@ -36,7 +36,7 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteMaps() {
-		return ['type' => 'favouriteMaps'] + getFavouriteMapsData();
+		return ['type' => 'favouriteMaps', 'maps' => getFavouriteMapsData()];
 	}
 
 	/**
