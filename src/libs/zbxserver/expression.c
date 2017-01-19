@@ -353,7 +353,8 @@ static void	DCexpand_trigger_expression(char **expression)
 
 			if (SUCCEED == errcode[0])
 			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
+				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1,
+						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 				if (SUCCEED == errcode[1])
 				{
@@ -846,7 +847,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
 			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1,
+						ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 				if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
 					DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
@@ -1170,7 +1172,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
@@ -2347,7 +2349,7 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 		DC_ITEM	item;
 		int	errcode;
 
-		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 		if (SUCCEED == errcode)
 			zbx_vector_uint64_append(hostids, item.host.hostid);
@@ -3966,7 +3968,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs, zbx_vector_ptr_t 
 	items = zbx_malloc(items, sizeof(DC_ITEM) * (size_t)ifuncs->num_data);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * (size_t)ifuncs->num_data);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->num_data);
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->num_data, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	zbx_free(itemids);
 
