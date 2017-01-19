@@ -288,6 +288,9 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 	*error = '\0';
 
+	if (NULL != output)
+		zbx_free(*output);
+
 	buffer = zbx_malloc(buffer, buf_size);
 	*buffer = '\0';
 
@@ -481,10 +484,7 @@ close:
 		zbx_free(buffer);
 
 	if (NULL != output)
-	{
-		zbx_free(*output);
 		*output = buffer;
-	}
 
 	return ret;
 }
