@@ -534,6 +534,27 @@ class CTrigger extends CTriggerGeneral {
 		$db_triggers = [];
 
 		$this->validateUpdate($triggers, $db_triggers);
+
+		$validate_dependencies = [];
+		foreach ($triggers as $tnum => $trigger) {
+			$db_trigger = $db_triggers[$tnum];
+
+			$expressions_changed = ($trigger['expression'] !== $db_trigger['expression']
+				|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']);
+
+			if ($expressions_changed && $db_trigger['dependencies'] && !array_key_exists('dependencies', $trigger)) {
+				$validate_dependencies[] = [
+					'triggerid' => $trigger['triggerid'],
+					'dependencies' => zbx_objectValues($db_trigger['dependencies'], 'triggerid')
+				];
+			}
+		}
+
+		if ($validate_dependencies) {
+			$this->checkDependencies($validate_dependencies);
+			$this->checkDependencyParents($validate_dependencies);
+		}
+
 		$this->updateReal($triggers, $db_triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1272,12 +1293,6 @@ class CTrigger extends CTriggerGeneral {
 				}
 
 				$lastEvents[$triggerId][$ns] = $dbEvent;
-			}
-
-			foreach ($lastEvents as $triggerId => $events) {
-				// find max 'ns' for each trigger and that will be the 'lastEvent'
-				$maxNs = max(array_keys($events));
-				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
 
 			foreach ($lastEvents as $triggerId => $events) {

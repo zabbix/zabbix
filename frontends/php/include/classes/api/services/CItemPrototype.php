@@ -83,6 +83,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectPreprocessing'			=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
@@ -278,11 +279,6 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-			// set default formula value
-			if (!$update && !isset($item['formula'])) {
-				$item['formula'] = '1';
-			}
-
 			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
 					&& $item['applicationPrototypes']) {
 				// Check that "name" field exists for application prototypes.
@@ -419,6 +415,8 @@ class CItemPrototype extends CItemGeneral {
 		if ($item_application_prototypes) {
 			DB::insert('item_application_prototype', $item_application_prototypes);
 		}
+
+		$this->createItemPreprocessing($items);
 
 // TODO: REMOVE info
 		$itemHosts = $this->get([
@@ -660,6 +658,8 @@ class CItemPrototype extends CItemGeneral {
 			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
+		$this->updateItemPreprocessing($items);
+
 // TODO: REMOVE info
 		$itemHosts = $this->get([
 			'itemids' => $itemids,
@@ -896,6 +896,7 @@ class CItemPrototype extends CItemGeneral {
 			'output' => $selectFields,
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
+			'selectPreprocessing' => ['type', 'params'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
@@ -907,6 +908,18 @@ class CItemPrototype extends CItemGeneral {
 		$this->inherit($items, $data['hostids']);
 
 		return true;
+	}
+
+	/**
+	 * Check item prototype specific fields.
+	 *
+	 * @param array  $item			An array of single item prototype data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
+		$this->validateItemPreprocessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
@@ -1105,6 +1118,29 @@ class CItemPrototype extends CItemGeneral {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
+			$db_item_preproc = API::getApiService()->select('item_preproc', [
+				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
+				'filter' => ['itemid' => array_keys($result)],
+			]);
+
+			CArrayHelper::sort($db_item_preproc, ['step']);
+
+			foreach ($result as &$item) {
+				$item['preprocessing'] = [];
+			}
+			unset($item);
+
+			foreach ($db_item_preproc as $step) {
+				$itemid = $step['itemid'];
+				unset($step['item_preprocid'], $step['itemid'], $step['step']);
+
+				if (array_key_exists($itemid, $result)) {
+					$result[$itemid]['preprocessing'][] = $step;
+				}
+			}
 		}
 
 		return $result;

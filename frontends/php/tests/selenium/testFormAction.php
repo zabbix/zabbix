@@ -1927,6 +1927,9 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
+			$this->zbxTestWaitForPageToLoad();
+			$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+			$this->zbxTestWaitForPageToLoad();
 		}
 
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
@@ -2062,6 +2065,9 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
 		$this->zbxTestInputTypeOverwrite('esc_period', '123');
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementValue('esc_period', '123');
 		$this->zbxTestDoubleClickXpath("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]", 'new_operation_esc_step_from');
 
