@@ -310,7 +310,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
-					'description' => _('Directory size (in bytes), dir - Absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - Mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
+					'description' => _('Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
 				],
 				[
 					'key' => 'vm.memory.size[<mode>]',
