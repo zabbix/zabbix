@@ -20,6 +20,6 @@
 #ifndef ZABBIX_MACROFUNC_H
 #define ZABBIX_MACROFUNC_H
 
-int	zbx_calculate_macro_function(const char *expression, size_t len, char **out);
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
 #endif

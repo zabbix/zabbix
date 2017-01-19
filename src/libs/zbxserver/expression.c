@@ -1779,6 +1779,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
+/* macros that can be indexed */
 static const char	*ex_macros[] =
 {
 	MVAR_INVENTORY_TYPE, MVAR_INVENTORY_TYPE_FULL,
@@ -1817,6 +1818,13 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
 	NULL
 };
+
+/* macros that are supported as simple macro host and item key */
+static const char	*simple_host_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, NULL};
+static const char	*simple_key_macros[] = {MVAR_ITEM_KEY, MVAR_TRIGGER_KEY, NULL};
+
+/* macros that can be modified using macro functions */
+static const char	*mod_macros[] = {MVAR_ITEM_VALUE, MVAR_ITEM_LASTVALUE, NULL};
 
 typedef struct
 {
@@ -2204,90 +2212,140 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_indexed_macro                                                 *
+ *                                                                            *
+ * Purpose: check if a token contains indexed macro                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_indexed_macro(const char *str, const zbx_token_t *token)
+{
+	const char	*p;
+
+	switch (token->type)
+	{
+		case ZBX_TOKEN_MACRO:
+			p = str + token->token.r;
+			break;
+		case ZBX_TOKEN_FUNC_MACRO:
+			p = str + token->data.func_macro.macro.r;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	return '1' <= *p && *p <= '9' ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: macro_in_list                                                    *
+ *                                                                            *
+ * Purpose: check if a macro in string is one of the list and extract index   *
+ *                                                                            *
+ * Parameters: str          - [IN] string containing potential macro          *
+ *             strloc       - [IN] part of the string to check                *
+ *             macros       - [IN] list of allowed macros (without indices)   *
+ *             N_functionid - [OUT] index of the macro in string (if valid)   *
+ *                                                                            *
+ * Return value: unindexed macro from the allowed list or NULL                *
+ *                                                                            *
+ * Comments: example: N_functionid is untouched if function returns NULL, for *
+ *           a valid unindexed macro N_function is 1.                         *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid)
+{
+	const char	**macro, *m;
+	size_t		i;
+
+	for (macro = macros; NULL != *macro; macro++)
+	{
+		for (m = *macro, i = strloc.l; '\0' != *m && i <= strloc.r && str[i] == *m; m++, i++)
+			;
+
+		/* check whether macro has ended while strloc hasn't or vice-versa */
+		if (('\0' == *m && i <= strloc.r) || ('\0' != *m && i > strloc.r))
+			continue;
+
+		/* strloc either fully matches macro... */
+		if ('\0' == *m)
+		{
+			*N_functionid = 1;
+			break;
+		}
+
+		/* ...or there is a mismatch, check if it's in a pre-last character and it's an index */
+		if (i == strloc.r - 1 && '1' <= str[i] && str[i] <= '9' && str[i + 1] == *m && '\0' == *(m + 1))
+		{
+			*N_functionid = str[i] - '0';
+			break;
+		}
+	}
+
+	return *macro;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_trigger_function_value                                       *
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
  *                                                                            *
- * Parameters: expression - [IN] string to parse                              *
- *             replace_to - [IN] the pointer to a result buffer               *
- *             bl         - [IN] the pointer to a left curly bracket          *
- *             br         - [OUT] the pointer to a next char, after a right   *
- *                          curly bracket                                     *
+ * Parameters: expression - [IN] trigger expression, source of hostnames and  *
+ *                            item keys for {HOST.HOST} and {ITEM.KEY} macros *
+ *             replace_to - [OUT] evaluation result                           *
+ *             data       - [IN] string containing simple macro               *
+ *             macro      - [IN] simple macro token location in string        *
  *                                                                            *
- * Return value: (1) *replace_to = NULL - invalid function format;            *
- *                    'br' pointer remains unchanged                          *
- *               (2) *replace_to = "*UNKNOWN*" - invalid hostname, key or     *
- *                    function, or a function cannot be evaluated             *
- *               (3) *replace_to = "<value>" - a function successfully        *
- *                    evaluated                                               *
+ * Return value: SUCCEED - successfully evaluated or invalid macro(s) in host *
+ *                           and/or item key positions (in the latter case    *
+ *                           replace_to remains unchanged and simple macro    *
+ *                           shouldn't be replaced with anything)             *
+ *               FAIL    - evaluation failed and macro has to be replaced     *
+ *                           with STR_UNKNOWN_VARIABLE ("*UNKNOWN*")          *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: example: " {Zabbix server:{ITEM.KEY1}.last(0)} " to " 1.34 "     *
- *                      ^ - bl                             ^ - br             *
  *                                                                            *
  ******************************************************************************/
-static void	get_trigger_function_value(const char *expression, char **replace_to, char *bl)
+static int	get_trigger_function_value(const char *expression, char **replace_to, char *data,
+		const zbx_token_simple_macro_t *simple_macro)
 {
-	char	*p, *host = NULL, *key = NULL;
+	char	*host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
-	size_t	sz, par_l, par_r;
 
-	p = bl + 1;
-
-	if (0 == strncmp(p, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2) ||
-			0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2))
+	if (NULL != macro_in_list(data, simple_macro->host, simple_host_macros, &N_functionid))
 	{
-		ret = SUCCEED;
+		if (SUCCEED != DBget_trigger_value(expression, &host, N_functionid, ZBX_REQUEST_HOST_HOST))
+			goto out;
 	}
 
-	if (SUCCEED == ret && ('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
+	if (NULL != macro_in_list(data, simple_macro->key, simple_key_macros, &N_functionid))
 	{
-		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
-		p += sz + ('}' == p[sz] ? 1 : 2);
-		ret = DBget_trigger_value(expression, &host, N_functionid, ZBX_REQUEST_HOST_HOST);
-	}
-	else
-		ret = parse_host(&p, &host);
-
-	if (SUCCEED != ret || ':' != *p++)
-		goto fail;
-
-	if ((0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2) ||
-				0 == strncmp(p, MVAR_TRIGGER_KEY, sz = sizeof(MVAR_TRIGGER_KEY) - 2)) &&
-			('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
-	{
-		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
-		p += sz + ('}' == p[sz] ? 1 : 2);
-		ret = DBget_trigger_value(expression, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
-	}
-	else
-		ret = get_item_key(&p, &key);
-
-	if (SUCCEED != ret || '.' != *p++)
-		goto fail;
-
-	if (SUCCEED != zbx_function_validate(p, &par_l, &par_r) || '}' != p[par_r + 1])
-		goto fail;
-
-	p[par_l] = '\0';
-	p[par_r] = '\0';
-
-	/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
-	*replace_to = zbx_realloc(*replace_to, MAX_BUFFER_LEN);
-
-	if (NULL == host || NULL == key ||
-			SUCCEED != evaluate_macro_function(*replace_to, host, key, p, p + par_l + 1))
-	{
-		zbx_strlcpy(*replace_to, STR_UNKNOWN_VARIABLE, MAX_BUFFER_LEN);
+		if (SUCCEED != DBget_trigger_value(expression, &key, N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG))
+			goto out;
 	}
 
-	p[par_l] = '(';
-	p[par_r] = ')';
+	data[simple_macro->host.r + 1] = '\0';
+	data[simple_macro->key.r + 1] = '\0';
+	data[simple_macro->func_param.l] = '\0';
+	data[simple_macro->func_param.r] = '\0';
 
-fail:
+	ret = evaluate_macro_function(replace_to, (NULL == host ? data + simple_macro->host.l : host),
+			(NULL == key ? data + simple_macro->key.l : key), data + simple_macro->func.l,
+			data + simple_macro->func_param.l + 1);
+
+	data[simple_macro->host.r + 1] = ':';
+	data[simple_macro->key.r + 1] = '.';
+	data[simple_macro->func_param.l] = '(';
+	data[simple_macro->func_param.r] = ')';
+out:
 	zbx_free(host);
 	zbx_free(key);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2433,10 +2491,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 {
 	const char		*__function_name = "substitute_simple_macros";
 
-	char			*p, c, *replace_to = NULL, sql[64];
+	char			c, *replace_to = NULL, sql[64];
 	const char		*m, *replace = NULL;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, func_macro,
-				found, raw_value;
+	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, found,
+				raw_value;
 	size_t			data_alloc, data_len, replace_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2468,10 +2526,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			found = zbx_token_find(*data, pos, &token, token_search))
 	{
 		indexed_macro = 0;
-		func_macro = 0;
 		require_numeric = 0;
-		/* temporarily reset function id to 0 before parsing possible indexed macros */
-		N_functionid = 0;
+		N_functionid = 1;
 		raw_value = 0;
 
 		switch (token.type)
@@ -2482,45 +2538,52 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				pos = token.token.r + 1;
 				continue;
 			case ZBX_TOKEN_MACRO:
-				p = *data + token.token.r - 1;
-				m = *data + token.token.l;
-				if ('1' <= *p && *p <= '9')
-					N_functionid = *p - '0';
+				if (0 == (indexed_macro = is_indexed_macro(*data, &token)))
+				{
+					/* Theoretically we could do m = macro_in_list() here as well to validate */
+					/* token and get unindexed macro equivalent, but it will be a double work */
+					/* since we will pass m through a lot of strcmp(m, MVAR_*) checks anyway, */
+					/* plus ex_macros is a long list. For now, we rely on this surgery. */
+					m = *data + token.token.l;
+					c = (*data)[token.token.r + 1];
+					(*data)[token.token.r + 1] = '\0';
+				}
+				else if (NULL == (m = macro_in_list(*data, token.token, ex_macros, &N_functionid)))
+				{
+					pos = token.token.r + 1;
+					continue;
+				}
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
-				p = *data + token.data.func_macro.macro.r - 1;
-				m = *data + token.data.func_macro.macro.l;
-				if ('1' <= *p && *p <= '9')
-					N_functionid = *p - '0';
+				indexed_macro = is_indexed_macro(*data, &token);
+				if (NULL == (m = macro_in_list(*data, token.data.func_macro.macro, mod_macros,
+						&N_functionid)))
+				{
+					/* Ignore functions with macros not supporting them, but do not skip the */
+					/* whole token, nested macro should be resolved in this case. */
+					pos++;
+					continue;
+				}
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				/* To avoid *data modification DCget_user_macro() should be replaced with a function */
+				/* that takes initial *data string and token.data.user_macro instead of m as params. */
+				m = *data + token.token.l;
+				c = (*data)[token.token.r + 1];
+				(*data)[token.token.r + 1] = '\0';
+				break;
+			case ZBX_TOKEN_SIMPLE_MACRO:
+			case ZBX_TOKEN_REFERENCE:
+				/* These macros (and probably all other in the future) must be resolved using only */
+				/* information stored in token.data union. For now, force crash if they rely on m. */
+				m = NULL;
 				break;
 			default:
-				m = *data + token.token.l;
+				THIS_SHOULD_NEVER_HAPPEN;
+				res = FAIL;
+				continue;
 		}
-
-		if (0 != N_functionid)
-		{
-			int	i, diff;
-
-			for (i = 0; NULL != ex_macros[i]; i++)
-			{
-				diff = zbx_mismatch(ex_macros[i], m);
-
-				if ('}' == ex_macros[i][diff] && '}' == m[diff + 1])
-				{
-					indexed_macro = 1;
-					m = ex_macros[i];
-					break;
-				}
-			}
-		}
-
-		/* reset functionid to its default value (first function) if this is not indexed macro */
-		if (0 == indexed_macro)
-			N_functionid = 1;
-
-		c = (*data)[token.token.r + 1];
-		(*data)[token.token.r + 1] = '\0';
 
 		ret = SUCCEED;
 
@@ -2538,6 +2601,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							c_event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.token.r;
+				}
+				else if (ZBX_TOKEN_SIMPLE_MACRO == token.type)
+				{
+					ret = get_trigger_function_value(c_event->trigger.expression, &replace_to,
+							*data, &token.data.simple_macro);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
@@ -2621,9 +2689,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid,
 							raw_value);
 				}
@@ -2679,9 +2746,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns, raw_value);
 				}
@@ -2783,11 +2849,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->value);
-				}
-				else
-				{
-					get_trigger_function_value(c_event->trigger.expression, &replace_to,
-							*data + token.token.l);
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -3444,15 +3505,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
 							raw_value);
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
@@ -3700,15 +3759,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.token.r;
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
 							raw_value);
 				}
-				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
-					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
@@ -3717,37 +3774,32 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
-			if (0 != func_macro)
-			{
-				if (SUCCEED != (ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
-						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
-						&replace_to)))
-				{
-					zbx_free(replace_to);
-				}
-			}
-			else
-			{
-				/* ignore functions with macros not supporting them */
+			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
 				zbx_free(replace_to);
-			}
 		}
 
 		if (1 == require_numeric && NULL != replace_to)
 		{
 			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+			{
 				wrap_negative_double_suffix(&replace_to, NULL);
+			}
 			else if (NULL != error)
-				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
+			{
+				zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
+						token.token.r - token.token.l + 1, *data + token.token.l);
+			}
 		}
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", *data + token.token.l);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'", token.token.r - token.token.l + 1,
+					*data + token.token.l);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
-		(*data)[token.token.r + 1] = c;
+		if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_MACRO == token.type && 0 == indexed_macro))
+			(*data)[token.token.r + 1] = c;
 
 		if (NULL != replace_to)
 		{
@@ -4408,74 +4460,63 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  * Purpose: trying to resolve the discovery macros in item key parameters     *
  *          in simple macros like {host:key[].func()}                         *
  *                                                                            *
- * Comments: This function could be improved by using zbx_token_simple_macro_t*
- *           structure host, key, func fields.                                *
- *                                                                            *
  ******************************************************************************/
 static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
-	char	*pl, *pr, *key = NULL, *replace_to = NULL;
-	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0, par_l, par_r;
+	char	*key = NULL, *replace_to = NULL, *dot, *params;
+	size_t	replace_to_offset = 0, replace_to_alloc = 128, lld_start, lld_end;
 	int	ret = FAIL;
 
-	pl = pr = *data + token->token.l;
-	pr++;	/* skip '{' */
-
-	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
-	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
-			0 == strncmp(pr, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2)) &&
-			('}' == pr[sz] || ('}' == pr[sz + 1] && '1' <= pr[sz] && pr[sz] <= '9')))
+	if ('{' == (*data)[token->data.simple_macro.host.l] &&
+			NULL == macro_in_list(*data, token->data.simple_macro.host, simple_host_macros, NULL))
 	{
-		pr += sz + ('}' == pr[sz] ? 1 : 2);
+		goto out;
 	}
-	else if (SUCCEED != parse_host(&pr, NULL))	/* a simple host name; e.g. "Zabbix server" */
-		return FAIL;
 
-	if (':' != *pr++)
-		return FAIL;
+	dot = *data + token->data.simple_macro.key.r + 1;
 
-	replace_to_alloc = 128;
+	if ('{' != (*data)[token->data.simple_macro.key.l])
+	{
+		/* extract key and substitute macros */
+		*dot = '\0';
+		key = zbx_strdup(key, *data + token->data.simple_macro.key.l);
+		substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		*dot = '.';
+	}
+	else if (NULL == macro_in_list(*data, token->data.simple_macro.key, simple_key_macros, NULL))
+		goto out;
+
 	replace_to = zbx_malloc(NULL, replace_to_alloc);
 
-	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
+	params = *data + token->data.simple_macro.func_param.l + 1;
 
-	/* an item key */
-	if (SUCCEED != get_item_key(&pr, &key))
-		goto clean;
+	if (NULL != key)
+	{
+		lld_start = token->data.simple_macro.key.l;
+		zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
+		zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, dot, params - dot);
+	}
+	else
+		lld_start = token->data.simple_macro.func_param.l + 1;
 
-	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
+	lld_end = token->data.simple_macro.func_param.r - 1;
 
-	zbx_free(key);
+	/* substitute macros in function parameters */
+	if (SUCCEED != substitute_function_lld_param(params, *data + lld_end - params + 1, 0, &replace_to,
+			&replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len))
+	{
+		goto out;
+	}
 
-	pl = pr;
+	/* replace LLD part in original string and adjust token boundary */
+	zbx_replace_string(data, lld_start, &lld_end, replace_to);
+	token->token.r += lld_end - (token->data.simple_macro.func_param.r - 1);
 
-	if ('.' != *pr++)
-		goto clean;
-
-	/* a trigger function with parameters */
-	if (SUCCEED != zbx_function_validate(pr, &par_l, &par_r))
-		goto clean;
-
-	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, par_l + 1 + (pr - pl));
-
-	ret = substitute_function_lld_param(pr + par_l + 1, par_r - (par_l + 1), 0,
-			&replace_to, &replace_to_alloc, &replace_to_offset, jp_row, error, max_error_len);
-
-	pl = pr + par_r;
-	pr += par_r + 1;
-
-	if (FAIL == ret || '}' != *pr++)
-		goto clean;
-
-	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
-
-	token->token.r = pr - *data - 1;
-	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
 	ret = SUCCEED;
-clean:
+out:
 	zbx_free(replace_to);
+	zbx_free(key);
 
 	return ret;
 }

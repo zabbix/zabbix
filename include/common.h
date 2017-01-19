@@ -1095,7 +1095,6 @@ char	*zbx_time2str(time_t time);
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
-int	zbx_mismatch(const char *s1, const char *s2);
 int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
@@ -1172,9 +1171,6 @@ int	is_snmp_type(unsigned char type);
 
 int	is_number_delimiter(unsigned char c);
 
-int	get_item_key(char **exp, char **key);
-
-int	parse_host(char **exp, char **host);
 int	parse_key(char **exp);
 
 int	parse_host_key(char *exp, char **host, char **key);
@@ -1242,7 +1238,7 @@ int	zbx_alarm_timed_out(void);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 
-/* {} tokens used in expressions */
+/* tokens used in expressions */
 #define ZBX_TOKEN_OBJECTID	0x0001
 #define ZBX_TOKEN_MACRO		0x0002
 #define ZBX_TOKEN_LLD_MACRO	0x0004
@@ -1302,6 +1298,8 @@ typedef struct
 	zbx_strloc_t	key;
 	/* function + parameters, for example avg(5m) */
 	zbx_strloc_t	func;
+	/* parameters, for example (5m) */
+	zbx_strloc_t	func_param;
 }
 zbx_token_simple_macro_t;
 

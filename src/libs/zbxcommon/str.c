@@ -784,100 +784,6 @@ int	zbx_check_hostname(const char *hostname, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_item_key                                                     *
- *                                                                            *
- * Purpose: return key with parameters (if present)                           *
- *                                                                            *
- *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
- *                                                                            *
- * Parameters: exp - [IN] pointer to the first char of key                    *
- *             key - [OUT] pointer to the resulted key                        *
- *                                                                            *
- *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
- *              ^                                                             *
- *                                                                            *
- * Return value: return SUCCEED and move exp to the next character after key  *
- *               or FAIL and move exp to incorrect character                  *
- *                                                                            *
- * Notes: implements the functionality of old parse_key() in a safe manner.   *
- *        input pointer is NOT advanced.                                      *
- *                                                                            *
- ******************************************************************************/
-int	get_item_key(char **exp, char **key)
-{
-	char	*p = *exp, c;
-
-	if (SUCCEED != parse_key(&p))
-		return FAIL;
-
-	if ('(' == *p)
-	{
-		for (p--; *exp < p && '.' != *p; p--)
-			;
-
-		if (*exp == p)	/* the key is empty */
-			return FAIL;
-	}
-
-	c = *p;
-	*p = '\0';
-	*key = zbx_strdup(NULL, *exp);
-	*p = c;
-
-	*exp = p;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: parse_host                                                       *
- *                                                                            *
- * Purpose: parse hostname                                                    *
- *                                                                            *
- *  e.g., Zabbix server                                                       *
- *                                                                            *
- * Parameters: exp - pointer to the first char of hostname                    *
- *             host - optional pointer to resulted hostname                   *
- *                                                                            *
- *  e.g., {Zabbix server:agent.ping.last(0)}                                  *
- *         ^                                                                  *
- *                                                                            *
- * Return value: return SUCCEED and move exp to the next char after hostname  *
- *               or FAIL and move exp at the failed character                 *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-int	parse_host(char **exp, char **host)
-{
-	char	*p, *s;
-
-	p = *exp;
-
-	for (s = *exp; SUCCEED == is_hostname_char(*s); s++)
-		;
-
-	*exp = s;
-
-	if (p == s)
-		return FAIL;
-
-	if (NULL != host)
-	{
-		char	c;
-
-		c = *s;
-		*s = '\0';
-		*host = strdup(p);
-		*s = c;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: parse_key                                                        *
  *                                                                            *
  * Purpose: advances pointer to first invalid character in string             *
@@ -2010,19 +1916,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-}
-
-int	zbx_mismatch(const char *s1, const char *s2)
-{
-	int	i = 0;
-
-	while (s1[i] == s2[i])
-	{
-		if ('\0' == s1[i++])
-			return FAIL;
-	}
-
-	return i;
 }
 
 int	cmp_key_id(const char *key_1, const char *key_2)
@@ -4372,6 +4265,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 
 	data->key = key_loc;
 	data->func = func_loc;
+	data->func_param = func_param;
 
 	return SUCCEED;
 }
