@@ -482,8 +482,7 @@ close:
 
 	if (SUCCEED != ret || NULL == output)
 		zbx_free(buffer);
-
-	if (NULL != output)
+	else
 		*output = buffer;
 
 	return ret;
