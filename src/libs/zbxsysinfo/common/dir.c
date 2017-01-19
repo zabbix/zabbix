@@ -78,14 +78,14 @@ static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int ma
 	{
 		item = (zbx_directory_item_t*)zbx_malloc(NULL, sizeof(zbx_directory_item_t));
 		item->depth = depth + 1;
-		item->path = path;
+		item->path = path;	/* 'path' changes ownership. Do not free 'path' in the caller. */
 
 		zbx_vector_ptr_append(list, item);
 
 		return SUCCEED;
 	}
 
-	return FAIL;
+	return FAIL;		/* 'path' did not go into 'list' - don't forget to free 'path' in the caller */
 }
 
 /******************************************************************************
@@ -285,7 +285,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&list);
 
-	queue_directory(&list, dir, -1, max_depth);	/* put top directory into list */
+	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
+		dir = NULL;
+	else
+		goto err2;
 
 	while (0 < list.values_num)
 	{
@@ -343,22 +346,22 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		do
 		{
-			char	*path = NULL;
+			char	*path;
 
 			if (0 == wcscmp(data.name, L".") || 0 == wcscmp(data.name, L".."))
 				continue;
 
 			name = zbx_unicode_to_utf8(data.name);
-			path = zbx_dsprintf(path, "%s/%s", item->path, name);
+			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 
-			if (0 == (data.attrib & _A_SUBDIR))
+			if (0 == (data.attrib & _A_SUBDIR))	/* not a directory */
 			{
 				if (0 != filename_matches(name, regex_incl, regex_excl))
 				{
 					DWORD	size_high, size_low;
 
 					wpath = zbx_utf8_to_unicode(path);
-					zbx_free(path);
+
 					/* GetCompressedFileSize gives more accurate result than zbx_stat for */
 					/* compressed files */
 					size_low = GetCompressedFileSize(wpath, &size_high);
@@ -376,13 +379,11 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					}
 					zbx_free(wpath);
 				}
+				zbx_free(path);
 			}
-			else
+			else if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
 			{
-				if (SUCCEED == queue_directory(&list, path, item->depth, max_depth))
-					path = NULL;
-				else
-					zbx_free(path);
+				zbx_free(path);
 			}
 
 			zbx_free(name);
@@ -405,6 +406,7 @@ err2:
 	list_vector_destroy(&list);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
+	zbx_free(dir);
 
 	return ret;
 }
@@ -412,7 +414,7 @@ err1:
 static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "vfs_dir_size";
-	char			*dir = NULL, *path = NULL;
+	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		size = 0;
 	zbx_vector_ptr_t	list, descriptors;
@@ -429,7 +431,10 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
-	queue_directory(&list, dir, -1, max_depth);	/* put top directory into list */
+	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
+		dir = NULL;
+	else
+		goto err2;
 
 	/* on UNIX count top directory size */
 
@@ -463,10 +468,12 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (NULL != (entry = readdir(directory)))
 		{
+			char	*path;
+
 			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
 				continue;
 
-			path = zbx_dsprintf(path, "%s/%s", item->path, entry->d_name);
+			path = zbx_dsprintf(NULL, "%s/%s", item->path, entry->d_name);
 
 			if (0 == lstat(path, &status))
 			{
@@ -487,6 +494,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 								compare_descriptors) )
 						{
 							zbx_free(file);
+							zbx_free(path);
 							continue;
 						}
 
@@ -508,16 +516,17 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 					}
 				}
 
-				if (0 != S_ISDIR(status.st_mode) && SUCCEED == queue_directory(&list, path, item->depth,
-						max_depth))
+				if (!(0 != S_ISDIR(status.st_mode) && SUCCEED == queue_directory(&list, path,
+						item->depth, max_depth)))
 				{
-					path = NULL;
+					zbx_free(path);
 				}
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot process directory entry '%s': %s",
 						__function_name, path, zbx_strerror(errno));
+				zbx_free(path);
 			}
 		}
 
@@ -532,7 +541,6 @@ skip:
 err2:
 	list_vector_destroy(&list);
 	descriptors_vector_destroy(&descriptors);
-	zbx_free(path);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl);
 	zbx_free(dir);
