@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -300,6 +300,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'publickey', 'privatekey', 'flags', 'port', 'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
+		'selectPreprocessing' => ['type', 'params'],
 		'itemids' => $src_itemids
 	]);
 

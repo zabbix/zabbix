@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -885,16 +885,6 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('preprocessing', $item)) {
 			if (!is_array($item['preprocessing'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if ($method === 'create' && !$item['preprocessing']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'preprocessing', _('cannot be empty'))
-				);
-			}
-			elseif ($method === 'update' && !$item['preprocessing']) {
-				// In case we want do delete item pre-processing by giving an empty array for update method.
-				return;
 			}
 
 			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types())]);

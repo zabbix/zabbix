@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+...G....S. [ZBXNEXT-1380] added check for exit code of scripts (vjaceslavs)
 A......... [ZBX-3783] deprecated mappings.sortorder parameter by iconmap.create() and iconmap.update() methods (Sasha)
 A.F.I..PS. [ZBXNEXT-1443] added item pre-processing options (wiper, Ivo)
 ..F....... [ZBXNEXT-830] implemented full clone of maps (Cemeris, Sasha)
@@ -35,6 +36,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
@@ -349,6 +351,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
