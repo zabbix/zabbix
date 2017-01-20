@@ -2580,6 +2580,16 @@ $form-icon-btn: (
 			}
 		}
 	}
+
+	.debug-output {
+		margin: 10px 10px 0 10px;
+		max-height: 300px;
+		border-color: $table-border-color;
+	}
+
+	.msg-good, .msg-bad {
+		margin: 0 10px;
+	}
 }
 
 .dashbrd-grid-widget {
@@ -2590,6 +2600,7 @@ $form-icon-btn: (
 .dashbrd-grid-widget-head {
 	position: relative;
 	padding: 8px 40px 8px 10px;
+	min-height: 16px;
 
 	h4 {
 		color: h4-widget-color($font-color);
