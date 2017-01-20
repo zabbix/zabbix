@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
@@ -318,6 +319,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
@@ -1926,6 +1928,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 .......PS. [ZBX-9889,ZBX-11674] fixed vmware.eventlog item values to have unique timestamps in history table (dimir)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
 .......PS. [ZBX-11481] fixed resolving macros for ip and dns fields in interfaces that are linked to main interface with {HOST.IP} and {HOST.DNS} macros (Sergejs)

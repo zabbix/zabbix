@@ -826,6 +826,9 @@ int	zbx_db_begin(void)
 int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
+#ifdef HAVE_ORACLE
+	sword	err;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -835,10 +838,7 @@ int	zbx_db_commit(void)
 	}
 
 	if (1 == txn_error)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
-		return zbx_db_rollback();
-	}
+		goto rollback;
 
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
@@ -854,16 +854,25 @@ int	zbx_db_commit(void)
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
-	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#elif defined(HAVE_SQLITE3)
+	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
+#endif
+
+	if (ZBX_DB_FAIL == rc)
+	{
+rollback:
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+		return zbx_db_rollback();
+	}
+
+#ifdef HAVE_SQLITE3
 	zbx_mutex_unlock(&sqlite_access);
 #endif
 
-	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -881,6 +890,9 @@ int	zbx_db_commit(void)
 int	zbx_db_rollback(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
+#ifdef HAVE_ORACLE
+	sword	err;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -911,7 +923,8 @@ int	zbx_db_rollback(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
-	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
 	zbx_mutex_unlock(&sqlite_access);
