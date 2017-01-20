@@ -3770,7 +3770,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
+static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
 {
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))

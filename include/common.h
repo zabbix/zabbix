@@ -1222,7 +1222,6 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
