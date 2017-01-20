@@ -2555,15 +2555,62 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	padding: .5rem;
+	//padding: .5rem;
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+
+	.list-table {
+		border: none;
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+
+		td {
+			@extend %dashbrd-widget-td;
+		}
+
+		tbody tr {
+
+			&:last-child td {
+				border-bottom: 1px solid $table-border-color;
+			}
+		}
+	}
 }
 
 .dashbrd-grid-widget {
 	display: flex;
 	position: absolute;
+}
+
+.dashbrd-grid-widget-head {
+	position: relative;
+	padding: 8px 40px 8px 10px;
+
+	h4 {
+		color: h4-widget-color($font-color);
+		font-weight: bold;
+	}
+
+	ul {
+		position: absolute;
+		top: 0;
+		right: 0;
+
+		li {
+			display: block;
+			float: left;
+			padding: 0;
+
+			select {
+				margin: 4px 0;
+			}
+		}
+	}
 }
 
 .ui-resize-dot {
