@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
-	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
+		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
+	],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'width' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Height')],
@@ -201,6 +203,23 @@ if (hasRequest('add') || hasRequest('update')) {
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
+		if (getRequest('form') === 'full_clone') {
+			$clone_maps = API::Map()->get([
+				'output' => [],
+				'selectSelements' => ['selementid', 'elementid', 'elementtype', 'iconid_off', 'iconid_on', 'label',
+					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
+					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+				],
+				'selectLinks' => ['selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers'],
+				'sysmapids' => $sysmap['sysmapid']
+			]);
+
+			if ($clone_maps) {
+				$map['selements'] = $clone_maps[0]['selements'];
+				$map['links'] = $clone_maps[0]['links'];
+			}
+		}
+
 		$result = API::Map()->create($map);
 
 		$messageSuccess = _('Network map added');

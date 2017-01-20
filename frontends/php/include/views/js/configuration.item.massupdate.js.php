@@ -23,13 +23,28 @@
 		</td>
 	</tr>
 </script>
+<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
+	<?=
+		(new CRow([
+			(new CCol(
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
+			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+				->setAttribute('placeholder', _('number')),
+			(new CTextBox('preprocessing[#{rowNum}][params][1]'))
+				->setAttribute('placeholder', _('output'))
+				->addStyle('display: none;'),
+			(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))
+			->addClass('sortable')
+			->toString()
+	?>
+	</script>
 <script type="text/javascript">
 	jQuery(function($) {
-		var multpStat = document.getElementById('multiplier');
-		if (multpStat && multpStat.onclick) {
-			multpStat.onclick();
-		}
-
 		$('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
@@ -67,5 +82,86 @@
 		$('#delayFlexTable').dynamicRows({
 			template: '#delayFlexRow'
 		});
+
+		var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
+			preprocessing = $('#preprocessing');
+
+		preprocessing.sortable({
+			disabled: (preprocessing.find('tr.sortable') < 2),
+			items: 'tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			containment: 'parent',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			helper: function(e, ui) {
+				ui.children().each(function() {
+					var td = $(this);
+
+					td.width(td.width());
+				});
+
+				return ui;
+			},
+			start: function(e, ui) {
+				$(ui.placeholder).height($(ui.helper).height());
+			}
+		});
+
+		preprocessing
+			.on('click', '.element-table-add', function() {
+				var row = $(this).parent().parent();
+				row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('tr.sortable').length}));
+
+				if (preprocessing.find('tr.sortable').length > 1) {
+					preprocessing.sortable('enable');
+				}
+			})
+			.on('click', '.element-table-remove', function() {
+				var row = $(this).parent().parent();
+				row.remove();
+
+				if (preprocessing.find('tr.sortable').length < 2) {
+					preprocessing.sortable('disable');
+				}
+			})
+			.on('change', 'select[name*="type"]', function() {
+				var inputs = $(this).parent().parent().find('[name*="params"]');
+
+				switch ($(this).val()) {
+					case '<?= ZBX_PREPROC_MULTIPLIER ?>':
+						$(inputs[0])
+							.show()
+							.attr('placeholder', '<?= _('number') ?>');
+						$(inputs[1]).hide();
+						break;
+
+					case '<?= ZBX_PREPROC_RTRIM ?>':
+					case '<?= ZBX_PREPROC_LTRIM ?>':
+					case '<?= ZBX_PREPROC_TRIM ?>':
+						$(inputs[0])
+							.show()
+							.attr('placeholder', '<?= _('list of characters') ?>');
+						$(inputs[1]).hide();
+						break;
+
+					case '<?= ZBX_PREPROC_REGSUB ?>':
+						$(inputs[0])
+							.show()
+							.attr('placeholder', '<?= _('pattern') ?>');
+						$(inputs[1]).show();
+						break;
+
+					case '<?= ZBX_PREPROC_BOOL2DEC ?>':
+					case '<?= ZBX_PREPROC_OCT2DEC ?>':
+					case '<?= ZBX_PREPROC_HEX2DEC ?>':
+					case '<?= ZBX_PREPROC_DELTA_VALUE ?>':
+					case '<?= ZBX_PREPROC_DELTA_SPEED ?>':
+						$(inputs[0]).hide();
+						$(inputs[1]).hide();
+						break;
+				}
+			});
 	});
 </script>

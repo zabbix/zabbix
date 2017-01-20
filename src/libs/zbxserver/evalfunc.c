@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2864,6 +2864,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeroes(value);
+			/* break; is not missing here */
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
 				add_value_suffix(value, max_len, units, value_type);

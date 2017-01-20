@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,6 +170,8 @@ struct	_DC_TRIGGER;
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 
 #define PROXY_DHISTORY_VALUE_LEN	255
+
+#define ITEM_PREPROC_PARAMS_LEN		255
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"

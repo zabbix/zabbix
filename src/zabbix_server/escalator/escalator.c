@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -783,20 +783,21 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			script.execute_on = (unsigned char)atoi(row[4]);
 
-		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT != script.type || ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		ZBX_STR2UINT64(host.hostid, row[0]);
+
+		if (0 != host.hostid)
 		{
-			ZBX_STR2UINT64(host.hostid, row[0]);
-
-			if (0 != host.hostid)
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
+				goto skip;
+			}
 
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-				strscpy(host.host, row[1]);
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			strscpy(host.host, row[1]);
+
+			if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+			{
 				host.tls_connect = (unsigned char)atoi(row[12]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[13]);
@@ -811,16 +812,16 @@ static void	execute_commands(const DB_EVENT *event, zbx_uint64_t actionid, zbx_u
 				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+		}
+		else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+		{
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
-
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+				goto skip;
 			}
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 		}
 
 		if (SUCCEED == rc)
@@ -1536,7 +1537,8 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
 	errcodes = zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+			ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
 
@@ -1641,7 +1643,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
 			/* item disabled or deleted? */
-			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
+			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1,
+					ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 			if (SUCCEED != errcode)
 			{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 	DC_ITEM		item;
 	int		errcode, ret = SUCCEED;
 
-	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	if (SUCCEED != errcode)
 	{

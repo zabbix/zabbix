@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1329,6 +1329,53 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
 #define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+
+#define ZBX_PREPROC_MULTIPLIER		1
+#define ZBX_PREPROC_RTRIM		2
+#define ZBX_PREPROC_LTRIM		3
+#define ZBX_PREPROC_TRIM		4
+#define ZBX_PREPROC_REGSUB		5
+#define ZBX_PREPROC_BOOL2DEC		6
+#define ZBX_PREPROC_OCT2DEC		7
+#define ZBX_PREPROC_HEX2DEC		8
+#define ZBX_PREPROC_DELTA_VALUE		9
+#define ZBX_PREPROC_DELTA_SPEED 	10
+
+zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
+
+typedef union
+{
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_variant_data_t;
+
+typedef struct
+{
+	unsigned char		type;
+	zbx_variant_data_t	data;
+}
+zbx_variant_t;
+
+#define ZBX_VARIANT_NONE	0
+#define ZBX_VARIANT_STR		1
+#define ZBX_VARIANT_DBL		2
+#define ZBX_VARIANT_UI64	3
+
+void	zbx_variant_clear(zbx_variant_t *value);
+void	zbx_variant_set_none(zbx_variant_t *value);
+void	zbx_variant_set_str(zbx_variant_t *value, char *text);
+void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
+void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
+int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
+
+int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_variant_value_desc(const zbx_variant_t *value);
+const char	*zbx_variant_type_desc(const zbx_variant_t *value);
+
+int	zbx_validate_value_dbl(double value);
 
 #endif
 

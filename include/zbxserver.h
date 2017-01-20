@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #define MACRO_TYPE_ITEM_KEY		0x00000040
 #define MACRO_TYPE_ITEM_EXPRESSION	0x00000080
 #define MACRO_TYPE_INTERFACE_ADDR	0x00000100
-#define MACRO_TYPE_INTERFACE_ADDR_DB	0x00000200
 #define MACRO_TYPE_COMMON		0x00000400
 #define MACRO_TYPE_PARAMS_FIELD		0x00000800
 #define MACRO_TYPE_SCRIPT		0x00001000

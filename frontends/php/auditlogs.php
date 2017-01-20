@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'action' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null],
-	'resourcetype' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 31), null],
+	'resourcetype' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 32), null],
 	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'alias' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,14 +85,16 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 	$screen = getSlideshowScreens($elementId, getRequest('upd_counter'));
 
 	// display screens
-	$dbScreens = API::Screen()->get([
-		'screenids' => $screen['screenid'],
-		'output' => API_OUTPUT_EXTEND,
-		'selectScreenItems' => API_OUTPUT_EXTEND
-	]);
+	$dbScreens = $screen
+		? API::Screen()->get([
+			'screenids' => $screen['screenid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND
+		])
+		: [];
 
 	if (!$dbScreens) {
-		insert_js('alert("'._('No permissions').'");');
+		echo (new CTableInfo());
 	}
 	else {
 		$dbScreen = reset($dbScreens);

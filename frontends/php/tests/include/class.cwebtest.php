@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -613,6 +613,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		while ($row = DBfetch($result)) {
 			$this->zbxTestTextNotPresent($row['host']);
 		}
+	}
+
+	public function zbxTestWaitForPageToLoad() {
+		$this->webDriver->wait(10, 2000)->until(function () {
+			return $this->webDriver->executeScript("return document.readyState;") == "complete";
+			}
+		);
 	}
 
 }
