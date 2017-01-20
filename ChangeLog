@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
 .......PS. [ZBX-11584] fixed selection of ntext data from Microsoft SQL Server using 'db.odbc.select' item key (Sergejs)
 ..F....... [ZBX-11492] fixed copying sharing properties while cloning slide shows (Cemeris, Sasha)
