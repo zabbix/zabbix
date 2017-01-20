@@ -46,10 +46,8 @@
  ******************************************************************************/
 static int	filename_matches(const char *fname, const regex_t *regex_incl, const regex_t *regex_excl)
 {
-	return ((regex_incl == NULL ||
-			0 == zbx_regexp_match_precompiled(fname, regex_incl)) &&
-			(regex_excl == NULL ||
-			0 != zbx_regexp_match_precompiled(fname, regex_excl)));
+	return ((NULL == regex_incl || 0 == zbx_regexp_match_precompiled(fname, regex_incl)) &&
+			(NULL == regex_excl || 0 != zbx_regexp_match_precompiled(fname, regex_excl)));
 }
 
 /******************************************************************************
