@@ -58,6 +58,16 @@ static size_t		max_buffer_len;	/* error message buffer size */
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check whether the character delimits a numeric token              *
+ *                                                                            *
+ ******************************************************************************/
+int	is_number_delimiter(char c)
+{
+	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: check whether the character delimits a symbolic operator token    *
  *                                                                            *
  ******************************************************************************/
@@ -74,7 +84,6 @@ static int	is_operator_delimiter(char c)
 static double	evaluate_number(int *unknown_idx)
 {
 	double		result;
-	zbx_uint64_t	factor;
 	int		len;
 
 	/* Is it a special token of unknown value (e.g. ZBX_UNKNOWN0, ZBX_UNKNOWN1) ? */
@@ -103,9 +112,9 @@ static double	evaluate_number(int *unknown_idx)
 		return ZBX_INFINITY;
 	}
 
-	if (SUCCEED == zbx_number_parse(ptr, &len, &factor))
+	if (SUCCEED == zbx_number_parse(ptr, &len) && SUCCEED == is_number_delimiter(*(ptr + len)))
 	{
-		result = atof(ptr) * (double)factor;
+		result = atof(ptr) * suffix2factor(*(ptr + len - 1));
 		ptr += len;
 	}
 	else

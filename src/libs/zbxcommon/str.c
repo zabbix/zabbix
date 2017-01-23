@@ -4515,24 +4515,12 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether the character delimits a numeric token              *
- *                                                                            *
- ******************************************************************************/
-int	is_number_delimiter(unsigned char c)
-{
-	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_number_parse                                                 *
  *                                                                            *
  * Purpose: parse a suffixed number like "12.345K"                            *
  *                                                                            *
  * Parameters: number - [IN] start of number                                  *
  *             len    - [OUT] length of parsed number                         *
- *             factor - [IN] number can contain suffix which will be          *
- *                           translated to factor                             *
  *                                                                            *
  * Return value: SUCCEED - the number was parsed successfully                 *
  *               FAIL    - invalid number                                     *
@@ -4542,16 +4530,15 @@ int	is_number_delimiter(unsigned char c)
  *           beginning of the expression.                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor)
+int	zbx_number_parse(const char *number, int *len)
 {
 	int	digits = 0, dots = 0;
 
-	*factor = 1;
 	*len = 0;
 
 	while (1)
 	{
-		if (0 != isdigit((unsigned char)number[*len]))
+		if (0 != isdigit(number[*len]))
 		{
 			(*len)++;
 			digits++;
@@ -4568,15 +4555,10 @@ int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor)
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
-		if (0 != isalpha((unsigned char)number[*len]))
-		{
-			if (NULL == strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-				return FAIL;
+		if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+			(*len)++;
 
-			*factor = suffix2factor(number[(*len)++]);
-		}
-
-		return is_number_delimiter(number[*len]);
+		return SUCCEED;
 	}
 }
 
@@ -4603,7 +4585,6 @@ int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor)
 int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 {
 	const char	*s, *e;
-	zbx_uint64_t	factor;
 	int		len;
 
 	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
@@ -4618,12 +4599,33 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		if (SUCCEED != zbx_number_parse(s, &len, &factor))
+		if (SUCCEED != zbx_number_parse(s, &len))
 			continue;
 
 		/* number found */
-		number_loc->l = s - str;
+
 		number_loc->r = s + len - str - 1;
+
+		/* check for minus before number */
+		if (s > str + pos && '-' == *(s - 1))
+		{
+			/* and make sure it's unary */
+			if (s - 1 > str)
+			{
+				e = s - 2;
+
+				if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
+					e--;
+
+				/* check that minus is not preceded by function, parentheses or (suffixed) number */
+				if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
+					s--;
+			}
+			else	/* nothing before minus, it's definitely unary */
+				s--;
+		}
+
+		number_loc->l = s - str;
 
 		return SUCCEED;
 	}

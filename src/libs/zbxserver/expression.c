@@ -185,6 +185,26 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_expanded_expression                                          *
+ *                                                                            *
+ * Purpose: get trigger expression with expanded user macros                  *
+ *                                                                            *
+ * Comments: removes ' ', '\r', '\n' and '\t' for easier number search        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*get_expanded_expression(const char *expression)
+{
+	char	*expression_ex;
+
+	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression, NULL)))
+		zbx_remove_whitespace(expression_ex);
+
+	return expression_ex;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_trigger_expression_constant                                  *
  *                                                                            *
  * Purpose: get constant from a trigger expression corresponding a given      *
@@ -3407,7 +3427,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					/* try to expand trigger expression if it hasn't been done yet */
 					if (NULL == expression && NULL == (expression =
-							DCexpression_expand_user_macros(event->trigger.expression, NULL)))
+							get_expanded_expression(event->trigger.expression)))
 					{
 						/* expansion failed, reference substitution is impossible */
 						token_search = ZBX_TOKEN_SEARCH_BASIC;

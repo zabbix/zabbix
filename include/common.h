@@ -1171,15 +1171,13 @@ int	is_discovery_macro(const char *name);
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
-int	is_number_delimiter(unsigned char c);
-
 int	parse_key(char **exp);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
 
-int	zbx_number_parse(const char *number, int *len, zbx_uint64_t *factor);
+int	zbx_number_parse(const char *number, int *len);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
