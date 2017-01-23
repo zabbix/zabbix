@@ -225,9 +225,8 @@
 		});
 	}
 
-	function updateWidgetContent($div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
-			url = new Curl('zabbix.php');
+	function updateWidgetContent(widget) {
+		var url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'widget.' + widget.widgetid + '.view')
 		url.setArgument('output', 'ajax');
@@ -237,7 +236,7 @@
 			method: 'GET',
 			dataType: 'json',
 			success: function(resp) {
-				var $content_div = $('.dashbrd-grid-widget-content', $div);
+				var $content_div = $('.dashbrd-grid-widget-content', widget['div']);
 
 				$content_div.empty();
 
@@ -287,7 +286,15 @@
 		},
 
 		addWidget: function(params) {
-			params = $.extend({}, {'widgetid': '', 'pos': {'row': 0, 'col': 0, 'height': 1, 'width': 1}}, params);
+			params = $.extend({}, {
+				'widgetid': '',
+				'pos': {
+					'row': 0,
+					'col': 0,
+					'height': 1,
+					'width': 1
+				}
+			}, params);
 
 			return this.each(function() {
 				var	$this = $(this),
@@ -325,7 +332,7 @@
 
 				$this.append($div);
 
-				updateWidgetContent($div, data);
+				updateWidgetContent(params);
 
 				$div.draggable({
 					start: function(event, ui) {
