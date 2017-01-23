@@ -473,45 +473,6 @@ void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_delete_tasks                                              *
- *                                                                            *
- * Purpose: deletes tasks from database                                       *
- *                                                                            *
- * Parameters: tasks  - [IN] the tasks                                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tm_delete_tasks(zbx_vector_ptr_t *tasks)
-{
-	const char		*__function_name = "zbx_tm_delete_tasks";
-	zbx_vector_uint64_t	taskids;
-	int			i;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&taskids);
-
-	for (i = 0; i < tasks->values_num; i++)
-	{
-		zbx_tm_task_t	*task = (zbx_tm_task_t *)tasks->values[i];
-		zbx_vector_uint64_append(&taskids, task->taskid);
-	}
-
-	zbx_vector_uint64_sort(&taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from task where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids.values, taskids.values_num);
-	DBexecute("%s", sql);
-	zbx_free(sql);
-
-	zbx_vector_uint64_destroy(&taskids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: tm_json_serialize_task                                           *
  *                                                                            *
  * Purpose: serializes common task data in json format                        *
@@ -573,7 +534,7 @@ static void	tm_json_serialize_remote_command_result(struct zbx_json *json,
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_json_serialize_remote_command                                 *
+ * Function: zbx_tm_json_serialize_tasks                                      *
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
  *                                                                            *

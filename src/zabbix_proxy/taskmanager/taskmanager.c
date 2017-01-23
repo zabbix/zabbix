@@ -27,7 +27,8 @@
 
 #include "../../zabbix_server/scripts/scripts.h"
 
-#define ZBX_TASKMANAGER_TIMEOUT		5
+#define ZBX_TM_PROCESS_PERIOD		5
+#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -66,7 +67,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, 0, 0, 0);
+		task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 
 		if (0 != ttl && clock + ttl < now)
 		{
@@ -113,7 +114,7 @@ finish:;
 
 	DBfree_result(result);
 
-	DBexecute("delete from task where taskid=" ZBX_FS_UI64, taskid);
+	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 	DBcommit();
 
@@ -171,8 +172,25 @@ static int	tm_process_tasks(int now)
 	return processed_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_remove_old_tasks                                              *
+ *                                                                            *
+ * Purpose: remove old done/expired tasks                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_remove_old_tasks(int now)
+{
+	DBbegin();
+	DBexecute("delete from task where status in (%d,%d) and clock<=%d",
+			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
+	DBcommit();
+}
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
+	static int	cleanup_time = 0;
+
 	double	sec1, sec2;
 	int	tasks_num = 0, sleeptime, nextcheck;
 
@@ -189,7 +207,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	sec1 = zbx_time();
 	sec2 = sec1;
 
-	sleeptime = ZBX_TASKMANAGER_TIMEOUT - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT;
+	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
@@ -202,10 +220,17 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
 		sec1 = zbx_time();
+
 		tasks_num = tm_process_tasks((int)sec1);
+		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
+		{
+			tm_remove_old_tasks((int)sec1);
+			cleanup_time = sec1;
+		}
+
 		sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_TASKMANAGER_TIMEOUT + ZBX_TASKMANAGER_TIMEOUT;
+		nextcheck = (int)sec1 - (int)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
 		if (0 > (sleeptime = nextcheck - (int)sec2))
 			sleeptime = 0;

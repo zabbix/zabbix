@@ -208,7 +208,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		if (0 != tasks.values_num)
 		{
-			zbx_tm_delete_tasks(&tasks);
+			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
 			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 		}
 
@@ -283,7 +283,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		if (0 != tasks.values_num)
 		{
-			zbx_tm_delete_tasks(&tasks);
+			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
 			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 		}
 

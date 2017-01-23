@@ -169,7 +169,7 @@ static int	DBpatch_3030016(void)
 
 static int	DBpatch_3030017(void)
 {
-	return DBcreate_index("task", "task_1", "proxy_hostid,status,type", 0);
+	return DBcreate_index("task", "task_1", "status,proxy_hostid", 0);
 }
 
 static int	DBpatch_3030018(void)

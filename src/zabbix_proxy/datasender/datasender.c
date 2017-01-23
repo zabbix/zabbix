@@ -153,7 +153,7 @@ static int	proxy_data_sender(int *more, int now)
 
 				if (0 != (flags & ZBX_DATASENDER_TASKS))
 				{
-					zbx_tm_delete_tasks(&tasks);
+					zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
 					zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 				}
 
