@@ -921,7 +921,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 		/* substitute LLD macros in the part of the string preceding function parameters */
 
 		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
-		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, NULL, error, max_error_len))
+		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
 			goto out;
 
 		tmp_offset = strlen(tmp);
@@ -946,7 +946,7 @@ static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
 	/* substitute LLD macros in the remaining part */
 
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
-	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, NULL, error, max_error_len))
+	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
 		goto out;
 
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
@@ -1002,7 +1002,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-	substitute_lld_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
@@ -1011,7 +1011,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
 	item->units_orig = NULL;
-	substitute_lld_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->units, ZBX_WHITESPACE);
 
 	item->params = zbx_strdup(NULL, item_prototype->params);
@@ -1023,13 +1023,13 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 			ret = substitute_formula_macros(&item->params, jp_row, err, sizeof(err));
 	}
 	else
-		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 	item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
 	item->ipmi_sensor_orig = NULL;
-	substitute_lld_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
@@ -1039,7 +1039,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->description = zbx_strdup(NULL, item_prototype->description);
 	item->description_orig = NULL;
-	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->description, ZBX_WHITESPACE);
 
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -1081,7 +1081,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -1108,7 +1108,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->units);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->units, buffer))
 	{
@@ -1139,7 +1139,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 	else
 	{
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 != strcmp(item->params, buffer))
@@ -1152,7 +1152,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ipmi_sensor);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ipmi_sensor, buffer))
 	{
@@ -1174,7 +1174,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->description);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->description, buffer))
 	{
@@ -2844,7 +2844,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->application_discoveryid = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
-		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(application->name, ZBX_WHITESPACE);
 
 		application->name_proto = zbx_strdup(NULL, application_prototype->name);
@@ -2864,7 +2864,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 		{
 			buffer = zbx_strdup(NULL, application_prototype->name);
-			substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+			substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 != strcmp(application->name, buffer))
@@ -2918,7 +2918,7 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 			lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
 			buffer = zbx_strdup(buffer, application->name_proto);
-			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 == strcmp(application->name, buffer))

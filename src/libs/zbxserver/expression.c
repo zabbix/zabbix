@@ -2209,14 +2209,18 @@ static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const cha
 		/* strloc either fully matches macro... */
 		if ('\0' == *m)
 		{
-			*N_functionid = 1;
+			if (NULL != N_functionid)
+				*N_functionid = 1;
+
 			break;
 		}
 
 		/* ...or there is a mismatch, check if it's in a pre-last character and it's an index */
 		if (i == strloc.r - 1 && '1' <= str[i] && str[i] <= '9' && str[i + 1] == *m && '\0' == *(m + 1))
 		{
-			*N_functionid = str[i] - '0';
+			if (NULL != N_functionid)
+				*N_functionid = str[i] - '0';
+
 			break;
 		}
 	}
@@ -4553,7 +4557,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, struct zbx
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
 	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
-	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, NULL, 0);
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -4564,48 +4568,6 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, struct zbx
 
 	zbx_free(context_esc);
 	zbx_free(context);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: validate_func_macro                                              *
- *                                                                            *
- * Purpose: checks if the function macro located at token contains supported  *
- *          macro                                                             *
- *                                                                            *
- * Parameters: expression  - [IN] the expression containing function macro    *
- *             token       - [IN] the token with function macro location data *
- *             func_macros - [IN] NULL terminated array of supported macro    *
- *                                names without enclosing brackets            *
- *                                                                            *
- * Return value: SUCCEED - the function macro is supported                    *
- *               FAIL    - the function macro is not supported                *
- *                                                                            *
- ******************************************************************************/
-int	validate_func_macro(const char *expression, zbx_token_t *token, const char **func_macros)
-{
-	const char	*macro;
-	size_t		len;
-
-	if (NULL == func_macros)
-		return SUCCEED;
-
-	macro = expression + token->data.func_macro.macro.l + 1;
-
-	for (; NULL != *func_macros; func_macros++)
-	{
-		len = strlen(*func_macros);
-
-		if (0 != strncmp(macro, *func_macros, len))
-			continue;
-
-		if ('}' != macro[len] && (0 == isdigit(macro[len]) || '}' != macro[len + 1]))
-			continue;
-
-		return SUCCEED;
-	}
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -4666,10 +4628,6 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
  *                            skipped (lld macros inside function macros will *
  *                            be ignored) for macros specified in func_macros *
  *                            array                                           *
- *             func_macros - [IN] an optional NULL terminated array of macros *
- *                            supporting functions. This array is used when   *
- *                            ZBX_MACRO_FUNC flag is specified to determine   *
- *                            if a function macro is supported.               *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
  *             max_error_len - [IN] the size of error buffer                  *
@@ -4681,8 +4639,7 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags, const char **func_macros,
-		char *error, size_t max_error_len)
+int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_lld_macros";
 
@@ -4711,7 +4668,7 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
+					if (NULL != macro_in_list(*data, token.data.func_macro.macro, mod_macros, NULL))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, error, max_error_len);
 						pos = token.token.r;
@@ -4770,7 +4727,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
 				param, macro_type, NULL, 0);
 	else
-		substitute_lld_macros(param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
 	{
@@ -4932,7 +4889,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 				param = key;
 		}
 		else
-			substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+			substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 		if (SUCCEED != zbx_function_param_quote(&param, quoted))
 		{

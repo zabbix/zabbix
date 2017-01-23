@@ -585,7 +585,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			continue;
 
 		buffer = zbx_strdup(buffer, host->host_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(host->host, buffer))
@@ -602,10 +602,10 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->ts_delete = 0;
 		host->host = zbx_strdup(NULL, host_proto);
 		host->host_orig = NULL;
-		substitute_lld_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(host->host, ZBX_WHITESPACE);
 		host->name = zbx_strdup(NULL, name_proto);
-		substitute_lld_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(host->name, ZBX_WHITESPACE);
 		host->name_orig = NULL;
 		zbx_vector_uint64_create(&host->new_groupids);
@@ -624,14 +624,14 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		{
 			host->host_orig = host->host;
 			host->host = zbx_strdup(NULL, host_proto);
-			substitute_lld_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+			substitute_lld_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
 			zbx_lrtrim(host->host, ZBX_WHITESPACE);
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(host->name, buffer))
 		{
@@ -918,7 +918,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 			continue;
 
 		buffer = zbx_strdup(buffer, group->name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(group->name, buffer))
@@ -930,7 +930,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		/* trying to find an already existing group */
 
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		for (i = 0; i < groups->values_num; i++)
@@ -956,7 +956,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		zbx_vector_ptr_create(&group->hosts);
 		group->name_proto = NULL;
 		group->name = zbx_strdup(NULL, name_proto);
-		substitute_lld_macros(&group->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&group->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(group->name, ZBX_WHITESPACE);
 		group->name_orig = NULL;
 		group->lastcheck = 0;
@@ -972,7 +972,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 
 		/* group name */
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(group->name, buffer))
 		{
