@@ -391,12 +391,6 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-			if (ZBX_SCRIPT_EXECUTE_ON_PROXY == script->execute_on && 0 == host->proxy_hostid)
-			{
-				zbx_snprintf(error, max_error_len, "Cannot execute script on proxy: "
-						"host is not monitored by a proxy.");
-				return FAIL;
-			}
 			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
