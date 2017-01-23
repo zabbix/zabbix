@@ -896,6 +896,11 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 								italic(zbx_nl2br($operation['opcommand']['command']))
 							];
 						}
+						elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
+							$result[$key][] = [bold(_('Run custom commands on Zabbix server (proxy)').': '), BR(),
+								italic(zbx_nl2br($operation['opcommand']['command']))
+							];
+						}
 						else {
 							$result[$key][] = [bold(_('Run custom commands on Zabbix server').': '), BR(),
 								italic(zbx_nl2br($operation['opcommand']['command']))
