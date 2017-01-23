@@ -61,7 +61,7 @@ class CRouter {
 		'dashboard.sort'		=> ['CControllerDashboardSort',			'layout.javascript',	null],
 		'dashboard.view'		=> ['CControllerDashboardView',			'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.widget'		=> ['CControllerDashboardWidget',		'layout.javascript',	null],
-		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.javascript',	null],
+		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',	null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
 		'favourite.delete'		=> ['CControllerFavouriteDelete',		'layout.javascript',	null],

@@ -31,19 +31,22 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		];
 
 		$fields = [
-			'widgetid' =>		'fatal|required|in '.implode(',', $widgetids),
-			'refreshrate' =>	'fatal         |in 10,30,60,120,600,900',
-			'state' =>			'fatal         |in 0,1',
-			'row' =>			'fatal         |ge 0',
-			'col' =>			'fatal         |ge 0',
-			'height' =>			'fatal         |ge 1',
-			'width' =>			'fatal         |ge 1'
+			'widgets' =>	'required|array'
+//			'widgetid' =>		'fatal|required|in '.implode(',', $widgetids),
+//			'refreshrate' =>	'fatal         |in 10,30,60,120,600,900',
+//			'state' =>			'fatal         |in 0,1',
+//			'row' =>			'fatal         |ge 0',
+//			'col' =>			'fatal         |ge 0',
+//			'height' =>			'fatal         |ge 1',
+//			'width' =>			'fatal         |ge 1'
 		];
+
+// TODO: validation
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => '']));
+			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 		}
 
 		return $ret;
@@ -54,13 +57,8 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$widgetid = $this->getInput('widgetid');
 
-		$data = [
-			'main_block' => ''
-		];
-
-		if ($this->hasInput('refreshrate')) {
+/*		if ($this->hasInput('refreshrate')) {
 			$refreshrate = $this->getInput('refreshrate');
 
 			CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $refreshrate, PROFILE_TYPE_INT);
@@ -73,23 +71,16 @@ class CControllerDashbrdWidgetUpdate extends CController {
 		if ($this->hasInput('state')) {
 			CProfile::update('web.dashbrd.widget.'.$widgetid.'.state', $this->getInput('state'), PROFILE_TYPE_INT);
 		}
+*/
+		foreach ($this->getInput('widgets') as $widget) {
+			$widgetid = $widget['widgetid'];
 
-		if ($this->hasInput('row')) {
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $this->getInput('row'), PROFILE_TYPE_INT);
+			CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $widget['row'], PROFILE_TYPE_INT);
+			CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $widget['col'], PROFILE_TYPE_INT);
+			CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['height'], PROFILE_TYPE_INT);
+			CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['width'], PROFILE_TYPE_INT);
 		}
 
-		if ($this->hasInput('col')) {
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $this->getInput('col'), PROFILE_TYPE_INT);
-		}
-
-		if ($this->hasInput('height')) {
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $this->getInput('height'), PROFILE_TYPE_INT);
-		}
-
-		if ($this->hasInput('width')) {
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $this->getInput('width'), PROFILE_TYPE_INT);
-		}
-
-		$this->setResponse(new CControllerResponseData($data));
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
 	}
 }

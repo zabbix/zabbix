@@ -90,10 +90,12 @@ foreach ($widgets as $widgetid => $widget) {
 // ----------------
 	$grid_widgets[] = [
 		'widgetid' => $widgetid,
-		'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
-		'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
-		'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
-		'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+		'pos' => [
+			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
+			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
+			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
+			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+		]
 	];
 // ----------------
 }
@@ -171,10 +173,12 @@ foreach ($widgets as $widgetid => $widget) {
 // ----------------
 	$grid_widgets[] = [
 		'widgetid' => $widgetid,
-		'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
-		'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
-		'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
-		'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+		'pos' => [
+			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
+			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
+			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
+			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+		]
 	];
 // ----------------
 }
@@ -194,7 +198,9 @@ foreach ($dashboardGrid as $key => $val) {
 		)
 	)
 	->addItem(
-		(new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER)
+		(new CDiv())
+			->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER)
+			->addStyle('padding-bottom: 120px;')	// TODO: remove this line
 	)
 	->addItem(
 		(new CDiv(

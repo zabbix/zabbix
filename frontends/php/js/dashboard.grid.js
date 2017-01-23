@@ -25,8 +25,8 @@
 		data['options']['rows'] = 0;
 
 		$.each(data['widgets'], function() {
-			if (this['row'] + this['height'] > data['options']['rows']) {
-				data['options']['rows'] = this['row'] + this['height'];
+			if (this['pos']['row'] + this['pos']['height'] > data['options']['rows']) {
+				data['options']['rows'] = this['pos']['row'] + this['pos']['height'];
 			}
 		});
 
@@ -38,7 +38,7 @@
 	}
 
 	function getWidgetByTarget(widgets, $div) {
-		return widgets[$div.data('widget-id')];
+		return widgets[$div.data('widget-index')];
 	}
 
 	function getDivPosition($obj, data, $div) {
@@ -88,9 +88,59 @@
 		});
 	}
 
+	function resetCurrentPositions(widgets) {
+		for (var i = 0; i < widgets.length; i++) {
+			widgets[i]['current_pos'] = $.extend({}, widgets[i]['pos']);
+		}
+	}
+
 	function startWidgetPositioning($div, data) {
 		data['placeholder'].show();
+
 		$div.addClass('dashbrd-grid-widget-draggable');
+
+		resetCurrentPositions(data['widgets']);
+	}
+
+	function posEquals(pos1, pos2) {
+		var ret = true;
+
+		$.each(['row', 'col', 'height', 'width'], function(index, key) {
+			if (pos1[key] !== pos2[key]) {
+				ret = false;
+				return false;
+			}
+		});
+
+		return ret;
+	}
+
+	function rectOverlap(pos1, pos2) {
+		return ((pos1['row'] >= pos2['row'] && pos2['row'] + pos2['height'] - 1 >= pos1['row']) ||
+			(pos2['row'] >= pos1['row'] && pos1['row'] + pos1['height'] - 1 >= pos2['row'])) &&
+			((pos1['col'] >= pos2['col'] && pos2['col'] + pos2['width'] - 1 >= pos1['col']) ||
+			(pos2['col'] >= pos1['col'] && pos1['col'] + pos1['width'] - 1 >= pos2['col']));
+	}
+
+	function realignWidget($obj, data, widget) {
+		var to_row = widget['current_pos']['row'] + widget['current_pos']['height'],
+			overlapped_widgets = [];
+
+		$.each(data['widgets'], function() {
+			if (widget != this && rectOverlap(widget['current_pos'], this['current_pos'])) {
+				overlapped_widgets.push(this);
+			}
+		});
+
+		overlapped_widgets.sort(function (widget1, widget2) {
+			return widget2['current_pos']['row'] - widget1['current_pos']['row'];
+		});
+
+		for (var i = 0; i < overlapped_widgets.length; i++) {
+			overlapped_widgets[i]['current_pos']['row'] = to_row;
+
+			realignWidget($obj, data, overlapped_widgets[i]);
+		}
 	}
 
 	function doWidgetPositioning($obj, $div, data) {
@@ -99,41 +149,77 @@
 
 		setDivPosition(data['placeholder'], data, pos);
 
-		if (data['options']['rows'] < pos.row + pos.height) {
-			resizeDashboardGrid($obj, data, pos.row + pos.height);
+		if (!posEquals(pos, widget['current_pos'])) {
+			resetCurrentPositions(data['widgets']);
+			widget['current_pos'] = pos;
+
+			realignWidget($obj, data, widget);
+
+			$.each(data['widgets'], function() {
+				if (widget != this) {
+					setDivPosition(this['div'], data, this['current_pos']);
+				}
+			});
+		}
+
+		var min_rows = 0;
+
+		$.each(data['widgets'], function() {
+			var rows = this['current_pos']['row'] + this['current_pos']['height'];
+
+			if (min_rows < rows) {
+				min_rows = rows;
+			}
+		});
+
+		if (data['options']['rows'] < min_rows) {
+			resizeDashboardGrid($obj, data, min_rows);
 		}
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = getDivPosition($obj, data, $div),
-			url = new Curl('zabbix.php');
+			url = new Curl('zabbix.php'),
+			ajax_data = [];
 
 		data['placeholder'].hide();
+
 		$div.removeClass('dashbrd-grid-widget-draggable');
 
 		url.setArgument('action', 'dashbrd.widget.update')
 		url.setArgument('output', 'ajax');
 
+		$.each(data['widgets'], function() {
+			ajax_data.push({
+				widgetid: this['widgetid'],
+				row: this['current_pos']['row'],
+				col: this['current_pos']['col'],
+				height: this['current_pos']['height'],
+				width: this['current_pos']['width']
+			});
+		});
+
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: {
-				widgetid: widget.widgetid,
-				row: pos.row,
-				col: pos.col,
-				height: pos.height,
-				width: pos.width
+				widgets: ajax_data
 			},
-			dataType: 'script',
+			dataType: 'json',
 			success: function(resp) {
-				$.extend(widget, pos);
-				setDivPosition($div, data, widget);
+				$.each(data['widgets'], function() {
+					this['pos'] = this['current_pos'];
+					delete this['current_pos'];
+				});
+				setDivPosition($div, data, widget['pos']);
 				resizeDashboardGrid($obj, data);
 			},
 			error: function() {
 				// TODO: gentle message about failed saving of widget size and position
-				setDivPosition($div, data, widget);
+				$.each(data['widgets'], function() {
+					setDivPosition(this['div'], data, this['pos']);
+					delete this['current_pos'];
+				});
 				resizeDashboardGrid($obj, data);
 			}
 		});
@@ -201,32 +287,33 @@
 		},
 
 		addWidget: function(params) {
-			params = $.extend({}, {'widgetid': '', 'row': 0, 'col': 0, 'height': 1, 'width': 1 }, params);
+			params = $.extend({}, {'widgetid': '', 'pos': {'row': 0, 'col': 0, 'height': 1, 'width': 1}}, params);
 
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					$div = $('<div>', {'class': 'dashbrd-grid-widget'})
-						.data('widget-id', data['widgets'].length)
+						.data('widget-index', data['widgets'].length)
 						.append($('<div>', {'class': 'dashbrd-grid-widget-content'})),
 					handles = {};
 
-				$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, value) {
-					var	$handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + value);
+				$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
+					var	$handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
 
-					if ($.inArray(value, ['n', 'e', 's', 'w']) >= 0) {
+					if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
 						$handle
 							.append($('<div>', {'class': 'ui-resize-dot'}))
-							.append($('<div>', {'class': 'ui-resizable-border-' + value}));
+							.append($('<div>', {'class': 'ui-resizable-border-' + key}));
 					}
 
 					$div.append($handle);
-					handles[value] = $handle;
+					handles[key] = $handle;
 				});
 
+				params['div'] = $div;
 				data['widgets'].push(params);
 
-				setDivPosition($div, data, params);
+				setDivPosition($div, data, params['pos']);
 
 				resizeDashboardGrid($this, data);
 
