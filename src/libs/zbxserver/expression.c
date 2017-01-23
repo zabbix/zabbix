@@ -2162,17 +2162,17 @@ static int	is_indexed_macro(const char *str, const zbx_token_t *token)
 	switch (token->type)
 	{
 		case ZBX_TOKEN_MACRO:
-			p = str + token->token.r;
+			p = str + token->token.r - 1;
 			break;
 		case ZBX_TOKEN_FUNC_MACRO:
-			p = str + token->data.func_macro.macro.r;
+			p = str + token->data.func_macro.macro.r - 1;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 	}
 
-	return '1' <= *p && *p <= '9' ? SUCCEED : FAIL;
+	return '1' <= *p && *p <= '9' ? 1 : 0;
 }
 
 /******************************************************************************
