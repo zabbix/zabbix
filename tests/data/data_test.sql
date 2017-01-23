@@ -703,15 +703,37 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula,
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, 1, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, 1, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                                   VALUES (15093, 15000, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing'   , 30, 3,'', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15005, 15001, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, '', '', 15000, 15000);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15006, 15001, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , 30, 3, '', '', 15000, 15001);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15007, 15001, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, '', '', 15000, 15002);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15008, 15001, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, '', '', 15000, 15003);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15009, 15001, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, '', '', 15000, 15004);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15094, 15001, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing', 30, 3, '', '', 15000, 15093);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid)             VALUES (15010, 15001, 0, 'itemInheritanceTest' , 'key-test-inheritance'     , 30, 3, '', '', 15000);
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15079, 15002, 0, 'testInheritance'     , 'key-item-inheritance'     , 30, 3, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15080, 15001, 0, 'testInheritance'     , 'key-item-inheritance'     , 30, 3, '', '', 15000, 15079);
+
+-- testFormItem.LayoutCheck testInheritanceItem.Preprocessing
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (125,15093,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (126,15093,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (127,15093,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (128,15093,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (129,15093,5,5,'regular expression\noutput formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (130,15093,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (131,15093,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (132,15093,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (133,15093,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (134,15094,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (135,15094,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (138,15094,5,5,'regular expression\noutput formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (139,15094,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (140,15094,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (141,15094,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (142,15094,9,9,'');
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments)             VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
