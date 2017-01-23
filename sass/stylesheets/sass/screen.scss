@@ -2555,7 +2555,6 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	//padding: .5rem;
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -2658,7 +2657,7 @@ $form-icon-btn: (
 
 .ui-resizable-n {
 	@extend %ui-resizable;
-	cursor: n-resize;
+	cursor: ns-resize;
 	height: 5px;
 	width: 100%;
 	top: -1px;
@@ -2674,21 +2673,21 @@ $form-icon-btn: (
 
 .ui-resizable-ne {
 	@extend %ui-resize-dot;
-	cursor: ne-resize;
+	cursor: nesw-resize;
 	right: 0;
 	top: 0;
 }
 
 .ui-resizable-nw {
 	@extend %ui-resize-dot;
-	cursor: nw-resize;
+	cursor: nwse-resize;
 	left: 0;
 	top: 0;
 }
 
 .ui-resizable-e {
 	@extend %ui-resizable;
-	cursor: e-resize;
+	cursor: ew-resize;
 	width: 5px;
 	right: 0;
 	top: 0;
@@ -2703,7 +2702,7 @@ $form-icon-btn: (
 
 .ui-resizable-s {
 	@extend %ui-resizable;
-	cursor: s-resize;
+	cursor: ns-resize;
 	height: 5px;
 	width: 100%;
 	bottom: 0;
@@ -2719,21 +2718,21 @@ $form-icon-btn: (
 
 .ui-resizable-se {
 	@extend %ui-resize-dot;
-	cursor: se-resize;
+	cursor: nwse-resize;
 	right: 0;
 	bottom: 0;
 }
 
 .ui-resizable-sw {
 	@extend %ui-resize-dot;
-	cursor: sw-resize;
+	cursor: nesw-resize;
 	left: 0;
 	bottom: 0;
 }
 
 .ui-resizable-w {
 	@extend %ui-resizable;
-	cursor: w-resize;
+	cursor: ew-resize;
 	width: 5px;
 	left: 0;
 	top: 0;
