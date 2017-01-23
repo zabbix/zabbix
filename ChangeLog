@@ -3,6 +3,7 @@ Changes for 3.2.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11402] fixed unnecessary notification sending from dependent triggers (viktors)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
@@ -319,6 +320,7 @@ Changes for 3.0.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11402] fixed unnecessary notification sending from dependent triggers (viktors)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)
 ...G...... [ZBX-11621] fixed cause of error with EventID 5858 in Windows EventLog when using wmi.get key (viktors)
