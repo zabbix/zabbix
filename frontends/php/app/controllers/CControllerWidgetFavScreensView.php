@@ -36,8 +36,48 @@ class CControllerWidgetFavScreensView extends CController {
 	}
 
 	protected function doAction() {
+		$screens = [];
+		$ids = ['screenid' => [], 'slideshowid' => []];
+
+		foreach (CFavorite::get('web.favorite.screenids') as $favourite) {
+			$ids[$favourite['source']][$favourite['value']] = true;
+		}
+
+		if ($ids['screenid']) {
+			$db_screens = API::Screen()->get([
+				'output' => ['screenid', 'name'],
+				'screenids' => array_keys($ids['screenid'])
+			]);
+
+			foreach ($db_screens as $db_screen) {
+				$screens[] = [
+					'screenid' => $db_screen['screenid'],
+					'label' => $db_screen['name'],
+					'slideshow' => false
+				];
+			}
+		}
+
+		if ($ids['slideshowid']) {
+			foreach ($ids['slideshowid'] as $slideshowid) {
+				if (slideshow_accessible($slideshowid, PERM_READ)) {
+					$db_slideshow = get_slideshow_by_slideshowid($slideshowid, PERM_READ);
+
+					if ($db_slideshow) {
+						$screens[] = [
+							'slideshowid' => $db_slideshow['slideshowid'],
+							'label' => $db_slideshow['name'],
+							'slideshow' => true
+						];
+					}
+				}
+			}
+		}
+
+		CArrayHelper::sort($screens, ['label']);
+
 		$this->setResponse(new CControllerResponseData([
-			'data' => getFavouriteScreensData(),
+			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

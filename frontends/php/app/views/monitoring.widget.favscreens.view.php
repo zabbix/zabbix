@@ -19,9 +19,18 @@
 **/
 
 
+$table = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
+
+foreach ($data['screens'] as $screen) {
+	$url = $screen['slideshow']
+		? (new CUrl('slides.php'))->setArgument('elementid', $screen['slideshowid'])
+		: (new CUrl('screens.php'))->setArgument('elementid', $screen['screenid']);
+	$table->addRow([new CLink($screen['label'], $url)]);
+}
+
 $output = [
 	'header' => _('Favourite screens'),
-	'body' => makeFavouriteScreens($data['data'])->toString(),
+	'body' => $table->toString(),
 	'footer' => (new CList([
 		new CLink(_('Screens'), new CUrl('screens.php')),
 		new CLink(_('Slide shows'), new CUrl('slides.php')),

@@ -30,100 +30,82 @@ $widgetRefreshParams = [];
 
 $widgets = [
 	WIDGET_FAVOURITE_GRAPHS => [
-		'id' => 'favouriteGraphs',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteGraphs'],
-		'data' => makeFavouriteGraphs($data['favourite_graphs']),
-		'header' => _('Favourite graphs'),
-		'links' => [
-			['name' => _('Graphs'), 'url' => 'charts.php']
-		],
-		'defaults' => ['col' => 0, 'row' => 0],
-		'position' => ['row' => 0, 'col' => 0, 'height' => 4, 'width' => 2]
+//		'header' => _('Favourite graphs'),
+		'pos' => ['row' => 0, 'col' => 0, 'height' => 4, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_SCREENS => [
-		'id' => 'favouriteScreens',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteScreens'],
-		'data' => makeFavouriteScreens($data['favourite_screens']),
-		'header' => _('Favourite screens'),
-		'links' => [
-			['name' => _('Screens'), 'url' => 'screens.php'],
-			['name' => _('Slide shows'), 'url' => 'slides.php']
-		],
-		'defaults' => ['col' => 0, 'row' => 1],
-		'position' => ['row' => 4, 'col' => 0, 'height' => 3, 'width' => 2]
+//		'header' => _('Favourite screens'),
+		'pos' => ['row' => 4, 'col' => 0, 'height' => 3, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_MAPS => [
-		'id' => 'favouriteMaps',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteMaps'],
-		'data' => makeFavouriteMaps($data['favourite_maps']),
-		'header' => _('Favourite maps'),
-		'links' => [
-			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']
-		],
-		'defaults' => ['col' => 0, 'row' => 2],
-		'position' => ['row' => 7, 'col' => 0, 'height' => 3, 'width' => 2]
+//		'header' => _('Favourite maps'),
+		'pos' => ['row' => 7, 'col' => 0, 'height' => 3, 'width' => 2]
+	],
+	WIDGET_SYSTEM_STATUS => [
+//		'header' => _('System status'),
+		'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 5]
+	],
+	WIDGET_HOST_STATUS => [
+//		'header' => _('Host status'),
+		'pos' => ['row' => 3, 'col' => 2, 'height' => 3, 'width' => 5]
+	],
+	WIDGET_LAST_ISSUES => [
+//		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+		'pos' => ['row' => 6, 'col' => 2, 'height' => 4, 'width' => 5]
+	],
+	WIDGET_WEB_OVERVIEW => [
+//		'header' => _('Web monitoring'),
+		'pos' => ['row' => 7, 'col' => 7, 'height' => 3, 'width' => 5]
 	]
 ];
+
+if ($data['show_status_widget']) {
+	$widgets[WIDGET_ZABBIX_STATUS] = [
+//		'header' => _('Status of Zabbix'),
+		'pos' => ['row' => 0, 'col' => 7, 'height' => 4, 'width' => 5]
+	];
+}
+if ($data['show_discovery_widget']) {
+	$widgets[WIDGET_DISCOVERY_STATUS] = [
+//		'header' => _('Discovery status'),
+		'pos' => ['row' => 4, 'col' => 7, 'height' => 3, 'width' => 5]
+	];
+}
 
 $grid_widgets = [];
 
 foreach ($widgets as $widgetid => $widget) {
-	$icon = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-		->setTitle(_('Action'))
-		->setId($widget['id'])
-		->setMenuPopup(call_user_func($widget['menu_popup']));
-
-	$footer = new CList();
-	foreach ($widget['links'] as $link) {
-		$footer->addItem(new CLink($link['name'], $link['url']));
-	}
-
-	$col = CProfile::get('web.dashboard.widget.'.$widgetid.'.col', $widget['defaults']['col']);
-	$row = CProfile::get('web.dashboard.widget.'.$widgetid.'.row', $widget['defaults']['row']);
-
-	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, $widget['data']))
-		->setExpanded((bool) CProfile::get('web.dashboard.widget.'.$widgetid.'.state', true))
-		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter($footer);
-
-// ----------------
 	$grid_widgets[] = [
 		'widgetid' => $widgetid,
 		'pos' => [
-			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
-			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
-			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
-			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
+			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
+			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
+			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
+			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
 		]
 	];
-// ----------------
 }
 
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
 		'action' => 'widget.system.view',
 		'header' => _('System status'),
-		'defaults' => ['col' => 1, 'row' => 1],
-		'position' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 1]
 	],
 	WIDGET_HOST_STATUS => [
 		'action' => 'widget.hosts.view',
 		'header' => _('Host status'),
-		'defaults' => ['col' => 1, 'row' => 2],
-		'position' => ['row' => 3, 'col' => 2, 'height' => 3, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 2]
 	],
 	WIDGET_LAST_ISSUES => [
 		'action' => 'widget.issues.view',
 		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'defaults' => ['col' => 1, 'row' => 3],
-		'position' => ['row' => 6, 'col' => 2, 'height' => 4, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 3]
 	],
 	WIDGET_WEB_OVERVIEW => [
 		'action' => 'widget.web.view',
 		'header' => _('Web monitoring'),
-		'defaults' => ['col' => 1, 'row' => 4],
-		'position' => ['row' => 7, 'col' => 7, 'height' => 3, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 4]
 	],
 ];
 
@@ -131,16 +113,14 @@ if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
 		'action' => 'widget.status.view',
 		'header' => _('Status of Zabbix'),
-		'defaults' => ['col' => 1, 'row' => 0],
-		'position' => ['row' => 0, 'col' => 7, 'height' => 4, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 0]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
 		'action' => 'widget.discovery.view',
 		'header' => _('Discovery status'),
-		'defaults' => ['col' => 1, 'row' => 5],
-		'position' => ['row' => 4, 'col' => 7, 'height' => 3, 'width' => 5]
+		'defaults' => ['col' => 1, 'row' => 5]
 	];
 }
 
@@ -169,18 +149,6 @@ foreach ($widgets as $widgetid => $widget) {
 		'darken' => 0,
 		'params' => ['widgetRefresh' => $widgetid]
 	];
-
-// ----------------
-	$grid_widgets[] = [
-		'widgetid' => $widgetid,
-		'pos' => [
-			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['position']['col']),
-			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['position']['row']),
-			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['position']['height']),
-			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['position']['width'])
-		]
-	];
-// ----------------
 }
 
 // sort dashboard grid
@@ -231,29 +199,3 @@ $this->addPostJS(
 		'.dashboardGrid()'.
 		'.dashboardGrid("addWidgets", '.CJs::encodeJson($grid_widgets).');'
 );
-
-?>
-
-<script type="text/javascript">
-	/**
-	 * @see init.js add.popup event
-	 */
-	function addPopupValues(list) {
-		var favourites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
-
-		if (isset(list.object, favourites)) {
-			var favouriteIds = [];
-
-			for (var i = 0; i < list.values.length; i++) {
-				favouriteIds.push(list.values[i][list.object]);
-			}
-
-			sendAjaxData('zabbix.php?action=dashboard.favourite&operation=create', {
-				data: {
-					object: list.object,
-					'objectids[]': favouriteIds
-				}
-		});
-		}
-	}
-</script>

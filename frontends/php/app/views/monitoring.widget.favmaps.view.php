@@ -19,9 +19,19 @@
 **/
 
 
+$table = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
+
+foreach ($data['maps'] as $map) {
+	$table->addRow([new CLink($map['label'],
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'map.view')
+			->setArgument('sysmapid', $map['id'])
+	)]);
+}
+
 $output = [
 	'header' => _('Favourite maps'),
-	'body' => makeFavouriteMaps($data['data'])->toString(),
+	'body' => $table->toString(),
 	'footer' => (new CList([
 		new CLink(_('Maps'), (new CUrl('zabbix.php'))->setArgument('action', 'map.view')),
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))

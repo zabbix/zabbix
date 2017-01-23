@@ -36,8 +36,31 @@ class CControllerWidgetFavMapsView extends CController {
 	}
 
 	protected function doAction() {
+		$maps = [];
+		$mapids = [];
+
+		foreach (CFavorite::get('web.favorite.sysmapids') as $favourite) {
+			$mapids[$favourite['value']] = true;
+		}
+
+		if ($mapids) {
+			$db_maps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($mapids)
+			]);
+
+			foreach ($db_maps as $db_map) {
+				$maps[] = [
+					'id' => $db_map['sysmapid'],
+					'label' => $db_map['name']
+				];
+			}
+		}
+
+		CArrayHelper::sort($maps, ['label']);
+
 		$this->setResponse(new CControllerResponseData([
-			'data' => getFavouriteMapsData(),
+			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -19,9 +19,21 @@
 **/
 
 
+$table = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
+
+foreach ($data['graphs'] as $graph) {
+	$url = $graph['simple']
+		? (new CUrl('history.php'))
+			->setArgument('action', HISTORY_GRAPH)
+			->setArgument('itemids', [$graph['itemid']])
+		: (new CUrl('charts.php'))->setArgument('graphid', $graph['graphid']);
+
+	$table->addRow([new CLink($graph['label'], $url)]);
+}
+
 $output = [
 	'header' => _('Favourite graphs'),
-	'body' => makeFavouriteGraphs($data['data'])->toString(),
+	'body' => $table->toString(),
 	'footer' => (new CList([
 		new CLink(_('Graphs'), new CUrl('charts.php')),
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))

@@ -292,7 +292,13 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					$div = $('<div>', {'class': 'dashbrd-grid-widget'})
+					$div = $('<div>', {
+						'class': 'dashbrd-grid-widget',
+						'css': {
+							'min-height': '' + data['options']['widget-height'] + 'px',
+							'min-width': '' + data['options']['widget-width'] + '%'
+						}
+					})
 						.data('widget-index', data['widgets'].length)
 						.append($('<div>', {'class': 'dashbrd-grid-widget-content'})),
 					handles = {};

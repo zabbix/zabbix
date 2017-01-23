@@ -22,33 +22,6 @@
 class CMenuPopupHelper {
 
 	/**
-	 * Prepare data for favourite graphs menu popup.
-	 *
-	 * @return array
-	 */
-	public static function getFavouriteGraphs() {
-		return ['type' => 'favouriteGraphs'] + getFavouriteGraphsData();
-	}
-
-	/**
-	 * Prepare data for favourite maps menu popup.
-	 *
-	 * @return array
-	 */
-	public static function getFavouriteMaps() {
-		return ['type' => 'favouriteMaps', 'maps' => getFavouriteMapsData()];
-	}
-
-	/**
-	 * Prepare data for favourite screens menu popup.
-	 *
-	 * @return array
-	 */
-	public static function getFavouriteScreens() {
-		return ['type' => 'favouriteScreens'] + getFavouriteScreensData();
-	}
-
-	/**
 	 * Prepare data for item history menu popup.
 	 *
 	 * @param array $item				item data
