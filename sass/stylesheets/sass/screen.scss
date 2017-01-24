@@ -2604,6 +2604,7 @@ $form-icon-btn: (
 	h4 {
 		color: h4-widget-color($font-color);
 		font-weight: bold;
+		@extend %overflow-ellipsis;
 	}
 
 	ul {
@@ -2620,6 +2621,18 @@ $form-icon-btn: (
 				margin: 4px 0;
 			}
 		}
+	}
+}
+
+.dashbrd-grid-widget-foot {
+	text-align: right;
+	color: $font-alt-color;
+	margin: 0 10px;
+	align-self: flex-end;
+
+	li {
+		display: inline-block;
+		padding: 8px 0 8px 13px
 	}
 }
 
@@ -2759,7 +2772,6 @@ $form-icon-btn: (
 	z-index: 90;
 	position: absolute;
 	display: flex;
-
 }
 
 .dashbrd-widget-placeholder {
@@ -4008,15 +4020,22 @@ a.overlay-close-btn {
 }
 
 .preloader-container {
-	border-radius: 50%;
 	padding: 7px;
 	display: inline-block;
-	margin: 0 auto;
+	width: 24px;
+	height: 24px;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin: auto;
+	position: absolute;
 	background-color: rgba($ui-bg-color, .8);
+	@include border-radius(50%);
+	@include transform(translateY(-50%));
 }
 
 .preloader {
-	border-radius: 50%;
+	@include border-radius(50%);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;
