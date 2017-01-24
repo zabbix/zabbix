@@ -4436,33 +4436,21 @@ static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zb
 		goto out;
 	}
 
-	dot = *data + token->data.simple_macro.key.r + 1;
-
-	if ('{' != (*data)[token->data.simple_macro.key.l])
-	{
-		/* extract key and substitute macros */
-		*dot = '\0';
-		key = zbx_strdup(key, *data + token->data.simple_macro.key.l);
-		substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-		*dot = '.';
-	}
-	else if (NULL == macro_in_list(*data, token->data.simple_macro.key, simple_key_macros, NULL))
-		goto out;
-
 	replace_to = zbx_malloc(NULL, replace_to_alloc);
 
+	lld_start = token->data.simple_macro.key.l;
+	lld_end = token->data.simple_macro.func_param.r - 1;
+	dot = *data + token->data.simple_macro.key.r + 1;
 	params = *data + token->data.simple_macro.func_param.l + 1;
 
-	if (NULL != key)
-	{
-		lld_start = token->data.simple_macro.key.l;
-		zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
-		zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, dot, params - dot);
-	}
-	else
-		lld_start = token->data.simple_macro.func_param.l + 1;
+	/* extract key and substitute macros */
+	*dot = '\0';
+	key = zbx_strdup(key, *data + token->data.simple_macro.key.l);
+	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	*dot = '.';
 
-	lld_end = token->data.simple_macro.func_param.r - 1;
+	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, dot, params - dot);
 
 	/* substitute macros in function parameters */
 	if (SUCCEED != substitute_function_lld_param(params, *data + lld_end - params + 1, 0, &replace_to,
