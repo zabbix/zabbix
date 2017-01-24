@@ -246,11 +246,11 @@
 					}).append($('<h4>').html(resp.header)));
 				}
 				if (resp.messages !== undefined) {
-					$content_div.append($('<div>').html(resp.messages));
+					$content_div.append(resp.messages);
 				}
-				$content_div.append($('<div>').html(resp.body));
+				$content_div.append(resp.body);
 				if (resp.debug !== undefined) {
-					$content_div.append($('<div>').html(resp.debug));
+					$content_div.append(resp.debug);
 				}
 				if (resp.footer !== undefined) {
 					$content_div.append($('<div>', {
