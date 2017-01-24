@@ -25,9 +25,6 @@ $this->addJsFile('dashboard.grid.js');
 /*
  * Dashboard grid
  */
-$dashboardGrid = [[], [], []];
-$widgetRefreshParams = [];
-
 $widgets = [
 	WIDGET_FAVOURITE_GRAPHS => [
 //		'header' => _('Favourite graphs'),
@@ -86,76 +83,6 @@ foreach ($widgets as $widgetid => $widget) {
 	];
 }
 
-$widgets = [
-	WIDGET_SYSTEM_STATUS => [
-		'action' => 'widget.system.view',
-		'header' => _('System status'),
-		'defaults' => ['col' => 1, 'row' => 1]
-	],
-	WIDGET_HOST_STATUS => [
-		'action' => 'widget.hosts.view',
-		'header' => _('Host status'),
-		'defaults' => ['col' => 1, 'row' => 2]
-	],
-	WIDGET_LAST_ISSUES => [
-		'action' => 'widget.issues.view',
-		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'defaults' => ['col' => 1, 'row' => 3]
-	],
-	WIDGET_WEB_OVERVIEW => [
-		'action' => 'widget.web.view',
-		'header' => _('Web monitoring'),
-		'defaults' => ['col' => 1, 'row' => 4]
-	],
-];
-
-if ($data['show_status_widget']) {
-	$widgets[WIDGET_ZABBIX_STATUS] = [
-		'action' => 'widget.status.view',
-		'header' => _('Status of Zabbix'),
-		'defaults' => ['col' => 1, 'row' => 0]
-	];
-}
-if ($data['show_discovery_widget']) {
-	$widgets[WIDGET_DISCOVERY_STATUS] = [
-		'action' => 'widget.discovery.view',
-		'header' => _('Discovery status'),
-		'defaults' => ['col' => 1, 'row' => 5]
-	];
-}
-
-foreach ($widgets as $widgetid => $widget) {
-	$profile = 'web.dashboard.widget.'.$widgetid;
-
-	$rate = CProfile::get($profile.'.rf_rate', 60);
-	$expanded = (bool) CProfile::get($profile.'.state', true);
-	$col = CProfile::get($profile.'.col', $widget['defaults']['col']);
-	$row = CProfile::get($profile.'.row', $widget['defaults']['row']);
-
-	$icon = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-		->setTitle(_('Action'))
-		->setMenuPopup(CMenuPopupHelper::getRefresh($widgetid, $rate));
-
-	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass(ZBX_STYLE_PRELOADER)))
-		->setExpanded($expanded)
-		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter((new CList())->setId($widgetid.'_footer'));
-
-	$widgetRefreshParams[$widgetid] = [
-		'frequency' => $rate,
-		'url' => 'zabbix.php?action='.$widget['action'],
-		'counter' => 0,
-		'darken' => 0,
-		'params' => ['widgetRefresh' => $widgetid]
-	];
-}
-
-// sort dashboard grid
-foreach ($dashboardGrid as $key => $val) {
-	ksort($dashboardGrid[$key]);
-}
-
 (new CWidget())
 	->setTitle(_('Dashboard'))
 	->setControls((new CForm())
@@ -165,31 +92,12 @@ foreach ($dashboardGrid as $key => $val) {
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
-	->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER)
-			->addStyle('padding-bottom: 120px;')	// TODO: remove this line
-	)
-	->addItem(
-		(new CDiv(
-			(new CDiv([
-				(new CDiv($dashboardGrid[0]))->addClass(ZBX_STYLE_CELL),
-				(new CDiv($dashboardGrid[1]))->addClass(ZBX_STYLE_CELL),
-				(new CDiv($dashboardGrid[2]))->addClass(ZBX_STYLE_CELL)
-			]))
-				->addClass(ZBX_STYLE_ROW)
-		))
-			->addClass(ZBX_STYLE_TABLE)
-			->addClass('widget-placeholder')
-	)
+	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->show();
 
 /*
  * Javascript
  */
-// start refresh process
-$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
-
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
 
