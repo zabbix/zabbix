@@ -57,7 +57,7 @@
 #	define alloca		_alloca
 
 #	ifndef uint32_t
-#		define uint32_t	__int32
+#		define uint32_t	unsigned __int32
 #	endif
 
 #	ifndef PATH_SEPARATOR
