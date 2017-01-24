@@ -38,6 +38,8 @@
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
+#define MAX_QUEUE_DETAILS_ITEMS	501
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
@@ -349,7 +351,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i;
-	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
+	zbx_uint32_t		limit = MAX_QUEUE_DETAILS_ITEMS;
+	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
@@ -371,7 +374,18 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
 			request_type = ZBX_GET_QUEUE_PROXY;
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
+		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
+
+			if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)))
+			{
+				if (FAIL == is_uint32(limit_str, &limit))
+				{
+					zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+					goto out;
+				}
+			}
+		}
 	}
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
@@ -444,7 +458,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-			for (i = 0; i < queue.values_num && i <= 500; i++)
+			for (i = 0; i < queue.values_num && i < limit; i++)
 			{
 				zbx_queue_item_t	*item = queue.values[i];
 
@@ -455,6 +469,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			}
 
 			zbx_json_close(&json);
+			zbx_json_adduint64(&json, "total", queue.values_num);
 
 			break;
 	}

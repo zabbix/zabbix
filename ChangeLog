@@ -1,6 +1,7 @@
 Changes for 3.2.4rc1
 
 New features:
+..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
 ........S. [ZBX-11402] fixed unnecessary notification sending from dependent triggers (viktors)
@@ -318,6 +319,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.8rc1
 
 New features:
+..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
 ........S. [ZBX-11402] fixed unnecessary notification sending from dependent triggers (viktors)
