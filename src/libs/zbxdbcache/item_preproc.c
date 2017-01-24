@@ -593,6 +593,9 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 			}
 			ZBX_HEX2UINT64(value_ui64, value->data.str);
 			break;
+		default:
+			*errmsg = zbx_strdup(NULL, "unknown operation type");
+			return FAIL;
 	}
 
 	zbx_variant_clear(value);
