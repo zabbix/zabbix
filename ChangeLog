@@ -1932,6 +1932,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-11719] fixed reading files with vfs.file.regmatch[] and vfs.file.cksum[] keys on windows (Sergejs)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 .......PS. [ZBX-9889,ZBX-11674] fixed vmware.eventlog item values to have unique timestamps in history table (dimir)
 ........S. [ZBX-11635] fixed possible deadlocks when removing obsolete VMWare services (Sergejs)
