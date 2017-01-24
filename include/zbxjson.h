@@ -51,6 +51,7 @@
 #define ZBX_PROTO_TAG_STATUS		"status"
 #define ZBX_PROTO_TAG_STATE		"state"
 #define ZBX_PROTO_TAG_TYPE		"type"
+#define ZBX_PROTO_TAG_LIMIT		"limit"
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
 #define ZBX_PROTO_TAG_HOSTID		"hostid"
