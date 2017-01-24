@@ -46,11 +46,10 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	if (SUCCEED != zbx_parse_ipmi_command(command, sensor, &op, error, max_error_len))
 		return FAIL;
 
-	if (FAIL == zbx_ipc_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, 10, &errmsg))
+	if (FAIL == zbx_ipc_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, SEC_PER_MIN, &errmsg))
 	{
-		zbx_snprintf(error, max_error_len, "cannot connect to IPMI service: %s", errmsg);
-		zbx_free(errmsg);
-		return FAIL;
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to IPMI service: %s", errmsg);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_ipc_message_init(&message);
