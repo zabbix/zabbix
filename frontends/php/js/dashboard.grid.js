@@ -257,10 +257,17 @@
 						'class': 'dashbrd-widget-foot'
 					}).html(resp.footer));
 				}
+
+				if (widget['frequency'] != 0) {
+					setTimeout(function () { updateWidgetContent(widget); }, widget['frequency'] * 1000);
+				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
-			},
+				if (widget['frequency'] != 0) {
+					setTimeout(function () { updateWidgetContent(widget); }, widget['frequency'] * 1000);
+				}
+			}
 		});
 	}
 
@@ -293,7 +300,8 @@
 					'col': 0,
 					'height': 1,
 					'width': 1
-				}
+				},
+				'frequency': 0
 			}, params);
 
 			return this.each(function() {
