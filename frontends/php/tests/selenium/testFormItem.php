@@ -455,7 +455,7 @@ class testFormItem extends CWebTest {
 					'key' => 'test-inheritance-item-preprocessing',
 					'preprocessing' => true
 				]
-			],
+			]
 		];
 	}
 
@@ -657,6 +657,10 @@ class testFormItem extends CWebTest {
 						' WHERE hostid='.$hostid.
 							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
 					);
+					while ($row = DBfetch($dbInterfaces)) {
+						$data[] = [$row];
+					}
+					$dbInterfaces = $data[0];
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
@@ -2310,7 +2314,7 @@ class testFormItem extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'params' => ''],
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty. '
+					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			[
@@ -2606,6 +2610,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickButton('item.masscopyto');
 
 		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
+		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
 		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
 		$this->zbxTestClickWait('copy');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
