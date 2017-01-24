@@ -57,7 +57,7 @@
 	(										\
 			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
 			0 < value_len ? (						\
-			*value = malloc(value_len + 1), 				\
+			*value = zbx_malloc(NULL, value_len + 1), 			\
 			memcpy(*(value), buffer + sizeof(zbx_uint32_t), value_len),	\
 			(*value)[value_len] = '\0'					\
 			) : (*value = NULL, 0),						\
