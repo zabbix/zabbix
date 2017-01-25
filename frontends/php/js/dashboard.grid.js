@@ -319,7 +319,8 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['div'].fadeTo(widget['preloader_fadespeed'], 0.6);
+			widget['content_body'].fadeTo(widget['preloader_fadespeed'], 0.4);
+			widget['content_footer'].fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
@@ -329,7 +330,8 @@
 		}
 
 		hidePreloader(widget);
-		widget['div'].fadeTo(0, 1);
+		widget['content_body'].fadeTo(0, 1);
+		widget['content_footer'].fadeTo(0, 1);
 	}
 
 	function updateWidgetContent(widget) {
@@ -406,7 +408,7 @@
 				},
 				'frequency': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 2000
+				'preloader_fadespeed': 500
 			}, widget);
 
 			return this.each(function() {
