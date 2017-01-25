@@ -2641,28 +2641,28 @@ $form-icon-btn: (
 }
 
 .ui-resizable-border-n {
-	border-bottom: 1px solid $form-border-focus-color;
-	height: 5px;
-	margin: 0 .25rem;
-	flex: 1;
-}
-
-.ui-resizable-border-e {
-	border-left: 1px solid $form-border-focus-color;
-	width: 5px;
-	margin: .25rem 0;
-	flex: 1;
-}
-
-.ui-resizable-border-s {
 	border-top: 1px solid $form-border-focus-color;
 	height: 5px;
 	margin: 0 .25rem;
 	flex: 1;
 }
 
-.ui-resizable-border-w {
+.ui-resizable-border-e {
 	border-right: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-border-s {
+	border-bottom: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-w {
+	border-left: 1px solid $form-border-focus-color;
 	width: 5px;
 	margin: .25rem 0;
 	flex: 1;
@@ -2673,14 +2673,14 @@ $form-icon-btn: (
 	cursor: ns-resize;
 	height: 5px;
 	width: 100%;
-	top: -1px;
+	top: 4px;
 	left: 0;
 
 	.ui-resize-dot {
 		left: 0;
 		right: 0;
 		margin: auto;
-		bottom: -5px;
+		bottom: 0;
 	}
 }
 
@@ -2702,12 +2702,12 @@ $form-icon-btn: (
 	@extend %ui-resizable;
 	cursor: ew-resize;
 	width: 5px;
-	right: 0;
+	right: 4px;
 	top: 0;
 	height: 100%;
 
 	.ui-resize-dot {
-		left: -4px;
+		left: 0;
 		top: 50%;
 		@include transform(translateY(-50%));
 	}
@@ -2718,14 +2718,14 @@ $form-icon-btn: (
 	cursor: ns-resize;
 	height: 5px;
 	width: 100%;
-	bottom: 0;
+	bottom: 5px;
 	left: 0;
 
 	.ui-resize-dot {
 		left: 0;
 		right: 0;
 		margin: auto;
-		top: -4px;
+		bottom: -5px;
 	}
 }
 
@@ -2747,12 +2747,12 @@ $form-icon-btn: (
 	@extend %ui-resizable;
 	cursor: ew-resize;
 	width: 5px;
-	left: 0;
+	left: 4px;
 	top: 0;
 	height: 100%;
 
 	.ui-resize-dot {
-		right: -4px;
+		right: 0;
 		top: 50%;
 		@include transform(translateY(-50%));
 	}
@@ -4020,28 +4020,26 @@ a.overlay-close-btn {
 }
 
 .preloader-container {
-	padding: 7px;
-	display: inline-block;
-	width: 24px;
-	height: 24px;
-	top: 50%;
-	left: 0;
-	right: 0;
-	margin: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	position: absolute;
+	z-index: 2;
+	left: 5px;
+	top: 5px;
+	right: 5px;
+	bottom: 5px;
 	background-color: rgba($ui-bg-color, .8);
-	@include border-radius(50%);
-	@include transform(translateY(-50%));
 }
 
 .preloader {
-	@include border-radius(50%);
 	width: 20px;
 	height: 20px;
-	margin: 0 auto;
 	border: 2px solid #ccd5d9;
 	border-bottom: 2px solid #0275b8;
 	animation: load 0.6s infinite linear;
+	@include border-radius(50%);
 }
 
 @keyframes load {
