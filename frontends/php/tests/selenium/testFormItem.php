@@ -2633,7 +2633,7 @@ class testFormItem extends CWebTest {
 			$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
 			$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type'][readonly]");
 			$this->zbxTestDropdownAssertSelected("preprocessing[".($itemPreproc['step']-1)."][type]", $preprocessing_type);
-			if ((1 <= $itemPreproc['type']) && ($itemsPreproc['type'] <= 4)) {
+			if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
 				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
 				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
 			}
