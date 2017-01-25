@@ -416,8 +416,6 @@
 					data = $this.data('dashboardGrid');
 
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
-				makeDraggable($this, data, widget);
-				makeResizable($this, data, widget);
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
@@ -428,6 +426,9 @@
 
 				showPreloader(widget);
 				updateWidgetContent(widget);
+
+				makeDraggable($this, data, widget);
+				makeResizable($this, data, widget);
 			});
 		},
 
