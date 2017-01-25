@@ -21,6 +21,30 @@
 (function($) {
 	"use strict"
 
+	function makeWidgetDiv(data, widget) {
+		widget['content_header'] = $('<div>')
+			.addClass('dashbrd-widget-head')
+			.addClass('cursor-move')
+			.append($('<h4>').text(widget['header']));
+		widget['content_body'] = $('<div>');
+		widget['content_footer'] = $('<div>')
+			.addClass('dashbrd-widget-foot');
+
+		return $('<div>', {
+			'class': 'dashbrd-grid-widget',
+			'css': {
+				'min-height': '' + data['options']['widget-height'] + 'px',
+				'min-width': '' + data['options']['widget-width'] + '%'
+			}
+		})
+			.append(
+				$('<div>', {'class': 'dashbrd-grid-widget-content'})
+					.append(widget['content_header'])
+					.append(widget['content_body'])
+					.append(widget['content_footer'])
+			);
+	}
+
 	function resizeDashboardGrid($obj, data, min_rows) {
 		data['options']['rows'] = 0;
 
@@ -225,38 +249,116 @@
 		});
 	}
 
+	function makeDraggable($obj, data, widget) {
+		widget['div'].draggable({
+			handle: widget['content_header'],
+			start: function(event, ui) {
+				startWidgetPositioning($(event.target), data);
+			},
+			drag: function(event, ui) {
+				doWidgetPositioning($obj, $(event.target), data);
+			},
+			stop: function(event, ui) {
+				stopWidgetPositioning($obj, $(event.target), data);
+			}
+		});
+	}
+
+	function makeResizable($obj, data, widget) {
+		var	handles = {};
+
+		$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
+			var	$handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
+
+			if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
+				$handle
+					.append($('<div>', {'class': 'ui-resize-dot'}))
+					.append($('<div>', {'class': 'ui-resizable-border-' + key}));
+			}
+
+			widget['div'].append($handle);
+			handles[key] = $handle;
+		});
+
+		widget['div'].resizable({
+			handles: handles,
+			autoHide: true,
+			start: function(event, ui) {
+				startWidgetPositioning($(event.target), data);
+			},
+			resize: function(event, ui) {
+				doWidgetPositioning($obj, $(event.target), data);
+			},
+			stop: function(event, ui) {
+				stopWidgetPositioning($obj, $(event.target), data);
+			}
+		});
+	}
+
+	function showPreloader(widget) {
+		if (widget['preloader_div'] === undefined) {
+			widget['preloader_div'] = $('<div>', {
+				'class': 'preloader-container'
+			}).append($('<div>', {
+				'class': 'preloader'
+			}));
+
+			widget['div'].append(widget['preloader_div']);
+		}
+	}
+
+	function hidePreloader(widget) {
+		if (widget['preloader_div'] !== undefined) {
+			widget['preloader_div'].remove();
+			delete widget['preloader_div'];
+		}
+	}
+
+	function startPreloader(widget) {
+		widget['preloader_timeoutid'] = setTimeout(function () {
+			delete widget['preloader_timeoutid'];
+
+			showPreloader(widget);
+			widget['div'].fadeTo(widget['preloader_fadespeed'], 0.6);
+		}, widget['preloader_timeout']);
+	}
+
+	function stopPreloader(widget) {
+		if (widget['preloader_timeoutid'] !== undefined) {
+			clearTimeout(widget['preloader_timeoutid']);
+		}
+
+		hidePreloader(widget);
+		widget['div'].fadeTo(0, 1);
+	}
+
 	function updateWidgetContent(widget) {
 		var url = new Curl('zabbix.php');
 
-		url.setArgument('action', 'widget.' + widget.widgetid + '.view')
+		url.setArgument('action', 'widget.' + widget['widgetid'] + '.view')
 		url.setArgument('output', 'ajax');
+
+		startPreloader(widget);
 
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'GET',
 			dataType: 'json',
 			success: function(resp) {
-				var $content_div = $('.dashbrd-grid-widget-content', widget['div']);
+				stopPreloader(widget);
 
-				$content_div.empty();
+				$('h4', widget['content_header']).text(resp.header);
 
-				if (resp.header !== undefined) {
-					$content_div.append($('<div>', {
-						'class': 'dashbrd-widget-head'
-					}).append($('<h4>').html(resp.header)));
-				}
+				widget['content_body'].empty();
 				if (resp.messages !== undefined) {
-					$content_div.append(resp.messages);
+					$widget['content_body'].append(resp.messages);
 				}
-				$content_div.append(resp.body);
+				widget['content_body'].append(resp.body);
 				if (resp.debug !== undefined) {
-					$content_div.append(resp.debug);
+					widget['content_body'].append(resp.debug);
 				}
-				if (resp.footer !== undefined) {
-					$content_div.append($('<div>', {
-						'class': 'dashbrd-widget-foot'
-					}).html(resp.footer));
-				}
+
+				widget['content_footer'].html(resp.footer);
 
 				if (widget['frequency'] != 0) {
 					setTimeout(function () { updateWidgetContent(widget); }, widget['frequency'] * 1000);
@@ -292,89 +394,46 @@
 			});
 		},
 
-		addWidget: function(params) {
-			params = $.extend({}, {
+		addWidget: function(widget) {
+			widget = $.extend({}, {
 				'widgetid': '',
+				'header': '',
 				'pos': {
 					'row': 0,
 					'col': 0,
 					'height': 1,
 					'width': 1
 				},
-				'frequency': 0
-			}, params);
+				'frequency': 0,
+				'preloader_timeout': 10000,	// in milliseconds
+				'preloader_fadespeed': 2000
+			}, widget);
 
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid'),
-					$div = $('<div>', {
-						'class': 'dashbrd-grid-widget',
-						'css': {
-							'min-height': '' + data['options']['widget-height'] + 'px',
-							'min-width': '' + data['options']['widget-width'] + '%'
-						}
-					})
-						.data('widget-index', data['widgets'].length)
-						.append($('<div>', {'class': 'dashbrd-grid-widget-content'})),
-					handles = {};
+					data = $this.data('dashboardGrid');
 
-				$.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
-					var	$handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
+				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				makeDraggable($this, data, widget);
+				makeResizable($this, data, widget);
 
-					if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
-						$handle
-							.append($('<div>', {'class': 'ui-resize-dot'}))
-							.append($('<div>', {'class': 'ui-resizable-border-' + key}));
-					}
+				data['widgets'].push(widget);
+				$this.append(widget['div']);
 
-					$div.append($handle);
-					handles[key] = $handle;
-				});
-
-				params['div'] = $div;
-				data['widgets'].push(params);
-
-				setDivPosition($div, data, params['pos']);
+				setDivPosition(widget['div'], data, widget['pos']);
 
 				resizeDashboardGrid($this, data);
 
-				$this.append($div);
-
-				updateWidgetContent(params);
-
-				$div.draggable({
-					start: function(event, ui) {
-						startWidgetPositioning($(event.target), data);
-					},
-					drag: function(event, ui) {
-						doWidgetPositioning($this, $(event.target), data);
-					},
-					stop: function(event, ui) {
-						stopWidgetPositioning($this, $(event.target), data);
-					}
-				});
-
-				$div.resizable({
-					handles: handles,
-					autoHide: true,
-					start: function(event, ui) {
-						startWidgetPositioning($(event.target), data);
-					},
-					resize: function(event, ui) {
-						doWidgetPositioning($this, $(event.target), data);
-					},
-					stop: function(event, ui) {
-						stopWidgetPositioning($this, $(event.target), data);
-					}
-				});
+				showPreloader(widget);
+				updateWidgetContent(widget);
 			});
 		},
 
-		addWidgets: function(params) {
+		addWidgets: function(widgets) {
 			return this.each(function() {
 				var	$this = $(this);
 
-				$.each(params, function(index, value) {
+				$.each(widgets, function(index, value) {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
 				});
 			});

@@ -19,7 +19,6 @@
 **/
 
 
-$this->addJsFile('class.pmaster.js');
 $this->addJsFile('dashboard.grid.js');
 
 /*
@@ -27,44 +26,44 @@ $this->addJsFile('dashboard.grid.js');
  */
 $widgets = [
 	WIDGET_FAVOURITE_GRAPHS => [
-//		'header' => _('Favourite graphs'),
+		'header' => _('Favourite graphs'),
 		'pos' => ['row' => 0, 'col' => 0, 'height' => 4, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_SCREENS => [
-//		'header' => _('Favourite screens'),
+		'header' => _('Favourite screens'),
 		'pos' => ['row' => 4, 'col' => 0, 'height' => 3, 'width' => 2]
 	],
 	WIDGET_FAVOURITE_MAPS => [
-//		'header' => _('Favourite maps'),
+		'header' => _('Favourite maps'),
 		'pos' => ['row' => 7, 'col' => 0, 'height' => 3, 'width' => 2]
 	],
 	WIDGET_SYSTEM_STATUS => [
-//		'header' => _('System status'),
+		'header' => _('System status'),
 		'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 5]
 	],
 	WIDGET_HOST_STATUS => [
-//		'header' => _('Host status'),
+		'header' => _('Host status'),
 		'pos' => ['row' => 3, 'col' => 2, 'height' => 3, 'width' => 5]
 	],
 	WIDGET_LAST_ISSUES => [
-//		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 		'pos' => ['row' => 6, 'col' => 2, 'height' => 4, 'width' => 5]
 	],
 	WIDGET_WEB_OVERVIEW => [
-//		'header' => _('Web monitoring'),
+		'header' => _('Web monitoring'),
 		'pos' => ['row' => 7, 'col' => 7, 'height' => 3, 'width' => 5]
 	]
 ];
 
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
-//		'header' => _('Status of Zabbix'),
+		'header' => _('Status of Zabbix'),
 		'pos' => ['row' => 0, 'col' => 7, 'height' => 4, 'width' => 5]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
-//		'header' => _('Discovery status'),
+		'header' => _('Discovery status'),
 		'pos' => ['row' => 4, 'col' => 7, 'height' => 3, 'width' => 5]
 	];
 }
@@ -74,12 +73,14 @@ $grid_widgets = [];
 foreach ($widgets as $widgetid => $widget) {
 	$grid_widgets[] = [
 		'widgetid' => $widgetid,
+		'header' => $widget['header'],
 		'pos' => [
 			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
 			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
 			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
 			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
-		]
+		],
+		'frequency' => 60
 	];
 }
 
