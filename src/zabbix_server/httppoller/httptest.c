@@ -764,7 +764,8 @@ clean:
 	DBfree_result(result);
 
 	delay_str = zbx_strdup(NULL, httptest->httptest.delay);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON,
+			NULL, 0);
 
 	if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 	{
