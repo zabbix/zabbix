@@ -4020,26 +4020,29 @@ a.overlay-close-btn {
 }
 
 .preloader-container {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	z-index: 10;
+	padding: 7px;
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin: auto;
 	position: absolute;
-	z-index: 2;
-	left: 5px;
-	top: 5px;
-	right: 5px;
-	bottom: 5px;
 	background-color: rgba($ui-bg-color, .8);
+	@include border-radius(50%);
+	@include transform(translateY(-50%));
 }
 
 .preloader {
+	@include border-radius(50%);
 	width: 20px;
 	height: 20px;
+	margin: 0 auto;
 	border: 2px solid #ccd5d9;
 	border-bottom: 2px solid #0275b8;
 	animation: load 0.6s infinite linear;
-	@include border-radius(50%);
 }
 
 @keyframes load {
