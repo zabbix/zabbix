@@ -143,6 +143,9 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
+#define ZBX_EMPTY_LIST_NOT_ALLOWED	0
+#define ZBX_EMPTY_LIST_ALLOWED		1
+
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_empty);
 

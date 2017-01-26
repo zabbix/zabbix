@@ -1928,7 +1928,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
-	if (1 == allow_if_empty && (NULL == peer_list || '\0' == *peer_list))
+	if (ZBX_EMPTY_LIST_ALLOWED == allow_if_empty && (NULL == peer_list || '\0' == *peer_list))
 		return SUCCEED;
 
 	nlen = sizeof(name);
