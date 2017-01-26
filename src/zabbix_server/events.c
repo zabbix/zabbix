@@ -901,7 +901,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
-	for (; SUCCEED == zbx_token_find(expression, pos, &token); pos++)
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;
@@ -1176,7 +1176,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
-	for (; SUCCEED == zbx_token_find(expression, pos, &token); pos++)
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;
