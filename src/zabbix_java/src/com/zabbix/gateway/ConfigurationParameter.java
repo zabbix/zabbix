@@ -81,9 +81,12 @@ class ConfigurationParameter
 		{
 			throw new IllegalArgumentException(e);
 		}
+		
+		if (null == userValue)
+			throw new IllegalArgumentException(String.format("unknown type %d", type));
 
 		if (null != validator && !validator.validate(userValue))
-			throw new IllegalArgumentException("bad value for " + name + " parameter: '" + text + "'");
+			throw new IllegalArgumentException(String.format("bad value for %s parameter: '%s'", name, text));
 
 		if (null != postValidator)
 			postValidator.execute(userValue);
