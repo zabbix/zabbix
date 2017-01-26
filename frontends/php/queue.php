@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ $queueRequests = [
 	QUEUE_OVERVIEW_BY_PROXY => CZabbixServer::QUEUE_OVERVIEW_BY_PROXY,
 	QUEUE_DETAILS => CZabbixServer::QUEUE_DETAILS
 ];
-$queueData = $zabbixServer->getQueue($queueRequests[$config], get_cookie('zbx_sessionid'));
+$queueData = $zabbixServer->getQueue($queueRequests[$config], get_cookie('zbx_sessionid'), QUEUE_DETAIL_ITEM_COUNT);
 
 // check for errors error
 if ($zabbixServer->getError()) {
@@ -255,7 +255,7 @@ elseif ($config == QUEUE_DETAILS) {
 			continue;
 		}
 
-		// display only the first 500 items
+		// display only the first QUEUE_DETAIL_ITEM_COUNT items (can only occur when using old server versions)
 		$i++;
 		if ($i > QUEUE_DETAIL_ITEM_COUNT) {
 			break;
@@ -277,20 +277,37 @@ elseif ($config == QUEUE_DETAILS) {
 
 // display the table footer
 if ($config == QUEUE_OVERVIEW_BY_PROXY) {
-	$table->setFooter(
-		new CCol(_('Total').': '.$table->getNumRows())
-	);
+	$total = _('Total').': '.$table->getNumRows();
 }
 elseif ($config == QUEUE_DETAILS) {
-	$table->setFooter(
-		new CCol(_('Total').': '.$table->getNumRows().
-		(count($queueData) > QUEUE_DETAIL_ITEM_COUNT ? ' ('._('Truncated').')' : ''))
-	);
+	if (null !== $zabbixServer->getTotalCount()) {
+		$total = _s('Displaying %1$s of %2$s found', $table->getNumRows(), $zabbixServer->getTotalCount());
+	}
+	else {
+		// fallback to old solution
+		$total = _('Total').': '.$table->getNumRows().
+			(count($queueData) > QUEUE_DETAIL_ITEM_COUNT ? ' ('._('Truncated').')' : '');
+	}
+}
+else {
+	$total = null;
+}
+
+if ($total !== null) {
+	$total = (new CDiv())
+		->addClass(ZBX_STYLE_TABLE_PAGING)
+		->addItem((new CDiv())
+			->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			->addItem((new CDiv())
+				->addClass(ZBX_STYLE_TABLE_STATS)
+				->addItem($total)
+			)
+		);
 }
 
 $widget
 	->addItem($table)
+	->addItem($total)
 	->show();
-
 
 require_once dirname(__FILE__).'/include/page_footer.php';
