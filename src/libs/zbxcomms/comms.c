@@ -1857,12 +1857,12 @@ static int	validate_hostname(const char *hostname, int len)
 	return SUCCEED;
 }
 
-int	zbx_validate_ip_list(const char *ip_list, char **error)
+int	zbx_validate_peer_list(const char *peer_list, char **error)
 {
 	char	*start, *end, *cidr_sep;
 	char	tmp[MAX_STRING_LEN];
 
-	strscpy(tmp, ip_list);
+	strscpy(tmp, peer_list);
 
 	for (start = tmp; '\0' != *start;)
 	{
@@ -1899,11 +1899,11 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
  *                                                                            *
  * Function: zbx_tcp_check_security                                           *
  *                                                                            *
- * Purpose: check if connection initiator is in list of IP addresses          *
+ * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
  * Parameters: s - socket descriptor                                          *
- *             host_list - comma-delimited list of hosts                      *
- *             allow_if_empty - allow connection if no IP given               *
+ *             peer_list - comma-delimited list of peers                      *
+ *             allow_if_empty - allow connection if no peers given            *
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
@@ -1914,7 +1914,7 @@ int	zbx_validate_ip_list(const char *ip_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_empty)
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
@@ -1928,7 +1928,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
-	if (1 == allow_if_empty && (NULL == host_list || '\0' == *host_list))
+	if (1 == allow_if_empty && (NULL == peer_list || '\0' == *peer_list))
 		return SUCCEED;
 
 	nlen = sizeof(name);
@@ -1940,7 +1940,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_
 		return FAIL;
 	}
 
-	strscpy(tmp, host_list);
+	strscpy(tmp, peer_list);
 
 	for (start = tmp; '\0' != *start;)
 	{
@@ -2016,9 +2016,9 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *host_list, int allow_if_
 
 #if defined(HAVE_IPV6)
 	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
-		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, host_list);
+		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, peer_list);
 	else
-		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", host_list);
+		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", peer_list);
 #else
 	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"",
 			inet_ntoa(name.sin_addr), host_list);
