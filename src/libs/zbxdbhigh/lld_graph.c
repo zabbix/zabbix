@@ -643,7 +643,7 @@ static void 	lld_graph_make(zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gr
 	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
 	{
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_SIMPLE, NULL, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(graph->name, buffer))
 		{
@@ -673,7 +673,7 @@ static void 	lld_graph_make(zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gr
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		substitute_lld_macros(&graph->name, jp_row, ZBX_MACRO_SIMPLE, NULL, NULL, 0);
+		substitute_lld_macros(&graph->name, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		graph->ymin_itemid = ymin_itemid;
