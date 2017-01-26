@@ -64,7 +64,7 @@ class CMacrosResolverGeneral {
 		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
 
 		// Replace whitespace with emptyness to make value search easier.
-		$expression = preg_replace('/[ \r\n\t]+/', '', $expression);
+		$expression = str_replace(" \r\n\t", '', $expression);
 
 		// Search for numeric values in expression.
 		preg_match_all('/((?<![\)\.0-9]|[\.0-9]['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']|function)\-?'.
