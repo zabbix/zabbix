@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ static void	ipmi_poller_send_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request
  * Purpose: schedules request to IPMI poller                                  *
  *                                                                            *
  * Parameters: poller  - [IN] the IPMI poller                                 *
- *             message - [IN] the message to send                             *
+ *             request - [IN] the request to send                             *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_schedule_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request_t *request)
@@ -620,15 +620,14 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
  * Purpose: updates cached host                                               *
  *                                                                            *
  * Parameters: manager - [IN] the IPMI manager                                *
- *             hostid  - [IN] the host identifier                             *
- *             now     - [IN] the current time                                *
+ *             host    - [IN] the host                                        *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, zbx_uint64_t hostid, const DC_HOST *host)
+static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const DC_HOST *host)
 {
 	zbx_ipmi_manager_host_t	*ipmi_host;
 
-	if (NULL == (ipmi_host = (zbx_ipmi_manager_host_t *)zbx_hashset_search(&manager->hosts, &hostid)))
+	if (NULL == (ipmi_host = (zbx_ipmi_manager_host_t *)zbx_hashset_search(&manager->hosts, &host->hostid)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
@@ -656,7 +655,7 @@ static void	ipmi_manager_activate_host(zbx_ipmi_manager_t *manager, zbx_uint64_t
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	zbx_activate_item_host(&item, ts);
-	ipmi_manager_update_host(manager, item.host.hostid, &item.host);
+	ipmi_manager_update_host(manager, &item.host);
 
 	DCconfig_clean_items(&item, &errcode, 1);
 }
@@ -682,7 +681,7 @@ static void	ipmi_manager_deactivate_host(zbx_ipmi_manager_t *manager, zbx_uint64
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	zbx_deactivate_item_host(&item, ts, error);
-	ipmi_manager_update_host(manager, item.host.hostid, &item.host);
+	ipmi_manager_update_host(manager, &item.host);
 
 	DCconfig_clean_items(&item, &errcode, 1);
 }
@@ -799,7 +798,7 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, int command, zbx
  * Purpose: schedules request to the host                                     *
  *                                                                            *
  * Parameters: manager  - [IN] the IPMI manager                               *
- *             host     - [IN] the target host                                *
+ *             hostid   - [IN] the target host id                             *
  *             request  - [IN] the request to schedule                        *
  *             now      - [IN] the current timestamp                          *
  *                                                                            *

@@ -104,7 +104,7 @@ static const char	*ipc_get_path()
  *                                                                            *
  * Purpose: makes socket path from the service name                           *
  *                                                                            *
- * Parameters: service - [IN] the service name                                *
+ * Parameters: service_name - [IN] the service name                           *
  *                                                                            *
  * Return value: The created path or NULL if the path exceeds unix domain     *
  *               socket path maximum length                                   *
@@ -153,7 +153,6 @@ static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, 
 {
 	zbx_uint32_t	offset = 0;
 	int		n, ret = SUCCEED;
-	static zbx_uint64_t	write_num = 0;
 
 	while (offset != size)
 	{
@@ -171,7 +170,6 @@ static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, 
 			ret = FAIL;
 			break;
 		}
-		write_num += n;
 		offset += n;
 	}
 
@@ -230,9 +228,9 @@ static int	ipc_read_data(int fd, unsigned char *buffer, zbx_uint32_t size, zbx_u
  * Purpose: reads data from a socket until the requested data has been read   *
  *                                                                            *
  * Parameters: fd        - [IN] the socket file descriptor                    *
- *             data      - [IN] the data                                      *
+ *             buffer    - [IN] the data                                      *
  *             size      - [IN] the data size                                 *
- *             size_sent - [IN] the actual size read from socket              *
+ *             read_size - [IN] the actual size read from socket              *
  *                                                                            *
  * Return value: SUCCEED - the data was successfully read                     *
  *               FAIL    - otherwise                                          *
@@ -273,7 +271,7 @@ out:
  *                                                                            *
  * Purpose: writes IPC message to socket                                      *
  *                                                                            *
- * Parameters: socket  - [IN] the IPC socket                                  *
+ * Parameters: csocket - [IN] the IPC socket                                  *
  *             code    - [IN] the message code                                *
  *             data    - [IN] the data                                        *
  *             size    - [IN] the data size                                   *
@@ -329,7 +327,7 @@ static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code
  *                                (including header)                          *
  *             buffer      - [IN] the buffer to parse                         *
  *             size        - [IN] the number of bytes to parse                *
- *             size_parsed - [OUT] the number of bytes parsed                 *
+ *             read_size   - [OUT] the number of bytes read                   *
  *                                                                            *
  * Return value: SUCCEED - message was successfully parsed                    *
  *               FAIL - not enough data                                       *
@@ -407,7 +405,8 @@ static int	ipc_message_is_completed(const zbx_uint32_t *header, zbx_uint32_t rx_
  * Purpose: reads IPC message from buffered client socket                     *
  *                                                                            *
  * Parameters: csocket  - [IN] the source socket                              *
- *             message  - [OUT] the message                                   *
+ *             header   - [OUT] the header of the message                     *
+ *             data     - [OUT] the data of the message                       *
  *             rx_bytes - [IN/OUT] the total message size read (including     *
  *                                 header                                     *
  *                                                                            *
@@ -486,7 +485,7 @@ out:
  *                                                                            *
  * Purpose: frees client's libevent event                                     *
  *                                                                            *
- * Parameters: client - [IN]                                                  *
+ * Parameters: client - [IN] the client                                       *
  *                                                                            *
  ******************************************************************************/
 static void	ipc_client_free_events(zbx_ipc_client_t *client)
@@ -829,7 +828,6 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
-
 
 	if (SUCCEED != ipc_client_write(client))
 	{
@@ -1217,7 +1215,8 @@ void	zbx_ipc_message_init(zbx_ipc_message_t *message)
  *                                                                            *
  * Purpose: formats message to readable format for debug messages             *
  *                                                                            *
- * Parameters: service - [IN] the IPC service                                 *
+ * Parameters: message - [IN] the message                                     *
+ *             data    - [OUT] the formatted message                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
@@ -1508,7 +1507,7 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 			{
-				char		*data = NULL;
+				char	*data = NULL;
 
 				zbx_ipc_message_format(*message, &data);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, data);
@@ -1592,8 +1591,7 @@ out:
  *                                                                            *
  * Purpose: closes client socket and frees resources allocated for client     *
  *                                                                            *
- * Parameters: service - [IN] the IPC service                                 *
- *             csocket - [IN] the client socket.                              *
+ * Parameters: csocket - [IN] the client socket.                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ipc_client_close(zbx_ipc_client_t *client)
