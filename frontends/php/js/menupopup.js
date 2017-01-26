@@ -340,10 +340,11 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string options['widgetName']		widget name
- * @param string options['currentRate']		current rate value
- * @param bool   options['multiplier']		multiplier or time mode
- * @param array  options['params']			url parameters (optional)
+ * @param string   options['widgetName']   widget name
+ * @param string   options['currentRate']  current rate value
+ * @param bool     options['multiplier']   multiplier or time mode
+ * @param array    options['params']       (optoinal) url parameters
+ * @param callback options['callback']     (optional) callback function on success
  *
  * @return array
  */
@@ -392,28 +393,45 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 				else {
-					sendAjaxData('zabbix.php?action=dashboard.widget', {
-						data: jQuery.extend({}, params, {
-							widget: options.widgetName,
-							refreshrate: currentRate
-						}),
-						dataType: 'script',
-						success: function(js) { js }
+					var url = new Curl('zabbix.php');
+
+					url.setArgument('action', 'dashbrd.widget.update')
+
+					jQuery.ajax({
+						url: url.getUrl(),
+						method: 'POST',
+						dataType: 'json',
+						data: {
+							widgets: [
+								{
+									'widgetid': options.widgetName,
+									'rf_rate': currentRate
+								}
+							]
+						},
+						success: function(resp) {
+							jQuery('a').each(function() {
+								var link = jQuery(this);
+
+								if (link.data('value') == currentRate) {
+									link.addClass('selected');
+								}
+								else {
+									link.removeClass('selected');
+								}
+							});
+
+							obj.closest('.action-menu').fadeOut(100);
+
+							jQuery('.dashbrd-grid-widget-container')
+								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
+						},
+						error: function() {
+							obj.closest('.action-menu').fadeOut(100);
+							// TODO: gentle message about failed saving of widget refresh rate
+						}
 					});
 				}
-
-				jQuery('a').each(function() {
-					var link = jQuery(this);
-
-					if (link.data('value') == currentRate) {
-						link.addClass('selected');
-					}
-					else {
-						link.removeClass('selected');
-					}
-				});
-
-				obj.closest('.action-menu').fadeOut(100);
 			}
 		};
 

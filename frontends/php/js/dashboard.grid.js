@@ -30,6 +30,23 @@
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-widget-foot');
 
+		if (widget['rf_rate'] != 0) {
+			widget['content_header'].append($('<ul>')
+				.append($('<li>')
+					.append($('<button>', {
+						'type': 'button',
+						'class': 'btn-widget-action',
+						'data-menu-popup': JSON.stringify({
+							'type': 'refresh',
+							'widgetName': widget['widgetid'],
+							'currentRate': widget['rf_rate'],
+							'multiplier': false
+						})
+					}))
+				)
+			);
+		}
+
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget',
 			'css': {
@@ -54,7 +71,7 @@
 			}
 		});
 
-		if (min_rows !== undefined && data['options']['rows'] < min_rows) {
+		if (typeof(min_rows) != 'undefined' && data['options']['rows'] < min_rows) {
 			data['options']['rows'] = min_rows;
 		}
 
@@ -211,25 +228,26 @@
 		$div.removeClass('dashbrd-grid-widget-draggable');
 
 		url.setArgument('action', 'dashbrd.widget.update')
-		url.setArgument('output', 'ajax');
 
 		$.each(data['widgets'], function() {
 			ajax_data.push({
-				widgetid: this['widgetid'],
-				row: this['current_pos']['row'],
-				col: this['current_pos']['col'],
-				height: this['current_pos']['height'],
-				width: this['current_pos']['width']
+				'widgetid': this['widgetid'],
+				'pos': {
+					'row': this['current_pos']['row'],
+					'col': this['current_pos']['col'],
+					'height': this['current_pos']['height'],
+					'width': this['current_pos']['width']
+				}
 			});
 		});
 
-		jQuery.ajax({
+		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
+			dataType: 'json',
 			data: {
 				widgets: ajax_data
 			},
-			dataType: 'json',
 			success: function(resp) {
 				$.each(data['widgets'], function() {
 					this['pos'] = this['current_pos'];
@@ -296,7 +314,7 @@
 	}
 
 	function showPreloader(widget) {
-		if (widget['preloader_div'] === undefined) {
+		if (typeof(widget['preloader_div']) == 'undefined') {
 			widget['preloader_div'] = $('<div>', {
 				'class': 'preloader-container'
 			}).append($('<div>', {
@@ -308,7 +326,7 @@
 	}
 
 	function hidePreloader(widget) {
-		if (widget['preloader_div'] !== undefined) {
+		if (typeof(widget['preloader_div']) != 'undefined') {
 			widget['preloader_div'].remove();
 			delete widget['preloader_div'];
 		}
@@ -325,7 +343,7 @@
 	}
 
 	function stopPreloader(widget) {
-		if (widget['preloader_timeoutid'] !== undefined) {
+		if (typeof(widget['preloader_timeoutid']) != 'undefined') {
 			clearTimeout(widget['preloader_timeoutid']);
 		}
 
@@ -334,11 +352,24 @@
 		widget['content_footer'].fadeTo(0, 1);
 	}
 
+	function startWidgetRefreshTimer(widget) {
+		if (widget['rf_rate'] != 0) {
+			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget); }, widget['rf_rate'] * 1000);
+		}
+	}
+
+	function startWidgetRefresh(widget) {
+		if (typeof(widget['rf_timeoutid']) != 'undefined') {
+			clearTimeout(widget['rf_timeoutid']);
+		}
+
+		startWidgetRefreshTimer(widget);
+	}
+
 	function updateWidgetContent(widget) {
 		var url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'widget.' + widget['widgetid'] + '.view')
-		url.setArgument('output', 'ajax');
 
 		startPreloader(widget);
 
@@ -352,25 +383,21 @@
 				$('h4', widget['content_header']).text(resp.header);
 
 				widget['content_body'].empty();
-				if (resp.messages !== undefined) {
+				if (typeof(resp.messages) != 'undefined') {
 					$widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
-				if (resp.debug !== undefined) {
+				if (typeof(resp.debug) != 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
 
 				widget['content_footer'].html(resp.footer);
 
-				if (widget['frequency'] != 0) {
-					setTimeout(function () { updateWidgetContent(widget); }, widget['frequency'] * 1000);
-				}
+				startWidgetRefreshTimer(widget);
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
-				if (widget['frequency'] != 0) {
-					setTimeout(function () { updateWidgetContent(widget); }, widget['frequency'] * 1000);
-				}
+				startWidgetRefreshTimer(widget);
 			}
 		});
 	}
@@ -406,7 +433,7 @@
 					'height': 1,
 					'width': 1
 				},
-				'frequency': 0,
+				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500
 			}, widget);
@@ -429,6 +456,23 @@
 
 				makeDraggable($this, data, widget);
 				makeResizable($this, data, widget);
+			});
+		},
+
+		setWidgetRefreshRate: function(widgetid, rf_rate) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid) {
+						if (widget['rf_rate'] != rf_rate) {
+							widget['rf_rate'] = rf_rate;
+
+							startWidgetRefresh(widget);
+						}
+					}
+				});
 			});
 		},
 

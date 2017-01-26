@@ -24,26 +24,33 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 class CControllerDashbrdWidgetUpdate extends CController {
 
 	protected function checkInput() {
-		$widgetids = [
-			WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
-			WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS,
-			WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS, WIDGET_FAVOURITE_SCREENS
-		];
-
 		$fields = [
 			'widgets' =>	'required|array'
-//			'widgetid' =>		'fatal|required|in '.implode(',', $widgetids),
-//			'refreshrate' =>	'fatal         |in 10,30,60,120,600,900',
-//			'state' =>			'fatal         |in 0,1',
-//			'row' =>			'fatal         |ge 0',
-//			'col' =>			'fatal         |ge 0',
-//			'height' =>			'fatal         |ge 1',
-//			'width' =>			'fatal         |ge 1'
 		];
 
-// TODO: validation
-
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$widgetids = [
+				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
+				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
+				WIDGET_FAVOURITE_SCREENS
+			];
+
+			/*
+			 * @var array  $widgets
+			 * @var string $widget[]['widgetid']
+			 * @var int    $widget[]['rf_rate']        (optional)
+			 * @var array  $widget[]['pos']            (optional)
+			 * @var int    $widget[]['pos']['row']
+			 * @var int    $widget[]['pos']['col']
+			 * @var int    $widget[]['pos']['height']
+			 * @var int    $widget[]['pos']['width']
+			 */
+			foreach ($this->getInput('widgets') as $widget) {
+				// TODO: validation
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));
@@ -57,28 +64,19 @@ class CControllerDashbrdWidgetUpdate extends CController {
 	}
 
 	protected function doAction() {
-
-/*		if ($this->hasInput('refreshrate')) {
-			$refreshrate = $this->getInput('refreshrate');
-
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $refreshrate, PROFILE_TYPE_INT);
-
-			$data['main_block'] =
-				'PMasters["dashboard"].dolls["'.$widgetid.'"].frequency('.CJs::encodeJson($refreshrate).');'."\n".
-				'PMasters["dashboard"].dolls["'.$widgetid.'"].restartDoll();';
-		}
-
-		if ($this->hasInput('state')) {
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.state', $this->getInput('state'), PROFILE_TYPE_INT);
-		}
-*/
 		foreach ($this->getInput('widgets') as $widget) {
 			$widgetid = $widget['widgetid'];
 
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $widget['row'], PROFILE_TYPE_INT);
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $widget['col'], PROFILE_TYPE_INT);
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['height'], PROFILE_TYPE_INT);
-			CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['width'], PROFILE_TYPE_INT);
+			if (array_key_exists('rf_rate', $widget)) {
+				CProfile::update('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'], PROFILE_TYPE_INT);
+			}
+
+			if (array_key_exists('pos', $widget)) {
+				CProfile::update('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row'], PROFILE_TYPE_INT);
+				CProfile::update('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col'], PROFILE_TYPE_INT);
+				CProfile::update('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height'], PROFILE_TYPE_INT);
+				CProfile::update('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'], PROFILE_TYPE_INT);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson('')]));

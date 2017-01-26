@@ -58,7 +58,7 @@ class CRouter {
 		'acknowledge.create'	=> ['CControllerAcknowledgeCreate',		null,					null],
 		'acknowledge.edit'		=> ['CControllerAcknowledgeEdit',		'layout.htmlpage',		'monitoring.acknowledge.edit'],
 		'dashboard.view'		=> ['CControllerDashboardView',			'layout.htmlpage',		'monitoring.dashboard.view'],
-		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',	null],
+		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
 		'favourite.delete'		=> ['CControllerFavouriteDelete',		'layout.javascript',	null],
