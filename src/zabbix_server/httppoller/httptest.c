@@ -556,14 +556,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
-		/* enable/disable fetching the body */
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
-				ZBX_RETRIEVE_MODE_HEADERS == httpstep.retrieve_mode ? 1L : 0L)))
-		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			goto httpstep_error;
-		}
-
 		if (HTTPTEST_AUTH_NONE != httptest->httptest.authentication)
 		{
 			long	curlauth = 0;
