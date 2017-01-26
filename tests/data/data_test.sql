@@ -825,7 +825,8 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (143,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (144,15095,2,2,'abc');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (145,15095,3,3,'def');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (146,15095,4,4,'1a2b3c');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,5,5,'regular expression\noutput formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,5,5,'regular expression pattern
+output formatting template');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (148,15095,6,6,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (149,15095,7,7,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (150,15095,8,8,'');
@@ -834,7 +835,8 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (152,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (153,15096,2,2,'abc');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (154,15096,3,3,'def');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (155,15096,4,4,'1a2b3c');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (156,15096,5,5,'regular expression\noutput formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (156,15096,5,5,'regular expression pattern
+output formatting template');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (157,15096,6,6,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (158,15096,7,7,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (159,15096,8,8,'');
