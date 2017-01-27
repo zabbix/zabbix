@@ -710,6 +710,7 @@ footer {
 
 	td {
 		padding: 6px 5px;
+		position: relative;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -2628,7 +2629,8 @@ $form-icon-btn: (
 	text-align: right;
 	color: $font-alt-color;
 	margin: 0 10px;
-	align-self: flex-end;
+	position: absolute;
+	bottom: 10px;
 
 	li {
 		display: inline-block;
@@ -3933,6 +3935,17 @@ td.inactive-bg {
 		text-decoration: none;
 		color: $font-alt-color;
 	}
+}
+
+.remove-btn {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	min-height: auto;
+	border: none;
+	background-color: $transparent !important;
+	@extend %close-icon;
+	@include border-radius(2px);
 }
 
 .overlay-close-btn {
