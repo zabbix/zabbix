@@ -1077,9 +1077,9 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			if (SUCCEED == correlation_condition_match_new_event(condition, event, SUCCEED))
-				filter = "1";
+				filter = "1=1";
 			else
-				filter = "0";
+				filter = "0=1";
 
 			return zbx_strdup(NULL, filter);
 	}
