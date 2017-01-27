@@ -352,9 +352,9 @@
 		widget['content_footer'].fadeTo(0, 1);
 	}
 
-	function startWidgetRefreshTimer(widget) {
-		if (widget['rf_rate'] != 0) {
-			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget); }, widget['rf_rate'] * 1000);
+	function startWidgetRefreshTimer(widget, rf_rate) {
+		if (rf_rate != 0) {
+			widget['rf_timeoutid'] = setTimeout(function () { updateWidgetContent(widget); }, rf_rate * 1000);
 		}
 	}
 
@@ -363,7 +363,7 @@
 			clearTimeout(widget['rf_timeoutid']);
 		}
 
-		startWidgetRefreshTimer(widget);
+		startWidgetRefreshTimer(widget, widget['rf_rate']);
 	}
 
 	function updateWidgetContent(widget) {
@@ -393,11 +393,11 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				startWidgetRefreshTimer(widget);
+				startWidgetRefreshTimer(widget, widget['rf_rate']);
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
-				startWidgetRefreshTimer(widget);
+				startWidgetRefreshTimer(widget, 3);
 			}
 		});
 	}
