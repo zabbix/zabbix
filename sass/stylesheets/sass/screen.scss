@@ -2556,9 +2556,6 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	margin: .25rem;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 
@@ -2597,6 +2594,15 @@ $form-icon-btn: (
 	position: absolute;
 }
 
+.dashbrd-grid-widget-padding {
+	display: flex;
+	flex-direction: column;
+	margin: .25rem;
+	flex-grow: 1;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+}
+
 .dashbrd-grid-widget-head {
 	position: relative;
 	padding: 8px 40px 8px 10px;
@@ -2628,13 +2634,11 @@ $form-icon-btn: (
 .dashbrd-grid-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
-	margin: 0 10px;
-	position: absolute;
-	bottom: 10px;
+	padding: 8px;
 
 	li {
 		display: inline-block;
-		padding: 8px 0 8px 13px
+		padding: 0 0 0 13px
 	}
 }
 
