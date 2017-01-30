@@ -2068,7 +2068,7 @@ int	is_double_suffix(const char *str, unsigned char flags)
 		}
 
 		/* last character is suffix */
-		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
+		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]) && '\0' == str[i + 1])
 			continue;
 
 		return FAIL;

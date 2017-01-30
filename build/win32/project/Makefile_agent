@@ -58,6 +58,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\common\common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
+	..\..\..\src\libs\zbxsysinfo\common\dir.o \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
@@ -94,7 +95,8 @@ OBJS = \
 	..\..\..\src\zabbix_agent\zbxconf.o \
 	..\..\..\src\libs\zbxregexp\gnuregex.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
-	..\..\..\src\libs\zbxwin32\fatal.o
+	..\..\..\src\libs\zbxwin32\fatal.o \
+	..\..\..\src\libs\zbxwin32\disk.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib
 

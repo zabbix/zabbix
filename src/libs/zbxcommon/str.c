@@ -784,100 +784,6 @@ int	zbx_check_hostname(const char *hostname, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_item_key                                                     *
- *                                                                            *
- * Purpose: return key with parameters (if present)                           *
- *                                                                            *
- *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
- *                                                                            *
- * Parameters: exp - [IN] pointer to the first char of key                    *
- *             key - [OUT] pointer to the resulted key                        *
- *                                                                            *
- *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
- *              ^                                                             *
- *                                                                            *
- * Return value: return SUCCEED and move exp to the next character after key  *
- *               or FAIL and move exp to incorrect character                  *
- *                                                                            *
- * Notes: implements the functionality of old parse_key() in a safe manner.   *
- *        input pointer is NOT advanced.                                      *
- *                                                                            *
- ******************************************************************************/
-int	get_item_key(char **exp, char **key)
-{
-	char	*p = *exp, c;
-
-	if (SUCCEED != parse_key(&p))
-		return FAIL;
-
-	if ('(' == *p)
-	{
-		for (p--; *exp < p && '.' != *p; p--)
-			;
-
-		if (*exp == p)	/* the key is empty */
-			return FAIL;
-	}
-
-	c = *p;
-	*p = '\0';
-	*key = zbx_strdup(NULL, *exp);
-	*p = c;
-
-	*exp = p;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: parse_host                                                       *
- *                                                                            *
- * Purpose: parse hostname                                                    *
- *                                                                            *
- *  e.g., Zabbix server                                                       *
- *                                                                            *
- * Parameters: exp - pointer to the first char of hostname                    *
- *             host - optional pointer to resulted hostname                   *
- *                                                                            *
- *  e.g., {Zabbix server:agent.ping.last(0)}                                  *
- *         ^                                                                  *
- *                                                                            *
- * Return value: return SUCCEED and move exp to the next char after hostname  *
- *               or FAIL and move exp at the failed character                 *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-int	parse_host(char **exp, char **host)
-{
-	char	*p, *s;
-
-	p = *exp;
-
-	for (s = *exp; SUCCEED == is_hostname_char(*s); s++)
-		;
-
-	*exp = s;
-
-	if (p == s)
-		return FAIL;
-
-	if (NULL != host)
-	{
-		char	c;
-
-		c = *s;
-		*s = '\0';
-		*host = strdup(p);
-		*s = c;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: parse_key                                                        *
  *                                                                            *
  * Purpose: advances pointer to first invalid character in string             *
@@ -2010,19 +1916,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-}
-
-int	zbx_mismatch(const char *s1, const char *s2)
-{
-	int	i = 0;
-
-	while (s1[i] == s2[i])
-	{
-		if ('\0' == s1[i++])
-			return FAIL;
-	}
-
-	return i;
 }
 
 int	cmp_key_id(const char *key_1, const char *key_2)
@@ -3877,7 +3770,7 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
  *                         characters can be safely skipped                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
+static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r)
 {
 	/* try to validate function name */
 	if (SUCCEED != function_parse_name(expr, par_l))
@@ -4372,6 +4265,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 
 	data->key = key_loc;
 	data->func = func_loc;
+	data->func_param = func_param;
 
 	return SUCCEED;
 }
@@ -4480,10 +4374,12 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  * Function: zbx_token_find                                                   *
  *                                                                            *
  * Purpose: finds token {} inside expression starting at specified position   *
+ *          also searches for reference if requested                          *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             pos        - [IN] the starting position                        *
- *             token      - [OUT] the token data                              *
+ * Parameters: expression   - [IN] the expression                             *
+ *             pos          - [IN] the starting position                      *
+ *             token        - [OUT] the token data                            *
+ *             token_search - [IN] specify if references will be searched     *
  *                                                                            *
  * Return value: SUCCEED - the token was parsed successfully                  *
  *               FAIL    - expression does not contain valid token.           *
@@ -4502,14 +4398,40 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *           }                                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
 	int		ret = FAIL;
-	const char	*ptr = expression + pos;
+	const char	*ptr = expression + pos, *dollar = ptr;
 
 	while (SUCCEED != ret)
 	{
-		if (NULL == (ptr = strchr(ptr, '{')))
+		ptr = strchr(ptr, '{');
+
+		switch (token_search)
+		{
+			case ZBX_TOKEN_SEARCH_BASIC:
+				break;
+			case ZBX_TOKEN_SEARCH_REFERENCES:
+				while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+				{
+					if (0 == isdigit(dollar[1]))
+					{
+						dollar++;
+						continue;
+					}
+
+					token->data.reference.index = dollar[1] - '0';
+					token->type = ZBX_TOKEN_REFERENCE;
+					token->token.l = dollar - expression;
+					token->token.r = token->token.l + 1;
+					return SUCCEED;
+				}
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		if (NULL == ptr)
 			return FAIL;
 
 		if ('\0' == ptr[1])
@@ -4589,4 +4511,169 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_number_parse                                                 *
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_number_parse(const char *number, int *len)
+{
+	int	digits = 0, dots = 0;
+
+	*len = 0;
+
+	while (1)
+	{
+		if (0 != isdigit(number[*len]))
+		{
+			(*len)++;
+			digits++;
+			continue;
+		}
+
+		if ('.' == number[*len])
+		{
+			(*len)++;
+			dots++;
+			continue;
+		}
+
+		if (1 > digits || 1 < dots)
+			return FAIL;
+
+		if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+			(*len)++;
+
+		return SUCCEED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_number_find                                                  *
+ *                                                                            *
+ * Purpose: finds number inside expression starting at specified position     *
+ *                                                                            *
+ * Parameters: str        - [IN] the expression                               *
+ *             pos        - [IN] the starting position                        *
+ *             number_loc - [OUT] the number location                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - expression does not contain number                 *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
+{
+	const char	*s, *e;
+	int		len;
+
+	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
+	{
+		if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])))
+			continue;
+
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		{
+			/* skip functions '{65432}' */
+			s = e;
+			continue;
+		}
+
+		if (SUCCEED != zbx_number_parse(s, &len))
+			continue;
+
+		/* number found */
+
+		number_loc->r = s + len - str - 1;
+
+		/* check for minus before number */
+		if (s > str + pos && '-' == *(s - 1))
+		{
+			/* and make sure it's unary */
+			if (s - 1 > str)
+			{
+				e = s - 2;
+
+				if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
+					e--;
+
+				/* check that minus is not preceded by function, parentheses or (suffixed) number */
+				if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
+					s--;
+			}
+			else	/* nothing before minus, it's definitely unary */
+				s--;
+		}
+
+		number_loc->l = s - str;
+
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_replace_mem_dyn                                              *
+ *                                                                            *
+ * Purpose: to replace memory block and allocate more memory if needed        *
+ *                                                                            *
+ * Parameters: data       - [IN/OUT] allocated memory                         *
+ *             data_alloc - [IN/OUT] allocated memory size                    *
+ *             data_len   - [IN/OUT] used memory size                         *
+ *             offset     - [IN] offset of memory block to be replaced        *
+ *             sz_to      - [IN] size of block that need to be replaced       *
+ *             from       - [IN] what to replace with                         *
+ *             sz_from    - [IN] size of new block                            *
+ *                                                                            *
+ * Return value: once data is replaced offset can become less, bigger or      *
+ *               remain unchanged                                             *
+ ******************************************************************************/
+int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
+		const char *from, size_t sz_from)
+{
+	int	sz_changed = sz_from - sz_to;
+
+	if (0 != sz_changed)
+	{
+		char	*to;
+
+		*data_len += sz_changed;
+
+		if (*data_len > *data_alloc)
+		{
+			while (*data_len > *data_alloc)
+				*data_alloc *= 2;
+
+			*data = zbx_realloc(*data, *data_alloc);
+		}
+
+		to = *data + offset;
+		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
+	}
+
+	memcpy(*data + offset, from, sz_from);
+
+	return sz_changed;
 }

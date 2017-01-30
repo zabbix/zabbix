@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MACROFUNC_H
-#define ZABBIX_MACROFUNC_H
+#ifndef ZABBIX_SYSINFO_COMMON_DIR_H
+#define ZABBIX_SYSINFO_COMMON_DIR_H
 
-int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+#include "sysinfo.h"
 
-#endif
+#define DISK_BLOCK_SIZE			512	/* 512-byte blocks */
+
+#define SIZE_MODE_APPARENT		0	/* bytes in file */
+#define SIZE_MODE_DISK			1	/* size on disk */
+
+#define TRAVERSAL_DEPTH_UNLIMITED	-1	/* directory traversal depth is not limited */
+
+typedef struct
+{
+	int depth;
+	char *path;
+} zbx_directory_item_t;
+
+typedef struct
+{
+	zbx_uint64_t st_dev;			/* device */
+	zbx_uint64_t st_ino;			/* file serial number */
+} zbx_file_descriptor_t;
+
+int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#endif /* ZABBIX_SYSINFO_COMMON_DIR_H */
