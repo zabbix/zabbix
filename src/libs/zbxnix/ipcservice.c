@@ -831,7 +831,9 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 
 	if (SUCCEED != ipc_client_write(client))
 	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
 		ipc_client_free_events(client);
+		ipc_service_remove_client(client->service, client);
 		return;
 	}
 
