@@ -26,7 +26,8 @@
 			.addClass('dashbrd-widget-head')
 			.addClass('cursor-move')
 			.append($('<h4>').text(widget['header']));
-		widget['content_body'] = $('<div>');
+		widget['content_body'] = $('<div>')
+			.addClass('dashbrd-grid-widget-content');
 		widget['content_footer'] = $('<div>')
 			.addClass('dashbrd-grid-widget-foot');
 
@@ -55,7 +56,7 @@
 			}
 		})
 			.append(
-				$('<div>', {'class': 'dashbrd-grid-widget-content'})
+				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
 					.append(widget['content_header'])
 					.append(widget['content_body'])
 					.append(widget['content_footer'])
