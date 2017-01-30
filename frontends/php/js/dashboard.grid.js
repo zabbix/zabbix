@@ -184,20 +184,6 @@
 		}
 	}
 
-	function checkWidgetOverlap($obj, data, widget) {
-		resetCurrentPositions(data['widgets']);
-		realignWidget($obj, data, widget);
-
-		$.each(data['widgets'], function() {
-			if (!posEquals(this['pos'], this['current_pos'])) {
-				this['pos'] = this['current_pos'];
-				setDivPosition(this['div'], data, this['pos']);
-			}
-
-			delete this['current_pos'];
-		});
-	}
-
 	function doWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = getDivPosition($obj, data, $div);
@@ -470,7 +456,6 @@
 				$this.append(widget['div']);
 
 				setDivPosition(widget['div'], data, widget['pos']);
-				checkWidgetOverlap($this, data, widget);
 
 				resizeDashboardGrid($this, data);
 
