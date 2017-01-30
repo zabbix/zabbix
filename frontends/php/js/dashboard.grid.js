@@ -28,7 +28,7 @@
 			.append($('<h4>').text(widget['header']));
 		widget['content_body'] = $('<div>');
 		widget['content_footer'] = $('<div>')
-			.addClass('dashbrd-widget-foot');
+			.addClass('dashbrd-grid-widget-foot');
 
 		if (widget['rf_rate'] != 0) {
 			widget['content_header'].append($('<ul>')
@@ -402,6 +402,14 @@
 		});
 	}
 
+	function refreshWidget(widget) {
+		if (typeof(widget['rf_timeoutid']) != 'undefined') {
+			clearTimeout(widget['rf_timeoutid']);
+		}
+
+		updateWidgetContent(widget);
+	}
+
 	var	methods = {
 		init: function(options) {
 			options = $.extend({}, {columns: 12}, options);
@@ -466,11 +474,21 @@
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
-						if (widget['rf_rate'] != rf_rate) {
-							widget['rf_rate'] = rf_rate;
+						widget['rf_rate'] = rf_rate;
+						startWidgetRefresh(widget);
+					}
+				});
+			});
+		},
 
-							startWidgetRefresh(widget);
-						}
+		refreshWidget: function(widgetid) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid) {
+						refreshWidget(widget);
 					}
 				});
 			});

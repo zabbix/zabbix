@@ -22,18 +22,20 @@
 $table = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
 
 foreach ($data['maps'] as $map) {
-	$table->addRow([new CLink($map['label'],
-		(new CUrl('zabbix.php'))
+	$table->addRow([
+		new CLink($map['label'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'map.view')
-			->setArgument('sysmapid', $map['id'])
-	)]);
+			->setArgument('sysmapid', $map['sysmapid'])),
+		(new CButton())
+			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
+			->addClass(ZBX_STYLE_REMOVE_BTN)
+	]);
 }
 
 $output = [
 	'header' => _('Favourite maps'),
 	'body' => $table->toString(),
 	'footer' => (new CList([
-		new CLink(_('Maps'), (new CUrl('zabbix.php'))->setArgument('action', 'map.view')),
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 	]))->toString()
 ];

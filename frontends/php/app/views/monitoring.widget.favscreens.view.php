@@ -25,15 +25,22 @@ foreach ($data['screens'] as $screen) {
 	$url = $screen['slideshow']
 		? (new CUrl('slides.php'))->setArgument('elementid', $screen['slideshowid'])
 		: (new CUrl('screens.php'))->setArgument('elementid', $screen['screenid']);
-	$table->addRow([new CLink($screen['label'], $url)]);
+	$on_click = $screen['slideshow']
+		? "rm4favorites('slideshowid','".$screen['slideshowid']."')"
+		: "rm4favorites('screenid','".$screen['screenid']."')";
+
+	$table->addRow([
+		new CLink($screen['label'], $url),
+		(new CButton())
+			->onClick($on_click)
+			->addClass(ZBX_STYLE_REMOVE_BTN)
+	]);
 }
 
 $output = [
 	'header' => _('Favourite screens'),
 	'body' => $table->toString(),
 	'footer' => (new CList([
-		new CLink(_('Screens'), new CUrl('screens.php')),
-		new CLink(_('Slide shows'), new CUrl('slides.php')),
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 	]))->toString()
 ];

@@ -27,15 +27,22 @@ foreach ($data['graphs'] as $graph) {
 			->setArgument('action', HISTORY_GRAPH)
 			->setArgument('itemids', [$graph['itemid']])
 		: (new CUrl('charts.php'))->setArgument('graphid', $graph['graphid']);
+	$on_click = $graph['simple']
+		? "rm4favorites('itemid','".$graph['itemid']."')"
+		: "rm4favorites('graphid','".$graph['graphid']."')";
 
-	$table->addRow([new CLink($graph['label'], $url)]);
+	$table->addRow([
+		new CLink($graph['label'], $url),
+		(new CButton())
+			->onClick($on_click)
+			->addClass(ZBX_STYLE_REMOVE_BTN)
+	]);
 }
 
 $output = [
 	'header' => _('Favourite graphs'),
 	'body' => $table->toString(),
 	'footer' => (new CList([
-		new CLink(_('Graphs'), new CUrl('charts.php')),
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 	]))->toString()
 ];

@@ -51,7 +51,7 @@ class CControllerWidgetFavMapsView extends CController {
 
 			foreach ($db_maps as $db_map) {
 				$maps[] = [
-					'id' => $db_map['sysmapid'],
+					'sysmapid' => $db_map['sysmapid'],
 					'label' => $db_map['name']
 				];
 			}
