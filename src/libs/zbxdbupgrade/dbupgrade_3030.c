@@ -280,14 +280,6 @@ static int	DBpatch_3030022(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3030023(void)
-{
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.dashboard.widget.%%'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 #endif
 
 DBPATCH_START(3030)
@@ -317,6 +309,5 @@ DBPATCH_ADD(3030019, 0, 1)
 DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
 DBPATCH_ADD(3030022, 0, 1)
-DBPATCH_ADD(3030023, 0, 0)
 
 DBPATCH_END()
