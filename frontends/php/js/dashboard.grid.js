@@ -360,6 +360,7 @@
 	function stopPreloader(widget) {
 		if (typeof(widget['preloader_timeoutid']) != 'undefined') {
 			clearTimeout(widget['preloader_timeoutid']);
+			delete widget['preloader_timeoutid'];
 		}
 
 		hidePreloader(widget);
@@ -376,12 +377,17 @@
 	function startWidgetRefresh(widget) {
 		if (typeof(widget['rf_timeoutid']) != 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
+			delete widget['rf_timeoutid'];
 		}
 
 		startWidgetRefreshTimer(widget, widget['rf_rate']);
 	}
 
 	function updateWidgetContent(widget) {
+		if (++widget['update_attempts'] > 1) {
+			return;
+		}
+
 		var url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'widget.' + widget['widgetid'] + '.view')
@@ -408,10 +414,18 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				startWidgetRefreshTimer(widget, widget['rf_rate']);
+				if (widget['update_attempts'] == 1) {
+					widget['update_attempts'] = 0;
+					startWidgetRefreshTimer(widget, widget['rf_rate']);
+				}
+				else {
+					widget['update_attempts'] = 0;
+					updateWidgetContent(widget);
+				}
 			},
 			error: function() {
 				// TODO: gentle message about failed update of widget content
+				widget['update_attempts'] = 0;
 				startWidgetRefreshTimer(widget, 3);
 			}
 		});
@@ -420,6 +434,7 @@
 	function refreshWidget(widget) {
 		if (typeof(widget['rf_timeoutid']) != 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
+			delete widget['rf_timeoutid'];
 		}
 
 		updateWidgetContent(widget);
@@ -458,7 +473,8 @@
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 500
+				'preloader_fadespeed': 500,
+				'update_attempts': 0
 			}, widget);
 
 			return this.each(function() {
