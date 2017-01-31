@@ -30,7 +30,23 @@
 #include "checks_ipmi.h"
 #include "zbxserver.h"
 
-int	zbx_ipmi_convert_port(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipmi_port_expand_macros                                      *
+ *                                                                            *
+ * Purpose: expands user macros in IPMI port value and converts the result to *
+ *          to unsigned short value                                           *
+ *                                                                            *
+ * Parameters: hostid    - [IN] the host identifier                           *
+ *             port_orig - [IN] the original port value                       *
+ *             port      - [OUT] the resulting port value                     *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the value was converted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error)
 {
 	char	*tmp;
 	int	ret = SUCCEED;
@@ -49,6 +65,21 @@ int	zbx_ipmi_convert_port(zbx_uint64_t hostid, const char *port_orig, unsigned s
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipmi_execute_command                                         *
+ *                                                                            *
+ * Purpose: executes IPMI command                                             *
+ *                                                                            *
+ * Parameters: host          - [IN] the target host                           *
+ *             command       - [IN] the command to execute                    *
+ *             error         - [OUT] the error message buffer                 *
+ *             max_error_len - [IN] the size of error message buffer          *
+ *                                                                            *
+ * Return value: SUCCEED - the command was executed successfully              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
 	const char		*__function_name = "ipmi_manager_init";
@@ -75,7 +106,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	zbx_ipc_message_init(&message);
 	DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI);
 
-	if (FAIL == zbx_ipmi_convert_port(host->hostid, interface.port_orig, &interface.port, &errmsg))
+	if (FAIL == zbx_ipmi_port_expand_macros(host->hostid, interface.port_orig, &interface.port, &errmsg))
 	{
 		zbx_strlcpy(error, errmsg, max_error_len);
 		zbx_free(errmsg);

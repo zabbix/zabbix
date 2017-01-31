@@ -839,7 +839,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 	for (i = 0; i < num; i++)
 	{
-		if (FAIL == zbx_ipmi_convert_port(items[i].host.hostid, items[i].interface.port_orig,
+		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))
 		{
 			zbx_timespec_t	ts;
