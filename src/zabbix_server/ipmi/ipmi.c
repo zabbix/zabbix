@@ -28,13 +28,14 @@
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
+#include "zbxserver.h"
 
 int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
 	const char		*__function_name = "ipmi_manager_init";
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
-	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;
+	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL, *port = NULL;
 	zbx_uint32_t		data_len;
 	unsigned char		*data = NULL;
 	int			ret = FAIL, op;
@@ -44,7 +45,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%d", __function_name, host->host, command);
 
 	if (SUCCEED != zbx_parse_ipmi_command(command, sensor, &op, error, max_error_len))
-		return FAIL;
+		goto out;
 
 	if (FAIL == zbx_ipc_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, SEC_PER_MIN, &errmsg))
 	{
@@ -56,13 +57,23 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 
 	DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI);
 
+	port = zbx_strdup(NULL, interface.port_orig);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &port,
+			MACRO_TYPE_COMMON, NULL, 0);
+
+	if (FAIL == is_ushort(port, &interface.port))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid port value \"%s\".", port);
+		goto cleanup;
+	}
+
 	data_len = zbx_ipmi_serialize_request(&data, host->hostid, interface.addr, interface.port, host->ipmi_authtype,
 			host->ipmi_privilege, host->ipmi_username, host->ipmi_password, sensor, op);
 
 	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, ZBX_IPC_IPMI_SCRIPT_REQUEST, data, data_len))
 	{
 		zbx_strlcpy(error, "cannot send script request message to IPMI service", max_error_len);
-		goto out;
+		goto cleanup;
 	}
 
 	zbx_ipc_message_init(&message);
@@ -70,25 +81,27 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	if (FAIL == zbx_ipc_socket_read(&ipmi_socket, &message))
 	{
 		zbx_strlcpy(error,  "cannot read script request response from IPMI service", max_error_len);
-		goto out;
+		goto cleanup;
 	}
 
 	if (ZBX_IPC_IPMI_SCRIPT_RESULT != message.code)
 	{
 		zbx_snprintf(error, max_error_len, "invalid response code:%u received form IPMI service", message.code);
-		goto out;
+		goto cleanup;
 	}
 
 	zbx_ipmi_deserialize_result(message.data, &ts, &ret, &value);
 
 	if (SUCCEED != ret)
 		zbx_strlcpy(error, value, max_error_len);
-out:
+cleanup:
 	zbx_free(value);
 	zbx_free(data);
+	zbx_free(port);
 	zbx_ipc_message_clean(&message);
 	zbx_ipc_socket_close(&ipmi_socket);
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
