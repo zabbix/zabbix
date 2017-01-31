@@ -30,12 +30,31 @@
 #include "checks_ipmi.h"
 #include "zbxserver.h"
 
+int	zbx_ipmi_convert_port(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error)
+{
+	char	*tmp;
+	int	ret = SUCCEED;
+
+	tmp = zbx_strdup(NULL, port_orig);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+
+	if (FAIL == is_ushort(tmp, port) || 0 == *port)
+	{
+		*error = zbx_dsprintf(*error, "Invalid port value \"%s\"", port_orig);
+		ret = FAIL;
+	}
+
+	zbx_free(tmp);
+
+	return ret;
+}
+
 int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
 	const char		*__function_name = "ipmi_manager_init";
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
-	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL, *port = NULL;
+	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;
 	zbx_uint32_t		data_len;
 	unsigned char		*data = NULL;
 	int			ret = FAIL, op;
@@ -54,16 +73,12 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	}
 
 	zbx_ipc_message_init(&message);
-
 	DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI);
 
-	port = zbx_strdup(NULL, interface.port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &port,
-			MACRO_TYPE_COMMON, NULL, 0);
-
-	if (FAIL == is_ushort(port, &interface.port))
+	if (FAIL == zbx_ipmi_convert_port(host->hostid, interface.port_orig, &interface.port, &errmsg))
 	{
-		zbx_snprintf(error, max_error_len, "Invalid port value \"%s\".", port);
+		zbx_strlcpy(error, errmsg, max_error_len);
+		zbx_free(errmsg);
 		goto cleanup;
 	}
 
@@ -97,7 +112,6 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 cleanup:
 	zbx_free(value);
 	zbx_free(data);
-	zbx_free(port);
 	zbx_ipc_message_clean(&message);
 	zbx_ipc_socket_close(&ipmi_socket);
 

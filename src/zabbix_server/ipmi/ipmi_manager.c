@@ -32,6 +32,7 @@
 #include "ipmi_manager.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
+#include "ipmi.h"
 
 #include "../poller/poller.h"
 
@@ -829,32 +830,23 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
  ******************************************************************************/
 static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, int *nextcheck)
 {
-	int			i, num, rc;
+	int			i, num;
 	DC_ITEM			items[MAX_POLLER_ITEMS];
 	zbx_ipmi_request_t	*request;
-	char			*port;
+	char			*error = NULL;
 
 	num = DCconfig_get_ipmi_poller_items(now, items, MAX_POLLER_ITEMS, nextcheck);
 
 	for (i = 0; i < num; i++)
 	{
-		port = zbx_strdup(NULL, items[i].interface.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL, &port,
-				MACRO_TYPE_COMMON, NULL, 0);
-
-		rc = is_ushort(port, &items[i].interface.port);
-		zbx_free(port);
-
-		/* generate configuration error if port contains invalid value */
-		if (FAIL == rc)
+		if (FAIL == zbx_ipmi_convert_port(items[i].host.hostid, items[i].interface.port_orig,
+				&items[i].interface.port, &error))
 		{
 			zbx_timespec_t	ts;
 			unsigned char	state = ITEM_STATE_NOTSUPPORTED;
 			int		errcode = CONFIG_ERROR;
-			char		*error;
 
 			zbx_timespec(&ts);
-			error = zbx_dsprintf(NULL, "Invalid port value \"%s\".", port);
 			dc_add_history(items[i].itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, error);
 			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
 			zbx_free(error);
@@ -867,6 +859,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 		ipmi_manager_schedule_request(manager, items[i].host.hostid, request, now);
 	}
 
+	dc_flush_history();
 	DCconfig_clean_items(items, NULL, num);
 
 	return num;
