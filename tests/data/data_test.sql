@@ -1324,5 +1324,11 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            nam
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
 
+-- testUrlUserPermissions
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'admin-zabbix', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 7, 4);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'user-zabbix', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
+
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
