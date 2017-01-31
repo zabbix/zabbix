@@ -39,8 +39,6 @@
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
-#define MAX_QUEUE_DETAILS_ITEMS	501
-
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
@@ -359,7 +357,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i;
-	zbx_uint32_t		limit = MAX_QUEUE_DETAILS_ITEMS;
+	zbx_uint32_t		limit;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
@@ -385,13 +383,11 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
 
-			if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)))
+			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
+					FAIL == is_uint32(limit_str, &limit))
 			{
-				if (FAIL == is_uint32(limit_str, &limit))
-				{
-					zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
-					goto out;
-				}
+				zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+				goto out;
 			}
 		}
 	}
