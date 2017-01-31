@@ -53,11 +53,11 @@ class CUpdateIntervalParser extends CParser {
 		$i = 0;
 
 		// First interval must be simple interval (or macro). Other intervals may be mixed and repeat multiple times.
-		if ($this->simple_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		if ($this->simple_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->simple_interval_parser->getLength();
 			$this->delay = $this->simple_interval_parser->getmatch();
 		}
-		elseif ($this->user_macro_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
 			$this->delay = $this->user_macro_parser->getmatch();
 		}
@@ -75,7 +75,7 @@ class CUpdateIntervalParser extends CParser {
 		$p++;
 
 		for (; isset($source[$p]); $p++) {
-			if ($this->flexible_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			if ($this->flexible_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->flexible_interval_parser->getLength();
 
 				/*
@@ -97,7 +97,7 @@ class CUpdateIntervalParser extends CParser {
 					continue;
 				}
 			}
-			elseif ($this->scheduling_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			elseif ($this->scheduling_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->scheduling_interval_parser->getLength();
 
 				$this->intervals[$i++] = [
@@ -115,7 +115,7 @@ class CUpdateIntervalParser extends CParser {
 					continue;
 				}
 			}
-			elseif ($this->user_macro_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				// Scheduling interval as macro.
 
 				$p += $this->user_macro_parser->getLength();

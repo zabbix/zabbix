@@ -43,7 +43,7 @@ class CTimePeriodsParser extends CParser {
 		$p = $pos;
 
 		for (; isset($source[$p]); $p++) {
-			if ($this->time_period_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->time_period_parser->getLength();
 			}
 

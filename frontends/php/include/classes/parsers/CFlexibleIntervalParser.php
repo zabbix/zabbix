@@ -50,10 +50,10 @@ class CFlexibleIntervalParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		if ($this->simple_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		if ($this->simple_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->simple_interval_parser->getLength();
 		}
-		elseif ($this->user_macro_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
 		}
 		else {
@@ -66,10 +66,10 @@ class CFlexibleIntervalParser extends CParser {
 
 		$p++;
 
-		if ($this->time_period_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->time_period_parser->getLength();
 		}
-		elseif ($this->user_macro_parser->parse($source, $p) !== self::PARSE_FAIL) {
+		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
 		}
 		else {
