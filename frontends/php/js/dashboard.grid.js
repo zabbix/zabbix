@@ -428,7 +428,7 @@
 	var	methods = {
 		init: function(options) {
 			options = $.extend({}, {columns: 12}, options);
-			options['widget-height'] = 60;
+			options['widget-height'] = 70;
 			options['widget-width'] = 100 / options['columns'];
 			options['rows'] = 0;
 
