@@ -2596,9 +2596,10 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-padding {
 	display: flex;
-	flex-direction: column;
-	margin: .25rem;
 	flex-grow: 1;
+	flex-direction: column;
+	min-width: 8.33333%;
+	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 }
