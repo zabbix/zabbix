@@ -568,6 +568,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 		lifetime_str = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
+
 		if (SUCCEED != is_time_suffix(lifetime_str, &lifetime, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
@@ -575,6 +576,14 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 					zbx_host_string(hostid), discovery_key, lifetime_str);
 			lifetime = 10 * SEC_PER_YEAR;	/* max value for the field */
 		}
+		else if (10 * SEC_PER_YEAR < lifetime)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
+					" \"%s\" exceeds maximum allowed value",
+					zbx_host_string(hostid), discovery_key, lifetime_str);
+			lifetime = 10 * SEC_PER_YEAR;	/* max value for the field */
+		}
+
 		zbx_free(lifetime_str);
 	}
 	else
