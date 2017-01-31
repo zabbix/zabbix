@@ -848,25 +848,34 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 			case ZBX_REQUEST_ITEM_KEY:
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
-				if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
-					DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
-
-				key = zbx_strdup(NULL, dc_item.key_orig);
-				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
-
-				if (ZBX_REQUEST_ITEM_NAME == request)
+				if (SUCCEED == errcode)
 				{
-					*replace_to = zbx_strdup(*replace_to, row[6]);
-					item_description(replace_to, key, dc_item.host.hostid);
-					zbx_free(key);
+					if (INTERFACE_TYPE_UNKNOWN == dc_item.interface.type)
+						ret = DCconfig_get_interface(&dc_item.interface, dc_item.host.hostid, 0);
+					else
+						ret = SUCCEED;
+
+					if (SUCCEED == ret)
+					{
+						key = zbx_strdup(NULL, dc_item.key_orig);
+						substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY,
+								NULL, 0);
+
+						if (ZBX_REQUEST_ITEM_NAME == request)
+						{
+							*replace_to = zbx_strdup(*replace_to, row[6]);
+							item_description(replace_to, key, dc_item.host.hostid);
+							zbx_free(key);
+						}
+						else	/* ZBX_REQUEST_ITEM_KEY */
+						{
+							zbx_free(*replace_to);
+							*replace_to = key;
+						}
+					}
+
+					DCconfig_clean_items(&dc_item, &errcode, 1);
 				}
-				else    /* ZBX_REQUEST_ITEM_KEY */
-				{
-					zbx_free(*replace_to);
-					*replace_to = key;
-				}
-				DCconfig_clean_items(&dc_item, &errcode, 1);
-				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[6]);
