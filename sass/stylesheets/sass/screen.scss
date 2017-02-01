@@ -2635,11 +2635,16 @@ $form-icon-btn: (
 .dashbrd-grid-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
-	padding: 8px;
+	padding: 8px 8px 6px 8px;
 
-	li {
-		display: inline-block;
-		padding: 0 0 0 13px
+	ul {
+		display: flex;
+		justify-content: flex-end;
+
+		li {
+			padding: 0 0 0 13px;
+			@extend %overflow-ellipsis;
+		}
 	}
 }
 
