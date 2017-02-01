@@ -2021,7 +2021,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_
 		zbx_set_socket_strerror("connection rejected, allowed hosts: \"%s\"", peer_list);
 #else
 	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"",
-			inet_ntoa(name.sin_addr), host_list);
+			inet_ntoa(name.sin_addr), peer_list);
 #endif
 	return FAIL;
 }
