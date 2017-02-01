@@ -2914,7 +2914,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	allowed_hosts = zbx_strdup(NULL, item->trapper_hosts);
 	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, &allowed_hosts,
 			MACRO_TYPE_PARAMS_FIELD, NULL, 0);
-	ret = zbx_tcp_check_security(sock, allowed_hosts, ZBX_EMPTY_LIST_ALLOWED);
+	ret = zbx_tcp_check_security(sock, allowed_hosts, ZBX_TCP_PERMIT_IF_EMPTY);
 	zbx_free(allowed_hosts);
 
 	if (FAIL == ret)

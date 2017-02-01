@@ -1901,9 +1901,12 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *                                                                            *
  * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
- * Parameters: s - socket descriptor                                          *
- *             peer_list - comma-delimited list of peers                      *
- *             allow_if_empty - allow connection if no peers given            *
+ * Parameters: s               - [IN] socket descriptor                       *
+ *             peer_list       - [IN] comma-delimited list of allowed peers   *
+ *             action_if_empty - [IN] action if there are no peers given,     *
+ *                                 possible values are:                       *
+ *                                   - ZBX_TCP_REJECT_IF_EMPTY - deny         *
+ *                                   - ZBX_TCP_PERMIT_IF_EMPTY - allow        *
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
@@ -1914,7 +1917,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_empty)
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if_empty)
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
@@ -1928,8 +1931,18 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int allow_if_
 
 	char		tmp[MAX_STRING_LEN], *start = NULL, *end = NULL, *cidr_sep;
 
-	if (ZBX_EMPTY_LIST_ALLOWED == allow_if_empty && (NULL == peer_list || '\0' == *peer_list))
-		return SUCCEED;
+	if (NULL == peer_list || '\0' == *peer_list)
+	{
+		switch (action_if_empty)
+		{
+			case ZBX_TCP_REJECT_IF_EMPTY:
+				break;	/* no return, still need to zbx_set_socket_strerror() */
+			case ZBX_TCP_PERMIT_IF_EMPTY:
+				return SUCCEED;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
 
 	nlen = sizeof(name);
 
