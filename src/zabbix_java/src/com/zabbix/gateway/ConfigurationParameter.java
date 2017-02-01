@@ -75,15 +75,14 @@ class ConfigurationParameter
 				case TYPE_FILE:
 					userValue = new File(text);
 					break;
+				default:
+					throw new IllegalArgumentException(String.format("unknown type %d", type));
 			}
 		}
 		catch (Exception e)
 		{
 			throw new IllegalArgumentException(e);
 		}
-		
-		if (null == userValue)
-			throw new IllegalArgumentException(String.format("unknown type %d", type));
 
 		if (null != validator && !validator.validate(userValue))
 			throw new IllegalArgumentException(String.format("bad value for %s parameter: '%s'", name, text));
