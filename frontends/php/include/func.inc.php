@@ -739,6 +739,48 @@ function convert_units($options = []) {
 }
 
 /**
+ * Convert time format with suffixes to seconds.
+ * Examples:
+ *		10m = 600
+ *		3d = 10800
+ *
+ * @param string $time
+ *
+ * @return int
+ */
+function timeUnitToSeconds($time) {
+	preg_match('/^((\d)+)(['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+
+	if (array_key_exists(3, $matches)) {
+		$suffix = $matches[3];
+		$time = $matches[1];
+
+		switch ($suffix) {
+			case 's':
+				$sec = $time;
+				break;
+			case 'm':
+				$sec = $time * SEC_PER_MIN;
+				break;
+			case 'h':
+				$sec = $time * SEC_PER_HOUR;
+				break;
+			case 'd':
+				$sec = $time * SEC_PER_DAY;
+				break;
+			case 'w':
+				$sec = $time * SEC_PER_WEEK;
+				break;
+		}
+	}
+	else {
+		$sec = $matches[0];
+	}
+
+	return $sec;
+}
+
+/**
  * Converts value with suffix to actual value.
  * Supported time suffixes: s, m, h, d, w
  * Supported metric suffixes: K, M, G, T

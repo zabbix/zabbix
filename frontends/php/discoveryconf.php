@@ -35,7 +35,7 @@ $fields = [
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'proxy_hostid' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({add}) || isset({update})'],
 	'iprange' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'delay' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(1, SEC_PER_WEEK), 'isset({add}) || isset({update})'],
+	'delay' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'status' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'uniqueness_criteria' => [T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')],
 	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -254,7 +254,7 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['proxy_hostid'] = getRequest('proxy_hostid', 0);
 		$data['drule']['name'] = getRequest('name', '');
 		$data['drule']['iprange'] = getRequest('iprange', '192.168.0.1-254');
-		$data['drule']['delay'] = getRequest('delay', SEC_PER_HOUR);
+		$data['drule']['delay'] = getRequest('delay', convertUnitsS(SEC_PER_HOUR));
 		$data['drule']['status'] = getRequest('status', DRULE_STATUS_ACTIVE);
 		$data['drule']['dchecks'] = getRequest('dchecks', []);
 		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);

@@ -219,14 +219,7 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if (!zbx_is_int($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
-				}
-				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
-					);
-				}
+				$this->checkDelay($drule['delay']);
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
@@ -372,14 +365,7 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if (!zbx_is_int($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
-				}
-				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
-					);
-				}
+				$this->checkDelay($drule['delay']);
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
@@ -958,6 +944,35 @@ class CDRule extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+		}
+	}
+
+	/**
+	 * Check if delay field is valid.
+	 *
+	 * @param string $delay
+	 *
+	 * @throws APIException if delay is not a macro, not a valid simple interval or not in between 1 and 604800.
+	 */
+	protected function checkDelay($delay) {
+		$simple_interval_parser = new CSimpleIntervalParser();
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($simple_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
+			$delay = timeUnitToSeconds($simple_interval_parser->getMatch());
+
+			if ($delay < 1 || $delay > SEC_PER_WEEK) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": "%2$s"', 'delay',
+						_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_WEEK)
+					)
+				);
+			}
+		}
+		elseif ($user_macro_parser->parse($delay) != CParser::PARSE_SUCCESS) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": "%2$s"', 'delay', _('invalid delay'))
+			);
 		}
 	}
 }

@@ -52,8 +52,8 @@ $discoveryFormList
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Delay (in sec)'),
-		(new CNumericBox('delay', $this->data['drule']['delay'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(_('Update interval'),
+		(new CTextBox('delay', $data['drule']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
 $discoveryFormList->addRow(_('Checks'),
