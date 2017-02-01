@@ -28,7 +28,6 @@ class GeneralInformation
 
 	static void printVersion()
 	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION,REVISION,
-				REVISION_DATE));
+		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
 	}
 }
