@@ -839,7 +839,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *             max_error_len - [IN] size of 'error' string                    *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row,
+static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_formula_macros";
@@ -971,12 +971,12 @@ out:
 static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
 		char **error)
 {
-	const char		*__function_name = "lld_item_make";
+	const char			*__function_name = "lld_item_make";
 
-	zbx_lld_item_t		*item;
-	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
-	char			err[MAX_STRING_LEN];
-	int			ret;
+	zbx_lld_item_t			*item;
+	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
+	char				err[MAX_STRING_LEN];
+	int				ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1294,15 +1294,21 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  * Parameters: hostid          - [IN] parent host id                          *
  *             item_prototypes - [IN] item prototypes                         *
  *             items           - [IN/OUT] items to save                       *
+ *             host_locked     - [IN/OUT] host record is locked               *
+ *                                                                            *
+ * Return value: SUCCEED - if items were successfully saved or saving was not *
+ *                         necessary                                          *
+ *               FAIL    - items cannot be saved                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
+static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items,
+		int *host_locked)
 {
 	const char			*__function_name = "lld_items_save";
 
-	int				index, i, new_items = 0, upd_items = 0;
+	int				ret = SUCCEED, index, i, new_items = 0, upd_items = 0;
 	zbx_lld_item_t			*item;
-	zbx_lld_item_prototype_t	*item_prototype;
+	const zbx_lld_item_prototype_t	*item_prototype;
 	zbx_uint64_t			itemid = 0, itemdiscoveryid = 0;
 	char				*sql = NULL, *value_esc;
 	size_t				sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
@@ -1329,11 +1335,16 @@ static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_pro
 	if (0 == new_items && 0 == upd_items)
 		goto out;
 
-	if (SUCCEED != DBlock_hostid(hostid))
+	if (0 == *host_locked)
 	{
-		/* the host was removed while processing lld rule */
-		DBrollback();
-		goto out;
+		if (SUCCEED != DBlock_hostid(hostid))
+		{
+			/* the host was removed while processing lld rule */
+			ret = FAIL;
+			goto out;
+		}
+
+		*host_locked = 1;
 	}
 
 	if (0 != new_items)
@@ -1699,6 +1710,8 @@ static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_pro
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1708,25 +1721,38 @@ out:
  * Parameters: hostid                 - [IN] host id                          *
  *             applications           - [IN/OUT] applications to save         *
  *             application_prototypes - [IN] the application prototypes       *
+ *             host_locked            - [IN/OUT] host record is locked        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applications,
-		const zbx_vector_ptr_t *application_prototypes)
+static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applications,
+		const zbx_vector_ptr_t *application_prototypes, int *host_locked)
 {
-	const char			*__function_name = "lld_applications_save";
-	int				i, new_applications = 0, new_discoveries = 0, index;
-	zbx_lld_application_t		*application;
-	zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t			applicationid, application_discoveryid;
-	zbx_db_insert_t			db_insert, db_insert_discovery;
-	zbx_vector_uint64_t		del_applicationids, del_discoveryids;
-	char				*sql_a = NULL, *sql_ad = NULL, *name;
-	size_t				sql_a_alloc = 0, sql_a_offset = 0, sql_ad_alloc = 0, sql_ad_offset = 0;
+	const char				*__function_name = "lld_applications_save";
+	int					ret = SUCCEED, i, new_applications = 0, new_discoveries = 0, index;
+	zbx_lld_application_t			*application;
+	const zbx_lld_application_prototype_t	*application_prototype;
+	zbx_uint64_t				applicationid, application_discoveryid;
+	zbx_db_insert_t				db_insert, db_insert_discovery;
+	zbx_vector_uint64_t			del_applicationids, del_discoveryids;
+	char					*sql_a = NULL, *sql_ad = NULL, *name;
+	size_t					sql_a_alloc = 0, sql_a_offset = 0, sql_ad_alloc = 0, sql_ad_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == applications->values_num)
 		goto out;
+
+	if (0 == *host_locked)
+	{
+		if (SUCCEED != DBlock_hostid(hostid))
+		{
+			/* the host was removed while processing lld rule */
+			ret = FAIL;
+			goto out;
+		}
+
+		*host_locked = 1;
+	}
 
 	zbx_vector_uint64_create(&del_applicationids);
 	zbx_vector_uint64_create(&del_discoveryids);
@@ -1876,6 +1902,8 @@ static void	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applica
 	zbx_vector_uint64_destroy(&del_applicationids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2341,7 +2369,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
+static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
 		zbx_hashset_t *items_index)
 {
 	int				i, j;
@@ -2374,7 +2402,7 @@ static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx
 	}
 }
 
-static void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows)
+void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -3034,7 +3062,7 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
  * Function: lld_items_applications_make                                      *
  *                                                                            *
  * Purpose: makes new item-application links and marks existing links as      *
- *          discovered based item_prototypes applications links               *
+ *          discovered based on item_prototypes applications links            *
  *                                                                            *
  * Parameters: item_prototypes    - [IN] the item prototypes                  *
  *             items              - [IN] the items                            *
@@ -3219,14 +3247,19 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
  *                                                                            *
  * Purpose: add or update discovered items                                    *
  *                                                                            *
+ * Return value: SUCCEED - if items were successfully added/updated or        *
+ *                         adding/updating was not necessary                  *
+ *               FAIL    - items cannot be added/updated                      *
+ *                                                                            *
  ******************************************************************************/
-void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error,
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
 		unsigned short lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_items";
 
 	zbx_vector_ptr_t	applications, application_prototypes, items, item_prototypes;
 	zbx_hashset_t		applications_index, items_index, items_applications;
+	int			ret = SUCCEED, host_record_is_locked = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3266,17 +3299,24 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 
 	DBbegin();
 
-	lld_items_save(hostid, &item_prototypes, &items);
-	lld_applications_save(hostid, &applications, &application_prototypes);
-	lld_items_applications_save(&items_applications, &items, &applications);
-
-	DBcommit();
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &host_record_is_locked) &&
+			SUCCEED == lld_applications_save(hostid, &applications, &application_prototypes,
+					&host_record_is_locked))
+	{
+		lld_items_applications_save(&items_applications, &items, &applications);
+		DBcommit();
+	}
+	else
+	{
+		ret = FAIL;
+		DBrollback();
+		goto clean;
+	}
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_remove_lost_items(&items, lifetime, lastcheck);
 	lld_remove_lost_applications(lld_ruleid, &applications, lifetime, lastcheck);
-	lld_item_links_sort(lld_rows);
-
+clean:
 	zbx_hashset_destroy(&items_applications);
 	zbx_hashset_destroy(&items_index);
 
@@ -3296,4 +3336,6 @@ out:
 	zbx_vector_ptr_destroy(&item_prototypes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }

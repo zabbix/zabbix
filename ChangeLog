@@ -323,6 +323,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+........S. [ZBX-11703] removed possibility to execute commit without transaction in processing LLD rules (Sergejs)
 ........S. [ZBX-11402] fixed unnecessary notification sending from dependent triggers (viktors)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
 A.F....... [ZBX-11698] fixed resolving of user macros with context wich are defined on host or template level (Sasha)

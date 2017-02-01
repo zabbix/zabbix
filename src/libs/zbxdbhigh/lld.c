@@ -216,7 +216,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *jp_row)
+static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "filter_evaluate_and_or";
 
@@ -228,7 +228,7 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
@@ -274,7 +274,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_row)
+static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "filter_evaluate_and";
 
@@ -286,7 +286,7 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
@@ -319,7 +319,7 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_row)
+static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "filter_evaluate_or";
 
@@ -331,7 +331,7 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
@@ -369,7 +369,7 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
  *           2) call evaluate() to calculate the final result                 *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_parse *jp_row)
+static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "filter_evaluate_expression";
 
@@ -383,9 +383,9 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		char		*value = NULL;
-		size_t		value_alloc = 0;
-		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		char			*value = NULL;
+		size_t			value_alloc = 0;
+		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
@@ -431,7 +431,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate(lld_filter_t *filter, struct zbx_json_parse *jp_row)
+static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
 {
 	switch (filter->evaltype)
 	{
@@ -448,7 +448,7 @@ static int	filter_evaluate(lld_filter_t *filter, struct zbx_json_parse *jp_row)
 	return FAIL;
 }
 
-static int	lld_rows_get(char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **error)
+static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
@@ -523,15 +523,15 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *             value      - [IN] received value from agent                    *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts)
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, const zbx_timespec_t *ts)
 {
 	const char		*__function_name = "lld_process_discovery_rule";
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		hostid = 0;
+	zbx_uint64_t		hostid;
 	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc;
-	unsigned char		state = 0;
+	unsigned char		state;
 	unsigned short		lifetime;
 	zbx_vector_ptr_t	lld_rows;
 	char			*sql = NULL;
@@ -577,12 +577,13 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 		}
 		zbx_free(lifetime_str);
 	}
-	else
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
 	DBfree_result(result);
 
-	if (0 == hostid)
+	if (NULL == row)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
 		goto clean;
+	}
 
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
 		goto error;
@@ -594,9 +595,29 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 
 	now = time(NULL);
 
-	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now);
-	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
-	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
+				" processing lld rule");
+		goto clean;
+	}
+
+	lld_item_links_sort(&lld_rows);
+
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
+				" processing lld rule");
+		goto clean;
+	}
+
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
+				" processing lld rule");
+		goto clean;
+	}
+
 	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, now);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)

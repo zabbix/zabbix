@@ -567,7 +567,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 }
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
-		struct zbx_json_parse *jp_row)
+		const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_host_make";
 
@@ -699,7 +699,7 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
-		zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
+		const zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
 	const char		*__function_name = "lld_hostgroups_make";
 
@@ -709,7 +709,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
 	zbx_lld_host_t		*host;
-	zbx_lld_group_t		*group;
+	const zbx_lld_group_t	*group;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -897,7 +897,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
-		const char *name_proto, struct zbx_json_parse *jp_row)
+		const char *name_proto, const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_group_make";
 
@@ -997,8 +997,8 @@ out:
  * Function: lld_groups_make                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_prototypes,
-		struct zbx_json_parse *jp_row)
+static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
+		const struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_groups_make";
 
@@ -1008,7 +1008,7 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, zbx_
 
 	for (i = 0; i < group_prototypes->values_num; i++)
 	{
-		zbx_lld_group_prototype_t	*group_prototype;
+		const zbx_lld_group_prototype_t	*group_prototype;
 		zbx_lld_group_t			*group;
 
 		group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[i];
@@ -1422,13 +1422,13 @@ out:
  *                                     sorted by group_prototypeid            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_prototypes)
+static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes)
 {
 	const char			*__function_name = "lld_groups_save";
 
 	int				i, j, new_groups_num = 0, upd_groups_num = 0;
 	zbx_lld_group_t			*group;
-	zbx_lld_group_prototype_t	*group_prototype;
+	const zbx_lld_group_prototype_t	*group_prototype;
 	zbx_lld_host_t			*host;
 	zbx_uint64_t			groupid = 0;
 	char				*sql = NULL, *name_esc, *name_proto_esc;
@@ -1862,7 +1862,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
 		const char *ipmi_password, unsigned char status, char inventory_mode, unsigned char tls_connect,
 		unsigned char tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity,
-		const char *tls_psk, zbx_vector_uint64_t *del_hostgroupids, zbx_vector_uint64_t *del_hostmacroids)
+		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids,
+		const zbx_vector_uint64_t *del_hostmacroids)
 {
 	const char		*__function_name = "lld_hosts_save";
 
@@ -2396,11 +2397,11 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts)
  *          fields; removes lost resources                                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime, int lastcheck)
+static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, unsigned short lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_lld_host_t		*host;
+	const zbx_lld_host_t	*host;
 	zbx_vector_uint64_t	del_hostids, lc_hostids, ts_hostids;
 	int			i, lifetime_sec;
 
@@ -2499,11 +2500,11 @@ static void	lld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime, i
  *          fields; removes lost resources                                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_remove(zbx_vector_ptr_t *groups, unsigned short lifetime, int lastcheck)
+static void	lld_groups_remove(const zbx_vector_ptr_t *groups, unsigned short lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_lld_group_t		*group;
+	const zbx_lld_group_t	*group;
 	zbx_vector_uint64_t	del_groupids, lc_groupids, ts_groupids;
 	int			i, lifetime_sec;
 
@@ -2819,8 +2820,8 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
  ******************************************************************************/
 static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, const zbx_lld_interface_t *interface)
 {
-	zbx_lld_interface_t	*interface_b;
-	int			i;
+	const zbx_lld_interface_t	*interface_b;
+	int				i;
 
 	for (i = 0; i < interfaces->values_num; i++)
 	{
@@ -3027,8 +3028,8 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error, unsigned short lifetime,
-		int lastcheck)
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
+		unsigned short lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_hosts";
 
@@ -3071,7 +3072,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 	}
 	DBfree_result(result);
 
-	if (NULL == ipmi_username)
+	if (NULL == row)
 	{
 		*error = zbx_strdcatf(*error, "Cannot process host prototypes: a parent host not found.\n");
 		return;
@@ -3104,7 +3105,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 		const char	*host_proto, *name_proto;
 		zbx_lld_host_t	*host;
 		unsigned char	status;
-		zbx_lld_row_t	*lld_row;
 		int		i;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
@@ -3127,7 +3127,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 
 		for (i = 0; i < lld_rows->values_num; i++)
 		{
-			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
+			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			host = lld_host_make(&hosts, host_proto, name_proto, &lld_row->jp_row);
 			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row);

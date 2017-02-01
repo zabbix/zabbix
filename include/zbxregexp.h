@@ -45,8 +45,8 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions);
 
 void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
 		char exp_delimiter, int case_sensitive);
-int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive);
-int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
+int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive);
+int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
 
 #endif /* ZABBIX_ZBXREGEXP_H */
