@@ -125,7 +125,7 @@ static int	get_function_parameter_int(zbx_uint64_t hostid, const char *parameter
 	}
 
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%d value:%d", __function_name, zbx_type_string(*type), *value);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __function_name, zbx_type_string(*type), *value);
 
 	zbx_free(parameter);
 out:
