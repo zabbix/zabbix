@@ -350,8 +350,7 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
-	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i;
-	zbx_uint32_t		limit = MAX_QUEUE_DETAILS_ITEMS;
+	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit = MAX_QUEUE_DETAILS_ITEMS;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
@@ -379,7 +378,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 			if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)))
 			{
-				if (FAIL == is_uint32(limit_str, &limit))
+				if (FAIL == is_uint31(limit_str, &limit))
 				{
 					zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 					goto out;
