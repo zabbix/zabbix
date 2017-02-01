@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -356,8 +356,8 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
-	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i;
-	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
+	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
+	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
@@ -379,7 +379,16 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
 			request_type = ZBX_GET_QUEUE_PROXY;
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
+		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
+
+			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str)) ||
+					FAIL == is_uint31(limit_str, &limit))
+			{
+				zbx_send_response_raw(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
+				goto out;
+			}
+		}
 	}
 
 	if (ZBX_GET_QUEUE_UNKNOWN == request_type)
@@ -452,7 +461,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-			for (i = 0; i < queue.values_num && i <= 500; i++)
+			for (i = 0; i < queue.values_num && i < limit; i++)
 			{
 				zbx_queue_item_t	*item = queue.values[i];
 
@@ -463,13 +472,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			}
 
 			zbx_json_close(&json);
+			zbx_json_adduint64(&json, "total", queue.values_num);
 
 			break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
 
-	zbx_tcp_send_raw(sock, json.buffer);
+	(void)zbx_tcp_send_raw(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);

@@ -703,15 +703,39 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula,
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, 1, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, 1, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description)                          VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                                   VALUES (15093, 15000, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing'   , 30, 3,'', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15005, 15001, 0, 'itemInheritance'     , 'key-item-inheritance-test', 30, 3, '', '', 15000, 15000);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15006, 15001, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , 30, 3, '', '', 15000, 15001);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15007, 15001, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , 30, 3, '', '', 15000, 15002);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15008, 15001, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , 30, 3, '', '', 15000, 15003);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15009, 15001, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , 30, 3, '', '', 15000, 15004);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15094, 15001, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing', 30, 3, '', '', 15000, 15093);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid)             VALUES (15010, 15001, 0, 'itemInheritanceTest' , 'key-test-inheritance'     , 30, 3, '', '', 15000);
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description)                          VALUES (15079, 15002, 0, 'testInheritance'     , 'key-item-inheritance'     , 30, 3, '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid) VALUES (15080, 15001, 0, 'testInheritance'     , 'key-item-inheritance'     , 30, 3, '', '', 15000, 15079);
+
+-- testFormItem.Preprocessing
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (125,15093,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (126,15093,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (127,15093,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (128,15093,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (129,15093,5,5,'regular expression pattern
+output formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (130,15093,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (131,15093,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (132,15093,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (133,15093,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (134,15094,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (135,15094,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (138,15094,5,5,'regular expression pattern
+output formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (139,15094,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (140,15094,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (141,15094,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (142,15094,9,9,'');
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments)             VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
@@ -771,11 +795,13 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula,
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15023, 15000, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2'    , 30, 3, 1, '', '', 2);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15024, 15000, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3'    , 30, 3, 1, '', '', 2);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags)                          VALUES (15025, 15000, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4'    , 30, 3, 1, '', '', 2);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15095, 15000, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing'    , 30, 3,'', '', 2);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15026, 15001, 0, 'itemDiscovery'                , 'item-discovery-prototype', 30, 3, '', '', 2, 15000, 15021);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15027, 15001, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1'    , 30, 3, '', '', 2, 15000, 15022);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15028, 15001, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2'    , 30, 3, '', '', 2, 15000, 15023);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15029, 15001, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3'    , 30, 3, '', '', 2, 15000, 15024);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15030, 15001, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4'    , 30, 3, '', '', 2, 15000, 15025);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15096, 15001, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing'    , 30, 3, '', '', 2, 15000, 15095);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15021, 15021, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15022, 15022, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15023, 15023, 15011);
@@ -786,11 +812,35 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (1502
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15028, 15028, 15016);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15029, 15029, 15016);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15030, 15030, 15016);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15031, 15095, 15011);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15032, 15096, 15016);
 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5'    , 30, 3, '', '', 2);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5'    , 30, 3, '', '', 2, 15000, 15083);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15083, 15083, 15081);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15084, 15084, 15082);
+
+-- testFormItemPrototype.Preprocessing
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (143,15095,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (144,15095,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (145,15095,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (146,15095,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (147,15095,5,5,'regular expression pattern
+output formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (148,15095,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (149,15095,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (150,15095,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (151,15095,9,9,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (152,15096,1,1,'123');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (153,15096,2,2,'abc');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (154,15096,3,3,'def');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (155,15096,4,4,'1a2b3c');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (156,15096,5,5,'regular expression pattern
+output formatting template');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (157,15096,6,6,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (158,15096,7,7,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (159,15096,8,8,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (160,15096,9,9,'');
 
 -- testFormGraphPrototype.LayoutCheck and testInheritanceGraphPrototype.SimpleUpdate
 INSERT INTO graphs (graphid, name, flags)             VALUES (15008, 'testInheritanceGraphPrototype1', 2);
@@ -1077,7 +1127,7 @@ INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,hi
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23433,9,'','',40001,'Failed step of scenario "$1".','web.test.fail[testFormWeb3]',60,30,90,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23434,9,'','',40001,'Last error message of scenario "$1".','web.test.error[testFormWeb3]',60,30,90,0,1,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23435,9,'','',40001,'Download speed for step "$2" of scenario "$1".','web.test.in[testFormWeb3,testFormWeb3,bps]',60,30,90,0,0,'','Bps','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
-INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23436,9,'','',40001,'Response time for step "$2" of scenario "$1".','web.test.time[testFormWeb3,testFormWeb3,resp]',60,30,90,0,0,'','s','',0,'','',,'',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
+INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23436,9,'','',40001,'Response time for step "$2" of scenario "$1".','web.test.time[testFormWeb3,testFormWeb3,resp]',60,30,90,0,0,'','s','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23437,9,'','',40001,'Response code for step "$2" of scenario "$1".','web.test.rspcode[testFormWeb3,testFormWeb3]',60,30,90,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23438,9,'','',40001,'Download speed for scenario "$1".','web.test.in[testFormWeb4,,bps]',60,30,90,0,0,'','Bps','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol) VALUES (23439,9,'','',40001,'Failed step of scenario "$1".','web.test.fail[testFormWeb4]',60,30,90,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,NULL,'','',0,'30',0,0);
@@ -1164,7 +1214,7 @@ INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,hi
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40042,0,'','',50001,'Item ZBX6663','item-ZBX6663',30,90,365,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,0,50015,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40043,0,'','',50001,'DiscoveryRule ZBX6663','drule-zbx6663',30,90,365,0,4,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,1,50015,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40045,0,'','',50002,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second',30,90,365,0,4,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,1,NULL,'','',0,'30',0,0,0,'');
-INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40046,0,'','',50001,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second',30,90,365,0,4,'','''',0,'','','',0,'',40045,NULL,'','','',0,'','','','',0,1,50015,'','',0,'30',0,0,0,'');
+INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40046,0,'','',50001,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second',30,90,365,0,4,'','','',0,'','','',0,'',40045,NULL,'','','',0,'','','','',0,1,50015,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40047,0,'','',50000,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second',30,90,365,0,4,'','','',0,'','','',0,'',40045,NULL,'','','',0,'','','','',0,1,NULL,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40048,0,'','',50002,'ItemProto ZBX6663 Second','item-proto-zbx6663-second',30,90,365,0,3,'','','',0,'','','',0,'',NULL,NULL,'','','',0,'','','','',0,2,NULL,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40049,0,'','',50001,'ItemProto ZBX6663 Second','item-proto-zbx6663-second',30,90,365,0,3,'','','',0,'','','',0,'',40048,NULL,'','','',0,'','','','',0,2,50015,'','',0,'30',0,0,0,'');
@@ -1323,6 +1373,12 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, de
 -- testPageUsers
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
+
+-- testUrlUserPermissions
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'admin-zabbix', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 7, 4);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'user-zabbix', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;

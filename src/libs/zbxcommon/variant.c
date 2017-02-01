@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ void	zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl)
 	value->type = ZBX_VARIANT_DBL;
 }
 
-void	zbx_variant_set_ui64(zbx_variant_t *value, double value_ui64)
+void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64)
 {
 	value->data.ui64 = value_ui64;
 	value->type = ZBX_VARIANT_UI64;
@@ -120,7 +120,10 @@ static int	variant_to_ui64(zbx_variant_t *value)
 		case ZBX_VARIANT_UI64:
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
-			zbx_variant_set_ui64(value, (zbx_uint64_t)value->data.dbl);
+			if (0 > value->data.dbl)
+				return FAIL;
+
+			zbx_variant_set_ui64(value, value->data.dbl);
 			return SUCCEED;
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));

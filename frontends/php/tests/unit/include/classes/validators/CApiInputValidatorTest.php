@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_STRING_UTF8],
 				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_STRING_UTF8],
+				true,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
 			],
@@ -159,6 +165,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_INT32],
 				[],
+				'/1/int',
+				'Invalid parameter "/1/int": a number is expected.'
+			],
+			[
+				['type' => API_INT32],
+				true,
 				'/1/int',
 				'Invalid parameter "/1/int": a number is expected.'
 			],
@@ -314,6 +326,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_ID],
+				true,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID],
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
@@ -404,6 +422,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => []],
+				true,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => []],
+				null,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => []],
 				'',
 				'/',
 				'Invalid parameter "/": an array is expected.'
@@ -466,6 +496,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_IDS],
 				'',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_IDS],
+				true,
 				'/',
 				'Invalid parameter "/": an array is expected.'
 			],
@@ -546,6 +582,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[0, 1, 2, 3, '4', '9223372036854775807', 5, 6, 7, '03'],
 				'/',
 				'Invalid parameter "/10": value (3) already exists.'
+			],
+			[
+				['type' => API_OBJECTS],
+				true,
+				'/',
+				'Invalid parameter "/": an array is expected.'
 			],
 			[
 				['type' => API_OBJECTS],
@@ -781,6 +823,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_HG_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_HG_NAME],
 				null,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
@@ -848,6 +896,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_SCRIPT_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
 				null,
 				'/1/name',
 				'Invalid parameter "/1/name": a character string is expected.'
@@ -894,6 +948,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'{$MACRO: "context"',
 				'/1/macro',
 				'Invalid parameter "/1/macro": a user macro is expected.'
+			],
+			[
+				['type' => API_USER_MACRO],
+				true,
+				'/1/macro',
+				'Invalid parameter "/1/macro": a character string is expected.'
 			],
 			[
 				['type' => API_USER_MACRO],
@@ -946,6 +1006,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_TIME_PERIOD],
+				true,
+				'/1/period',
+				'Invalid parameter "/1/period": a character string is expected.'
+			],
+			[
+				['type' => API_TIME_PERIOD],
 				null,
 				'/1/period',
 				'Invalid parameter "/1/period": a character string is expected.'
@@ -962,7 +1028,74 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'1-7'."\xd1".',00:00-24:00',
 				'/1/period',
 				'Invalid parameter "/1/period": invalid byte sequence in UTF-8.'
-			]
+			],
+			[
+				['type' => API_REGEX, 'length' => 7],
+				'^[a-z]$',
+				'/1/expression',
+				'^[a-z]$'
+			],
+			[
+				['type' => API_REGEX, 'length' => 6],
+				'^[a-z]$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_NOT_EMPTY],
+				'^[a-z]$',
+				'/1/expression',
+				'^[a-z]$'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_REGEX],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_REGEX],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				true,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_REGEX],
+				// broken UTF-8 byte sequence
+				'^'."\xd1".'$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_REGEX],
+				'^[a-z$',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@^[a-z$',
+				'/1/expression',
+				'@^[a-z$'
+			],
 		];
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ define('ZABBIX_EXPORT_VERSION',	'3.4');
 define('ZABBIX_DB_VERSION',		3030022);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2016');
+define('ZABBIX_COPYRIGHT_TO',	'2017');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -193,6 +193,7 @@ define('AUDIT_RESOURCE_REGEXP',			28);
 define('AUDIT_RESOURCE_MACRO',			29);
 define('AUDIT_RESOURCE_TEMPLATE',		30);
 define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
+define('AUDIT_RESOURCE_ICON_MAP',		32);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1007,6 +1008,7 @@ define('API_HG_NAME',		9);
 define('API_SCRIPT_NAME',	10);
 define('API_USER_MACRO',	11);
 define('API_TIME_PERIOD',	12);
+define('API_REGEX',			13);
 
 // flags
 define('API_REQUIRED',		0x01);
@@ -1014,6 +1016,7 @@ define('API_NOT_EMPTY',		0x02);
 define('API_ALLOW_NULL',	0x04);
 define('API_NORMALIZE',		0x08);
 define('API_MULTIPLE',		0x10);
+define('API_DEPRECATED',	0x20);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
