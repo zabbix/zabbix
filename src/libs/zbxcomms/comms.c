@@ -25,21 +25,21 @@
 #define IPV4_MAX_CIDR_PREFIX	32
 #define IPV6_MAX_CIDR_PREFIX	128
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 #	define ZBX_SOCKADDR struct sockaddr_storage
 #else
 #	define ZBX_SOCKADDR struct sockaddr_in
 #endif
 
-#if !defined(ZBX_SOCKLEN_T)
+#ifndef ZBX_SOCKLEN_T
 #	define ZBX_SOCKLEN_T socklen_t
 #endif
 
-#if !defined(SOCK_CLOEXEC)
+#ifndef SOCK_CLOEXEC
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
-#if defined(HAVE_OPENSSL)
+#ifdef HAVE_OPENSSL
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
@@ -97,7 +97,7 @@ static char	*zbx_get_ip_by_socket(zbx_socket_t *s)
 		goto out;
 	}
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_socket_last_error());
@@ -116,7 +116,7 @@ out:
 	return host;
 }
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *
  * Function: zbx_gethost_by_ip                                                *
@@ -126,7 +126,7 @@ out:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
 	struct addrinfo	hints, *ai = NULL;
@@ -187,7 +187,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
 #define ZBX_SOCKET_START()	if (FAIL == socket_started) socket_started = zbx_socket_start()
 
@@ -257,7 +257,7 @@ static void	zbx_socket_free(zbx_socket_t *s)
 static void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
 {
 	s->timeout = timeout;
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	timeout *= 1000;
 
 	if (ZBX_PROTO_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
@@ -289,7 +289,7 @@ static void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
  ******************************************************************************/
 static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
 {
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	if (0 != s->timeout)
 	{
 		zbx_alarm_off();
@@ -322,7 +322,7 @@ static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
 static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
 		char **error)
 {
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	u_long		mode = 1;
 	FD_SET		fdw, fde;
 	int		res;
@@ -331,7 +331,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
@@ -424,7 +424,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
@@ -565,15 +565,17 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (NULL == (hp = gethostbyname(ip)))
 	{
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		zbx_set_socket_strerror("gethostbyname() failed for '%s': %s",
 				ip, strerror_from_system(WSAGetLastError()));
-#elif defined(HAVE_HSTRERROR)
+#else
+#ifdef HAVE_HSTRERROR
 		zbx_set_socket_strerror("gethostbyname() failed for '%s': [%d] %s",
 				ip, h_errno, hstrerror(h_errno));
 #else
 		zbx_set_socket_strerror("gethostbyname() failed for '%s': [%d]",
 				ip, h_errno);
+#endif
 #endif
 		return FAIL;
 	}
@@ -656,7 +658,7 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char	*error = NULL;
 #endif
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -671,14 +673,14 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 		return res;
 	}
 #endif
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
 	{
 		res = ZBX_TCP_WRITE(s->socket, buf, len);
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
@@ -872,7 +874,7 @@ out:
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
@@ -1180,7 +1182,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	for (i = 0; i < s->num_socks; i++)
 	{
 		FD_SET(s->sockets[i], &sock_set);
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 		if (s->sockets[i] > n)
 			n = s->sockets[i];
 #endif
@@ -1460,7 +1462,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1477,14 +1479,14 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 		return res;
 	}
 #endif
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
 	do
 	{
 		res = ZBX_TCP_READ(s->socket, buf, len);
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
 #endif
@@ -1739,7 +1741,7 @@ static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *
 	return SUCCEED;
 }
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
@@ -1919,7 +1921,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  ******************************************************************************/
 int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if_empty)
 {
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
 	struct hostent	*hp;
@@ -1976,7 +1978,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 		/* (based on gethostbyname()) for handling non-IPv6-enabled components. In   */
 		/* the future it should be considered to switch completely to getaddrinfo(). */
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = PF_UNSPEC;
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
@@ -2027,7 +2029,7 @@ int	zbx_tcp_check_security(zbx_socket_t *s, const char *peer_list, int action_if
 	if (NULL != end)
 		*end = ',';
 
-#if defined(HAVE_IPV6)
+#ifdef HAVE_IPV6
 	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
 		zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, peer_list);
 	else
