@@ -4432,7 +4432,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *          in simple macros like {host:key[].func()}                         *
  *                                                                            *
  ******************************************************************************/
-static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+static int	process_simple_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	char	*key = NULL, *replace_to = NULL, *dot, *params;
@@ -4501,7 +4501,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
-		struct zbx_json_parse *jp_row, char *error, size_t error_len)
+		const struct zbx_json_parse *jp_row, char *error, size_t error_len)
 {
 	char	c, *replace_to = NULL;
 	int	ret = SUCCEED;
@@ -4559,7 +4559,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
  *             jp_row    - [IN] discovery data                                *
  *                                                                            *
  ******************************************************************************/
-static void	process_user_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
+static void	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row)
 {
 	int			force_quote;
 	size_t			context_r;
@@ -4603,7 +4603,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, struct zbx
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row,
+static int	substitute_func_macro(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	int	ret;
@@ -4656,7 +4656,8 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, struct zbx_jso
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags, char *error, size_t max_error_len)
+int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int flags, char *error,
+		size_t max_error_len)
 {
 	const char	*__function_name = "substitute_lld_macros";
 
@@ -4704,10 +4705,10 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 
 typedef struct
 {
-	zbx_uint64_t		*hostid;
-	DC_ITEM			*dc_item;
-	struct zbx_json_parse	*jp_row;
-	int			macro_type;
+	zbx_uint64_t			*hostid;
+	DC_ITEM				*dc_item;
+	const struct zbx_json_parse	*jp_row;
+	int				macro_type;
 }
 replace_key_param_data_t;
 
@@ -4724,7 +4725,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
-	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
+	const struct zbx_json_parse	*jp_row = replace_key_param_data->jp_row;
 	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	ZBX_UNUSED(num);
@@ -4790,7 +4791,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
+int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t maxerrlen)
 {
 	const char			*__function_name = "substitute_key_macros";
@@ -4848,7 +4849,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
  *                                                                            *
  ******************************************************************************/
 int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
-		char **exp, size_t *exp_alloc, size_t *exp_offset, struct zbx_json_parse *jp_row,
+		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_function_lld_param";
