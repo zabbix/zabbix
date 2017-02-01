@@ -4106,7 +4106,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *                                                                            *
  ******************************************************************************/
 static int	substitute_discovery_macros_simple(char *data, char **replace_to, size_t *replace_to_alloc,
-		size_t *pos, struct zbx_json_parse *jp_row)
+		size_t *pos, const struct zbx_json_parse *jp_row)
 {
 	char	*pl, *pr;
 	char	*key = NULL;
@@ -4193,7 +4193,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int flags,
+int	substitute_discovery_macros(char **data, const struct zbx_json_parse *jp_row, int flags,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_discovery_macros";
@@ -4321,10 +4321,10 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 
 typedef struct
 {
-	zbx_uint64_t		*hostid;
-	DC_ITEM			*dc_item;
-	struct zbx_json_parse	*jp_row;
-	int			macro_type;
+	zbx_uint64_t			*hostid;
+	DC_ITEM				*dc_item;
+	const struct zbx_json_parse	*jp_row;
+	int				macro_type;
 }
 replace_key_param_data_t;
 
@@ -4341,7 +4341,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
-	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
+	const struct zbx_json_parse	*jp_row = replace_key_param_data->jp_row;
 	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
@@ -4405,7 +4405,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
+int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t maxerrlen)
 {
 	const char			*__function_name = "substitute_key_macros";
