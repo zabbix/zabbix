@@ -23,7 +23,7 @@
 
 	function makeWidgetDiv(data, widget) {
 		widget['content_header'] = $('<div>')
-			.addClass('dashbrd-widget-head')
+			.addClass('dashbrd-grid-widget-head')
 			.addClass('cursor-move')
 			.append($('<h4>').text(widget['header']));
 		widget['content_body'] = $('<div>')
