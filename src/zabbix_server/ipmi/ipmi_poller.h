@@ -17,19 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
+#ifndef ZABBIX_IPMI_POLLER_H
+#define ZABBIX_IPMI_POLLER_H
+
+#include "common.h"
+
+#ifdef HAVE_OPENIPMI
 
 #include "threads.h"
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_UNREACHABLE_PERIOD;
-extern int	CONFIG_UNREACHABLE_DELAY;
+ZBX_THREAD_ENTRY(ipmi_poller_thread, args);
 
-ZBX_THREAD_ENTRY(poller_thread, args);
-
-void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts);
-void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error);
+#endif
 
 #endif

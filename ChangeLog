@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+....I..PS. [ZBXNEXT-3386] added IPMI manager and reworked IPMI pollers to avoid connecting to one host from multiple pollers (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 ..FGI..... [ZBXNEXT-491] added vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>] check (vjaceslavs, Andris)
 ...G....S. [ZBXNEXT-1380] added check for exit code of scripts (vjaceslavs)
