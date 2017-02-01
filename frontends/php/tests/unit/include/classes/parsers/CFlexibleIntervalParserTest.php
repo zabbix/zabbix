@@ -62,6 +62,13 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{$C:"d"}/{$E:"f"}'
 				]
 			],
+			[
+				'{#A}/{#B}', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#A}/{#B}'
+				]
+			],
 			// partial success
 			[
 				'random text.....52w/7,00:00-0:01....text', 16,
