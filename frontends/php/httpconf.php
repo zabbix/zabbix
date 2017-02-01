@@ -41,7 +41,7 @@ $fields = [
 	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
 	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'],
 	'name'            => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')],
-	'delay'           => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')],
+	'delay'           => [T_ZBX_STR, O_OPT, null,  null,					'isset({add}) || isset({update})'],
 	'retries'         => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})',
 		_('Attempts')
 	],
@@ -240,7 +240,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
 			'applicationid' => getRequest('applicationid'),
-			'delay' => $_REQUEST['delay'],
+			'delay' => getRequest('delay', '1m'),
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
@@ -567,7 +567,7 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
-		$data['delay'] = getRequest('delay', 60);
+		$data['delay'] = getRequest('delay', ZBX_HTTPTEST_DEFAULT_DELAY);
 		$data['retries'] = getRequest('retries', 1);
 
 		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);

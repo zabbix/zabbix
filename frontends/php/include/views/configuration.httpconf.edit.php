@@ -74,8 +74,8 @@ $httpFormList
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	)
-	->addRow(_('Update interval (in sec)'),
-		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(_('Update interval'),
+		(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)

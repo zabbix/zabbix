@@ -127,7 +127,9 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
-		convertUnitsS($httpTest['delay']),
+		(strpos($httpTest['delay'], '{') === false)
+			? convertUnitsS(timeUnitToSeconds($httpTest['delay']))
+			: $httpTest['delay'],
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
