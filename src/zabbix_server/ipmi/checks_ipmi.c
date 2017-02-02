@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1401,43 +1401,41 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
+int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value)
 {
 	const char		*__function_name = "get_value_ipmi";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s'", __function_name, item->host.host, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
 	if (NULL == os_hnd)
 	{
-		SET_MSG_RESULT(value, strdup("IPMI handler is not initialised"));
+		*value = zbx_strdup(*value, "IPMI handler is not initialised.");
 		return CONFIG_ERROR;
 	}
 
-	h = zbx_init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
-			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
+	h = zbx_init_ipmi_host(addr, port, authtype, privilege, username, password);
 
 	h->lastaccess = time(NULL);
 
 	if (0 == h->domain_up)
 	{
 		if (NULL != h->err)
-		{
-			SET_MSG_RESULT(value, strdup(h->err));
-		}
+			*value = zbx_strdup(*value, h->err);
+
 		return h->ret;
 	}
 
-	s = zbx_get_ipmi_sensor_by_id(h, item->ipmi_sensor);
+	s = zbx_get_ipmi_sensor_by_id(h, sensor);
 	if (NULL == s)
-		c = zbx_get_ipmi_control_by_name(h, item->ipmi_sensor);
+		c = zbx_get_ipmi_control_by_name(h, sensor);
 
 	if (NULL == s && NULL == c)
 	{
-		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "sensor or control %s@[%s]:%d does not exist",
-				item->ipmi_sensor, h->ip, h->port));
+		*value = zbx_dsprintf(*value, "sensor or control %s@[%s]:%d does not exist", sensor, h->ip, h->port);
 		return NOTSUPPORTED;
 	}
 
@@ -1449,21 +1447,20 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	if (h->ret != SUCCEED)
 	{
 		if (NULL != h->err)
-		{
-			SET_MSG_RESULT(value, strdup(h->err));
-		}
+			*value = zbx_strdup(*value, h->err);
+
 		return h->ret;
 	}
 
 	if (NULL != s)
 	{
 		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
-			SET_DBL_RESULT(value, s->value.threshold);
+			*value = zbx_dsprintf(*value, ZBX_FS_DBL, s->value.threshold);
 		else
-			SET_UI64_RESULT(value, s->value.discrete);
+			*value = zbx_dsprintf(*value, ZBX_FS_UI64, s->value.discrete);
 	}
 	if (NULL != c)
-		SET_DBL_RESULT(value, c->val[0]);
+		*value = zbx_dsprintf(*value, ZBX_FS_DBL, c->val[0]);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 
@@ -1522,40 +1519,42 @@ fail:
 	return ret;
 }
 
-int	zbx_set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len)
+int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned short port, signed char authtype,
+		unsigned char privilege, const char *username, const char *password, const char *sensor,
+		int value, char **error)
 {
+	const char              *__function_name = "zbx_set_ipmi_control_value";
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_set_ipmi_control_value(control:%s, value:%d)", item->ipmi_sensor, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
+			__function_name, hostid, sensor, value);
 
 	if (NULL == os_hnd)
 	{
-		zbx_strlcpy(error, "IPMI handler is not initialised", max_error_len);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		*error = zbx_strdup(*error, "IPMI handler is not initialized.");
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return NOTSUPPORTED;
 	}
 
-	h = zbx_init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
-			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
+	h = zbx_init_ipmi_host(addr, port, authtype, privilege, username, password);
 
 	if (0 == h->domain_up)
 	{
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, max_error_len);
+			*error = zbx_strdup(*error, h->err);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 		return h->ret;
 	}
 
-	c = zbx_get_ipmi_control_by_name(h, item->ipmi_sensor);
+	c = zbx_get_ipmi_control_by_name(h, sensor);
 
 	if (NULL == c)
 	{
-		zbx_snprintf(error, max_error_len, "control %s@[%s]:%d does not exist",
-				item->ipmi_sensor, h->ip, h->port);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		*error = zbx_dsprintf(*error, "Control %s@ on address %s:%d does not exist.", sensor, h->ip, h->port);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return NOTSUPPORTED;
 	}
 
@@ -1565,10 +1564,12 @@ int	zbx_set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max
 	{
 		if (NULL != h->err)
 		{
-			zbx_strlcpy(error, h->err, max_error_len);
+			*error = zbx_strdup(*error, h->err);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", h->err);
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);\
 
 	return h->ret;
 }

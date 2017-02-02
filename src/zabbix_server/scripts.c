@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 #include "common.h"
 #include "poller/checks_agent.h"
-#include "poller/checks_ipmi.h"
 #include "poller/checks_ssh.h"
 #include "poller/checks_telnet.h"
+#include "ipmi/ipmi.h"
 #include "zbxexec.h"
 #include "zbxserver.h"
 #include "db.h"
@@ -98,50 +98,6 @@ fail:
 
 	return ret;
 }
-
-#ifdef HAVE_OPENIPMI
-static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *error, size_t max_error_len)
-{
-	const char	*__function_name = "zbx_execute_ipmi_command";
-	int		val, ret;
-	char		*port = NULL;
-	DC_ITEM		item;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	*error = '\0';
-	memset(&item, 0, sizeof(item));
-	memcpy(&item.host, host, sizeof(item.host));
-
-	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_IPMI)))
-	{
-		zbx_snprintf(error, max_error_len, "IPMI interface is not defined for host [%s]", host->host);
-		goto fail;
-	}
-
-	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &port,
-			MACRO_TYPE_COMMON, NULL, 0);
-
-	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
-	{
-		zbx_snprintf(error, max_error_len, "invalid port number [%s]", item.interface.port_orig);
-		goto fail;
-	}
-
-	if (SUCCEED == (ret = zbx_parse_ipmi_command(command, item.ipmi_sensor, &val, error, max_error_len)))
-	{
-		if (SUCCEED != (ret = zbx_set_ipmi_control_value(&item, val, error, max_error_len)))
-			ret = FAIL;
-	}
-fail:
-	zbx_free(port);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-#endif
 
 static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
@@ -414,7 +370,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, zbx_user_t *user, ch
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (SUCCEED == (ret = zbx_execute_ipmi_command(host, script->command, error, max_error_len)))
+			if (SUCCEED == (ret = zbx_ipmi_execute_command(host, script->command, error, max_error_len)))
 			{
 				if (NULL != result)
 					*result = zbx_strdup(*result, "IPMI command successfully executed.");

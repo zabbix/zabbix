@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 
 		$cookie  = ['name' => 'zbx_sessionid', 'value' => '09e7d4286dfdca4ba7be15e0f3b2b55a', 'domain' => $domain, 'path' => $path];
+		$this->webDriver->manage()->addCookie($cookie);
+	}
+
+	public function authenticateUser($sessionid, $userId) {
+		$this->webDriver->get(PHPUNIT_URL);
+		$row = DBfetch(DBselect("select null from sessions where sessionid='$sessionid'"));
+
+		if (!$row) {
+			DBexecute("insert into sessions (sessionid, userid) values ('$sessionid', $userId)");
+		}
+
+		$domain = parse_url(PHPUNIT_URL, PHP_URL_HOST);
+		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
+
+		$cookie  = ['name' => 'zbx_sessionid', 'value' => $sessionid, 'domain' => $domain, 'path' => $path];
 		$this->webDriver->manage()->addCookie($cookie);
 	}
 
@@ -613,6 +628,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		while ($row = DBfetch($result)) {
 			$this->zbxTestTextNotPresent($row['host']);
 		}
+	}
+
+	public function zbxTestWaitForPageToLoad() {
+		$this->webDriver->wait(10, 2000)->until(function () {
+			return $this->webDriver->executeScript("return document.readyState;") == "complete";
+			}
+		);
 	}
 
 }

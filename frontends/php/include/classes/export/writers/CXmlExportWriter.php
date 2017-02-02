@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,8 @@ class CXmlExportWriter extends CExportWriter {
 			'mappings' => 'mapping',
 			'httptests' => 'httptest',
 			'steps' => 'step',
-			'tags' => 'tag'
+			'tags' => 'tag',
+			'preprocessing' => 'step'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

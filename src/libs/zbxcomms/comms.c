@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1710,8 +1710,7 @@ out:
 static int	subnet_match(int af, unsigned int prefix_size, void *address1, void *address2)
 {
 	unsigned char	netmask[16] = {0};
-	unsigned int	bytes;
-	int		i, j;
+	unsigned int	bytes, i, j;
 
 	if (af == AF_INET)
 	{

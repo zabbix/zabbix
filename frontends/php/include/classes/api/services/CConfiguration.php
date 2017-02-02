@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
 class CConfiguration extends CApiService {
 
 	/**
-	 * Export configuration data.
-	 *
 	 * @param array $params
 	 *
 	 * @return string
@@ -58,8 +56,6 @@ class CConfiguration extends CApiService {
 	}
 
 	/**
-	 * Import configuration data.
-	 *
 	 * @param array $params
 	 *
 	 * @return bool
@@ -150,6 +146,7 @@ class CConfiguration extends CApiService {
 		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
 		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
 		$converterChain->addConverter('3.0', $importConverterFactory->getObject('3.0'));
+		$converterChain->addConverter('3.2', $importConverterFactory->getObject('3.2'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($data);

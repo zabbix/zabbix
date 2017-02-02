@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,6 +219,7 @@ int	CONFIG_COLLECTOR_FORKS		= 1;
 int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 0;
+int	CONFIG_IPMIMANAGER_FORKS	= 0;
 
 char	*opt = NULL;
 

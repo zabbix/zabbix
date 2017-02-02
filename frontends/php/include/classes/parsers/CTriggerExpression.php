@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -593,6 +593,8 @@ class CTriggerExpression {
 	/**
 	 * Parses a number constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the number
+	 *
+	 * comments: !!! Don't forget sync code with C !!!
 	 *
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */

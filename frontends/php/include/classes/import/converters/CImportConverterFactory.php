@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ class CImportConverterFactory extends CRegistryFactory {
 		parent::__construct([
 			'1.0' => new C10ImportConverter(),
 			'2.0' => new C20ImportConverter(),
-			'3.0' => new C30ImportConverter()
+			'3.0' => new C30ImportConverter(),
+			'3.2' => new C32ImportConverter()
 		]);
 	}
 }

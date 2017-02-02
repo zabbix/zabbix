@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,12 +33,19 @@ class C30ImportConverterTest extends CImportConverterTest {
 										[
 											'description' => 'trigger1',
 											'expression' => '{Template:item1.last()}',
+											'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+											'recovery_expression' => '',
 											'dependencies' => [
 												[
 													'description' => 'trigger2',
-													'expression' => '{Template:item2.last()}'
+													'expression' => '{Template:item2.last()}',
+													'recovery_expression' => ''
 												]
-											]
+											],
+											'tags' => [],
+											'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+											'correlation_tag' => '',
+											'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 										]
 									]
 								]
@@ -53,12 +60,19 @@ class C30ImportConverterTest extends CImportConverterTest {
 										[
 											'description' => 'trigger1',
 											'expression' => '{host:item1.last()}',
+											'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+											'recovery_expression' => '',
 											'dependencies' => [
 												[
 													'description' => 'trigger2',
-													'expression' => '{host:item2.last()}'
+													'expression' => '{host:item2.last()}',
+													'recovery_expression' => ''
 												]
-											]
+											],
+											'tags' => [],
+											'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+											'correlation_tag' => '',
+											'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 										]
 									]
 								]
@@ -69,12 +83,19 @@ class C30ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'trigger1',
 							'expression' => '{host:item1.last()}',
+							'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+							'recovery_expression' => '',
 							'dependencies' => [
 								[
 									'description' => 'trigger2',
-									'expression' => '{host:item2.last()}'
+									'expression' => '{host:item2.last()}',
+									'recovery_expression' => ''
 								]
-							]
+							],
+							'tags' => [],
+							'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+							'correlation_tag' => '',
+							'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 						]
 					],
 					'maps' => [
@@ -115,7 +136,7 @@ class C30ImportConverterTest extends CImportConverterTest {
 										[
 											'description' => 'trigger1',
 											'expression' => '{Template:item1.last()}',
-											'recovery_mode' => '0',
+											'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
 											'recovery_expression' => '',
 											'dependencies' => [
 												[
@@ -142,7 +163,7 @@ class C30ImportConverterTest extends CImportConverterTest {
 										[
 											'description' => 'trigger1',
 											'expression' => '{host:item1.last()}',
-											'recovery_mode' => '0',
+											'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
 											'recovery_expression' => '',
 											'dependencies' => [
 												[
@@ -165,7 +186,7 @@ class C30ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'trigger1',
 							'expression' => '{host:item1.last()}',
-							'recovery_mode' => '0',
+							'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
 							'recovery_expression' => '',
 							'dependencies' => [
 								[
