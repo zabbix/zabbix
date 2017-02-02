@@ -330,11 +330,9 @@
 
 	function showPreloader(widget) {
 		if (typeof(widget['preloader_div']) == 'undefined') {
-			widget['preloader_div'] = $('<div>', {
-				'class': 'preloader-container'
-			}).append($('<div>', {
-				'class': 'preloader'
-			}));
+			widget['preloader_div'] = $('<div>')
+				.addClass('preloader-container')
+				.append($('<div>').addClass('preloader'));
 
 			widget['div'].append(widget['preloader_div']);
 		}
@@ -348,6 +346,10 @@
 	}
 
 	function startPreloader(widget) {
+		if (typeof(widget['preloader_timeoutid']) != 'undefined' || typeof(widget['preloader_div']) != 'undefined') {
+			return;
+		}
+
 		widget['preloader_timeoutid'] = setTimeout(function () {
 			delete widget['preloader_timeoutid'];
 
