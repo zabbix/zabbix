@@ -100,6 +100,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->manage()->addCookie($cookie);
 	}
 
+	public function authenticateUser($sessionid, $userId) {
+		$this->webDriver->get(PHPUNIT_URL);
+		$row = DBfetch(DBselect("select null from sessions where sessionid='$sessionid'"));
+
+		if (!$row) {
+			DBexecute("insert into sessions (sessionid, userid) values ('$sessionid', $userId)");
+		}
+
+		$domain = parse_url(PHPUNIT_URL, PHP_URL_HOST);
+		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
+
+		$cookie  = ['name' => 'zbx_sessionid', 'value' => $sessionid, 'domain' => $domain, 'path' => $path];
+		$this->webDriver->manage()->addCookie($cookie);
+	}
+
 	public function zbxTestOpen($url) {
 		$this->webDriver->get(PHPUNIT_URL.$url);
 	}

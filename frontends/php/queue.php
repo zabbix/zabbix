@@ -280,14 +280,7 @@ if ($config == QUEUE_OVERVIEW_BY_PROXY) {
 	$total = _('Total').': '.$table->getNumRows();
 }
 elseif ($config == QUEUE_DETAILS) {
-	if (null !== $zabbixServer->getTotalCount()) {
-		$total = _s('Displaying %1$s of %2$s found', $table->getNumRows(), $zabbixServer->getTotalCount());
-	}
-	else {
-		// fallback to old solution
-		$total = _('Total').': '.$table->getNumRows().
-			(count($queueData) > QUEUE_DETAIL_ITEM_COUNT ? ' ('._('Truncated').')' : '');
-	}
+	$total = _s('Displaying %1$s of %2$s found', $table->getNumRows(), $zabbixServer->getTotalCount());
 }
 else {
 	$total = null;

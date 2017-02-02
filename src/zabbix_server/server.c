@@ -45,7 +45,6 @@
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
-#include "poller/checks_ipmi.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
@@ -59,6 +58,12 @@
 #include "valuecache.h"
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
+#include "zbxipcservice.h"
+
+#ifdef HAVE_OPENIPMI
+#include "ipmi/ipmi_manager.h"
+#include "ipmi/ipmi_poller.h"
+#endif
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_server.conf"
 
@@ -147,6 +152,7 @@ int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 1;
+int	CONFIG_IPMIMANAGER_FORKS	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -239,6 +245,8 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
+char	*CONFIG_SOCKET_PATH		= NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -260,25 +268,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_WATCHDOG;
 		*local_process_num = local_server_num - server_count + CONFIG_WATCHDOG_FORKS;
 	}
-	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_IPMIMANAGER_FORKS))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
-		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_IPMIMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
 	{
@@ -350,6 +343,26 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_TASKMANAGER;
 		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
 	}
+	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
+		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+	}
 	else
 		return FAIL;
 
@@ -409,6 +422,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_LOG_TYPE_STR)
 		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+
+	if (NULL == CONFIG_SOCKET_PATH)
+		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
 }
 
 /******************************************************************************
@@ -424,11 +440,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
 	int	err = 0;
 
-	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_IPMIPOLLER_FORKS +
-			CONFIG_JAVAPOLLER_FORKS)
+	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
-				" if regular, IPMI or Java pollers are started");
+				" if regular or Java pollers are started");
 		err = 1;
 	}
 
@@ -473,6 +488,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+#endif
+
+#if !defined(HAVE_OPENIPMI)
+	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
@@ -639,6 +658,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -681,7 +702,7 @@ static void	zbx_free_config(void)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch;
+	char		ch, *error = NULL;
 	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
@@ -760,9 +781,13 @@ int	main(int argc, char **argv)
 
 	zbx_initialize_events();
 
-#ifdef HAVE_OPENIPMI
-	zbx_init_ipmi_handler();
-#endif
+	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+	{
+		zbx_error("Cannot initialize IPC services: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -906,13 +931,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBclose();
 
+	if (0 != CONFIG_IPMIPOLLER_FORKS)
+		CONFIG_IPMIMANAGER_FORKS = 1;
+
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -989,11 +1017,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 				threads[i] = zbx_thread_start(escalator_thread, &thread_args);
 				break;
-			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				poller_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-				thread_args.args = &poller_type;
-				threads[i] = zbx_thread_start(poller_thread, &thread_args);
-				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
 				thread_args.args = &poller_type;
@@ -1014,6 +1037,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				threads[i] = zbx_thread_start(taskmanager_thread, &thread_args);
 				break;
+#ifdef HAVE_OPENIPMI
+			case ZBX_PROCESS_TYPE_IPMIMANAGER:
+				threads[i] = zbx_thread_start(ipmi_manager_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_IPMIPOLLER:
+				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
+				break;
+#endif
 		}
 	}
 
@@ -1067,6 +1098,8 @@ void	zbx_on_exit(void)
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
+	zbx_ipc_service_free_env();
+
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	free_database_cache();
@@ -1079,10 +1112,6 @@ void	zbx_on_exit(void)
 	zbx_vc_destroy();
 
 	zbx_destroy_itservices_lock();
-
-#ifdef HAVE_OPENIPMI
-	zbx_free_ipmi_handler();
-#endif
 
 #ifdef HAVE_SQLITE3
 	zbx_remove_sqlite3_mutex();

@@ -642,7 +642,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *           whole string is stored into output variable.                         *
  *                                                                                *
  **********************************************************************************/
-int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
 	int	i, ret = FAIL;
@@ -664,7 +664,7 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 
 	for (i = 0; i < regexps->values_num; i++)
 	{
-		zbx_expression_t	*regexp = regexps->values[i];
+		const zbx_expression_t	*regexp = regexps->values[i];
 
 		if (0 != strcmp(regexp->name, pattern))
 			continue;
@@ -715,7 +715,7 @@ out:
 	return ret;
 }
 
-int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
+int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
