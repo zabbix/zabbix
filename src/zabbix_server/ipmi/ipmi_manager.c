@@ -255,9 +255,8 @@ static zbx_ipmi_request_t	*ipmi_poller_pop_request(zbx_ipmi_poller_t *poller)
  ******************************************************************************/
 static void	ipmi_poller_push_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request_t *request)
 {
-	zbx_binary_heap_elem_t	el;
+	zbx_binary_heap_elem_t	el = {0, (void *)request};
 
-	el.data = (void *)request;
 	zbx_binary_heap_insert(&poller->requests, &el);
 }
 
