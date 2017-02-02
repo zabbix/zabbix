@@ -745,7 +745,12 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(client, 0, sizeof(zbx_ipc_client_t));
 
-	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+	if (-1 == fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set non-blocking mode for IPC client socket");
+		exit(EXIT_FAILURE);
+	}
+
 	client->csocket.fd = fd;
 	client->csocket.rx_buffer_bytes = 0;
 	client->csocket.rx_buffer_offset = 0;
