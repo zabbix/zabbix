@@ -106,6 +106,8 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
+		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
@@ -116,6 +118,7 @@ class testPageDashboard extends CWebTest {
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 	}
 
 	public function testPageDashboard_AddFavouriteScreen() {
@@ -130,6 +133,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='screens.php?elementid=$this->screenClockId']", $this->screenClock);
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids' AND value_id=$this->screenClockId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteScreens() {
@@ -140,6 +144,7 @@ class testPageDashboard extends CWebTest {
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No screens added.');
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids'"));
 	}
 
 	public function testPageDashboard_AddFavouriteMap() {
@@ -154,6 +159,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
@@ -164,6 +170,7 @@ class testPageDashboard extends CWebTest {
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No maps added.');
 		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
 	}
 
 	public function testPageDashboard_FullScreen() {
