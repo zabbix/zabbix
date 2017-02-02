@@ -737,15 +737,22 @@ static void	ipc_service_push_client(zbx_ipc_service_t *service, zbx_ipc_client_t
 static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 {
 	const char		*__function_name = "ipc_service_add_client";
-	zbx_ipc_client_t	*client;
 	static zbx_uint64_t	next_clientid = 1;
+	zbx_ipc_client_t	*client;
+	int			flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(client, 0, sizeof(zbx_ipc_client_t));
 
-	if (-1 == fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK))
+	if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot get IPC client socket flags");
+		exit(EXIT_FAILURE);
+	}
+
+	if (-1 == fcntl(fd, F_SETFL, flags | O_NONBLOCK))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot set non-blocking mode for IPC client socket");
 		exit(EXIT_FAILURE);
