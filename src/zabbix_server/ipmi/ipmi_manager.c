@@ -968,6 +968,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
+	time_now = time_stat;
 	time_idle = 0;
 	polled_num = 0;
 	scheduled_num = 0;
@@ -1012,13 +1013,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-		{
-			double	time_recv;
-
-			time_recv = zbx_time();
-			time_idle += time_recv - time_now;
-			time_now = time_recv;
-		}
+			time_idle += zbx_time() - time_now;
 
 		if (NULL != message)
 		{
