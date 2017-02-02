@@ -25,6 +25,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
+	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
 	datasender/libzbxdatasender.a \
 	taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
@@ -39,8 +40,8 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -56,6 +57,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a
+	
 
 zabbix_proxy_LDADD += @PROXY_LIBS@
 

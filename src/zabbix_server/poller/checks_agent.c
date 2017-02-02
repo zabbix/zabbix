@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __function_name,
 				item->host.host, item->interface.addr, item->key,
-				zbx_tls_connection_type_name(item->host.tls_connect));
+				zbx_tcp_connection_type_name(item->host.tls_connect));
 	}
 
 	switch (item->host.tls_connect)
@@ -144,8 +144,8 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 					item->interface.addr));
 			ret = NETWORK_ERROR;
 		}
-		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, s.buffer))
-			ret = NOTSUPPORTED;
+		else
+			set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

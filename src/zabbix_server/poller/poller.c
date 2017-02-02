@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
-#include "checks_ipmi.h"
 #include "checks_db.h"
 #ifdef HAVE_SSH2
 #	include "checks_ssh.h"
@@ -82,16 +81,16 @@ static int	db_host_update_availability(const zbx_host_availability_t *ha)
  *                                                                            *
  * Function: host_get_availability                                            *
  *                                                                            *
- * Purpose: get host availability data based on the specified item type       *
+ * Purpose: get host availability data based on the specified agent type      *
  *                                                                            *
  * Parameters: dc_host      - [IN] the host                                   *
- *             type         - [IN] the item type                              *
+ *             type         - [IN] the agent type                             *
  *             availability - [OUT] the host availability data                *
  *                                                                            *
  * Return value: SUCCEED - the host availability data was retrieved           *
  *                         successfully                                       *
  *               FAIL    - failed to retrieve host availability data,         *
- *                         unrecognized item type was specified               *
+ *                         invalid agent type was specified                   *
  *                                                                            *
  ******************************************************************************/
 static int	host_get_availability(const DC_HOST *dc_host, unsigned char agent, zbx_host_availability_t *ha)
@@ -135,6 +134,73 @@ static int	host_get_availability(const DC_HOST *dc_host, unsigned char agent, zb
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: host_set_availability                                            *
+ *                                                                            *
+ * Purpose: sets host availability data based on the specified agent type     *
+ *                                                                            *
+ * Parameters: dc_host      - [IN] the host                                   *
+ *             type         - [IN] the agent type                             *
+ *             availability - [IN] the host availability data                 *
+ *                                                                            *
+ * Return value: SUCCEED - the host availability data was set successfully    *
+ *               FAIL    - failed to set host availability data,              *
+ *                         invalid agent type was specified                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	host_set_availability(DC_HOST *dc_host, unsigned char agent, const zbx_host_availability_t *ha)
+{
+	const zbx_agent_availability_t	*availability = &ha->agents[agent];
+	unsigned char			*pavailable;
+	int				*perrors_from, *pdisable_until;
+	char				*perror;
+
+	switch (agent)
+	{
+		case ZBX_AGENT_ZABBIX:
+			pavailable = &dc_host->available;
+			perror = dc_host->error;
+			perrors_from = &dc_host->errors_from;
+			pdisable_until = &dc_host->disable_until;
+			break;
+		case ZBX_AGENT_SNMP:
+			pavailable = &dc_host->snmp_available;
+			perror = dc_host->snmp_error;
+			perrors_from = &dc_host->snmp_errors_from;
+			pdisable_until = &dc_host->snmp_disable_until;
+			break;
+		case ZBX_AGENT_IPMI:
+			pavailable = &dc_host->ipmi_available;
+			perror = dc_host->ipmi_error;
+			perrors_from = &dc_host->ipmi_errors_from;
+			pdisable_until = &dc_host->ipmi_disable_until;
+			break;
+		case ZBX_AGENT_JMX:
+			pavailable = &dc_host->jmx_available;
+			perror = dc_host->jmx_error;
+			pdisable_until = &dc_host->jmx_disable_until;
+			perrors_from = &dc_host->jmx_errors_from;
+			break;
+		default:
+			return FAIL;
+	}
+
+	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
+		*pavailable = availability->available;
+
+	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
+		zbx_strlcpy(perror, availability->error, HOST_ERROR_LEN_MAX);
+
+	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
+		*perrors_from = availability->errors_from;
+
+	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
+		*pdisable_until = availability->disable_until;
+
+	return SUCCEED;
+}
+
 static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 {
 	switch (type)
@@ -158,9 +224,9 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 	}
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
+void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "activate_host";
+	const char		*__function_name = "zbx_activate_item_host";
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
 
@@ -182,6 +248,8 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (FAIL == db_host_update_availability(&out))
 		goto out;
 
+	host_set_availability(&item->host, agent_type, &out);
+
 	if (HOST_AVAILABLE_TRUE == in.agents[agent_type].available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
@@ -199,9 +267,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
+void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
-	const char		*__function_name = "deactivate_host";
+	const char		*__function_name = "zbx_deactivate_item_host";
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
 
@@ -225,6 +293,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	if (FAIL == db_host_update_availability(&out))
 		goto out;
+
+	host_set_availability(&item->host, agent_type, &out);
 
 	if (0 == in.agents[agent_type].errors_from)
 	{
@@ -281,14 +351,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_agent(item, result);
 			zbx_alarm_off();
-			break;
-		case ITEM_TYPE_IPMI:
-#ifdef HAVE_OPENIPMI
-			res = get_value_ipmi(item, result);
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
-			res = CONFIG_ERROR;
-#endif
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -409,7 +471,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
@@ -532,7 +593,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case AGENT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
 				{
-					activate_host(&items[i], &timespec);
+					zbx_activate_item_host(&items[i], &timespec);
 					last_available = HOST_AVAILABLE_TRUE;
 				}
 				break;
@@ -541,7 +602,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
 				{
-					deactivate_host(&items[i], &timespec, results[i].msg);
+					zbx_deactivate_item_host(&items[i], &timespec, results[i].msg);
 					last_available = HOST_AVAILABLE_FALSE;
 				}
 				break;
@@ -555,14 +616,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		if (SUCCEED == errcodes[i])
 		{
-			/* remove formatting symbols from the end of the result */
-			/* so it could be checked by "is_uint64" and "is_double" functions */
-			/* when we try to get "int" or "float" values from "string" result */
-			if (0 != ISSET_STR(&results[i]))
-				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (0 != ISSET_TEXT(&results[i]))
-				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
-
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
@@ -665,7 +718,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time, last_ipmi_host_check;
+	time_t		last_stat_time;
 	unsigned char	poller_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -688,7 +741,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = last_ipmi_host_check = time(NULL);
+	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -706,13 +759,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
-#ifdef HAVE_OPENIPMI
-		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
-		{
-			last_ipmi_host_check = time(NULL);
-			delete_inactive_ipmi_hosts(last_ipmi_host_check);
-		}
-#endif
+
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)

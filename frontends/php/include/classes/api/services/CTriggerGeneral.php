@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -817,11 +817,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($expressions_changed) {
 				$this->checkTriggerExpressions($trigger);
-
-				// If the expression has changed, revalidate the existing dependencies.
-				if (!array_key_exists('dependencies', $trigger)) {
-					$trigger['dependencies'] = $_db_trigger['dependencies'];
-				}
 			}
 
 			if ($expressions_changed || $trigger['description'] !== $_db_trigger['description']) {

@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2016 Zabbix SIA
+dnl Copyright (C) 2001-2017 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -1325,7 +1325,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
 	AC_SUBST(SSH2_CFLAGS)
-
+	
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
@@ -1336,6 +1336,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_ipmi="yes"
 		fi
 	fi
+	
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENIPMI_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $OPENIPMI_LIBS"
 
@@ -1343,6 +1344,19 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
+	
+	dnl Check for libevent
+	LIBEVENT_CHECK_CONFIG([no])
+	if test "x$found_libevent" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
+	fi
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
+	
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
+	
+	AC_SUBST(LIBEVENET_CFLAGS)
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
@@ -1594,6 +1608,7 @@ AC_OUTPUT([
 	src/zabbix_server/selfmon/Makefile
 	src/zabbix_server/vmware/Makefile
 	src/zabbix_server/taskmanager/Makefile
+	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/scripts/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile

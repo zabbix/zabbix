@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,17 +139,8 @@ elseif (hasRequest('graphid')) {
 		access_deny();
 	}
 }
-elseif ($hostId) {
-	// check whether host is editable by user
-	$host = (bool) API::Host()->get([
-		'output' => [],
-		'hostids' => $hostId,
-		'templated_hosts' => true,
-		'editable' => true
-	]);
-	if (!$host) {
-		access_deny();
-	}
+elseif ($hostId && !isWritableHostTemplates([$hostId])) {
+	access_deny();
 }
 
 /*

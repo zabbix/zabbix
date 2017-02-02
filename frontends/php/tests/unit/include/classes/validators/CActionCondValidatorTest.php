@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -262,42 +262,42 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/31'
 				],
-				'Invalid IP address range "192.168.0.0/31".'
+				'Invalid action condition: invalid address range "192.168.0.0/31".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/16-30'
 				],
-				'Invalid IP address range "192.168.0.0/16-30".'
+				'Invalid action condition: invalid address range "192.168.0.0/16-30".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
 				],
-				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
+				'Invalid action condition: invalid address range "fe80:0:0:0:0:0:c0a8:0/129".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80::c0a8:0/129'
 				],
-				'Invalid IP address range "fe80::c0a8:0/129".'
+				'Invalid action condition: invalid address range "fe80::c0a8:0/129".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
 				],
-				'Invalid IP address range "192.168.443.0/432".'
+				'Invalid action condition: invalid address range "192.168.443.0/432".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '{$A}'
 				],
-				'Invalid IP address range "{$A}".'
+				'Invalid action condition: invalid address range "{$A}".'
 			],
 			[[],
 				[

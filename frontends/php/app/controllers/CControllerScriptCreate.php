@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class CControllerScriptCreate extends CController {
 		$this->getInputs($script, ['command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation']);
 		$script['name'] = trimPath($this->getInput('name', ''));
 		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
-		$script['execute_on'] = $this->getInput('type', ZBX_SCRIPT_EXECUTE_ON_SERVER);
+		$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
 
 		if ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
 			if ($this->hasInput('commandipmi')) {

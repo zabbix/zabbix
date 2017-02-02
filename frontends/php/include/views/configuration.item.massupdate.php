@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,14 +187,6 @@ $itemFormList->addRow(
 	])
 );
 
-// append data type to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[data_type]', 'data_type', _('Original')))
-		->setLabel(_('Data type'))
-		->setChecked(isset($this->data['visible']['data_type'])),
-	new CComboBox('data_type', $this->data['data_type'], null, item_data_type2str())
-);
-
 // append units to form list
 $itemFormList->addRow(
 	(new CVisibilityBox('visible[units]', 'units', _('Original')))
@@ -246,14 +238,96 @@ $itemFormList->addRow(
 	(new CTextBox('password', $this->data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
-// append formula to form list
+// append item pre-processing
+$preprocessing = (new CTable())
+	->setId('preprocessing')
+	->setHeader([
+		'',
+		new CColHeader(_('Name')),
+		new CColHeader(_('Parameters')),
+		new CColHeader(null),
+		(new CColHeader(_('Action')))->setWidth(50)
+	]);
+
+foreach ($data['preprocessing'] as $i => $step) {
+	// Depeding on preprocessing type, display corresponding params field and placeholders.
+	$params = [];
+
+	// Use numeric box for multiplier, otherwise use text box.
+	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
+		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		))->setAttribute('placeholder', _('number'));
+	}
+	else {
+		$params[] = new CTextBox('preprocessing['.$i.'][params][0]',
+			array_key_exists('params', $step) ? $step['params'][0] : ''
+		);
+	}
+
+	// Create a secondary param text box, so it can be hidden if necessary.
+	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
+		(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+			? $step['params'][1]
+			: ''
+	))->setAttribute('placeholder', _('output'));
+
+	// Add corresponding placeholders and show or hide text boxes.
+	switch ($step['type']) {
+		case ZBX_PREPROC_MULTIPLIER:
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_RTRIM:
+		case ZBX_PREPROC_LTRIM:
+		case ZBX_PREPROC_TRIM:
+			$params[0]->setAttribute('placeholder', _('list of characters'));
+			$params[1]->addStyle('display: none;');
+			break;
+
+		case ZBX_PREPROC_REGSUB:
+			$params[0]->setAttribute('placeholder', _('pattern'));
+				break;
+
+		case ZBX_PREPROC_BOOL2DEC:
+		case ZBX_PREPROC_OCT2DEC:
+		case ZBX_PREPROC_HEX2DEC:
+		case ZBX_PREPROC_DELTA_VALUE:
+		case ZBX_PREPROC_DELTA_SPEED:
+			$params[0]->addStyle('display: none;');
+			$params[1]->addStyle('display: none;');
+			break;
+	}
+
+	$preprocessing->addRow(
+		(new CRow([
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$params[0],
+			$params[1],
+			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))->addClass('sortable')
+	);
+}
+
+$preprocessing->addRow(
+	(new CCol(
+		(new CButton('param_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(5)
+);
+
 $itemFormList->addRow(
-	(new CVisibilityBox('visible[formula]', 'formula', _('Original')))
-		->setLabel(_('Custom multiplier').' (0 - '._('Disabled').')')
-		->setChecked(isset($this->data['visible']['formula'])),
-	(new CTextBox('formula', $this->data['formula']))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAttribute('style', 'text-align: right;')
+	(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+		->setLabel(_('Preprocessing'))
+		->setChecked(isset($this->data['visible']['preprocessing'])),
+	(new CDiv($preprocessing))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('preprocessing_div')
 );
 
 // append delay to form list
@@ -347,18 +421,6 @@ $itemFormList->addRow(
 		->setLabel(_('Log time format'))
 		->setChecked(isset($this->data['visible']['logtimefmt'])),
 	(new CTextBox('logtimefmt', $this->data['logtimefmt']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-// append delta to form list
-$itemFormList->addRow(
-	(new CVisibilityBox('visible[delta]', 'delta', _('Original')))
-		->setLabel(_('Store value'))
-		->setChecked(isset($this->data['visible']['delta'])),
-	new CComboBox('delta', $this->data['delta'], null, [
-		0 => _('As is'),
-		1 => _('Delta (speed per second)'),
-		2 => _('Delta (simple change)')
-	])
 );
 
 // append valuemap to form list

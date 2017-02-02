@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1970,9 +1970,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             fields      - [IN] names of the fields to insert               *
  *             fields_num  - [IN] the number of items in fields array         *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
- *                                                                            *
  * Comments: The operation fails if the target table does not have the        *
  *           specified fields defined in its schema.                          *
  *                                                                            *
@@ -2136,9 +2133,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
  *                                                                            *
  * Parameters: self - [IN] the bulk insert data                               *
  *             ...  - [IN] the values to insert                               *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_add_values_dyn() *
  *           function.                                                        *
@@ -2443,9 +2437,6 @@ out:
  * Purpose: executes the prepared database bulk insert operation              *
  *                                                                            *
  * Parameters: self - [IN] the bulk insert data                               *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,6 +293,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
+	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
 	int		rc;
 	char		*cport = NULL;
@@ -439,10 +440,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
-	if (NULL == getenv("NLS_LANG"))
-		putenv("NLS_LANG=.UTF8");
-#endif
 	memset(&oracle, 0, sizeof(oracle));
 
 	zbx_vector_ptr_create(&oracle.db_results);
@@ -460,15 +457,29 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	else
 		ret = ZBX_DB_FAIL;
 
-	if (ZBX_DB_OK == ret)
+	while (ZBX_DB_OK == ret)
 	{
 		/* initialize environment */
-		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+		if (OCI_SUCCESS == (err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT, (dvoid *)0,
+				(dvoid * (*)(dvoid *,size_t))0, (dvoid * (*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0, csid, csid)))
+		{
+			if (0 != csid)
+				break;	/* environment with UTF8 character set successfully created */
 
-		if (OCI_SUCCESS != err)
+			/* try to find out the id of UTF8 character set */
+			if (0 == (csid = OCINlsCharSetNameToId(oracle.envhp, (const oratext *)"UTF8")))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Cannot find out the ID of \"UTF8\" character set."
+						" Relying on current \"NLS_LANG\" settings.");
+				break;	/* use default environment with character set derived from NLS_LANG */
+			}
+
+			/* get rid of this environment to create a better one on the next iteration */
+			OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+			oracle.envhp = NULL;
+		}
+		else
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
 			ret = ZBX_DB_FAIL;
@@ -826,6 +837,9 @@ int	zbx_db_begin(void)
 int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
+#ifdef HAVE_ORACLE
+	sword	err;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -835,10 +849,7 @@ int	zbx_db_commit(void)
 	}
 
 	if (1 == txn_error)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
-		return zbx_db_rollback();
-	}
+		goto rollback;
 
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
@@ -854,16 +865,25 @@ int	zbx_db_commit(void)
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
-	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#elif defined(HAVE_SQLITE3)
+	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
+#endif
+
+	if (ZBX_DB_FAIL == rc)
+	{
+rollback:
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+		return zbx_db_rollback();
+	}
+
+#ifdef HAVE_SQLITE3
 	zbx_mutex_unlock(&sqlite_access);
 #endif
 
-	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -881,6 +901,9 @@ int	zbx_db_commit(void)
 int	zbx_db_rollback(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
+#ifdef HAVE_ORACLE
+	sword	err;
+#endif
 
 	if (0 == txn_level)
 	{
@@ -911,7 +934,8 @@ int	zbx_db_rollback(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
-	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
+		rc = OCI_handle_sql_error(ERR_Z3005, err, NULL);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
 	zbx_mutex_unlock(&sqlite_access);

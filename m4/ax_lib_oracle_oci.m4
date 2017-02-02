@@ -285,7 +285,7 @@ Please, locate Oracle directories using --with-oracle or \
                 AC_LANG_PROGRAM([[@%:@include <oci.h>]],
                     [[
 OCIEnv* envh = 0;
-OCIEnvCreate(&envh, OCI_DEFAULT, 0, 0, 0, 0, 0, 0);
+OCIEnvNlsCreate(&envh, OCI_DEFAULT, 0, 0, 0, 0, 0, 0, 0, 0);
 if (envh) OCIHandleFree(envh, OCI_HTYPE_ENV);
                     ]]
                 )],

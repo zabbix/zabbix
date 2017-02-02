@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,30 +155,11 @@ if ($triggerIds) {
 	}
 }
 
-// Validate permissions to group.
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-
-// Validate permissions to host.
-if (getRequest('hostid')) {
-	$hosts = API::Host()->get([
-		'output' => [],
-		'hostids' => getRequest('hostid'),
-		'editable' => true
-	]);
-
-	if (!$hosts) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'templateids' => getRequest('hostid'),
-			'editable' => true
-		]);
-
-		if (!$templates) {
-			access_deny();
-		}
-	}
+if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
 }
 
 /*
@@ -647,7 +628,7 @@ else {
 		'groupid' => getRequest('groupid'),
 		'hostid' => getRequest('hostid')
 	]);
-	$data['groupid'] = $data['pageFilter']->groupids;
+	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	// get triggers

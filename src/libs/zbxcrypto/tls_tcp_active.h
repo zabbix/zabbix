@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,5 @@ int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
 #endif
-
-const char	*zbx_tls_connection_type_name(unsigned int type);
 
 #endif	/* ZABBIX_TLS_TCP_ACTIVE_H */

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ struct	_DC_TRIGGER;
 #define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_DELAY_FLEX_LEN		255
+#define ITEM_DELAY_FLEX_LEN		1024
 #define ITEM_DELAY_FLEX_LEN_MAX		(ITEM_DELAY_FLEX_LEN + 1)
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
@@ -170,6 +170,8 @@ struct	_DC_TRIGGER;
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
 
 #define PROXY_DHISTORY_VALUE_LEN	255
+
+#define ITEM_PREPROC_PARAMS_LEN		255
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
@@ -291,29 +293,6 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	zbx_item_type_t		type;
-	zbx_item_data_type_t	data_type;
-	char			*key;
-	char			*host_name;
-	int			history;
-	int			trends;
-	zbx_item_value_type_t	value_type;
-	int			delta;
-	int			multiplier;
-	char			*units;
-	char			*formula;
-	zbx_uint64_t		valuemapid;
-	char			*error;
-
-	unsigned char		state;
-	unsigned char		flags;
-}
-DB_ITEM;
 
 typedef struct
 {
@@ -516,7 +495,6 @@ void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
@@ -526,16 +504,14 @@ char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
-int	DBadd_templates_to_host(int hostid,int host_templateid);
+int	DBadd_templates_to_host(int hostid, int host_templateid);
 
-int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
+int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
 
-int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
-
-int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
+int	DBadd_trigger_to_linked_hosts(int triggerid, int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
-int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
+int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);

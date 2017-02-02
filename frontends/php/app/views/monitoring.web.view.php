@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ $this->addJsFile('flickerfreescreen.js');
 				'hosts_selected' => $data['pageFilter']->hostsSelected,
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
-				'sortorder' => $data['sortorder']
+				'sortorder' => $data['sortorder'],
+				'groupid' => $data['pageFilter']->groupid
 			]
 		])->get()
 	)

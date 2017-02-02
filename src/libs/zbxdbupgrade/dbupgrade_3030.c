@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,45 +141,186 @@ static int	DBpatch_3030012(void)
 
 static int	DBpatch_3030013(void)
 {
+	const ZBX_FIELD field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media", &field);
+}
+
+static int	DBpatch_3030014(void)
+{
+	const ZBX_FIELD field = {"delay_flex", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
+static int	DBpatch_3030015(void)
+{
+	const ZBX_TABLE table =
+			{"item_preproc", "item_preprocid", 0,
+				{
+					{"item_preprocid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"step", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030016(void)
+{
+	return DBcreate_index("item_preproc", "item_preproc_1", "itemid, step", 0);
+}
+
+static int	DBpatch_3030017(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_preproc", 1, &field);
+}
+
+static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
+		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
+{
+	int	step = 1;
+
+	switch (data_type)
+	{
+		case ITEM_DATA_TYPE_BOOLEAN:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_BOOL2DEC, "");
+			break;
+		case ITEM_DATA_TYPE_OCTAL:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_OCT2DEC, "");
+			break;
+		case ITEM_DATA_TYPE_HEXADECIMAL:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_HEX2DEC, "");
+			break;
+	}
+
+	switch (delta)
+	{
+		case ITEM_STORE_SPEED_PER_SECOND:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_SPEED, "");
+			break;
+		case ITEM_STORE_SIMPLE_CHANGE:
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_VALUE, "");
+			break;
+	}
+
+	if (NULL != formula)
+		zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_MULTIPLIER, formula);
+
+}
+
+static int	DBpatch_3030018(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	unsigned char	value_type, data_type, delta;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	itemid;
+	const char	*formula;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params", NULL);
+
+	result = DBselect("select itemid,value_type,data_type,multiplier,formula,delta from items");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(value_type, row[1]);
+
+		switch (value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UCHAR(data_type, row[2]);
+				formula = (1 == atoi(row[3]) ? row[4] : NULL);
+				ZBX_STR2UCHAR(delta, row[5]);
+				DBpatch_3030018_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
+						formula, delta);
+				break;
+		}
+	}
+
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_3030019(void)
+{
+	return DBdrop_field("items", "multiplier");
+}
+
+static int	DBpatch_3030020(void)
+{
+	return DBdrop_field("items", "data_type");
+}
+
+static int	DBpatch_3030021(void)
+{
+	return DBdrop_field("items", "delta");
+}
+
+static int	DBpatch_3030022(void)
+{
+	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags<>1 or evaltype<>3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3030023(void)
+{
 	const ZBX_FIELD	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("task", &field);
 }
 
-static int	DBpatch_3030014(void)
+static int	DBpatch_3030024(void)
 {
 	const ZBX_FIELD	field = {"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("task", &field);
 }
 
-static int	DBpatch_3030015(void)
+static int	DBpatch_3030025(void)
 {
 	const ZBX_FIELD	field = {"ttl", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("task", &field);
 }
 
-static int	DBpatch_3030016(void)
+static int	DBpatch_3030026(void)
 {
 	const ZBX_FIELD	field = {"proxy_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("task", &field);
 }
 
-static int	DBpatch_3030017(void)
+static int	DBpatch_3030027(void)
 {
 	return DBcreate_index("task", "task_1", "status,proxy_hostid", 0);
 }
 
-static int	DBpatch_3030018(void)
+static int	DBpatch_3030028(void)
 {
 	const ZBX_FIELD	field = {"proxy_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("task", 1, &field);
 }
 
-static int	DBpatch_3030019(void)
+static int	DBpatch_3030029(void)
 {
 	const ZBX_TABLE table =
 			{"task_remote_command", "taskid", 0,
@@ -205,14 +346,14 @@ static int	DBpatch_3030019(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3030020(void)
+static int	DBpatch_3030030(void)
 {
 	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("task_remote_command", 1, &field);
 }
 
-static int	DBpatch_3030021(void)
+static int	DBpatch_3030031(void)
 {
 	const ZBX_TABLE table =
 			{"task_remote_command_result", "taskid", 0,
@@ -229,13 +370,12 @@ static int	DBpatch_3030021(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3030022(void)
+static int	DBpatch_3030032(void)
 {
 	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("task_remote_command_result", 1, &field);
 }
-
 #endif
 
 DBPATCH_START(3030)
@@ -265,5 +405,15 @@ DBPATCH_ADD(3030019, 0, 1)
 DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
 DBPATCH_ADD(3030022, 0, 1)
+DBPATCH_ADD(3030023, 0, 1)
+DBPATCH_ADD(3030024, 0, 1)
+DBPATCH_ADD(3030025, 0, 1)
+DBPATCH_ADD(3030026, 0, 1)
+DBPATCH_ADD(3030027, 0, 1)
+DBPATCH_ADD(3030028, 0, 1)
+DBPATCH_ADD(3030029, 0, 1)
+DBPATCH_ADD(3030030, 0, 1)
+DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
 
 DBPATCH_END()

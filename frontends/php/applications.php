@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,24 +82,8 @@ if (hasRequest('action')) {
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid')) {
-	$hosts = API::Host()->get([
-		'output' => [],
-		'hostids' => getRequest('hostid'),
-		'editable' => true
-	]);
-
-	if (!$hosts) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'templateids' => getRequest('hostid'),
-			'editable' => true
-		]);
-
-		if (!$templates) {
-			access_deny();
-		}
-	}
+if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
 }
 
 $pageFilter = new CPageFilter([

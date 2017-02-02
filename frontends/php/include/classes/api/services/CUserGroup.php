@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,8 +195,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $usrgrps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -223,7 +221,7 @@ class CUserGroup extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps);
+		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
 	}
 
@@ -276,8 +274,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array $usrgrps
 	 * @param array $db_usrgrps
 	 *
@@ -305,7 +301,7 @@ class CUserGroup extends CApiService {
 		}
 
 		// Check user group names.
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
 			'usrgrpids' => zbx_objectValues($usrgrps, 'usrgrpid'),
 			'preservekeys' => true
@@ -332,7 +328,7 @@ class CUserGroup extends CApiService {
 			$this->checkDuplicates($names);
 		}
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps, $db_usrgrps);
+		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 	}
@@ -345,7 +341,7 @@ class CUserGroup extends CApiService {
 	 * @throws APIException  if user group already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
@@ -381,7 +377,7 @@ class CUserGroup extends CApiService {
 
 		$userids = array_keys($userids);
 
-		$db_users = API::getApiService()->select('users', [
+		$db_users = DB::select('users', [
 			'output' => [],
 			'userids' => $userids,
 			'preservekeys' => true
@@ -419,7 +415,7 @@ class CUserGroup extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = API::getApiService()->select('groups', [
+		$db_groups = DB::select('groups', [
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -433,28 +429,71 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
+	 * Auxiliary function for checkHimself().
+	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
+	 *
+	 * @param array  $usrgrp
+	 * @param string $method
+	 * @param array  $db_usrgrps
+	 *
+	 * @return bool
+	 */
+	private static function userGroupDisabled(array $usrgrp, $method, array $db_usrgrps = null) {
+		$gui_access = array_key_exists('gui_access', $usrgrp)
+			? $usrgrp['gui_access']
+			: ($method === 'validateCreate' ? GROUP_GUI_ACCESS_SYSTEM : $db_usrgrps[$usrgrp['usrgrpid']]['gui_access']);
+		$users_status = array_key_exists('users_status', $usrgrp)
+			? $usrgrp['users_status']
+			: ($method === 'validateCreate' ? GROUP_STATUS_ENABLED : $db_usrgrps[$usrgrp['usrgrpid']]['users_status']);
+
+		return ($gui_access == GROUP_GUI_ACCESS_DISABLED || $users_status == GROUP_STATUS_DISABLED);
+	}
+
+	/**
 	 * Additional check to exclude an opportunity to deactivate himself.
 	 *
 	 * @param array  $usrgrps
+	 * @param string $method
 	 * @param array  $db_usrgrps
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $usrgrps, array $db_usrgrps = null) {
-		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('userids', $usrgrp) && uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
-				$gui_access = array_key_exists('gui_access', $usrgrp)
-					? $usrgrp['gui_access']
-					: ($db_usrgrps === null ? GROUP_GUI_ACCESS_SYSTEM : $db_usrgrps[$usrgrp['usrgrpid']]['gui_access']);
-				$users_status = array_key_exists('users_status', $usrgrp)
-					? $usrgrp['users_status']
-					: ($db_usrgrps === null ? GROUP_STATUS_ENABLED : $db_usrgrps[$usrgrp['usrgrpid']]['users_status']);
+	private function checkHimself(array $usrgrps, $method, array $db_usrgrps = null) {
+		if ($method === 'validateUpdate') {
+			$groups_users = [];
 
-				if ($gui_access == GROUP_GUI_ACCESS_DISABLED || $users_status == GROUP_STATUS_DISABLED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('User cannot add himself to a disabled group or a group with disabled GUI access.')
-					);
+			foreach ($usrgrps as $usrgrp) {
+				if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && !array_key_exists('userids', $usrgrp)) {
+					$groups_users[$usrgrp['usrgrpid']] = [];
 				}
+			}
+
+			if ($groups_users) {
+				$db_users_groups = DB::select('users_groups', [
+					'output' => ['usrgrpid', 'userid'],
+					'filter' => ['usrgrpid' => array_keys($groups_users)]
+				]);
+
+				foreach ($db_users_groups as $db_user_group) {
+					$groups_users[$db_user_group['usrgrpid']][] = $db_user_group['userid'];
+				}
+
+				foreach ($usrgrps as &$usrgrp) {
+					if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+							&& !array_key_exists('userids', $usrgrp)) {
+						$usrgrp['userids'] = $groups_users[$usrgrp['usrgrpid']];
+					}
+				}
+				unset($usrgrp);
+			}
+		}
+
+		foreach ($usrgrps as $usrgrp) {
+			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+				);
 			}
 		}
 	}
@@ -485,7 +524,7 @@ class CUserGroup extends CApiService {
 			return;
 		}
 
-		$db_users_groups = API::getApiService()->select('users_groups', [
+		$db_users_groups = DB::select('users_groups', [
 			'output' => ['usrgrpid', 'userid'],
 			'filter' => ['usrgrpid' => array_keys($users_groups)]
 		]);
@@ -558,7 +597,7 @@ class CUserGroup extends CApiService {
 		}
 
 		$db_rights = ($method === 'update')
-			? API::getApiService()->select('rights', [
+			? DB::select('rights', [
 				'output' => ['rightid', 'groupid', 'id', 'permission'],
 				'filter' => ['groupid' => array_keys($rights)]
 			])
@@ -631,7 +670,7 @@ class CUserGroup extends CApiService {
 		}
 
 		$db_users_groups = ($method === 'update')
-			? API::getApiService()->select('users_groups', [
+			? DB::select('users_groups', [
 				'output' => ['id', 'usrgrpid', 'userid'],
 				'filter' => ['usrgrpid' => array_keys($users_groups)]
 			])
@@ -966,8 +1005,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Delete user groups.
-	 *
 	 * @param array $usrgrpids
 	 *
 	 * @return array
@@ -985,8 +1022,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @throws APIException
 	 *
 	 * @param array $usrgrpids
@@ -1002,7 +1037,7 @@ class CUserGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_usrgrps = API::getApiService()->select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name'],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -1041,7 +1076,7 @@ class CUserGroup extends CApiService {
 		}
 
 		// Check if user groups are used in scripts.
-		$db_scripts = API::getApiService()->select('scripts', [
+		$db_scripts = DB::select('scripts', [
 			'output' => ['name', 'usrgrpid'],
 			'filter' => ['usrgrpid' => $usrgrpids],
 			'limit' => 1

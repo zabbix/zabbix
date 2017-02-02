@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@
 
 define('ZABBIX_VERSION',		'3.3.0');
 define('ZABBIX_API_VERSION',	'3.3.0');
-define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3030022);
+define('ZABBIX_EXPORT_VERSION',	'3.4');
+define('ZABBIX_DB_VERSION',		3030032);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2016');
+define('ZABBIX_COPYRIGHT_TO',	'2017');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -194,6 +194,7 @@ define('AUDIT_RESOURCE_REGEXP',			28);
 define('AUDIT_RESOURCE_MACRO',			29);
 define('AUDIT_RESOURCE_TEMPLATE',		30);
 define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
+define('AUDIT_RESOURCE_ICON_MAP',		32);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -440,6 +441,18 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 
 define('ITEM_DELAY_FLEX_TYPE_FLEXIBLE',		0);
 define('ITEM_DELAY_FLEX_TYPE_SCHEDULING',	1);
+
+// item pre-processing
+define('ZBX_PREPROC_MULTIPLIER',	1);
+define('ZBX_PREPROC_RTRIM',			2);
+define('ZBX_PREPROC_LTRIM',			3);
+define('ZBX_PREPROC_TRIM',			4);
+define('ZBX_PREPROC_REGSUB',		5);
+define('ZBX_PREPROC_BOOL2DEC',		6);
+define('ZBX_PREPROC_OCT2DEC',		7);
+define('ZBX_PREPROC_HEX2DEC',		8);
+define('ZBX_PREPROC_DELTA_VALUE',	9);
+define('ZBX_PREPROC_DELTA_SPEED',	10);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -943,7 +956,7 @@ define('IPMI_PRIVILEGE_OPERATOR',	3);
 define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
-define('ZBX_HAVE_IPV6', 1);
+define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
@@ -996,6 +1009,7 @@ define('API_HG_NAME',		9);
 define('API_SCRIPT_NAME',	10);
 define('API_USER_MACRO',	11);
 define('API_TIME_PERIOD',	12);
+define('API_REGEX',			13);
 
 // flags
 define('API_REQUIRED',		0x01);
@@ -1003,6 +1017,7 @@ define('API_NOT_EMPTY',		0x02);
 define('API_ALLOW_NULL',	0x04);
 define('API_NORMALIZE',		0x08);
 define('API_MULTIPLE',		0x10);
+define('API_DEPRECATED',	0x20);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1054,7 +1069,6 @@ define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
 define('ZBX_TEXTAREA_4DIGITS_WIDTH',			50);	// please use for date selector only
 define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
-define('ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH',	100);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 

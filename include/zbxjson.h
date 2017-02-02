@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@
 #define ZBX_PROTO_TAG_STATUS		"status"
 #define ZBX_PROTO_TAG_STATE		"state"
 #define ZBX_PROTO_TAG_TYPE		"type"
+#define ZBX_PROTO_TAG_LIMIT		"limit"
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
 #define ZBX_PROTO_TAG_HOSTID		"hostid"

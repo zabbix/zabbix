@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class CControllerWebView extends CController {
 				'with_httptests' => true
 			],
 			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
-			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
 		]);
 
 		$response = new CControllerResponseData($data);

@@ -38,6 +38,7 @@ if SERVER
 PROXY_SUBDIRS = \
 	zabbix_proxy
 else
+
 PROXY_SUBDIRS = \
 	zabbix_server/dbsyncer \
 	zabbix_server/dbconfig \
@@ -49,8 +50,10 @@ PROXY_SUBDIRS = \
 	zabbix_server/selfmon \
 	zabbix_server/snmptrapper \
 	zabbix_server/vmware \
+	zabbix_server/ipmi \
 	zabbix_server/scripts \
 	zabbix_proxy
+	
 endif
 endif
 

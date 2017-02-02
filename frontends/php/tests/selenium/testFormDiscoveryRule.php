@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1472,11 +1472,6 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestInputType('params_es', $data['params_es']);
 		}
 
-		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelect('multiplier');
-			$this->zbxTestInputType('formula', $data['formula']);
-		}
-
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
@@ -1502,14 +1497,6 @@ class testFormDiscoveryRule extends CWebTest {
 					$this->zbxTestClickWait('delay_flex_'.($itemCount-1).'_remove');
 				}
 			}
-		}
-
-		if (isset($data['history'])) {
-			$this->zbxTestInputType('history', $data['history']);
-		}
-
-		if (isset($data['trends'])) {
-			$this->zbxTestInputType('trends', $data['trends']);
 		}
 
 		if ($itemFlexFlag == true) {

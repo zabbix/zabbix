@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "../poller/checks_agent.h"
-#include "../poller/checks_ipmi.h"
+#include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"

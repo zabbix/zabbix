@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,20 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-function get_last_event_by_triggerid($triggerId) {
-	$dbEvents = DBfetch(DBselect(
-		'SELECT e.*'.
-		' FROM events e'.
-		' WHERE e.objectid='.zbx_dbstr($triggerId).
-			' AND e.source='.EVENT_SOURCE_TRIGGERS.
-			' AND e.object='.EVENT_OBJECT_TRIGGER.
-		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
-		1
-	));
-
-	return $dbEvents ? $dbEvents : false;
-}
 
 /**
  * Get acknowledgement table.

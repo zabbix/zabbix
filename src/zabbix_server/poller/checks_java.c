@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,13 +71,8 @@ static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errc
 
 				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
-					if (SUCCEED == set_result_type(&results[i], items[i].value_type,
-							items[i].data_type, value))
-					{
-						errcodes[i] = SUCCEED;
-					}
-					else
-						errcodes[i] = NOTSUPPORTED;
+					set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, value);
+					errcodes[i] = SUCCEED;
 				}
 				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
 				{

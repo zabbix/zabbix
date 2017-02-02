@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1110,6 +1110,33 @@ function isReadableHostTemplates(array $hostids) {
 	$count += API::Template()->get([
 		'countOutput' => true,
 		'templateids' => $hostids
+	]);
+
+	return ($count == count($hostids));
+}
+
+/**
+ * Check if user has read permissions for hosts or templates.
+ *
+ * @param array $hostids
+ *
+ * @return bool
+ */
+function isWritableHostTemplates(array $hostids) {
+	$count = API::Host()->get([
+		'countOutput' => true,
+		'hostids' => $hostids,
+		'editable' => true
+	]);
+
+	if ($count == count($hostids)) {
+		return true;
+	}
+
+	$count += API::Template()->get([
+		'countOutput' => true,
+		'templateids' => $hostids,
+		'editable' => true
 	]);
 
 	return ($count == count($hostids));

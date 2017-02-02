@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,8 +86,7 @@ class testPageUserGroups extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('Cannot disable user group');
-			$this->zbxTestTextPresent('User cannot change status of himself.');
+			$this->zbxTestTextPresent('User cannot add himself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
 			$this->zbxTestTextPresent('User group disabled');

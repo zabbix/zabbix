@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
+
 SUBDIRS = \
 	alerter \
 	dbsyncer \
@@ -18,6 +19,7 @@ SUBDIRS = \
 	selfmon \
 	vmware \
 	taskmanager \
+	ipmi \
 	scripts
 
 sbin_PROGRAMS = zabbix_server
@@ -46,6 +48,7 @@ zabbix_server_LDADD = \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
+	ipmi/libipmi.a \
 	scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -55,8 +58,8 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \

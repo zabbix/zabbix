@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class CScreenHttpTest extends CScreenBase {
 
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'web.view')
-				->setArgument('groupid', $this->groupid)
+				->setArgument('groupid', $this->data['groupid'])
 				->setArgument('hostid', $this->hostid)
 				->setArgument('fullscreen', $this->data['fullscreen']);
 
@@ -156,10 +156,9 @@ class CScreenHttpTest extends CScreenBase {
 					$status = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
 				}
 			}
-			// no history data exists
 			else {
-				$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
-				$status = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_GREY);
+				$lastcheck = '';
+				$status = '';
 			}
 
 			$table->addRow(new CRow([
