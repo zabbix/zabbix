@@ -992,6 +992,29 @@ static void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
 {
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_check_running_service                                        *
+ *                                                                            *
+ * Purpose: checks if an IPC service is already running                       *
+ *                                                                            *
+ * Parameters: service_name - [IN]                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	ipc_check_running_service(const char *service_name)
+{
+	zbx_ipc_socket_t	csocket;
+	int			ret;
+	char			*error = NULL;
+
+	if (SUCCEED == (ret = zbx_ipc_socket_open(&csocket, service_name, 0, &error)))
+		zbx_ipc_socket_close(&csocket);
+	else
+		zbx_free(error);
+
+	return ret;
+}
+
 /*
  * Public client API
  */
@@ -1360,6 +1383,7 @@ void	zbx_ipc_service_free_env()
 	ipc_service_free_libevent();
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_service_start                                            *
@@ -1390,7 +1414,15 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	}
 
 	if (0 == access(socket_path, W_OK))
+	{
+		if (SUCCEED == ipc_check_running_service(service_name))
+		{
+			*error = zbx_dsprintf(*error, "\"%s\" service is already running.", service_name);
+			goto out;
+		}
+
 		unlink(socket_path);
+	}
 
 	if (-1 == (service->fd = socket(AF_UNIX, SOCK_STREAM, 0)))
 	{
@@ -1624,9 +1656,7 @@ void	zbx_ipc_client_addref(zbx_ipc_client_t *client)
 void	zbx_ipc_client_release(zbx_ipc_client_t *client)
 {
 	if (0 == --client->refcount)
-	{
 		ipc_client_free(client);
-	}
 }
 
 int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
