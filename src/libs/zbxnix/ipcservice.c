@@ -692,11 +692,8 @@ static zbx_ipc_client_t	*ipc_service_pop_client(zbx_ipc_service_t *service)
 {
 	zbx_ipc_client_t	*client;
 
-	if (0 == zbx_queue_ptr_values_num(&service->clients_recv))
-		return NULL;
-
-	client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv);
-	client->state = ZBX_IPC_CLIENT_STATE_NONE;
+	if (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
+		client->state = ZBX_IPC_CLIENT_STATE_NONE;
 
 	return client;
 }
