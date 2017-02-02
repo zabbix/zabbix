@@ -651,16 +651,12 @@ class testFormItem extends CWebTest {
 				case INTERFACE_TYPE_IPMI :
 				case INTERFACE_TYPE_ANY :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBselect(
+					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
 							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-					);
-					while ($row = DBfetch($dbInterfaces)) {
-						$data[] = [$row];
-					}
-					$dbInterfaces = $data[0];
+					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
