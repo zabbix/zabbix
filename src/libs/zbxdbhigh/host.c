@@ -2261,9 +2261,9 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 		if (SUCCEED == res)
 		{
-			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
-			recovery_expression_esc = DBdyn_escape_string_len(new_recovery_expression,
-					TRIGGER_EXPRESSION_LEN);
+			expression_esc = DBdyn_escape_field("triggers", "expression", new_expression);
+			recovery_expression_esc = DBdyn_escape_field("triggers", "recovery_expression",
+					new_recovery_expression);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update triggers"
@@ -4932,8 +4932,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 	if (0 != interfaceid)
 		goto out;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	ip_esc = DBdyn_escape_field("interface", "ip", ip);
+	dns_esc = DBdyn_escape_field("interface", "dns", dns);
 
 	interfaceid = DBget_maxid("interface");
 
