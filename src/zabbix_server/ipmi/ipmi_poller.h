@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
+#ifndef ZABBIX_IPMI_POLLER_H
+#define ZABBIX_IPMI_POLLER_H
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "13 September 2016";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "3.3.0";
+#include "common.h"
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
-	}
-}
+#ifdef HAVE_OPENIPMI
+
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(ipmi_poller_thread, args);
+
+#endif
+
+#endif

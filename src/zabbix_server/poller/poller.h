@@ -29,4 +29,7 @@ extern int	CONFIG_UNREACHABLE_DELAY;
 
 ZBX_THREAD_ENTRY(poller_thread, args);
 
+void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts);
+void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error);
+
 #endif
