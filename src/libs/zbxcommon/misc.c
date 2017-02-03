@@ -829,7 +829,7 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
 	text += parsed_len;
 	len -= parsed_len;
 
-	if (0 >= len-- || '-' != *text)
+	if (0 >= len-- || '-' != *text++)
 		return FAIL;
 
 	if (SUCCEED != time_parse(&period->end_time, text, len, &parsed_len))
