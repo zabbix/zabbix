@@ -19,12 +19,30 @@
 **/
 
 
-$table = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
+$table = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
+
+foreach ($data['screens'] as $screen) {
+	$url = $screen['slideshow']
+		? (new CUrl('slides.php'))->setArgument('elementid', $screen['slideshowid'])
+		: (new CUrl('screens.php'))->setArgument('elementid', $screen['screenid']);
+	$on_click = $screen['slideshow']
+		? "rm4favorites('slideshowid','".$screen['slideshowid']."')"
+		: "rm4favorites('screenid','".$screen['screenid']."')";
+
+	$table->addRow([
+		new CLink($screen['label'], $url),
+		(new CButton())
+			->onClick($on_click)
+			->addClass(ZBX_STYLE_REMOVE_BTN)
+	]);
+}
 
 $output = [
-	'header' => _('System status'),
+	'header' => _('Favourite screens'),
 	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'footer' => (new CList([
+		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	]))->toString()
 ];
 
 if (($messages = getMessages()) !== null) {
