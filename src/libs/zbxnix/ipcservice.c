@@ -1378,7 +1378,6 @@ int	zbx_ipc_service_init_env(const char *path, char **error)
 
 	if (0 != access(path, W_OK | R_OK))
 	{
-		/* TODO: create service directory if necessary */
 		*error = zbx_dsprintf(*error, "Cannot access path \"%s\": %s.", path, zbx_strerror(errno));
 		goto out;
 	}
