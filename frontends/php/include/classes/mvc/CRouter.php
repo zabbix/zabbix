@@ -89,15 +89,15 @@ class CRouter {
 		'script.update'			=> ['CControllerScriptUpdate',			null,					null],
 		'system.warning'		=> ['CControllerSystemWarning',			'layout.warning',		'system.warning'],
 		'web.view'				=> ['CControllerWebView',				'layout.htmlpage',		'monitoring.web.view'],
-		'widget.'.WIDGET_FAVOURITE_GRAPHS.'.view'	=> ['CControllerWidgetFavGraphsView',	'layout.widget',	'monitoring.widget.favgraphs.view'],
-		'widget.'.WIDGET_FAVOURITE_MAPS.'.view'		=> ['CControllerWidgetFavMapsView',		'layout.widget',	'monitoring.widget.favmaps.view'],
-		'widget.'.WIDGET_FAVOURITE_SCREENS.'.view'	=> ['CControllerWidgetFavScreensView',	'layout.widget',	'monitoring.widget.favscreens.view'],
-		'widget.'.WIDGET_DISCOVERY_STATUS.'.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',	'monitoring.widget.discovery.view'],
-		'widget.'.WIDGET_HOST_STATUS.'.view'		=> ['CControllerWidgetHostsView',		'layout.widget',	'monitoring.widget.hosts.view'],
-		'widget.'.WIDGET_LAST_ISSUES.'.view'		=> ['CControllerWidgetIssuesView',		'layout.widget',	'monitoring.widget.issues.view'],
-		'widget.'.WIDGET_ZABBIX_STATUS.'.view'		=> ['CControllerWidgetStatusView',		'layout.widget',	'monitoring.widget.status.view'],
-		'widget.'.WIDGET_SYSTEM_STATUS.'.view'		=> ['CControllerWidgetSystemView',		'layout.widget',	'monitoring.widget.system.view'],
-		'widget.'.WIDGET_WEB_OVERVIEW.'.view'		=> ['CControllerWidgetWebView',			'layout.widget',	'monitoring.widget.web.view'],
+		'widget.favgrph.view'	=> ['CControllerWidgetFavGraphsView',	'layout.widget',		'monitoring.widget.favgraphs.view'],
+		'widget.favmap.view'	=> ['CControllerWidgetFavMapsView',		'layout.widget',		'monitoring.widget.favmaps.view'],
+		'widget.favscr.view'	=> ['CControllerWidgetFavScreensView',	'layout.widget',		'monitoring.widget.favscreens.view'],
+		'widget.dscvry.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
+		'widget.hoststat.view'	=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
+		'widget.lastiss.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
+		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
+		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
+		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view']
 	];
 
 	public function __construct($action) {
