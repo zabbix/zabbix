@@ -395,7 +395,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestAssertAttribute($xpath, $attribute, $value = 'true') {
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
 		$this->assertEquals($element->getAttribute($attribute), $value);
 	}
