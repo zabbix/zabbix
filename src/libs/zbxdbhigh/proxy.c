@@ -3522,7 +3522,7 @@ int	proxy_get_history_count(void)
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
+int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN], *pminor, *ptr;
 	int	version;
@@ -3550,6 +3550,7 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
 				ZBX_COMPONENT_VERSION_MINOR(version));
 
 		zbx_dc_update_proxy_version(proxy->hostid, version);
+		proxy->version = version;
 	}
 
 	return SUCCEED;
