@@ -44,7 +44,7 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Discovery status');
 					break;
 				case 'admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
@@ -53,7 +53,7 @@ class testPageDashboard extends CWebTest {
 					$this->zbxTestAssertElementNotPresentXpath("//div[@class='dashbrd-grid-widget-container']/div[10]//h4");
 					break;
 				case 'user';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckTitle('Dashboard');
 					$this->zbxTestCheckHeader('Dashboard');
