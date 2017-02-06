@@ -27,11 +27,27 @@ class CFlexibleIntervalParser extends CParser {
 	private $simple_interval_parser;
 	private $time_period_parser;
 	private $user_macro_parser;
+	private $lld_macro_parser;
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => true	Low-level discovery macros.
+	 *
+	 * @var array
+	 */
+	public $options = ['lldmacros' => true];
 
 	public function __construct($options = []) {
 		$this->simple_interval_parser = new CSimpleIntervalParser();
 		$this->time_period_parser = new CTimePeriodParser();
 		$this->user_macro_parser = new CUserMacroParser();
+		$this->lld_macro_parser = new CLLDMacroParser();
+
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
 	}
 
 	/**
@@ -56,6 +72,9 @@ class CFlexibleIntervalParser extends CParser {
 		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
 		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_parser->getLength();
+		}
 		else {
 			return self::PARSE_FAIL;
 		}
@@ -71,6 +90,9 @@ class CFlexibleIntervalParser extends CParser {
 		}
 		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
+		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_parser->getLength();
 		}
 		else {
 			return self::PARSE_FAIL;

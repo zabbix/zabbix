@@ -361,7 +361,10 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_ITEM_DELAY_DEFAULT', '30s');
+define('ZBX_ITEM_DELAY_DEFAULT',			'30s');
+define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
+define('ZBX_ITEM_HISTORY_DEFAULT',			'90d');
+define('ZBX_ITEM_TRENDS_DEFAULT',			'365d');
 
 define('ITEM_TYPE_ZABBIX',			0);
 define('ITEM_TYPE_SNMPV1',			1);

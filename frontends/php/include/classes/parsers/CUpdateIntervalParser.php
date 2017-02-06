@@ -28,14 +28,30 @@ class CUpdateIntervalParser extends CParser {
 	private $flexible_interval_parser;
 	private $scheduling_interval_parser;
 	private $user_macro_parser;
+	private $lld_macro_parser;
 	private $delay;
 	private $intervals = [];
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => true	Low-level discovery macros.
+	 *
+	 * @var array
+	 */
+	public $options = ['lldmacros' => true];
 
 	public function __construct($options = []) {
 		$this->simple_interval_parser = new CSimpleIntervalParser();
 		$this->flexible_interval_parser = new CFlexibleIntervalParser();
 		$this->scheduling_interval_parser = new CSchedulingIntervalParser();
 		$this->user_macro_parser = new CUserMacroParser();
+		$this->lld_macro_parser = new CLLDMacroParser();
+
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
 	}
 
 	/**
@@ -59,6 +75,10 @@ class CUpdateIntervalParser extends CParser {
 		}
 		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
+			$this->delay = $this->user_macro_parser->getmatch();
+		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_parser->getLength();
 			$this->delay = $this->user_macro_parser->getmatch();
 		}
 		else {
@@ -123,6 +143,24 @@ class CUpdateIntervalParser extends CParser {
 				$this->intervals[$i++] = [
 					'type' => ITEM_DELAY_SCHEDULING,
 					'interval' => $this->user_macro_parser->getMatch()
+				];
+
+				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
+					$this->length = $p - $pos - 1;
+					$this->match = substr($source, $pos, $this->length);
+
+					return self::PARSE_SUCCESS_CONT;
+				}
+				else {
+					continue;
+				}
+			}
+			elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+				$p += $this->lld_macro_parser->getLength();
+
+				$this->intervals[$i++] = [
+					'type' => ITEM_DELAY_SCHEDULING,
+					'interval' => $this->lld_macro_parser->getMatch()
 				];
 
 				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {

@@ -43,19 +43,18 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
-	'delay' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
+	'delay' =>					[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP,
-		_('Update interval (in sec)')],
-	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})',
-		_('History storage period')
+		_('Update interval')
 	],
+	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), 'isset({add}) || isset({update})'],
-	'trends' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), '(isset({add}) || isset({update})) && isset({value_type}) && '.
+	'trends' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update})) && isset({value_type}) && '.
 		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Trend storage period')
 	],
 	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
@@ -148,9 +147,9 @@ $fields = [
 	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_port' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')],
 	'filter_value_type' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
-	'filter_delay' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')],
-	'filter_history' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null,	_('History')],
-	'filter_trends' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Trends')],
+	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_history' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
+	'filter_trends' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Trends')],
 	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
 	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]), null],
 	'filter_templated_items' => [T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
@@ -166,9 +165,9 @@ $fields = [
 	'subfilter_templated_items' => [T_ZBX_INT, O_OPT, null, null,		null],
 	'subfilter_with_triggers' => [T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_history' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_trends' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_interval' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_history' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_trends' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,
 									IN('"delay","history","key_","name","status","trends","type"'),
@@ -386,15 +385,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	/*
-	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
-	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
+	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
+	$delay = getRequest('delay', '0s');
 	$delay_flex = '';
 	$intervals = [];
 
 	if (getRequest('delay_flex')) {
 		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
 					continue;
 				}
@@ -430,6 +430,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($intervals) {
 			$delay_flex = join(';', $intervals);
 		}
+	}
+
+	if ($delay_flex !== '') {
+		$delay .= ';'.$delay_flex;
 	}
 
 	if ($result) {
@@ -480,10 +484,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_sensor' => getRequest('ipmi_sensor', ''),
 				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
 				'units' => getRequest('units', ''),
-				'delay' => getRequest('delay', 0),
-				'delay_flex' => $delay_flex,
-				'history' => getRequest('history', 0),
-				'trends' => getRequest('trends', 0),
+				'delay' => $delay,
+				'history' => getRequest('history', '0s'),
+				'trends' => getRequest('trends', '0s'),
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -504,9 +507,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
 					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
 					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
-					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'delay_flex',
-					'history', 'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description',
-					'status', 'templateid', 'flags'
+					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
+					'trends', 'valuemapid', 'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status',
+					'templateid', 'flags'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params'],
@@ -602,17 +605,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['params'] !== getRequest('params', '')) {
 					$item['params'] = getRequest('params', '');
 				}
-				if ($db_item['delay'] != getRequest('delay', 0)) {
-					$item['delay'] = getRequest('delay', 0);
+				if ($db_item['delay'] != $delay) {
+					$item['delay'] = $delay;
 				}
-				if ($db_item['delay_flex'] !== $delay_flex) {
-					$item['delay_flex'] = $delay_flex;
+				if ($db_item['history'] != getRequest('history', '0s')) {
+					$item['history'] = getRequest('history', '0s');
 				}
-				if ($db_item['history'] != getRequest('history', 0)) {
-					$item['history'] = getRequest('history', 0);
-				}
-				if ($db_item['trends'] != getRequest('trends', 0)) {
-					$item['trends'] = getRequest('trends', 0);
+				if ($db_item['trends'] != getRequest('trends', '0s')) {
+					$item['trends'] = getRequest('trends', '0s');
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
@@ -703,13 +703,14 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 
 	$result = true;
 
-	if (isset($visible['delay_flex'])) {
+	if (isset($visible['update_interval'])) {
+		$delay = getRequest('delay', '0s');
 		$delay_flex = '';
 		$intervals = [];
 
 		if (getRequest('delay_flex')) {
 			foreach (getRequest('delay_flex') as $interval) {
-				if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 					if ($interval['delay'] === '' && $interval['period'] === '') {
 						continue;
 					}
@@ -746,9 +747,13 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				$delay_flex = join(';', $intervals);
 			}
 		}
+
+		if ($delay_flex !== '') {
+			$delay .= ';'.$delay_flex;
+		}
 	}
 	else {
-		$delay_flex = null;
+		$delay = null;
 	}
 
 	$applications = getRequest('applications');
@@ -852,7 +857,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			$item = [
 				'interfaceid' => getRequest('interfaceid'),
 				'description' => getRequest('description'),
-				'delay' => getRequest('delay'),
+				'delay' => $delay,
 				'history' => getRequest('history'),
 				'type' => getRequest('type'),
 				'snmp_community' => getRequest('snmp_community'),
@@ -871,7 +876,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 				'trends' => getRequest('trends'),
 				'logtimefmt' => getRequest('logtimefmt'),
 				'valuemapid' => getRequest('valuemapid'),
-				'delay_flex' => $delay_flex,
 				'authtype' => getRequest('authtype'),
 				'username' => getRequest('username'),
 				'password' => getRequest('password'),
@@ -1073,9 +1077,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectHosts' => ['status'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1125,7 +1129,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'delay_flex' => getRequest('delay_flex', []),
-		'history' => getRequest('history', 90),
+		'history' => getRequest('history', ZBX_ITEM_HISTORY_DEFAULT),
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
 		'interfaceid' => getRequest('interfaceid', 0),
@@ -1140,7 +1144,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
-		'trends' => getRequest('trends', DAY_IN_YEAR),
+		'trends' => getRequest('trends', ZBX_ITEM_TRENDS_DEFAULT),
 		'applications' => getRequest('applications', []),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
@@ -1230,7 +1234,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	CArrayHelper::sort($data['valuemaps'], ['name']);
 
 	if (!$data['delay_flex']) {
-		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
 
 	// render view
@@ -1430,8 +1434,34 @@ else {
 				$item['trends'] = '';
 			}
 
+			// Use temporary variable for delay, because the original will be used for sorting later.
+			$delay = $item['delay'];
+
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-				$item['delay'] = '';
+				$delay = '';
+			}
+			else {
+				$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+
+				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
+					$delay = $update_interval_parser->getDelay();
+
+					$delay = (strpos($delay , '{') === false) ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+				}
+				else {
+					$delay = '';
+				}
+			}
+
+			// Use temporary variables for history and trends, because original values will be used for sorting later.
+			$history = $item['history'];
+			if (is_numeric($history)) {
+				$history .= _x('d', 'day short');
+			}
+
+			$trends = $item['trends'];
+			if (is_numeric($trends)) {
+				$trends .= _x('d', 'day short');
 			}
 
 			$item['subfilters'] = [
@@ -1451,12 +1481,12 @@ else {
 				'subfilter_with_triggers' => empty($_REQUEST['subfilter_with_triggers'])
 					|| (count($item['triggers']) == 0 && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 					|| (count($item['triggers']) > 0 && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])),
-				'subfilter_history' => empty($_REQUEST['subfilter_history'])
-					|| uint_in_array($item['history'], $_REQUEST['subfilter_history']),
-				'subfilter_trends' => !getRequest('subfilter_trends')
-					|| ($item['trends'] !== '' && uint_in_array($item['trends'], getRequest('subfilter_trends'))),
-				'subfilter_interval' => !getRequest('subfilter_interval')
-					|| ($item['delay'] !== '' && uint_in_array($item['delay'], getRequest('subfilter_interval'))),
+				'subfilter_history' => (!getRequest('subfilter_history')
+					|| (in_array($history, getRequest('subfilter_history')))),
+				'subfilter_trends' => (!getRequest('subfilter_trends')
+					|| ($trends !== '' && in_array($trends, getRequest('subfilter_trends')))),
+				'subfilter_interval' => (!getRequest('subfilter_interval')
+					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			];
 
@@ -1509,9 +1539,10 @@ else {
 		}
 	}
 
+	// Draw the filter and subfilter.
 	$data['flicker'] = getItemFilterForm($data['items']);
 
-	// remove subfiltered items
+	// Remove subfiltered items.
 	if (!empty($data['items'])) {
 		foreach ($data['items'] as $number => $item) {
 			foreach ($item['subfilters'] as $value) {
@@ -1522,6 +1553,41 @@ else {
 			}
 		}
 	}
+
+	/*
+	 * 1) Convert trapper item delays to empty strings, for better sorting and representation;
+	 * 2) Get only delay from the whole update interval and convert delay to seconds, so items are properly sorted.
+	 */
+	foreach ($data['items'] as $number => &$item) {
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			$item['delay'] = '';
+		}
+		else {
+			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+
+			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+				$item['delay'] = $update_interval_parser->getDelay();
+
+				if (strpos($item['delay'], '{') === false) {
+					$item['delay'] = timeUnitToSeconds($item['delay']);
+				}
+			}
+			else {
+				$item['delay'] = '';
+			}
+		}
+
+		if (strpos($item['history'], '{') === false && !is_numeric($item['history'])) {
+			// Remove the ending "d".
+			$item['history'] = substr($item['history'], 0, -1);
+		}
+
+		if (strpos($item['history'], '{') === false && !is_numeric($item['trends']) && $item['trends'] !== '') {
+			// Remove the ending "d".
+			$item['trends'] = substr($item['trends'], 0, -1);
+		}
+	}
+	unset($item);
 
 	if ($sortField === 'status') {
 		orderItemsByStatus($data['items'], $sortOrder);

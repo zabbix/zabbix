@@ -168,7 +168,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 }
 
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
-	order_result($data, 'name');
+	CArrayHelper::sort($data, ['value', 'name']);
 
 	$output = [new CTag('h3', true, $label)];
 
@@ -394,8 +394,8 @@ function getItemFilterForm(&$items) {
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow(_('Update interval (in sec)'),
-		(new CNumericBox('filter_delay', $filter_delay, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+	$filterColumn2->addRow(_('Update interval'),
+		(new CTextBox('filter_delay', $filter_delay))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'filter_delay_row'
 	);
 	$filterColumn4->addRow(_('Status'),
@@ -432,8 +432,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	$filterColumn3->addRow(_('History (in days)'),
-		(new CNumericBox('filter_history', $filter_history, 8, false, true))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Triggers'),
 		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
@@ -452,8 +451,7 @@ function getItemFilterForm(&$items) {
 		'filter_snmp_oid_row'
 	);
 	$filterColumn3->addRow(_('Trends (in days)'),
-		(new CNumericBox('filter_trends', $filter_trends, 8, false, true))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
@@ -683,8 +681,23 @@ function getItemFilterForm(&$items) {
 
 		// trends
 		if (zbx_empty($filter_trends)) {
-			if (!isset($item_params['trends'][$item['trends']]) && $item['trends'] !== '') {
-				$item_params['trends'][$item['trends']] = ['name' => $item['trends'], 'count' => 0];
+			$trends = $item['trends'];
+			$value = $trends;
+
+			if (strpos($trends, '{') === false && !is_numeric($trends) && $trends !== '') {
+				$value = substr($trends, 0, -1);
+			}
+
+			if (is_numeric($trends)) {
+				$trends .= _x('d', 'day short');
+			}
+
+			if (!array_key_exists($trends, $item_params['trends']) && $trends !== '') {
+				$item_params['trends'][$trends] = [
+					'name' => $trends,
+					'count' => 0,
+					'value' => $value
+				];
 			}
 
 			$show_item = true;
@@ -696,32 +709,78 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $item['trends'] !== '') {
-				$item_params['trends'][$item['trends']]['count']++;
+			if ($show_item && $trends !== '') {
+				$item_params['trends'][$trends]['count']++;
 			}
 		}
 
 		// history
 		if (zbx_empty($filter_history)) {
-			if (!isset($item_params['history'][$item['history']])) {
-				$item_params['history'][$item['history']] = ['name' => $item['history'], 'count' => 0];
+			$history = $item['history'];
+			$value = $history;
+
+			if (strpos($history, '{') === false && !is_numeric($history)) {
+				$value = substr($history, 0, -1);
 			}
+
+			if (is_numeric($history)) {
+				$history .= _x('d', 'day short');
+			}
+
+			if (!array_key_exists($history, $item_params['history'])) {
+				$item_params['history'][$history] = [
+					'name' => $history,
+					'count' => 0,
+					'value' => $value
+				];
+			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_history') {
+				if ($name === 'subfilter_history') {
 					continue;
 				}
 				$show_item &= $value;
 			}
+
 			if ($show_item) {
-				$item_params['history'][$item['history']]['count']++;
+				$item_params['history'][$history]['count']++;
 			}
 		}
 
 		// interval
 		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER) {
-			if (!isset($item_params['interval'][$item['delay']]) && $item['delay'] !== '') {
-				$item_params['interval'][$item['delay']] = ['name' => $item['delay'], 'count' => 0];
+			// Skip trapper items. Don't add them to subfilter.
+			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+				continue;
+			}
+
+			// Use temporary variable for delay, because the original will be used for sorting later.
+			$delay = $item['delay'];
+			$value = $delay;
+
+			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+
+			if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
+				$delay = $update_interval_parser->getDelay();
+
+				// "value" is delay represented in seconds and it is used for sorting the subfilter.
+				if (strpos($delay , '{') === false) {
+					$value = timeUnitToSeconds($delay);
+					$delay = convertUnitsS(timeUnitToSeconds($delay));
+				}
+				else {
+					$value = $delay;
+				}
+			}
+
+			if (!array_key_exists($delay, $item_params['interval'])) {
+				$item_params['interval'][$delay] = [
+					'name' => $delay,
+					'count' => 0,
+					'value' => $value
+				];
 			}
 
 			$show_item = true;
@@ -733,8 +792,8 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $item['delay'] !== '') {
-				$item_params['interval'][$item['delay']]['count']++;
+			if ($show_item && $delay !== '') {
+				$item_params['interval'][$delay]['count']++;
 			}
 		}
 	}
@@ -822,7 +881,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'key' => getRequest('key', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'history' => getRequest('history', 90),
+		'history' => getRequest('history', ZBX_ITEM_HISTORY_DEFAULT),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', 0),
 		'snmp_community' => getRequest('snmp_community', 'public'),
@@ -833,7 +892,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
-		'trends' => getRequest('trends', DAY_IN_YEAR),
+		'trends' => getRequest('trends', ZBX_ITEM_TRENDS_DEFAULT),
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
 		'delay_flex' => getRequest('delay_flex', []),
@@ -1018,32 +1077,44 @@ function getItemFormData(array $item = [], array $options = []) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
-			if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $data['delay'] == 0) {
-				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
-			}
-			$data['history'] = $data['item']['history'];
-			$data['status'] = $data['item']['status'];
-			$data['trends'] = $data['item']['trends'];
 
-			$parser = new CItemDelayFlexParser($data['item']['delay_flex']);
-			if ($parser->isValid()) {
-				foreach ($parser->getIntervals() as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => ($data['parent_discoveryid'])]);
+
+			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
+				$data['delay'] = $update_interval_parser->getDelay();
+
+				if (strpos($data['delay'], '{') === false) {
+					$delay = timeUnitToSeconds($data['delay']);
+
+					if (($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP) && $delay == 0) {
+						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+					}
+				}
+
+				foreach ($update_interval_parser->getIntervals() as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 						$interval_parts = explode('/', $interval['interval']);
 						$data['delay_flex'][] = [
 							'delay' => $interval_parts[0],
 							'period' => $interval_parts[1],
-							'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE
+							'type' => ITEM_DELAY_FLEXIBLE
 						];
 					}
 					else {
 						$data['delay_flex'][] = [
 							'schedule' => $interval['interval'],
-							'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING
+							'type' => ITEM_DELAY_SCHEDULING
 						];
 					}
 				}
 			}
+			else {
+				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			}
+
+			$data['history'] = $data['item']['history'];
+			$data['status'] = $data['item']['status'];
+			$data['trends'] = $data['item']['trends'];
 
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
 
@@ -1069,7 +1140,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	if (!$data['delay_flex']) {
-		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
 
 	// applications

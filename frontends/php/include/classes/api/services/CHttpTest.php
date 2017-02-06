@@ -476,6 +476,8 @@ class CHttpTest extends CApiService {
 		}
 
 		$this->checkHostPermissions(array_keys($hostids));
+		$simple_interval_parser = new CSimpleIntervalParser();
+		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($httpTests as $httpTest) {
 			if (zbx_empty($httpTest['name'])) {
@@ -483,7 +485,22 @@ class CHttpTest extends CApiService {
 			}
 
 			if (array_key_exists('delay', $httpTest)) {
-				$this->checkDelay($httpTest['delay']);
+				if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
+					$delay = timeUnitToSeconds($httpTest['delay']);
+
+					if ($delay < 1 || $delay > SEC_PER_DAY) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s', 'delay',
+								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_DAY)
+							)
+						);
+					}
+				}
+				elseif ($user_macro_parser->parse($httpTest['delay']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+					);
+				}
 			}
 
 			$this->checkSslParameters($httpTest);
@@ -545,6 +562,9 @@ class CHttpTest extends CApiService {
 		// Required fields for steps.
 		$required_fields = ['httpstepid'];
 
+		$simple_interval_parser = new CSimpleIntervalParser();
+		$user_macro_parser = new CUserMacroParser();
+
 		foreach ($httpTests as &$httpTest) {
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
 
@@ -555,7 +575,22 @@ class CHttpTest extends CApiService {
 			}
 
 			if (array_key_exists('delay', $httpTest)) {
-				$this->checkDelay($httpTest['delay']);
+				if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
+					$delay = timeUnitToSeconds($httpTest['delay']);
+
+					if ($delay < 1 || $delay > SEC_PER_DAY) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s', 'delay',
+								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_DAY)
+							)
+						);
+					}
+				}
+				elseif ($user_macro_parser->parse($httpTest['delay']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+					);
+				}
 			}
 
 			$this->checkSslParameters($httpTest);
@@ -961,35 +996,6 @@ class CHttpTest extends CApiService {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_s('Empty SSL certificate file for web scenario "%1$s".', $httpTest['name'])
-			);
-		}
-	}
-
-	/**
-	 * Check if delay field is valid.
-	 *
-	 * @param string $delay
-	 *
-	 * @throws APIException if delay is not a macro, not a valid simple interval or not in between 1 and 604800.
-	 */
-	protected function checkDelay($delay) {
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
-
-		if ($simple_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
-			$delay = timeUnitToSeconds($simple_interval_parser->getMatch());
-
-			if ($delay < 1 || $delay > SEC_PER_DAY) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": "%2$s"', 'delay',
-						_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_DAY)
-					)
-				);
-			}
-		}
-		elseif ($user_macro_parser->parse($delay) != CParser::PARSE_SUCCESS) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": "%2$s"', 'delay', _('invalid delay'))
 			);
 		}
 	}

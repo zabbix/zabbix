@@ -566,7 +566,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
 	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
 
-	return $str ? rtrim($str) : '0';
+	return $str ? rtrim($str) : '0'._x('s', 'second short');
 }
 
 /**

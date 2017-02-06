@@ -29,6 +29,22 @@ class CSimpleIntervalParser extends CParser {
 	const STATE_LETTER_FOUND = 2;
 
 	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'suffixes' => 'smhdw'		Allowed time suffixes.
+	 *
+	 * @var array
+	 */
+	public $options = ['suffixes' => ZBX_TIME_SUFFIXES];
+
+	public function __construct($options = []) {
+		if (array_key_exists('suffixes', $options)) {
+			$this->options['suffixes'] = $options['suffixes'];
+		}
+	}
+
+	/**
 	 * Parse the given source string.
 	 *
 	 * @param string $source	Source string that needs to be parsed.
@@ -58,7 +74,7 @@ class CSimpleIntervalParser extends CParser {
 
 				case self::STATE_NUM_FOUND:
 					if (!is_numeric($source[$p])) {
-						if (strpos(ZBX_TIME_SUFFIXES, $source[$p]) === false) {
+						if (strpos($this->options['suffixes'], $source[$p]) === false) {
 							break 2;
 						}
 						else {

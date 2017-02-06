@@ -287,7 +287,7 @@ if (hasRequest('form')) {
 		$data['slideshow'] = [
 			'slideshowid' => getRequest('slideshowid'),
 			'name' => getRequest('name', ''),
-			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+			'delay' => getRequest('delay', timeUnitToSeconds(ZBX_ITEM_DELAY_DEFAULT)),
 			'slides' => getRequest('slides', []),
 			'private' => getRequest('private', PRIVATE_SHARING),
 			'users' => getRequest('users', []),

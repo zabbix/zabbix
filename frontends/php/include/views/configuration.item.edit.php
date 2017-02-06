@@ -308,9 +308,8 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow(_('Update interval (in sec)'),
-	(new CNumericBox('delay', $data['delay'], 5, $discovered_item))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+$itemFormList->addRow(_('Update interval'),
+	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'row_delay'
 );
 
@@ -324,22 +323,21 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	if ($discovered_item) {
 		$itemForm->addVar('delay_flex['.$i.'][type]', (int) $delay_flex['type']);
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type_name]', (int) $delay_flex['type']))
-			->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
-			->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
 			->setEnabled(!$discovered_item);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
-			->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
-			->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true);
 	}
 
-	if ($delay_flex['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], 5, $discovered_item, true,
-			false
-		))->setAttribute('placeholder', 50);
+	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item, 255))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item, 255))
@@ -347,8 +345,8 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('style', 'display: none;');
 	}
 	else {
-		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', '', 5, $discovered_item, true, false))
-			->setAttribute('placeholder', 50)
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
 			->setAttribute('style', 'display: none;');
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', $discovered_item, 255))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
@@ -381,8 +379,7 @@ $itemFormList->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keepHistory = [];
-$keepHistory[] = (new CNumericBox('history', $data['history'], 8, $discovered_item))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
@@ -404,8 +401,8 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 // Append trend storage to form list.
 $keepTrend = [];
-$keepTrend[] = (new CNumericBox('trends', $data['trends'], 8, $discovered_item))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {

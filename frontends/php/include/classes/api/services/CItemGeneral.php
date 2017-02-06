@@ -74,7 +74,6 @@ abstract class CItemGeneral extends CApiService {
 			'logtimefmt'			=> [],
 			'templateid'			=> ['system' => 1],
 			'valuemapid'			=> ['template' => 1],
-			'delay_flex'			=> [],
 			'params'				=> [],
 			'ipmi_sensor'			=> ['template' => 1],
 			'authtype'				=> [],
@@ -141,8 +140,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostid' => null,
 				'type' => null,
 				'value_type' => null,
-				'delay' => '0',
-				'delay_flex' => ''
+				'delay' => null
 			];
 
 			$dbHosts = API::Host()->get([
@@ -189,6 +187,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$item_key_parser = new CItemKey();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => (get_class($this) === 'CItemPrototype')]);
+		$simple_interval_parser = new CSimpleIntervalParser(['suffixes' => 'd']);
+		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
@@ -254,15 +255,111 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $dbHosts[$fullItem['hostid']];
 
-			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				$item['delay_flex'] = '';
-				$fullItem['delay_flex'] = '';
+			// Validate update interval.
+			if (($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP)
+					|| $fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+				if ($update_interval_parser->parse($fullItem['delay']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+					);
+				}
+
+				$delay = $update_interval_parser->getDelay();
+
+				// Check if not macros. If delay is a macro, skip this step, otherwise check if delay is valid.
+				if (strpos($delay, '{') === false) {
+					$delay_ = timeUnitToSeconds($delay);
+					$intervals = $update_interval_parser->getIntervals();
+
+					// If delay is 0, there must be at least one either flexible or scheduling interval.
+					if ($delay_ < 0 || $delay_ > SEC_PER_DAY || ($delay_ == 0 && !$intervals)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Item will not be refreshed. Please enter a correct update interval.')
+						);
+					}
+
+					if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+						// Remove flexible and scheduling intervals and leave only the delay part.
+						$item['delay'] = $delay;
+					}
+					else {
+						// For trapper items, remove flexible intervals if they are written as macros.
+						$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
+						foreach ($flexible_intervals as $key => $flexible_interval) {
+							if (strpos($flexible_interval, '{') !== false) {
+								unset($flexible_intervals[$key]);
+							}
+						}
+
+						// If there are no flexible intervals or they contain macros, skip the next check calculation.
+						if ($flexible_intervals) {
+							$next_check = calculateItemNextCheck(0, $delay_, $flexible_intervals, time());
+							if ($next_check == ZBX_JAN_2038) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Item will not be refreshed. Please enter a correct update interval.')
+								);
+							}
+						}
+					}
+				}
+				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+					// Remove flexible and scheduling intervals and leave only the delay part.
+					$item['delay'] = $delay;
+				}
+			}
+
+			if (array_key_exists('history', $item)) {
+				if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+					$history = $item['history'];
+
+					if (!is_numeric($history)) {
+						// Remove the ending "d" in order to validate period in days as integers.
+						$history = substr($history, 0, -1);
+					}
+
+					if ($history < 0 || $history > 65535) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s', 'history',
+								_s('must be between "%1$s" and "%2$s"', 0, 65535)
+							)
+						);
+					}
+				}
+				elseif ($user_macro_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'history', _('invalid history storage period'))
+					);
+				}
+			}
+
+			if (array_key_exists('trends', $item)) {
+				if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+					$trends = $item['trends'];
+
+					if (!is_numeric($trends)) {
+						// Remove the ending "d" in order to validate period in days as integers.
+						$trends = substr($trends, 0, -1);
+					}
+
+					if ($trends < 0 || $trends > 65535) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s', 'trends',
+								_s('must be between "%1$s" and "%2$s"', 0, 65535)
+							)
+						);
+					}
+				}
+				elseif ($user_macro_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'trends', _('invalid trend storage period'))
+					);
+				}
 			}
 
 			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
 					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = 0;
+				$item['trends'] = '0s';
 			}
 
 			// check if the item requires an interface
@@ -334,57 +431,6 @@ abstract class CItemGeneral extends CApiService {
 					&& $fullItem['value_type'] != ITEM_VALUE_TYPE_FLOAT) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
-			}
-
-			// update interval
-			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				// delay must be between 0 and 86400, if delay is 0, delay_flex interval must be set.
-				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY
-					|| ($fullItem['delay'] == 0 && $fullItem['delay_flex'] === '')) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Item will not be refreshed. Please enter a correct update interval.')
-					);
-				}
-
-				// Don't parse empty strings, they will not be valid.
-				if ($fullItem['delay_flex'] !== '') {
-					// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
-					$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
-
-					if ($item_delay_flex_parser->isValid()) {
-						$delay_flex_validator = new CItemDelayFlexValidator();
-
-						if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
-							// Some valid intervals exist at this point.
-							$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
-
-							// If there are no flexible intervals, skip the next check calculation.
-							if (!$flexible_intervals) {
-								continue;
-							}
-
-							$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
-								$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
-								time()
-							);
-
-							if ($nextCheck == ZBX_JAN_2038) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_('Item will not be refreshed. Please enter a correct update interval.')
-								);
-							}
-						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
-						}
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
-							$fullItem['delay_flex'],
-							$item_delay_flex_parser->getError())
-						);
-					}
-				}
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_TRAPPER) {

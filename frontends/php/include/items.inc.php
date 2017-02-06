@@ -1039,6 +1039,8 @@ function checkTimePeriod($period, $now) {
  * @return string
  */
 function getItemDelay($delay, array $flexible_intervals) {
+	$delay = timeUnitToSeconds($delay);
+
 	if ($delay != 0 || !$flexible_intervals) {
 		return $delay;
 	}
@@ -1047,7 +1049,7 @@ function getItemDelay($delay, array $flexible_intervals) {
 
 	foreach ($flexible_intervals as $flexible_interval) {
 		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = (int) $flexible_interval_parts[0];
+		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
 
 		$min_delay = min($min_delay, $flexible_delay);
 	}

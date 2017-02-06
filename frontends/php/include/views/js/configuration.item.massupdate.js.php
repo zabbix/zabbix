@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="delayFlexRow">
+<script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">
 		<td>
 			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
@@ -12,7 +12,7 @@
 			</ul>
 		</td>
 		<td>
-			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="5" onchange="validateNumericBox(this, true, false);" placeholder="50" style="text-align: right;">
+			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="255" placeholder="<?= ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT ?>">
 			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="wd1-5h9-18" style="display: none;">
 		</td>
 		<td>
@@ -64,10 +64,10 @@
 			})
 			.trigger('change');
 
-		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
+		$('#custom_intervals').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
-			if ($(this).val() == <?= ITEM_DELAY_FLEX_TYPE_FLEXIBLE; ?>) {
+			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
 				$('#delay_flex_' + rowNum + '_schedule').hide();
 				$('#delay_flex_' + rowNum + '_delay').show();
 				$('#delay_flex_' + rowNum + '_period').show();
@@ -79,8 +79,8 @@
 			}
 		});
 
-		$('#delayFlexTable').dynamicRows({
-			template: '#delayFlexRow'
+		$('#custom_intervals').dynamicRows({
+			template: '#custom_intervals_row'
 		});
 
 		var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
