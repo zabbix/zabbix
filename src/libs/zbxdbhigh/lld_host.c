@@ -2422,17 +2422,19 @@ static void	lld_hosts_remove(zbx_vector_ptr_t *hosts, int lifetime, int lastchec
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 		{
-			if (host->lastcheck < lastcheck - lifetime)
+			int	ts_delete = lld_end_of_life(host->lastcheck, lifetime);
+
+			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_hostids, host->hostid);
 			}
-			else if (host->ts_delete != host->lastcheck + lifetime)
+			else if (host->ts_delete != ts_delete)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update host_discovery"
 						" set ts_delete=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
-						host->lastcheck + lifetime, host->hostid);
+						ts_delete, host->hostid);
 			}
 		}
 		else
@@ -2523,17 +2525,19 @@ static void	lld_groups_remove(zbx_vector_ptr_t *groups, int lifetime, int lastch
 
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 		{
-			if (group->lastcheck < lastcheck - lifetime)
+			int	ts_delete = lld_end_of_life(group->lastcheck, lifetime);
+
+			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_groupids, group->groupid);
 			}
-			else if (group->ts_delete != group->lastcheck + lifetime)
+			else if (group->ts_delete != ts_delete)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update group_discovery"
 						" set ts_delete=%d"
 						" where groupid=" ZBX_FS_UI64 ";\n",
-						group->lastcheck + lifetime, group->groupid);
+						ts_delete, group->groupid);
 			}
 		}
 		else

@@ -2349,16 +2349,18 @@ static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, int lifetime, i
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		{
-			if (item->lastcheck < lastcheck - lifetime)
+			int	ts_delete = lld_end_of_life(item->lastcheck, lifetime);
+
+			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_itemids, item->itemid);
 			}
-			else if (item->ts_delete != item->lastcheck + lifetime)
+			else if (item->ts_delete != ts_delete)
 			{
 				zbx_uint64_pair_t	itemts;
 
 				itemts.first = item->itemid;
-				itemts.second = item->lastcheck + lifetime;
+				itemts.second = ts_delete;
 				zbx_vector_uint64_pair_append(&discovery_itemts, itemts);
 			}
 		}
@@ -2479,17 +2481,19 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 		{
-			if (application->lastcheck < lastcheck - lifetime)
+			int	ts_delete = lld_end_of_life(application->lastcheck, lifetime);
+
+			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_applicationids, application->applicationid);
 				zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
 			}
-			else if (application->ts_delete != application->lastcheck + lifetime)
+			else if (application->ts_delete != ts_delete)
 			{
 				zbx_uint64_pair_t	applicationts;
 
 				applicationts.first = application->application_discoveryid;
-				applicationts.second = application->lastcheck + lifetime;
+				applicationts.second = ts_delete;
 				zbx_vector_uint64_pair_append(&discovery_applicationts, applicationts);
 			}
 		}

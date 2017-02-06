@@ -51,4 +51,6 @@ void	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_
 
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char **error, int lifetime, int lastcheck);
 
+int	lld_end_of_life(int lastcheck, int lifetime);
+
 #endif
