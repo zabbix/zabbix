@@ -2337,6 +2337,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
 			(NULL != value->value && 0 == strcmp(value->value, ZBX_NOTSUPPORTED)))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
+
 		item->state = ITEM_STATE_NOTSUPPORTED;
 		dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts,
 				item->state, value->value);
@@ -2379,25 +2381,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			}
 			else
 				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
-
-			if (0 != value->meta)
-				set_result_meta(&result, value->lastlogsize, value->mtime);
-
-			item->state = ITEM_STATE_NORMAL;
-			dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts,
-					item->state, NULL);
 		}
-		else if (ISSET_MSG(&result))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig,
-					result.msg);
 
-			item->state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
-					result.msg);
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
+		if (0 != value->meta)
+			set_result_meta(&result, value->lastlogsize, value->mtime);
+
+		item->state = ITEM_STATE_NORMAL;
+		dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts, item->state, NULL);
 
 		free_result(&result);
 	}
