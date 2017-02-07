@@ -338,21 +338,21 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item, 255))
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18')
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
 			->setAttribute('style', 'display: none;');
 	}
 	else {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $discovered_item))
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
 			->setAttribute('style', 'display: none;');
-		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', $discovered_item, 255))
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', $discovered_item))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
 			->setAttribute('style', 'display: none;');
-		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], $discovered_item, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18');
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], $discovered_item))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
 	}
 
 	$button = $discovered_item
@@ -397,7 +397,7 @@ if ($data['config']['hk_history_global']
 	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
 }
 
-$itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
+$itemFormList->addRow(_('History storage period'), $keepHistory);
 
 // Append trend storage to form list.
 $keepTrend = [];
@@ -420,7 +420,7 @@ if ($data['config']['hk_trends_global']
 	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
 }
 
-$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, 'row_trends');
+$itemFormList->addRow(_('Trend storage period'), $keepTrend, 'row_trends');
 
 $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

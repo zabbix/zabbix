@@ -242,9 +242,9 @@ foreach ($this->data['items'] as $item) {
 		(strpos($item['delay'], '{') === false && $item['delay'] !== '')
 			? convertUnitsS($item['delay'])
 			: $item['delay'],
-		(strpos($item['trends'], '{') === false) ? $item['history']._x('d', 'day short') : $item['history'],
+		(strpos($item['trends'], '{') === false) ? convertUnitsS($item['history']) : $item['history'],
 		(strpos($item['trends'], '{') === false && $item['trends'] !== '')
-			? $item['trends']._x('d', 'day short')
+			? convertUnitsS($item['trends'])
 			: $item['trends'],
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),

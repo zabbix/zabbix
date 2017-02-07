@@ -209,11 +209,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_TP) {
-		$timePeriodValidator = new CTimePeriodValidator();
-
-		if (!$timePeriodValidator->validate($var)) {
+		if ((new CTimePeriodsParser())->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
-			$message = _s('Field "%1$s" is not correct: %2$s', $caption, $timePeriodValidator->getError());
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('Invalid time period.'));
 		}
 	}
 

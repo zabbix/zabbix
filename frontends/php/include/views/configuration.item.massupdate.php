@@ -357,7 +357,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], false, 255))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', false, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18')
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
 			->setAttribute('style', 'display: none;');
 	}
 	else {
@@ -368,7 +368,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
 			->setAttribute('style', 'display: none;');
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], false, 255))
-			->setAttribute('placeholder', 'wd1-5h9-18');
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
 	}
 
 	$button = (new CButton('delay_flex['.$i.'][remove]', _('Remove')))
@@ -397,18 +397,19 @@ $itemFormList->addRow(
 	(new CDiv($update_interval))->setId('update_interval_div')
 );
 
-$itemFormList->addRow(
+$itemFormList
+	->addRow(
 		(new CVisibilityBox('visible[history]', 'history', _('Original')))
-			->setLabel(_('History storage period (in days)'))
+			->setLabel(_('History storage period'))
 			->setChecked(isset($data['visible']['history'])),
 		(new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-)
+	)
 	->addRow(
 		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
-			->setLabel(_('Trend storage period (in days)'))
+			->setLabel(_('Trend storage period'))
 			->setChecked(isset($data['visible']['trends'])),
 		(new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-);
+	);
 
 // append status to form list
 $statusComboBox = new CComboBox('status', $this->data['status']);

@@ -24,9 +24,6 @@
  */
 class CDiscoveryRule extends CItemGeneral {
 
-	const MIN_LIFETIME = 0;
-	const MAX_LIFETIME = 3650;
-
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
@@ -997,17 +994,33 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Check discovery rule specific fields.
 	 *
-	 * @param array  $item			An array of single discovery rule data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array                 $item						An array of single discovery rule data.
+	 * @param string                $method						A string of "create" or "update" method.
+	 * @param CSimpleIntervalParser	$simple_interval_parser		Simple interval parser class.
+	 * @param CUserMacroParser	    $user_macro_parser			User macro parser class.
+	 * @param CLLDMacroParser       $lld_macro_parser			LLD macro parser class.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkSpecificFields(array $item, $method) {
-		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
-					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
-			);
+	protected function checkSpecificFields(array $item, $method, CSimpleIntervalParser $simple_interval_parser,
+			CUserMacroParser $user_macro_parser, CLLDMacroParser $lld_macro_parser) {
+		if (array_key_exists('lifetime', $item)) {
+			if ($simple_interval_parser->parse($item['lifetime']) == CParser::PARSE_SUCCESS) {
+				$lifetime = timeUnitToSeconds($item['lifetime']);
+
+				if ($lifetime != 0 && ($lifetime < SEC_PER_HOUR || $lifetime > SEC_PER_YEAR * 10)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'lifetime',
+							_s('must be between "%1$s" and "%2$s"', SEC_PER_HOUR, SEC_PER_YEAR * 10)
+						)
+					);
+				}
+			}
+			elseif ($user_macro_parser->parse($item['lifetime']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s', 'lifetime', _('invalid lifetime'))
+				);
+			}
 		}
 
 		if (array_key_exists('preprocessing', $item)) {
@@ -1381,10 +1394,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 		return $rs;
-	}
-
-	private function validateLifetime($lifetime) {
-		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

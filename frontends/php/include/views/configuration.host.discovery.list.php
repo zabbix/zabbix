@@ -122,7 +122,9 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		$hostPrototypeLink,
 		$discovery['key_'],
-		($discovery['delay'] === '') ? '' : convertUnitsS($discovery['delay']),
+		(strpos($discovery['delay'], '{') === false && $discovery['delay'] !== '')
+			? convertUnitsS($discovery['delay'])
+			: $discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
 		$data['showInfoColumn'] ? makeInformationList($info_icons) : null

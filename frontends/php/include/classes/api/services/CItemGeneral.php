@@ -188,8 +188,9 @@ abstract class CItemGeneral extends CApiService {
 		$item_key_parser = new CItemKey();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
 		$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => (get_class($this) === 'CItemPrototype')]);
-		$simple_interval_parser = new CSimpleIntervalParser(['suffixes' => 'd']);
+		$simple_interval_parser = new CSimpleIntervalParser();
 		$user_macro_parser = new CUserMacroParser();
+		$lld_macro_parser = new CLLDMacroParser();
 
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
@@ -305,54 +306,6 @@ abstract class CItemGeneral extends CApiService {
 				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 					// Remove flexible and scheduling intervals and leave only the delay part.
 					$item['delay'] = $delay;
-				}
-			}
-
-			if (array_key_exists('history', $item)) {
-				if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-					$history = $item['history'];
-
-					if (!is_numeric($history)) {
-						// Remove the ending "d" in order to validate period in days as integers.
-						$history = substr($history, 0, -1);
-					}
-
-					if ($history < 0 || $history > 65535) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'history',
-								_s('must be between "%1$s" and "%2$s"', 0, 65535)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'history', _('invalid history storage period'))
-					);
-				}
-			}
-
-			if (array_key_exists('trends', $item)) {
-				if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-					$trends = $item['trends'];
-
-					if (!is_numeric($trends)) {
-						// Remove the ending "d" in order to validate period in days as integers.
-						$trends = substr($trends, 0, -1);
-					}
-
-					if ($trends < 0 || $trends > 65535) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'trends',
-								_s('must be between "%1$s" and "%2$s"', 0, 65535)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'trends', _('invalid trend storage period'))
-					);
 				}
 			}
 
@@ -524,7 +477,9 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
+			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create', $simple_interval_parser,
+				$user_macro_parser, $lld_macro_parser
+			);
 		}
 		unset($item);
 
@@ -535,12 +490,16 @@ abstract class CItemGeneral extends CApiService {
 	 * Check item specific fields. Each API like Item, Itemprototype and Discovery rule may inherit different fields
 	 * to validate.
 	 *
-	 * @param array  $item			An array of single item data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array                 $item						An array of single item data.
+	 * @param string                $method						A string of "create" or "update" method.
+	 * @param CSimpleIntervalParser $simple_interval_parser		Simple interval parser class.
+	 * @param CUserMacroParser      $user_macro_parser			User macro parser class.
+	 * @param CLLDMacroParser       $lld_macro_parser			LLD macro parser class.
 	 *
 	 * @return bool
 	 */
-	protected function checkSpecificFields(array $item, $method) {
+	protected function checkSpecificFields(array $item, $method, CSimpleIntervalParser $simple_interval_parser,
+			CUserMacroParser $user_macro_parser, CLLDMacroParser $lld_macro_parser) {
 		return true;
 	}
 

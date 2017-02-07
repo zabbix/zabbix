@@ -431,7 +431,7 @@ function getItemFilterForm(&$items) {
 		'filter_snmpv3_securityname_row'
 	);
 
-	$filterColumn3->addRow(_('History (in days)'),
+	$filterColumn3->addRow(_('History'),
 		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Triggers'),
@@ -450,7 +450,7 @@ function getItemFilterForm(&$items) {
 		(new CTextBox('filter_snmp_oid', $filter_snmp_oid, '', 255))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
-	$filterColumn3->addRow(_('Trends (in days)'),
+	$filterColumn3->addRow(_('Trends'),
 		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Template'),
@@ -684,12 +684,9 @@ function getItemFilterForm(&$items) {
 			$trends = $item['trends'];
 			$value = $trends;
 
-			if (strpos($trends, '{') === false && !is_numeric($trends) && $trends !== '') {
-				$value = substr($trends, 0, -1);
-			}
-
-			if (is_numeric($trends)) {
-				$trends .= _x('d', 'day short');
+			if (strpos($trends, '{') === false && $trends !== '') {
+				$value = timeUnitToSeconds($trends);
+				$trends = convertUnitsS(timeUnitToSeconds($trends));
 			}
 
 			if (!array_key_exists($trends, $item_params['trends']) && $trends !== '') {
@@ -719,12 +716,9 @@ function getItemFilterForm(&$items) {
 			$history = $item['history'];
 			$value = $history;
 
-			if (strpos($history, '{') === false && !is_numeric($history)) {
-				$value = substr($history, 0, -1);
-			}
-
-			if (is_numeric($history)) {
-				$history .= _x('d', 'day short');
+			if (strpos($history, '{') === false) {
+				$value = timeUnitToSeconds($history);
+				$history = convertUnitsS(timeUnitToSeconds($history));
 			}
 
 			if (!array_key_exists($history, $item_params['history'])) {
@@ -766,7 +760,7 @@ function getItemFilterForm(&$items) {
 				$delay = $update_interval_parser->getDelay();
 
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
-				if (strpos($delay , '{') === false) {
+				if (strpos($delay, '{') === false) {
 					$value = timeUnitToSeconds($delay);
 					$delay = convertUnitsS(timeUnitToSeconds($delay));
 				}

@@ -1446,23 +1446,20 @@ else {
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
-					$delay = (strpos($delay , '{') === false) ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+					$delay = (strpos($delay, '{') === false) ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
 				}
 				else {
 					$delay = '';
 				}
 			}
 
-			// Use temporary variables for history and trends, because original values will be used for sorting later.
 			$history = $item['history'];
-			if (is_numeric($history)) {
-				$history .= _x('d', 'day short');
-			}
+			$history = (strpos($history, '{') === false) ? convertUnitsS(timeUnitToSeconds($history)) : $history;
 
 			$trends = $item['trends'];
-			if (is_numeric($trends)) {
-				$trends .= _x('d', 'day short');
-			}
+			$trends = (strpos($trends, '{') === false && $trends !== '')
+				? convertUnitsS(timeUnitToSeconds($trends))
+				: $trends;
 
 			$item['subfilters'] = [
 				'subfilter_hosts' => empty($_REQUEST['subfilter_hosts'])
@@ -1558,7 +1555,7 @@ else {
 	 * 1) Convert trapper item delays to empty strings, for better sorting and representation;
 	 * 2) Get only delay from the whole update interval and convert delay to seconds, so items are properly sorted.
 	 */
-	foreach ($data['items'] as $number => &$item) {
+	foreach ($data['items'] as &$item) {
 		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 			$item['delay'] = '';
 		}
@@ -1577,14 +1574,12 @@ else {
 			}
 		}
 
-		if (strpos($item['history'], '{') === false && !is_numeric($item['history'])) {
-			// Remove the ending "d".
-			$item['history'] = substr($item['history'], 0, -1);
+		if (strpos($item['history'], '{') === false) {
+			$item['history'] = timeUnitToSeconds($item['history']);
 		}
 
-		if (strpos($item['history'], '{') === false && !is_numeric($item['trends']) && $item['trends'] !== '') {
-			// Remove the ending "d".
-			$item['trends'] = substr($item['trends'], 0, -1);
+		if (strpos($item['history'], '{') === false && $item['trends'] !== '') {
+			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}
 	unset($item);

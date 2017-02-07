@@ -136,8 +136,6 @@ class CUpdateIntervalParser extends CParser {
 				}
 			}
 			elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-				// Scheduling interval as macro.
-
 				$p += $this->user_macro_parser->getLength();
 
 				$this->intervals[$i++] = [

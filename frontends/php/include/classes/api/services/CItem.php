@@ -702,14 +702,58 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Check item specific fields.
+	 * Check item specific fields:
+	 *		- validate history and trends using simple interval parser and user macro parser;
+	 *		- validate item preprocessing.
 	 *
-	 * @param array  $item			An array of single item data.
-	 * @param string $method		A string of "create" or "update" method.
+	 * @param array                 $item						An array of single item data.
+	 * @param string                $method						A string of "create" or "update" method.
+	 * @param CSimpleIntervalParser $simple_interval_parser		Simple interval parser class.
+	 * @param CUserMacroParser      $user_macro_parser			User macro parser class.
+	 * @param CLLDMacroParser       $lld_macro_parser			LLD macro parser class.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkSpecificFields(array $item, $method) {
+	protected function checkSpecificFields(array $item, $method, CSimpleIntervalParser $simple_interval_parser,
+			CUserMacroParser $user_macro_parser, CLLDMacroParser $lld_macro_parser) {
+		if (array_key_exists('history', $item)) {
+			if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+				$history = timeUnitToSeconds($item['history']);
+
+				if ($history != 0 && ($history < SEC_PER_HOUR || $history > ZBX_MAX_DATE)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'history',
+							_s('must be between "%1$s" and "%2$s"', SEC_PER_HOUR, ZBX_MAX_DATE)
+						)
+					);
+				}
+			}
+			elseif ($user_macro_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s', 'history', _('invalid history storage period'))
+				);
+			}
+		}
+
+		if (array_key_exists('trends', $item)) {
+			if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+				$trends = timeUnitToSeconds($item['trends']);
+
+				if ($trends != 0 && ($trends < SEC_PER_DAY || $trends > ZBX_MAX_DATE)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s', 'trends',
+							_s('must be between "%1$s" and "%2$s"', SEC_PER_DAY, ZBX_MAX_DATE)
+						)
+					);
+				}
+			}
+			elseif ($user_macro_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s', 'trends', _('invalid trend storage period'))
+				);
+			}
+		}
+
 		$this->validateItemPreprocessing($item, $method);
 	}
 
