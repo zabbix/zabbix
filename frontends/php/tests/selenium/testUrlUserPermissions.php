@@ -784,7 +784,7 @@ class testUrlUserPermissions extends CWebTest {
 	}
 
 	public function testUrlUserPermissions_DisableGuest() {
-		DBexecute("INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 9, 2)");
+		DBexecute("INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)");
 	}
 
 	/**
@@ -798,6 +798,6 @@ class testUrlUserPermissions extends CWebTest {
 	}
 
 	public function testUrlUserPermissions_EnableGuest() {
-		DBexecute("DELETE FROM users_groups WHERE id=8");
+		DBexecute("DELETE FROM users_groups WHERE id=150");
 	}
 }

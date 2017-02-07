@@ -22,17 +22,85 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormLogin extends CWebTest {
 
-	public function testFormLogin_ClearIds() {
-		DBexecute('DELETE FROM ids');
+	public static function data() {
+		return [
+			[[
+				'login' => 'disabled-user',
+				'password' => 'zabbix',
+				'success_expected' => false,
+				'dbCheck' => false
+			]],
+			[[
+				'login' => 'no-access-to-the-frontend',
+				'password' => 'zabbix',
+				'success_expected' => false,
+				'dbCheck' => false
+			]],
+			[[
+				'login' => 'admin',
+				'password' => 'zabbix',
+				'success_expected' => false,
+				'dbCheck' => false
+			]],
+			[[
+				'login' => 'Admin',
+				'password' => 'Zabbix',
+				'success_expected' => false,
+				'dbCheck' => true
+			]],
+			[[
+				'login' => 'Admin',
+				'password' => '',
+				'success_expected' => false,
+				'dbCheck' => true
+			]],
+			[[
+				'login' => 'Admin',
+				'password' => '!@$#%$&^*(\"\'\\*;:',
+				'success_expected' => false,
+				'dbCheck' => true
+			]],
+			[[
+				'login' => 'Admin',
+				'password' => 'zabbix',
+				'success_expected' => true,
+				'dbCheck' => false
+			]],
+			[[
+				'login' => 'guest',
+				'password' => '',
+				'success_expected' => true,
+				'dbCheck' => false
+			]],
+		];
 	}
 
-	public function testFormLogin_LoginLogout() {
+	/**
+	 * @dataProvider data
+	 */
+	public function testFormLogin_LoginLogout($data) {
 		$this->zbxTestOpen('index.php');
-		$this->zbxTestInputTypeOverwrite('name', 'Admin');
-		$this->zbxTestInputTypeOverwrite('password', 'zabbix');
+		$this->zbxTestInputTypeOverwrite('name', $data['login']);
+		$this->zbxTestInputTypeOverwrite('password', $data['password']);
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextNotPresent('Login name or password is incorrect.');
 
+		switch($data['login'])	{
+			case 'disabled-user':
+				$this->zbxTestAssertElementText("//form//div[@class='red']", 'No permissions for system access.');
+				$this->zbxTestTextPresent(['Username', 'Password']);
+				break;
+			case 'no-access-to-the-frontend':
+				$this->zbxTestAssertElementText("//form//div[@class='red']", 'GUI access disabled.');
+				$this->zbxTestTextPresent(['Username', 'Password']);
+				break;
+			case 'admin':
+				$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+				$this->zbxTestTextPresent(['Username', 'Password']);
+				break;
+		}
+
+		if ($data['success_expected']) {
+		$this->zbxTestTextNotPresent('Login name or password is incorrect.');
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');
@@ -42,92 +110,47 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextPresent('Password');
 		$this->zbxTestTextNotPresent('Dashboard');
 	}
-
-	public function testFormLogin_LoginIncorrectPassword() {
-		DBsave_tables('users');
-
-		$this->zbxTestOpen('index.php');
-
-		$this->zbxTestInputTypeWait('name', 'Admin');
-		$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
-
-		$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='Admin'";
-		$this->assertEquals(1, DBcount($sql));
-		$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='Admin'";
-		$this->assertEquals(1, DBcount($sql));
-		$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='Admin'";
-		$this->assertEquals(1, DBcount($sql));
-
-		DBrestore_tables('users');
+		elseif ($data['dbCheck']) {
+			$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+			$this->zbxTestTextPresent(['Username', 'Password']);
+			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
+			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
+			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'"));
 	}
-
-	public function testFormLogin_BlockAccount() {
-		DBsave_tables('users');
-
-		$this->zbxTestOpen('index.php');
-
-		for ($i = 1; $i <= 5; $i++) {
-			$this->zbxTestInputTypeWait('name', 'Admin');
-			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
-			$this->zbxTestClickWait('enter');
-			$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
-
-			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
-			$this->assertEquals(1, DBcount($sql));
-			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_clock>0';
-			$this->assertEquals(1, DBcount($sql));
-			$sql = "SELECT * FROM users WHERE alias='Admin' AND attempt_ip<>''";
-			$this->assertEquals(1, DBcount($sql));
 		}
 
-		$this->zbxTestInputType('name', 'Admin');
-		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
-
-		DBrestore_tables('users');
-	}
-
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
-		DBsave_tables('users');
-
 		$this->zbxTestOpen('index.php');
 
 		for ($i = 1; $i <= 5; $i++) {
-			$this->zbxTestInputTypeWait('name', 'Admin');
+			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
 			$this->zbxTestTextPresent('Login name or password is incorrect');
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
 
-			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
+			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_failed='.$i.'';
 			$this->assertEquals(1, DBcount($sql));
-			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_clock>0';
+			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_clock>0';
 			$this->assertEquals(1, DBcount($sql));
-			$sql = "SELECT * FROM users WHERE alias='Admin' AND attempt_ip<>''";
+			$sql = "SELECT * FROM users WHERE alias='user-for-blocking' AND attempt_ip<>''";
 			$this->assertEquals(1, DBcount($sql));
 		}
 
-		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('name', 'user-for-blocking');
 		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
-
 		// account is blocked, waiting 30 sec and trying to login
 		sleep(30);
 
-		$this->zbxTestInputTypeWait('name', 'Admin');
+		$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 		$this->zbxTestInputTypeWait('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestCheckHeader('Dashboard');
-
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', '5 failed login attempts logged.');
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');
-
-		DBrestore_tables('users');
 	}
-
 }
