@@ -2828,10 +2828,7 @@ void	zbx_vc_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL != vc_cache)
-	{
-		zbx_mem_destroy(vc_mem);
 		zbx_mutex_destroy(&vc_lock);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

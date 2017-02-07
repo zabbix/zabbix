@@ -90,9 +90,6 @@
  *                                                                            *
  ******************************************************************************/
 
-#define LOCK_INFO	if (1 == info->use_lock) zbx_mutex_lock(&info->mem_lock)
-#define UNLOCK_INFO	if (1 == info->use_lock) zbx_mutex_unlock(&info->mem_lock)
-
 static void	*ALIGN4(void *ptr);
 static void	*ALIGN8(void *ptr);
 static void	*ALIGNPTR(void *ptr);
@@ -610,9 +607,6 @@ void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr,
 
 	(*info)->allow_oom = allow_oom;
 
-	/* do not allocate mutex */
-	(*info)->use_lock = 0;
-
 	/* prepare shared memory for further allocation by creating one big chunk */
 	(*info)->lo_bound = ALIGN8(base);
 	(*info)->hi_bound = ALIGN8((char *)base + size - 8);
@@ -637,24 +631,6 @@ void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	zbx_mem_destroy(zbx_mem_info_t *info)
-{
-	const char	*__function_name = "zbx_mem_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s'", __function_name, info->mem_descr);
-
-	if (1 == info->use_lock)
-		zbx_mutex_destroy(&info->mem_lock);
-
-	if (-1 == shmctl(info->shm_id, IPC_RMID, 0))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for %s: %s",
-				info->mem_descr, zbx_strerror(errno));
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
 {
 	const char	*__function_name = "zbx_mem_malloc";
@@ -675,11 +651,7 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 		exit(EXIT_FAILURE);
 	}
 
-	LOCK_INFO;
-
 	chunk = __mem_malloc(info, size);
-
-	UNLOCK_INFO;
 
 	if (NULL == chunk)
 	{
@@ -709,14 +681,10 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 		exit(EXIT_FAILURE);
 	}
 
-	LOCK_INFO;
-
 	if (NULL == old)
 		chunk = __mem_malloc(info, size);
 	else
 		chunk = __mem_realloc(info, old, size);
-
-	UNLOCK_INFO;
 
 	if (NULL == chunk)
 	{
@@ -744,11 +712,7 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 		exit(EXIT_FAILURE);
 	}
 
-	LOCK_INFO;
-
 	__mem_free(info, ptr);
-
-	UNLOCK_INFO;
 }
 
 void	zbx_mem_clear(zbx_mem_info_t *info)
@@ -759,8 +723,6 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_INFO;
-
 	memset(info->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
 	index = mem_bucket_by_size(info->total_size);
 	info->buckets[index] = info->lo_bound;
@@ -769,8 +731,6 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 	mem_set_next_chunk(info->buckets[index], NULL);
 	info->used_size = 0;
 	info->free_size = info->total_size;
-
-	UNLOCK_INFO;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -781,8 +741,6 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 	int		index;
 	zbx_uint64_t	counter, total, total_free = 0;
 	zbx_uint64_t	min_size = __UINT64_C(0xffffffffffffffff), max_size = __UINT64_C(0);
-
-	LOCK_INFO;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "=== memory statistics for %s ===", info->mem_descr);
 
@@ -817,8 +775,6 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d used chunks", info->used_size, total - total_free);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "================================");
-
-	UNLOCK_INFO;
 }
 
 size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)

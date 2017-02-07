@@ -5508,9 +5508,6 @@ void	free_configuration_cache(void)
 	LOCK_CACHE;
 
 	config = NULL;
-	zbx_mem_destroy(config_mem);
-
-	zbx_strpool_destroy();
 
 	UNLOCK_CACHE;
 

@@ -3395,12 +3395,6 @@ void	free_database_cache(void)
 
 	cache = NULL;
 
-	zbx_mem_destroy(hc_mem);
-	zbx_mem_destroy(hc_index_mem);
-
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		zbx_mem_destroy(trend_mem);
-
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 

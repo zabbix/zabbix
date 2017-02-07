@@ -33,7 +33,6 @@ typedef struct
 	zbx_uint64_t	orig_size;
 	zbx_uint64_t	total_size;
 	int		shm_id;
-	char		use_lock;
 
 	/* Continue execution in out of memory situation.                         */
 	/* Normally allocator forces exit when it runs out of allocatable memory. */
@@ -47,7 +46,6 @@ typedef struct
 zbx_mem_info_t;
 
 void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom);
-void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)
 #define	zbx_mem_realloc(info, old, size) __zbx_mem_realloc(__FILE__, __LINE__, info, old, size)

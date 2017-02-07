@@ -4237,7 +4237,6 @@ void	zbx_vmware_destroy(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_mem_destroy(vmware_mem);
 	zbx_mutex_destroy(&vmware_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

@@ -68,17 +68,6 @@ void	zbx_strpool_create(size_t size)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	zbx_strpool_destroy()
-{
-	const char	*__function_name = "zbx_strpool_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_mem_destroy(strpool.mem_info);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 const char	*zbx_strpool_intern(const char *str)
 {
 	void		*record;
