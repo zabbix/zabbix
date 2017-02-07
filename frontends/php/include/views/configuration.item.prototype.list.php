@@ -95,9 +95,13 @@ foreach ($this->data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$description,
 		$item['key_'],
-		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		$item['history']._x('d', 'day short'),
-		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
+		(strpos($item['delay'], '{') === false && $item['delay'] !== '')
+			? convertUnitsS($item['delay'])
+			: $item['delay'],
+		(strpos($item['trends'], '{') === false) ? convertUnitsS($item['history']) : $item['history'],
+		(strpos($item['trends'], '{') === false && $item['trends'] !== '')
+			? convertUnitsS($item['trends'])
+			: $item['trends'],
 		item_type2str($item['type']),
 		$applications,
 		$status

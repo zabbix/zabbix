@@ -79,7 +79,7 @@ class CUpdateIntervalParser extends CParser {
 		}
 		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->lld_macro_parser->getLength();
-			$this->delay = $this->user_macro_parser->getmatch();
+			$this->delay = $this->lld_macro_parser->getmatch();
 		}
 		else {
 			return self::PARSE_FAIL;

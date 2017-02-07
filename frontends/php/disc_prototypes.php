@@ -44,10 +44,10 @@ $fields = [
 	'key' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
 		_('Key')
 	],
-	'delay' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
+	'delay' =>						[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update}))'.
 			' && (isset({type}) && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.'))',
-		_('Update interval (in sec)')
+		_('Update interval')
 	],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
@@ -149,10 +149,10 @@ $fields = [
 		'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
 	],
 	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'history' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})',
+	'history' =>					[T_ZBX_STR, O_OPT, null,	null, 'isset({add}) || isset({update})',
 		_('History storage period')
 	],
-	'trends' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
+	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type})'.
 			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
@@ -249,15 +249,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	/*
-	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
-	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
+	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
+	$delay = getRequest('delay', '0s');
 	$delay_flex = '';
 	$intervals = [];
 
 	if (getRequest('delay_flex')) {
 		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
 					continue;
 				}
@@ -293,6 +294,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($intervals) {
 			$delay_flex = join(';', $intervals);
 		}
+	}
+
+	if ($delay_flex !== '') {
+		$delay .= ';'.$delay_flex;
 	}
 
 	if ($result) {
@@ -342,7 +347,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'key_'			=> getRequest('key'),
 			'hostid'		=> $discoveryRule['hostid'],
 			'interfaceid'	=> getRequest('interfaceid'),
-			'delay'			=> getRequest('delay'),
+			'delay'			=> $delay,
 			'status'		=> getRequest('status', ITEM_STATUS_DISABLED),
 			'type'			=> getRequest('type'),
 			'snmp_community' => getRequest('snmp_community'),
@@ -369,8 +374,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey'	=> getRequest('privatekey'),
 			'params'		=> getRequest('params'),
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
-			'ruleid'		=> getRequest('parent_discoveryid'),
-			'delay_flex'	=> $delay_flex
+			'ruleid'		=> getRequest('parent_discoveryid')
 		];
 
 		if (hasRequest('update')) {
@@ -380,8 +384,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'output' => ['type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 					'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt',
-					'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username',
-					'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
+					'templateid', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
+					'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol',
 					'snmpv3_privprotocol', 'snmpv3_contextname'
 				],
 				'selectApplications' => ['applicationid'],
@@ -503,9 +507,8 @@ if (isset($_REQUEST['form'])) {
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'templateid',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname'
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectPreprocessing' => ['type', 'params']
 		]);
@@ -558,6 +561,28 @@ else {
 
 		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 			$item['delay'] = '';
+		}
+		else {
+			$update_interval_parser = new CUpdateIntervalParser();
+
+			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+				$item['delay'] = $update_interval_parser->getDelay();
+
+				if (strpos($item['delay'], '{') === false) {
+					$item['delay'] = timeUnitToSeconds($item['delay']);
+				}
+			}
+			else {
+				$item['delay'] = '';
+			}
+		}
+
+		if (strpos($item['history'], '{') === false) {
+			$item['history'] = timeUnitToSeconds($item['history']);
+		}
+
+		if (strpos($item['history'], '{') === false && $item['trends'] !== '') {
+			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}
 	unset($item);
