@@ -2564,7 +2564,6 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  * Purpose: add new value to the cache                                        *
  *                                                                            *
  * Parameters:  itemid     - [IN] the itemid                                  *
- *              value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
  *              item_flags - [IN] the item flags (e. g. lld rule)             *
  *              result     - [IN] agent result containing the value to add    *
  *              ts         - [IN] the value timestamp                         *
@@ -2573,8 +2572,8 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  *                                ITEM_STATE_NOTSUPPORTED                     *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
-		const zbx_timespec_t *ts, unsigned char state, const char *error)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result, const zbx_timespec_t *ts,
+		unsigned char state, const char *error)
 {
 	unsigned char	value_flags;
 
