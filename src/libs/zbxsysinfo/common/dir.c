@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -429,9 +429,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
-	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
-		dir = NULL;
-	else
+	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
 		goto err2;
 
 	/* on UNIX count top directory size */
@@ -443,6 +441,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else		/* must be SIZE_MODE_DISK */
 			size += (zbx_uint64_t)status.st_blocks * DISK_BLOCK_SIZE;
 	}
+
+	dir = NULL;
 
 	while (0 < list.values_num)
 	{

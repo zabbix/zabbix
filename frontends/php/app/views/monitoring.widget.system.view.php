@@ -23,9 +23,13 @@ $table = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view')
 
 $output = [
 	'header' => _('System status'),
-	'body' => (new CDiv([getMessages(), $table]))->toString(),
-	'footer' => (new CListItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))))->toString()
+	'body' => $table->toString(),
+	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];
+
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

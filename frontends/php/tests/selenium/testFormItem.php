@@ -455,7 +455,7 @@ class testFormItem extends CWebTest {
 					'key' => 'test-inheritance-item-preprocessing',
 					'preprocessing' => true
 				]
-			],
+			]
 		];
 	}
 
@@ -651,12 +651,12 @@ class testFormItem extends CWebTest {
 				case INTERFACE_TYPE_IPMI :
 				case INTERFACE_TYPE_ANY :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBselect(
+					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
 							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-					);
+					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
@@ -1155,20 +1155,21 @@ class testFormItem extends CWebTest {
 		if (isset($templateid) && array_key_exists('preprocessing', $data)) {
 			$this->zbxTestTabSwitch('Preprocessing');
 			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
-			foreach ($dbResult as $result) {
-				$preprocessing_type = get_preprocessing_types($result['type']);
-				$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($result['step']-1)."_type_name']", 'readonly');
-				$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_type_name", $preprocessing_type);
-				if ((1 <= $result['type']) && ($result['type'] <= 4)) {
-					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($result['step']-1)."_params_0']", 'readonly');
-					$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_0", $result['params']);
+			$itemsPreproc = DBfetchArray($dbResult);
+			foreach ($itemsPreproc as $itemPreproc) {
+				$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
+				$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type_name']", 'readonly');
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_type_name", $preprocessing_type);
+				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
 				}
-				elseif ($result['type'] == 5) {
-					$reg_exp = preg_split("/\n/", $result['params']);
-					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($result['step']-1)."_params_0']", 'readonly');
-					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($result['step']-1)."_params_1']", 'readonly');
-					$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_0", $reg_exp[0]);
-					$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_1", $reg_exp[1]);
+				elseif ($itemPreproc['type'] == 5) {
+					$reg_exp = preg_split("/\n/", $itemPreproc['params']);
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_1']", 'readonly');
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $reg_exp[0]);
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
 				}
 			}
 		}
@@ -2310,7 +2311,7 @@ class testFormItem extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'params' => ''],
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty. '
+					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			[
@@ -2606,6 +2607,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickButton('item.masscopyto');
 
 		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
+		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
 		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
 		$this->zbxTestClickWait('copy');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
@@ -2622,20 +2624,21 @@ class testFormItem extends CWebTest {
 		$this->zbxTestTabSwitch('Preprocessing');
 
 		$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$preprocessingItemId);
-		foreach ($dbResult as $result) {
-			$preprocessing_type = get_preprocessing_types($result['type']);
-			$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($result['step']-1)."_type'][readonly]");
-			$this->zbxTestDropdownAssertSelected("preprocessing[".($result['step']-1)."][type]", $preprocessing_type);
-			if ((1 <= $result['type']) && ($result['type'] <= 4)) {
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($result['step']-1)."_params_0'][readonly]");
-				$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_0", $result['params']);
+		$itemsPreproc = DBfetchArray($dbResult);
+		foreach ($itemsPreproc as $itemPreproc) {
+			$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
+			$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type'][readonly]");
+			$this->zbxTestDropdownAssertSelected("preprocessing[".($itemPreproc['step']-1)."][type]", $preprocessing_type);
+			if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
 			}
-			elseif ($result['type'] == 5) {
-				$reg_exp = preg_split("/\n/", $result['params']);
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($result['step']-1)."_params_0'][readonly]");
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($result['step']-1)."_params_1'][readonly]");
-				$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_0", $reg_exp[0]);
-				$this->zbxTestAssertElementValue("preprocessing_".($result['step']-1)."_params_1", $reg_exp[1]);
+			elseif ($itemPreproc['type'] == 5) {
+				$reg_exp = preg_split("/\n/", $itemPreproc['params']);
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_1'][readonly]");
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $reg_exp[0]);
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
 			}
 		}
 	}
