@@ -63,7 +63,6 @@
  * performance data updates.
  */
 
-extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern int		CONFIG_VMWARE_PERF_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
@@ -4205,25 +4204,17 @@ void	zbx_vmware_init(void)
 {
 	const char	*__function_name = "zbx_vmware_init";
 
-	key_t		shm_key;
 	zbx_uint64_t	size_reserved;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VMWARE_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for vmware cache");
-		exit(EXIT_FAILURE);
-	}
-
 	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
-	zbx_mem_create(&vmware_mem, shm_key, ZBX_NO_MUTEX, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size",
-			"VMwareCacheSize", 0);
+	zbx_mem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize", 0);
 
 	vmware = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));

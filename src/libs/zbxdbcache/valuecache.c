@@ -2758,7 +2758,6 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
 void	zbx_vc_init(void)
 {
 	const char	*__function_name = "zbx_vc_init";
-	key_t		shm_key;
 	zbx_uint64_t	size_reserved;
 
 	if (0 == CONFIG_VALUE_CACHE_SIZE)
@@ -2766,13 +2765,7 @@ void	zbx_vc_init(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VALUECACHE_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for value cache");
-		exit(EXIT_FAILURE);
-	}
-
-	if (FAIL == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
+	if (SUCCEED != zbx_mutex_create(&vc_lock, ZBX_MUTEX_VALUECACHE))
 	{
 		zbx_error("cannot create mutex for value cache");
 		exit(EXIT_FAILURE);
@@ -2780,8 +2773,7 @@ void	zbx_vc_init(void)
 
 	size_reserved = zbx_mem_required_size(1, "value cache size", "ValueCacheSize");
 
-	zbx_mem_create(&vc_mem, shm_key, ZBX_NO_MUTEX, CONFIG_VALUE_CACHE_SIZE,
-			"value cache size", "ValueCacheSize", 1);
+	zbx_mem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1);
 
 	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
 

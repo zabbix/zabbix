@@ -296,7 +296,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
+		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for log file");
 			exit(EXIT_FAILURE);
@@ -313,7 +313,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	}
 	else if (LOG_TYPE_CONSOLE == type)
 	{
-		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
+		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for standard output");
 			exit(EXIT_FAILURE);

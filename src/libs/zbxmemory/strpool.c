@@ -26,8 +26,6 @@
 
 #include "strpool.h"
 
-extern char		*CONFIG_FILE;
-
 static zbx_strpool_t	strpool;
 
 static zbx_hash_t	__strpool_hash_func(const void *data);
@@ -58,17 +56,9 @@ void	zbx_strpool_create(size_t size)
 {
 	const char	*__function_name = "zbx_strpool_create";
 
-	key_t		shm_key;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_STRPOOL_ID)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for string pool");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize", 0);
+	zbx_mem_create(&strpool.mem_info, size, "string pool", "CacheSize", 0);
 
 	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
 	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,

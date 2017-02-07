@@ -28,16 +28,9 @@
 
 #define ZBX_NONEXISTENT_SHMID		(-1)
 
-#define ZBX_IPC_CONFIG_ID		'g'
-#define ZBX_IPC_HISTORY_ID		'h'
-#define ZBX_IPC_HISTORY_INDEX_ID	'H'
-#define ZBX_IPC_TREND_ID		't'
-#define ZBX_IPC_STRPOOL_ID		's'
 #define ZBX_IPC_COLLECTOR_ID		'l'
 #define ZBX_IPC_COLLECTOR_DISKSTAT	'm'
 #define ZBX_IPC_SELFMON_ID		'S'
-#define ZBX_IPC_VALUECACHE_ID		'v'
-#define ZBX_IPC_VMWARE_ID		'w'
 #define ZBX_IPC_COLLECTOR_PROC_ID	'p'
 
 key_t	zbx_ftok(char *path, int id);

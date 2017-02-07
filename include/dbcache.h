@@ -47,7 +47,6 @@
 
 #define ZBX_EXPAND_MACROS		1
 
-extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;

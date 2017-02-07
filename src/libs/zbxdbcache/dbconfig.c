@@ -5351,7 +5351,6 @@ void	init_configuration_cache(void)
 	const char	*__function_name = "init_configuration_cache";
 
 	int		i;
-	key_t		shm_key;
 	size_t		config_size;
 	size_t		strpool_size;
 
@@ -5360,19 +5359,13 @@ void	init_configuration_cache(void)
 	strpool_size = (size_t)(CONFIG_CONF_CACHE_SIZE * 0.15);
 	config_size = CONFIG_CONF_CACHE_SIZE - strpool_size;
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
+	if (SUCCEED != zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG))
 	{
-		zbx_error("Can't create IPC key for configuration cache");
+		zbx_error("unable to create mutex for configuration cache");
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_mutex_create_force(&config_lock, ZBX_MUTEX_CONFIG))
-	{
-		zbx_error("Unable to create mutex for configuration cache");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
+	zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0);
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));

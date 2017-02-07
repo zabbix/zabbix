@@ -196,7 +196,7 @@ void	init_collector_data()
 	zbx_procstat_init();
 #endif
 
-	if (FAIL == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
+	if (SUCCEED != zbx_mutex_create(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
 	{
 		zbx_error("cannot create mutex for disk statistics collector");
 		exit(EXIT_FAILURE);

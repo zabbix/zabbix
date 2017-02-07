@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "mutexs.h"
-#include "ipc.h"
 #include "log.h"
 
 #include "memalloc.h"
@@ -540,13 +539,12 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uint64_t size,
-		const char *descr, const char *param, int allow_oom)
+void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom)
 {
-	const char	*__function_name = "zbx_mem_create";
+	const char		*__function_name = "zbx_mem_create";
 
-	int		shm_id, index;
-	void		*base;
+	int			shm_id, index;
+	void			*base;
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
@@ -570,9 +568,10 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 		exit(EXIT_FAILURE);
 	}
 
-	if (-1 == (shm_id = zbx_shmget(shm_key, size)))
+	if (-1 == (shm_id = shmget(IPC_PRIVATE, size, 0600)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for %s", descr);
+		zbx_error("cannot get private shared memory of size " ZBX_FS_SIZE_T " for %s: %s", (zbx_fs_size_t)size,
+				descr, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -581,6 +580,9 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for %s: %s", descr, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	if (-1 == shmctl(shm_id, IPC_RMID, NULL))
+		zabbix_log(LOG_LEVEL_CRIT, "cannot mark shared memory for destruction: %s", zbx_strerror(errno));
 
 	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
 
@@ -608,20 +610,8 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 
 	(*info)->allow_oom = allow_oom;
 
-	/* allocate mutex */
-
-	if (ZBX_NO_MUTEX != lock_name)
-	{
-		(*info)->use_lock = 1;
-
-		if (FAIL == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for %s", descr);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-		(*info)->use_lock = 0;
+	/* do not allocate mutex */
+	(*info)->use_lock = 0;
 
 	/* prepare shared memory for further allocation by creating one big chunk */
 	(*info)->lo_bound = ALIGN8(base);
