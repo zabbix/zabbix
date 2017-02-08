@@ -650,9 +650,14 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$time_period_validator = new CTimePeriodValidator(['allowMultiple' => ($flags & API_MULTIPLE)]);
+		if ($flags & API_MULTIPLE) {
+			$time_period_parser = new CTimePeriodsParser();
+		}
+		else {
+			$time_period_parser = new CTimePeriodParser();
+		}
 
-		if (!$time_period_validator->validate($data)) {
+		if ($time_period_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time period is expected'));
 			return false;
 		}

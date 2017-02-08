@@ -30,7 +30,6 @@ class CActionCondValidator extends CValidator {
 	 */
 	public function validate($condition) {
 		// build validators
-		$timePeriodValidator = new CTimePeriodValidator();
 		$discoveryCheckTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_check_type2str())
 		]);
@@ -112,8 +111,8 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_TIME_PERIOD:
-				if (!$timePeriodValidator->validate($conditionValue)) {
-					$this->setError($timePeriodValidator->getError());
+				if ((new CTimePeriodsParser())->parse($conditionValue) != CParser::PARSE_SUCCESS) {
+					$this->setError(_('Invalid time period.'));
 				}
 				break;
 

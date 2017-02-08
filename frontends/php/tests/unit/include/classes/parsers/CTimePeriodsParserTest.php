@@ -41,6 +41,13 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '3-4,00:05-00:06;4-5,00:07-00:08'
 				]
 			],
+			[
+				'{$MACRO1};{$MACRO2}', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO1};{$MACRO2}'
+				]
+			],
 			// partial success
 			[
 				'2-3,00:03-00:04;', 0,

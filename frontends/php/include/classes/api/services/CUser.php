@@ -960,11 +960,11 @@ class CUser extends CApiService {
 			}
 		}
 
-		$timePeriodValidator = new CTimePeriodValidator();
+		$time_periods_parser = new CTimePeriodsParser();
 
-		foreach ($media as $mediaItem) {
-			if (!$timePeriodValidator->validate($mediaItem['period'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
+		foreach ($media as $media_item) {
+			if ($time_periods_parser->parse($media_item['period']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid time period.'));
 			}
 		}
 	}
@@ -1156,15 +1156,15 @@ class CUser extends CApiService {
 			'severity' => null
 		];
 
-		$timePeriodValidator = new CTimePeriodValidator();
+		$time_periods_parser = new CTimePeriodsParser();
 
-		foreach ($media as $mediaItem) {
+		foreach ($media as $media_item) {
 			if (!check_db_fields($mediaDBfields, $mediaItem)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 
-			if (!$timePeriodValidator->validate($mediaItem['period'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
+			if ($time_periods_parser->parse($media_item['period']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid time period.'));
 			}
 		}
 	}

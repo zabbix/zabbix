@@ -57,8 +57,7 @@ check_fields($fields);
 insert_js_function('add_media');
 
 if (isset($_REQUEST['add'])) {
-	$validator = new CTimePeriodValidator();
-	if ($validator->validate($_REQUEST['period'])) {
+	if ((new CTimePeriodsParser())->parse(getRequest('period')) == CParser::PARSE_SUCCESS) {
 		$severity = 0;
 		$_REQUEST['severity'] = getRequest('severity', []);
 		foreach ($_REQUEST['severity'] as $id) {
@@ -76,7 +75,7 @@ if (isset($_REQUEST['add'])) {
 				'</script>';
 	}
 	else {
-		error($validator->getError());
+		error(_('Invalid time period.'));
 	}
 }
 
