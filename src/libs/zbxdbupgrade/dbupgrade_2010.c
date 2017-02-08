@@ -1476,7 +1476,7 @@ static int	DBpatch_2010176(void)
 
 		if (0 != strcmp(name, row[1]))
 		{
-			name_esc = DBdyn_escape_string_len(name, 255);
+			name_esc = DBdyn_escape_field("scripts", "name", name);
 
 			if (ZBX_DB_OK > DBexecute("update scripts set name='%s' where scriptid=%s", name_esc, row[0]))
 				ret = FAIL;
