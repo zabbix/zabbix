@@ -150,7 +150,7 @@ out:
  * Comments: 'history data' request is deprecated starting with Zabbix v3.4   *
  *                                                                            *
  ******************************************************************************/
-static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
+static void	send_proxyhistory(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_proxyhistory";
 
@@ -571,7 +571,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_proxyhistory(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_proxyhistory(sock, ts);
+					send_proxyhistory(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 			{
