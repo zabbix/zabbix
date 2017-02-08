@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testUrlUserPermissions extends CWebTest {
+	public function testUrlUserPermissions_ClearSessionIds() {
+		DBexecute('DELETE FROM sessions');
+	}
 
 	public static function data() {
 		return [
