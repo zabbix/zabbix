@@ -374,9 +374,7 @@ $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operation_tab->addRow(_('Default operation step duration'), [
-		(new CNumericBox('esc_period', $data['action']['esc_period'], 6))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		' ('._('minimum 60 seconds').')'
+		(new CTextBox('esc_period', $data['action']['esc_period']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	]);
 }
 
@@ -398,7 +396,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 // create operation table
 $operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
+	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
 	$delay = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
 }
 else {
@@ -554,10 +552,10 @@ if (!empty($data['new_operation'])) {
 		]);
 
 		$new_operation_formlist->addRow(_('Step duration'), [
-			(new CNumericBox('new_operation[esc_period]', $data['new_operation']['esc_period'], 6))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CTextBox('new_operation[esc_period]', $data['new_operation']['esc_period']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			_('(minimum 60 seconds, 0 - use action default)')
+			_('(0 - use action default)')
 		]);
 	}
 

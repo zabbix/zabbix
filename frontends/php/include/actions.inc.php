@@ -1221,7 +1221,7 @@ function get_operators_by_conditiontype($conditiontype) {
 	return [];
 }
 
-function count_operations_delay($operations, $def_period = 0) {
+function count_operations_delay($operations, $def_period = '0s') {
 	$delays = [1 => 0];
 	$periods = [];
 	$max_step = 0;
@@ -1229,6 +1229,7 @@ function count_operations_delay($operations, $def_period = 0) {
 	foreach ($operations as $operation) {
 		$step_to = $operation['esc_step_to'] ? $operation['esc_step_to'] : 9999;
 		$esc_period = $operation['esc_period'] ? $operation['esc_period'] : $def_period;
+		$esc_period = timeUnitToSeconds($esc_period);
 
 		if ($max_step < $operation['esc_step_from']) {
 			$max_step = $operation['esc_step_from'];
@@ -1243,7 +1244,7 @@ function count_operations_delay($operations, $def_period = 0) {
 
 	for ($i = 1; $i <= $max_step; $i++) {
 		$esc_period = isset($periods[$i]) ? $periods[$i] : $def_period;
-		$delays[$i+1] = $delays[$i] + $esc_period;
+		$delays[$i + 1] = $delays[$i] + $esc_period;
 	}
 
 	return $delays;
