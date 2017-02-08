@@ -91,12 +91,14 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('charts.php');
 		$this->zbxTestCheckHeader('Graphs');
 		$this->zbxTestDropdownSelectWait('graphid', $this->graphCpu);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestDropdownSelectWait('graphid', $this->graphMemory);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
 		$this->zbxTestCheckFatalErrors();
@@ -125,6 +127,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckHeader('Screens');
 		$this->zbxTestClickLinkTextWait($this->screenClock);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
 		$this->zbxTestCheckFatalErrors();
@@ -151,6 +154,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckHeader('Maps');
 		$this->zbxTestClickLinkTextWait($this->mapTest);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
 		$this->zbxTestCheckFatalErrors();
