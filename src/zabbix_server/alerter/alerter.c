@@ -212,7 +212,7 @@ void	main_alerter_loop(void)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
 
-				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
+				error_esc = DBdyn_escape_field("alerts", "error", error);
 
 				alert.retries++;
 

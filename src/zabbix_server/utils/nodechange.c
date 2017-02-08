@@ -211,7 +211,7 @@ static void	convert_trigger_expressions(int nodeid)
 		convert_expression(nodeid, prefix, row[0], &new_expression, &new_expression_alloc,
 				&new_expression_offset);
 
-		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
+		new_expression_esc = DBdyn_escape_field("triggers", "expression", new_expression);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
 				new_expression_esc, row[1]);
 		zbx_free(new_expression_esc);

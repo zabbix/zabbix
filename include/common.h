@@ -778,7 +778,6 @@ int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
-
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
 #define is_ushort(str, value) \

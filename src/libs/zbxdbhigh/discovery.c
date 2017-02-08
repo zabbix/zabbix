@@ -27,7 +27,7 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 	DB_RESULT	result;
 	char		*value_esc;
 
-	value_esc = DBdyn_escape_string_len(value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_field("dservices", "value", value);
 
 	result = DBselect(
 			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
@@ -48,7 +48,7 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 	DB_RESULT	result;
 	char		*ip_esc;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	ip_esc = DBdyn_escape_field("dservices", "ip", ip);
 
 	result = DBselect(
 			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
@@ -86,7 +86,7 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	ip_esc = DBdyn_escape_field("dservices", "ip", ip);
 	sql = zbx_dsprintf(sql,
 			"select dserviceid"
 			" from dservices"
@@ -222,8 +222,8 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' port:%d key:'%s'",
 			__function_name, ip, port, dcheck->key_);
 
-	key_esc = DBdyn_escape_string_len(dcheck->key_, DSERVICE_KEY_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	key_esc = DBdyn_escape_field("dservices", "key_", dcheck->key_);
+	ip_esc = DBdyn_escape_field("dservices", "ip", ip);
 
 	result = DBselect(
 			"select dserviceid,dhostid,status,lastup,lastdown,value,dns"
@@ -248,7 +248,7 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 			dservice->dserviceid = DBget_maxid("dservices");
 			dservice->status = DOBJECT_STATUS_DOWN;
 
-			dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+			dns_esc = DBdyn_escape_field("dservices", "dns", dns);
 
 			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,dns,port,status)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s','%s',%d,%d)",
@@ -283,7 +283,7 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 
 		if (0 != strcmp(row[6], dns))
 		{
-			dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+			dns_esc = DBdyn_escape_field("dservices", "dns", dns);
 
 			DBexecute("update dservices"
 					" set dns='%s'"
@@ -314,7 +314,7 @@ static void	discovery_update_dservice(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_field("dservices", "value", service->value);
 
 	DBexecute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
 			service->status, service->lastup, service->lastdown, value_esc, service->dserviceid);
@@ -334,7 +334,7 @@ static void	discovery_update_dservice_value(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_field("dservices", "value", service->value);
 
 	DBexecute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64,
 			value_esc, service->dserviceid);

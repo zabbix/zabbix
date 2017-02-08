@@ -254,7 +254,7 @@ static int	db_host_update_availability(const zbx_host_availability_t *in, const 
 	{
 		char	*error_esc;
 
-		error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
+		error_esc = DBdyn_escape_field("hosts", "error", error);
 
 		DBbegin();
 		DBexecute("update hosts set%s,%serror='%s' where hostid=" ZBX_FS_UI64,
