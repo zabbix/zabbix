@@ -483,6 +483,40 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	return ret;
 }
 
+#ifdef HAVE_MYSQL
+static size_t	get_string_field_size(unsigned char type)
+{
+	switch(type)
+	{
+		case ZBX_TYPE_LONGTEXT:
+			return ZBX_SIZE_T_MAX;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+			return 65535u;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+	}
+}
+#elif HAVE_ORACLE
+static size_t	get_string_field_size(unsigned char type)
+{
+	switch(type)
+	{
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_TEXT:
+			return ZBX_SIZE_T_MAX;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_SHORTTEXT:
+			return 4000u;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_string                                              *
@@ -490,17 +524,49 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	return zbx_db_dyn_escape_string(src);
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdyn_escape_string_len                                          *
+ * Function: DBdyn_escape_field_len                                           *
  *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
+static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
 {
-	return zbx_db_dyn_escape_string_len(src, max_src_len);
+	size_t	length;
+
+	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+		length = ZBX_SIZE_T_MAX;
+	else
+		length = field->length;
+
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
+#elif HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, flag);
+#else
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_field                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src)
+{
+	const ZBX_TABLE	*table;
+	const ZBX_FIELD	*field;
+
+	if (NULL == (table = DBget_table(table_name)) || NULL == (field = DBget_field(table, field_name)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", table_name, field_name);
+		exit(EXIT_FAILURE);
+	}
+
+	return DBdyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
@@ -1352,10 +1418,10 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
-	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	host_metadata_esc = DBdyn_escape_string(host_metadata);
+	host_esc = DBdyn_escape_field("proxy_autoreg_host", "host", host);
+	ip_esc = DBdyn_escape_field("proxy_autoreg_host", "listen_ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_autoreg_host", "listen_dns", dns);
+	host_metadata_esc = DBdyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
 			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"
@@ -1570,51 +1636,6 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_inventory_field_len                                        *
- *                                                                            *
- * Purpose: get host_inventory field length by inventory_link                 *
- *                                                                            *
- * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
- *                                                                            *
- * Return value: field length                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
-{
-	static unsigned short	*inventory_field_len = NULL;
-	const char		*inventory_field;
-	const ZBX_TABLE		*table;
-	const ZBX_FIELD		*field;
-
-	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
-		assert(0);
-
-	inventory_link--;
-
-	if (NULL == inventory_field_len)
-	{
-		inventory_field_len = zbx_malloc(inventory_field_len, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
-		memset(inventory_field_len, 0, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
-	}
-
-	if (0 != inventory_field_len[inventory_link])
-		return inventory_field_len[inventory_link];
-
-	inventory_field = DBget_inventory_field(inventory_link + 1);
-	table = DBget_table("host_inventory");
-	assert(NULL != table);
-	field = DBget_field(table, inventory_field);
-	assert(NULL != field);
-
-	inventory_field_len[inventory_link] = field->length;
-
-	return inventory_field_len[inventory_link];
 }
 
 #undef ZBX_MAX_INVENTORY_FIELDS
@@ -2081,31 +2102,17 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
-#ifdef HAVE_ORACLE
-		size_t			str_alloc = 0, str_offset = 0;
-#endif
+
 		switch (field->type)
 		{
 			case ZBX_TYPE_LONGTEXT:
-				if (0 == field->length)
-				{
-#ifdef HAVE_ORACLE
-					row[i].str = zbx_strdup(NULL, value->str);
-#else
-					row[i].str = DBdyn_escape_string(value->str);
-#endif
-					break;
-				}
-				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = NULL;
-				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_nchars(value->str, field->length));
+				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
-				row[i].str = DBdyn_escape_string_len(value->str, field->length);
+				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
 			default:
@@ -2656,7 +2663,7 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		{
 			char	*error_esc;
 
-			error_esc = DBdyn_escape_string_len(ha->agents[i].error, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_field("hosts", "error", ha->agents[i].error);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serror='%s'", delim, field_prefix[i],
 					error_esc);
 			zbx_free(error_esc);

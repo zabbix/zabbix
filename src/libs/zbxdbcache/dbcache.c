@@ -1184,7 +1184,7 @@ notsupported:
 
 		if (0 != strcmp(item->db_error, h->value_orig.err))
 		{
-			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
+			value_esc = DBdyn_escape_field("items", "error", h->value_orig.err);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
 
@@ -1229,7 +1229,6 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 {
 	char			value[MAX_BUFFER_LEN];
 	const char		*inventory_field;
-	unsigned short		inventory_field_len;
 	zbx_inventory_value_t	*inventory_value;
 
 	if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1262,13 +1261,11 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 
 	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
 
-	inventory_field_len = DBget_inventory_field_len(item->inventory_link);
-
 	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value_esc = DBdyn_escape_string_len(value, inventory_field_len);
+	inventory_value->value_esc = DBdyn_escape_field("host_inventory", inventory_field, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }

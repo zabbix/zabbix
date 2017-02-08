@@ -497,8 +497,8 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
+char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*DBdyn_escape_string(const char *src);
-char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
@@ -554,7 +554,6 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
-unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 
 void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode);

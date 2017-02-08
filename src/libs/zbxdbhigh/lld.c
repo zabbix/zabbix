@@ -635,7 +635,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
-		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
+		error_esc = DBdyn_escape_field("items", "error", error);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s'", sql_start, error_esc);
 		sql_start = sql_continue;
