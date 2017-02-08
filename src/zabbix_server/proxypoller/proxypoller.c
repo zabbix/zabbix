@@ -248,15 +248,14 @@ out:
  *                                                                            *
  * Purpose: checks proxy response for error message                           *
  *                                                                            *
- * Parameters: proxy - [IN] the proxy                                         *
- *             jp    - [IN] the json data received form proxy                 *
+ * Parameters: jp    - [IN] the json data received form proxy                 *
  *             error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - proxy response doesn't have error message          *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_check_error_response(const DC_PROXY *proxy, const struct zbx_json_parse *jp, char **error)
+static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **error)
 {
 	char	response[MAX_STRING_LEN], *info = NULL;
 	size_t	info_alloc = 0;
@@ -317,7 +316,7 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 
 	zbx_proxy_update_version(proxy, &jp);
 
-	if (SUCCEED != proxy_check_error_response(proxy, &jp, &error))
+	if (SUCCEED != proxy_check_error_response(&jp, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
 				" %s", proxy->host, proxy->addr, error);
@@ -378,7 +377,7 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 
 		zbx_proxy_update_version(proxy, &jp);
 
-		if (SUCCEED != proxy_check_error_response(proxy, &jp, &error))
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
 					" %s", proxy->host, proxy->addr, error);
@@ -448,7 +447,7 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 
 		zbx_proxy_update_version(proxy, &jp);
 
-		if (SUCCEED != proxy_check_error_response(proxy, &jp, &error))
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
 					" %s", proxy->host, proxy->addr, error);
@@ -518,7 +517,7 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 
 		zbx_proxy_update_version(proxy, &jp);
 
-		if (SUCCEED != proxy_check_error_response(proxy, &jp, &error))
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
 					" %s", proxy->host, proxy->addr, error);
