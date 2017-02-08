@@ -758,7 +758,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				init_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
-				dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, &result, &ts, state, NULL);
+				dc_add_history(itemid, 0, &result, &ts, state, NULL);
 				free_result(&result);
 			}
 			break;
@@ -767,7 +767,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, value);
+			dc_add_history(itemid, 0, NULL, &ts, state, value);
 	}
 
 	dc_flush_history();
@@ -858,7 +858,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			int		errcode = CONFIG_ERROR;
 
 			zbx_timespec(&ts);
-			dc_add_history(items[i].itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, error);
+			dc_add_history(items[i].itemid, 0, NULL, &ts, state, error);
 			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
 			zbx_free(error);
 			continue;
