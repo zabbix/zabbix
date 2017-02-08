@@ -53,10 +53,10 @@ static void	proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, const char 
 {
 	char	*ip_esc, *dns_esc, *key_esc, *value_esc;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	key_esc = DBdyn_escape_string_len(dcheck->key_, PROXY_DHISTORY_KEY_LEN);
-	value_esc = DBdyn_escape_string_len(value, PROXY_DHISTORY_VALUE_LEN);
+	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
+	key_esc = DBdyn_escape_field("proxy_dhistory", "key_", dcheck->key_);
+	value_esc = DBdyn_escape_field("proxy_dhistory", "value", value);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,type,ip,dns,port,key_,value,status)"
 			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s',%d,'%s','%s',%d)",
@@ -82,8 +82,8 @@ static void	proxy_update_host(DB_DRULE *drule, const char *ip, const char *dns, 
 {
 	char	*ip_esc, *dns_esc;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,dns,status)"
 			" values (%d," ZBX_FS_UI64 ",-1,'%s','%s',%d)",
