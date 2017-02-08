@@ -43,7 +43,7 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse autoregistration data from active proxy at \"%s\": %s",
 				sock->peer, error);
