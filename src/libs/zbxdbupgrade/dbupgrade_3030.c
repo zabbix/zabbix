@@ -184,7 +184,7 @@ static int	DBpatch_3030017(void)
 }
 
 static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
-		unsigned char value_type, unsigned char data_type, const char *formula, unsigned char delta)
+		unsigned char data_type, const char *formula, unsigned char delta)
 {
 	int	step = 1;
 
@@ -242,8 +242,8 @@ static int	DBpatch_3030018(void)
 				ZBX_STR2UCHAR(data_type, row[2]);
 				formula = (1 == atoi(row[3]) ? row[4] : NULL);
 				ZBX_STR2UCHAR(delta, row[5]);
-				DBpatch_3030018_add_numeric_preproc_steps(&db_insert, itemid, value_type, data_type,
-						formula, delta);
+				DBpatch_3030018_add_numeric_preproc_steps(&db_insert, itemid, data_type, formula,
+						delta);
 				break;
 		}
 	}
@@ -280,6 +280,14 @@ static int	DBpatch_3030022(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3030023(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.dashboard.widget.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -309,5 +317,6 @@ DBPATCH_ADD(3030019, 0, 1)
 DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
 DBPATCH_ADD(3030022, 0, 1)
+DBPATCH_ADD(3030023, 0, 0)
 
 DBPATCH_END()

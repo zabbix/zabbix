@@ -21,24 +21,14 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerDashboardView extends CController {
+class CControllerWidgetFavMapsView extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'fullscreen' =>	'in 0,1'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions() {
@@ -46,21 +36,34 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function doAction() {
-		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
-			'output' => [],
-			'filter' => ['status' => DRULE_STATUS_ACTIVE],
-			'limit' => 1
+		$maps = [];
+		$mapids = [];
+
+		foreach (CFavorite::get('web.favorite.sysmapids') as $favourite) {
+			$mapids[$favourite['value']] = true;
+		}
+
+		if ($mapids) {
+			$db_maps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($mapids)
+			]);
+
+			foreach ($db_maps as $db_map) {
+				$maps[] = [
+					'sysmapid' => $db_map['sysmapid'],
+					'label' => $db_map['name']
+				];
+			}
+		}
+
+		CArrayHelper::sort($maps, ['label']);
+
+		$this->setResponse(new CControllerResponseData([
+			'maps' => $maps,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		]));
-
-		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
-			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
-			'show_discovery_widget' => $show_discovery_widget
-		];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Dashboard'));
-		$this->setResponse($response);
 	}
 }

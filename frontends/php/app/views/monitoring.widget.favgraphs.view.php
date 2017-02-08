@@ -19,12 +19,32 @@
 **/
 
 
-$table = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
+$table = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
+
+foreach ($data['graphs'] as $graph) {
+	$url = $graph['simple']
+		? (new CUrl('history.php'))
+			->setArgument('action', HISTORY_GRAPH)
+			->setArgument('itemids', [$graph['itemid']])
+		: (new CUrl('charts.php'))->setArgument('graphid', $graph['graphid']);
+	$on_click = $graph['simple']
+		? "rm4favorites('itemid','".$graph['itemid']."')"
+		: "rm4favorites('graphid','".$graph['graphid']."')";
+
+	$table->addRow([
+		new CLink($graph['label'], $url),
+		(new CButton())
+			->onClick($on_click)
+			->addClass(ZBX_STYLE_REMOVE_BTN)
+	]);
+}
 
 $output = [
-	'header' => _('System status'),
+	'header' => _('Favourite graphs'),
 	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'footer' => (new CList([
+		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	]))->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

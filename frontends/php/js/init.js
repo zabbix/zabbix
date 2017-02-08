@@ -57,18 +57,6 @@ jQuery(function($) {
 			data = obj.data('menu-popup');
 
 		switch (data.type) {
-			case 'favouriteGraphs':
-				data = getMenuPopupFavouriteGraphs(data);
-				break;
-
-			case 'favouriteMaps':
-				data = getMenuPopupFavouriteMaps(data);
-				break;
-
-			case 'favouriteScreens':
-				data = getMenuPopupFavouriteScreens(data);
-				break;
-
 			case 'history':
 				data = getMenuPopupHistory(data);
 				break;
