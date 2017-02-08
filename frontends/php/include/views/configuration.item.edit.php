@@ -394,7 +394,7 @@ if ($data['config']['hk_history_global']
 		$keepHistory[] = _x('global housekeeping settings', 'item_form');
 	}
 
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
+	$keepHistory[] = ' ('.convertUnitsS(timeUnitToSeconds($data['config']['hk_history'])).')';
 }
 
 $itemFormList->addRow(_('History storage period'), $keepHistory);
@@ -417,7 +417,7 @@ if ($data['config']['hk_trends_global']
 		$keepTrend[] = _x('global housekeeping settings', 'item_form');
 	}
 
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
+	$keepTrend[] = ' ('.convertUnitsS(timeUnitToSeconds($data['config']['hk_trends'])).')';
 }
 
 $itemFormList->addRow(_('Trend storage period'), $keepTrend, 'row_trends');

@@ -49,7 +49,7 @@ $guiTab = (new CFormList())
 	->addRow(_('Enable event acknowledgement'),
 		(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 	)
-	->addRow(_('Show events not older than (in days)'),
+	->addRow(_('Show events not older than'),
 		(new CTextBox('event_expire', $data['event_expire']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
 	->addRow(_('Max count of events per trigger to show'),

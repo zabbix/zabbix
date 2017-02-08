@@ -35,27 +35,27 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Trigger data storage period (in days)'), 'hk_events_trigger'),
-		(new CNumericBox('hk_events_trigger', $data['hk_events_trigger'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Trigger data storage period'), 'hk_events_trigger'),
+		(new CTextBox('hk_events_trigger', $data['hk_events_trigger']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Internal data storage period (in days)'), 'hk_events_internal'),
-		(new CNumericBox('hk_events_internal', $data['hk_events_internal'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Internal data storage period'), 'hk_events_internal'),
+		(new CTextBox('hk_events_internal', $data['hk_events_internal']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Network discovery data storage period (in days)'), 'hk_events_discovery'),
-		(new CNumericBox('hk_events_discovery', $data['hk_events_discovery'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Network discovery data storage period'), 'hk_events_discovery'),
+		(new CTextBox('hk_events_discovery', $data['hk_events_discovery']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Auto-registration data storage period (in days)'), 'hk_events_autoreg'),
-		(new CNumericBox('hk_events_autoreg', $data['hk_events_autoreg'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Auto-registration data storage period'), 'hk_events_autoreg'),
+		(new CTextBox('hk_events_autoreg', $data['hk_events_autoreg']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
 	->addRow(null)
@@ -65,9 +65,9 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Data storage period (in days)'), 'hk_services'),
-		(new CNumericBox('hk_services', $data['hk_services'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Data storage period'), 'hk_services'),
+		(new CTextBox('hk_services', $data['hk_services']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_services_mode'] == 1)
 	)
 	->addRow(null)
@@ -77,9 +77,9 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Data storage period (in days)'), 'hk_audit'),
-		(new CNumericBox('hk_audit', $data['hk_audit'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Data storage period'), 'hk_audit'),
+		(new CTextBox('hk_audit', $data['hk_audit']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_audit_mode'] == 1)
 	)
 	->addRow(null)
@@ -89,9 +89,9 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Data storage period (in days)'), 'hk_sessions'),
-		(new CNumericBox('hk_sessions', $data['hk_sessions'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Data storage period'), 'hk_sessions'),
+		(new CTextBox('hk_sessions', $data['hk_sessions']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_sessions_mode'] == 1)
 	)
 	->addRow(null)
@@ -105,9 +105,9 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Data storage period (in days)'), 'hk_history'),
-		(new CNumericBox('hk_history', $data['hk_history'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Data storage period'), 'hk_history'),
+		(new CTextBox('hk_history', $data['hk_history']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
 	)
 	->addRow(null)
@@ -121,9 +121,9 @@ $houseKeeperTab = (new CFormList())
 		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Data storage period (in days)'), 'hk_trends'),
-		(new CNumericBox('hk_trends', $data['hk_trends'], 5))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		new CLabel(_('Data storage period'), 'hk_trends'),
+		(new CTextBox('hk_trends', $data['hk_trends']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_trends_global'] == 1)
 	);
 

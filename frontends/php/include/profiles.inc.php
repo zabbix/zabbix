@@ -44,6 +44,42 @@ function setHostGroupInternal($groupid, $internal) {
 	);
 }
 
+/**
+ * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
+ * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
+ * If the value is incorrect, set an error.
+ *
+ * @param CSimpleIntervalParser     $simple_interval_parser		Simple interval parser class.
+ * @param string                    $value						Value to parse and validate.
+ * @param int                       $min						Lowed bound.
+ * @param int                       $max						Upper bound.
+ * @param bool                      $allow_zero					Set to "true" to allow value to be zero.
+ * @param string                    $error						Untranslated error message
+ * @return boolean
+ */
+function validateTimeUnitConfig(CSimpleIntervalParser $simple_interval_parser, $value, $min, $max, $allow_zero,
+		$error) {
+	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+		$value = timeUnitToSeconds($value);
+
+		if ($allow_zero && $value == 0) {
+			return true;
+		}
+		elseif ($value < $min || $value > $max) {
+			error(_s($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
+
+			return false;
+		}
+	}
+	else {
+		error(_s($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
+
+		return false;
+	}
+
+	return true;
+}
+
 function update_config($config) {
 	$configOrig = select_config();
 
@@ -66,8 +102,71 @@ function update_config($config) {
 		));
 		if (!$userGroup) {
 			error(_('Incorrect user group.'));
+
 			return false;
 		}
+	}
+
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	if (array_key_exists('event_expire', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['event_expire'], SEC_PER_DAY, ZBX_MAX_DATE,
+				false, 'Invalid event expiry time: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_events_trigger', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_trigger'], SEC_PER_DAY, ZBX_MAX_DATE,
+				false, 'Invalid trigger data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_events_internal', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_internal'], SEC_PER_DAY,
+				ZBX_MAX_DATE, false, 'Invalid internal data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_events_discovery', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_discovery'], SEC_PER_DAY,
+				ZBX_MAX_DATE, false, 'Invalid network discovery data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_events_autoreg', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_autoreg'], SEC_PER_DAY, ZBX_MAX_DATE,
+				false, 'Invalid auto-registration data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_services', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_services'], SEC_PER_DAY, ZBX_MAX_DATE,
+				false, 'Invalid IT services data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_audit', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_audit'], SEC_PER_DAY, ZBX_MAX_DATE, false,
+				'Invalid audit data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_sessions', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_sessions'], SEC_PER_DAY, ZBX_MAX_DATE,
+				false, 'Invalid user sessions data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_history', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_history'], SEC_PER_HOUR, ZBX_MAX_DATE, true,
+				'Invalid history data storage period: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('hk_trends', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_history'], SEC_PER_DAY, ZBX_MAX_DATE, true,
+				'Invalid trends data storage period: %1$s')) {
+		return false;
 	}
 
 	$updateSeverity = false;
@@ -120,37 +219,37 @@ function update_config($config) {
 	if ($result) {
 		$msg = [];
 		if (array_key_exists('hk_events_trigger', $config)) {
-			$msg[] = _s('Trigger event and alert data storage period (in days) "%1$s".', $config['hk_events_trigger']);
+			$msg[] = _s('Trigger event and alert data storage period "%1$s".', $config['hk_events_trigger']);
 		}
 		if (array_key_exists('hk_events_internal', $config)) {
-			$msg[] = _s('Internal event and alert data storage period (in days) "%1$s".',
+			$msg[] = _s('Internal event and alert data storage period "%1$s".',
 				$config['hk_events_internal']
 			);
 		}
 		if (array_key_exists('hk_events_discovery', $config)) {
-			$msg[] = _s('Network discovery event and alert data storage period (in days) "%1$s".',
+			$msg[] = _s('Network discovery event and alert data storage period "%1$s".',
 				$config['hk_events_discovery']
 			);
 		}
 		if (array_key_exists('hk_events_autoreg', $config)) {
-			$msg[] = _s('Auto-registration event and alert data storage period (in days) "%1$s".',
+			$msg[] = _s('Auto-registration event and alert data storage period "%1$s".',
 				$config['hk_events_autoreg']
 			);
 		}
 		if (array_key_exists('hk_services', $config)) {
-			$msg[] = _s('IT service data storage period (in days) "%1$s".', $config['hk_services']);
+			$msg[] = _s('IT service data storage period "%1$s".', $config['hk_services']);
 		}
 		if (array_key_exists('hk_audit', $config)) {
-			$msg[] = _s('Audit data storage period (in days) "%1$s".', $config['hk_audit']);
+			$msg[] = _s('Audit data storage period "%1$s".', $config['hk_audit']);
 		}
 		if (array_key_exists('hk_sessions', $config)) {
-			$msg[] = _s('User session data storage period (in days) "%1$s".', $config['hk_sessions']);
+			$msg[] = _s('User session data storage period "%1$s".', $config['hk_sessions']);
 		}
 		if (array_key_exists('hk_history', $config)) {
-			$msg[] = _s('History data storage period (in days) "%1$s".', $config['hk_history']);
+			$msg[] = _s('History data storage period "%1$s".', $config['hk_history']);
 		}
 		if (array_key_exists('hk_trends', $config)) {
-			$msg[] = _s('Trend data storage period (in days) "%1$s".', $config['hk_trends']);
+			$msg[] = _s('Trend data storage period "%1$s".', $config['hk_trends']);
 		}
 		if (array_key_exists('work_period', $config)) {
 			$msg[] = _s('Working time "%1$s".', $config['work_period']);
@@ -162,7 +261,7 @@ function update_config($config) {
 			$msg[] = _s('Event acknowledges "%1$s".', $config['event_ack_enable']);
 		}
 		if (array_key_exists('event_expire', $config)) {
-			$msg[] = _s('Show events not older than (in days) "%1$s".', $config['event_expire']);
+			$msg[] = _s('Show events not older than "%1$s".', $config['event_expire']);
 		}
 		if (array_key_exists('event_show_max', $config)) {
 			$msg[] = _s('Show events max "%1$s".', $config['event_show_max']);
@@ -180,7 +279,7 @@ function update_config($config) {
 			$msg[] = _s('Zabbix server is running check interval "%1$s".', $config['server_check_interval']);
 		}
 		if (array_key_exists('refresh_unsupported', $config)) {
-			$msg[] = _s('Refresh unsupported items (in sec) "%1$s".', $config['refresh_unsupported']);
+			$msg[] = _s('Refresh unsupported items "%1$s".', $config['refresh_unsupported']);
 		}
 		if (array_key_exists('discovery_groupid', $config)) {
 			$msg[] = _s('Group for discovered hosts "%1$s".', $hostGroups[0]['name']);
