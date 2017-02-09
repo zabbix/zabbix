@@ -812,6 +812,9 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
 
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+
 	if (SUCCEED != ipc_client_read(client))
 		ipc_client_free_events(client);
 
@@ -828,6 +831,9 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
+
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
 
 	if (SUCCEED != ipc_client_write(client))
 	{
@@ -969,6 +975,9 @@ static void	ipc_service_client_connected_cb(evutil_socket_t fd, short what, void
 {
 	zbx_ipc_service_t	*service = (zbx_ipc_service_t *)arg;
 
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+
 	ipc_service_accept(service);
 }
 
@@ -981,6 +990,9 @@ static void	ipc_service_client_connected_cb(evutil_socket_t fd, short what, void
  ******************************************************************************/
 static void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
 {
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+	ZBX_UNUSED(arg);
 }
 
 /*

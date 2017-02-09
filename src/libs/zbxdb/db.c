@@ -303,6 +303,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*p, *path = NULL;
 #endif
 
+#ifndef HAVE_MYSQL
+	ZBX_UNUSED(dbsocket);
+#endif
 	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
 	if (0 != txn_level)
 		txn_error = 1;

@@ -44,7 +44,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host availability data from active proxy at \"%s\": %s",
 				sock->peer, error);

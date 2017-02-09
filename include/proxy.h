@@ -33,8 +33,7 @@
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
 
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, const zbx_socket_t *sock, DC_PROXY *proxy,
-		char **error);
+int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req);
 

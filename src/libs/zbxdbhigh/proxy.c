@@ -285,7 +285,6 @@ int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, ch
  *                                                                            *
  * Parameters:                                                                *
  *     jp      - [IN] JSON with the proxy name                                *
- *     sock    - [IN] connection socket context                               *
  *     proxy   - [OUT] the proxy data                                         *
  *     error   - [OUT] error message                                          *
  *                                                                            *
@@ -295,8 +294,7 @@ int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, ch
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, const zbx_socket_t *sock, DC_PROXY *proxy,
-		char **error)
+int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
 	char	*ch_error, host[HOST_HOST_LEN_MAX];
 
@@ -2870,6 +2868,9 @@ out:
 static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_uint64_t	*proxyid = (zbx_uint64_t *)args;
+
+	ZBX_UNUSED(sock);
+	ZBX_UNUSED(error);
 
 	/* don't process item if its host was assigned to another proxy */
 	if (item->host.proxy_hostid != *proxyid)
