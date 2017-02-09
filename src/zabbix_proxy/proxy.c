@@ -744,7 +744,7 @@ static void	zbx_free_config(void)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch, *error = NULL;
+	char		ch;
 	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
@@ -821,13 +821,18 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+#ifdef HAVE_IPCSERVICE
 	{
-		zbx_error("Cannot initialize IPC services: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
+		char	*error = NULL;
 
+		if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+		{
+			zbx_error("Cannot initialize IPC services: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -1099,7 +1104,9 @@ void	zbx_on_exit(void)
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
+#ifdef HAVE_IPCSERVICE
 	zbx_ipc_service_free_env();
+#endif
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 	free_database_cache();
