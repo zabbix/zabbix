@@ -5,6 +5,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+........S. [ZBX-11740] fixed empty value handling in event correlation on oracle databases (wiper)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ........S. [ZBX-11703] removed possibility to execute commit without transaction in processing LLD rules (Sergejs)
 ........S. [ZBX-11705] fixed event correlation when using databases other than mysql (wiper)
