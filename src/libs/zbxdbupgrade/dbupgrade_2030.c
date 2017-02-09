@@ -485,8 +485,7 @@ static int	DBpatch_2030045(void)
 	return FAIL;
 }
 
-static int	dm_rename_slave_data(const char *table_name, const char *key_name, const char *field_name,
-		int field_length)
+static int	dm_rename_slave_data(const char *table_name, const char *key_name, const char *field_name)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -533,7 +532,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 		else
 			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "{$N%d_%s", nodeid, row[1] + 2);
 
-		name_esc = DBdyn_escape_string_len(name, field_length);
+		name_esc = DBdyn_escape_field(table_name, field_name, name);
 
 		if (ZBX_DB_OK > DBexecute("update %s set %s='%s' where %s=" ZBX_FS_UI64,
 				table_name, field_name, name_esc, key_name, id))
@@ -576,97 +575,97 @@ static int	check_data_uniqueness(const char *table_name, const char *field_name)
 
 static int	DBpatch_2030046(void)
 {
-	return dm_rename_slave_data("actions", "actionid", "name", 255);
+	return dm_rename_slave_data("actions", "actionid", "name");
 }
 
 static int	DBpatch_2030047(void)
 {
-	return dm_rename_slave_data("drules", "druleid", "name", 255);
+	return dm_rename_slave_data("drules", "druleid", "name");
 }
 
 static int	DBpatch_2030048(void)
 {
-	return dm_rename_slave_data("globalmacro", "globalmacroid", "macro", 64);
+	return dm_rename_slave_data("globalmacro", "globalmacroid", "macro");
 }
 
 static int	DBpatch_2030049(void)
 {
-	return dm_rename_slave_data("groups", "groupid", "name", 64);
+	return dm_rename_slave_data("groups", "groupid", "name");
 }
 
 static int	DBpatch_2030050(void)
 {
-	return dm_rename_slave_data("hosts", "hostid", "host", 64);
+	return dm_rename_slave_data("hosts", "hostid", "host");
 }
 
 static int	DBpatch_2030051(void)
 {
-	return dm_rename_slave_data("hosts", "hostid", "name", 64);
+	return dm_rename_slave_data("hosts", "hostid", "name");
 }
 
 static int	DBpatch_2030052(void)
 {
-	return dm_rename_slave_data("icon_map", "iconmapid", "name", 64);
+	return dm_rename_slave_data("icon_map", "iconmapid", "name");
 }
 
 static int	DBpatch_2030053(void)
 {
-	return dm_rename_slave_data("images", "imageid", "name", 64);
+	return dm_rename_slave_data("images", "imageid", "name");
 }
 
 static int	DBpatch_2030054(void)
 {
-	return dm_rename_slave_data("maintenances", "maintenanceid", "name", 128);
+	return dm_rename_slave_data("maintenances", "maintenanceid", "name");
 }
 
 static int	DBpatch_2030055(void)
 {
-	return dm_rename_slave_data("media_type", "mediatypeid", "description", 100);
+	return dm_rename_slave_data("media_type", "mediatypeid", "description");
 }
 
 static int	DBpatch_2030056(void)
 {
-	return dm_rename_slave_data("regexps", "regexpid", "name", 128);
+	return dm_rename_slave_data("regexps", "regexpid", "name");
 }
 
 static int	DBpatch_2030057(void)
 {
-	return dm_rename_slave_data("screens", "screenid", "name", 255);
+	return dm_rename_slave_data("screens", "screenid", "name");
 }
 
 static int	DBpatch_2030058(void)
 {
-	return dm_rename_slave_data("scripts", "scriptid", "name", 255);
+	return dm_rename_slave_data("scripts", "scriptid", "name");
 }
 
 static int	DBpatch_2030059(void)
 {
-	return dm_rename_slave_data("services", "serviceid", "name", 128);
+	return dm_rename_slave_data("services", "serviceid", "name");
 }
 
 static int	DBpatch_2030060(void)
 {
-	return dm_rename_slave_data("slideshows", "slideshowid", "name", 255);
+	return dm_rename_slave_data("slideshows", "slideshowid", "name");
 }
 
 static int	DBpatch_2030061(void)
 {
-	return dm_rename_slave_data("sysmaps", "sysmapid", "name", 128);
+	return dm_rename_slave_data("sysmaps", "sysmapid", "name");
 }
 
 static int	DBpatch_2030062(void)
 {
-	return dm_rename_slave_data("usrgrp", "usrgrpid", "name", 64);
+	return dm_rename_slave_data("usrgrp", "usrgrpid", "name");
 }
 
 static int	DBpatch_2030063(void)
 {
-	return dm_rename_slave_data("users", "userid", "alias", 100);
+	return dm_rename_slave_data("users", "userid", "alias");
 }
 
 static int	DBpatch_2030064(void)
 {
-	return dm_rename_slave_data("valuemaps", "valuemapid", "name", 64);
+	return dm_rename_slave_data("valuemaps", "valuemapid", "name");
 }
 
 static int	DBpatch_2030065(void)
