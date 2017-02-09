@@ -33,8 +33,7 @@
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
 
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, const zbx_socket_t *sock, DC_PROXY *proxy,
-		char **error);
+int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req);
 
@@ -63,7 +62,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 
 int	proxy_get_history_count(void);
 
-int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp);
+int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp);
 
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);

@@ -103,13 +103,13 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "recv_proxyhistory";
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	int		ret = FAIL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse history data from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -128,7 +128,7 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+				proxy.host, sock->peer, error);
 		goto out;
 	}
 
@@ -150,7 +150,7 @@ out:
  * Comments: 'history data' request is deprecated starting with Zabbix v3.4   *
  *                                                                            *
  ******************************************************************************/
-static void	send_proxyhistory(zbx_socket_t *sock, zbx_timespec_t *ts)
+static void	send_proxyhistory(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_proxyhistory";
 
@@ -185,7 +185,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse heartbeat from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -571,7 +571,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_proxyhistory(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_proxyhistory(sock, ts);
+					send_proxyhistory(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 			{
