@@ -162,18 +162,18 @@ $userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], n
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked(isset($this->data['autologout']));
 if (isset($this->data['autologout'])) {
-	$autologoutTextBox = (new CNumericBox('autologout', $this->data['autologout'], 4))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+	$autologoutTextBox = (new CTextBox('autologout', $this->data['autologout']))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 }
 else {
-	$autologoutTextBox = (new CNumericBox('autologout', 900, 4))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	$autologoutTextBox = (new CTextBox('autologout', ZBX_USER_AUTOLOGOUT_DEFAULT))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		->setAttribute('disabled', 'disabled');
 }
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
 	$userFormList->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($this->data['autologin']));
-	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [
+	$userFormList->addRow(_('Auto-logout'), [
 		$autologoutCheckBox,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$autologoutTextBox
@@ -181,8 +181,8 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow(_('Refresh (in seconds)'),
-		(new CNumericBox('refresh', $this->data['refresh'], 4))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->addRow(_('Refresh'),
+		(new CTextBox('refresh', $data['refresh']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
 	->addRow(_('Rows per page'),
 		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))

@@ -1096,6 +1096,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/expression',
 				'@^[a-z$'
 			],
+			[
+				['type' => API_TIME_UNIT],
+				'30mm',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			]
 		];
 	}
 

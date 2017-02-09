@@ -27,9 +27,7 @@ $page['file'] = 'adm.other.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
-	'refresh_unsupported' =>	[T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535), 'isset({update})',
-		_('Refresh unsupported items (in sec)')
-	],
+	'refresh_unsupported' =>	[T_ZBX_STR, O_OPT, null, null, 'isset({update})', _('Refresh unsupported items')],
 	'discovery_groupid' =>		[T_ZBX_INT, O_OPT, null, DB_ID, 'isset({update})',
 		_('Group for discovered hosts')
 	],

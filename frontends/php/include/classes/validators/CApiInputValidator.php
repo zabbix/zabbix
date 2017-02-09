@@ -107,6 +107,9 @@ class CApiInputValidator {
 
 			case API_REGEX:
 				return self::validateRegex($rule, $data, $path, $error);
+
+			case API_TIME_UNIT:
+				return self::validateTimeUnit($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -137,6 +140,7 @@ class CApiInputValidator {
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
+			case API_TIME_UNIT:
 			case API_REGEX:
 				return true;
 
@@ -710,6 +714,60 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_USER_MACRO
+	 * @param int    $rule['in']      (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTimeUnit($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		/*
+		 * It's possible to enter seconds as integers, but by default now we look for strings. For example: "30m".
+		 * Other rules like emptiness and invalid characters are validated by parsers.
+		 */
+		if (!is_int($data) && !is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a character string is expected'));
+			return false;
+		}
+
+		// The given input may be in seconds as interger or string. In order to parser accept the value, conver to string.
+		$data = (string) $data;
+
+		// In some places time units can be replaced with macros. Allow both checks.
+		$simple_interval_parser = new CSimpleIntervalParser();
+
+		if ($flags & API_USER_MACRO) {
+			$user_macro_parser = new CUserMacroParser();
+
+			if ($simple_interval_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				$data_ = timeUnitToSeconds($data);
+				return self::validateInt32($rule, $data_, $path, $error);
+			}
+			elseif ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
+				return false;
+			}
+		}
+		else {
+			if ($simple_interval_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				$data_ = timeUnitToSeconds($data);
+				return self::validateInt32($rule, $data_, $path, $error);
+			}
+			else {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
+				return false;
+			}
+		}
 	}
 
 	/**

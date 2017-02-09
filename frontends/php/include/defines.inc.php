@@ -705,6 +705,9 @@ define('USER_TYPE_ZABBIX_USER',		1);
 define('USER_TYPE_ZABBIX_ADMIN',	2);
 define('USER_TYPE_SUPER_ADMIN',		3);
 
+define('ZBX_USER_AUTOLOGOUT_DEFAULT', '15m');
+define('ZBX_USER_REFRESH_DEFAULT', '30s');
+
 define('ZBX_NOT_INTERNAL_GROUP',	0);
 define('ZBX_INTERNAL_GROUP',		1);
 
@@ -1019,6 +1022,7 @@ define('API_SCRIPT_NAME',	10);
 define('API_USER_MACRO',	11);
 define('API_TIME_PERIOD',	12);
 define('API_REGEX',			13);
+define('API_TIME_UNIT',		14);
 
 // flags
 define('API_REQUIRED',		0x01);

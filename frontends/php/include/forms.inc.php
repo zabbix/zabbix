@@ -69,7 +69,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 
 		$data['user_medias'] = $user['medias'];
 
-		if ($data['autologout'] > 0) {
+		if (timeUnitToSeconds($data['autologout']) > 0) {
 			$_REQUEST['autologout'] = $data['autologout'];
 		}
 	}
@@ -81,10 +81,10 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['password2']		= getRequest('password2', '');
 		$data['url']			= getRequest('url', '');
 		$data['autologin']		= getRequest('autologin', 0);
-		$data['autologout']		= getRequest('autologout', 900);
+		$data['autologout']		= getRequest('autologout', ZBX_USER_AUTOLOGOUT_DEFAULT);
 		$data['lang']			= getRequest('lang', 'en_gb');
 		$data['theme']			= getRequest('theme', THEME_DEFAULT);
-		$data['refresh']		= getRequest('refresh', 30);
+		$data['refresh']		= getRequest('refresh', ZBX_USER_REFRESH_DEFAULT);
 		$data['rows_per_page']	= getRequest('rows_per_page', 50);
 		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
 		$data['user_groups']	= getRequest('user_groups', []);
@@ -120,7 +120,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 
 	// set autologout
 	if ($data['autologin'] || !isset($data['autologout'])) {
-		$data['autologout'] = 0;
+		$data['autologout'] = '0s';
 	}
 
 	// set media types

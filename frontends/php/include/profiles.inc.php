@@ -169,6 +169,24 @@ function update_config($config) {
 		return false;
 	}
 
+	if (array_key_exists('ok_period', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['ok_period'], 0, SEC_PER_DAY, false,
+				'Invalid displaying of OK triggers: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('blink_period', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['blink_period'], 0, SEC_PER_DAY, false,
+				'Invalid blinking on trigger status change: %1$s')) {
+		return false;
+	}
+
+	if (array_key_exists('refresh_unsupported', $config)
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['refresh_unsupported'], 0, 65535, false,
+				'Invalid refresh of unsupported items: %1$s')) {
+		return false;
+	}
+
 	$updateSeverity = false;
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 		if (isset($config['severity_name_'.$i])) {
