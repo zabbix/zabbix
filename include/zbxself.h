@@ -67,7 +67,7 @@ int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
 
 #ifndef _WINDOWS
-void		init_selfmon_collector(void);
+int		init_selfmon_collector(char **error);
 void		free_selfmon_collector(void);
 void		update_selfmon_counter(unsigned char state);
 void		collect_selfmon_stats(void);

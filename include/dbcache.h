@@ -414,7 +414,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
 int	DCsync_history(int sync_type, int *sync_num);
-void	init_database_cache(void);
+int	init_database_cache(char **error);
 void	free_database_cache(void);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -445,7 +445,7 @@ void	*DCget_stats(int request);
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 void	DCsync_configuration(void);
-void	init_configuration_cache(void);
+int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 void	DCload_config(void);
 

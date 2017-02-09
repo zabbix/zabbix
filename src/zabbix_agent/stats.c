@@ -145,10 +145,10 @@ return_one:
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	init_collector_data()
+int	init_collector_data(char **error)
 {
 	const char	*__function_name = "init_collector_data";
-	int		cpu_count;
+	int		cpu_count, ret = FAIL;
 	size_t		sz, sz_cpu;
 #ifndef _WINDOWS
 	key_t		shm_key;
@@ -172,20 +172,20 @@ void	init_collector_data()
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for collector");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot create IPC key for collector");
+		goto out;
 	}
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz + sz_cpu)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for collector");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot allocate shared memory for collector");
+		goto out;
 	}
 
 	if ((void *)(-1) == (collector = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
+		goto out;
 	}
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)((char *)collector + sz);
@@ -196,17 +196,18 @@ void	init_collector_data()
 	zbx_procstat_init();
 #endif
 
-	if (SUCCEED != zbx_mutex_create(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
-	{
-		zbx_error("cannot create mutex for disk statistics collector");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != zbx_mutex_create(&diskstats_lock, ZBX_MUTEX_DISKSTATS, error))
+		goto out;
 #endif
 
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************

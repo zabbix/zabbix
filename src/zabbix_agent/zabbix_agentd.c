@@ -865,6 +865,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
+	char		*error = NULL;
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
@@ -876,7 +877,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
-	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	{
+		zbx_error("cannot open log: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef HAVE_IPV6
 #	define IPV6_FEATURE_STATUS	"YES"
@@ -922,7 +928,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	init_collector_data();
+	if (SUCCEED != init_collector_data(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #ifdef _WINDOWS
 	init_perf_collector(1);

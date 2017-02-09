@@ -57,12 +57,12 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
+int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 {
 #ifdef _WINDOWS
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
-		zbx_error("error on mutex creating: %s", strerror_from_system(GetLastError()));
+		*error = zbx_dsprintf(*error, "error on mutex creating: %s", strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 #else
@@ -73,7 +73,7 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 
 		if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT, 0600)))
 		{
-			zbx_error("cannot create semaphore set: %s", zbx_strerror(errno));
+			*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
 			return FAIL;
 		}
 
@@ -85,10 +85,12 @@ int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 			if (-1 != semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 				continue;
 
-			zbx_error("cannot initialize semaphore: %s", zbx_strerror(errno));
+			*error = zbx_dsprintf(*error, "cannot initialize semaphore: %s", zbx_strerror(errno));
 
 			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 				zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
+
+			ZBX_SEM_LIST_ID = -1;
 
 			return FAIL;
 		}

@@ -2755,25 +2755,24 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
  * Purpose: initializes value cache                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_init(void)
+int	zbx_vc_init(char **error)
 {
 	const char	*__function_name = "zbx_vc_init";
 	zbx_uint64_t	size_reserved;
+	int		ret = FAIL;
 
 	if (0 == CONFIG_VALUE_CACHE_SIZE)
-		goto out;
+		return SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != zbx_mutex_create(&vc_lock, ZBX_MUTEX_VALUECACHE))
-	{
-		zbx_error("cannot create mutex for value cache");
-		exit(EXIT_FAILURE);
-	}
+	if (SUCCEED != zbx_mutex_create(&vc_lock, ZBX_MUTEX_VALUECACHE, error))
+		goto out;
 
 	size_reserved = zbx_mem_required_size(1, "value cache size", "ValueCacheSize");
 
-	zbx_mem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1);
+	if (SUCCEED != zbx_mem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1, error))
+		goto out;
 
 	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
 
@@ -2781,8 +2780,8 @@ void	zbx_vc_init(void)
 
 	if (NULL == vc_cache)
 	{
-		zbx_error("cannot allocate value cache header");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot allocate value cache header");
+		goto out;
 	}
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
@@ -2792,8 +2791,8 @@ void	zbx_vc_init(void)
 
 	if (NULL == vc_cache->items.slots)
 	{
-		zbx_error("cannot allocate value cache data storage");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot allocate value cache data storage");
+		goto out;
 	}
 
 	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE,
@@ -2802,16 +2801,20 @@ void	zbx_vc_init(void)
 
 	if (NULL == vc_cache->strpool.slots)
 	{
-		zbx_error("cannot allocate string pool for value cache data storage");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot allocate string pool for value cache data storage");
+		goto out;
 	}
 
 	/* the free space request should be 5% of cache size, but no more than 128KB */
 	vc_cache->min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
 	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
 		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
+
+	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************

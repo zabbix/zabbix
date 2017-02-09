@@ -269,18 +269,16 @@ void	zbx_handle_log(void)
 	unlock_log();
 }
 
-int	zabbix_open_log(int type, int level, const char *filename)
+int	zabbix_open_log(int type, int level, const char *filename, char **error)
 {
-	FILE	*log_file = NULL;
-#ifdef _WINDOWS
-	wchar_t	*wevent_source;
-#endif
 	log_type = type;
 	log_level = level;
 
 	if (LOG_TYPE_SYSTEM == type)
 	{
 #ifdef _WINDOWS
+		wchar_t	*wevent_source;
+
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
 		zbx_free(wevent_source);
@@ -290,22 +288,21 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	}
 	else if (LOG_TYPE_FILE == type)
 	{
+		FILE	*log_file = NULL;
+
 		if (MAX_STRING_LEN <= strlen(filename))
 		{
-			zbx_error("too long path for logfile");
-			exit(EXIT_FAILURE);
+			*error = zbx_strdup(*error, "too long path for logfile");
+			return FAIL;
 		}
 
-		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG))
-		{
-			zbx_error("unable to create mutex for log file");
-			exit(EXIT_FAILURE);
-		}
+		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
+			return FAIL;
 
 		if (NULL == (log_file = fopen(filename, "a+")))
 		{
-			zbx_error("unable to open log file [%s]: %s", filename, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename, zbx_strerror(errno));
+			return FAIL;
 		}
 
 		strscpy(log_filename, filename);
@@ -313,15 +310,20 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	}
 	else if (LOG_TYPE_CONSOLE == type)
 	{
-		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG))
+		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 		{
-			zbx_error("unable to create mutex for standard output");
-			exit(EXIT_FAILURE);
+			*error = zbx_strdup(*error, "unable to create mutex for standard output");
+			return FAIL;
 		}
 
 		fflush(stderr);
 		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "unknown log type");
+		return FAIL;
 	}
 
 	return SUCCEED;

@@ -60,7 +60,7 @@ extern int	CONFIG_LOG_FILE_SIZE;
 #	define zabbix_log __zbx_zabbix_log
 #endif
 
-int		zabbix_open_log(int type, int level, const char *filename);
+int		zabbix_open_log(int type, int level, const char *filename, char **error);
 void		zabbix_errlog(zbx_err_codes_t err, ...);
 void		__zbx_zabbix_log(int level, const char *fmt, ...);
 void		zabbix_close_log(void);

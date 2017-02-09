@@ -55,11 +55,8 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proj_id:%d size:" ZBX_FS_SIZE_T, __function_name, proj_id,
 			(zbx_fs_size_t)shm_size);
 
-	if (SUCCEED != zbx_mutex_create(&shm->lock, mutex))
-	{
-		*errmsg = zbx_strdup(*errmsg, "cannot create mutex");
+	if (SUCCEED != zbx_mutex_create(&shm->lock, mutex, errmsg))
 		goto out;
-	}
 
 	if (0 < shm_size)
 	{

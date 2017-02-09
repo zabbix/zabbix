@@ -57,7 +57,7 @@
 #define zbx_mutex_lock(mutex)			__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #define zbx_mutex_unlock(mutex)			__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 
-int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name);
+int	zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	zbx_mutex_destroy(ZBX_MUTEX *mutex);

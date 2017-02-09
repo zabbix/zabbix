@@ -536,50 +536,53 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom)
+int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
+		char **error)
 {
 	const char		*__function_name = "zbx_mem_create";
 
-	int			shm_id, index;
+	int			shm_id, index, ret = FAIL;
 	void			*base;
 
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s' param:'%s' size:" ZBX_FS_SIZE_T,
-			__function_name, descr, param, (zbx_fs_size_t)size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:'%s' size:" ZBX_FS_SIZE_T, __function_name, param,
+			(zbx_fs_size_t)size);
 
 	/* allocate shared memory */
 
 	if (4 != ZBX_PTR_SIZE && 8 != ZBX_PTR_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed assumption about pointer size (" ZBX_FS_SIZE_T " not in {4, 8})",
+		*error = zbx_dsprintf(*error, "failed assumption about pointer size (" ZBX_FS_SIZE_T " not in {4, 8})",
 				(zbx_fs_size_t)ZBX_PTR_SIZE);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
+		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
 				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (-1 == (shm_id = shmget(IPC_PRIVATE, size, 0600)))
 	{
-		zbx_error("cannot get private shared memory of size " ZBX_FS_SIZE_T " for %s: %s", (zbx_fs_size_t)size,
-				descr, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot get private shared memory of size " ZBX_FS_SIZE_T " for %s: %s",
+				(zbx_fs_size_t)size, descr, zbx_strerror(errno));
+		goto out;
 	}
 
 	if ((void *)(-1) == (base = shmat(shm_id, NULL, 0)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for %s: %s", descr, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot attach shared memory for %s: %s", descr, zbx_strerror(errno));
+		goto out;
 	}
 
 	if (-1 == shmctl(shm_id, IPC_RMID, NULL))
-		zabbix_log(LOG_LEVEL_CRIT, "cannot mark shared memory for destruction: %s", zbx_strerror(errno));
+		zbx_error("cannot mark shared memory %d for destruction: %s", shm_id, zbx_strerror(errno));
+
+	ret = SUCCEED;
 
 	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
 
@@ -627,7 +630,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr,
 			(char *)(*info)->lo_bound + MEM_SIZE_FIELD,
 			(char *)(*info)->hi_bound - MEM_SIZE_FIELD,
 			(zbx_fs_size_t)(*info)->total_size);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

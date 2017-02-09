@@ -30,7 +30,6 @@
 
 #define ZBX_IPC_COLLECTOR_ID		'l'
 #define ZBX_IPC_COLLECTOR_DISKSTAT	'm'
-#define ZBX_IPC_SELFMON_ID		'S'
 #define ZBX_IPC_COLLECTOR_PROC_ID	'p'
 
 key_t	zbx_ftok(char *path, int id);
