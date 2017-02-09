@@ -5365,7 +5365,7 @@ int	init_configuration_cache(char **error)
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, config_size, "configuration cache", "CacheSize", 0, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, &error)))
+	if (SUCCEED != (ret = zbx_strpool_create(strpool_size, error)))
 		goto out;
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
