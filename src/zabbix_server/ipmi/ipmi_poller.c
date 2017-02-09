@@ -47,7 +47,11 @@ extern int		server_num, process_num;
  ******************************************************************************/
 static void	ipmi_poller_register(zbx_ipc_socket_t *socket)
 {
-	zbx_ipc_socket_write(socket, ZBX_IPC_IPMI_REGISTER, NULL, 0);
+	pid_t	ppid;
+
+	ppid = getppid();
+
+	zbx_ipc_socket_write(socket, ZBX_IPC_IPMI_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
 
 /******************************************************************************

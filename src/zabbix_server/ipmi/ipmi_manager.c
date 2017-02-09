@@ -255,9 +255,8 @@ static zbx_ipmi_request_t	*ipmi_poller_pop_request(zbx_ipmi_poller_t *poller)
  ******************************************************************************/
 static void	ipmi_poller_push_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request_t *request)
 {
-	zbx_binary_heap_elem_t	el;
+	zbx_binary_heap_elem_t	el = {0, (void *)request};
 
-	el.data = (void *)request;
 	zbx_binary_heap_insert(&poller->requests, &el);
 }
 
@@ -452,23 +451,35 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
  *             client  - [IN] the connected IPMI poller                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client)
+static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "ipmi_manager_register_poller";
-	zbx_ipmi_poller_t	*poller;
+	zbx_ipmi_poller_t	*poller = NULL;
+	pid_t			ppid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (manager->next_poller_index == manager->pollers.values_num)
+	memcpy(&ppid, message->data, sizeof(ppid));
+
+	if (ppid != getppid())
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_ipc_client_close(client);
+		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
 	}
+	else
+	{
+		if (manager->next_poller_index == manager->pollers.values_num)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
 
-	poller = (zbx_ipmi_poller_t *)manager->pollers.values[manager->next_poller_index++];
-	poller->client = client;
+		poller = (zbx_ipmi_poller_t *)manager->pollers.values[manager->next_poller_index++];
+		poller->client = client;
 
-	zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(poller));
+		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(poller));
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -747,7 +758,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				init_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
-				dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, &result, &ts, state, NULL);
+				dc_add_history(itemid, 0, &result, &ts, state, NULL);
 				free_result(&result);
 			}
 			break;
@@ -756,7 +767,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case AGENT_ERROR:
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, value);
+			dc_add_history(itemid, 0, NULL, &ts, state, value);
 	}
 
 	dc_flush_history();
@@ -847,7 +858,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			int		errcode = CONFIG_ERROR;
 
 			zbx_timespec(&ts);
-			dc_add_history(items[i].itemid, ITEM_VALUE_TYPE_TEXT, 0, NULL, &ts, state, error);
+			dc_add_history(items[i].itemid, 0, NULL, &ts, state, error);
 			DCrequeue_items(&items[i].itemid, &state, &ts.sec, NULL, NULL, &errcode, 1);
 			zbx_free(error);
 			continue;
@@ -968,6 +979,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
+	time_now = time_stat;
 	time_idle = 0;
 	polled_num = 0;
 	scheduled_num = 0;
@@ -1012,21 +1024,18 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-		{
-			double	time_recv;
-
-			time_recv = zbx_time();
-			time_idle += time_recv - time_now;
-			time_now = time_recv;
-		}
+			time_idle += zbx_time() - time_now;
 
 		if (NULL != message)
 		{
 			switch (message->code)
 			{
 				case ZBX_IPC_IPMI_REGISTER:
-					poller = ipmi_manager_register_poller(&ipmi_manager, client);
-					ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
+					if (NULL != (poller = ipmi_manager_register_poller(&ipmi_manager, client,
+							message)))
+					{
+						ipmi_manager_process_poller_queue(&ipmi_manager, poller, now);
+					}
 					break;
 				case ZBX_IPC_IPMI_VALUE_RESULT:
 					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
