@@ -931,6 +931,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
  *             values     - [IN] array of string values                       *
  *             num        - [IN] number of elements in 'values' array         *
  *                                                                            *
+ * Comments: To support Oracle empty values are checked separately (is null   *
+ *           for Oracle and ='' for the other databases).                     *
+ *                                                                            *
  ******************************************************************************/
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
@@ -939,29 +942,59 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 	int	i, cnt = 0;
 	char	*value_esc;
+	int	values_num = 0, empty_num = 0;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	if (1 == num)
+	for (i = 0; i < num; i++)
 	{
-		value_esc = DBdyn_escape_string(values[0]);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
-		zbx_free(value_esc);
-
-		return;
+		if ('\0' == *values[i])
+			empty_num++;
+		else
+			values_num++;
 	}
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+	if (0 != empty_num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_SQL_STRCMP, fieldname, ZBX_SQL_STRVAL_EQ(""));
+
+		if (0 == values_num)
+			return;
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
+
+	if (1 == values_num)
+	{
+		for (i = 0; i < num; i++)
+		{
+			if ('\0' == *values[i])
+				continue;
+
+			value_esc = DBdyn_escape_string(values[i]);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
+			zbx_free(value_esc);
+		}
+
+		if (0 != empty_num)
+			zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+		return;
+	}
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 
 	for (i = 0; i < num; i++)
 	{
+		if ('\0' == *values[i])
+			continue;
+
 		if (MAX_EXPRESSIONS == cnt)
 		{
 			cnt = 0;
@@ -983,7 +1016,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 	(*sql_offset)--;
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < values_num || 0 != empty_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS

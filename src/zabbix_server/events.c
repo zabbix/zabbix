@@ -1032,8 +1032,8 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 	{
 		case CONDITION_OPERATOR_EQUAL:
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value='%s'", tag_esc,
-					value_esc);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value" ZBX_SQL_STRCMP,
+					tag_esc, ZBX_SQL_STRVAL_EQ(value_esc));
 			break;
 		case CONDITION_OPERATOR_LIKE:
 		case CONDITION_OPERATOR_NOT_LIKE:
