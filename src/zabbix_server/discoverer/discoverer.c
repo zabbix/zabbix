@@ -53,9 +53,9 @@ static void	proxy_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, co
 {
 	char	*ip_esc, *dns_esc, *value_esc;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	value_esc = DBdyn_escape_string_len(value, PROXY_DHISTORY_VALUE_LEN);
+	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
+	value_esc = DBdyn_escape_field("proxy_dhistory", "value", value);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,ip,dns,port,value,status)"
 			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,'%s',%d)",
@@ -79,8 +79,8 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
 {
 	char	*ip_esc, *dns_esc;
 
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,ip,dns,status)"
 			" values (%d," ZBX_FS_UI64 ",'%s','%s',%d)",

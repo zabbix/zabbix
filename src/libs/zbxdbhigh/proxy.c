@@ -2335,9 +2335,10 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
 			(NULL != value->value && 0 == strcmp(value->value, ZBX_NOTSUPPORTED)))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
+
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts,
-				item->state, value->value);
+		dc_add_history(item->itemid, item->flags, NULL, &value->ts, item->state, value->value);
 	}
 	else
 	{
@@ -2377,25 +2378,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			}
 			else
 				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
-
-			if (0 != value->meta)
-				set_result_meta(&result, value->lastlogsize, value->mtime);
-
-			item->state = ITEM_STATE_NORMAL;
-			dc_add_history(item->itemid, item->value_type, item->flags, &result, &value->ts,
-					item->state, NULL);
 		}
-		else if (ISSET_MSG(&result))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig,
-					result.msg);
 
-			item->state = ITEM_STATE_NOTSUPPORTED;
-			dc_add_history(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
-					result.msg);
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
+		if (0 != value->meta)
+			set_result_meta(&result, value->lastlogsize, value->mtime);
+
+		item->state = ITEM_STATE_NORMAL;
+		dc_add_history(item->itemid, item->flags, &result, &value->ts, item->state, NULL);
 
 		free_result(&result);
 	}
@@ -3533,7 +3522,7 @@ int	proxy_get_history_count(void)
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
+int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN], *pminor, *ptr;
 	int	version;
@@ -3561,6 +3550,7 @@ int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp)
 				ZBX_COMPONENT_VERSION_MINOR(version));
 
 		zbx_dc_update_proxy_version(proxy->hostid, version);
+		proxy->version = version;
 	}
 
 	return SUCCEED;

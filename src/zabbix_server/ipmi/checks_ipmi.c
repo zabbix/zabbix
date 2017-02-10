@@ -1460,9 +1460,10 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 			*value = zbx_dsprintf(*value, ZBX_FS_UI64, s->value.discrete);
 	}
 	if (NULL != c)
-		*value = zbx_dsprintf(*value, ZBX_FS_DBL, c->val[0]);
+		*value = zbx_dsprintf(*value, "%d", c->val[0]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s", __function_name, zbx_result_string(h->ret),
+			ZBX_NULL2EMPTY_STR(*value));
 
 	return h->ret;
 }

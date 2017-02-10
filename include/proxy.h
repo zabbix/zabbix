@@ -62,7 +62,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 
 int	proxy_get_history_count(void);
 
-int	zbx_proxy_update_version(const DC_PROXY *proxy, struct zbx_json_parse *jp);
+int	zbx_proxy_update_version(DC_PROXY *proxy, struct zbx_json_parse *jp);
 
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);

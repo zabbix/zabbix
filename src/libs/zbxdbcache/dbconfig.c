@@ -4398,7 +4398,7 @@ static void	DCsync_item_preproc(DB_RESULT result)
 	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
 	int			found;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	ZBX_DC_ITEM		*item = NULL;
 	zbx_dc_item_preproc_t	*preproc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4409,7 +4409,13 @@ static void	DCsync_item_preproc(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		if (itemid != lastitemid && NULL == (item = zbx_hashset_search(&config->items, &itemid)))
+		if (itemid != lastitemid)
+		{
+			lastitemid = itemid;
+			item = zbx_hashset_search(&config->items, &itemid);
+		}
+
+		if (NULL == item)
 			continue;
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -4422,8 +4428,6 @@ static void	DCsync_item_preproc(DB_RESULT result)
 
 		/* cleared in DCsync_items() */
 		zbx_vector_ptr_append(&item->preproc_ops, preproc);
-
-		lastitemid = itemid;
 	}
 
 	/* remove deleted correlation operations */

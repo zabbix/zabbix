@@ -244,6 +244,42 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: proxy_check_error_response                                       *
+ *                                                                            *
+ * Purpose: checks proxy response for error message                           *
+ *                                                                            *
+ * Parameters: jp    - [IN] the json data received form proxy                 *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - proxy response doesn't have error message          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **error)
+{
+	char	response[MAX_STRING_LEN], *info = NULL;
+	size_t	info_alloc = 0;
+
+	/* response tag will be set only in the case of errors */
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response)))
+		return SUCCEED;
+
+	if (0 != strcmp(response, ZBX_PROTO_VALUE_FAILED))
+		return SUCCEED;
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+	{
+		zbx_free(*error);
+		*error = info;
+	}
+	else
+		*error = zbx_strdup(*error, "Unknown error");
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: proxy_get_host_availability                                      *
  *                                                                            *
  * Purpose: gets host availability data from proxy                            *
@@ -275,6 +311,15 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
 				" %s", proxy->host, proxy->addr, zbx_json_strerror());
+		goto out;
+	}
+
+	zbx_proxy_update_version(proxy, &jp);
+
+	if (SUCCEED != proxy_check_error_response(&jp, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+				" %s", proxy->host, proxy->addr, error);
 		goto out;
 	}
 
@@ -327,6 +372,15 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" history data: %s", proxy->host, proxy->addr, zbx_json_strerror());
+			break;
+		}
+
+		zbx_proxy_update_version(proxy, &jp);
+
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
 
@@ -391,6 +445,15 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 			break;
 		}
 
+		zbx_proxy_update_version(proxy, &jp);
+
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+					" %s", proxy->host, proxy->addr, error);
+			break;
+		}
+
 		if (SUCCEED != process_discovery_data(&jp, &ts, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
@@ -449,6 +512,15 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 					" auto registration data: %s", proxy->host, proxy->addr,
 					zbx_json_strerror());
+			break;
+		}
+
+		zbx_proxy_update_version(proxy, &jp);
+
+		if (SUCCEED != proxy_check_error_response(&jp, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
+					" %s", proxy->host, proxy->addr, error);
 			break;
 		}
 

@@ -38,7 +38,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_host_availability";
 
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	int		ret = FAIL;
 	DC_PROXY	proxy;
 
@@ -63,7 +63,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = process_host_availability(jp, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data from proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+				proxy.host, sock->peer, error);
 	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);

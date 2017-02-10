@@ -5,15 +5,17 @@
 #include <sys/stat.h>
 #include <sys/un.h>
 #include <sys/ioctl.h>
-#include <event.h>
 
 #include "common.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"
 
-#include "zbxipcservice.h"
+#ifdef HAVE_IPCSERVICE
 
+#include <event.h>
+
+#include "zbxipcservice.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
 
@@ -24,6 +26,8 @@ static size_t	ipc_path_root_len = 0;
 
 #define ZBX_IPC_CLIENT_STATE_NONE	0
 #define ZBX_IPC_CLIENT_STATE_QUEUED	1
+
+extern unsigned char	program_type;
 
 struct zbx_ipc_client
 {
@@ -98,6 +102,11 @@ static const char	*ipc_get_path()
 #define ZBX_IPC_SOCKET_PREFIX	"/zabbix_"
 #define ZBX_IPC_SOCKET_SUFFIX	".sock"
 
+#define ZBX_IPC_CLASS_PREFIX_NONE	""
+#define ZBX_IPC_CLASS_PREFIX_SERVER	"server_"
+#define ZBX_IPC_CLASS_PREFIX_PROXY	"proxy_"
+#define ZBX_IPC_CLASS_PREFIX_AGENT	"agent_"
+
 /******************************************************************************
  *                                                                            *
  * Function: ipc_make_path                                                    *
@@ -113,18 +122,44 @@ static const char	*ipc_get_path()
 static const char	*ipc_make_path(const char *service_name)
 {
 	int	path_len, offset;
+	char	*prefix;
+	size_t	prefix_len;
+
 
 	path_len = strlen(service_name);
 
+	switch (program_type)
+	{
+		case ZBX_PROGRAM_TYPE_SERVER:
+			prefix = ZBX_IPC_CLASS_PREFIX_SERVER;
+			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_SERVER);
+			break;
+		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
+			prefix = ZBX_IPC_CLASS_PREFIX_PROXY;
+			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_PROXY);
+			break;
+		case ZBX_PROGRAM_TYPE_AGENTD:
+			prefix = ZBX_IPC_CLASS_PREFIX_AGENT;
+			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_AGENT);
+			break;
+		default:
+			prefix = ZBX_IPC_CLASS_PREFIX_NONE;
+			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE);
+			break;
+	}
+
 	if (ZBX_IPC_PATH_MAX < ipc_path_root_len + path_len + 1 + ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX) +
-			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX))
+			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + prefix_len)
 	{
 		return NULL;
 	}
 
 	offset = ipc_path_root_len;
-	memcpy(ipc_path + ipc_path_root_len , ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
+	memcpy(ipc_path + offset , ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
 	offset += ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX);
+	memcpy(ipc_path + offset, prefix, prefix_len);
+	offset += prefix_len;
 	memcpy(ipc_path + offset, service_name, path_len);
 	offset += path_len;
 	memcpy(ipc_path + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
@@ -692,11 +727,8 @@ static zbx_ipc_client_t	*ipc_service_pop_client(zbx_ipc_service_t *service)
 {
 	zbx_ipc_client_t	*client;
 
-	if (0 == zbx_queue_ptr_values_num(&service->clients_recv))
-		return NULL;
-
-	client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv);
-	client->state = ZBX_IPC_CLIENT_STATE_NONE;
+	if (NULL != (client = (zbx_ipc_client_t *)zbx_queue_ptr_pop(&service->clients_recv)))
+		client->state = ZBX_IPC_CLIENT_STATE_NONE;
 
 	return client;
 }
@@ -740,15 +772,27 @@ static void	ipc_service_push_client(zbx_ipc_service_t *service, zbx_ipc_client_t
 static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 {
 	const char		*__function_name = "ipc_service_add_client";
-	zbx_ipc_client_t	*client;
 	static zbx_uint64_t	next_clientid = 1;
+	zbx_ipc_client_t	*client;
+	int			flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(client, 0, sizeof(zbx_ipc_client_t));
 
-	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+	if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot get IPC client socket flags");
+		exit(EXIT_FAILURE);
+	}
+
+	if (-1 == fcntl(fd, F_SETFL, flags | O_NONBLOCK))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set non-blocking mode for IPC client socket");
+		exit(EXIT_FAILURE);
+	}
+
 	client->csocket.fd = fd;
 	client->csocket.rx_buffer_bytes = 0;
 	client->csocket.rx_buffer_offset = 0;
@@ -993,6 +1037,29 @@ static void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(what);
 	ZBX_UNUSED(arg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_check_running_service                                        *
+ *                                                                            *
+ * Purpose: checks if an IPC service is already running                       *
+ *                                                                            *
+ * Parameters: service_name - [IN]                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	ipc_check_running_service(const char *service_name)
+{
+	zbx_ipc_socket_t	csocket;
+	int			ret;
+	char			*error = NULL;
+
+	if (SUCCEED == (ret = zbx_ipc_socket_open(&csocket, service_name, 0, &error)))
+		zbx_ipc_socket_close(&csocket);
+	else
+		zbx_free(error);
+
+	return ret;
 }
 
 /*
@@ -1325,7 +1392,6 @@ int	zbx_ipc_service_init_env(const char *path, char **error)
 
 	if (0 != access(path, W_OK | R_OK))
 	{
-		/* TODO: create service directory if necessary */
 		*error = zbx_dsprintf(*error, "Cannot access path \"%s\": %s.", path, zbx_strerror(errno));
 		goto out;
 	}
@@ -1363,6 +1429,7 @@ void	zbx_ipc_service_free_env()
 	ipc_service_free_libevent();
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_service_start                                            *
@@ -1383,8 +1450,11 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	struct sockaddr_un	addr;
 	const char		*socket_path;
 	int			ret = FAIL;
+	mode_t			mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service:%s", __function_name, service_name);
+
+	mode = umask(077);
 
 	if (NULL == (socket_path = ipc_make_path(service_name)))
 	{
@@ -1392,8 +1462,22 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 		goto out;
 	}
 
-	if (0 == access(socket_path, W_OK))
+	if (0 == access(socket_path, F_OK))
+	{
+		if (0 != access(socket_path, W_OK))
+		{
+			*error = zbx_dsprintf(*error, "The file \"%s\" is used by another process.", socket_path);
+			goto out;
+		}
+
+		if (SUCCEED == ipc_check_running_service(service_name))
+		{
+			*error = zbx_dsprintf(*error, "\"%s\" service is already running.", service_name);
+			goto out;
+		}
+
 		unlink(socket_path);
+	}
 
 	if (-1 == (service->fd = socket(AF_UNIX, SOCK_STREAM, 0)))
 	{
@@ -1403,8 +1487,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-
 	memcpy(addr.sun_path, socket_path, sizeof(addr.sun_path));
+
 	if (0 != bind(service->fd, (struct sockaddr*)&addr, sizeof(addr)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot bind socket to \"%s\": %s.", socket_path, zbx_strerror(errno));
@@ -1430,6 +1514,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	ret = SUCCEED;
 out:
+	umask(mode);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1627,13 +1713,13 @@ void	zbx_ipc_client_addref(zbx_ipc_client_t *client)
 void	zbx_ipc_client_release(zbx_ipc_client_t *client)
 {
 	if (0 == --client->refcount)
-	{
 		ipc_client_free(client);
-	}
 }
 
 int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 {
 	return (NULL == client->rx_event ? FAIL : SUCCEED);
 }
+
+#endif
 

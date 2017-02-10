@@ -1099,6 +1099,7 @@ have_ipv6="no"
 have_ssh2="no"
 have_tls="no"
 
+
 if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
 	have_ipv6="yes"
@@ -1348,8 +1349,18 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
-	
-	dnl Check for libevent
+fi
+
+dnl Check if Zabbix internal IPC services are used
+have_ipcservice="no"
+if test "x$have_ipmi" = "xyes"; then
+	have_ipcservice="yes"
+fi
+
+dnl Check for libevent, used by Zabbix IPC services
+if test "x$have_ipcservice" = "xyes"; then
+	AC_DEFINE([HAVE_IPCSERVICE], 1, [Define to 1 if Zabbix IPC services are used])
+
 	LIBEVENT_CHECK_CONFIG([no])
 	if test "x$found_libevent" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
@@ -1361,6 +1372,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 	
 	AC_SUBST(LIBEVENET_CFLAGS)
+
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]

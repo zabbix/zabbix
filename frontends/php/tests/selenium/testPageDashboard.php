@@ -116,7 +116,9 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
 		foreach ($FavouriteGraphs as $FavouriteGraph) {
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
 			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[2]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 		$this->zbxTestCheckFatalErrors();
@@ -143,7 +145,9 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.screenids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
 			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No screens added.');
 		$this->zbxTestCheckFatalErrors();
@@ -170,7 +174,9 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
 			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No maps added.');
 		$this->zbxTestCheckFatalErrors();
