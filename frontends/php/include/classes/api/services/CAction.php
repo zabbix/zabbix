@@ -863,10 +863,10 @@ class CAction extends CApiService {
 						}
 					}
 					if (isset($operation['opmessage_grp'])) {
-						foreach ($operation['opmessage_grp'] as $userGroup) {
+						foreach ($operation['opmessage_grp'] as $userGroupId) {
 							$opMessageGrpsToInsert[] = [
 								'operationid' => $operationId,
-								'usrgrpid' => $userGroup['usrgrpid']
+								'usrgrpid' => $userGroupId
 							];
 						}
 					}
