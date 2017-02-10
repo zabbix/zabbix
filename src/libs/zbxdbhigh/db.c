@@ -107,9 +107,14 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit(void)
+int	DBinit(char **error)
 {
-	zbx_db_init(CONFIG_DBNAME, db_schema);
+	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+}
+
+void	DBdeinit(void)
+{
+	zbx_db_deinit();
 }
 
 /******************************************************************************

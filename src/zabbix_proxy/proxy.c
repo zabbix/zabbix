@@ -952,7 +952,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	DBinit();
+	if (SUCCEED != DBinit(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
@@ -1132,9 +1137,7 @@ void	zbx_on_exit(void)
 	free_configuration_cache();
 	DBclose();
 
-#ifdef HAVE_SQLITE3
-	zbx_remove_sqlite3_mutex();
-#endif
+	DBdeinit();
 
 	/* free vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)

@@ -402,8 +402,10 @@ typedef struct
 }
 DB_ESCALATION;
 
+int	DBinit(char **error);
+void	DBdeinit(void);
+
 int	DBconnect(int flag);
-void	DBinit(void);
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE

@@ -656,25 +656,9 @@ out:
 	return ret;
 }
 
-#if defined(HAVE_SQLITE3)
-void	zbx_create_sqlite3_mutex(void)
+int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
 {
-	if (SUCCEED != zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3))
-	{
-		zbx_error("cannot create mutex for SQLite3");
-		exit(EXIT_FAILURE);
-	}
-}
-
-void	zbx_remove_sqlite3_mutex(void)
-{
-	zbx_mutex_destroy(&sqlite_access);
-}
-#endif	/* HAVE_SQLITE3 */
-
-void	zbx_db_init(const char *dbname, const char *const db_schema)
-{
-#if defined(HAVE_SQLITE3)
+#ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
 
 	if (0 != zbx_stat(dbname, &buf))
@@ -685,20 +669,33 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
-			exit(EXIT_FAILURE);
+			*error = zbx_strdup(*error, "cannot open database");
+			return FAIL;
 		}
 
-		zbx_create_sqlite3_mutex();
+		if (SUCCEED != zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error))
+			return FAIL;
 
 		zbx_db_execute("%s", db_schema);
 		zbx_db_close();
+		return SUCCEED;
 	}
-	else
-		zbx_create_sqlite3_mutex();
+
+	return zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error);
 #else	/* not HAVE_SQLITE3 */
 	ZBX_UNUSED(dbname);
 	ZBX_UNUSED(db_schema);
+	ZBX_UNUSED(error);
+
+	return SUCCEED;
 #endif	/* HAVE_SQLITE3 */
+}
+
+void	zbx_db_deinit(void)
+{
+#ifdef HAVE_SQLITE3
+	zbx_mutex_destroy(&sqlite_access);
+#endif
 }
 
 void	zbx_db_close(void)
@@ -1913,7 +1910,7 @@ int	zbx_db_is_null(const char *field)
 	return FAIL;
 }
 
-#if defined(HAVE_ORACLE)
+#ifdef HAVE_ORACLE
 static void	OCI_DBclean_result(DB_RESULT result)
 {
 	if (NULL == result)
@@ -2022,7 +2019,7 @@ void	DBfree_result(DB_RESULT result)
 #endif	/* HAVE_SQLITE3 */
 }
 
-#if defined(HAVE_IBM_DB2)
+#ifdef HAVE_IBM_DB2
 /* server status: SQL_CD_TRUE or SQL_CD_FALSE */
 static int	IBM_DB2server_status()
 {
@@ -2073,7 +2070,9 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 		}
 	}
 }
-#elif defined(HAVE_ORACLE)
+#endif
+
+#ifdef HAVE_ORACLE
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
 static ub4	OCI_DBserver_status()
 {
