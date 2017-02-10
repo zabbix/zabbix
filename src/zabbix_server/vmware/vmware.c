@@ -4409,6 +4409,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	}
 #undef STAT_INTERVAL
 #else
+	ZBX_UNUSED(args);
+	THIS_SHOULD_NEVER_HAPPEN;
 	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }

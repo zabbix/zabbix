@@ -606,8 +606,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 out:
 #elif defined(HAVE_SQLITE3)
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(user);
+	ZBX_UNUSED(password);
 	ZBX_UNUSED(dbschema);
-
+	ZBX_UNUSED(port);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
