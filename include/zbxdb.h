@@ -31,6 +31,16 @@
 typedef char	**DB_ROW;
 typedef struct zbx_db_result	*DB_RESULT;
 
+/* database field value */
+typedef union
+{
+	int		i32;
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_db_value_t;
+
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */
 #	define ZBX_SQL_MOD(x, y) #x "%%" #y
@@ -65,9 +75,28 @@ int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 
 #ifdef HAVE_ORACLE
+
+/* context for dynamic parameter binding */
+typedef struct
+{
+	/* the parameter position, starting with 0 */
+	int			position;
+	/* the parameter type (ZBX_TYPE_* ) */
+	unsigned char		type;
+	/* the maximum parameter size */
+	size_t			size_max;
+	/* the data to bind - array of rows, each row being an array of columns */
+	zbx_db_value_t		**rows;
+	/* custom data, depending on column type */
+	void			*data;
+}
+zbx_db_bind_context_t;
+
 int		zbx_db_statement_prepare(const char *sql);
-int		zbx_db_bind_parameter(int position, void *buffer, unsigned char type);
-int		zbx_db_statement_execute();
+int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsigned char type,
+				zbx_db_value_t **rows, int rows_num);
+void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
+int		zbx_db_statement_execute(int iters);
 #endif
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
