@@ -309,8 +309,10 @@ static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *index_name)
 {
+	ZBX_UNUSED(table_name);
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop index %s", index_name);
 #ifdef HAVE_MYSQL
+	ZBX_UNUSED(index_name);
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " on %s", table_name);
 #endif
 }
