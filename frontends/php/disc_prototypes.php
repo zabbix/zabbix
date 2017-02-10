@@ -581,7 +581,7 @@ else {
 			$item['history'] = timeUnitToSeconds($item['history']);
 		}
 
-		if (strpos($item['history'], '{') === false && $item['trends'] !== '') {
+		if (strpos($item['trends'], '{') === false && $item['trends'] !== '') {
 			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}

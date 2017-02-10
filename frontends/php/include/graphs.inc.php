@@ -178,6 +178,7 @@ function get_min_itemclock_by_graphid($graphid) {
  *
  * @param array $items
  * @param array $items[]['itemid']
+ * @param array $items[]['hostid']
  * @param array $items[]['value_type']
  * @param array $items[]['history']
  * @param array $items[]['trends']
@@ -195,10 +196,29 @@ function get_min_itemclock_by_itemid($items) {
 
 	$max = ['history' => 0, 'trends' => 0];
 
+	$simple_interval_parser = new CSimpleIntervalParser();
+
 	foreach ($items as $item) {
 		$item_types[$item['value_type']][] = $item['itemid'];
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$resolved_macros = CMacrosResolverHelper::resolveTimeUnitMacros([
+				$item['hostid'] => [
+					$item['history'],
+					$item['trends']
+				]
+			]);
+
+			list($item['history'], $item['trends']) = $resolved_macros[$item['hostid']];
+
+			if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+				$item['history'] = timeUnitToSeconds($item['history']);
+			}
+
+			if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+				$item['trends'] = timeUnitToSeconds($item['trends']);
+			}
+
 			$max['history'] = max($max['history'], (int) $item['history']);
 			$max['trends'] = max($max['trends'], (int) $item['trends']);
 		}

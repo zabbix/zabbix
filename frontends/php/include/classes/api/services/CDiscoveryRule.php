@@ -1077,8 +1077,8 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
 				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],

@@ -511,10 +511,10 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if (isset($item['lifetime']) && $item['lifetime'] != '') {
+		if (isset($item['lifetime']) && $item['lifetime'] !== '') {
 			$item['lifetime'] = ltrim($item['lifetime'], '0');
-			if ($item['lifetime'] == '') {
-				$item['lifetime'] = 0;
+			if ($item['lifetime'] === '' || in_array($item['lifetime'], str_split(ZBX_TIME_SUFFIXES))) {
+				$item['lifetime'] = '0s';
 			}
 		}
 

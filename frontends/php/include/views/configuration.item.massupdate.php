@@ -332,7 +332,9 @@ $itemFormList->addRow(
 
 $update_interval = (new CTable())
 	->setId('update_interval')
-	->addRow([_('Delay'), (new CDiv((new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))]);
+	->addRow([_('Delay'),
+		(new CDiv((new CTextBox('delay', $data['delay'], false, 1024))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
+	]);
 
 $custom_intervals = (new CTable())
 	->setId('custom_intervals')

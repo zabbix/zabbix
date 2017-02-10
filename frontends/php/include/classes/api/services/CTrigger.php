@@ -402,8 +402,10 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['only_true'])) {
 			$config = select_config();
 			$sqlParts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
-					' OR '.
-					'((t.value='.TRIGGER_VALUE_FALSE.') AND (t.lastchange>'.(time() - $config['ok_period']).')))';
+				' OR ((t.value='.TRIGGER_VALUE_FALSE.')'.
+					' AND (t.lastchange>'.(time() - timeUnitToSeconds($config['ok_period'])).
+				'))'.
+			')';
 		}
 
 		// min_severity

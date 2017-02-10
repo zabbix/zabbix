@@ -169,9 +169,64 @@ class CPieGraphDraw extends CGraphDraw {
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
-			// override item history setting with housekeeping settings
+			// Override item history setting with housekeeping settings, if they are enabled in config.
 			if ($config['hk_history_global']) {
-				$item['history'] = $config['hk_history'];
+				$item['history'] = timeUnitToSeconds($config['hk_history']);
+			}
+
+			if ($config['hk_trends_global']) {
+				$config['hk_trends'] = timeUnitToSeconds($config['hk_trends']);
+			}
+
+			// Otherwise, resolve user macro and parse the string. If successfull, convert to seconds.
+			if (!$config['hk_history_global'] || !$config['hk_trends_global']) {
+				$to_resolve = [$item['hostid'] => []];
+
+				if (!$config['hk_history_global']) {
+					$to_resolve[$item['hostid']][] = $item['history'];
+				}
+
+				if (!$config['hk_trends_global']) {
+					$to_resolve[$item['hostid']][] = $item['trends'];
+				}
+
+				$simple_interval_parser = new CSimpleIntervalParser();
+
+				$resolved_macros = CMacrosResolverHelper::resolveTimeUnitMacros($to_resolve);
+
+				if (count($to_resolve[$item['hostid']]) > 1) {
+					list($item['history'], $item['trends']) = $resolved_macros[$item['hostid']];
+				}
+				else {
+					if (!$config['hk_history_global']) {
+						$item['history'] = reset($resolved_macros[$item['hostid']]);
+					}
+					elseif (!$config['hk_trends_global']) {
+						$item['trends'] = reset($resolved_macros[$item['hostid']]);
+					}
+				}
+
+				if (!$config['hk_history_global']
+						&& $simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
+					show_error_message(_s('Incorrect value for field "%1$s": %2$s', 'history',
+						_('invalid history storage period')
+					));
+					exit;
+				}
+				else {
+					$item['history'] = timeUnitToSeconds($item['history']);
+				}
+
+				if (!$config['hk_history_global']
+						&& $simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
+					show_error_message(_s('Incorrect value for field "%1$s": %2$s', 'trends',
+						_('invalid trend storage period')
+					));
+					exit;
+				}
+				else {
+					$item['trends'] = timeUnitToSeconds($item['trends']);
+				}
 			}
 
 			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);

@@ -67,6 +67,7 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertItems(array $items) {
 		foreach ($items as &$item) {
+			// Item preprocessing.
 			$item['preprocessing'] = [];
 
 			if ($item['data_type'] != ITEM_DATA_TYPE_DECIMAL) {
@@ -101,6 +102,15 @@ class C32ImportConverter extends CConverter {
 			if (!$item['preprocessing']) {
 				unset($item['preprocessing']);
 			}
+
+			// Merge item delay_flex into delay separated by a semicolon.
+			if ($item['delay_flex'] !== '') {
+				$item['delay'] .= ';'.$item['delay_flex'];
+			}
+
+			// Convert to days.
+			$item['history'] .= 'd';
+			$item['trends'] .= 'd';
 		}
 		unset($item);
 
@@ -118,6 +128,14 @@ class C32ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule['item_prototypes'] =
 				$this->convertItems($discovery_rule['item_prototypes']);
+
+			// Merge item delay_flex into delay separated by a semicolon.
+			if ($discovery_rule['delay_flex'] !== '') {
+				$discovery_rule['delay'] .= ';'.$discovery_rule['delay_flex'];
+			}
+
+			// Convert to days.
+			$discovery_rule['lifetime'] .= 'd';
 		}
 		unset($discovery_rule);
 

@@ -164,7 +164,7 @@ function update_config($config) {
 	}
 
 	if (array_key_exists('hk_trends', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_history'], SEC_PER_DAY, ZBX_MAX_DATE, true,
+			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_trends'], SEC_PER_DAY, ZBX_MAX_DATE, true,
 				'Invalid trends data storage period: %1$s')) {
 		return false;
 	}

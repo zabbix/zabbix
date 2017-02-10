@@ -240,7 +240,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
 			'applicationid' => getRequest('applicationid'),
-			'delay' => getRequest('delay', '1m'),
+			'delay' => getRequest('delay', ZBX_HTTPTEST_DEFAULT_DELAY),
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),

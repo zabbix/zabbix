@@ -308,15 +308,16 @@ class CUser extends CApiService {
 			$db_user = $db_users[$user['userid']];
 
 			$upd_user = [];
+			$strings = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
+			$integers = ['autologin',  'type',  'rows_per_page'];
 
-			// strings
-			foreach (['alias', 'name', 'surname', 'passwd', 'url', 'lang', 'theme'] as $field_name) {
+			foreach ($strings as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
 			}
-			// integers
-			foreach (['autologin', 'autologout', 'type', 'refresh', 'rows_per_page'] as $field_name) {
+
+			foreach ($integers as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
@@ -573,15 +574,15 @@ class CUser extends CApiService {
 	/**
 	 * Additional check to exclude an opportunity to enable auto-login and auto-logout options together..
 	 *
-	 * @param array $user
-	 * @param int   $user[]['autologin']   (optional)
-	 * @param int   $user[]['autologout']  (optional)
+	 * @param array  $user
+	 * @param int    $user[]['autologin']   (optional)
+	 * @param string $user[]['autologout']  (optional)
 	 *
 	 * @throws APIException
 	 */
 	private function checkLoginOptions(array $user) {
 		if (!array_key_exists('autologout', $user) && array_key_exists('autologin', $user) && $user['autologin'] != 0) {
-			$user['autologout'] = 0;
+			$user['autologout'] = '0s';
 		}
 
 		if (!array_key_exists('autologin', $user) && array_key_exists('autologout', $user)
@@ -590,7 +591,7 @@ class CUser extends CApiService {
 		}
 
 		if (array_key_exists('autologin', $user) && array_key_exists('autologout', $user)
-				&& $user['autologin'] != 0 && $user['autologout'] != 0) {
+				&& $user['autologin'] != 0 && timeUnitToSeconds($user['autologout']) != 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_('Auto-login and auto-logout options cannot be enabled together.')
 			);
@@ -1502,8 +1503,10 @@ class CUser extends CApiService {
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
+		$autologout = timeUnitToSeconds($db_user['autologout']);
+
 		// Check system permissions.
-		if (($db_user['autologout'] != 0 && $db_session['lastaccess'] + $db_user['autologout'] <= $time)
+		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
 				|| $usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
 			DB::delete('sessions', [
 				'status' => ZBX_SESSION_PASSIVE,

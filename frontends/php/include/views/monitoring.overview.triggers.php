@@ -42,7 +42,8 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // blinking preview in help popup (only if blinking is enabled)
-if ($data['config']['blink_period'] > 0) {
+$blink_period = timeUnitToSeconds($data['config']['blink_period']);
+if ($blink_period > 0) {
 	$indic_container = (new CDiv())
 		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER)
 		->addItem(
@@ -60,8 +61,7 @@ if ($data['config']['blink_period'] > 0) {
 			);
 	}
 	$indic_container->addItem(
-		(new CTag('p', true, _s('Age less than %s', convertUnitsS($data['config']['blink_period']))))
-			->addClass(ZBX_STYLE_GREY)
+		(new CTag('p', true, _s('Age less than %s', convertUnitsS($blink_period))))->addClass(ZBX_STYLE_GREY)
 	);
 
 	$help_hint->addItem($indic_container);

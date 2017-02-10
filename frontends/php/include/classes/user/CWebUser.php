@@ -189,4 +189,13 @@ class CWebUser {
 	public static function isGuest() {
 		return (self::$data['alias'] == ZBX_GUEST_USER);
 	}
+
+	/**
+	 * Returns refresh rate in seconds.
+	 *
+	 * @return int
+	 */
+	public static function getRefresh() {
+		return timeUnitToSeconds(self::$data['refresh']);
+	}
 }

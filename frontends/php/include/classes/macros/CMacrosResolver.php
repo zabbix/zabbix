@@ -1520,6 +1520,54 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolve item delay macros, item history and item trend macros.
+	 *
+	 * @param array $data
+	 * @param array $data[<key>][<macro-n>]		Array of macros to resolve. Usually the key is a host ID.
+	 *
+	 * @return array
+	 */
+	public function resolveTimeUnitMacros(array $data) {
+		$usermacros = [];
+		$macro_values = [];
+
+		$types = [
+			'usermacros' => true
+		];
+
+		// Find macros.
+		foreach ($data as $key => $texts) {
+			$matched_macros = $this->extractMacros($texts, $types);
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = ['hostids' => [$key], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		$types = $this->transformToPositionTypes($types);
+
+		// Replace macros to value.
+		foreach (array_keys($macro_values) as $key) {
+			foreach ($data[$key] as &$text) {
+				$matched_macros = $this->getMacroPositions($text, $types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$text = substr_replace($text, $macro_values[$key][$macro], $pos, strlen($macro));
+				}
+			}
+			unset($text);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Resolve function parameter macros to "parameter_expanded" field.
 	 *
 	 * @param array  $functions

@@ -24,8 +24,8 @@
  */
 class CHttpTestManager {
 
-	const ITEM_HISTORY = 30;
-	const ITEM_TRENDS = 90;
+	const ITEM_HISTORY = '30d';
+	const ITEM_TRENDS = '90d';
 
 	/**
 	 * Changed steps names.

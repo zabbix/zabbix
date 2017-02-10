@@ -377,7 +377,7 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
-		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
+		'time_from' => time() - timeUnitToSeconds($config['event_expire']),
 		'time_till' => time(),
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN

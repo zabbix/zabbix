@@ -418,7 +418,7 @@ class CScreenBase {
 	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
-			'interval' => CWebUser::$data['refresh']
+			'interval' => CWebUser::getRefresh()
 		];
 
 		$parameters = $this->parameters;

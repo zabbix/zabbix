@@ -48,14 +48,18 @@ $fields = [
 		_('Update interval')
 	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})',
+		_('History storage period')
+	],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP]), 'isset({add}) || isset({update})'],
-	'trends' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update})) && isset({value_type}) && '.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Trend storage period')
+	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({value_type}) && '.
+			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+		_('Trend storage period')
 	],
 	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
 	'valuemapid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'(isset({add}) || isset({update})) && isset({value_type}) && '.
@@ -1578,7 +1582,7 @@ else {
 			$item['history'] = timeUnitToSeconds($item['history']);
 		}
 
-		if (strpos($item['history'], '{') === false && $item['trends'] !== '') {
+		if (strpos($item['trends'], '{') === false && $item['trends'] !== '') {
 			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}

@@ -242,7 +242,7 @@ foreach ($this->data['items'] as $item) {
 		(strpos($item['delay'], '{') === false && $item['delay'] !== '')
 			? convertUnitsS($item['delay'])
 			: $item['delay'],
-		(strpos($item['trends'], '{') === false) ? convertUnitsS($item['history']) : $item['history'],
+		(strpos($item['history'], '{') === false) ? convertUnitsS($item['history']) : $item['history'],
 		(strpos($item['trends'], '{') === false && $item['trends'] !== '')
 			? convertUnitsS($item['trends'])
 			: $item['trends'],

@@ -25,7 +25,7 @@
 class CTimePeriodsParser extends CParser {
 
 	private $time_period_parser;
-
+	private $periods = [];
 	private $options = ['user_macros' => true];
 
 	public function __construct($options = []) {
@@ -52,9 +52,11 @@ class CTimePeriodsParser extends CParser {
 		for (; isset($source[$p]); $p++) {
 			if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->time_period_parser->getLength();
+				$this->periods[] = $this->time_period_parser->getmatch();
 			}
 			elseif ($this->options['user_macros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->user_macro_parser->getLength();
+				$this->periods[] = $this->user_macro_parser->getmatch();
 			}
 
 			if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
@@ -69,5 +71,14 @@ class CTimePeriodsParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		return (isset($source[$p - 1]) && $source[$p - 1] === ';') ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Retrieve the time periods.
+	 *
+	 * @return array
+	 */
+	public function getPeriods() {
+		return $this->periods;
 	}
 }

@@ -159,10 +159,12 @@
  */
 $this->data['typeVisibility'] = [];
 $i = 0;
+
 foreach ($this->data['delay_flex'] as $delayFlex) {
 	if (!isset($delayFlex['delay']) && !isset($delayFlex['period'])) {
 		continue;
 	}
+
 	foreach ($this->data['types'] as $type => $label) {
 		if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_ZABBIX_ACTIVE || $type == ITEM_TYPE_SNMPTRAP) {
 			continue;
@@ -170,11 +172,10 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][delay]');
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][period]');
 	}
+
 	$i++;
-	if ($i == 7) {
-		break;
-	}
 }
+
 if (!empty($this->data['interfaces'])) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interfaceid');

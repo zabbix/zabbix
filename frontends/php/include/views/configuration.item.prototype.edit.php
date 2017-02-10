@@ -227,8 +227,8 @@ $itemFormList->addRow(_('Units'),
 	'row_units'
 );
 
-$itemFormList->addRow(_('Update interval'), (new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	'row_delay'
+$itemFormList->addRow(_('Update interval'),
+	(new CTextBox('delay', $data['delay'], false, 1024))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
 );
 
 // Append delay_flex to form list.

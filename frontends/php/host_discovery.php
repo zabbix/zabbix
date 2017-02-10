@@ -380,7 +380,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($formItem, [
 		'is_discovery_rule' => true
 	]);
-	$data['lifetime'] = getRequest('lifetime', 30);
+	$data['lifetime'] = getRequest('lifetime', ZBX_LLD_RULE_LIFETIME_DEFAULT);
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);

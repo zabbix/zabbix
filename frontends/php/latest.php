@@ -437,7 +437,33 @@ $tab_rows = [];
 
 $config = select_config();
 
-foreach ($items as $key => $item){
+// Safely convert history and trends to seconds since they don't contain macros.
+$config['hk_history'] = timeUnitToSeconds($config['hk_history']);
+$config['hk_trends'] = timeUnitToSeconds($config['hk_trends']);
+
+// Resolve delay, history and trend macros.
+$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+$simple_interval_parser = new CSimpleIntervalParser();
+
+foreach ($items as &$item) {
+	$resolved_macros = CMacrosResolverHelper::resolveTimeUnitMacros([
+		$item['hostid'] => [
+			$item['delay'],
+			$item['history'],
+			$item['trends']
+		]
+	]);
+
+	list($item['delay'], $item['history'], $item['trends']) = $resolved_macros[$item['hostid']];
+
+	if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$delay = $update_interval_parser->getDelay();
+		$item['delay'] = (strpos($delay, '{') === false) ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+	}
+}
+unset($item);
+
+foreach ($items as $key => $item) {
 	if (!$item['applications']) {
 		continue;
 	}
@@ -484,8 +510,22 @@ foreach ($items as $key => $item){
 		$change = UNKNOWN_VALUE;
 	}
 
-	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
-			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
+	$history = $item['history'];
+	if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
+		$history = timeUnitToSeconds($history);
+		$item['history'] = convertUnitsS($history);
+	}
+
+	$trends = $item['trends'];
+	if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
+		$trends = timeUnitToSeconds($trends);
+		$item['trends'] = convertUnitsS($trends);
+	}
+
+	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0)
+				|| (strpos($history, '{') === false && $history == 0))
+			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0)
+				|| (strpos($trends, '{') === false && $trends == 0))
 	);
 
 	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
@@ -519,7 +559,7 @@ foreach ($items as $key => $item){
 
 		// trend value
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
+			$trendValue = $config['hk_trends_global'] ? convertUnitsS($config['hk_trends']) : $item['trends'];
 		}
 		else {
 			$trendValue = UNKNOWN_VALUE;
@@ -535,7 +575,8 @@ foreach ($items as $key => $item){
 					? UNKNOWN_VALUE
 					: $item['delay']
 			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? convertUnitsS($config['hk_history']) : $item['history']))
+				->addClass($state_css),
 			(new CCol($trendValue))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
@@ -659,9 +700,23 @@ foreach ($items as $item) {
 		$change = UNKNOWN_VALUE;
 	}
 
+	$history = $item['history'];
+	if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
+		$history = timeUnitToSeconds($history);
+		$item['history'] = convertUnitsS($history);
+	}
+
+	$trends = $item['trends'];
+	if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
+		$trends = timeUnitToSeconds($trends);
+		$item['trends'] = convertUnitsS($trends);
+	}
+
 	// column "action"
-	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
-			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
+	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0)
+				|| (strpos($history, '{') === false && $history == 0))
+			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0)
+				|| (strpos($trends, '{') === false && $trends == 0))
 	);
 
 	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
@@ -696,7 +751,7 @@ foreach ($items as $item) {
 
 		// trend value
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
+			$trendValue = $config['hk_trends_global'] ? convertUnitsS($config['hk_trends']) : $item['trends'];
 		}
 		else {
 			$trendValue = UNKNOWN_VALUE;
@@ -712,7 +767,8 @@ foreach ($items as $item) {
 					? UNKNOWN_VALUE
 					: $item['delay']
 			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? convertUnitsS($config['hk_history']) : $item['history']))
+				->addClass($state_css),
 			(new CCol($trendValue))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),

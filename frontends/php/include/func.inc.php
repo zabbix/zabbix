@@ -1997,25 +1997,45 @@ function fatal_error($msg) {
 
 function parse_period($str) {
 	$out = null;
-	$str = trim($str, ';');
-	$periods = explode(';', $str);
+	$time_periods_parser = new CTimePeriodsParser();
+
+	if ($time_periods_parser->parse($str) == CParser::PARSE_SUCCESS) {
+		$periods = $time_periods_parser->getPeriods();
+
+		foreach ($periods as $key => &$period) {
+			if (strpos($period, '{') !== false) {
+				$period = CMacrosResolverHelper::resolveTimeUnitMacros([[$period]]);
+				$period = $period[0][0];
+
+				if ($time_periods_parser->parse($period) != CParser::PARSE_SUCCESS) {
+					unset($periods[$key]);
+					continue;
+				}
+			}
+		}
+	}
+	else {
+		return null;
+	}
+
 	foreach ($periods as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $arr)) {
+		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
 			return null;
 		}
 
-		for ($i = $arr[1]; $i <= $arr[2]; $i++) {
+		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
 			if (!isset($out[$i])) {
 				$out[$i] = [];
 			}
 			array_push($out[$i], [
-				'start_h' => $arr[3],
-				'start_m' => $arr[4],
-				'end_h' => $arr[5],
-				'end_m' => $arr[6]
+				'start_h' => $matches[3],
+				'start_m' => $matches[4],
+				'end_h' => $matches[5],
+				'end_m' => $matches[6]
 			]);
 		}
 	}
+
 	return $out;
 }
 

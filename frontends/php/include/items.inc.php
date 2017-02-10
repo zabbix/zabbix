@@ -296,8 +296,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-			'publickey', 'privatekey', 'flags', 'port', 'description', 'inventory_link'
+			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'port', 'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -364,8 +364,8 @@ function copyItems($srcHostId, $dstHostId) {
 		'output' => ['type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 			'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase',
-			'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'authtype', 'username', 'password',
-			'publickey', 'privatekey', 'flags', 'port',	'description', 'inventory_link'
+			'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'flags', 'port',	'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params'],
@@ -452,9 +452,9 @@ function get_item_by_itemid_limited($itemid) {
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
 			'i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.port,i.units,i.snmpv3_contextname,'.
 			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,'.
-			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,'.
-			'i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,'.
-			'i.description,i.inventory_link'.
+			'i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.trends,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,'.
+			'i.templateid,i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.description,'.
+			'i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
