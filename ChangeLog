@@ -1,7 +1,7 @@
 Changes for 3.2.4rc1
 
 New features:
-.......PS. [ZBXNEXT-3681] improved bulk inserts using Oracle database (wiper)
+.......PS. [ZBXNEXT-3681] improved bulk inserts for Oracle database backend (wiper)
 ........S. [ZBXNEXT-3669] optimized trigger expression batch processing to avoid recalculation of identical functions (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
@@ -325,7 +325,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.8rc1
 
 New features:
-.......PS. [ZBXNEXT-3681] improved bulk inserts using Oracle database (wiper)
+.......PS. [ZBXNEXT-3681] improved bulk inserts for Oracle database backend (wiper)
 ........S. [ZBXNEXT-3669] optimized trigger expression batch processing to avoid recalculation of identical functions (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
