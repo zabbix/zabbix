@@ -763,15 +763,17 @@ class testUrlUserPermissions extends CWebTest {
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
-				$this->zbxTestCheckHeader($data['header']);
 				$this->zbxTestCheckTitle($data['title']);
+				$this->zbxTestCheckHeader($data['header']);
 				$this->zbxTestCheckFatalErrors();
+				$this->webDriver->manage()->deleteAllcookies();
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestCheckTitle($data['title']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it does not exist!');
 				$this->zbxTestCheckFatalErrors();
+				$this->webDriver->manage()->deleteAllcookies();
 			}
 			else {
 				$this->zbxTestOpen($data['url']);
@@ -779,6 +781,7 @@ class testUrlUserPermissions extends CWebTest {
 				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no permissions to access this page.');
 				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 				$this->zbxTestCheckFatalErrors();
+				$this->webDriver->manage()->deleteAllcookies();
 			}
 		}
 	}
