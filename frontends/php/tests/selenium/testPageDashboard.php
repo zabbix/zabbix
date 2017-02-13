@@ -74,6 +74,7 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//h4[@id='webovr_header']", 'Web monitoring');
 			$this->zbxTestAssertElementText("//h4[@id='hoststat_header']", 'Host status');
 			$this->zbxTestAssertElementText("//h4[@id='syssum_header']", 'System status');
+			$this->webDriver->manage()->deleteAllcookies();
 		}
 	}
 
