@@ -890,7 +890,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 			/* regular procedure with item update in database and config cache, logging etc. There is */
 			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-			dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
+			dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
 			zbx_free(error);
 
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
@@ -2710,8 +2710,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* regular procedure with item update in database and config cache, logging etc. There is */
 			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-			dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, "cannot resolve macros"
-					" in update interval");
+			dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, "cannot resolve macros in"
+					" update interval");
 
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
 			/* can only be healed by editing configuration (either update interval or macros involved) */
@@ -2781,7 +2781,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 						/* with item update in database and config cache, logging etc. There */
 						/* is no need to set ITEM_STATE_NOTSUPPORTED here. */
 
-						dc_add_history(item->itemid, 0, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+						dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
 								error);
 						zbx_free(error);
 

@@ -1026,17 +1026,17 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
-	substitute_lld_macros(&item->delay, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->delay, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->delay, ZBX_WHITESPACE);
 
 	item->history = zbx_strdup(NULL, item_prototype->history);
 	item->history_orig = NULL;
-	substitute_lld_macros(&item->history, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->history, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->history, ZBX_WHITESPACE);
 
 	item->trends = zbx_strdup(NULL, item_prototype->trends);
 	item->trends_orig = NULL;
-	substitute_lld_macros(&item->trends, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&item->trends, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->trends, ZBX_WHITESPACE);
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
@@ -1138,7 +1138,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->delay);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->delay, buffer))
 	{
@@ -1149,7 +1149,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->history);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->history, buffer))
 	{
@@ -1160,7 +1160,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->trends);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->trends, buffer))
 	{
