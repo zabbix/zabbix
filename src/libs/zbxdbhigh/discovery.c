@@ -85,6 +85,7 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
 	ip_esc = DBdyn_escape_field("dservices", "ip", ip);
+
 	sql = zbx_dsprintf(sql,
 			"select dserviceid"
 			" from dservices"
