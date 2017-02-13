@@ -936,7 +936,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	init_perf_collector(1);
+	if (SUCCEED != init_perf_collector(ZBX_MULTI_THREADED, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize performance counter collector: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 	zbx_free_config();
@@ -1172,7 +1178,13 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
-			init_perf_collector(0);
+			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
+			{
+				zbx_error("cannot initialize performance counter collector: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #else
 			zbx_set_common_signal_handlers();
