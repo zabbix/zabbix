@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -901,7 +901,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
-	for (; SUCCEED == zbx_token_find(expression, pos, &token); pos++)
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;
@@ -1032,8 +1032,8 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 	{
 		case CONDITION_OPERATOR_EQUAL:
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value='%s'", tag_esc,
-					value_esc);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value" ZBX_SQL_STRCMP,
+					tag_esc, ZBX_SQL_STRVAL_EQ(value_esc));
 			break;
 		case CONDITION_OPERATOR_LIKE:
 		case CONDITION_OPERATOR_NOT_LIKE:
@@ -1077,9 +1077,9 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			if (SUCCEED == correlation_condition_match_new_event(condition, event, SUCCEED))
-				filter = "1";
+				filter = "1=1";
 			else
-				filter = "0";
+				filter = "0=1";
 
 			return zbx_strdup(NULL, filter);
 	}
@@ -1176,7 +1176,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 
 	expression = zbx_strdup(NULL, correlation->formula);
 
-	for (; SUCCEED == zbx_token_find(expression, pos, &token); pos++)
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;

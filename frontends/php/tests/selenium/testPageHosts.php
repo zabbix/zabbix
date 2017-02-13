@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageHosts extends CWebTest {
+	public $HostName = 'ЗАББИКС Сервер';
+	public $HostGroup = 'Zabbix servers';
+	public $HostIp = '127.0.0.1';
+	public $HostPort = '10050';
 
 	public static function allHosts() {
 		return DBdata(
@@ -35,35 +39,38 @@ class testPageHosts extends CWebTest {
 		);
 	}
 
-	/**
-	* @dataProvider allHosts
-	*/
-	public function testPageHosts_CheckLayout($host) {
+	public function testPageHosts_CheckLayout() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', $host['group_name']);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
-		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
 
-		$this->zbxTestTextPresent(
-			[
-				'Name',
-				'Applications',
-				'Items',
-				'Triggers',
-				'Graphs',
-				'Discovery',
-				'Interface',
-				'Templates',
-				'Status',
-				'Availability',
-				'Agent encryption',
-				'Info'
-			]
-		);
+		$this->zbxTestTextPresent($this->HostName);
+		$this->zbxTestTextPresent('Simple form test host');
+		$this->zbxTestTextNotPresent('ZBX6648 All Triggers Host');
 
-		$this->zbxTestTextPresent([$host['name']]);
-		$this->zbxTestTextPresent(['Export', 'Mass update', 'Enable', 'Disable', 'Delete']);
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Items')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Triggers')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Graphs')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Discovery')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Web')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Interface')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Templates')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[contains(text(),'Status')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Availability')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Agent encryption')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Info')]");
+
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
+
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Export'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Mass update'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Enable'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Disable'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete'][@disabled]");
 	}
 
 	/**
@@ -88,127 +95,38 @@ class testPageHosts extends CWebTest {
 		$oldHashApplications = DBhash($sqlApplications);
 		$sqlInteraface = "select * from interface where hostid=$hostid order by interfaceid";
 		$oldHashInterface = DBhash($sqlInteraface);
-		$sqlHostmacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
-		$oldHashHostmacro = DBhash($sqlHostmacro);
-		$sqlHostsgroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
-		$oldHashHostsgroups = DBhash($sqlHostsgroups);
-		$sqlHoststemplates = "select * from hosts_templates where hostid=$hostid order by hosttemplateid";
-		$oldHashHoststemplates = DBhash($sqlHoststemplates);
-		$sqlMaintenanceshosts = "select * from maintenances_hosts where hostid=$hostid order by maintenance_hostid";
-		$oldHashMaintenanceshosts = DBhash($sqlMaintenanceshosts);
-		$sqlHostinventory = "select * from host_inventory where hostid=$hostid";
-		$oldHashHostinventory = DBhash($sqlHostinventory);
+		$sqlHostMacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
+		$oldHashHostMacro = DBhash($sqlHostMacro);
+		$sqlHostsGroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
+		$oldHashHostsGroups = DBhash($sqlHostsGroups);
+		$sqlHostsTemplates = "select * from hosts_templates where hostid=$hostid order by hosttemplateid";
+		$oldHashHostsTemplates = DBhash($sqlHostsTemplates);
+		$sqlMaintenancesHosts = "select * from maintenances_hosts where hostid=$hostid order by maintenance_hostid";
+		$oldHashMaintenancesHosts = DBhash($sqlMaintenancesHosts);
+		$sqlHostInventory = "select * from host_inventory where hostid=$hostid";
+		$oldHashHostInventory = DBhash($sqlHostInventory);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
-		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextNotPresent('Displaying 0');
 
-		$this->zbxTestTextPresent(
-			[
-				'Name',
-				'Applications',
-				'Items',
-				'Triggers',
-				'Graphs',
-				'Discovery',
-				'Interface',
-				'Templates',
-				'Status',
-				'Availability',
-				'Agent encryption',
-				'Info'
-			]
-		);
-
+		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestTextPresent($name);
 
-		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Host update changed data in table 'hosts'");
-		$this->assertEquals($oldHashItems, DBhash($sqlItems), "Chuck Norris: Host update changed data in table 'items'");
-		$this->assertEquals($oldHashApplications, DBhash($sqlApplications), "Chuck Norris: Host update changed data in table 'applications'");
-		$this->assertEquals($oldHashInterface, DBhash($sqlInteraface), "Chuck Norris: Host update changed data in table 'interface'");
-		$this->assertEquals($oldHashHostmacro, DBhash($sqlHostmacro), "Chuck Norris: Host update changed data in table 'host_macro'");
-		$this->assertEquals($oldHashHostsgroups, DBhash($sqlHostsgroups), "Chuck Norris: Host update changed data in table 'hosts_groups'");
-		$this->assertEquals($oldHashHoststemplates, DBhash($sqlHoststemplates), "Chuck Norris: Host update changed data in table 'hosts_templates'");
-		$this->assertEquals($oldHashMaintenanceshosts, DBhash($sqlMaintenanceshosts), "Chuck Norris: Host update changed data in table 'maintenances_hosts'");
-		$this->assertEquals($oldHashHostinventory, DBhash($sqlHostinventory), "Chuck Norris: Host update changed data in table 'host_inventory'");
-	}
-
-	/**
-	* @dataProvider allHosts
-	*/
-	public function testPageHosts_FilterHost($host) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestInputTypeWait('filter_host', $host['name']);
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestTextPresent($host['name']);
-	}
-
-	public function testPageHosts_FilterNone() {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-		$this->zbxTestClickButtonText('Reset');
-
-		$this->zbxTestInputTypeWait('filter_host', '1928379128ksdhksdjfh');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestClickButtonText('Reset');
-
-		$this->zbxTestInputTypeWait('filter_host', '%');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-	}
-
-	public function testPageHosts_FilterReset() {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
-	}
-
-	/**
-	* @dataProvider allHosts
-	*/
-	public function testPageHosts_Items($host) {
-		$hostid = $host['hostid'];
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestCheckHeader('Hosts');
-		$this->zbxTestTextPresent('Displaying');
-
-		$this->zbxTestHrefClickWait("items.php?filter_set=1&hostid=$hostid");
-
-		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestCheckHeader('Items');
-		$this->zbxTestTextPresent('Displaying');
-
-		$this->zbxTestTextPresent(
-			[
-				'Wizard',
-				'Name',
-				'Triggers',
-				'Key',
-				'Interval',
-				'History',
-				'Trends',
-				'Type',
-				'Status',
-				'Applications',
-				'Info'
-			]
-		);
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashApplications, DBhash($sqlApplications));
+		$this->assertEquals($oldHashInterface, DBhash($sqlInteraface));
+		$this->assertEquals($oldHashHostMacro, DBhash($sqlHostMacro));
+		$this->assertEquals($oldHashHostsGroups, DBhash($sqlHostsGroups));
+		$this->assertEquals($oldHashHostsTemplates, DBhash($sqlHostsTemplates));
+		$this->assertEquals($oldHashMaintenancesHosts, DBhash($sqlMaintenancesHosts));
+		$this->assertEquals($oldHashHostInventory, DBhash($sqlHostInventory));
 	}
 
 	public function testPageHosts_MassActivateAll() {
@@ -295,4 +213,42 @@ class testPageHosts extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
 	}
 
+	public function testPageHosts_FilterByName() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextPresent($this->HostName);
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageHosts_FilterNone() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestInputTypeOverwrite('filter_host', '1928379128ksdhksdjfh');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->zbxTestInputTypeOverwrite('filter_host', '%');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+	}
+
+	public function testPageHosts_FilterByAllFields() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
+		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
+		$this->zbxTestInputTypeOverwrite('filter_ip', $this->HostIp);
+		$this->zbxTestInputTypeOverwrite('filter_port', $this->HostPort);
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextPresent($this->HostName);
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+	}
+
+	public function testPageHosts_FilterReset() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
 }

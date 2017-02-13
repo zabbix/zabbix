@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -235,67 +235,6 @@ void	DBstatement_prepare(const char *sql)
 		}
 	}
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: DBbind_parameter                                                 *
- *                                                                            *
- * Purpose: creates an association between a program variable and             *
- *          a placeholder in a SQL statement                                  *
- *                                                                            *
- * Comments: retry until DB is up                                             *
- *                                                                            *
- ******************************************************************************/
-void	DBbind_parameter(int position, void *buffer, unsigned char type)
-{
-	int	rc;
-
-	rc = zbx_db_bind_parameter(position, buffer, type);
-
-	while (ZBX_DB_DOWN == rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
-			connection_failure = 1;
-			sleep(ZBX_DB_WAIT_DOWN);
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBstatement_execute                                              *
- *                                                                            *
- * Purpose: executes a SQL statement                                          *
- *                                                                            *
- * Comments: retry until DB is up                                             *
- *                                                                            *
- ******************************************************************************/
-int	DBstatement_execute()
-{
-	int	rc;
-
-	rc = zbx_db_statement_execute();
-
-	while (ZBX_DB_DOWN == rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
-			connection_failure = 1;
-			sleep(ZBX_DB_WAIT_DOWN);
-		}
-	}
-
-	return rc;
-}
 #endif
 
 /******************************************************************************
@@ -483,6 +422,40 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	return ret;
 }
 
+#ifdef HAVE_MYSQL
+static size_t	get_string_field_size(unsigned char type)
+{
+	switch(type)
+	{
+		case ZBX_TYPE_LONGTEXT:
+			return ZBX_SIZE_T_MAX;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+			return 65535u;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+	}
+}
+#elif HAVE_ORACLE
+static size_t	get_string_field_size(unsigned char type)
+{
+	switch(type)
+	{
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_TEXT:
+			return ZBX_SIZE_T_MAX;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_SHORTTEXT:
+			return 4000u;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_string                                              *
@@ -490,17 +463,49 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	return zbx_db_dyn_escape_string(src);
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdyn_escape_string_len                                          *
+ * Function: DBdyn_escape_field_len                                           *
  *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
+static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
 {
-	return zbx_db_dyn_escape_string_len(src, max_src_len);
+	size_t	length;
+
+	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+		length = ZBX_SIZE_T_MAX;
+	else
+		length = field->length;
+
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
+#elif HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, flag);
+#else
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_field                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src)
+{
+	const ZBX_TABLE	*table;
+	const ZBX_FIELD	*field;
+
+	if (NULL == (table = DBget_table(table_name)) || NULL == (field = DBget_field(table, field_name)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", table_name, field_name);
+		exit(EXIT_FAILURE);
+	}
+
+	return DBdyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
@@ -865,6 +870,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
  *             values     - [IN] array of string values                       *
  *             num        - [IN] number of elements in 'values' array         *
  *                                                                            *
+ * Comments: To support Oracle empty values are checked separately (is null   *
+ *           for Oracle and ='' for the other databases).                     *
+ *                                                                            *
  ******************************************************************************/
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
@@ -873,29 +881,59 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 	int	i, cnt = 0;
 	char	*value_esc;
+	int	values_num = 0, empty_num = 0;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 
-	if (1 == num)
+	for (i = 0; i < num; i++)
 	{
-		value_esc = DBdyn_escape_string(values[0]);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
-		zbx_free(value_esc);
-
-		return;
+		if ('\0' == *values[i])
+			empty_num++;
+		else
+			values_num++;
 	}
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+	if (0 != empty_num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_SQL_STRCMP, fieldname, ZBX_SQL_STRVAL_EQ(""));
+
+		if (0 == values_num)
+			return;
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
+
+	if (1 == values_num)
+	{
+		for (i = 0; i < num; i++)
+		{
+			if ('\0' == *values[i])
+				continue;
+
+			value_esc = DBdyn_escape_string(values[i]);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
+			zbx_free(value_esc);
+		}
+
+		if (0 != empty_num)
+			zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+		return;
+	}
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 
 	for (i = 0; i < num; i++)
 	{
+		if ('\0' == *values[i])
+			continue;
+
 		if (MAX_EXPRESSIONS == cnt)
 		{
 			cnt = 0;
@@ -917,7 +955,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 	(*sql_offset)--;
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
-	if (MAX_EXPRESSIONS < num)
+	if (MAX_EXPRESSIONS < values_num || 0 != empty_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
@@ -1352,10 +1390,10 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
-	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
-	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	host_metadata_esc = DBdyn_escape_string(host_metadata);
+	host_esc = DBdyn_escape_field("proxy_autoreg_host", "host", host);
+	ip_esc = DBdyn_escape_field("proxy_autoreg_host", "listen_ip", ip);
+	dns_esc = DBdyn_escape_field("proxy_autoreg_host", "listen_dns", dns);
+	host_metadata_esc = DBdyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
 			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"
@@ -1570,51 +1608,6 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_inventory_field_len                                        *
- *                                                                            *
- * Purpose: get host_inventory field length by inventory_link                 *
- *                                                                            *
- * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
- *                                                                            *
- * Return value: field length                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
-{
-	static unsigned short	*inventory_field_len = NULL;
-	const char		*inventory_field;
-	const ZBX_TABLE		*table;
-	const ZBX_FIELD		*field;
-
-	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
-		assert(0);
-
-	inventory_link--;
-
-	if (NULL == inventory_field_len)
-	{
-		inventory_field_len = zbx_malloc(inventory_field_len, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
-		memset(inventory_field_len, 0, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
-	}
-
-	if (0 != inventory_field_len[inventory_link])
-		return inventory_field_len[inventory_link];
-
-	inventory_field = DBget_inventory_field(inventory_link + 1);
-	table = DBget_table("host_inventory");
-	assert(NULL != table);
-	field = DBget_field(table, inventory_field);
-	assert(NULL != field);
-
-	inventory_field_len[inventory_link] = field->length;
-
-	return inventory_field_len[inventory_link];
 }
 
 #undef ZBX_MAX_INVENTORY_FIELDS
@@ -1968,9 +1961,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             fields      - [IN] names of the fields to insert               *
  *             fields_num  - [IN] the number of items in fields array         *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
- *                                                                            *
  * Comments: The operation fails if the target table does not have the        *
  *           specified fields defined in its schema.                          *
  *                                                                            *
@@ -2088,31 +2078,17 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
-#ifdef HAVE_ORACLE
-		size_t			str_alloc = 0, str_offset = 0;
-#endif
+
 		switch (field->type)
 		{
 			case ZBX_TYPE_LONGTEXT:
-				if (0 == field->length)
-				{
-#ifdef HAVE_ORACLE
-					row[i].str = zbx_strdup(NULL, value->str);
-#else
-					row[i].str = DBdyn_escape_string(value->str);
-#endif
-					break;
-				}
-				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = NULL;
-				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_nchars(value->str, field->length));
+				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
-				row[i].str = DBdyn_escape_string_len(value->str, field->length);
+				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
 			default:
@@ -2132,9 +2108,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
  *                                                                            *
  * Parameters: self - [IN] the bulk insert data                               *
  *             ...  - [IN] the values to insert                               *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_add_values_dyn() *
  *           function.                                                        *
@@ -2221,6 +2194,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	char		*sql_values = NULL;
 	size_t		sql_values_alloc = 0, sql_values_offset = 0;
 #	endif
+#else
+	zbx_db_bind_context_t	*contexts;
+	int			rc, tries = 0;
 #endif
 
 	if (0 == self->rows.values_num)
@@ -2294,51 +2270,59 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	}
 	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
 
+	contexts = (zbx_db_bind_context_t *)zbx_malloc(NULL, sizeof(zbx_db_bind_context_t) * self->fields.values_num);
+
+retry_oracle:
 	DBstatement_prepare(sql_command);
 
-	for (i = 0; i < self->rows.values_num; i++)
+	for (j = 0; j < self->fields.values_num; j++)
 	{
-		zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+		field = (ZBX_FIELD *)self->fields.values[j];
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (ZBX_DB_OK > zbx_db_bind_parameter_dyn(&contexts[j], j, field->type,
+				(zbx_db_value_t **)self->rows.values, self->rows.values_num))
 		{
+			for (i = 0; i < j; i++)
+				zbx_db_clean_bind_context(&contexts[i]);
+
+			goto out;
+		}
+	}
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		for (i = 0; i < self->rows.values_num; i++)
+		{
+			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
 			char	*str;
 
 			str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, self->fields.values_num);
 			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
 			zbx_free(str);
 		}
-
-		for (j = 0; j < self->fields.values_num; j++)
-		{
-			const zbx_db_value_t	*value = &values[j];
-
-			field = self->fields.values[j];
-
-			switch (field->type)
-			{
-				case ZBX_TYPE_CHAR:
-				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
-				case ZBX_TYPE_LONGTEXT:
-					DBbind_parameter(j + 1, (void *)value->str, field->type);
-					break;
-				default:
-					DBbind_parameter(j + 1, (void *)value, field->type);
-					break;
-			}
-
-			if (0 != zbx_db_txn_error())
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to bind field: %s", field->name);
-				goto out;
-			}
-		}
-		if (ZBX_DB_OK > DBstatement_execute())
-			goto out;
-
 	}
-	ret = SUCCEED;
+
+	rc = zbx_db_statement_execute(self->rows.values_num);
+
+	for (j = 0; j < self->fields.values_num; j++)
+		zbx_db_clean_bind_context(&contexts[j]);
+
+	if (ZBX_DB_DOWN == rc)
+	{
+		if (0 < tries++)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			connection_failure = 1;
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		goto retry_oracle;
+	}
+
+	ret = (ZBX_DB_OK == rc ? SUCCEED : FAIL);
 
 #else
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2428,6 +2412,8 @@ out:
 #	ifdef HAVE_MYSQL
 	zbx_free(sql_values);
 #	endif
+#else
+	zbx_free(contexts);
 #endif
 	return ret;
 }
@@ -2439,9 +2425,6 @@ out:
  * Purpose: executes the prepared database bulk insert operation              *
  *                                                                            *
  * Parameters: self - [IN] the bulk insert data                               *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
@@ -2669,7 +2652,7 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		{
 			char	*error_esc;
 
-			error_esc = DBdyn_escape_string_len(ha->agents[i].error, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_field("hosts", "error", ha->agents[i].error);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serror='%s'", delim, field_prefix[i],
 					error_esc);
 			zbx_free(error_esc);

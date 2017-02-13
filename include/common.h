@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1104,7 +1104,6 @@ char	*zbx_time2str(time_t time);
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
-int	zbx_mismatch(const char *s1, const char *s2);
 int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
@@ -1146,6 +1145,8 @@ void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
+/* time and memory size suffixes */
+#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
 #if defined(_WINDOWS)
@@ -1177,20 +1178,21 @@ int	is_discovery_macro(const char *name);
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
-int	get_item_key(char **exp, char **key);
-
-int	parse_host(char **exp, char **host);
 int	parse_key(char **exp);
 
 int	parse_host_key(char *exp, char **host, char **key);
 
 void	make_hostname(char *host);
 
+int	zbx_number_parse(const char *number, int *len);
+
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
+int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
+		const char *from, size_t sz_from);
 
 void	zbx_trim_str_list(char *list, char delimiter);
 
@@ -1225,7 +1227,6 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r);
 
@@ -1243,13 +1244,14 @@ int	zbx_alarm_timed_out(void);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 
-/* {} tokens used in expressions */
+/* tokens used in expressions */
 #define ZBX_TOKEN_OBJECTID	0x0001
 #define ZBX_TOKEN_MACRO		0x0002
 #define ZBX_TOKEN_LLD_MACRO	0x0004
 #define ZBX_TOKEN_USER_MACRO	0x0008
 #define ZBX_TOKEN_FUNC_MACRO	0x0010
 #define ZBX_TOKEN_SIMPLE_MACRO	0x0020
+#define ZBX_TOKEN_REFERENCE	0x0040
 
 /* additional token flags */
 #define ZBX_TOKEN_NUMERIC	0x8000
@@ -1302,8 +1304,18 @@ typedef struct
 	zbx_strloc_t	key;
 	/* function + parameters, for example avg(5m) */
 	zbx_strloc_t	func;
+	/* parameters, for example (5m) */
+	zbx_strloc_t	func_param;
 }
 zbx_token_simple_macro_t;
+
+/* data used by references */
+typedef struct
+{
+	/* index of constant being referenced (1 for $1, 2 for $2, ..., 9 for $9) */
+	int	index;
+}
+zbx_token_reference_t;
 
 /* the token type specific data */
 typedef union
@@ -1314,6 +1326,7 @@ typedef union
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
 	zbx_token_simple_macro_t	simple_macro;
+	zbx_token_reference_t		reference;
 }
 zbx_token_data_t;
 
@@ -1329,8 +1342,15 @@ typedef struct
 }
 zbx_token_t;
 
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
+typedef enum
+{
+	ZBX_TOKEN_SEARCH_BASIC,
+	ZBX_TOKEN_SEARCH_REFERENCES
+}
+zbx_token_search_t;
 
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
+int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)

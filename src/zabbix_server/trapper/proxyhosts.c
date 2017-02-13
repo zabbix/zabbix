@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_host_availability";
 
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	int		ret = FAIL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host availability data from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -63,7 +63,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = process_host_availability(jp, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data from proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+				proxy.host, sock->peer, error);
 	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);

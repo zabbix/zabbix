@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ void	zbx_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 		{
 			char	*error_esc;
 
-			error_esc = DBdyn_escape_string_len(diff->error, TRIGGER_ERROR_LEN);
+			error_esc = DBdyn_escape_field("triggers", "error", diff->error);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror='%s'", delim, error_esc);
 			zbx_free(error_esc);
 		}

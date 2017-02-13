@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_proxyconfig";
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, sock, &proxy, &error))
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
 				" \"%s\": %s", sock->peer, error);
@@ -68,18 +68,18 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+				proxy.host, sock->peer, error);
 		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
-			host, sock->peer, (zbx_fs_size_t)j.buffer_size);
+			proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TRAPPER_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, zbx_socket_strerror());
+				proxy.host, sock->peer, zbx_socket_strerror());
 	}
 clean:
 	zbx_json_free(&j);

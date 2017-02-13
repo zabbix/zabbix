@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,10 +57,8 @@ class CRouter {
 		// action					controller							layout					view
 		'acknowledge.create'	=> ['CControllerAcknowledgeCreate',		null,					null],
 		'acknowledge.edit'		=> ['CControllerAcknowledgeEdit',		'layout.htmlpage',		'monitoring.acknowledge.edit'],
-		'dashboard.favourite'	=> ['CControllerDashboardFavourite',	'layout.javascript',	null],
-		'dashboard.sort'		=> ['CControllerDashboardSort',			'layout.javascript',	null],
 		'dashboard.view'		=> ['CControllerDashboardView',			'layout.htmlpage',		'monitoring.dashboard.view'],
-		'dashboard.widget'		=> ['CControllerDashboardWidget',		'layout.javascript',	null],
+		'dashbrd.widget.update'	=> ['CControllerDashbrdWidgetUpdate',	'layout.json',			null],
 		'discovery.view'		=> ['CControllerDiscoveryView',			'layout.htmlpage',		'monitoring.discovery.view'],
 		'favourite.create'		=> ['CControllerFavouriteCreate',		'layout.javascript',	null],
 		'favourite.delete'		=> ['CControllerFavouriteDelete',		'layout.javascript',	null],
@@ -91,12 +89,15 @@ class CRouter {
 		'script.update'			=> ['CControllerScriptUpdate',			null,					null],
 		'system.warning'		=> ['CControllerSystemWarning',			'layout.warning',		'system.warning'],
 		'web.view'				=> ['CControllerWebView',				'layout.htmlpage',		'monitoring.web.view'],
-		'widget.discovery.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
-		'widget.hosts.view'		=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
-		'widget.issues.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
-		'widget.status.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
-		'widget.system.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
-		'widget.web.view'		=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view']
+		'widget.favgrph.view'	=> ['CControllerWidgetFavGraphsView',	'layout.widget',		'monitoring.widget.favgraphs.view'],
+		'widget.favmap.view'	=> ['CControllerWidgetFavMapsView',		'layout.widget',		'monitoring.widget.favmaps.view'],
+		'widget.favscr.view'	=> ['CControllerWidgetFavScreensView',	'layout.widget',		'monitoring.widget.favscreens.view'],
+		'widget.dscvry.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
+		'widget.hoststat.view'	=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
+		'widget.lastiss.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
+		'widget.stszbx.view'	=> ['CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'],
+		'widget.syssum.view'	=> ['CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'],
+		'widget.webovr.view'	=> ['CControllerWidgetWebView',			'layout.widget',		'monitoring.widget.web.view']
 	];
 
 	public function __construct($action) {

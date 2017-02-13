@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #if defined(_WINDOWS)
 
-#	define _WIN32_WINNT	0x0500	/* Target MS Windows 2000 and later. */
+#	define _WIN32_WINNT	0x0501	/* target MS Windows XP and later */
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {

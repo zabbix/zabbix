@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2736,7 +2736,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
-					ZBX_POLLER_TYPE_IPMI == item->poller_type ||
 					ZBX_POLLER_TYPE_JAVA == item->poller_type))
 			{
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
@@ -4515,7 +4514,7 @@ static void	DCsync_item_preproc(DB_RESULT result)
 	zbx_uint64_t 		item_preprocid, itemid, lastitemid = 0;
 	int			found;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	ZBX_DC_ITEM		*item = NULL;
 	zbx_dc_item_preproc_t	*preproc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4526,7 +4525,13 @@ static void	DCsync_item_preproc(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		if (itemid != lastitemid && NULL == (item = zbx_hashset_search(&config->items, &itemid)))
+		if (itemid != lastitemid)
+		{
+			lastitemid = itemid;
+			item = zbx_hashset_search(&config->items, &itemid);
+		}
+
+		if (NULL == item)
 			continue;
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -4539,8 +4544,6 @@ static void	DCsync_item_preproc(DB_RESULT result)
 
 		/* cleared in DCsync_items() */
 		zbx_vector_ptr_append(&item->preproc_ops, preproc);
-
-		lastitemid = itemid;
 	}
 
 	/* remove deleted correlation operations */
@@ -7140,6 +7143,9 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  *           icmpping* simple checks. In other cases only single item is      *
  *           retrieved.                                                       *
  *                                                                            *
+ *           IPMI poller queue are handled by DCconfig_get_ipmi_poller_items()*
+ *           function.                                                        *
+ *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 {
@@ -7236,9 +7242,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		}
 		else
 		{
-			if (ZBX_POLLER_TYPE_NORMAL == poller_type ||
-					ZBX_POLLER_TYPE_IPMI == poller_type ||
-					ZBX_POLLER_TYPE_JAVA == poller_type)
+			if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
@@ -7289,6 +7293,101 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 	return num;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_ipmi_poller_items                                   *
+ *                                                                            *
+ * Purpose: Get array of items for IPMI poller                                *
+ *                                                                            *
+ * Parameters: now       - [IN] current timestamp                             *
+ *             items     - [OUT] array of items                               *
+ *             items_num - [IN] the number of items to get                    *
+ *             nextcheck - [OUT] the next scheduled check                     *
+ *                                                                            *
+ * Return value: number of items in items array                               *
+ *                                                                            *
+ * Comments: IPMI items leave the queue only through this function. IPMI      *
+ *           manager must always return the items they have taken using       *
+ *           DCrequeue_items() or DCpoller_requeue_items().                   *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck)
+{
+	const char		*__function_name = "DCconfig_get_ipmi_poller_items";
+
+	int			num = 0;
+	zbx_binary_heap_t	*queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	queue = &config->queues[ZBX_POLLER_TYPE_IPMI];
+
+	LOCK_CACHE;
+
+	while (num < items_num && FAIL == zbx_binary_heap_empty(queue))
+	{
+		int				disable_until, old_nextcheck;
+		const zbx_binary_heap_elem_t	*min;
+		ZBX_DC_HOST			*dc_host;
+		ZBX_DC_ITEM			*dc_item;
+
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (ZBX_DC_ITEM *)min->data;
+
+		if (dc_item->nextcheck > now)
+			break;
+
+		zbx_binary_heap_remove_min(queue);
+		dc_item->location = ZBX_LOC_NOWHERE;
+
+		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
+		{
+			old_nextcheck = dc_item->nextcheck;
+			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
+
+			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+			continue;
+		}
+
+		if (0 != (disable_until = DCget_disable_until(dc_item, dc_host)))
+		{
+			if (disable_until > now)
+			{
+				old_nextcheck = dc_item->nextcheck;
+				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+				continue;
+			}
+
+			DCincrease_disable_until(dc_item, dc_host, now);
+		}
+
+		dc_item->location = ZBX_LOC_POLLER;
+		DCget_host(&items[num].host, dc_host);
+		DCget_item(&items[num], dc_item, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
+		num++;
+	}
+
+	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[ZBX_POLLER_TYPE_IPMI]);
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+
+	return num;
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -7403,7 +7502,7 @@ unlock:
 	return items_num;
 }
 
-static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
+static void	dc_requeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -7424,7 +7523,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host)
+static void	dc_requeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -7439,12 +7538,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	old_poller_type = dc_item->poller_type;
 
-	if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type ||
-			ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
-			ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
-	{
+	if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
 		dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
@@ -7492,12 +7587,12 @@ static void	dc_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
-				DCrequeue_reachable_item(dc_item, dc_host, lastclocks[i]);
+				dc_requeue_reachable_item(dc_item, dc_host, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
-				DCrequeue_unreachable_item(dc_item, dc_host);
+				dc_requeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -7522,6 +7617,53 @@ void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *l
 
 	dc_requeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_requeue_unreachable_items                                 *
+ *                                                                            *
+ * Purpose: requeue unreachable items                                         *
+ *                                                                            *
+ * Parameters: itemids     - [IN] the item id array                           *
+ *             itemids_num - [IN] the number of values in itemids array       *
+ *                                                                            *
+ * Comments: This function is used when items must be put back in the queue   *
+ *           without polling them. For example if a poller has taken a batch  *
+ *           of items from queue, host becomes unreachable during while       *
+ *           polling the items, so the unpolled items of the same host must   *
+ *           be returned to queue without updating their status.              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
+{
+	size_t		i;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < itemids_num; i++)
+	{
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
+			continue;
+
+		if (ZBX_LOC_POLLER == dc_item->location)
+			dc_item->location = ZBX_LOC_NOWHERE;
+
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
+		dc_requeue_unreachable_item(dc_item, dc_host);
+	}
 
 	UNLOCK_CACHE;
 }
@@ -8065,7 +8207,6 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state &&
 					TRIGGER_STATUS_ENABLED == next_trigger->status &&
 					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
@@ -8590,7 +8731,7 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 	UNLOCK_CACHE;
 }
 
-static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
+static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
 	int			i, j;
@@ -8679,7 +8820,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	}
 }
 
-static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
+static void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
 		char **replace_to)
 {
 	char	*value = NULL, *value_default = NULL;
@@ -8714,7 +8855,7 @@ static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char
 	}
 }
 
-void	DCget_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
+void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
 	char		*name = NULL, *context = NULL;

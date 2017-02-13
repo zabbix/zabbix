@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -962,7 +962,7 @@ notsupported:
 
 		if (0 != strcmp(item->db_error, h->value.err))
 		{
-			value_esc = DBdyn_escape_string_len(h->value.err, ITEM_ERROR_LEN);
+			value_esc = DBdyn_escape_field("items", "error", h->value.err);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
 
@@ -1007,7 +1007,6 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 {
 	char			value[MAX_BUFFER_LEN];
 	const char		*inventory_field;
-	unsigned short		inventory_field_len;
 	zbx_inventory_value_t	*inventory_value;
 
 	if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1040,13 +1039,11 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 
 	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
 
-	inventory_field_len = DBget_inventory_field_len(item->inventory_link);
-
 	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
 	inventory_value->hostid = item->host.hostid;
 	inventory_value->field_name = inventory_field;
-	inventory_value->value_esc = DBdyn_escape_string_len(value, inventory_field_len);
+	inventory_value->value_esc = DBdyn_escape_field("host_inventory", inventory_field, value);
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
@@ -2564,7 +2561,6 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  * Purpose: add new value to the cache                                        *
  *                                                                            *
  * Parameters:  itemid     - [IN] the itemid                                  *
- *              value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
  *              item_flags - [IN] the item flags (e. g. lld rule)             *
  *              result     - [IN] agent result containing the value to add    *
  *              ts         - [IN] the value timestamp                         *
@@ -2573,8 +2569,8 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  *                                ITEM_STATE_NOTSUPPORTED                     *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
-		const zbx_timespec_t *ts, unsigned char state, const char *error)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char item_flags, AGENT_RESULT *result, const zbx_timespec_t *ts,
+		unsigned char state, const char *error)
 {
 	unsigned char	value_flags;
 
