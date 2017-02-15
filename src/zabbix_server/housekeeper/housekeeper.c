@@ -216,7 +216,12 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
 static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		zbx_hk_item_cache_t *item_record, int history)
 {
-	int	keep_from = now - history;
+	int	keep_from;
+
+	if (history > now)
+		return;	/* there shouldn't be any records with negative timestamps, nothing to do */
+
+	keep_from = now - history;
 
 	if (keep_from > item_record->min_clock)
 	{
