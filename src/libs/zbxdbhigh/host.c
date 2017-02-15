@@ -5069,7 +5069,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 			" (interfaceid,hostid,main,type,useip,ip,dns,port)"
 		" values"
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s',%d)",
-			interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
+		interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
 
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);

@@ -898,6 +898,19 @@ static size_t	get_string_field_size(unsigned char type)
 }
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_string_len                                          *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBdyn_escape_string_len(const char *src, size_t length)
+{
+#if HAVE_IBM_DB2	/* IBM DB2 fields are limited by bytes rather than characters */
+	return zbx_db_dyn_escape_string(src, length, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+#else
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
+#endif
+}
 
 /******************************************************************************
  *                                                                            *
@@ -2482,8 +2495,6 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 
 	zbx_vector_ptr_destroy(&fields);
 }
-
-
 
 /******************************************************************************
  *                                                                            *
