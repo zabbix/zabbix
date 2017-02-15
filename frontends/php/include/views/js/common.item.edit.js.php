@@ -73,7 +73,7 @@
 				preprocessing = $('#preprocessing');
 
 			preprocessing.sortable({
-				disabled: (preprocessing.find('tr.sortable') < 2),
+				disabled: (preprocessing.find('tr.sortable').length < 2),
 				items: 'tr.sortable',
 				axis: 'y',
 				cursor: 'move',
