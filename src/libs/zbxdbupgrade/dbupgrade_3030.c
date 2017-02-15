@@ -886,6 +886,25 @@ static int	DBpatch_3030080(void)
 	return DBpatch_table_convert("config", "configid", field_convs);
 }
 
+static int	DBpatch_3030081(void)
+{
+	const char	*sql =
+			"delete from profiles"
+			" where idx in ("
+				"'web.items.filter_delay',"
+				"'web.items.filter_history',"
+				"'web.items.filter_trends',"
+				"'web.items.subfilter_history',"
+				"'web.items.subfilter_interval',"
+				"'web.items.subfilter_trends'"
+			");";
+
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -972,5 +991,6 @@ DBPATCH_ADD(3030077, 0, 1)
 DBPATCH_ADD(3030078, 0, 1)
 DBPATCH_ADD(3030079, 0, 1)
 DBPATCH_ADD(3030080, 0, 1)
+DBPATCH_ADD(3030081, 0, 1)
 
 DBPATCH_END()
