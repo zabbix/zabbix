@@ -1004,45 +1004,45 @@ class testUrlParameters extends CWebTest {
 				]
 			],
 			[
-				'title' => 'IT services [refreshed every 30 sec.]',
+				'title' => 'Services [refreshed every 30 sec.]',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'srv_status.php?period=today',
-						'text_present' => 'IT services'
+						'text_present' => 'Sservices'
 					],
 					[
 						'url' => 'srv_status.php?period=week',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=month',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=year',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=24',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=168',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=720',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=8760',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=1',
-						'text_not_present' => 'IT services',
+						'text_not_present' => 'Services',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "1" for "period" field.'
@@ -1050,7 +1050,7 @@ class testUrlParameters extends CWebTest {
 					],
 					[
 						'url' => 'srv_status.php?period=abc',
-						'text_not_present' => 'IT services',
+						'text_not_present' => 'Services',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "abc" for "period" field.'
@@ -1058,7 +1058,7 @@ class testUrlParameters extends CWebTest {
 					],
 					[
 						'url' => 'srv_status.php?period=',
-						'text_not_present' => 'IT services',
+						'text_not_present' => 'Services',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "" for "period" field.'
@@ -1066,7 +1066,7 @@ class testUrlParameters extends CWebTest {
 					],
 					[
 						'url' => 'srv_status.php?period=-1',
-						'text_not_present' => 'IT services',
+						'text_not_present' => 'Services',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "period" field.'
@@ -1074,7 +1074,7 @@ class testUrlParameters extends CWebTest {
 					],
 					[
 						'url' => 'srv_status.php',
-						'text_present' => 'IT services'
+						'text_present' => 'Services'
 					]
 				]
 			],

@@ -23,7 +23,7 @@ include('include/views/js/configuration.services.edit.js.php');
 
 $service = $this->data['service'];
 
-$widget = (new CWidget())->setTitle(_('IT services'));
+$widget = (new CWidget())->setTitle(_('Services'));
 
 // create form
 $servicesForm = (new CForm())
