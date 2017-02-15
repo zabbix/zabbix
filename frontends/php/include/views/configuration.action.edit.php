@@ -847,7 +847,7 @@ if (!empty($data['new_operation'])) {
 			];
 
 			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
-			$new_operation_formlist->addRow(_('Script name'), $userScript);
+			$new_operation_formlist->addRow(_('Script name'), (new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP));
 
 			// script
 			$new_operation_formlist->addRow(_('Execute on'),

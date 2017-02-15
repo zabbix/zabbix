@@ -780,7 +780,8 @@ footer, .footer {
 .multiselect-wrapper {
   position: relative;
   vertical-align: top;
-  display: inline-block; }
+  display: inline-block;
+  white-space: nowrap; }
 
 .multiselect {
   position: relative;
@@ -2252,10 +2253,10 @@ td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {
-  color: #00268e; }
+  color: #00268d; }
 
 .log-info-bg {
-  color: #00268e;
+  color: #00268d;
   background-color: #7499ff; }
 
 .average-bg, .average-bg input[type="radio"]:checked + label {
@@ -2459,9 +2460,9 @@ td.active-bg {
   .subfilter-disable-btn:hover {
     color: #e5e5e5; }
   .subfilter-disable-btn:focus {
-    color: #d9d9d9; }
+    color: #d8d8d8; }
   .subfilter-disable-btn:active {
-    color: #d9d9d9; }
+    color: #d8d8d8; }
 
 .color-picker {
   height: 20px;
@@ -3510,3 +3511,5 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
+
+/*# sourceMappingURL=dark-theme.css.map */
