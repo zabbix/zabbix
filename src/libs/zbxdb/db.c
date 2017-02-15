@@ -35,7 +35,6 @@
 #	include <sqlite3.h>
 #endif
 
-#include "db.h"
 #include "dbschema.h"
 #include "log.h"
 #if defined(HAVE_SQLITE3)
@@ -373,7 +372,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (0 < (ret = zbx_db_execute("set current schema='%s'", dbschema_esc)))
 			ret = ZBX_DB_OK;
 		zbx_free(dbschema_esc);
@@ -535,7 +534,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
