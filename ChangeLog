@@ -6,6 +6,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 ........S. [ZBX-11740] fixed empty value handling in event correlation on oracle databases (wiper)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
@@ -331,6 +332,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ........S. [ZBX-11703] removed possibility to execute commit without transaction in processing LLD rules (Sergejs)
@@ -1944,6 +1946,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ...G...... [ZBX-11719] fixed reading files with vfs.file.regmatch[] and vfs.file.cksum[] keys on windows (Sergejs)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)
