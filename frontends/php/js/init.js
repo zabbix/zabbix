@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2016 Zabbix SIA
+ ** Copyright (C) 2001-2017 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -57,18 +57,6 @@ jQuery(function($) {
 			data = obj.data('menu-popup');
 
 		switch (data.type) {
-			case 'favouriteGraphs':
-				data = getMenuPopupFavouriteGraphs(data);
-				break;
-
-			case 'favouriteMaps':
-				data = getMenuPopupFavouriteMaps(data);
-				break;
-
-			case 'favouriteScreens':
-				data = getMenuPopupFavouriteScreens(data);
-				break;
-
 			case 'history':
 				data = getMenuPopupHistory(data);
 				break;

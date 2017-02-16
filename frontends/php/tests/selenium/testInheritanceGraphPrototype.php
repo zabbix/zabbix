@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 						['itemName' => 'testInheritanceItemPrototype1']
 					],
 					'errors'=> [
-						'Cannot add graph prototype',
 						'Graph with name "testInheritanceGraphPrototype4" already exists in graphs or graph prototypes.'
 					]
 				]
@@ -125,13 +124,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestCheckHeader('Graph prototypes');
-				$this->zbxTestTextPresent('Graph prototype added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype added');
 				$this->zbxTestTextPresent($data['name']);
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestCheckHeader('Graph prototypes');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add graph prototype');
 				$this->zbxTestTextPresent($data['errors']);
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;

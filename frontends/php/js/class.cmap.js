@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -481,7 +481,7 @@ ZABBIX.apps.map = (function($) {
 				 * Selements events
 				 */
 				// delegate selements icons clicks
-				$(this.container).delegate('.sysmap_element', 'click', function(event) {
+				$(this.container).on('click', '.sysmap_element', function(event) {
 					that.selectElements([$(this).attr('data-id')], event.ctrlKey || event.metaKey);
 				});
 
@@ -575,7 +575,7 @@ ZABBIX.apps.map = (function($) {
 				}, this));
 
 				// open link form
-				$('.element-links').delegate('.openlink', 'click', function() {
+				$('.element-links').on('click', '.openlink', function() {
 					that.currentLinkId = $(this).attr('data-linkid');
 
 					var linkData = that.links[that.currentLinkId].getData();
@@ -607,7 +607,7 @@ ZABBIX.apps.map = (function($) {
 					that.linkForm.hide();
 				});
 
-				this.linkForm.domNode.delegate('.triggerRemove', 'click', function() {
+				this.linkForm.domNode.on('click', '.triggerRemove', function() {
 					var triggerid,
 						tid = $(this).attr('data-linktriggerid').toString();
 
@@ -621,7 +621,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// changes for color inputs
-				this.linkForm.domNode.delegate('.input-color-picker input', 'change', function() {
+				this.linkForm.domNode.on('change', '.input-color-picker input', function() {
 					var id = $(this).attr('id');
 
 					set_color_by_name(id, this.value);

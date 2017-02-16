@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,15 @@
 **/
 
 
-$table = make_status_of_zbx();
-
 $output = [
 	'header' => _('Status of Zabbix'),
-	'body' => (new CDiv([getMessages(), $table]))->toString(),
-	'footer' => (new CListItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))))->toString()
+	'body' => make_status_of_zbx()->toString(),
+	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];
+
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

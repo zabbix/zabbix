@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ static size_t		max_buffer_len;	/* error message buffer size */
  * Purpose: check whether the character delimits a numeric token              *
  *                                                                            *
  ******************************************************************************/
-static int	is_number_delimiter(unsigned char c)
+int	is_number_delimiter(char c)
 {
 	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
 }
@@ -83,10 +83,8 @@ static int	is_operator_delimiter(char c)
  ******************************************************************************/
 static double	evaluate_number(int *unknown_idx)
 {
-	int		digits = 0, dots = 0;
-	const char	*iter = ptr;
 	double		result;
-	zbx_uint64_t	factor = 1;
+	int		len;
 
 	/* Is it a special token of unknown value (e.g. ZBX_UNKNOWN0, ZBX_UNKNOWN1) ? */
 	if (0 == strncmp(ZBX_UNKNOWN_STR, ptr, ZBX_UNKNOWN_STR_LEN))
@@ -114,42 +112,15 @@ static double	evaluate_number(int *unknown_idx)
 		return ZBX_INFINITY;
 	}
 
-	while (1)
+	if (SUCCEED == zbx_number_parse(ptr, &len) && SUCCEED == is_number_delimiter(*(ptr + len)))
 	{
-		if (0 != isdigit((unsigned char)*iter))
-		{
-			iter++;
-			digits++;
-			continue;
-		}
-
-		if ('.' == *iter)
-		{
-			iter++;
-			dots++;
-			continue;
-		}
-
-		if (1 > digits || 1 < dots)
-			return ZBX_INFINITY;
-
-		if (0 != isalpha((unsigned char)*iter))
-		{
-			if (NULL == strchr("KMGTsmhdw", *iter))
-				return ZBX_INFINITY;
-
-			factor = suffix2factor(*iter++);
-		}
-
-		if (SUCCEED != is_number_delimiter(*iter))
-			return ZBX_INFINITY;
-
-		result = atof(ptr) * (double)factor;
-
-		ptr = iter;
-
-		return result;
+		result = atof(ptr) * suffix2factor(*(ptr + len - 1));
+		ptr += len;
 	}
+	else
+		result = ZBX_INFINITY;
+
+	return result;
 }
 
 static double	evaluate_term1(int *unknown_idx);

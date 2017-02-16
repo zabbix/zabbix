@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@
 #define ZBX_PROCESS_TYPE_LISTENER	22
 #define ZBX_PROCESS_TYPE_ACTIVE_CHECKS	23
 #define ZBX_PROCESS_TYPE_TASKMANAGER	24
-#define ZBX_PROCESS_TYPE_COUNT		25	/* number of process types */
+#define ZBX_PROCESS_TYPE_IPMIMANAGER	25
+#define ZBX_PROCESS_TYPE_COUNT		26	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 
 #define ZBX_RTC_LOG_SCOPE_FLAG		0x80

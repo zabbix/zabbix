@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,7 +160,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < num; i++)
 	{
@@ -195,7 +195,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
+		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
@@ -248,7 +248,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 	DBfree_result(result);
 
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num, ZBX_FLAG_ITEM_FIELDS_DEFAULT);
 
 	for (i = 0; i < num; i++)
 	{
@@ -283,7 +283,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
+		dc_add_history(items[i].itemid, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;

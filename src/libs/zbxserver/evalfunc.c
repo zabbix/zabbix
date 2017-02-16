@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ static int	get_function_parameter_int(zbx_uint64_t hostid, const char *parameter
 	}
 
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%d value:%d", __function_name, zbx_type_string(*type), *value);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __function_name, zbx_type_string(*type), *value);
 
 	zbx_free(parameter);
 out:
@@ -632,7 +632,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, ti
 			{
 				if (OP_BAND != op)
 				{
-					if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
+					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
 								" value", arg2);
@@ -2725,7 +2725,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 		value_double /= base * base * base * base;
 	}
 
-	if (SUCCEED != zbx_double_compare((int)(value_double + 0.5), value_double))
+	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
 		del_zeroes(tmp);
@@ -2864,6 +2864,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeroes(value);
+			/* break; is not missing here */
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
 				add_value_suffix(value, max_len, units, value_type);
@@ -2879,9 +2880,9 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *                                                                            *
  * Function: evaluate_macro_function                                          *
  *                                                                            *
- * Purpose: evaluate function used as a macro (e.g., in notifications)        *
+ * Purpose: evaluate function used in simple macro                            *
  *                                                                            *
- * Parameters: value     - [OUT] evaluation result (if it's successful)       *
+ * Parameters: result    - [OUT] evaluation result (if it's successful)       *
  *             host      - [IN] host the key belongs to                       *
  *             key       - [IN] item's key                                    *
  *                              (for example, 'system.cpu.load[,avg1]')       *
@@ -2892,31 +2893,29 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  * Comments: used for evaluation of notification macros                       *
- *           output buffer size should be MAX_BUFFER_LEN                      *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter)
+int	evaluate_macro_function(char **result, const char *host, const char *key, const char *function,
+		const char *parameter)
 {
 	const char	*__function_name = "evaluate_macro_function";
 
 	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
-	char		*error = NULL;
-	int		ret = FAIL, errcode;
+	char		value[MAX_BUFFER_LEN], *error = NULL;
+	int		ret, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
 
 	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 
-	if (SUCCEED != errcode)
+	if (SUCCEED != errcode || SUCCEED != evaluate_function(value, &item, function, parameter, time(NULL), &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,
-				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
-				host, key, function, parameter);
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate function \"%s:%s.%s(%s)\": %s", host, key, function,
+				parameter, (NULL == error ? "item does not exist" : error));
+		ret = FAIL;
 	}
-
-	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL), &error)))
+	else
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
@@ -2938,11 +2937,13 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		{
 			add_value_suffix(value, MAX_BUFFER_LEN, "s", ITEM_VALUE_TYPE_FLOAT);
 		}
+
+		*result = zbx_strdup(NULL, value);
+		ret = SUCCEED;
 	}
 
-	zbx_free(error);
-out:
 	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,6 +75,8 @@ class ConfigurationParameter
 				case TYPE_FILE:
 					userValue = new File(text);
 					break;
+				default:
+					throw new IllegalArgumentException(String.format("unknown type %d", type));
 			}
 		}
 		catch (Exception e)
@@ -83,7 +85,7 @@ class ConfigurationParameter
 		}
 
 		if (null != validator && !validator.validate(userValue))
-			throw new IllegalArgumentException("bad value for " + name + " parameter: '" + text + "'");
+			throw new IllegalArgumentException(String.format("bad value for %s parameter: '%s'", name, text));
 
 		if (null != postValidator)
 			postValidator.execute(userValue);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ class CXmlValidator {
 			'1.0' => 'C10XmlValidator',
 			'2.0' => 'C20XmlValidator',
 			'3.0' => 'C30XmlValidator',
-			'3.2' => 'C32XmlValidator'
+			'3.2' => 'C32XmlValidator',
+			'3.4' => 'C34XmlValidator'
 		];
 	}
 

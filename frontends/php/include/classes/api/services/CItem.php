@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ class CItem extends CItemGeneral {
 			'selectApplications'		=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
+			'selectPreprocessing'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -398,11 +399,6 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-
-			// set default formula value
-			if (!isset($item['formula'])) {
-				$item['formula'] = '1';
-			}
 		}
 		unset($item);
 
@@ -443,6 +439,8 @@ class CItem extends CItemGeneral {
 		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
 		}
+
+		$this->createItemPreprocessing($items);
 
 		$itemHosts = $this->get([
 			'output' => ['name'],
@@ -493,6 +491,8 @@ class CItem extends CItemGeneral {
 			DB::delete('items_applications', ['itemid' => $applicationids]);
 			DB::insert('items_applications', $itemApplications);
 		}
+
+		$this->updateItemPreprocessing($items);
 
 		$itemHosts = $this->get([
 			'output' => ['name'],
@@ -688,6 +688,7 @@ class CItem extends CItemGeneral {
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => ['applicationid'],
+			'selectPreprocessing' => ['type', 'params'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
@@ -698,6 +699,18 @@ class CItem extends CItemGeneral {
 		$this->inherit($items, $data['hostids']);
 
 		return true;
+	}
+
+	/**
+	 * Check item specific fields.
+	 *
+	 * @param array  $item			An array of single item data.
+	 * @param string $method		A string of "create" or "update" method.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkSpecificFields(array $item, $method) {
+		$this->validateItemPreprocessing($item, $method);
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
@@ -1098,6 +1111,29 @@ class CItem extends CItemGeneral {
 				}
 			}
 			unset($item);
+		}
+
+		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
+			$db_item_preproc = API::getApiService()->select('item_preproc', [
+				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
+				'filter' => ['itemid' => array_keys($result)],
+			]);
+
+			CArrayHelper::sort($db_item_preproc, ['step']);
+
+			foreach ($result as &$item) {
+				$item['preprocessing'] = [];
+			}
+			unset($item);
+
+			foreach ($db_item_preproc as $step) {
+				$itemid = $step['itemid'];
+				unset($step['item_preprocid'], $step['itemid'], $step['step']);
+
+				if (array_key_exists($itemid, $result)) {
+					$result[$itemid]['preprocessing'][] = $step;
+				}
+			}
 		}
 
 		return $result;
