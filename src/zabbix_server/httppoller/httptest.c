@@ -358,10 +358,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
-	char		*err_str = NULL;
+	char		*err_str = NULL, *buffer = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
-	char		*delay_str;
 	int		delay;
 	zbx_httpstat_t	stat;
 	double		speed_download = 0;
@@ -383,6 +382,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
 			httptest->httptest.httptestid);
+
+	buffer = zbx_strdup(buffer, httptest->httptest.delay);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer, MACRO_TYPE_COMMON,
+			NULL, 0);
+
+	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
+	{
+		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
+		lastfailedstep = -1;
+		goto httptest_error;
+	}
 
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -484,7 +494,20 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
-		httpstep.timeout = atoi(row[4]);
+		buffer = zbx_strdup(buffer, row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &buffer,
+				MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != is_time_suffix(buffer, &httpstep.timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is invalid", buffer);
+			goto httpstep_error;
+		}
+		else if (SEC_PER_HOUR < httpstep.timeout)
+		{
+			err_str = zbx_dsprintf(err_str, "timeout \"%s\" exceeds 1 hour limit", buffer);
+			goto httpstep_error;
+		}
 
 		httpstep.posts = zbx_strdup(NULL, row[5]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
@@ -724,14 +747,33 @@ clean:
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 
+httptest_error:
 	zbx_timespec(&ts);
+
+	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
+	{
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ZBX_JAN_2038, httptest->httptest.httptestid);
+	}
+	else if (0 > ts.sec + delay)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "nextcheck update causes overflow for web scenario \"%s\" on host \"%s\"",
+				httptest->httptest.name, host->name);
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ZBX_JAN_2038, httptest->httptest.httptestid);
+	}
+	else
+	{
+		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
+				ts.sec + delay, httptest->httptest.httptestid);
+	}
 
 	if (NULL != err_str)
 	{
-		if (0 == lastfailedstep)
+		if (0 >= lastfailedstep)
 		{
-			/* we are here either because cURL initialization failed */
-			/* or we have been compiled without cURL library */
+			/* we are here because web scenario update interval is invalid, */
+			/* cURL initialization failed or we have been compiled without cURL library */
 
 			lastfailedstep = 1;
 
@@ -763,36 +805,12 @@ clean:
 	}
 	DBfree_result(result);
 
-	delay_str = zbx_strdup(NULL, httptest->httptest.delay);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, &delay_str, MACRO_TYPE_COMMON,
-			NULL, 0);
-
-	if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid update interval \"%s\" configured for web scenario \"%s\""
-				" on host \"%s\"", delay_str, httptest->httptest.name, host->name);
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				ZBX_JAN_2038, httptest->httptest.httptestid);
-	}
-	else if (0 > ts.sec + delay)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "nextcheck update causes overflow for web scenario \"%s\" on host \"%s\"",
-				httptest->httptest.name, host->name);
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				ZBX_JAN_2038, httptest->httptest.httptestid);
-	}
-	else
-	{
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				ts.sec + delay, httptest->httptest.httptestid);
-	}
-
 	if (0 != speed_download_num)
 		speed_download /= speed_download_num;
 
 	process_test_data(httptest->httptest.httptestid, lastfailedstep, speed_download, err_str, &ts);
 
-	zbx_free(delay_str);
+	zbx_free(buffer);
 	zbx_free(err_str);
 
 	dc_flush_history();
