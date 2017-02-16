@@ -25,52 +25,65 @@
 class CTimePeriodsParser extends CParser {
 
 	private $time_period_parser;
+	private $user_macro_parser;
+
 	private $periods = [];
 	private $options = ['user_macros' => true];
 
 	public function __construct($options = []) {
-		$this->time_period_parser = new CTimePeriodParser();
-		$this->user_macro_parser = new CUserMacroParser();
-
 		if (array_key_exists('user_macros', $options)) {
 			$this->options['user_macros'] = $options['user_macros'];
+		}
+
+		$this->time_period_parser = new CTimePeriodParser();
+
+		if ($this->options['user_macros']) {
+			$this->user_macro_parser = new CUserMacroParser();
 		}
 	}
 
 	/**
 	 * Parse the given periods separated by a semicolon.
 	 *
-	 * @param string $source	Source string that needs to be parsed.
-	 * @param int   $pos		Position offset.
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->periods = [];
 
+		$periods = [];
 		$p = $pos;
 
-		for (; isset($source[$p]); $p++) {
+		while (isset($source[$p])) {
 			if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->time_period_parser->getLength();
-				$this->periods[] = $this->time_period_parser->getmatch();
+				$periods[] = $this->time_period_parser->getMatch();
 			}
 			elseif ($this->options['user_macros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->user_macro_parser->getLength();
-				$this->periods[] = $this->user_macro_parser->getmatch();
-			}
-
-			if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-				return self::PARSE_FAIL;
+				$periods[] = $this->user_macro_parser->getMatch();
 			}
 			else {
-				continue;
+				return self::PARSE_FAIL;
+			}
+
+			if (isset($source[$p])) {
+				if ($source[$p] === ';') {
+					$p++;
+				}
+				else {
+					return self::PARSE_FAIL;
+				}
 			}
 		}
 
-		$this->length = $p - $pos - 1;
+		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
+		$this->periods = $periods;
 
-		return (isset($source[$p - 1]) && $source[$p - 1] === ';') ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return self::PARSE_SUCCESS;
 	}
 
 	/**
