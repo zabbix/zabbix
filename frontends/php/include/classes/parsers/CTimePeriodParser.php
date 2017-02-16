@@ -35,7 +35,7 @@ class CTimePeriodParser extends CParser {
 		$this->match = '';
 
 		$pattern_wdays = '(?P<w_from>[1-7])(-(?P<w_till>[1-7]))?';
-		$pattern_hours = '(?P<h_from>[0-9]{1,2}):(?P<m_from>[0-9]{1,2})-(?P<h_till>[0-9]{1,2}):(?P<m_till>[0-9]{1,2})';
+		$pattern_hours = '(?P<h_from>[0-9]{1,2}):(?P<m_from>[0-9]{2})-(?P<h_till>[0-9]{1,2}):(?P<m_till>[0-9]{2})';
 
 		if (!preg_match('/^'.$pattern_wdays.','.$pattern_hours.'/', substr($source, $pos), $matches)) {
 			return self::PARSE_FAIL;

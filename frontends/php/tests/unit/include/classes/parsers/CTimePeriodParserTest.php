@@ -350,6 +350,20 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
+			],
+			[
+				'1-7,00:00-24:0', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'1-7,00:0-24:00', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
 			]
 		];
 	}
