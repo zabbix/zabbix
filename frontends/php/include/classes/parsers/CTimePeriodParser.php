@@ -24,179 +24,37 @@
  */
 class CTimePeriodParser extends CParser {
 
-	// Possible parsing states.
-	const STATE_NEW = 0;
-	const STATE_WEEK_DAY_FROM = 1;
-	const STATE_WEEK_DAY_TILL = 2;
-	const STATE_HOUR_FROM = 3;
-	const STATE_MINUTE_FROM = 4;
-	const STATE_HOUR_TILL = 5;
-	const STATE_MINUTE_TILL = 6;
-
 	/**
 	 * Parse the given period.
 	 *
-	 * @param string $source	Source string that needs to be parsed.
-	 * @param int    $pos		Position offset.
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 
-		$p = $pos;
+		$pattern_wdays = '(?P<w_from>[1-7])(-(?P<w_till>[1-7]))?';
+		$pattern_hours = '(?P<h_from>[0-9]{1,2}):(?P<m_from>[0-9]{1,2})-(?P<h_till>[0-9]{1,2}):(?P<m_till>[0-9]{1,2})';
 
-		if (!isset($source[$p])) {
+		if (!preg_match('/^'.$pattern_wdays.','.$pattern_hours.'/', substr($source, $pos), $matches)) {
 			return self::PARSE_FAIL;
 		}
 
-		$week_day_from = '';
-		$week_day_till = '';
-		$hours_from = '';
-		$hours_till = '';
-		$minutes_from = '';
-		$minutes_till = '';
-
-		$state = self::STATE_NEW;
-
-		while (isset($source[$p])) {
-			switch ($state) {
-				case self::STATE_NEW:
-					if (!is_numeric($source[$p])) {
-						return self::PARSE_FAIL;
-					}
-
-					$week_day_from = $source[$p];
-
-					$state = self::STATE_WEEK_DAY_FROM;
-					break;
-
-				case self::STATE_WEEK_DAY_FROM:
-					switch ($source[$p]) {
-						case '-':
-							$state = self::STATE_WEEK_DAY_TILL;
-							break;
-
-						case ',':
-							$state = self::STATE_HOUR_FROM;
-							break;
-
-						default:
-							return self::PARSE_FAIL;
-					}
-					break;
-
-				case self::STATE_WEEK_DAY_TILL:
-					switch ($source[$p]) {
-						case ',':
-							$state = self::STATE_HOUR_FROM;
-							break;
-
-						default:
-							if (!is_numeric($source[$p])) {
-								return self::PARSE_FAIL;
-							}
-
-							$week_day_till .= $source[$p];
-							break;
-					}
-					break;
-
-				case self::STATE_HOUR_FROM:
-					switch ($source[$p]) {
-						case ':':
-							$state = self::STATE_MINUTE_FROM;
-							break;
-
-						default:
-							if (!is_numeric($source[$p])) {
-								return self::PARSE_FAIL;
-							}
-
-							$hours_from .= $source[$p];
-					}
-					break;
-
-				case self::STATE_MINUTE_FROM:
-					switch ($source[$p]) {
-						case '-':
-							$state = self::STATE_HOUR_TILL;
-							break;
-
-						default:
-							if (!is_numeric($source[$p])) {
-								return self::PARSE_FAIL;
-							}
-
-							$minutes_from .= $source[$p];
-					}
-					break;
-
-				case self::STATE_HOUR_TILL:
-					switch ($source[$p]) {
-						case ':':
-							$state = self::STATE_MINUTE_TILL;
-							break;
-
-						default:
-							if (!is_numeric($source[$p])) {
-								return self::PARSE_FAIL;
-							}
-
-							$hours_till .= $source[$p];
-					}
-					break;
-
-				case self::STATE_MINUTE_TILL:
-					if (is_numeric($source[$p])) {
-						$minutes_till .= $source[$p];
-
-						if (strlen($minutes_till) > 2) {
-							$this->length = $p - $pos;
-							$this->match = substr($source, $pos, $this->length);
-
-							return self::PARSE_SUCCESS_CONT;
-						}
-
-						if (strlen($minutes_till) != 1 && strlen($minutes_till) != 2) {
-							return self::PARSE_FAIL;
-						}
-					}
-					else {
-						if (strlen($minutes_till) >= 2) {
-							$this->length = $p - $pos;
-							$this->match = substr($source, $pos, $this->length);
-
-							return self::PARSE_SUCCESS_CONT;
-						}
-
-						return self::PARSE_FAIL;
-					}
-			}
-
-			$p++;
+		if (($matches['w_till'] !== '' && $matches['w_from'] > $matches['w_till'])
+				|| $matches['m_from'] > 59 || $matches['m_till'] > 59) {
+			return self::PARSE_FAIL;
 		}
 
-		// String can end at any state. Validate the last entered characters depeding on the last state once more.
-		switch ($state) {
-			case self::STATE_MINUTE_TILL:
-				if ($week_day_from < 1 || $week_day_from > 7 || strlen($week_day_till) > 1 || $week_day_till > 7
-						|| (strlen($week_day_till) == 1 && $week_day_from > $week_day_till)
-						|| (strlen($hours_from) != 1 && strlen($hours_from) != 2) || $hours_from > 24
-						|| (strlen($hours_till) != 1 && strlen($hours_till) != 2) || $hours_till > 24
-						|| $hours_from > $hours_till || strlen($minutes_from) != 2 || $minutes_from > 59
-						|| strlen($minutes_till) != 2 || $minutes_till > 59
-						|| ($hours_from == $hours_till && $minutes_from >= $minutes_till)
-						|| ($hours_till == 24 && $minutes_till != 0)) {
-					return self::PARSE_FAIL;
-				}
-				break;
+		$time_from = $matches['h_from'] * SEC_PER_HOUR + $matches['m_from'] * SEC_PER_MIN;
+		$time_till = $matches['h_till'] * SEC_PER_HOUR + $matches['m_till'] * SEC_PER_MIN;
 
-			default:
-				return self::PARSE_FAIL;
+		if ($time_from >= $time_till || $time_till > 24 * SEC_PER_HOUR) {
+			return self::PARSE_FAIL;
 		}
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
+		$this->match = $matches[0];
+		$this->length = strlen($this->match);
 
 		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
