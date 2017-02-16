@@ -135,7 +135,9 @@ class C32ImportConverter extends CConverter {
 			}
 
 			// Convert to days.
-			$discovery_rule['lifetime'] .= 'd';
+			if (strpos($discovery_rule['lifetime'], '{') === false) {
+				$discovery_rule['lifetime'] .= 'd';
+			}
 		}
 		unset($discovery_rule);
 
