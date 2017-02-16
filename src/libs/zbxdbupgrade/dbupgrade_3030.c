@@ -283,7 +283,12 @@ static int	DBpatch_3030023(void)
 
 static void	DBpatch_conv_day(int *value, char *suffix)
 {
-	if (0 != *value && 0 == *value % 7)
+	if (25 * 365 < *value)
+	{
+		*value = 25 * 365;
+		*suffix = 'd';
+	}
+	else if (0 != *value && 0 == *value % 7)
 	{
 		*value /= 7;
 		*suffix = 'w';
