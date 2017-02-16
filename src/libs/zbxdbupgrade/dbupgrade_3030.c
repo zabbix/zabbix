@@ -631,11 +631,8 @@ static int	DBpatch_3030049(void)
 			DBpatch_conv_day(&value, &suffix);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d%c", value, suffix);
 		}
-		else	/* items.lifetime may be a macro, in such case simply append days unit */
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, row[1]);
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, 'd');
-		}
+		else	/* items.lifetime may be a macro, in such case simply rewrite with max allowed value */
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "9125d");	/* 25 * 365 days */
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "' where itemid=%s;\n", row[0]);
 
