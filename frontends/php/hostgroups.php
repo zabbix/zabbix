@@ -176,7 +176,10 @@ if (hasRequest('form')) {
 				}
 
 				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$groups_rights = applyHostgroupRightsToAllSubgroups($groupId);
+					$groups_rights = applyHostgroupRightsToAllSubgroups([
+						'name' => $name,
+						'id' => $groupId
+					]);
 
 					if ($groups_rights) {
 						API::UserGroup()->update($groups_rights);

@@ -372,23 +372,45 @@ function permissionText($perm) {
 /**
  * Apply host group rights to all subgroups
  *
- * @param int $hostgroupid
+ * @param array  $hostgroup
+ * @param string $hostgroup['name']
+ * @param int $hostgroup['id']
  *
  * @return array			Permissions for update.
  */
-function applyHostgroupRightsToAllSubgroups($hostgroupid) {
+function applyHostgroupRightsToAllSubgroups($hostgroup) {
 	$user_groups = API::UserGroup()->get([
 		'output' => [],
 		'selectRights' => 1
 	]);
 
+	$ex_groups_rights = getHostGroupsRights();
+
+	$host_group_name = $hostgroup['name'].'/';
+	$host_group_name_len = strlen($host_group_name);
+
+	$subgroup = [];
+	foreach ($ex_groups_rights as $groupid => $ex_group_rights) {
+		if (substr($ex_group_rights['name'], 0, $host_group_name_len) === $host_group_name) {
+			$subgroup[$groupid] = $ex_group_rights;
+		}
+	}
+
 	$upd_user_groups = [];
 	foreach ($user_groups as $user_group) {
 		foreach ($user_group['rights'] as $group_rights) {
-			if ($group_rights['id'] == $hostgroupid) {
+			if ($group_rights['id'] == $hostgroup['id']) {
 				$upd_user_groups[] = [
-					'usrgrpid' => $user_group['usrgrpid'],
-					'permission' => $group_rights['permission']
+						'usrgrpid' => $user_group['usrgrpid'],
+						'permission' => $group_rights['permission']
+				];
+
+				continue 2;
+			}
+			if (!array_key_exists($group_rights['id'], $subgroup)) {
+				$upd_user_groups[] = [
+						'usrgrpid' => $user_group['usrgrpid'],
+						'permission' => (String) PERM_NONE
 				];
 
 				continue 2;
@@ -399,11 +421,11 @@ function applyHostgroupRightsToAllSubgroups($hostgroupid) {
 	$upd_groups_rights = [];
 	foreach ($upd_user_groups as $upd_user_group) {
 		$groups_rights = collapseHostGroupRights(getHostGroupsRights([$upd_user_group['usrgrpid']]));
-		$groups_rights = applyHostGroupRights($groups_rights, [], [$hostgroupid], $upd_user_group['permission']);
+		$groups_rights = applyHostGroupRights($groups_rights, [], [$hostgroup['id']], $upd_user_group['permission']);
 
 		$user_group_rights = [];
 		foreach ($groups_rights as $groupid => $group_rights) {
-			if ($groupid != 0 && $group_rights['permission'] != PERM_NONE) {
+			if ($groupid != 0) {
 				$user_group_rights[] = [
 					'id' => $groupid,
 					'permission' => $group_rights['permission']
