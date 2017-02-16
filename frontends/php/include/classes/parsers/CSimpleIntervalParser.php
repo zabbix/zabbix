@@ -24,59 +24,22 @@
  */
 class CSimpleIntervalParser extends CParser {
 
-	const STATE_NEW = 0;
-	const STATE_NUM_FOUND = 1;
-	const STATE_LETTER_FOUND = 2;
-
 	/**
 	 * Parse the given source string.
 	 *
-	 * @param string $source	Source string that needs to be parsed.
-	 * @param int    $pos		Position offset.
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 
-		$p = $pos;
-		$state = self::STATE_NEW;
-
-		if (!isset($source[$p])) {
+		if (!preg_match('/^([0-9]+['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $pos), $matches)) {
 			return self::PARSE_FAIL;
 		}
 
-		while (isset($source[$p])) {
-			switch ($state) {
-				case self::STATE_NEW:
-					if (is_numeric($source[$p])) {
-						$state = self::STATE_NUM_FOUND;
-					}
-					else {
-						return self::PARSE_FAIL;
-					}
-					break;
-
-				case self::STATE_NUM_FOUND:
-					if (!is_numeric($source[$p])) {
-						if (strpos(ZBX_TIME_SUFFIXES, $source[$p]) === false) {
-							break 2;
-						}
-						else {
-							$state = self::STATE_LETTER_FOUND;
-						}
-					}
-					break;
-
-				case self::STATE_LETTER_FOUND:
-					break 2;
-			}
-
-			$p++;
-		}
-
-		$this->length = $p - $pos;
-
-		$this->match = substr($source, $pos, $this->length);
+		$this->match = $matches[0];
+		$this->length = strlen($this->match);
 
 		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}

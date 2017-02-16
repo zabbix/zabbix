@@ -70,6 +70,27 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'02', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '02'
+				]
+			],
+			[
+				'00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '00'
+				]
+			],
+			[
+				'00h', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '00h'
+				]
+			],
+			[
 				'2w', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
