@@ -1167,9 +1167,9 @@ return [
 			],
 			'timeout' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '15',
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '15s',
 			],
 			'posts' => [
 				'null' => false,
