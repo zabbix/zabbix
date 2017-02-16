@@ -1,6 +1,7 @@
 Changes for 3.2.4rc1
 
 New features:
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process
 .......PS. [ZBXNEXT-3681] improved bulk inserts for Oracle database backend (wiper)
 ........S. [ZBXNEXT-3669] optimized trigger expression batch processing to avoid recalculation of identical functions (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
@@ -332,6 +333,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
@@ -1946,6 +1948,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ...G...... [ZBX-11719] fixed reading files with vfs.file.regmatch[] and vfs.file.cksum[] keys on windows (Sergejs)
