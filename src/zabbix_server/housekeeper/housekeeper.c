@@ -215,7 +215,12 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
 static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		zbx_hk_item_cache_t *item_record, int history)
 {
-	int	keep_from = now - history * SEC_PER_DAY;
+	int	keep_from;
+
+	if ((zbx_uint64_t)history * SEC_PER_DAY > now)
+		keep_from = 0;
+	else
+		keep_from = now - history * SEC_PER_DAY;
 
 	if (keep_from > item_record->min_clock)
 	{
