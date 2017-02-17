@@ -1010,7 +1010,7 @@ class testUrlParameters extends CWebTest {
 				'test_cases' => [
 					[
 						'url' => 'srv_status.php?period=today',
-						'text_present' => 'Sservices'
+						'text_present' => 'Services'
 					],
 					[
 						'url' => 'srv_status.php?period=week',
