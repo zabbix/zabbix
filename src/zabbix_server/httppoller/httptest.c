@@ -372,6 +372,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			" order by no",
 			httptest->httptest.httptestid);
 
+	/* Explicitly initialize the name. If we compile without libCURL support, we avoid the potential usage */
+	/* of unititialized values*/
+	httpstep.name = NULL;
+
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -725,8 +729,11 @@ clean:
 			lastfailedstep = 1;
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\""
-				": %s", httpstep.name, httptest->httptest.name, host->name, err_str);
+		if (NULL != httpstep.name)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
+					httpstep.name, httptest->httptest.name, host->name, err_str);
+		}
 	}
 	DBfree_result(result);
 
