@@ -7,6 +7,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+...G...... [ZBX-11568] fixed wrong number round for cpu statistics (abs)
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 ........S. [ZBX-11740] fixed empty value handling in event correlation on oracle databases (wiper)
@@ -333,6 +334,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+...G...... [ZBX-11568] fixed wrong number round for cpu statistics (abs)
 ........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
