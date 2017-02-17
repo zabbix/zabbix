@@ -372,8 +372,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			" order by no",
 			httptest->httptest.httptestid);
 
-	/* Explicitly initialize the name. If we compile without libCURL support, we avoid the potential usage */
-	/* of unititialized values*/
+	/* Explicitly initialize the name. If we compile without libCURL support, */
+	/* we avoid the potential usage of unititialized values. */
 	httpstep.name = NULL;
 
 #ifdef HAVE_LIBCURL
