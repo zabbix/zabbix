@@ -1029,6 +1029,244 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'md01-31wd/6,1-5/4,2-7/5h1-5,7-10/03m1-1,58-59/1,/1,/59s/30,1-4,05-09,58-59/1,/1,/59'
 				]
 			],
+			[
+				'md31w7h23m59s99', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md31'
+				]
+			],
+			[
+				'md31w7h23m99', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md31'
+				]
+			],
+			[
+				'md4h23m99', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md4h23'
+				]
+			],
+			[
+				'md1-31wd7h', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-31wd7'
+				]
+			],
+			[
+				'md1-31wd9', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-31'
+				]
+			],
+			[
+				'md/30,1-5/4,8888-31/23', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md/30,1-5/4'
+				]
+			],
+			[
+				'md1-5,8--31', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-5,8'
+				]
+			],
+			[
+				'md1-5,,8-31', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-5'
+				]
+			],
+			[
+				'm00-59/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm00-59'
+				]
+			],
+			[
+				's00-59/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's00-59'
+				]
+			],
+			[
+				'h00-23/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'h00-23'
+				]
+			],
+			[
+				'h1-', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'h1'
+				]
+			],
+			[
+				'h00-23md1-31', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'h00-23'
+				]
+			],
+			[
+				'wd1-5/4,/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-5/4'
+				]
+			],
+			[
+				'wd1-7/6md', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-7/6'
+				]
+			],
+			[
+				'wd1--7/1', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1'
+				]
+			],
+			[
+				'wd1-7/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-7'
+				]
+			],
+			[
+				'md1-5/4,', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-5/4'
+				]
+			],
+			[
+				'md1-5/4,/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-5/4'
+				]
+			],
+			[
+				'wd1-5/4,', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-5/4'
+				]
+			],
+			[
+				'md28-31/', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md28-31'
+				]
+			],
+			[
+				'md01--31/1', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md01'
+				]
+			],
+			[
+				'md1/1', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1'
+				]
+			],
+			[
+				'md01-01/01', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md01-01'
+				]
+			],
+			[
+				'h01-01/01', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'h01-01'
+				]
+			],
+			[
+				'm01-01/01', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm01-01'
+				]
+			],
+			[
+				's01-01/01', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's01-01'
+				]
+			],
+			[
+				'h00-00/00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'h00-00'
+				]
+			],
+			[
+				'm00-00/00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm00-00'
+				]
+			],
+			[
+				's00-00/00', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's00-00'
+				]
+			],
+			[
+				'wd1-7/06', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-7'
+				]
+			],
+			[
+				'wd1-1/1', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1-1'
+				]
+			],
+			[
+				'md1-31/0000', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-31'
+				]
+			],
+			[
+				'md1-31/001', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1-31'
+				]
+			],
 			// fail
 			[
 				'md', 0,
@@ -1115,49 +1353,7 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'md1/1', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md01--31/1', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md28-31/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-5/4,', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-5/4,/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'md03-02/1', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md01-01/01', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1234,41 +1430,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'wd1--7/1', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-7/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-5/4,', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-5/4,/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-7/6md', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'ha', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1290,28 +1451,7 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'h00-23/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'h,', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'h1-', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'h00-23md1-31', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1339,13 +1479,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'm00-59/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'ss', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1367,28 +1500,7 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				's00-59/', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'zmd28-30', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-5,,8-31', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-5,8--31', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1403,13 +1515,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'md000000', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md/30,1-5/4,8888-31/23', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1444,20 +1549,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'md1-31/0000', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-31/001', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'md/003;', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1480,13 +1571,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'wd0-0/0', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-1/1', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1522,13 +1606,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'wd001-7', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'wd1-7/06', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -1584,20 +1661,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'h00-00/00', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'h01-01/01', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				'm99', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1640,20 +1703,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'm00-00/00', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'm01-01/01', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
 				's99', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1690,55 +1739,6 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				's23-15/1', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				's00-00/00', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				's01-01/01', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-31wd9', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md1-31wd7h', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md4h23m99', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md31w7h23m99', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'md31w7h23m59s99', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
