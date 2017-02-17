@@ -3,7 +3,7 @@ Changes for 2.2.17rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ...G...... [ZBX-11719] fixed reading files with vfs.file.regmatch[] and vfs.file.cksum[] keys on windows (Sergejs)
