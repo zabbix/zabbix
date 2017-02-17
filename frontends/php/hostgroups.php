@@ -406,7 +406,8 @@ if (hasRequest('form')) {
 		'name' => getRequest('name', ''),
 		'hosts' => getRequest('hosts', []),
 		'twb_groupid' => getRequest('twb_groupid', -1),
-		'r_hosts' => []
+		'r_hosts' => [],
+		'subgroups' => getRequest('subgroups', 0)
 	];
 
 	if ($data['groupid'] != 0) {
