@@ -292,7 +292,7 @@ class CUserGroup extends CApiService {
 			'users_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'rights' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE, PERM_NONE])]
+				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
 			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
 		]];
