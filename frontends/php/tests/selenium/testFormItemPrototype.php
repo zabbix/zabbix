@@ -1046,16 +1046,16 @@ class testFormItemPrototype extends CWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
-				$this->zbxTestTextPresent('Update interval (in sec)');
+				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 1024);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
-					$this->zbxTestAssertElementValue('delay', 30);
+					$this->zbxTestAssertElementValue('delay', '30s');
 				}
 				break;
 			default:
-				$this->zbxTestTextNotVisibleOnPage('Update interval (in sec)');
+				$this->zbxTestTextNotVisibleOnPage('Update interval');
 				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
@@ -1120,11 +1120,11 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', 'Action']);
 				$this->zbxTestAssertVisibleId('delayFlexTable');
 
-				$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval (in sec)']);
+				$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
 				$this->zbxTestAssertVisibleId('delay_flex_0_delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 5);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', 50);
+				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 				$this->zbxTestAssertVisibleId('delay_flex_0_period');
 				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
@@ -1142,26 +1142,26 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestAssertNotVisibleId('interval_add');
 		}
 
-		$this->zbxTestTextPresent('History storage period (in days)');
+		$this->zbxTestTextPresent('History storage period');
 		$this->zbxTestAssertVisibleId('history');
-		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 8);
+		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='history']", 'size', 20);
-		$this->zbxTestAssertElementValue('history', 90);
+		$this->zbxTestAssertElementValue('history', '90d');
 		if (!isset($itemid)) {
-			$this->zbxTestAssertElementValue('history', 90);
+			$this->zbxTestAssertElementValue('history', '90d');
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Trend storage period (in days)');
+			$this->zbxTestTextPresent('Trend storage period');
 			$this->zbxTestAssertVisibleId('trends');
-			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 8);
+			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 255);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('trends', 365);
+				$this->zbxTestAssertElementValue('trends', '365d');
 			}
 			$this->zbxTestAssertAttribute("//input[@id='trends']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Trend storage period (in days)');
+			$this->zbxTestTextNotVisibleOnPage('Trend storage period');
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 
@@ -1366,9 +1366,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => '-30',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1379,9 +1379,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 86401,
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1396,7 +1396,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid interval "50/": unexpected end of interval.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1411,7 +1411,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid interval "50/1-11,00:00-24:00": incorrect syntax near "1,00:00-24:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1426,7 +1426,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect time period "1-7,00:00-25:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1441,7 +1441,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1769,10 +1769,10 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
-					'history' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'history' => 2147483648,
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value "65536" for "History storage period" field: must be between 0 and 65535.'
+						'Incorrect value for field "history": must be between "3600" and "2147483647"'
 					]
 				]
 			],
@@ -1783,9 +1783,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "history": invalid history storage period'
 					]
 				]
 			],
@@ -1807,9 +1807,9 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => '-1',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "-1" for "Trend storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "trends": invalid trend storage period'
 					]
 				]
 			],
@@ -1819,10 +1819,10 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
-					'trends' => 65536,
-					'error_msg' => 'Page received incorrect data',
+					'trends' => 2147483648,
+					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
+							'Incorrect value for field "trends": must be between "86400" and "2147483647"'
 					]
 				]
 			],

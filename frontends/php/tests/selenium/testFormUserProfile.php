@@ -23,7 +23,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testFormUserProfile extends CWebTest {
 
 	public function testFormProfile_SimpleUpdate() {
-		$sqlHashUsers = 'select * from users order by userid';
+		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
+				. ' from users order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');

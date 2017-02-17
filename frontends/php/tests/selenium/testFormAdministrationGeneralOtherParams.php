@@ -138,7 +138,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestCheckHeader('Other configuration parameters');
 		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '65536');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
+		$this->zbxTestTextPresent('Invalid refresh of unsupported items: must be between "0" and "65535"');
 	}
-
 }

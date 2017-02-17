@@ -409,11 +409,11 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
 
-		$this->zbxTestTextPresent('Update interval (in sec)');
+		$this->zbxTestTextPresent('Update interval');
 		$this->zbxTestAssertVisibleId('delay');
-		$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 5);
+		$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
-		$this->zbxTestAssertElementValue('delay', 60);
+		$this->zbxTestAssertElementValue('delay', '1m');
 
 		$this->zbxTestTextPresent('Attempts');
 		$this->zbxTestAssertVisibleId('retries');
@@ -883,9 +883,9 @@ class testFormWeb extends CWebTest {
 					'add_step' => [
 						['step' => 'Interval- minus one']
 					],
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "-1" for "Update interval (in sec)" field: must be between 1 and 86400.'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -898,9 +898,9 @@ class testFormWeb extends CWebTest {
 					'add_step' => [
 						['step' => 'Interval- zero']
 					],
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "0" for "Update interval (in sec)" field: must be between 1 and 86400.'
+						'Incorrect value for field "delay": must be between "1" and "86400"'
 					]
 				]
 			],
@@ -935,9 +935,9 @@ class testFormWeb extends CWebTest {
 					'add_step' => [
 						['step' => 'Interval- 86401']
 					],
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 1 and 86400.'
+						'Incorrect value for field "delay": must be between "1" and "86400"'
 					]
 				]
 			],

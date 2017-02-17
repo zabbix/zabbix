@@ -195,10 +195,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$sql = 'SELECT ok_ack_style FROM config WHERE ok_ack_style=1 AND ok_ack_color='.zbx_dbstr('00AA00').'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_ack_style" for acknowledged OK events');
 
-		$sql = 'SELECT ok_period FROM config WHERE ok_period=1800';
+		$sql = "SELECT ok_period FROM config WHERE ok_period='30m'";
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "ok_period" for displaying OK triggers');
 
-		$sql = 'SELECT blink_period FROM config WHERE blink_period=1800';
+		$sql = "SELECT blink_period FROM config WHERE blink_period='30m'";
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "blink_period"');
 
 		// hash calculation for the DB fields that should be changed in this report
