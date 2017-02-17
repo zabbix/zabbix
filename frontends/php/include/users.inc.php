@@ -169,7 +169,7 @@ function getUserFullname($userData) {
 /**
  * Returns the list of permissions to the host groups for selected user groups.
  *
- * @param string $usrgrpid
+ * @param array $usrgrpids		An array of user group IDs.
  *
  * @return array
  */
