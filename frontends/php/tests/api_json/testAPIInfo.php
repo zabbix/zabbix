@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class API_JSON_APIInfo extends CZabbixTest {
+class testAPIInfo extends CZabbixTest {
 
 	public function testAPIInfo_VersionWithoutAuth() {
 		$result = $this->api_call('apiinfo.version', [], $debug);
