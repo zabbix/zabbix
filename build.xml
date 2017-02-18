@@ -94,6 +94,17 @@
 		</exec>
 	</target>
 
+	<target name="init-api-postgresql" depends="init-postgresql">
+		<exec executable="psql" input="tests/data/data_api_test.sql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
 	<target name="init-mysql" depends="create-configs,make-dbschema">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
@@ -137,6 +148,15 @@
 		</exec>
 	</target>
 
+	<target name="init-api-mysql" depends="init-mysql">
+		<exec executable="mysql" input="tests/data/data_api_test.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="frontends/php/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
@@ -159,8 +179,8 @@
 	<target name="build-phpunit" depends="test-phpunit"/>
 	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
 	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
-	<target name="build-api-mysql" depends="init-mysql,test-api"/>
-	<target name="build-api-postgresql" depends="init-postgresql,test-api"/>
+	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
+	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 
 	<!-- Default target -->
 	<target name="build" depends="build-phpunit,build-mysql,build-postgresql"/>
