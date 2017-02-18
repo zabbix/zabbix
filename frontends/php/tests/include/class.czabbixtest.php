@@ -119,6 +119,34 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 		return $decoded;
 	}
 
+	function api_call_with_user($method, $user, $params, &$debug) {
+		global $ID;
+
+		$data = [
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => $user,
+			'id' => $this->ID
+		];
+
+		$response = $this->do_post_request($data, $debug);
+		$decoded = json_decode($response, true);
+		$auth=$decoded["result"];
+
+		$data = [
+			'jsonrpc' => '2.0',
+			'method' => $method,
+			'params' => $params,
+			'auth' => $auth,
+			'id' => $this->ID
+		];
+
+		$response = $this->do_post_request($data, $debug);
+		$decoded = json_decode($response, true);
+
+		return $decoded;
+	}
+
 
 	protected function setUp() {
 		global $DB, $URL;
