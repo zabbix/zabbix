@@ -2526,7 +2526,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 	time_t			now;
 	unsigned char		old_poller_type, status, type, value_type;
-	int			old_nextcheck, delay_changed, delay_macros_expanded, key_changed, found, update_index;
+	int			old_nextcheck, type_changed, delay_changed, delay_macros_expanded, key_changed, found,
+				update_index;
 	char			*delay = NULL;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
@@ -2728,9 +2729,12 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_free(delay);
 		}
 
+		type_changed = (item->type != type);
+		item->type = type;
+
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
+			item->poller_type = poller_by_item(host->proxy_hostid, item->type, item->key);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -2739,8 +2743,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (SUCCEED == is_counted_in_item_queue(type, item->key) && 0 != delay_macros_expanded &&
-					(0 == item->nextcheck || 0 != key_changed || item->type != type ||
+			if (SUCCEED == is_counted_in_item_queue(item->type, item->key) && 0 != delay_macros_expanded &&
+					(0 == item->nextcheck || 0 != key_changed || 0 != type_changed ||
 					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state && 0 != delay_changed)))
 			{
@@ -2753,11 +2757,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 				proxy_timediff = (NULL == proxy ? 0 : proxy->timediff);
 
-				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, type, item->key);
+				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
-					item->nextcheck = calculate_item_nextcheck(seed, type,
+					item->nextcheck = calculate_item_nextcheck(seed, item->type,
 							config->config->refresh_unsupported, NULL,
 							now - proxy_timediff);
 					item->nextcheck += proxy_timediff + (NULL != proxy);
@@ -2794,8 +2798,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					}
 					else
 					{
-						item->nextcheck = calculate_item_nextcheck(seed, type, simple_interval,
-								custom_intervals, now - proxy_timediff);
+						item->nextcheck = calculate_item_nextcheck(seed, item->type,
+								simple_interval, custom_intervals, now - proxy_timediff);
 						item->nextcheck += proxy_timediff + (NULL != proxy);
 						zbx_custom_interval_free(custom_intervals);
 					}
@@ -2805,7 +2809,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* update host's used_interfaces flag */
 			if (ZBX_FLAG_INTERFACE_UNKNOWN != host->used_interfaces)
 			{
-				switch (type)
+				switch (item->type)
 				{
 					case ITEM_TYPE_ZABBIX:
 						host->used_interfaces |= ZBX_FLAG_INTERFACE_ZABBIX;
@@ -2830,8 +2834,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->nextcheck = 0;
 			item->unreachable = 0;
 		}
-
-		item->type = type;
 
 		/* numeric items */
 
