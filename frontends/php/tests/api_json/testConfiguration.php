@@ -467,7 +467,7 @@ class testConfiguration extends CZabbixTest {
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version>3.2</version><date>2016-12-09T07:12:45Z</date>' ,
-				'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 78].'
+				'error' => 'Cannot read XML: (77) Premature end of data in tag zabbix_export line 2 [Line: 2 | Column: 58].'
 			],
 			[
 				'format' => 'json',

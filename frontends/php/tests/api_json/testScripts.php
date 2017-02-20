@@ -395,8 +395,8 @@ class testScripts extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($scripts as $script) {
-				if (array_key_exists('name', $script) && array_key_exists('scriptid', $script)){
-					$dbResult = "select * from scripts where scriptid=".$script['scriptid']." and name='".$script['name']."'";
+				if (array_key_exists('name', $script) && $script['name'] != 'Ping'){
+					$dbResult = "select * from scripts where name='".$script['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
@@ -606,7 +606,7 @@ class testScripts extends CZabbixTest {
 						'name' => 'Api script with all properties',
 						'command' => 'reboot agent',
 						'host_access' => '3',
-						'usrgrpid' => '21',
+						'usrgrpid' => '13',
 						'groupid' => '50005',
 						'description' => 'Check successfully creation or update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
@@ -653,7 +653,7 @@ class testScripts extends CZabbixTest {
 				$this->assertTrue(array_key_exists('error', $result));
 
 				$this->assertSame($expected_error, $result['error']['data']);
-				$dbResult = 'select * from scripts where name='.$script['name'];
+				$dbResult = "select * from scripts where name='".$script['name']."'";
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
@@ -687,7 +687,7 @@ class testScripts extends CZabbixTest {
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (8) already exists.'
 			],
-			// // Check if deleted scripts used in actions.
+			// Check if deleted scripts used in actions.
 			[
 				'script' => ['11'],
 				'success_expected' => false,

@@ -262,7 +262,7 @@ class testUserMacro extends CZabbixTest {
 
 			$this->assertEquals($expected_error, $result['error']['data']);
 			if (array_key_exists('macro', $globalmacro)) {
-				$dbResult = 'select * from globalmacro where macro='.$globalmacro['macro'];
+				$dbResult = "select * from globalmacro where macro='".$globalmacro['macro']."'";
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
@@ -379,8 +379,8 @@ class testUserMacro extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($globalmacros as $globalmacro) {
-				if (array_key_exists('macro', $globalmacro)) {
-					$dbResult = 'select * from globalmacro where macro='.$globalmacro['macro'];
+				if (array_key_exists('macro', $globalmacro) && $globalmacro['macro'] != '{$SNMP_COMMUNITY}') {
+					$dbResult = "select * from globalmacro where macro='".$globalmacro['macro']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}

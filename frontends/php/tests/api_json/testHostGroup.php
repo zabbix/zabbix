@@ -212,7 +212,7 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '0.0',
-					'name' => 'æų'
+					'name' => 'æųæų'
 					]
 				],
 				'success_expected' => false,
@@ -338,9 +338,8 @@ class testHostGroup extends CZabbixTest {
 
 			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($hostgroups as $hostgroup) {
-				if (array_key_exists('name', $hostgroup) && array_key_exists('groupid', $hostgroup)){
-					$dbResult = "select * from groups where groupid=".$hostgroup['groupid'].
-							" and name='".$hostgroup['name']."'";
+				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] != 'Templates'){
+					$dbResult = "SELECT * FROM groups WHERE name='".$hostgroup['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}

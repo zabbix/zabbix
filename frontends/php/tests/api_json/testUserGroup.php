@@ -387,9 +387,8 @@ class testUserGroup extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($groups as $group) {
-				if (array_key_exists('name', $group) && array_key_exists('usrgrpid', $group)){
-					$dbResult = "select * from usrgrp where usrgrpid=".$group['usrgrpid'].
-							" and name='".$group['name']."'";
+				if (array_key_exists('name', $group) && $group['name'] != 'Zabbix administrators'){
+					$dbResult = "select * from usrgrp where name='".$group['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}

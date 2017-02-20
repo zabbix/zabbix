@@ -649,9 +649,8 @@ class testValuemap extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($valuemaps as $valuemap) {
-				if (array_key_exists('name', $valuemap) && array_key_exists('valuemapid', $valuemap)){
-					$dbResult = "select * from valuemaps where valuemapid=".$valuemap['valuemapid'].
-								" and name='".$valuemap['name']."'";
+				if (array_key_exists('name', $valuemap) && $valuemap['name'] != 'APC Battery Replacement Status'){
+					$dbResult = "select * from valuemaps where name='".$valuemap['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
