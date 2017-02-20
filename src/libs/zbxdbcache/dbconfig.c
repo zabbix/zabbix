@@ -867,7 +867,34 @@ typedef enum
 }
 zbx_reachability_t;
 
-static int	DCitem_host_disabled_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host);
+static int	DCitem_host_disabled_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			if (0 != host->errors_from)
+				return host->disable_until;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			if (0 != host->snmp_errors_from)
+				return host->snmp_disable_until;
+			break;
+		case ITEM_TYPE_IPMI:
+			if (0 != host->ipmi_errors_from)
+				return host->ipmi_disable_until;
+			break;
+		case ITEM_TYPE_JMX:
+			if (0 != host->jmx_errors_from)
+				return host->jmx_disable_until;
+			break;
+		default:
+			/* nothing to do */;
+	}
+
+	return 0;
+}
 
 static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, zbx_reachability_t reach, int now)
 {
@@ -929,35 +956,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 
 	if (NULL != proxy)
 		item->nextcheck += proxy->timediff + 1;
-}
-
-static int	DCitem_host_disabled_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
-{
-	switch (item->type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			if (0 != host->errors_from)
-				return host->disable_until;
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (0 != host->snmp_errors_from)
-				return host->snmp_disable_until;
-			break;
-		case ITEM_TYPE_IPMI:
-			if (0 != host->ipmi_errors_from)
-				return host->ipmi_disable_until;
-			break;
-		case ITEM_TYPE_JMX:
-			if (0 != host->jmx_errors_from)
-				return host->jmx_disable_until;
-			break;
-		default:
-			/* nothing to do */;
-	}
-
-	return 0;
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
