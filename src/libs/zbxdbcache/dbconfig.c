@@ -2748,62 +2748,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state && 0 != delay_changed)))
 			{
-				ZBX_DC_PROXY	*proxy = NULL;
-				zbx_uint64_t	seed;
-				int		proxy_timediff;
-
-				if (0 != host->proxy_hostid)
-					proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid);
-
-				proxy_timediff = (NULL == proxy ? 0 : proxy->timediff);
-
-				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
-
-				if (ITEM_STATE_NOTSUPPORTED == item->state)
-				{
-					item->nextcheck = calculate_item_nextcheck(seed, item->type,
-							config->config->refresh_unsupported, NULL,
-							now - proxy_timediff);
-					item->nextcheck += proxy_timediff + (NULL != proxy);
-				}
-				else
-				{
-					int			simple_interval;
-					zbx_custom_interval_t	*custom_intervals;
-					char			*error = NULL;
-
-					if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval,
-							&custom_intervals, &error))
-					{
-						zbx_timespec_t	ts = {now, 0};
-
-						/* Usual way for an item to become not supported is to receive an    */
-						/* error instead of value. Item state and error will be updated by   */
-						/* history syncer during history sync following a regular procedure  */
-						/* with item update in database and config cache, logging etc. There */
-						/* is no need to set ITEM_STATE_NOTSUPPORTED here. */
-
-						dc_add_history(item->itemid, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-								error);
-						zbx_free(error);
-
-						/* Polling items with invalid update intervals repeatedly does not    */
-						/* make sense because they can only be healed by editing              */
-						/* configuration (either update interval or macros involved) and such */
-						/* changes will be detected during configuration synchronization.     */
-						/* Items with new update intervals or with macros in them are         */
-						/* requeued automatically. */
-
-						item->nextcheck = ZBX_JAN_2038;
-					}
-					else
-					{
-						item->nextcheck = calculate_item_nextcheck(seed, item->type,
-								simple_interval, custom_intervals, now - proxy_timediff);
-						item->nextcheck += proxy_timediff + (NULL != proxy);
-						zbx_custom_interval_free(custom_intervals);
-					}
-				}
+				item->nextcheck = DCget_reachable_nextcheck(item, host, now);
 			}
 
 			/* update host's used_interfaces flag */
