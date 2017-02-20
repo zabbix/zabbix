@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-16 21:08+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2015-10-09 08:08+0300\n"
 "Last-Translator: ekakela <ekakela@gmail.com>\n"
 "Language-Team: none\n"
@@ -517,11 +517,12 @@ msgstr "Aktiivinen asti"
 #: include/views/hostmacros.php:163
 #: include/views/js/administration.general.valuemapping.edit.js.php:24
 #: include/views/js/adm.regexprs.edit.js.php:188
-#: include/views/js/configuration.action.edit.js.php:230
-#: include/views/js/configuration.action.edit.js.php:516
+#: include/views/js/configuration.action.edit.js.php:228
+#: include/views/js/configuration.action.edit.js.php:517
 #: include/views/js/configuration.discovery.edit.js.php:111
 #: include/views/js/configuration.discovery.edit.js.php:674
 #: include/views/js/monitoring.screen.edit.js.php:72
+#: include/views/js/monitoring.slideconf.edit.js.php:92
 #: include/views/js/monitoring.sysmap.edit.js.php:90
 #: include/views/js/monitoring.sysmaps.js.php:168
 #: include/views/js/monitoring.sysmaps.js.php:359
@@ -742,7 +743,7 @@ msgstr "Mikä tahansa merkkijono mukaanluettuna"
 #: include/views/configuration.httpconf.edit.php:62
 #: include/views/configuration.httpconf.edit.php:67
 #: include/views/configuration.httpconf.list.php:85
-#: include/views/inventory.host.view.php:168
+#: include/views/inventory.host.view.php:171
 #: include/views/js/monitoring.sysmaps.js.php:115
 #: include/views/monitoring.screen.constructor.edit.php:514 latest.php:339
 msgid "Application"
@@ -791,7 +792,7 @@ msgstr "Sovellus ID:llä \"%1$s\" ei ole käytettävissä koneella \"%2$s\"."
 #: include/views/configuration.item.prototype.edit.php:381
 #: include/views/configuration.item.prototype.list.php:48
 #: include/views/configuration.template.edit.php:183
-#: include/views/conf.import.php:33 include/views/inventory.host.view.php:155
+#: include/views/conf.import.php:33 include/views/inventory.host.view.php:158
 #: popup.php:55 search.php:134 search.php:160 search.php:189 search.php:399
 #: search.php:424 search.php:456 templates.php:598 templates.php:728
 msgid "Applications"
@@ -1205,7 +1206,7 @@ msgstr ""
 #: include/views/js/administration.general.housekeeper.edit.js.php:40
 #: include/views/js/administration.general.trigger.options.js.php:13
 #: include/views/js/administration.general.triggerSeverity.js.php:13
-#: include/views/js/configuration.action.edit.js.php:79
+#: include/views/js/configuration.action.edit.js.php:76
 #: include/views/js/configuration.discovery.edit.js.php:112
 #: include/views/js/configuration.discovery.edit.js.php:536
 #: include/views/js/configuration.discovery.edit.js.php:607
@@ -1363,7 +1364,7 @@ msgstr ""
 msgid "Cannot add service"
 msgstr ""
 
-#: slideconf.php:156
+#: slideconf.php:149
 msgid "Cannot add slide show"
 msgstr ""
 
@@ -1692,7 +1693,7 @@ msgstr ""
 msgid "Cannot delete service"
 msgstr ""
 
-#: slideconf.php:187 slideconf.php:208
+#: slideconf.php:180 slideconf.php:201
 msgid "Cannot delete slide show"
 msgstr ""
 
@@ -2174,7 +2175,7 @@ msgstr ""
 msgid "Cannot read XML: %1$s."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:221
+#: include/classes/server/CZabbixServer.php:248
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr ""
@@ -2191,7 +2192,7 @@ msgstr ""
 msgid "Cannot save discovery rule without checks."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:191
+#: include/classes/server/CZabbixServer.php:218
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
@@ -2521,7 +2522,7 @@ msgstr ""
 msgid "Cannot update service"
 msgstr ""
 
-#: slideconf.php:141
+#: slideconf.php:134
 msgid "Cannot update slide show"
 msgstr ""
 
@@ -2932,7 +2933,7 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
-#: include/menu.inc.php:185 include/views/inventory.host.view.php:176
+#: include/menu.inc.php:185 include/views/inventory.host.view.php:179
 #: jsLoader.php:182
 msgid "Configuration"
 msgstr ""
@@ -3133,12 +3134,12 @@ msgstr ""
 msgid "Connection security"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:207
+#: include/classes/server/CZabbixServer.php:234
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:282
+#: include/classes/server/CZabbixServer.php:312
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -3146,7 +3147,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:270
+#: include/classes/server/CZabbixServer.php:300
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -3156,7 +3157,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:278
+#: include/classes/server/CZabbixServer.php:308
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -3434,8 +3435,8 @@ msgstr ""
 msgid "Current date is NOT N"
 msgstr ""
 
-#: include/views/js/configuration.action.edit.js.php:66
-#: include/views/js/configuration.action.edit.js.php:159
+#: include/views/js/configuration.action.edit.js.php:65
+#: include/views/js/configuration.action.edit.js.php:157
 msgid "Current host"
 msgstr ""
 
@@ -3539,8 +3540,8 @@ msgstr ""
 msgid "DES"
 msgstr ""
 
-#: include/maps.inc.php:475 include/maps.inc.php:555 include/maps.inc.php:641
-#: include/maps.inc.php:729
+#: include/maps.inc.php:489 include/maps.inc.php:569 include/maps.inc.php:655
+#: include/maps.inc.php:743
 msgid "DISABLED"
 msgstr ""
 
@@ -3549,7 +3550,7 @@ msgid "DISCOVERED"
 msgstr ""
 
 #: app/views/administration.proxy.edit.php:53 events.php:391
-#: include/views/inventory.host.view.php:95
+#: include/views/inventory.host.view.php:100
 #: include/views/js/configuration.host.edit.js.php:24 search.php:127
 msgid "DNS"
 msgstr ""
@@ -3779,6 +3780,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:133
 #: include/views/configuration.host.edit.php:216
 #: include/views/configuration.host.prototype.edit.php:93
+#: include/views/inventory.host.view.php:90
 #: include/views/js/monitoring.sysmaps.js.php:67
 #: include/views/js/monitoring.sysmaps.js.php:131
 #: include/views/js/monitoring.sysmaps.js.php:232 jsLoader.php:146
@@ -4257,7 +4259,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:160
 #: include/views/configuration.trigger.prototype.edit.php:240
 #: include/views/configuration.triggers.edit.php:245
-#: include/views/inventory.host.view.php:128
+#: include/views/inventory.host.view.php:131
 #: include/views/monitoring.triggerComment.php:38 tr_status.php:284
 msgid "Description"
 msgstr ""
@@ -4276,7 +4278,7 @@ msgstr ""
 #: include/views/administration.auditlogs.list.php:66
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:397
-#: include/views/inventory.host.view.php:212 queue.php:73
+#: include/views/inventory.host.view.php:215 queue.php:73
 msgid "Details"
 msgstr ""
 
@@ -4495,8 +4497,8 @@ msgstr ""
 #: include/views/configuration.action.list.php:31
 #: include/views/configuration.host.list.php:67
 #: include/views/configuration.host.list.php:250
-#: include/views/inventory.host.view.php:161
-#: include/views/inventory.host.view.php:172 search.php:138 search.php:176
+#: include/views/inventory.host.view.php:164
+#: include/views/inventory.host.view.php:175 search.php:138 search.php:176
 #: search.php:205 search.php:404 search.php:444 search.php:461
 #: templates.php:603 templates.php:748
 msgid "Discovery"
@@ -4631,7 +4633,8 @@ msgstr ""
 msgid "Display stacked graph"
 msgstr ""
 
-#: include/func.inc.php:1569 search.php:251 search.php:347 search.php:488
+#: include/func.inc.php:1569 queue.php:284 search.php:251 search.php:347
+#: search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr ""
@@ -5017,7 +5020,7 @@ msgstr ""
 msgid "Empty parameters"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:231
+#: include/classes/server/CZabbixServer.php:258
 #, c-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
 msgstr ""
@@ -5213,8 +5216,8 @@ msgstr ""
 msgid "Error in search request for table \"%1$s\"."
 msgstr ""
 
-#: include/classes/screens/CScreenHttpTestDetails.php:113
-#: include/classes/screens/CScreenHttpTestDetails.php:185
+#: include/classes/screens/CScreenHttpTestDetails.php:112
+#: include/classes/screens/CScreenHttpTestDetails.php:183
 #, c-format
 msgid "Error: %1$s"
 msgstr ""
@@ -5277,7 +5280,7 @@ msgstr ""
 
 #: events.php:254 include/menu.inc.php:73
 #: include/views/common.filter.trigger.php:63
-#: include/views/inventory.host.view.php:144 jsLoader.php:187 search.php:130
+#: include/views/inventory.host.view.php:147 jsLoader.php:187 search.php:130
 #: search.php:234 search.php:286 search.php:336
 msgid "Events"
 msgstr ""
@@ -6017,9 +6020,9 @@ msgstr ""
 #: include/views/configuration.host.list.php:66
 #: include/views/configuration.host.list.php:246
 #: include/views/configuration.template.edit.php:249
-#: include/views/conf.import.php:37 include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:160
-#: include/views/inventory.host.view.php:171
+#: include/views/conf.import.php:37 include/views/inventory.host.view.php:150
+#: include/views/inventory.host.view.php:163
+#: include/views/inventory.host.view.php:174
 #: include/views/monitoring.charts.php:46 jsLoader.php:198 popup.php:91
 #: search.php:131 search.php:137 search.php:172 search.php:201 search.php:235
 #: search.php:287 search.php:337 search.php:402 search.php:436 search.php:459
@@ -6324,10 +6327,10 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:92
 #: include/views/configuration.triggers.list.php:111
 #: include/views/inventory.host.list.php:64
-#: include/views/inventory.host.view.php:154
-#: include/views/inventory.host.view.php:167
-#: include/views/js/configuration.action.edit.js.php:67
-#: include/views/js/configuration.action.edit.js.php:156
+#: include/views/inventory.host.view.php:157
+#: include/views/inventory.host.view.php:170
+#: include/views/js/configuration.action.edit.js.php:66
+#: include/views/js/configuration.action.edit.js.php:154
 #: include/views/js/monitoring.sysmaps.js.php:17
 #: include/views/js/monitoring.sysmaps.js.php:81
 #: include/views/monitoring.charts.php:28
@@ -6411,8 +6414,8 @@ msgstr[1] ""
 #: include/audit.inc.php:35 include/blocks.inc.php:282
 #: include/forms.inc.php:431 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:67
-#: include/views/js/configuration.action.edit.js.php:68
-#: include/views/js/configuration.action.edit.js.php:144
+#: include/views/js/configuration.action.edit.js.php:67
+#: include/views/js/configuration.action.edit.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:20
 #: include/views/js/monitoring.sysmaps.js.php:26
 #: include/views/js/monitoring.sysmaps.js.php:74 jsLoader.php:144
@@ -6726,7 +6729,7 @@ msgstr ""
 
 #: app/views/administration.proxy.edit.php:52 events.php:390
 #: include/views/administration.auditlogs.list.php:61
-#: include/views/inventory.host.view.php:95
+#: include/views/inventory.host.view.php:99
 #: include/views/js/configuration.host.edit.js.php:23 search.php:126
 msgid "IP"
 msgstr ""
@@ -6976,7 +6979,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:751
+#: include/maps.inc.php:765
 #: include/views/administration.general.image.edit.php:46
 #: include/views/administration.general.image.edit.php:49
 #: include/views/js/monitoring.sysmaps.js.php:21 jsLoader.php:145 map.php:152
@@ -7744,7 +7747,7 @@ msgstr ""
 msgid "Incorrect resource type provided for screen item."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:238
+#: include/classes/server/CZabbixServer.php:265
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr ""
@@ -8669,8 +8672,8 @@ msgstr ""
 #: include/views/configuration.item.list.php:31
 #: include/views/configuration.item.massupdate.php:22
 #: include/views/configuration.template.edit.php:207
-#: include/views/conf.import.php:34 include/views/inventory.host.view.php:158
-#: include/views/inventory.host.view.php:169 items.php:1079 popup.php:75
+#: include/views/conf.import.php:34 include/views/inventory.host.view.php:161
+#: include/views/inventory.host.view.php:172 items.php:1079 popup.php:75
 #: queue.php:103 search.php:135 search.php:164 search.php:193 search.php:400
 #: search.php:428 search.php:457 templates.php:599 templates.php:732
 msgid "Items"
@@ -8951,7 +8954,7 @@ msgstr ""
 msgid "Last year"
 msgstr ""
 
-#: include/menu.inc.php:62 include/views/inventory.host.view.php:137
+#: include/menu.inc.php:62 include/views/inventory.host.view.php:140
 #: jsLoader.php:202 latest.php:26 latest.php:301 search.php:128 search.php:232
 #: search.php:284 search.php:334
 msgid "Latest data"
@@ -9238,7 +9241,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:547
+#: include/maps.inc.php:481 include/maps.inc.php:561
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -9305,7 +9308,7 @@ msgstr ""
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:47 include/maps.inc.php:630 include/maps.inc.php:718
+#: include/audit.inc.php:47 include/maps.inc.php:644 include/maps.inc.php:732
 #: include/menu.inc.php:225
 #: include/views/configuration.maintenance.edit.php:205
 #: include/views/js/monitoring.sysmaps.js.php:138
@@ -9811,7 +9814,7 @@ msgstr ""
 msgid "Monitored host"
 msgstr ""
 
-#: include/menu.inc.php:38 include/views/inventory.host.view.php:134
+#: include/menu.inc.php:38 include/views/inventory.host.view.php:137
 msgid "Monitoring"
 msgstr ""
 
@@ -9995,15 +9998,9 @@ msgstr ""
 msgid "Network maps"
 msgstr ""
 
-#: app/views/administration.proxy.list.php:122
-#: include/classes/screens/CScreenHttpTest.php:161 include/func.inc.php:207
+#: app/views/administration.proxy.list.php:122 include/func.inc.php:207
 #: tr_status.php:739
 msgid "Never"
-msgstr ""
-
-#: include/classes/screens/CScreenHttpTestDetails.php:106
-#: include/classes/screens/CScreenHttpTestDetails.php:179
-msgid "Never executed"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:507
@@ -10389,10 +10386,6 @@ msgstr ""
 
 #: include/classes/html/CMultiSelect.php:50 jsLoader.php:173
 msgid "No matches found"
-msgstr ""
-
-#: slides.php:92
-msgid "No permissions"
 msgstr ""
 
 #: include/classes/api/services/CUser.php:1079
@@ -10863,10 +10856,10 @@ msgstr ""
 
 #: chart4.php:161 chart5.php:211
 #: include/classes/screens/CScreenHttpTestDetails.php:101
-#: include/classes/screens/CScreenHttpTestDetails.php:189
+#: include/classes/screens/CScreenHttpTestDetails.php:187
 #: include/classes/screens/CScreenHttpTest.php:156
-#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:483
-#: include/maps.inc.php:563 include/maps.inc.php:651 include/maps.inc.php:739
+#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:497
+#: include/maps.inc.php:577 include/maps.inc.php:665 include/maps.inc.php:753
 #: include/triggers.inc.php:170
 #: include/views/monitoring.overview.triggers.php:31
 msgid "OK"
@@ -11240,7 +11233,7 @@ msgid "Override item trend period"
 msgstr ""
 
 #: include/menu.inc.php:51 include/menu.inc.php:133
-#: include/views/inventory.host.view.php:190
+#: include/views/inventory.host.view.php:193
 #: include/views/monitoring.overview.items.php:41
 #: include/views/monitoring.overview.triggers.php:75 overview.php:27
 #: queue.php:71
@@ -11408,7 +11401,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:215 include/maps.inc.php:467 include/triggers.inc.php:171
+#: chart5.php:215 include/maps.inc.php:465 include/triggers.inc.php:171
 #: include/views/monitoring.overview.items.php:32
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11805,7 +11798,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:519 include/maps.inc.php:600 include/maps.inc.php:689
+#: include/maps.inc.php:533 include/maps.inc.php:614 include/maps.inc.php:703
 #: include/views/common.filter.trigger.php:37
 #: include/views/js/monitoring.sysmaps.js.php:133
 msgid "Problem"
@@ -11834,8 +11827,8 @@ msgstr ""
 
 #: app/views/report.services.php:60 app/views/report.services.php:61
 #: app/views/report.services.php:62 app/views/report.services.php:63
-#: chart4.php:165 include/maps.inc.php:513 include/maps.inc.php:594
-#: include/maps.inc.php:683 report2.php:373
+#: chart4.php:165 include/maps.inc.php:527 include/maps.inc.php:608
+#: include/maps.inc.php:697 report2.php:373
 msgid "Problems"
 msgstr ""
 
@@ -12728,7 +12721,7 @@ msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:47 include/html.inc.php:412
 #: include/menu.inc.php:83 include/views/configuration.template.edit.php:359
-#: include/views/conf.import.php:38 include/views/inventory.host.view.php:148
+#: include/views/conf.import.php:38 include/views/inventory.host.view.php:151
 #: include/views/monitoring.hostscreen.php:30
 #: include/views/monitoring.screen.constructor.list.php:22
 #: include/views/monitoring.screen.edit.php:24
@@ -13301,7 +13294,7 @@ msgstr ""
 msgid "Site state / province"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:212
+#: include/classes/server/CZabbixServer.php:239
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr ""
@@ -13335,11 +13328,11 @@ msgstr ""
 msgid "Slide show \"%s\" already exists."
 msgstr ""
 
-#: slideconf.php:155
+#: slideconf.php:148
 msgid "Slide show added"
 msgstr ""
 
-#: slideconf.php:187 slideconf.php:208
+#: slideconf.php:180 slideconf.php:201
 msgid "Slide show deleted"
 msgstr ""
 
@@ -13351,7 +13344,7 @@ msgstr ""
 msgid "Slide show owner cannot be empty."
 msgstr ""
 
-#: slideconf.php:140
+#: slideconf.php:133
 msgid "Slide show updated"
 msgstr ""
 
@@ -13744,7 +13737,7 @@ msgstr ""
 msgid "TELNET agent"
 msgstr ""
 
-#: include/classes/screens/CScreenHttpTestDetails.php:194
+#: include/classes/screens/CScreenHttpTestDetails.php:191
 msgid "TOTAL"
 msgstr ""
 
@@ -13771,7 +13764,7 @@ msgstr ""
 #: include/views/configuration.copy.elements.php:97
 #: include/views/configuration.trigger.prototype.edit.php:135
 #: include/views/configuration.triggers.edit.php:140
-#: include/views/js/configuration.action.edit.js.php:63
+#: include/views/js/configuration.action.edit.js.php:62
 msgid "Target"
 msgstr ""
 
@@ -14207,7 +14200,7 @@ msgid "Top"
 msgstr ""
 
 #: app/views/monitoring.widget.hosts.view.php:27
-#: include/classes/screens/CScreenHostsInfo.php:90 queue.php:281 queue.php:286
+#: include/classes/screens/CScreenHostsInfo.php:90 queue.php:280 queue.php:288
 msgid "Total"
 msgstr ""
 
@@ -14496,9 +14489,9 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:24
 #: include/views/configuration.triggers.list.php:56
 #: include/views/configuration.triggers.massupdate.php:24
-#: include/views/conf.import.php:36 include/views/inventory.host.view.php:140
-#: include/views/inventory.host.view.php:159
-#: include/views/inventory.host.view.php:170
+#: include/views/conf.import.php:36 include/views/inventory.host.view.php:143
+#: include/views/inventory.host.view.php:162
+#: include/views/inventory.host.view.php:173
 #: include/views/monitoring.overview.items.php:54
 #: include/views/monitoring.overview.triggers.php:88 jsLoader.php:214
 #: popup.php:59 search.php:129 search.php:136 search.php:168 search.php:197
@@ -14537,7 +14530,7 @@ msgstr ""
 msgid "Triggers with severity"
 msgstr ""
 
-#: queue.php:287
+#: queue.php:289
 msgid "Truncated"
 msgstr ""
 
@@ -14733,7 +14726,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:530 include/maps.inc.php:611 include/maps.inc.php:700
+#: include/maps.inc.php:544 include/maps.inc.php:625 include/maps.inc.php:714
 msgid "Unacknowledged"
 msgstr ""
 
@@ -14775,8 +14768,7 @@ msgstr ""
 #: events.php:502 events.php:503 events.php:504 events.php:505
 #: include/actions.inc.php:113 include/actions.inc.php:899
 #: include/classes/screens/CScreenHostsInfo.php:89
-#: include/classes/screens/CScreenHttpTestDetails.php:117
-#: include/classes/screens/CScreenHttpTest.php:162
+#: include/classes/screens/CScreenHttpTestDetails.php:116
 #: include/discovery.inc.php:124 include/discovery.inc.php:160
 #: include/events.inc.php:47 include/events.inc.php:78
 #: include/graphs.inc.php:37 include/graphs.inc.php:67
@@ -14800,8 +14792,8 @@ msgstr ""
 msgid "Unknown action"
 msgstr ""
 
-#: include/classes/screens/CScreenHttpTestDetails.php:112
-#: include/classes/screens/CScreenHttpTestDetails.php:184
+#: include/classes/screens/CScreenHttpTestDetails.php:111
+#: include/classes/screens/CScreenHttpTestDetails.php:183
 #: include/classes/screens/CScreenHttpTest.php:142
 #: include/views/configuration.httpconf.list.php:116
 msgid "Unknown error"
@@ -15796,9 +15788,9 @@ msgstr ""
 
 #: include/menu.inc.php:57 include/views/configuration.host.list.php:68
 #: include/views/configuration.host.list.php:254
-#: include/views/inventory.host.view.php:136
-#: include/views/inventory.host.view.php:164
-#: include/views/inventory.host.view.php:173 search.php:133 search.php:139
+#: include/views/inventory.host.view.php:139
+#: include/views/inventory.host.view.php:167
+#: include/views/inventory.host.view.php:176 search.php:133 search.php:139
 #: search.php:180 search.php:209 search.php:237 search.php:288 search.php:338
 #: search.php:405 search.php:448 search.php:462 templates.php:604
 #: templates.php:752
@@ -16151,11 +16143,11 @@ msgstr ""
 msgid "You can not switch hosts for current selection."
 msgstr ""
 
-#: include/views/js/configuration.action.edit.js.php:296
+#: include/views/js/configuration.action.edit.js.php:294
 msgid "You did not specify host for operation."
 msgstr ""
 
-#: include/views/js/configuration.action.edit.js.php:263
+#: include/views/js/configuration.action.edit.js.php:261
 msgid "You did not specify host group for operation."
 msgstr ""
 
@@ -16264,7 +16256,7 @@ msgstr ""
 msgid "Zabbix server"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:274
+#: include/classes/server/CZabbixServer.php:304
 #, c-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -16682,7 +16674,7 @@ msgstr ""
 #: hostinventoriesoverview.php:75
 #: include/classes/pagefilter/CPageFilter.php:727
 #: include/classes/pagefilter/CPageFilter.php:789 include/forms.inc.php:1084
-#: include/views/monitoring.screen.php:60 slides.php:196
+#: include/views/monitoring.screen.php:60 slides.php:198
 msgid "not selected"
 msgstr ""
 
