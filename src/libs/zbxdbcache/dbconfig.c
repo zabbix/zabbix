@@ -1091,7 +1091,7 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 		zbx_binary_heap_remove_direct(&config->queues[old_poller_type], item->itemid);
 	}
 
-	if (item->poller_type >= ZBX_POLLER_TYPE_COUNT)
+	if (item->poller_type == ZBX_NO_POLLER)
 		return;
 
 	if (ZBX_LOC_QUEUE == item->location && old_nextcheck == item->nextcheck)
