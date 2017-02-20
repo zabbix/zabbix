@@ -860,11 +860,10 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	return itemid;
 }
 
-static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
+static void	DCitem_nextcheck_update_reachable(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
 {
 	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
-	int		nextcheck;
 
 	if (0 != host->proxy_hostid && NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 		now -= proxy->timediff;
@@ -873,7 +872,8 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL, now);
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL,
+				now);
 	}
 	else
 	{
@@ -898,46 +898,57 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 			/* and such changes will be detected during configuration synchronization. Items with new  */
 			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
 
-			return ZBX_JAN_2038;
+			item->nextcheck = ZBX_JAN_2038;
+			return;
 		}
 
-		nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
 		zbx_custom_interval_free(custom_intervals);
 	}
 
 	if (NULL != proxy)
-		nextcheck += proxy->timediff + 1;
-
-	return nextcheck;
+		item->nextcheck += proxy->timediff + 1;
 }
 
-static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
+static void	DCitem_nextcheck_update_unreachable(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 {
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
 			if (0 != host->errors_from)
-				return host->disable_until;
+			{
+				item->nextcheck = host->disable_until;
+				return;
+			}
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
 			if (0 != host->snmp_errors_from)
-				return host->snmp_disable_until;
+			{
+				item->nextcheck = host->snmp_disable_until;
+				return;
+			}
 			break;
 		case ITEM_TYPE_IPMI:
 			if (0 != host->ipmi_errors_from)
-				return host->ipmi_disable_until;
+			{
+				item->nextcheck = host->ipmi_disable_until;
+				return;
+			}
 			break;
 		case ITEM_TYPE_JMX:
 			if (0 != host->jmx_errors_from)
-				return host->jmx_disable_until;
+			{
+				item->nextcheck = host->jmx_disable_until;
+				return;
+			}
 			break;
 		default:
 			/* nothing to do */;
 	}
 
-	return DCget_reachable_nextcheck(item, host, time(NULL));
+	DCitem_nextcheck_update_reachable(item, host, time(NULL));
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -2748,7 +2759,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state && 0 != delay_changed)))
 			{
-				item->nextcheck = DCget_reachable_nextcheck(item, host, now);
+				DCitem_nextcheck_update_reachable(item, host, now);
 			}
 
 			/* update host's used_interfaces flag */
@@ -7163,7 +7174,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
 			old_nextcheck = dc_item->nextcheck;
-			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
+			DCitem_nextcheck_update_reachable(dc_item, dc_host, now);
 
 			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 			continue;
@@ -7179,7 +7190,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 						dc_item->key);
 
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
+				DCitem_nextcheck_update_reachable(dc_item, dc_host, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
@@ -7194,7 +7205,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 				old_nextcheck = dc_item->nextcheck;
 				if (disable_until > now)
-					dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+					DCitem_nextcheck_update_unreachable(dc_item, dc_host);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
@@ -7202,7 +7213,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			else if (disable_until > now)
 			{
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+				DCitem_nextcheck_update_unreachable(dc_item, dc_host);
 
 				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 				continue;
@@ -7298,7 +7309,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
 			old_nextcheck = dc_item->nextcheck;
-			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
+			DCitem_nextcheck_update_reachable(dc_item, dc_host, now);
 
 			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 			continue;
@@ -7309,7 +7320,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 			if (disable_until > now)
 			{
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+				DCitem_nextcheck_update_unreachable(dc_item, dc_host);
 
 				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 				continue;
@@ -7453,7 +7464,7 @@ static void	dc_requeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
+	DCitem_nextcheck_update_reachable(dc_item, dc_host, lastclock);
 
 	dc_item->unreachable = 0;
 
@@ -7474,7 +7485,7 @@ static void	dc_requeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST 
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+	DCitem_nextcheck_update_unreachable(dc_item, dc_host);
 
 	dc_item->unreachable = 1;
 
@@ -10632,7 +10643,7 @@ void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values,
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, dc_item->lastclock);
+			DCitem_nextcheck_update_reachable(dc_item, dc_host, dc_item->lastclock);
 	}
 
 	UNLOCK_CACHE;
