@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2016-11-07 09:20+0300\n"
 "Last-Translator: Đào <nadao@monre.gov.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1065,14 +1065,14 @@ msgstr "Cấu hình các hình ảnh"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "Cấu hình các dịch vụ IT"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "Cấu hình các kiểu item"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "Cấu hình cac item"
 
@@ -1321,7 +1321,7 @@ msgstr "Không thể thêm hình ảnh"
 msgid "Cannot add image."
 msgstr "Không thể thêm hình ảnh."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "Không thể thêm item"
 
@@ -1330,7 +1330,7 @@ msgstr "Không thể thêm item"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Không thể thêm item \"%1$s\" từ \"%2$s\" đến ứng dụng \"%3$s\" từ \"%4$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "Không thể thêm kiểu item"
 
@@ -1445,7 +1445,7 @@ msgstr "Không thể thay đổi phương pháp xác thực thành LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Không thể thay đổi phương pháp xác thực thành Zabbix internal"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "Không thể xóa lịch sử"
 
@@ -1473,7 +1473,7 @@ msgstr "Không thể kết nối đến cổng của máy chủ trapper Za
 msgid "Cannot copy graphs"
 msgstr "Không thể sao chép các biểu đồ"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "Không thể sao chép các item"
 
@@ -1615,11 +1615,11 @@ msgstr "Không thể xóa item"
 msgid "Cannot delete item prototype"
 msgstr "Không thể xóa loại item"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "Không thể xóa các loại item"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "Không thể xóa các item"
 
@@ -1793,12 +1793,12 @@ msgstr[0] ""
 "Không thể vô hiệu hóa kiểu máy chủ\n"
 "Không thể vô hiệu hóa các kiểu máy chủ"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Không thể vô hiệu hóa itemKhông thể vô hiệu hóa các item"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Không thể vô hiệu hóa kiểu itemKhông thể vô hiệu hóa các kiểu item"
@@ -1865,12 +1865,12 @@ msgstr[0] ""
 "Không thể kích hoạt kiểu máy chủ\n"
 "Không thể kích hoạt các kiểu máy chủ"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Không thể kích hoạt itemKhông thể kích hoạt các item"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Không thể kích hoạt kiểu itemKhông thể kích hoạt các kiểu item"
@@ -2402,15 +2402,15 @@ msgstr "Không thể cập nhật hình ảnh."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Không thể cập nhật interface cho máy chủ được phát hiện \"%1$s\"."
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "Không thể cập nhật item"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "Không thể cập nhật kiểu item"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "Không thể cập nhật các item"
 
@@ -3191,7 +3191,7 @@ msgstr "Tạo biểu tượng bản đồ"
 msgid "Create image"
 msgstr "Tạo hình ảnh"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "Tạo item"
 
@@ -3433,8 +3433,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "CHI TIẾT CỦA SCENARIO"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "VÔ HIỆU HÓA"
 
@@ -5955,7 +5955,7 @@ msgstr "Lịch sử"
 msgid "History and simple graphs"
 msgstr "Lịch sử và các đồ thị đơn giản"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "Lịch sử bị xóa"
 
@@ -6031,8 +6031,8 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6677,7 +6677,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Nếu bạn nghĩ rằng tin nhắn này là sai, xin vui lòng tham khảo ý kiên các quản trị viên của bạn về việc nhận các điều khoản cần thiết."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7162,7 +7162,7 @@ msgstr "Kiểu giá trị item \"%1$s\" được cung cấp không chính x
 msgid "Incorrect key."
 msgstr "Key không chính xác."
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "Thống kê không chính xác của các item."
 
@@ -7740,8 +7740,8 @@ msgstr "Italian (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "Item"
 
@@ -7786,7 +7786,7 @@ msgstr "Item \"%1$s\" đã bỏ qua - quy tắc người dùng."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"%1$s\":\"%2$s\" có cổng không hợp lệ: \"%3$s\"."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "Item đã được thêm vào"
 
@@ -7798,12 +7798,12 @@ msgstr "Đếm item"
 msgid "Item deleted"
 msgstr "Item đã bị xóa"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Item đã bị vô hiệu hóaCác item đã bị vô hiệu hóa"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Item đã được kích hoạtCác item đã được kích hoạt"
@@ -7834,7 +7834,7 @@ msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa t
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "Kiểu item đã được thêm vào"
 
@@ -7842,17 +7842,17 @@ msgstr "Kiểu item đã được thêm vào"
 msgid "Item prototype deleted"
 msgstr "Kiểu item đã bị xóa"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Kiểu item đã bị vô hiệu hóaCác kiểu item đã bị vô hiệu hóa"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Kiểu item đã được kích hoạtCác kiểu item đã được kích hoạt"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "Kiểu item đã được cập nhật"
 
@@ -7863,7 +7863,7 @@ msgstr "Kiểu item đã được cập nhật"
 msgid "Item prototypes"
 msgstr "Các kiểu item"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "Các kiểu item đã bị xóa"
 
@@ -7871,7 +7871,7 @@ msgstr "Các kiểu item đã bị xóa"
 msgid "Item prototypes of"
 msgstr "Các kiểu item của"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "Item đã được cập nhật"
 
@@ -7938,11 +7938,11 @@ msgstr "Các item"
 msgid "Items (m/d/n)"
 msgstr "Các item (m/d/n)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "Các item được sao chép"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "Các item đã bị xóa"
 
@@ -7950,7 +7950,7 @@ msgstr "Các item đã bị xóa"
 msgid "Items list"
 msgstr "Danh sách các item"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "Các item được cập nhật"
 
@@ -8498,7 +8498,7 @@ msgstr "Địa chỉ MAC A"
 msgid "MAC address B"
 msgstr "Địa chỉ MAC B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "Bảo trì"
 
@@ -8571,7 +8571,7 @@ msgstr "Macros"
 msgid "Macros updated"
 msgstr "Các macro được cập nhật"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9986,7 +9986,7 @@ msgstr "Không có trạng thái cho proxy."
 msgid "No target selected"
 msgstr "Không có mục tiêu nào được chọn"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "Không có mục tiêu nào được chọn."
 
@@ -10385,8 +10385,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10901,7 +10901,7 @@ msgstr "Phần mở rộng PHP xmlwriter lỗi."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLEM"
@@ -11242,7 +11242,7 @@ msgstr "Cấp đặc quyền"
 msgid "Probably php-ldap module is missing."
 msgstr "Khả năng mô đun php-ldap bị lỗi."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Vấn đề"
@@ -11268,8 +11268,8 @@ msgstr "Problem, nếu tất cả các phần tử con đều có sự c
 msgid "Problem, if at least one child has a problem"
 msgstr "Vấn đề, nếu ít nhất một phần tử con có vấn đề"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Các vấn đề"
 
@@ -14061,7 +14061,7 @@ msgstr "Không thể lựa chọn cấu hình."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Không thể tải lên tập tin bởi vì \"file_uploads\" đã bị vô hiệu hóa."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "Không được tiếp nhận"
 

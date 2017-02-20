@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2015-11-26 03:07+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1068,14 +1068,14 @@ msgstr "图片的组态"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "IT服务的组态"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "项目原型的组态"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "项目的组态"
 
@@ -1324,7 +1324,7 @@ msgstr "无法添加图片"
 msgid "Cannot add image."
 msgstr "无法添加图片."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "无法添加项目"
 
@@ -1333,7 +1333,7 @@ msgstr "无法添加项目"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "无法添加监控项目\"%1$s\"从\"%2$s\"到分类 \"%3$s\" 从\"%4$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "无法添加监控项目样板"
 
@@ -1448,7 +1448,7 @@ msgstr "无法改变授权方式为LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "无法改变授权方式为Zabbix内部"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "无法清除历史"
 
@@ -1476,7 +1476,7 @@ msgstr "无法连接到系统主机主控程序的捉捕器的埠, 但是它应�
 msgid "Cannot copy graphs"
 msgstr "无法複製图形"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "无法複製项目"
 
@@ -1618,11 +1618,11 @@ msgstr "无法删除项目"
 msgid "Cannot delete item prototype"
 msgstr "无法删除监控项目样板"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "无法删除监控项目样板"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "无法删除项目"
 
@@ -1792,12 +1792,12 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] "无法禁用主机样板"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "无法禁监控项目"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "无法禁用监控项目样板"
@@ -1860,12 +1860,12 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] "无法启用主机样板"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "无法启用监控项目"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "无法启用监控项目样板"
@@ -2395,15 +2395,15 @@ msgstr "无法更新图片."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "对于自动发现的主机\"%1$s\"无法更新其接口."
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "无法更新项目"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "无法更新监控项目样板"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "无法更新项目"
 
@@ -3184,7 +3184,7 @@ msgstr "创建图标映射"
 msgid "Create image"
 msgstr "创建图像"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "创建监控项"
 
@@ -3426,8 +3426,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "场景细节"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "禁用"
 
@@ -5949,7 +5949,7 @@ msgstr "历史记录"
 msgid "History and simple graphs"
 msgstr "简单图形的历史"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "历史已清除"
 
@@ -6025,8 +6025,8 @@ msgstr "横向对齐"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6663,7 +6663,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "假如您认为这个信息是错的, 请谘询您的管理者关于如何取得需要的许可权."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7148,7 +7148,7 @@ msgstr "提供不正确的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
 msgid "Incorrect key."
 msgstr "不正确的键值."
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "不正确的项目清单"
 
@@ -7726,8 +7726,8 @@ msgstr "意大利语 (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "项目"
 
@@ -7772,7 +7772,7 @@ msgstr "略过项目\"%1$s\"-用户规则."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "项目\"%1$s:%2$s\"有无效的埠: \"%3$s\"."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "项目已添加"
 
@@ -7784,12 +7784,12 @@ msgstr "项目数量"
 msgid "Item deleted"
 msgstr "项目已删除"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "监控项目被禁用"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "监控项目已启用"
@@ -7820,7 +7820,7 @@ msgstr "项目原型\"%1$s\"已经存在于\"%2$s\",继承自其它的模板."
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\"上的项目样板\"%1$s\"已经存在."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "项目样板已经添加"
 
@@ -7828,17 +7828,17 @@ msgstr "项目样板已经添加"
 msgid "Item prototype deleted"
 msgstr "项目样板已删除"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "项目样板已被禁用"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "项目样板已启用"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "项目样板已更新"
 
@@ -7849,7 +7849,7 @@ msgstr "项目样板已更新"
 msgid "Item prototypes"
 msgstr "项目原型"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "项目样板已删除"
 
@@ -7857,7 +7857,7 @@ msgstr "项目样板已删除"
 msgid "Item prototypes of"
 msgstr "项目原型之于"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "项目已更新"
 
@@ -7924,11 +7924,11 @@ msgstr "项目"
 msgid "Items (m/d/n)"
 msgstr "项目 (m/d/n)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "项目已複製"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "项目已删除"
 
@@ -7936,7 +7936,7 @@ msgstr "项目已删除"
 msgid "Items list"
 msgstr "项目清单"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "监控项已更新"
 
@@ -8484,7 +8484,7 @@ msgstr "Mac位址A"
 msgid "MAC address B"
 msgstr "Mac位址B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "维修"
 
@@ -8557,7 +8557,7 @@ msgstr "巨集"
 msgid "Macros updated"
 msgstr "巨集已更新"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9972,7 +9972,7 @@ msgstr "没有状态代理."
 msgid "No target selected"
 msgstr "没有选择目标"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "没有已选的目标"
 
@@ -10371,8 +10371,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10887,7 +10887,7 @@ msgstr "PHP xmlwriter 扩展不支持"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "问题"
@@ -11228,7 +11228,7 @@ msgstr "优先权层级"
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模组不存在."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "问题"
@@ -11254,8 +11254,8 @@ msgstr "问题, 如果所有的下层都有问题"
 msgid "Problem, if at least one child has a problem"
 msgstr "问题, 如果至少一个下层有一个问题"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "问题"
 
@@ -14047,7 +14047,7 @@ msgstr "不能选择组态."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "不能上传文件因为 \"文件上传\"被禁止."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "未知悉的"
 

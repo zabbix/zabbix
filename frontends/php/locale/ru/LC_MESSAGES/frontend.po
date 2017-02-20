@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2015-11-26 18:04+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1085,14 +1085,14 @@ msgstr "НАСТРОЙКА ИЗОБРАЖЕНИЙ"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "НАСТРОЙКА УСЛУГ IT"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "НАСТРОЙКА ПРОТОТИПОВ ЭЛЕМЕНТОВ ДАННЫХ"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "НАСТРОЙКА ЭЛЕМЕНТОВ ДАННЫХ"
 
@@ -1341,7 +1341,7 @@ msgstr "Не удалось добавить изображение"
 msgid "Cannot add image."
 msgstr "Не удалось добавить изображение."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "Не удалось добавить элемент данных"
 
@@ -1350,7 +1350,7 @@ msgstr "Не удалось добавить элемент данных"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Не удалось добавить элемент данных \"%1$s\" из \"%2$s\" в группу элементов данных \"%3$s\" из \"%4$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "Не удалось добавить прототип элементов данных"
 
@@ -1465,7 +1465,7 @@ msgstr "Не удалось изменить метод аутентификац
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не удалось изменить метод аутентификации на внутренний Zabbix"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
@@ -1493,7 +1493,7 @@ msgstr "Не удалось подключиться на порт траппе�
 msgid "Cannot copy graphs"
 msgstr "Не удалось скопировать графики"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "Не удалось скопировать элементы данных"
 
@@ -1635,11 +1635,11 @@ msgstr "Не удалось удалить элемент данных"
 msgid "Cannot delete item prototype"
 msgstr "Не удалось удалить прототип элементов данных"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "Не удалось удалить прототипы элементов данных"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "Не удалось удалить элементы данных"
 
@@ -1821,14 +1821,14 @@ msgstr[0] "Не удалось деактивировать прототип у�
 msgstr[1] "Не удалось деактивировать прототипы узлов сети"
 msgstr[2] "Не удалось деактивировать прототипы узлов сети"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Не удалось деактивировать элемент данных"
 msgstr[1] "Не удалось деактивировать элементы данных"
 msgstr[2] "Не удалось деактивировать элементы данных"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Не удалось деактивировать прототип элементов данных"
@@ -1913,14 +1913,14 @@ msgstr[0] "Не удалось активировать прототип узл�
 msgstr[1] "Не удалось активировать прототипы узлов сети"
 msgstr[2] "Не удалось активировать прототипы узлов сети"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Не удалось активировать элемент данных"
 msgstr[1] "Не удалось активировать элементы данных"
 msgstr[2] "Не удалось активировать элементы данных"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Не удалось активировать прототип элементов данных"
@@ -2466,15 +2466,15 @@ msgstr "Не удалось обновить изображение."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не удалось обновить интерфейс для обнаруженного узла сети \"%1$s\"."
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "Не удалось обновить прототип элементов данных"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "Не удалось обновить элементы данных"
 
@@ -3255,7 +3255,7 @@ msgstr "Создать соответствие иконок"
 msgid "Create image"
 msgstr "Создать изображение"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "Создать элемент данных"
 
@@ -3497,8 +3497,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "ДЕТАЛИ СЦЕНАРИЯ"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "ОТКЛЮЧЕНО"
 
@@ -6025,7 +6025,7 @@ msgstr "История"
 msgid "History and simple graphs"
 msgstr "История и простые графики"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "История очищена"
 
@@ -6101,8 +6101,8 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6747,7 +6747,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7232,7 +7232,7 @@ msgstr "Указан некорректный тип элемента данны
 msgid "Incorrect key."
 msgstr "Некорректный ключ."
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "Некорректный список элементов данных."
 
@@ -7810,8 +7810,8 @@ msgstr "Итальянский (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "Элемент данных"
 
@@ -7856,7 +7856,7 @@ msgstr "Элемент данных \"%1$s\" пропущен - правило �
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "Элемент данных добавлен"
 
@@ -7868,14 +7868,14 @@ msgstr "Количество элементов данных"
 msgid "Item deleted"
 msgstr "Элемент данных удален"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Элемент данных деактивирован"
 msgstr[1] "Элементы данных деактивированы"
 msgstr[2] "Элементы данных деактивированы"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Элемент данных активирован"
@@ -7908,7 +7908,7 @@ msgstr "Прототип элемента данных \"%1$s\" уже суще�
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип элементов данных \"%1$s\" уже существует у \"%2$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "Прототип элементов данных добавлен"
 
@@ -7916,21 +7916,21 @@ msgstr "Прототип элементов данных добавлен"
 msgid "Item prototype deleted"
 msgstr "Прототип элементов данных удален"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Прототип элементов данных деактивирован"
 msgstr[1] "Прототипы элементов данных деактивированы"
 msgstr[2] "Прототипы элементов данных деактивированы"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Прототип элементов данных активирован"
 msgstr[1] "Прототипы элементов данных активированы"
 msgstr[2] "Прототипы элементов данных активированы"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "Прототип элементов данных обновлен"
 
@@ -7941,7 +7941,7 @@ msgstr "Прототип элементов данных обновлен"
 msgid "Item prototypes"
 msgstr "Прототипы элементов данных"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "Прототип элементов данных удален"
 
@@ -7949,7 +7949,7 @@ msgstr "Прототип элементов данных удален"
 msgid "Item prototypes of"
 msgstr "Прототипы элементов данных для"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "Элемент данных обновлен"
 
@@ -8016,11 +8016,11 @@ msgstr "Элементы данных"
 msgid "Items (m/d/n)"
 msgstr "Элементы данных (а/д/нп)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "Элементы данных скопированы"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "Элементы данных удалены"
 
@@ -8028,7 +8028,7 @@ msgstr "Элементы данных удалены"
 msgid "Items list"
 msgstr "Список элементов данных"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "Элементы данных обновлены"
 
@@ -8579,7 +8579,7 @@ msgstr "MAC адрес A"
 msgid "MAC address B"
 msgstr "MAC адрес B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "ОБСЛУЖИВАНИЕ"
 
@@ -8652,7 +8652,7 @@ msgstr "Макросы"
 msgid "Macros updated"
 msgstr "Макросы обновлены"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -10083,7 +10083,7 @@ msgstr "Нет состояния для прокси."
 msgid "No target selected"
 msgstr "Цель не выбрана"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "Цель не выбрана."
 
@@ -10482,8 +10482,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10998,7 +10998,7 @@ msgstr "Расширение PHP xmlwriter отсутствует."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
@@ -11339,7 +11339,7 @@ msgstr "Уровень привилегий"
 msgid "Probably php-ldap module is missing."
 msgstr "Возможно отсутствует модуль php-ldap."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Проблема"
@@ -11365,8 +11365,8 @@ msgstr "Проблема, если все подчиненные имеют пр
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, если хотя бы у одного из подчиненных имеется проблема"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Проблемы"
 
@@ -14175,7 +14175,7 @@ msgstr "Не удалось выбрать конфигурацию."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Не удалось загрузить файл, так как \"file_uploads\" отключено."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "Неподтверждено"
 

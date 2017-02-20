@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -1076,14 +1076,14 @@ msgstr "RESİMLERİN YAPILANDIRMASI"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "BT SERVİSLERİNİN YAPILANDIRMASI"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "ÖĞE PROTOTİPLERİNİN YAPILANDIRMASI"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "ÖĞELERİN YAPILANDIRMASI"
 
@@ -1332,7 +1332,7 @@ msgstr "Resim eklenemiyor"
 msgid "Cannot add image."
 msgstr "Resim eklenemiyor."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "Öğe eklenemiyor"
 
@@ -1341,7 +1341,7 @@ msgstr "Öğe eklenemiyor"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "\"%2$s\"'den \"%1$s\" öğesi \"%4$s\"'den \"%3$s\" uygulamasına eklenemiyor."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "Öğe prototipi eklenemiyor"
 
@@ -1456,7 +1456,7 @@ msgstr "Kimlik doğrulama yöntemi LDAP olarak değiştirilemiyor"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Kimlik doğrulama yöntemi Zabbix dahili olarak değiştirilemiyor"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "Geçmiş temizlenemiyor"
 
@@ -1484,7 +1484,7 @@ msgstr ""
 msgid "Cannot copy graphs"
 msgstr "Grafikler kopyalanamaz"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "Öğeler kopyalanamaz"
 
@@ -1626,11 +1626,11 @@ msgstr "Öğe silinemiyor"
 msgid "Cannot delete item prototype"
 msgstr "Öğe prototipi silinemiyor"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "Öğe prototipleri silienemez"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "Öğeler silinemiyor"
 
@@ -1806,13 +1806,13 @@ msgid_plural "Cannot disable host prototypes"
 msgstr[0] "Konak prototipi devre dışı bırakılamıyor"
 msgstr[1] "Konak prototipleri devre dışı bırakılamıyor"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Öğe devre dışı bırakılamıyor"
 msgstr[1] "Öğeler devre dışı bırakılamıyor"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Öğe prototipi devre dışı bırakılamıyor"
@@ -1886,13 +1886,13 @@ msgid_plural "Cannot enable host prototypes"
 msgstr[0] "Konak prototipi etkinleştirilemiyor"
 msgstr[1] "Konak prototipleri etkinleştirilemiyor"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Öğe etkinleştirilemiyor"
 msgstr[1] "Öğeler etkinleştirilemiyor"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Öğe prototipi etkinleştirilemiyor"
@@ -2430,15 +2430,15 @@ msgstr "Resim güncellenemiyor."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "Öğe güncellenemiyor"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "Öğe prototipi güncellenemiyor"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "Öğeler güncellenemiyor"
 
@@ -3219,7 +3219,7 @@ msgstr "Simge haritası oluştur"
 msgid "Create image"
 msgstr "Resim oluştur"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "Öğe oluştur"
 
@@ -3461,8 +3461,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "SENARYONUN DETAYLARI"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "DEVRE DIŞI"
 
@@ -5986,7 +5986,7 @@ msgstr "Geçmiş"
 msgid "History and simple graphs"
 msgstr "Geçmiş ve basit grafikler"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "Geçmiş temizlendi"
 
@@ -6062,8 +6062,8 @@ msgstr "Yatay hizalama"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6704,7 +6704,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinlerin alınması için lütfen yöneticilerinize danışın."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7189,7 +7189,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr "Geçersiz anahtar."
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "Geçersiz öğelerin listesi."
 
@@ -7767,8 +7767,8 @@ msgstr "İtalyanca (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "Öğe"
 
@@ -7813,7 +7813,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "\"%1$s:%2$s\" öğesi geçersiz porta sahip: \"%3$s\"."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "Öğe eklendi"
 
@@ -7825,13 +7825,13 @@ msgstr "Öğe sayısı"
 msgid "Item deleted"
 msgstr "Öğe silindi"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Öğe devre dışı"
 msgstr[1] "Öğeler devre dışı"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Öğe etkin"
@@ -7863,7 +7863,7 @@ msgstr "Öğe prototipi \"%1$s\" zaten \"%2$s üzerinde bulunuyor, başka bir ş
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr " \"%2$s\" üzerinde \"%1$s\" öğesi zaten var."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "Öğe prototipi eklendi"
 
@@ -7871,19 +7871,19 @@ msgstr "Öğe prototipi eklendi"
 msgid "Item prototype deleted"
 msgstr "Öğe prototipi silindi"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Öğe prototipi devre dışı"
 msgstr[1] "Öğe prototipleri devre dışı"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Öğe prototipi etkin"
 msgstr[1] "Öğe prototipleri etkin"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "Öğe prototipi güncellendi"
 
@@ -7894,7 +7894,7 @@ msgstr "Öğe prototipi güncellendi"
 msgid "Item prototypes"
 msgstr "Öğe prototipleri"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "Öğe prototipleri silindi"
 
@@ -7902,7 +7902,7 @@ msgstr "Öğe prototipleri silindi"
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "Öğe güncellendi"
 
@@ -7969,11 +7969,11 @@ msgstr "Öğeler"
 msgid "Items (m/d/n)"
 msgstr "Öğeler (m/e/d)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "Öğeler kopyalandı"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "Öğeler silindi"
 
@@ -7981,7 +7981,7 @@ msgstr "Öğeler silindi"
 msgid "Items list"
 msgstr "Öğe listesi"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "Öğeler güncellendi"
 
@@ -8530,7 +8530,7 @@ msgstr "MAC adresi A"
 msgid "MAC address B"
 msgstr "MAC adresi B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "BAKIM"
 
@@ -8603,7 +8603,7 @@ msgstr "Makrolar"
 msgid "Macros updated"
 msgstr "Makrolar güncellendi"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -10026,7 +10026,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Hiçbir hedef seçilmemiş"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "Hiçbir hedef seöilmemiş."
 
@@ -10425,8 +10425,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10941,7 +10941,7 @@ msgstr "PHP xmlwriter eklentisi eksik."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "SORUN"
@@ -11282,7 +11282,7 @@ msgstr "Öncelik seviyesi"
 msgid "Probably php-ldap module is missing."
 msgstr "Büyük olasılıklar php-ldap modülü eksik."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Sorun"
@@ -11308,8 +11308,8 @@ msgstr "Sorun, eğer bütün altlarda sorun varsa"
 msgid "Problem, if at least one child has a problem"
 msgstr "Sorun, eğer en az alttakilerden birinde sorun varsa"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemler"
 
@@ -14109,7 +14109,7 @@ msgstr "Yapılandırma seçilemiyor."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Dosya yüklenemedi çünkü \"dosya yükleme\" devre dışı."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "Onaylanmamış"
 

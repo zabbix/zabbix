@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1085,14 +1085,14 @@ msgstr "CONFIGURARE IMAGINI"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "CONFIGURARE SERVICII IT"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "CONFIGURARE PROTOTIPURI ELEMENT"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "CONFIGURARE ELEMENTE"
 
@@ -1341,7 +1341,7 @@ msgstr "Nu se poate adăuga imaginea"
 msgid "Cannot add image."
 msgstr "Nu se poate adăuga imaginea."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "Nu se poate adăuga elementul"
 
@@ -1350,7 +1350,7 @@ msgstr "Nu se poate adăuga elementul"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Nu se poate adăuga elementul \"%1$s\" de la \"%2$s\" la aplicația \"%3$s\" de la \"%4$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "Nu se poate adăuga prototip item"
 
@@ -1465,7 +1465,7 @@ msgstr "Nu se poate schimba metoda de autentificare la LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Nu se poate schimba metoda de autentificare la Zabbix intern"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "Nu se poate șterge istoricul"
 
@@ -1493,7 +1493,7 @@ msgstr "Nu se poate conecta la portul de trapp al demonului zabbix, ar trebui s�
 msgid "Cannot copy graphs"
 msgstr "Nu se pot copia graficele"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "Nu se pot copia elementele"
 
@@ -1635,11 +1635,11 @@ msgstr "Nu se poate șterge elementul"
 msgid "Cannot delete item prototype"
 msgstr "Nu se poate șterge prototipul itemului"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "Nu se pot şterge prototipurile de element"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "Nu se pot șterge elementele"
 
@@ -1821,14 +1821,14 @@ msgstr[0] "Nu se poate dezactiva pototipul server"
 msgstr[1] "Nu se pot dezactiva prototipurile servere"
 msgstr[2] "Nu se pot dezactiva prototipurile servere"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Nu se poate dezactiva elementul"
 msgstr[1] "Nu se pot dezactiva elementele"
 msgstr[2] "Nu se pot dezactiva elementele"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Nu se poate dezactiva prototipul elementului"
@@ -1913,14 +1913,14 @@ msgstr[0] "Nu se poate activa Serverul prototip"
 msgstr[1] "Nu se pot activa prototipurile server"
 msgstr[2] "Nu se pot activa prototipurile server"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Nu se poate activa elementul"
 msgstr[1] "Nu se pot activa elementele"
 msgstr[2] "Nu se pot activa elementele"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Nu se poate activa prototipul elementului"
@@ -2466,15 +2466,15 @@ msgstr "Nu se poate actualiza imaginea."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Nu se poate actualiza interfața pentru serverul detectat \"%1$s\"."
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "Nu se poate actualiza elementul"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "Nu se poate actualiza prototipul item"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "Nu se pot actualiza elementele"
 
@@ -3255,7 +3255,7 @@ msgstr "Creează mapare icon"
 msgid "Create image"
 msgstr "Creează imagine"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "Creează element"
 
@@ -3497,8 +3497,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALII SCENARIU"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "DEZACTIVAT"
 
@@ -6025,7 +6025,7 @@ msgstr "Istoric"
 msgid "History and simple graphs"
 msgstr "Istoric și grafice simple"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "Istoric șters"
 
@@ -6101,8 +6101,8 @@ msgstr "Aliniere orizontală"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6747,7 +6747,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Dacă crezi ca acest mesaj este greșit, te rog să consulți administratorii pentru obținerea permisiunilor necesare."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7232,7 +7232,7 @@ msgstr "Tip valoare item \"%1$s\" incorect prevăzut pentru funcția triggerului
 msgid "Incorrect key."
 msgstr "Cheie incorectă."
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "Listă incorectă de itemi."
 
@@ -7810,8 +7810,8 @@ msgstr "Italiană (it)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "Item"
 
@@ -7856,7 +7856,7 @@ msgstr "Itemul \"%1$s\" sărit - regula utilizatorului."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Itemul \"%1$s:%2$s\" are un port invalid: \"%3$s\"."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "Item adăugat"
 
@@ -7868,14 +7868,14 @@ msgstr "Numărătoare item"
 msgid "Item deleted"
 msgstr "Item șters"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Element dezactivat"
 msgstr[1] "Elemente dezactivate"
 msgstr[2] "Elemente dezactivate"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Item activat"
@@ -7908,7 +7908,7 @@ msgstr "Prototip item \"%1$s\" există deja pe \"%2$s\", moștenit de la alt șa
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototip item \"%1$s\" există deja pe \"%2$s\"."
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "Prototip item adăugat"
 
@@ -7916,21 +7916,21 @@ msgstr "Prototip item adăugat"
 msgid "Item prototype deleted"
 msgstr "Prototip item șters"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Prototip element dezactivat"
 msgstr[1] "Prototipuri elemente dezactivate"
 msgstr[2] "Prototipuri elemente dezactivate"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Prototip element activat"
 msgstr[1] "Prototipuri elemente activate"
 msgstr[2] "Prototipuri elemente activate"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "Prototip item actualizat"
 
@@ -7941,7 +7941,7 @@ msgstr "Prototip item actualizat"
 msgid "Item prototypes"
 msgstr "Prototipuri item"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "Prototipuri item șterse"
 
@@ -7949,7 +7949,7 @@ msgstr "Prototipuri item șterse"
 msgid "Item prototypes of"
 msgstr "Prototipuri item ale"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "Item actualizat"
 
@@ -8016,11 +8016,11 @@ msgstr "Itemi"
 msgid "Items (m/d/n)"
 msgstr "Itemi (m/d/n)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "Itemi copiați"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "Itemi ștersi"
 
@@ -8028,7 +8028,7 @@ msgstr "Itemi ștersi"
 msgid "Items list"
 msgstr "Lista itemi"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "Itemi actualizați"
 
@@ -8578,7 +8578,7 @@ msgstr "Adresă MAC A"
 msgid "MAC address B"
 msgstr "Adresă MAC B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "ÎNTREȚINERE"
 
@@ -8651,7 +8651,7 @@ msgstr "Macro-uri"
 msgid "Macros updated"
 msgstr "Macro-uri actualizate"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -10082,7 +10082,7 @@ msgstr "Niciun status pentru proxy."
 msgid "No target selected"
 msgstr "Nu a fost selectată nicio țintă"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "Nu a fost selectată nicio țintă."
 
@@ -10481,8 +10481,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10997,7 +10997,7 @@ msgstr "Extensie xmlwriter PHP lipsă."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLEMĂ"
@@ -11338,7 +11338,7 @@ msgstr "Nivel privilegiat"
 msgid "Probably php-ldap module is missing."
 msgstr "Probabil lipsește modului php-ldap."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problemă"
@@ -11364,8 +11364,8 @@ msgstr "Problemă, dacă toți copiii au probleme"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problemă, dacă cel puțin un copil are o problemă"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Probleme"
 
@@ -14173,7 +14173,7 @@ msgstr "Incapabil să selecteze configurația."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Incapabil să încarce fișierul pentru că \"file_uploads\" este dezactivat."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "Nerecunoscut"
 

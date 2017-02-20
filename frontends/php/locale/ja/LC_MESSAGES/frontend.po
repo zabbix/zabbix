@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2016-02-09 14:12+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1065,14 +1065,14 @@ msgstr "イメージの設定"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "ITサービスの設定"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "アイテムのプロトタイプの設定"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "アイテムの設定"
 
@@ -1321,7 +1321,7 @@ msgstr "イメージを追加できません"
 msgid "Cannot add image."
 msgstr "イメージを追加できません。"
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "アイテムを追加できません"
 
@@ -1330,7 +1330,7 @@ msgstr "アイテムを追加できません"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "\"%2$s\"のアイテム\"%1$s\"を\"%4$s\"のアプリケーション\"%3$s\"に追加できません"
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr "アイテムのプロトタイプが追加できません"
 
@@ -1445,7 +1445,7 @@ msgstr "認証方式をLDAPに変更できません"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "認証方式をZabbix内部データベースに変更できません"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "ヒストリを削除できません"
 
@@ -1473,7 +1473,7 @@ msgstr "ZabbixサーバーデーモンのTrapperポートに接続できませ�
 msgid "Cannot copy graphs"
 msgstr "グラフをコピーできません"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "アイテムをコピーできません"
 
@@ -1615,11 +1615,11 @@ msgstr "アイテムを削除できません"
 msgid "Cannot delete item prototype"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "アイテムを削除できません"
 
@@ -1789,12 +1789,12 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] "ホストのプロトタイプを無効にできません"
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "アイテムを無効にできません"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "アイテムのプロトタイプを無効にできません"
@@ -1857,12 +1857,12 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] "ホストのプロトタイプを有効にできません"
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "アイテムを有効にできません"
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "アイテムのプロトタイプを有効にできません"
@@ -2392,15 +2392,15 @@ msgstr "イメージを更新できません。"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のインターフェースを更新できません"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "アイテムを更新できません"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr "アイテムのプロトタイプを更新できません"
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "アイテムを更新できません"
 
@@ -3181,7 +3181,7 @@ msgstr "アイコンのマッピングの作成"
 msgid "Create image"
 msgstr "イメージの作成"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "アイテムの作成"
 
@@ -3423,8 +3423,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "シナリオの名前"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "無効"
 
@@ -5945,7 +5945,7 @@ msgstr "ヒストリ"
 msgid "History and simple graphs"
 msgstr "ヒストリとシンプルグラフ"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "ヒストリを削除しました"
 
@@ -6021,8 +6021,8 @@ msgstr "横位置"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6659,7 +6659,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "このメッセージが間違っている場合は、必要な権限を得るために管理者に問い合わせてください"
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7144,7 +7144,7 @@ msgstr "トリガー関数\"%2$s\"に正しくないアイテムのデータ型\
 msgid "Incorrect key."
 msgstr "キーが正しくありません。"
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "アイテムのリストの誤り"
 
@@ -7722,8 +7722,8 @@ msgstr "イタリア語 (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "アイテム"
 
@@ -7768,7 +7768,7 @@ msgstr "アイテム\"%1$s\"はスキップされました - ユーザの指定�
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "アイテム\"%1$s:%2$s\"のポート\"%3$s\"は正しくありません。"
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
@@ -7780,12 +7780,12 @@ msgstr "アイテム数"
 msgid "Item deleted"
 msgstr "アイテムを削除しました"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "アイテムを無効にしました"
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
@@ -7816,7 +7816,7 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr "アイテムのプロトタイプを追加しました"
 
@@ -7824,17 +7824,17 @@ msgstr "アイテムのプロトタイプを追加しました"
 msgid "Item prototype deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "アイテムのプロトタイプを無効にしました"
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "アイテムのプロトタイプを有効にしました"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr "アイテムのプロトタイプを更新しました"
 
@@ -7845,7 +7845,7 @@ msgstr "アイテムのプロトタイプを更新しました"
 msgid "Item prototypes"
 msgstr "アイテムのプロトタイプ"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
@@ -7853,7 +7853,7 @@ msgstr "アイテムのプロトタイプを削除しました"
 msgid "Item prototypes of"
 msgstr "アイテムのプロトタイプ:"
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "アイテムを更新しました"
 
@@ -7920,11 +7920,11 @@ msgstr "アイテム"
 msgid "Items (m/d/n)"
 msgstr "アイテム数 (有効/無効/取得不可)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "アイテムをコピーしました"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "アイテムを削除しました"
 
@@ -7932,7 +7932,7 @@ msgstr "アイテムを削除しました"
 msgid "Items list"
 msgstr "アイテムのリスト"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "アイテムを更新しました"
 
@@ -8480,7 +8480,7 @@ msgstr "MACアドレスA"
 msgid "MAC address B"
 msgstr "MACアドレスB"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "メンテナンス"
 
@@ -8553,7 +8553,7 @@ msgstr "マクロ"
 msgid "Macros updated"
 msgstr "マクロを更新しました"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9968,7 +9968,7 @@ msgstr "プロキシにステータスが設定されていません。"
 msgid "No target selected"
 msgstr "何も選択されていません"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "何も選択されていません。"
 
@@ -10367,8 +10367,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10883,7 +10883,7 @@ msgstr "PHP xmlwriterモジュールが存在しません。"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "障害"
@@ -11224,7 +11224,7 @@ msgstr "特権レベル"
 msgid "Probably php-ldap module is missing."
 msgstr "php-ldapモジュールが見つかりません。"
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "障害"
@@ -11250,8 +11250,8 @@ msgstr "すべての子に障害があった場合に障害として検知"
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "障害"
 
@@ -14043,7 +14043,7 @@ msgstr "選択した設定は行えません"
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "\"file_uploads\"が無効のためファイルをアップロードできません。"
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "未対応"
 

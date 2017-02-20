@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2013-12-10 22:40+0300\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1075,14 +1075,14 @@ msgstr "KÉPEK KONFIGURÁLÁSA"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "IT SZOLGÁLTATÁSOK KONFIGURÁLÁSA"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "ELEM PROTOTIPUS KONFIGURÁLÁSA"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "ELEMEK KONFIGURÁLÁSA"
 
@@ -1331,7 +1331,7 @@ msgstr "Nem sikerült a képet hozzáadni"
 msgid "Cannot add image."
 msgstr "Nem sikerült a képet hozzáadni."
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "Elem felvétele sikertelen"
 
@@ -1340,7 +1340,7 @@ msgstr "Elem felvétele sikertelen"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1455,7 +1455,7 @@ msgstr ""
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr ""
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "Előzmények törlése sikertelen"
 
@@ -1483,7 +1483,7 @@ msgstr ""
 msgid "Cannot copy graphs"
 msgstr "Nem lehet másolni a grafikonokat"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "Elemek másolása sikertelen"
 
@@ -1625,11 +1625,11 @@ msgstr "Elem törlése sikertelen"
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "Cannot delete items"
 
@@ -1805,13 +1805,13 @@ msgid_plural "Cannot disable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
@@ -1885,13 +1885,13 @@ msgid_plural "Cannot enable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
@@ -2429,15 +2429,15 @@ msgstr "Nem sikerült a képet frissíteni."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "Elem frissítése sikertelen"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "Elemek frissítése sikertelen"
 
@@ -3207,7 +3207,7 @@ msgstr ""
 msgid "Create image"
 msgstr ""
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr ""
 
@@ -3449,8 +3449,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "SCENARIO RÉSZLETEI"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "LETILTVA"
 
@@ -5974,7 +5974,7 @@ msgstr "Előzmények"
 msgid "History and simple graphs"
 msgstr ""
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr "Előzmények törölve"
 
@@ -6050,8 +6050,8 @@ msgstr "Vízszintes igazítás"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6692,7 +6692,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7177,7 +7177,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr ""
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr "Hibás elemlista."
 
@@ -7755,8 +7755,8 @@ msgstr "Olasz (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "Elem"
 
@@ -7801,7 +7801,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr "Adatsor hozzáadva"
 
@@ -7813,13 +7813,13 @@ msgstr ""
 msgid "Item deleted"
 msgstr "Elem törölve"
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -7851,7 +7851,7 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr ""
 
@@ -7859,19 +7859,19 @@ msgstr ""
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr ""
 
@@ -7882,7 +7882,7 @@ msgstr ""
 msgid "Item prototypes"
 msgstr ""
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr ""
 
@@ -7890,7 +7890,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr "Adatsor frissítve"
 
@@ -7957,11 +7957,11 @@ msgstr "Elemek"
 msgid "Items (m/d/n)"
 msgstr "Elemek (m/l/n)"
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr "Elemek másolva"
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr "Elemek törölve"
 
@@ -7969,7 +7969,7 @@ msgstr "Elemek törölve"
 msgid "Items list"
 msgstr ""
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr "Adatsorok hozzáadva"
 
@@ -8518,7 +8518,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "KARBANTARTÁS"
 
@@ -8591,7 +8591,7 @@ msgstr "Makrók"
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -10014,7 +10014,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Nincs cél kiválasztva"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr ""
 
@@ -10413,8 +10413,8 @@ msgstr "OEM"
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10929,7 +10929,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "HIBA"
@@ -11270,7 +11270,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Hiba"
@@ -11296,8 +11296,8 @@ msgstr "Számítás, ha minden alárendelt elem állapota hibás"
 msgid "Problem, if at least one child has a problem"
 msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Hibák"
 
@@ -14098,7 +14098,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr ""
 

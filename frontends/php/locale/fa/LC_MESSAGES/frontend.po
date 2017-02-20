@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-04 11:10+0200\n"
+"POT-Creation-Date: 2017-02-20 11:27+0200\n"
 "PO-Revision-Date: 2013-10-10 08:30+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1064,14 +1064,14 @@ msgstr ""
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "پیکربندی سرویس های IT"
 
-#: disc_prototypes.php:349
+#: disc_prototypes.php:357
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "پیکربندی نمونه اولیه آیتم"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:776
+#: include/views/configuration.item.massupdate.php:28 items.php:784
 msgid "CONFIGURATION OF ITEMS"
 msgstr "پیکربندی آیتم"
 
@@ -1320,7 +1320,7 @@ msgstr "تصویر نمی تواند اضافه شود"
 msgid "Cannot add image."
 msgstr ""
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Cannot add item"
 msgstr "آیتم نمی تواند اضافه شود"
 
@@ -1329,7 +1329,7 @@ msgstr "آیتم نمی تواند اضافه شود"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1444,7 +1444,7 @@ msgstr "روش تصدیق هویت نمی تواند به LDAP تغییر پید
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "روش تصدیق هویت نمی تواند به Fanoos internal تغییر پیدا کند"
 
-#: items.php:504
+#: items.php:512
 msgid "Cannot clear history"
 msgstr "تاریخچه نمی‌تواند پاک شود"
 
@@ -1472,7 +1472,7 @@ msgstr "اتصال به پورت سرویس سرور فانوس نمی‌توا�
 msgid "Cannot copy graphs"
 msgstr "نمودارها نمی‌توانند کپی شوند"
 
-#: items.php:714
+#: items.php:722
 msgid "Cannot copy items"
 msgstr "آیتم ها نمی‌توانند کپی شوند"
 
@@ -1614,11 +1614,11 @@ msgstr "آیتم نمی‌تواند حذف شود"
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:767
+#: items.php:775
 msgid "Cannot delete items"
 msgstr "آیتم ها نمی‌توانند حذف شوند"
 
@@ -1788,12 +1788,12 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] ""
 
-#: applications.php:213 items.php:682
+#: applications.php:213 items.php:690
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:337
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
@@ -1857,12 +1857,12 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] ""
 
-#: applications.php:212 items.php:681
+#: applications.php:212 items.php:689
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 
-#: disc_prototypes.php:328
+#: disc_prototypes.php:336
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
@@ -2393,15 +2393,15 @@ msgstr ""
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Cannot update item"
 msgstr "آیتم نمی‌تواند بروز شود"
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:660
+#: items.php:668
 msgid "Cannot update items"
 msgstr "آیتم ها نمی‌توانند بروز شوند"
 
@@ -3171,7 +3171,7 @@ msgstr "ایجاد نگاشت آیکن"
 msgid "Create image"
 msgstr "ایجاد تصویر"
 
-#: include/views/configuration.item.list.php:37 items.php:774
+#: include/views/configuration.item.list.php:37 items.php:782
 msgid "Create item"
 msgstr "ایجاد آیتم"
 
@@ -3413,8 +3413,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "جزئیات سناریو"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:689 include/maps.inc.php:771 include/maps.inc.php:859
+#: include/maps.inc.php:949
 msgid "DISABLED"
 msgstr "غیرفعال"
 
@@ -5935,7 +5935,7 @@ msgstr "تاریخچه"
 msgid "History and simple graphs"
 msgstr "تاریخچه و نمودارهای ساده"
 
-#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:507 items.php:512 items.php:744 items.php:750
 msgid "History cleared"
 msgstr ""
 
@@ -6011,8 +6011,8 @@ msgstr "ردیف کردن افقی"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:499 items.php:736
-#: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
+#: include/views/monitoring.slides.php:83 items.php:507 items.php:744
+#: items.php:771 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
@@ -6649,7 +6649,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:971
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7134,7 +7134,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr ""
 
-#: include/forms.inc.php:1321 items.php:913
+#: include/forms.inc.php:1321 items.php:921
 msgid "Incorrect list of items."
 msgstr ""
 
@@ -7712,8 +7712,8 @@ msgstr ""
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
-#: include/views/configuration.triggers.expression.php:57 items.php:498
-#: items.php:736 items.php:762 tr_logform.php:280
+#: include/views/configuration.triggers.expression.php:57 items.php:506
+#: items.php:744 items.php:770 tr_logform.php:280
 msgid "Item"
 msgstr "آیتم"
 
@@ -7758,7 +7758,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:478 screenedit.php:183
+#: items.php:486 screenedit.php:183
 msgid "Item added"
 msgstr ""
 
@@ -7770,12 +7770,12 @@ msgstr "تعداد آیتم"
 msgid "Item deleted"
 msgstr ""
 
-#: applications.php:210 items.php:679
+#: applications.php:210 items.php:687
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 
-#: applications.php:209 items.php:678
+#: applications.php:209 items.php:686
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -7806,7 +7806,7 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:305
+#: disc_prototypes.php:313
 msgid "Item prototype added"
 msgstr ""
 
@@ -7814,17 +7814,17 @@ msgstr ""
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:334
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 
-#: disc_prototypes.php:325
+#: disc_prototypes.php:333
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 
-#: disc_prototypes.php:301
+#: disc_prototypes.php:307
 msgid "Item prototype updated"
 msgstr ""
 
@@ -7835,7 +7835,7 @@ msgstr ""
 msgid "Item prototypes"
 msgstr "نمونه اولیه آیتم ها"
 
-#: disc_prototypes.php:340
+#: disc_prototypes.php:348
 msgid "Item prototypes deleted"
 msgstr ""
 
@@ -7843,7 +7843,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:475 screenedit.php:176
+#: items.php:483 screenedit.php:176
 msgid "Item updated"
 msgstr ""
 
@@ -7910,11 +7910,11 @@ msgstr "آیتم ها"
 msgid "Items (m/d/n)"
 msgstr ""
 
-#: items.php:714
+#: items.php:722
 msgid "Items copied"
 msgstr ""
 
-#: items.php:767
+#: items.php:775
 msgid "Items deleted"
 msgstr ""
 
@@ -7922,7 +7922,7 @@ msgstr ""
 msgid "Items list"
 msgstr "لیست آیتم"
 
-#: items.php:660
+#: items.php:668
 msgid "Items updated"
 msgstr ""
 
@@ -8470,7 +8470,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:681 include/maps.inc.php:763
 msgid "MAINTENANCE"
 msgstr "نگهداری"
 
@@ -8543,7 +8543,7 @@ msgstr "ماکروها"
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:848 include/maps.inc.php:938
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9958,7 +9958,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "هدف انتخاب نشده"
 
-#: graphs.php:355 items.php:720
+#: graphs.php:355 items.php:728
 msgid "No target selected."
 msgstr "هدف انتخاب نشده"
 
@@ -10357,8 +10357,8 @@ msgstr ""
 
 #: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:697 include/maps.inc.php:779 include/maps.inc.php:869
+#: include/maps.inc.php:959 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10873,7 +10873,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:665 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "مشکل"
@@ -11214,7 +11214,7 @@ msgstr "سطح ویژه"
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:735 include/maps.inc.php:818 include/maps.inc.php:909
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "مشکل"
@@ -11240,8 +11240,8 @@ msgstr "مشکل، اگر همه فرزندان مشکل دارند"
 msgid "Problem, if at least one child has a problem"
 msgstr "مشکل، اگر دست کم یکی از فرزندان مشکل دارند"
 
-#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:165 include/maps.inc.php:729 include/maps.inc.php:812
+#: include/maps.inc.php:903 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "مشکل"
 
@@ -14033,7 +14033,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:746 include/maps.inc.php:829 include/maps.inc.php:920
 msgid "Unacknowledged"
 msgstr "تأیید نشده"
 
