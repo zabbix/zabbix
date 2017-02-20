@@ -631,7 +631,7 @@ class testIconMap extends CZabbixTest {
 			$this->assertFalse(array_key_exists('result', $result));
 			$this->assertTrue(array_key_exists('error', $result));
 			$this->assertSame($expected_error, $result['error']['data']);
-			$dbResult = 'select * from icon_mapping where name='.$iconmap['name'];
+			$dbResult = "select * from icon_map where name='".$iconmap['name']."'";
 			$this->assertEquals(0, DBcount($dbResult));
 		}
 	}
@@ -674,7 +674,7 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [[
 					'iconmapid' => 'æų',
-					'name' => 'æų'
+					'name' => 'æųæų'
 				]],
 				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/iconmapid": a number is expected.'
@@ -699,7 +699,7 @@ class testIconMap extends CZabbixTest {
 					]
 				],
 				'success_expected' => false,
-				'expected_error' => ' Invalid parameter "/2": value (iconmapid)=(2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (iconmapid)=(2) already exists.'
 			],
 			// Check iconmap name.
 			[
@@ -881,8 +881,8 @@ class testIconMap extends CZabbixTest {
 			$this->assertSame($expected_error, $result['error']['data']);
 
 			foreach ($iconmaps as $iconmap) {
-				if (array_key_exists('name', $iconmap) && array_key_exists('iconmapid', $iconmap)){
-					$dbResult = "select * from icon_map where iconmapid=".$iconmap['iconmapid']." and name='".$iconmap['name']."'";
+				if (array_key_exists('name', $iconmap) && $iconmap['name'] != 'Api icon map'){
+					$dbResult = "select * from icon_map where name='".$iconmap['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}

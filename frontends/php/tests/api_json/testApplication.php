@@ -480,9 +480,8 @@ class testApplication extends CZabbixTest {
 
 			$this->assertEquals($expected_error, $result['error']['data']);
 			foreach ($applications as $application) {
-				if (array_key_exists('name', $application) && array_key_exists('applicationid', $application)){
-					$dbResult = "select * from applications where applicationid=".$application['applicationid'].
-							" and name='".$application['name']."'";
+				if (array_key_exists('name', $application) && $application['name'] != 'API application'){
+					$dbResult = "select * from applications where name='".$application['name']."'";
 					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}

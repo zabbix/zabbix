@@ -579,7 +579,7 @@ class testUsers extends CZabbixTest {
 	*/
 	public function testUsers_Update($users, $success_expected, $expected_error) {
 		foreach ($users as $user) {
-			if (array_key_exists('userid', $user) && !$success_expected){
+			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT) && !$success_expected){
 				$sqlUser = "select * from users where userid=".$user['userid'];
 				$oldHashUser = DBhash($sqlUser);
 			}
@@ -1436,7 +1436,7 @@ class testUsers extends CZabbixTest {
 				$this->assertTrue(array_key_exists('error', $result));
 
 				$this->assertSame($expected_error, $result['error']['data']);
-				$dbResult = 'select * from users where alias='.$user['alias'];
+				$dbResult = "select * from users where alias='".$user['alias']."'";
 				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
