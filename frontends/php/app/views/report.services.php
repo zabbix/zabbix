@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$widget = (new CWidget())->setTitle(_('Services availability report').': '.$data['service']['name']);
+$widget = (new CWidget())->setTitle(_('Service availability report').': '.$data['service']['name']);
 
 $controls = (new CList())
 	->addItem([
