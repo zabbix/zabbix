@@ -7500,8 +7500,8 @@ static void	dc_requeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-static void	dc_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks,
-		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num)
+static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -7556,8 +7556,8 @@ static void	dc_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *
 	}
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num)
+void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num)
 {
 	LOCK_CACHE;
 
@@ -7566,8 +7566,9 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 	UNLOCK_CACHE;
 }
 
-void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
+void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+		const zbx_uint64_t *lastlogsizes, const int *mtimes, const int *errcodes, size_t num,
+		unsigned char poller_type, int *nextcheck)
 {
 	LOCK_CACHE;
 
