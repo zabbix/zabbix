@@ -2701,7 +2701,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		/* process item intervals and update item nextcheck */
 
 		zbx_free(delay);
-		delay_macros_expanded = (NULL == (delay = dc_expand_user_macros(row[14], NULL, 0, NULL, NULL)) ? 0 : 1);
+		delay_macros_expanded = (NULL != (delay = dc_expand_user_macros(row[14], NULL, 0, NULL, NULL)));
 
 		if (0 == delay_macros_expanded)
 		{
