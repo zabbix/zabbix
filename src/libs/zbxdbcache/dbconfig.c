@@ -2701,7 +2701,9 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		/* process item intervals and update item nextcheck */
 
 		zbx_free(delay);
-		if (NULL == (delay = dc_expand_user_macros(row[14], NULL, 0, NULL, NULL)))
+		delay_macros_expanded = (NULL == (delay = dc_expand_user_macros(row[14], NULL, 0, NULL, NULL)) ? 0 : 1);
+
+		if (0 == delay_macros_expanded)
 		{
 			zbx_timespec_t	ts = {now, 0};
 
@@ -2719,15 +2721,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
 
 			item->nextcheck = ZBX_JAN_2038;
-
-			delay_macros_expanded = 0;
 		}
 		else
 		{
 			delay_changed = (SUCCEED == DCstrpool_replace(found, &item->delay, delay));
 			zbx_free(delay);
-
-			delay_macros_expanded = 1;
 		}
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
