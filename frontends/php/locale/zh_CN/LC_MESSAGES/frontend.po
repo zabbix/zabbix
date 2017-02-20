@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-02-20 11:27+0200\n"
-"PO-Revision-Date: 2016-09-23 09:11+0300\n"
+"PO-Revision-Date: 2017-02-03 06:32+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1474614696.000000\n"
+"X-POOTLE-MTIME: 1486096321.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -691,7 +691,7 @@ msgstr "所有"
 #: include/views/administration.users.edit.php:402
 #: include/views/administration.users.edit.php:408
 msgid "All groups"
-msgstr ""
+msgstr "所有组"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -2562,7 +2562,7 @@ msgstr "无法更新幻灯片演示"
 #: include/classes/api/services/CHttpTest.php:529
 #, c-format
 msgid "Cannot update step name for a templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "模板 \"%1$s\" 无法更新web场景名称"
 
 #: templates.php:178
 msgid "Cannot update template"
@@ -3377,7 +3377,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:367
 msgid "Count of matched lines in log file monitoring. Returns integer"
-msgstr ""
+msgstr "监控日志文件行数统计。返回 整数"
 
 #: include/views/configuration.action.list.php:36
 msgid "Create action"
@@ -6584,7 +6584,7 @@ msgstr "主机 \"%1$s\" 已存在."
 #: include/classes/api/services/CHost.php:1784
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
-msgstr ""
+msgstr "主机 \"%1$s\" 没有设置主机组"
 
 #: include/classes/api/services/CProxy.php:548
 #, c-format
@@ -7183,7 +7183,7 @@ msgstr "图标"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:547
 msgid "Identification of the system. Returns string"
-msgstr ""
+msgstr "识别系统。返回 字符串"
 
 #: include/func.inc.php:1684 include/func.inc.php:1703
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -7317,7 +7317,7 @@ msgstr "包含"
 
 #: include/views/administration.usergroups.edit.php:152
 msgid "Include subgroups"
-msgstr ""
+msgstr "包括子组"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:391
@@ -8052,7 +8052,7 @@ msgstr "模板的聚合图形ID错误。"
 
 #: include/classes/api/services/CHttpTest.php:708
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "模板Web方案步骤计数不正确。"
 
 #: include/classes/api/services/CUser.php:312
 #, c-format
@@ -8517,7 +8517,7 @@ msgstr "无效日期\"%s\"."
 
 #: include/classes/validators/CFunctionValidator.php:298
 msgid "Invalid fifth parameter."
-msgstr ""
+msgstr "第五个参数无效。"
 
 #: include/classes/validators/CFunctionValidator.php:294
 msgid "Invalid first parameter."
@@ -12789,7 +12789,7 @@ msgstr "已解决"
 #: include/events.inc.php:238 include/events.inc.php:241
 #: include/events.inc.php:246
 msgid "Resolved by"
-msgstr ""
+msgstr "处理方法"
 
 #: include/classes/screens/CScreenProblem.php:758
 #, c-format
