@@ -1,7 +1,7 @@
 Changes for 3.2.4
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Japanese, Polish, Portuguese (Brazil) translations; thanks
+A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Japanese, Polish, Portuguese (Brazil) translations; thanks to Zabbix translators (zalex_ua)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.4rc1
@@ -1964,8 +1964,6 @@ A.F....... [ZBX-1357] updated Czech, French, Italian, Japanese, Korean, Polish, 
 
 --------------------------------------------------------------------------------
 Changes for 2.2.17rc1
-
-New features:
 
 Bug fixes:
 ........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
