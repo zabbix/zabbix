@@ -128,6 +128,13 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'10s/', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
 				'10ss/7-7,23:59-24:00', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,

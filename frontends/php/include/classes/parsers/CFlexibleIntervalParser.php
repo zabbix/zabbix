@@ -29,42 +29,33 @@ class CFlexibleIntervalParser extends CParser {
 	private $user_macro_parser;
 	private $lld_macro_parser;
 
-	/**
-	 * An options array.
-	 *
-	 * Supported options:
-	 *   'lldmacros' => true	Low-level discovery macros.
-	 *
-	 * @var array
-	 */
-	public $options = ['lldmacros' => true];
+	private $options = ['lldmacros' => true];
 
 	public function __construct($options = []) {
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
+
 		$this->simple_interval_parser = new CSimpleIntervalParser();
 		$this->time_period_parser = new CTimePeriodParser();
 		$this->user_macro_parser = new CUserMacroParser();
-		$this->lld_macro_parser = new CLLDMacroParser();
 
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
 		}
 	}
 
 	/**
 	 * Parse the given flexible interval. The source string can contain macros separated by a forward slash.
 	 *
-	 * @param string $source	Source string that needs to be parsed.
-	 * @param int    $pos		Position offset.
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 
 		$p = $pos;
-
-		if (!isset($source[$p])) {
-			return self::PARSE_FAIL;
-		}
 
 		if ($this->simple_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->simple_interval_parser->getLength();
@@ -82,7 +73,6 @@ class CFlexibleIntervalParser extends CParser {
 		if (!isset($source[$p]) || $source[$p] !== '/') {
 			return self::PARSE_FAIL;
 		}
-
 		$p++;
 
 		if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
@@ -101,6 +91,6 @@ class CFlexibleIntervalParser extends CParser {
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 }
