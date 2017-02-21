@@ -931,6 +931,23 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 		item->nextcheck += proxy->timediff + 1;
 }
 
+static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, zbx_reachability_t reach)
+{
+	switch (reach)
+	{
+		case ZBX_REACHABLE:
+			if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
+				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
+			break;
+		case ZBX_UNREACHABLE:
+			if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
+				dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+}
+
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 {
 	switch (item->type)
@@ -2628,7 +2645,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			DCstrpool_replace(found, &item->db_error, row[36]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
-			old_poller_type = ZBX_NO_POLLER;
+			item->poller_type = ZBX_NO_POLLER;
 			item->unreachable = 0;
 
 			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
@@ -2638,8 +2655,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
-
-			old_poller_type = item->poller_type;
 
 			if (NULL != item->triggers)
 			{
@@ -2727,14 +2742,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(host->proxy_hostid, item->type, item->key);
-
-			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
-					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
-					ZBX_POLLER_TYPE_JAVA == item->poller_type))
-			{
-				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-			}
+			old_poller_type = item->poller_type;
+			DCitem_poller_type_update(item, host, ZBX_REACHABLE);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key) && 0 != delay_macros_expanded &&
 					(0 == item->nextcheck || 0 != key_changed || 0 != type_changed ||
@@ -2743,6 +2752,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			{
 				DCitem_nextcheck_update(item, host, ZBX_REACHABLE, now);
 			}
+
+			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 
 			/* update host's used_interfaces flag */
 			if (ZBX_FLAG_INTERFACE_UNKNOWN != host->used_interfaces)
@@ -2768,7 +2779,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		}
 		else
 		{
-			item->poller_type = ZBX_NO_POLLER;
 			item->nextcheck = 0;
 			item->unreachable = 0;
 		}
@@ -3027,8 +3037,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
-
-		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
 	/* remove deleted items from buffer */
@@ -7155,10 +7163,13 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
+			old_poller_type = dc_item->poller_type;
+			DCitem_poller_type_update(dc_item, dc_host, ZBX_REACHABLE);
+
 			old_nextcheck = dc_item->nextcheck;
 			DCitem_nextcheck_update(dc_item, dc_host, ZBX_REACHABLE, now);
 
-			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+			DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 			continue;
 		}
 
@@ -7168,8 +7179,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
-				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
-						dc_item->key);
+				DCitem_poller_type_update(dc_item, dc_host, ZBX_REACHABLE);
 
 				old_nextcheck = dc_item->nextcheck;
 				DCitem_nextcheck_update(dc_item, dc_host, ZBX_REACHABLE, now);
@@ -7182,22 +7192,28 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		{
 			if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type)
 			{
+				/* move items on unreachable hosts to unreahable pollers */
+
 				old_poller_type = dc_item->poller_type;
-				dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				DCitem_poller_type_update(dc_item, dc_host, ZBX_UNREACHABLE);
 
 				old_nextcheck = dc_item->nextcheck;
-				if (disable_until > now)
-					DCitem_nextcheck_update(dc_item, dc_host, ZBX_UNREACHABLE, now);
+				DCitem_nextcheck_update(dc_item, dc_host, ZBX_UNREACHABLE, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
 			}
 			else if (disable_until > now)
 			{
+				/* postpone checks on hosts that are know to be still unreachable */
+
+				old_poller_type = dc_item->poller_type;
+				DCitem_poller_type_update(dc_item, dc_host, ZBX_UNREACHABLE);	/* will do nothing */
+
 				old_nextcheck = dc_item->nextcheck;
 				DCitem_nextcheck_update(dc_item, dc_host, ZBX_UNREACHABLE, now);
 
-				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
 			}
 
@@ -7265,7 +7281,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 	while (num < items_num && FAIL == zbx_binary_heap_empty(queue))
 	{
-		int				disable_until, old_nextcheck;
+		int				disable_until, old_nextcheck, old_poller_type;
 		const zbx_binary_heap_elem_t	*min;
 		ZBX_DC_HOST			*dc_host;
 		ZBX_DC_ITEM			*dc_item;
@@ -7290,10 +7306,13 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
+			old_poller_type = dc_item->poller_type;
+			DCitem_poller_type_update(dc_item, dc_host, ZBX_REACHABLE);	/* will do nothing */
+
 			old_nextcheck = dc_item->nextcheck;
 			DCitem_nextcheck_update(dc_item, dc_host, ZBX_REACHABLE, now);
 
-			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+			DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 			continue;
 		}
 
@@ -7301,10 +7320,13 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		{
 			if (disable_until > now)
 			{
+				old_poller_type = dc_item->poller_type;
+				DCitem_poller_type_update(dc_item, dc_host, ZBX_UNREACHABLE);	/* will do nothing */
+
 				old_nextcheck = dc_item->nextcheck;
 				DCitem_nextcheck_update(dc_item, dc_host, ZBX_UNREACHABLE, now);
 
-				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
+				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
 			}
 
@@ -7450,13 +7472,8 @@ static void	dc_requeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 
 	dc_item->unreachable = 0;
 
-	if (ZBX_NO_POLLER == dc_item->poller_type)
-		return;
-
 	old_poller_type = dc_item->poller_type;
-
-	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
+	DCitem_poller_type_update(dc_item, dc_host, ZBX_REACHABLE);
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
@@ -7471,13 +7488,8 @@ static void	dc_requeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST 
 
 	dc_item->unreachable = 1;
 
-	if (ZBX_NO_POLLER == dc_item->poller_type)
-		return;
-
 	old_poller_type = dc_item->poller_type;
-
-	if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type || ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
-		dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+	DCitem_poller_type_update(dc_item, dc_host, ZBX_UNREACHABLE);
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
