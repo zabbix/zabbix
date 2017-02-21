@@ -2595,7 +2595,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			char	*history = NULL;
 
-			if (NULL == (history = dc_expand_user_macros(row[31], NULL, 0, NULL, NULL)) ||
+			if (NULL == (history = dc_expand_user_macros(row[31], &item->hostid, 1, NULL, NULL)) ||
 					SUCCEED != is_time_suffix(history, &item->history, ZBX_LENGTH_UNLIMITED))
 			{
 				item->history = 1;	/* just enough to make 0 == items[i].history condition fail */
@@ -2693,7 +2693,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		/* process item intervals and update item nextcheck */
 
 		zbx_free(delay);
-		delay_macros_expanded = (NULL != (delay = dc_expand_user_macros(row[14], NULL, 0, NULL, NULL)));
+		delay_macros_expanded = (NULL != (delay = dc_expand_user_macros(row[14], &item->hostid, 1, NULL, NULL)));
 
 		if (0 == delay_macros_expanded)
 		{
@@ -2713,6 +2713,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* update intervals or with macros in them are requeued automatically by DCsync_items().   */
 
 			item->nextcheck = ZBX_JAN_2038;
+
+			DCstrpool_replace(found, &item->delay, "");
 		}
 		else
 		{
@@ -2781,7 +2783,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			{
 				char	*trends = NULL;
 
-				if (NULL == (trends = dc_expand_user_macros(row[32], NULL, 0, NULL, NULL)) ||
+				if (NULL == (trends = dc_expand_user_macros(row[32], &item->hostid, 1, NULL, NULL)) ||
 						SUCCEED != is_time_suffix(trends, &numitem->trends, ZBX_LENGTH_UNLIMITED))
 				{
 					numitem->trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
