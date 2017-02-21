@@ -47,3 +47,64 @@ function isWritableHostGroups(array $groupids) {
 		'editable' => true
 	]);
 }
+
+/**
+ * Apply host group rights to all subgroups.
+ *
+ * @param string $groupid  Host group ID.
+ * @param string $name     Host group name.
+ */
+function inheritPermissions($groupid, $name) {
+	// Get child groupids.
+	$parent = $name.'/';
+	$len = strlen($parent);
+
+	$groups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'search' => ['name' => $parent],
+		'startSearch' => true
+	]);
+
+	$child_groupids = [];
+	foreach ($groups as $group) {
+		if (substr($group['name'], 0, $len) === $parent) {
+			$child_groupids[$group['groupid']] = true;
+		}
+	}
+
+	if ($child_groupids) {
+		$child_groupids = array_keys($child_groupids);
+
+		$usrgrps = API::UserGroup()->get([
+			'output' => ['usrgrpid'],
+			'selectRights' => ['id', 'permission']
+		]);
+
+		$upd_usergrps = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			$rights = zbx_toHash($usrgrp['rights'], 'id');
+
+			if (array_key_exists($groupid, $rights)) {
+				foreach ($child_groupids as $child_groupid) {
+					$rights[$child_groupid] = [
+						'id' => $child_groupid,
+						'permission' => $rights[$groupid]['permission']
+					];
+				}
+			}
+			else {
+				foreach ($child_groupids as $child_groupid) {
+					unset($rights[$child_groupid]);
+				}
+			}
+
+			$upd_usergrps[] = [
+				'usrgrpid' => $usrgrp['usrgrpid'],
+				'rights' => $rights
+			];
+		}
+
+		API::UserGroup()->update($upd_usergrps);
+	}
+}

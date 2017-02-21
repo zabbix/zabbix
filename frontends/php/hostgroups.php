@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('Configuration of host groups');
 $page['file'] = 'hostgroups.php';
@@ -177,59 +178,7 @@ if (hasRequest('form')) {
 
 				// Apply permissions to all subgroups.
 				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					// Get child groupids.
-					$parent = $name.'/';
-					$len = strlen($parent);
-
-					$groups = API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'search' => ['name' => $parent],
-						'startSearch' => true
-					]);
-
-					$child_groupids = [];
-					foreach ($groups as $group) {
-						if (substr($group['name'], 0, $len) === $parent) {
-							$child_groupids[$group['groupid']] = true;
-						}
-					}
-
-					if ($child_groupids) {
-						$child_groupids = array_keys($child_groupids);
-
-						$usrgrps = API::UserGroup()->get([
-							'output' => ['usrgrpid'],
-							'selectRights' => ['id', 'permission']
-						]);
-
-						$upd_usergrps = [];
-
-						// In each user group search rights to host groups. Set -1 as default, if there are no rights.
-						foreach ($usrgrps as $usrgrp) {
-							$rights = zbx_toHash($usrgrp['rights'], 'id');
-
-							if (array_key_exists($groupId, $rights)) {
-								foreach ($child_groupids as $child_groupid) {
-									$rights[$child_groupid] = [
-										'id' => $child_groupid,
-										'permission' => $rights[$groupId]['permission']
-									];
-								}
-							}
-							else {
-								foreach ($child_groupids as $child_groupid) {
-									unset($rights[$child_groupid]);
-								}
-							}
-
-							$upd_usergrps[] = [
-								'usrgrpid' => $usrgrp['usrgrpid'],
-								'rights' => $rights
-							];
-						}
-
-						API::UserGroup()->update($upd_usergrps);
-					}
+					inheritPermissions($groupId, $name);
 				}
 			}
 		}
