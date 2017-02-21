@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,9 +55,6 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
-			'favourite_graphs' => getFavouriteGraphs(),
-			'favourite_maps' => getFavouriteMaps(),
-			'favourite_screens' => getFavouriteScreens(),
 			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
 			'show_discovery_widget' => $show_discovery_widget
 		];

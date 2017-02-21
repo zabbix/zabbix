@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,10 +151,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
-			errcodes[i] = SUCCEED;
-		else
-			errcodes[i] = NOTSUPPORTED;
+		set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, trap);
+		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
 		free_request(&request);
@@ -162,10 +160,8 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		if (SUCCEED == set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
-			errcodes[fb] = SUCCEED;
-		else
-			errcodes[fb] = NOTSUPPORTED;
+		set_result_type(&results[fb], ITEM_VALUE_TYPE_TEXT, trap);
+		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}
 
@@ -181,8 +177,7 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-						ts, items[i].state, NULL);
+				dc_add_history(items[i].itemid, items[i].flags, &results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -190,8 +185,8 @@ next:
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].state, results[i].msg);
+				dc_add_history(items[i].itemid, items[i].flags, NULL, ts, items[i].state,
+						results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;

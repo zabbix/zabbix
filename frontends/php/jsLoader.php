@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
 	'common.js' => '',
+	'dashboard.grid.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -178,17 +179,11 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
-		'Add' => _('Add'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
 		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
-		'Favourite graphs' => _('Favourite graphs'),
-		'Favourite maps' => _('Favourite maps'),
-		'Favourite screens' => _('Favourite screens'),
-		'Favourite simple graphs' => _('Favourite simple graphs'),
-		'Favourite slide shows' => _('Favourite slide shows'),
 		'Insert expression' => _('Insert expression'),
 		'Trigger status "OK"' => _('Trigger status "OK"'),
 		'Trigger status "Problem"' => _('Trigger status "Problem"'),
@@ -206,8 +201,6 @@ $tranStrings = [
 		'Problems' => _('Problems'),
 		'Refresh time' => _('Refresh time'),
 		'Refresh time multiplier' => _('Refresh time multiplier'),
-		'Remove' => _('Remove'),
-		'Remove all' => _('Remove all'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),

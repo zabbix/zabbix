@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,19 +18,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/APIInfo.php';
-require_once dirname(__FILE__).'/User.php';
 require_once dirname(__FILE__).'/CHost.php';
 require_once dirname(__FILE__).'/CItem.php';
+require_once dirname(__FILE__).'/testAPIInfo.php';
+require_once dirname(__FILE__).'/testApplication.php';
+require_once dirname(__FILE__).'/testConfiguration.php';
+require_once dirname(__FILE__).'/testHostGroup.php';
+require_once dirname(__FILE__).'/testIconMap.php';
+require_once dirname(__FILE__).'/testScripts.php';
+require_once dirname(__FILE__).'/testUserGroup.php';
+require_once dirname(__FILE__).'/testUserMacro.php';
+require_once dirname(__FILE__).'/testUsers.php';
+require_once dirname(__FILE__).'/testValuemap.php';
 
 class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
-		$suite->addTestSuite('API_JSON_APIInfo');
-		$suite->addTestSuite('API_JSON_User');
-		$suite->addTestSuite('API_JSON_Host');
-		$suite->addTestSuite('API_JSON_Item');
+//		$suite->addTestSuite('API_JSON_Host');
+//		$suite->addTestSuite('API_JSON_Item');
+		$suite->addTestSuite('testAPIInfo');
+		$suite->addTestSuite('testApplication');
+		$suite->addTestSuite('testConfiguration');
+		$suite->addTestSuite('testHostGroup');
+		$suite->addTestSuite('testIconMap');
+		$suite->addTestSuite('testScripts');
+		$suite->addTestSuite('testUserGroup');
+		$suite->addTestSuite('testUserMacro');
+		$suite->addTestSuite('testUsers');
+		$suite->addTestSuite('testValuemap');
 
 		return $suite;
 	}

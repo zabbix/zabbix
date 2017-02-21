@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class API_JSON_APIInfo extends CZabbixTest {
+class testAPIInfo extends CZabbixTest {
 
 	public function testAPIInfo_VersionWithoutAuth() {
 		$result = $this->api_call('apiinfo.version', [], $debug);

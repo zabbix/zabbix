@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -307,6 +307,10 @@ class CHelpItems {
 				[
 					'key' => 'vfs.fs.size[fs,<mode>]',
 					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'description' => _('Directory size (in bytes), dir - absolute path to directory, <regex_incl> - regex describing the file name pattern for inclusion, <regex_excl> - regex describing the file name pattern for exclusion, <mode> - mode used to get directory size ("apparent" or "disk"), <max_depth> - maximal traversal depth for directories. Returns integer.')
 				],
 				[
 					'key' => 'vm.memory.size[<mode>]',

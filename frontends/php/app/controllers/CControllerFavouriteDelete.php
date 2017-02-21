@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,14 @@ class CControllerFavouriteDelete extends CController {
 			'sysmapid' => 'web.favorite.sysmapids'
 		];
 
+		$widgetids = [
+			'graphid' => WIDGET_FAVOURITE_GRAPHS,
+			'itemid' => WIDGET_FAVOURITE_GRAPHS,
+			'screenid' => WIDGET_FAVOURITE_SCREENS,
+			'slideshowid' => WIDGET_FAVOURITE_SCREENS,
+			'sysmapid' => WIDGET_FAVOURITE_MAPS
+		];
+
 		$object = $this->getInput('object');
 		$objectid = $this->getInput('objectid');
 
@@ -59,9 +67,16 @@ class CControllerFavouriteDelete extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$data['main_block'] = '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
-				'$("addrm_fav").onclick = function() { add2favorites("'.$object.'", "'.$objectid.'"); }'."\n".
-				'switchElementClass("addrm_fav", "btn-remove-fav", "btn-add-fav");';
+			$data['main_block'] =
+				'if (jQuery(\'#addrm_fav\').length) {'."\n".
+					'$(\'addrm_fav\').title = \''._('Add to favourites').'\';'."\n".
+					'$(\'addrm_fav\').onclick = function() { add2favorites(\''.$object.'\', \''.$objectid.'\'); }'."\n".
+					'switchElementClass(\'addrm_fav\', \'btn-remove-fav\', \'btn-add-fav\');'."\n".
+				'}'."\n".
+				'else {'."\n".
+					'jQuery(\'.dashbrd-grid-widget-container\')'."\n".
+						'.dashboardGrid(\'refreshWidget\', \''.$widgetids[$object].'\');'."\n".
+				'}';
 		}
 		else {
 			$data['main_block'] = '';

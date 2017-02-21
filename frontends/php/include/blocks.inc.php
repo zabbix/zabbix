@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,247 +23,6 @@ require_once dirname(__FILE__).'/graphs.inc.php';
 require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
-
-/**
- * Get favourite graphs and simple graph data.
- *
- * @return array['graphs']
- * @return array['simpleGraphs']
- */
-function getFavouriteGraphsData() {
-	$graphs = $simpeGraphs = [];
-
-	$favourites = CFavorite::get('web.favorite.graphids');
-
-	if ($favourites) {
-		$graphIds = $itemIds = $dbGraphs = $dbItems = [];
-
-		foreach ($favourites as $favourite) {
-			if ($favourite['source'] === 'itemid') {
-				$itemIds[$favourite['value']] = $favourite['value'];
-			}
-			else {
-				$graphIds[$favourite['value']] = $favourite['value'];
-			}
-		}
-
-		if ($graphIds) {
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'selectHosts' => ['hostid', 'name'],
-				'expandName' => true,
-				'graphids' => $graphIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($itemIds) {
-			$dbItems = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'selectHosts' => ['hostid', 'name'],
-				'itemids' => $itemIds,
-				'webitems' => true,
-				'preservekeys' => true
-			]);
-
-			$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
-		}
-
-		foreach ($favourites as $favourite) {
-			$sourceId = $favourite['value'];
-
-			if ($favourite['source'] === 'itemid') {
-				if (isset($dbItems[$sourceId])) {
-					$dbItem = $dbItems[$sourceId];
-					$dbHost = reset($dbItem['hosts']);
-
-					$simpeGraphs[] = [
-						'id' => $sourceId,
-						'label' => $dbHost['name'].NAME_DELIMITER.$dbItem['name_expanded']
-					];
-				}
-			}
-			else {
-				if (isset($dbGraphs[$sourceId])) {
-					$dbGraph = $dbGraphs[$sourceId];
-					$dbHost = reset($dbGraph['hosts']);
-
-					$graphs[] = [
-						'id' => $sourceId,
-						'label' => $dbHost['name'].NAME_DELIMITER.$dbGraph['name']
-					];
-				}
-			}
-		}
-	}
-
-	return [
-		'graphs' => $graphs,
-		'simpleGraphs' => $simpeGraphs
-	];
-}
-
-/**
- * Get favourite graphs and simple graph.
- *
- * @return CTableInfo
- */
-function getFavouriteGraphs() {
-	$data = getFavouriteGraphsData();
-
-	$favourites = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
-
-	if ($data['graphs']) {
-		foreach ($data['graphs'] as $graph) {
-			$favourites->addRow([new CLink($graph['label'], 'charts.php?graphid='.$graph['id'])]);
-		}
-	}
-
-	if ($data['simpleGraphs']) {
-		foreach ($data['simpleGraphs'] as $item) {
-			$favourites->addRow([new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id'])]);
-		}
-	}
-
-	return $favourites;
-}
-
-/**
- * Get favourite maps data.
- *
- * @return array
- */
-function getFavouriteMapsData() {
-	$maps = [];
-
-	$favourites = CFavorite::get('web.favorite.sysmapids');
-
-	if ($favourites) {
-		$mapIds = [];
-
-		foreach ($favourites as $favourite) {
-			$mapIds[$favourite['value']] = $favourite['value'];
-		}
-
-		$dbMaps = API::Map()->get([
-			'output' => ['sysmapid', 'name'],
-			'sysmapids' => $mapIds
-		]);
-
-		foreach ($dbMaps as $dbMap) {
-			$maps[] = [
-				'id' => $dbMap['sysmapid'],
-				'label' => $dbMap['name']
-			];
-		}
-	}
-
-	return $maps;
-}
-
-/**
- * Get favourite maps.
- *
- * @return CTableInfo
- */
-function getFavouriteMaps() {
-	$data = getFavouriteMapsData();
-
-	$favourites = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
-
-	if ($data) {
-		foreach ($data as $map) {
-			$favourites->addRow([new CLink($map['label'], 'zabbix.php?action=map.view&sysmapid='.$map['id'])]);
-		}
-	}
-
-	return $favourites;
-}
-
-/**
- * Get favourite screens and slide shows data.
- *
- * @return array['screens']
- * @return array['slideshows']
- */
-function getFavouriteScreensData() {
-	$screens = $slideshows = [];
-
-	$favourites = CFavorite::get('web.favorite.screenids');
-
-	if ($favourites) {
-		$screenIds = $slideshowIds = [];
-
-		foreach ($favourites as $favourite) {
-			if ($favourite['source'] === 'screenid') {
-				$screenIds[$favourite['value']] = $favourite['value'];
-			}
-		}
-
-		$dbScreens = API::Screen()->get([
-			'output' => ['screenid', 'name'],
-			'screenids' => $screenIds,
-			'preservekeys' => true
-		]);
-
-		foreach ($favourites as $favourite) {
-			$sourceId = $favourite['value'];
-
-			if ($favourite['source'] === 'slideshowid') {
-				if (slideshow_accessible($sourceId, PERM_READ)) {
-					$dbSlideshow = get_slideshow_by_slideshowid($sourceId, PERM_READ);
-
-					if ($dbSlideshow) {
-						$slideshows[] = [
-							'id' => $dbSlideshow['slideshowid'],
-							'label' => $dbSlideshow['name']
-						];
-					}
-				}
-			}
-			else {
-				if (isset($dbScreens[$sourceId])) {
-					$dbScreen = $dbScreens[$sourceId];
-
-					$screens[] = [
-						'id' => $dbScreen['screenid'],
-						'label' => $dbScreen['name']
-					];
-				}
-			}
-		}
-	}
-
-	return [
-		'screens' => $screens,
-		'slideshows' => $slideshows
-	];
-}
-
-/**
- * Get favourite screens and slide shows.
- *
- * @return CTableInfo
- */
-function getFavouriteScreens() {
-	$data = getFavouriteScreensData();
-
-	$favourites = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
-
-	if ($data['screens']) {
-		foreach ($data['screens'] as $screen) {
-			$favourites->addRow([new CLink($screen['label'], 'screens.php?elementid='.$screen['id'])]);
-		}
-	}
-
-	if ($data['slideshows']) {
-		foreach ($data['slideshows'] as $slideshow) {
-			$favourites->addRow([new CLink($slideshow['label'], 'slides.php?elementid='.$slideshow['id'])]);
-		}
-	}
-
-	return $favourites;
-}
 
 function make_system_status($filter, $backurl) {
 	$config = select_config();
@@ -316,7 +75,6 @@ function make_system_status($filter, $backurl) {
 		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange', 'expression'],
 		'selectGroups' => ['groupid'],
 		'selectHosts' => ['name'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'groupids' => $groupIds,
@@ -333,16 +91,12 @@ function make_system_status($filter, $backurl) {
 		'preservekeys' => true
 	]);
 
+	$problems = getTriggerLastProblems(array_keys($triggers), ['eventid', 'objectid', 'clock', 'acknowledged', 'ns']);
+
 	$events = [];
-
-	foreach ($triggers as $triggerId => $trigger) {
-		if ($trigger['lastEvent']) {
-			$eventid = $trigger['lastEvent']['eventid'];
-			$events[$eventid] = ['eventid' => $eventid];
-		}
-
-		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
-		unset($triggers[$triggerId]['lastEvent']);
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['event'] = $problem;
+		$events[$problem['eventid']] = ['eventid' => $problem['eventid']];
 	}
 
 	// get acknowledges
@@ -361,7 +115,7 @@ function make_system_status($filter, $backurl) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		// event
-		if ($trigger['event']) {
+		if (array_key_exists('event', $trigger)) {
 			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
 				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
 				: 0;
@@ -569,7 +323,6 @@ function make_latest_issues(array $filter = [], $backurl) {
 			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
 		],
 		'selectHosts' => ['hostid'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
 			? true
 			: null,
@@ -588,17 +341,19 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'countOutput' => true
 	]));
 
+	$problems = getTriggerLastProblems(array_keys($triggers), ['eventid', 'objectid', 'clock', 'acknowledged', 'ns']);
+
+	$events = [];
+	foreach ($problems as $problem) {
+		$triggers[$problem['objectid']]['lastEvent'] = $problem;
+		$events[$problem['eventid']] = ['eventid' => $problem['eventid']];
+	}
+
 	// get acknowledges
 	$hostids = [];
-	$events = [];
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			$hostids[$host['hostid']] = true;
-		}
-
-		if ($trigger['lastEvent']) {
-			$eventid = $trigger['lastEvent']['eventid'];
-			$events[$eventid] = ['eventid' => $eventid];
 		}
 	}
 
@@ -707,7 +462,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// trigger has events
-		if ($trigger['lastEvent']) {
+		if (array_key_exists('lastEvent', $trigger)) {
 			// description
 			$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, [
 				'clock' => $trigger['lastEvent']['clock'],
@@ -724,7 +479,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		if ($config['event_ack_enable']) {
-			if ($trigger['lastEvent']) {
+			if (array_key_exists('lastEvent', $trigger)) {
 				$trigger['lastEvent']['acknowledges'] =
 					$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
 
@@ -738,7 +493,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// description
-		if ($trigger['lastEvent'] || $trigger['comments'] !== '' || $trigger['url'] !== '') {
+		if (array_key_exists('lastEvent', $trigger) || $trigger['comments'] !== '' || $trigger['url'] !== '') {
 			$description = (new CSpan($description))
 				->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px')
 				->addClass(ZBX_STYLE_LINK_ACTION);
@@ -754,7 +509,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		);
 
 		// actions
-		$action_hint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+		$action_hint = (array_key_exists('lastEvent', $trigger) && isset($actions[$trigger['lastEvent']['eventid']]))
 			? $actions[$trigger['lastEvent']['eventid']]
 			: SPACE;
 

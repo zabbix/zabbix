@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_
 	const char	*__function_name = "recv_areg_data";
 
 	int		ret;
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		*error = NULL;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_from_request(jp, sock, &proxy, &error)))
+	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse autoregistration data from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -62,7 +62,7 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_
 	if (SUCCEED != (ret = process_auto_registration(jp, proxy.hostid, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\": %s",
-				host, sock->peer, error);
+				proxy.host, sock->peer, error);
 	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,8 +63,12 @@ class CMacrosResolverGeneral {
 		// Replace functionids with string 'function' to make values search easier.
 		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
 
+		// Replace whitespace with emptyness to make value search easier.
+		$expression = str_replace(" \r\n\t", '', $expression);
+
 		// Search for numeric values in expression.
-		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
+		preg_match_all('/((?<![\)\.0-9]|[\.0-9]['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']|function)\-?'.
+				'([.][0-9]+|[0-9]+[.]?[0-9]*)['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $expression, $values);
 
 		$macro_values = [];
 
@@ -863,10 +867,12 @@ class CMacrosResolverGeneral {
 		$user_macro_parser = new CUserMacroParser();
 
 		do {
+			$hostids = array_keys($hostids);
+
 			$db_host_macros = DBselect(
 				'SELECT hm.hostid,hm.macro,hm.value'.
 				' FROM hostmacro hm'.
-				' WHERE '.dbConditionInt('hm.hostid', array_keys($hostids))
+				' WHERE '.dbConditionInt('hm.hostid', $hostids)
 			);
 			while ($db_host_macro = DBfetch($db_host_macros)) {
 				if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
@@ -875,7 +881,14 @@ class CMacrosResolverGeneral {
 
 				$macro = $user_macro_parser->getMacro();
 				$context = $user_macro_parser->getContext();
-				$host_macros[$db_host_macro['hostid']][$macro] = ['value' => null, 'contexts' => []];
+
+				if (!array_key_exists($db_host_macro['hostid'], $host_macros)) {
+					$host_macros[$db_host_macro['hostid']] = [];
+				}
+
+				if (!array_key_exists($macro, $host_macros[$db_host_macro['hostid']])) {
+					$host_macros[$db_host_macro['hostid']][$macro] = ['value' => null, 'contexts' => []];
+				}
 
 				if ($context === null) {
 					$host_macros[$db_host_macro['hostid']][$macro]['value'] = $db_host_macro['value'];
@@ -885,39 +898,31 @@ class CMacrosResolverGeneral {
 				}
 			}
 
+			foreach ($hostids as $hostid) {
+				$host_templates[$hostid] = [];
+			}
+
 			$templateids = [];
 			$db_host_templates = DBselect(
 				'SELECT ht.hostid,ht.templateid'.
 				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionInt('ht.hostid', array_keys($hostids))
+				' WHERE '.dbConditionInt('ht.hostid', $hostids)
 			);
 			while ($db_host_template = DBfetch($db_host_templates)) {
 				$host_templates[$db_host_template['hostid']][] = $db_host_template['templateid'];
 				$templateids[$db_host_template['templateid']] = true;
-
-				if (!array_key_exists($db_host_template['hostid'], $host_macros)) {
-					$host_macros[$db_host_template['hostid']] = [];
-				}
-			}
-
-			foreach ($hostids as $key => $value) {
-				if (!array_key_exists($key, $host_templates)) {
-					$host_templates[$key] = [];
-				}
 			}
 
 			// only unprocessed templates will be populated
 			$hostids = [];
-			foreach ($templateids as $key => $value) {
-				if (!array_key_exists($key, $host_templates)) {
-					$hostids[$key] = true;
+			foreach (array_keys($templateids) as $templateid) {
+				if (!array_key_exists($templateid, $host_templates)) {
+					$hostids[$templateid] = true;
 				}
 			}
 		} while ($hostids);
 
 		$all_macros_resolved = true;
-
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($data as &$element) {
 			$hostids = [];

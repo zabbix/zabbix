@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,7 +155,6 @@ var CDoll = Class.create({
 		this.counter(obj4update.counter);
 		this.params(obj4update.params);
 		this.ready(obj4update.ready);
-		this.updateSortable();
 	},
 
 	startDoll: function() {
@@ -360,50 +359,6 @@ var CDoll = Class.create({
 			document.body.removeChild(this._domdark);
 			this._domdark = null;
 		}
-	},
-
-	updateSortable: function() {
-		var columnObj = jQuery('.widget-placeholder .cell');
-
-		if (columnObj.length > 0) {
-			columnObj
-				.sortable({
-					connectWith: '.widget-placeholder .cell',
-					handle: 'div.dashbrd-widget-head',
-					forcePlaceholderSize: true,
-					placeholder: 'dashbrd-widget',
-					tolerance: 'pointer',
-					start: function(e, ui) {
-						jQuery(ui.placeholder).addClass('dashbrd-widget-placeholder');
-						jQuery(ui.item).addClass('dashbrd-widget-draggable');
-						jQuery('.widget-placeholder .cell').css('min-width', '250px');
-						jQuery('.widget-placeholder .cell').sortable('refreshPositions');
-					},
-					stop: function(e, ui) {
-						jQuery(ui.placeholder).removeClass('dashbrd-widget-placeholder');
-						jQuery(ui.item).removeClass('dashbrd-widget-draggable');
-						jQuery('.widget-placeholder .cell').css('min-width', '');
-						jQuery('.widget-placeholder .cell[style=""]').removeAttr('style');
-					},
-					update: function(e, ui) {
-						// prevent duplicate save requests when moving a widget from one column to another
-						if (!ui.sender) {
-							var widgetPositions = {};
-
-							jQuery('.widget-placeholder .cell').each(function(colNum, column) {
-								widgetPositions[colNum] = {};
-
-								jQuery('.dashbrd-widget', column).each(function(rowNum, widget) {
-									widgetPositions[colNum][rowNum] = widget.id;
-								});
-							});
-
-							sendAjaxData('zabbix.php?action=dashboard.sort', {
-								data: {grid: Object.toJSON(widgetPositions)}
-							});
-						}
-					}
-				});
-		}
 	}
+
 });

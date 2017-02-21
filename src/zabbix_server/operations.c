@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			zbx_uint64_t	host_proxy_hostid;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
-			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
+			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
 
 			result2 = DBselect(

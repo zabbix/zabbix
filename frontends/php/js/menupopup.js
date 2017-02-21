@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,160 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * Get menu popup favourite graphs section data.
- *
- * @param array options['graphs']			graphs as id => label (optional)
- * @param array options['simpleGraphs']		simple graphs as id => label (optional)
- *
- * @return array
- */
-function getMenuPopupFavouriteGraphs(options) {
-	var sections = [];
-
-	if (typeof options.graphs !== 'undefined') {
-		sections[sections.length] = getMenuPopupFavouriteData(
-			t('Favourite graphs'),
-			options.graphs,
-			'graphid',
-			'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1&real_hosts=1'
-		);
-	}
-
-	if (typeof options.simpleGraphs !== 'undefined') {
-		sections[sections.length] = getMenuPopupFavouriteData(
-			t('Favourite simple graphs'),
-			options.simpleGraphs,
-			'itemid',
-			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1'
-				+ '&with_simple_graph_items=1&real_hosts=1'
-		);
-	}
-
-	return sections;
-}
-
-/**
- * Get menu popup favourite maps section data.
- *
- * @param array options['maps']		maps as id => label
- *
- * @return array
- */
-function getMenuPopupFavouriteMaps(options) {
-	return [getMenuPopupFavouriteData(
-		t('Favourite maps'),
-		options.maps,
-		'sysmapid',
-		'popup.php?srctbl=sysmaps&srcfld1=sysmapid&reference=sysmapid&multiselect=1'
-	)];
-}
-
-/**
- * Get menu popup favourite screens section data.
- *
- * @param array options['screens']		screens as id => label (optional)
- * @param array options['slideshows']	slideshows as id => label (optional)
- *
- * @return array
- */
-function getMenuPopupFavouriteScreens(options) {
-	var sections = [];
-
-	if (typeof options.screens !== 'undefined') {
-		sections[sections.length] = getMenuPopupFavouriteData(
-			t('Favourite screens'),
-			options.screens,
-			'screenid',
-			'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1'
-		);
-	}
-
-	if (typeof options.slideshows !== 'undefined') {
-		sections[sections.length] = getMenuPopupFavouriteData(
-			t('Favourite slide shows'),
-			options.slideshows,
-			'slideshowid',
-			'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1'
-		);
-	}
-
-	return sections;
-}
-
-/**
- * Prepare data for favourite section.
- *
- * @param string label			item label
- * @param array  data			item submenu
- * @param string favouriteObj	favourite object name
- * @param string addParams		popup parameters
- *
- * @returns array
- */
-function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
-	var removeItems = [];
-
-	if (objectSize(data) > 0) {
-		jQuery.each(data, function(i, item) {
-			removeItems[i] = {
-				label: item.label,
-				clickCallback: function() {
-					var obj = jQuery(this);
-
-					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
-						data: {
-							object: favouriteObj,
-							'objectids[]': [item.id]
-						}
-					});
-
-					obj.closest('.action-menu').fadeOut(100);
-					obj.remove();
-				}
-			};
-		});
-	}
-
-	var add = {
-			label: t('Add'),
-			clickCallback: function() {
-				PopUp(addParams);
-
-				jQuery(this).closest('.action-menu').fadeOut(100);
-			}
-		},
-		remove = {
-			label: t('Remove')
-		},
-		remove_all = {
-			label: t('Remove all')
-		};
-
-	if (removeItems.length != 0) {
-		remove.items = removeItems;
-		remove_all.clickCallback = function() {
-			sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
-				data: {
-					object: favouriteObj,
-					'objectids[]': [0]
-				}
-			});
-
-			jQuery(this).closest('.action-menu').fadeOut(100);
-		};
-	}
-	else {
-		remove.disabled = true;
-		remove_all.disabled = true;
-	}
-
-	return {
-		label: label,
-		items: [add, remove, remove_all]
-	};
-}
 
 /**
  * Get menu popup history section data.
@@ -494,10 +340,11 @@ function getMenuPopupMap(options) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string options['widgetName']		widget name
- * @param string options['currentRate']		current rate value
- * @param bool   options['multiplier']		multiplier or time mode
- * @param array  options['params']			url parameters (optional)
+ * @param string   options['widgetName']   widget name
+ * @param string   options['currentRate']  current rate value
+ * @param bool     options['multiplier']   multiplier or time mode
+ * @param array    options['params']       (optoinal) url parameters
+ * @param callback options['callback']     (optional) callback function on success
  *
  * @return array
  */
@@ -546,28 +393,45 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 				else {
-					sendAjaxData('zabbix.php?action=dashboard.widget', {
-						data: jQuery.extend({}, params, {
-							widget: options.widgetName,
-							refreshrate: currentRate
-						}),
-						dataType: 'script',
-						success: function(js) { js }
+					var url = new Curl('zabbix.php');
+
+					url.setArgument('action', 'dashbrd.widget.update')
+
+					jQuery.ajax({
+						url: url.getUrl(),
+						method: 'POST',
+						dataType: 'json',
+						data: {
+							widgets: [
+								{
+									'widgetid': options.widgetName,
+									'rf_rate': currentRate
+								}
+							]
+						},
+						success: function(resp) {
+							jQuery('a').each(function() {
+								var link = jQuery(this);
+
+								if (link.data('value') == currentRate) {
+									link.addClass('selected');
+								}
+								else {
+									link.removeClass('selected');
+								}
+							});
+
+							obj.closest('.action-menu').fadeOut(100);
+
+							jQuery('.dashbrd-grid-widget-container')
+								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
+						},
+						error: function() {
+							obj.closest('.action-menu').fadeOut(100);
+							// TODO: gentle message about failed saving of widget refresh rate
+						}
 					});
 				}
-
-				jQuery('a').each(function() {
-					var link = jQuery(this);
-
-					if (link.data('value') == currentRate) {
-						link.addClass('selected');
-					}
-					else {
-						link.removeClass('selected');
-					}
-				});
-
-				obj.closest('.action-menu').fadeOut(100);
 			}
 		};
 

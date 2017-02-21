@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ class CDRule extends CApiService {
 
 		$proxy_hostids = [];
 
-		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists('name', $drule)) {
@@ -198,13 +198,24 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (!array_key_exists('iprange', $drule)) {
+			if (!array_key_exists('iprange', $drule) || $drule['iprange'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'iprange', _('cannot be empty'))
 				);
 			}
-			elseif (!$ip_range_validator->validate($drule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
+			elseif (!$ip_range_parser->parse($drule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'iprange', $ip_range_parser->getError())
+				);
+			}
+			elseif (bccomp($ip_range_parser->getMaxIPCount(), ZBX_DISCOVERER_IPRANGE_LIMIT) > 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'iprange',
+						_s('IP range "%1$s" exceeds "%2$s" address limit', $ip_range_parser->getMaxIPRange(),
+							ZBX_DISCOVERER_IPRANGE_LIMIT
+						)
+					)
+				);
 			}
 
 			if (array_key_exists('delay', $drule)) {
@@ -316,7 +327,7 @@ class CDRule extends CApiService {
 		$drule_names_changed = [];
 		$proxy_hostids = [];
 
-		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists($drule['druleid'], $db_drules)) {
@@ -338,8 +349,26 @@ class CDRule extends CApiService {
 				}
 			}
 
-			if (array_key_exists('iprange', $drule) && !$ip_range_validator->validate($drule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
+			if (array_key_exists('iprange', $drule)) {
+				if ($drule['iprange'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'iprange', _('cannot be empty'))
+					);
+				}
+				elseif (!$ip_range_parser->parse($drule['iprange'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'iprange', $ip_range_parser->getError())
+					);
+				}
+				elseif (bccomp($ip_range_parser->getMaxIPCount(), ZBX_DISCOVERER_IPRANGE_LIMIT) > 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'iprange',
+							_s('IP range "%1$s" exceeds "%2$s" address limit', $ip_range_parser->getMaxIPRange(),
+								ZBX_DISCOVERER_IPRANGE_LIMIT
+							)
+						)
+					);
+				}
 			}
 
 			if (array_key_exists('delay', $drule)) {

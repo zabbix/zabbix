@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,137 +19,78 @@
 **/
 
 
-$this->addJsFile('class.pmaster.js');
+$this->addJsFile('dashboard.grid.js');
 
 /*
  * Dashboard grid
  */
-$dashboardGrid = [[], [], []];
-$widgetRefreshParams = [];
-
 $widgets = [
 	WIDGET_FAVOURITE_GRAPHS => [
-		'id' => 'favouriteGraphs',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteGraphs'],
-		'data' => $data['favourite_graphs'],
 		'header' => _('Favourite graphs'),
-		'links' => [
-			['name' => _('Graphs'), 'url' => 'charts.php']
-		],
-		'defaults' => ['col' => 0, 'row' => 0]
+		'pos' => ['row' => 0, 'col' => 0, 'height' => 3, 'width' => 2],
+		'rf_rate' => 15 * SEC_PER_MIN
 	],
 	WIDGET_FAVOURITE_SCREENS => [
-		'id' => 'favouriteScreens',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteScreens'],
-		'data' => $data['favourite_screens'],
 		'header' => _('Favourite screens'),
-		'links' => [
-			['name' => _('Screens'), 'url' => 'screens.php'],
-			['name' => _('Slide shows'), 'url' => 'slides.php']
-		],
-		'defaults' => ['col' => 0, 'row' => 1]
+		'pos' => ['row' => 0, 'col' => 2, 'height' => 3, 'width' => 2],
+		'rf_rate' => 15 * SEC_PER_MIN
 	],
 	WIDGET_FAVOURITE_MAPS => [
-		'id' => 'favouriteMaps',
-		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteMaps'],
-		'data' => $data['favourite_maps'],
 		'header' => _('Favourite maps'),
-		'links' => [
-			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']
-		],
-		'defaults' => ['col' => 0, 'row' => 2]
-	]
-];
-
-foreach ($widgets as $widgetid => $widget) {
-	$icon = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-		->setTitle(_('Action'))
-		->setId($widget['id'])
-		->setMenuPopup(call_user_func($widget['menu_popup']));
-
-	$footer = new CList();
-	foreach ($widget['links'] as $link) {
-		$footer->addItem(new CLink($link['name'], $link['url']));
-	}
-
-	$col = CProfile::get('web.dashboard.widget.'.$widgetid.'.col', $widget['defaults']['col']);
-	$row = CProfile::get('web.dashboard.widget.'.$widgetid.'.row', $widget['defaults']['row']);
-
-	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, $widget['data']))
-		->setExpanded((bool) CProfile::get('web.dashboard.widget.'.$widgetid.'.state', true))
-		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter($footer);
-}
-
-$widgets = [
-	WIDGET_SYSTEM_STATUS => [
-		'action' => 'widget.system.view',
-		'header' => _('System status'),
-		'defaults' => ['col' => 1, 'row' => 1]
-	],
-	WIDGET_HOST_STATUS => [
-		'action' => 'widget.hosts.view',
-		'header' => _('Host status'),
-		'defaults' => ['col' => 1, 'row' => 2]
+		'pos' => ['row' => 0, 'col' => 4, 'height' => 3, 'width' => 2],
+		'rf_rate' => 15 * SEC_PER_MIN
 	],
 	WIDGET_LAST_ISSUES => [
-		'action' => 'widget.issues.view',
 		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-		'defaults' => ['col' => 1, 'row' => 3]
+		'pos' => ['row' => 3, 'col' => 0, 'height' => 6, 'width' => 6],
+		'rf_rate' => SEC_PER_MIN
 	],
 	WIDGET_WEB_OVERVIEW => [
-		'action' => 'widget.web.view',
 		'header' => _('Web monitoring'),
-		'defaults' => ['col' => 1, 'row' => 4]
+		'pos' => ['row' => 9, 'col' => 0, 'height' => 4, 'width' => 3],
+		'rf_rate' => SEC_PER_MIN
 	],
+	WIDGET_HOST_STATUS => [
+		'header' => _('Host status'),
+		'pos' => ['row' => 0, 'col' => 6, 'height' => 4, 'width' => 6],
+		'rf_rate' => SEC_PER_MIN
+	],
+	WIDGET_SYSTEM_STATUS => [
+		'header' => _('System status'),
+		'pos' => ['row' => 4, 'col' => 6, 'height' => 4, 'width' => 6],
+		'rf_rate' => SEC_PER_MIN
+	]
 ];
 
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
-		'action' => 'widget.status.view',
 		'header' => _('Status of Zabbix'),
-		'defaults' => ['col' => 1, 'row' => 0]
+		'pos' => ['row' => 8, 'col' => 6, 'height' => 5, 'width' => 6],
+		'rf_rate' => 15 * SEC_PER_MIN
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
-		'action' => 'widget.discovery.view',
 		'header' => _('Discovery status'),
-		'defaults' => ['col' => 1, 'row' => 5]
+		'pos' => ['row' => 9, 'col' => 3, 'height' => 4, 'width' => 3],
+		'rf_rate' => SEC_PER_MIN
 	];
 }
+
+$grid_widgets = [];
 
 foreach ($widgets as $widgetid => $widget) {
-	$profile = 'web.dashboard.widget.'.$widgetid;
-
-	$rate = CProfile::get($profile.'.rf_rate', 60);
-	$expanded = (bool) CProfile::get($profile.'.state', true);
-	$col = CProfile::get($profile.'.col', $widget['defaults']['col']);
-	$row = CProfile::get($profile.'.row', $widget['defaults']['row']);
-
-	$icon = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-		->setTitle(_('Action'))
-		->setMenuPopup(CMenuPopupHelper::getRefresh($widgetid, $rate));
-
-	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass(ZBX_STYLE_PRELOADER)))
-		->setExpanded($expanded)
-		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter((new CList())->setId($widgetid.'_footer'));
-
-	$widgetRefreshParams[$widgetid] = [
-		'frequency' => $rate,
-		'url' => 'zabbix.php?action='.$widget['action'],
-		'counter' => 0,
-		'darken' => 0,
-		'params' => ['widgetRefresh' => $widgetid]
+	$grid_widgets[] = [
+		'widgetid' => $widgetid,
+		'header' => $widget['header'],
+		'pos' => [
+			'col' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.col', $widget['pos']['col']),
+			'row' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.row', $widget['pos']['row']),
+			'height' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.height', $widget['pos']['height']),
+			'width' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.width', $widget['pos']['width'])
+		],
+		'rf_rate' => (int) CProfile::get('web.dashbrd.widget.'.$widgetid.'.rf_rate', $widget['rf_rate'])
 	];
-}
-
-// sort dashboard grid
-foreach ($dashboardGrid as $key => $val) {
-	ksort($dashboardGrid[$key]);
 }
 
 (new CWidget())
@@ -161,51 +102,18 @@ foreach ($dashboardGrid as $key => $val) {
 			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	)
-	->addItem(
-		(new CDiv(
-			(new CDiv([
-				(new CDiv($dashboardGrid[0]))->addClass(ZBX_STYLE_CELL),
-				(new CDiv($dashboardGrid[1]))->addClass(ZBX_STYLE_CELL),
-				(new CDiv($dashboardGrid[2]))->addClass(ZBX_STYLE_CELL)
-			]))
-				->addClass(ZBX_STYLE_ROW)
-		))
-			->addClass(ZBX_STYLE_TABLE)
-			->addClass('widget-placeholder')
-	)
+	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 	->show();
 
 /*
  * Javascript
  */
-// start refresh process
-$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
-
 // activating blinking
 $this->addPostJS('jqBlink.blink();');
 
-?>
-
-<script type="text/javascript">
-	/**
-	 * @see init.js add.popup event
-	 */
-	function addPopupValues(list) {
-		var favourites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
-
-		if (isset(list.object, favourites)) {
-			var favouriteIds = [];
-
-			for (var i = 0; i < list.values.length; i++) {
-				favouriteIds.push(list.values[i][list.object]);
-			}
-
-			sendAjaxData('zabbix.php?action=dashboard.favourite&operation=create', {
-				data: {
-					object: list.object,
-					'objectids[]': favouriteIds
-				}
-			});
-		}
-	}
-</script>
+// Initialize dashboard grid
+$this->addPostJS(
+	'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'.dashboardGrid()'.
+		'.dashboardGrid("addWidgets", '.CJs::encodeJson($grid_widgets).');'
+);

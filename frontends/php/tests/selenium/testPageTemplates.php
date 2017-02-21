@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,24 +22,32 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageTemplates extends CWebTest {
 
+	public $templateName = 'Template OS Linux';
+
 	public static function allTemplates() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
 
-	/**
-	* @dataProvider allTemplates
-	*/
-	public function testPageTemplates_CheckLayout($template) {
+	public function testPageTemplates_CheckLayout() {
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$this->zbxTestTextPresent('Displaying');
-
-		$this->zbxTestTextPresent(['Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to']);
-
-		$this->zbxTestTextPresent([$template['name']]);
-		$this->zbxTestTextPresent(['Export', 'Delete', 'Delete and clear']);
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestTextPresent($this->templateName);
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Items')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Triggers')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Graphs')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Screens')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Discovery')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Web')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Linked templates')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Linked to')]");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Export'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete and clear'][@disabled]");
 	}
 
 	/**
@@ -68,17 +76,15 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->zbxTestCheckTitle('Configuration of templates');
-
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
+		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($name);
-		$this->zbxTestCheckHeader('Templates');
 
 		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
@@ -86,4 +92,31 @@ class testPageTemplates extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
+	public function testPageTemplates_FilterTemplate() {
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+	}
+
+	public function testPageTemplates_FilterNone() {
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestInputTypeOverwrite('filter_name', '123template!@#$%^&*()_"=');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->zbxTestInputTypeOverwrite('filter_name', '%');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+	}
+
+	public function testPageTemplates_FilterReset() {
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
 }

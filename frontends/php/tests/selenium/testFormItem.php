@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -66,7 +65,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -74,7 +72,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -113,7 +110,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -122,7 +118,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -131,7 +126,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -193,7 +187,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -225,7 +218,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Simple form test host'
 				]
 			],
@@ -267,7 +259,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -275,7 +266,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -283,7 +273,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -334,7 +323,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -343,7 +331,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -352,7 +339,6 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -404,7 +390,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -443,7 +428,6 @@ class testFormItem extends CWebTest {
 				[
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean',
 					'host' => 'Inheritance test template'
 				]
 			],
@@ -463,6 +447,14 @@ class testFormItem extends CWebTest {
 			],
 			[
 				['type' => 'Calculated', 'host' => 'Inheritance test template']
+			],
+			[
+				[
+					'host' => 'Template inheritance test host',
+					'hostTemplate' => 'Inheritance test template',
+					'key' => 'test-inheritance-item-preprocessing',
+					'preprocessing' => true
+				]
 			]
 		];
 	}
@@ -506,7 +498,7 @@ class testFormItem extends CWebTest {
 		if (isset($templateid)) {
 			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
-				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
+				$this->zbxTestAssertElementPresentXpath("//*[@id='itemFormList']/li[1]/div[2]/a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
@@ -609,19 +601,6 @@ class testFormItem extends CWebTest {
 			$value_type = $this->zbxTestGetSelectedLabel('value_type');
 		}
 
-		if ($value_type == 'Numeric (unsigned)') {
-			if (isset($data['data_type'])) {
-				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
-				$data_type = $data['data_type'];
-			}
-			elseif (isset($templateid)) {
-				$data_type = $this->zbxTestGetValue("//input[@id='data_type_name']");
-			}
-			else {
-				$data_type = $this->zbxTestGetSelectedLabel('data_type');
-			}
-		}
-
 		if ($type == 'SSH agent') {
 			if (isset($data['authtype'])) {
 				$this->zbxTestDropdownSelect('authtype', $data['authtype']);
@@ -672,13 +651,12 @@ class testFormItem extends CWebTest {
 				case INTERFACE_TYPE_IPMI :
 				case INTERFACE_TYPE_ANY :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBdata(
+					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
 							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-					);
-					$dbInterfaces = reset($dbInterfaces);
+					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
@@ -916,37 +894,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='value_type_name']", 'readonly');
 		}
 
-		if ($value_type == 'Numeric (unsigned)') {
-			$this->zbxTestTextPresent('Data type');
-			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('data_type');
-				$this->zbxTestDropdownHasOptions('data_type', ['Boolean', 'Octal', 'Decimal', 'Hexadecimal']);
-				$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Decimal']");
-
-				if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
-					$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Boolean']", 'disabled');
-					$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Octal']", 'disabled');
-					$this->zbxTestAssertAttribute("//*[@id='data_type']/option[text()='Hexadecimal']", 'disabled');
-				}
-				else {
-					$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Boolean']");
-					$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Octal']");
-					$this->zbxTestIsEnabled("//*[@id='data_type']/option[text()='Hexadecimal']");
-				}
-			}
-			else {
-				$this->zbxTestAssertVisibleId('data_type_name');
-				$this->zbxTestAssertAttribute("//input[@id='data_type_name']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='data_type_name']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='data_type_name']", 'readonly');
-			}
-		}
-		else {
-			$this->zbxTestTextNotVisibleOnPage('Data type');
-			$this->zbxTestAssertNotVisibleId('data_type');
-		}
-
-		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
+	if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
@@ -954,35 +902,10 @@ class testFormItem extends CWebTest {
 			if(isset($templateid)) {
 				$this->zbxTestAssertAttribute("//input[@id='units']", 'readonly');
 			}
-
-			$this->zbxTestTextPresent('Use custom multiplier');
-			$this->zbxTestAssertElementPresentId('multiplier');
-			$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier']");
-			if (isset($templateid)) {
-				$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
-			}
-
-			$this->zbxTestAssertVisibleId('formula');
-			$this->zbxTestAssertAttribute("//input[@id='formula']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='formula']", 'size', 20);
-			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('formula', 1);
-			}
-			if (!isset($templateid)) {
-				$this->zbxTestAssertElementPresentXpath("//input[@id='formula'][@disabled]");
-			}
-			else {
-				$this->zbxTestAssertAttribute("//input[@id='formula']", 'readonly');
-			}
-
 		}
 		else {
 			$this->zbxTestTextNotVisibleOnPage('Units');
 			$this->zbxTestAssertNotVisibleId('units');
-
-			$this->zbxTestTextNotVisibleOnPage('Use custom multiplier');
-			$this->zbxTestAssertNotVisibleId('multiplier');
-			$this->zbxTestAssertNotVisibleId('formula');
 		}
 
 		switch ($type) {
@@ -1045,24 +968,6 @@ class testFormItem extends CWebTest {
 		else {
 			$this->zbxTestTextNotVisibleOnPage('Trend storage period (in days)');
 			$this->zbxTestAssertNotVisibleId('trends');
-		}
-
-		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
-			$this->zbxTestTextPresent('Store value');
-			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('delta');
-				$this->zbxTestDropdownHasOptions('delta', ['As is', 'Delta (speed per second)', 'Delta (simple change)']);
-				$this->zbxTestDropdownAssertSelected('delta', 'As is');
-			}
-			else {
-				$this->zbxTestAssertVisibleId('delta_name');
-				$this->zbxTestAssertAttribute("//input[@id='delta_name']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delta_name']", 'readonly');
-			}
-		}
-		else {
-			$this->zbxTestTextNotVisibleOnPage('Store value');
-			$this->zbxTestAssertNotVisibleId('delta');
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
@@ -1246,6 +1151,28 @@ class testFormItem extends CWebTest {
 		else {
 			$this->zbxTestAssertElementNotPresentId('delete');
 		}
+
+		if (isset($templateid) && array_key_exists('preprocessing', $data)) {
+			$this->zbxTestTabSwitch('Preprocessing');
+			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
+			$itemsPreproc = DBfetchArray($dbResult);
+			foreach ($itemsPreproc as $itemPreproc) {
+				$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
+				$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type_name']", 'readonly');
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_type_name", $preprocessing_type);
+				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
+				}
+				elseif ($itemPreproc['type'] == 5) {
+					$reg_exp = preg_split("/\n/", $itemPreproc['params']);
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
+					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_1']", 'readonly');
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $reg_exp[0]);
+					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
+				}
+			}
+		}
 	}
 
 	// Returns update data
@@ -1320,58 +1247,6 @@ class testFormItem extends CWebTest {
 					'errors' => [
 						'Incorrect value for field "Key": cannot be empty.'
 					]
-				]
-			],
-			// Empty formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' ',
-					'formulaValue' => '',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			// Incorrect formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' value ',
-					'formulaValue' => 'value',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "value" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			// Incorrect formula
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => '321abc',
-					'formulaValue' => '321abc',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Value "321abc" of "Custom multiplier" has incorrect decimal format.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item formula1',
-					'key' => 'item-formula-test',
-					'formula' => '5',
-					'dbCheck' => true,
-					'formCheck' => true
 				]
 			],
 			// Empty timedelay
@@ -2225,11 +2100,6 @@ class testFormItem extends CWebTest {
 			$this->zbxTestInputTypeWait('params_ap', $data['params_ap']);
 		}
 
-		if (isset($data['formula'])) {
-			$this->zbxTestCheckboxSelect('multiplier');
-			$this->zbxTestInputType('formula', $data['formula']);
-		}
-
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
@@ -2283,7 +2153,6 @@ class testFormItem extends CWebTest {
 		}
 
 		$value_type = $this->zbxTestGetSelectedLabel('value_type');
-		$data_type = $this->zbxTestGetSelectedLabel('data_type');
 
 		if ($itemFlexFlag == true) {
 			$this->zbxTestClickWait('add');
@@ -2309,7 +2178,7 @@ class testFormItem extends CWebTest {
 			}
 
 		if (isset($data['dbCheck'])) {
-			$result = DBselect("SELECT name, key_, value_type, data_type FROM items where key_ = '".$key."'");
+			$result = DBselect("SELECT name,key_,value_type FROM items where key_ = '".$key."'");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $name);
 				$this->assertEquals($row['key_'], $key);
@@ -2332,22 +2201,6 @@ class testFormItem extends CWebTest {
 						break;
 				}
 				$this->assertEquals($value_typeDB, $value_type);
-
-				switch($row['data_type'])	{
-					case ITEM_DATA_TYPE_DECIMAL:
-						$data_typeDB = 'Decimal';
-						break;
-					case ITEM_DATA_TYPE_OCTAL:
-						$data_typeDB = 'Octal';
-						break;
-					case ITEM_DATA_TYPE_HEXADECIMAL:
-						$data_typeDB = 'Hexadecimal' ;
-						break;
-					case ITEM_DATA_TYPE_BOOLEAN:
-						$data_typeDB = 'Boolean' ;
-						break;
-				}
-				$this->assertEquals($data_typeDB, $data_type);
 			}
 		}
 		if (isset($data['formCheck'])) {
@@ -2380,7 +2233,6 @@ class testFormItem extends CWebTest {
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='data_type']/option[text()='$data_type']");
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
@@ -2424,7 +2276,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//li[30]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99 days)');
+		$this->zbxTestAssertElementText("//li[28]/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (99 days)');
 		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455 days)');
 
 		$this->zbxTestOpen('adm.gui.php');
@@ -2446,6 +2298,349 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (455 days)');
+	}
+
+	public static function preprocessing() {
+		return [
+			// Custom multiplier
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item empty multiplier',
+					'key' => 'item-empty-multiplier',
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item string multiplier',
+					'key' => 'item-string-multiplier',
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'params' => 'abc'],
+					],
+					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item multiplier symbol',
+					'key' => 'item-symbol-multiplier',
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'params' => '0,0'],
+					],
+					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item multiplier symbol',
+					'key' => 'item-symbol-multiplier',
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'params' => '1a!@#$%^&*()-='],
+					],
+					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+				]
+			],
+			// Empty trim
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item right trim',
+					'key' => 'item-empty-right-trim',
+					'preprocessing' => [
+						['type' => 'Right trim', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item left trim',
+					'key' => 'item-empty-left-trim',
+					'preprocessing' => [
+						['type' => 'Left trim ', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item trim',
+					'key' => 'item-empty-trim',
+					'preprocessing' => [
+						['type' => 'Trim', 'params' => ''],
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			// Regular expression
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item empty regular expression',
+					'key' => 'item-empty-first-parameter',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '', 'output' => ''],
+					],
+					'error' => 'Incorrect value for field "params": first parameter is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item empty regular expression',
+					'key' => 'item-empty-first-parameter',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '', 'output' => 'test output'],
+					],
+					'error' => 'Incorrect value for field "params": first parameter is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item empty regular expression',
+					'key' => 'item-empty-second-parameter',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => 'expression', 'output' => ''],
+					],
+					'error' => 'Incorrect value for field "params": second parameter is expected.'
+				]
+			],
+			// Delta
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item two delta',
+					'key' => 'item-two-delta',
+					'preprocessing' => [
+						['type' => 'Delta'],
+						['type' => 'Delta']
+					],
+					'error' => 'Only one "Delta" step is allowed.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item two delta per second',
+					'key' => 'item-two-delta-per-second',
+					'preprocessing' => [
+						['type' => 'Delta per second'],
+						['type' => 'Delta per second']
+					],
+					'error' => 'Only one "Delta" step is allowed.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item two different delta',
+					'key' => 'item-two--different-delta',
+					'preprocessing' => [
+						['type' => 'Delta'],
+						['type' => 'Delta per second']
+					],
+					'error' => 'Only one "Delta" step is allowed.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Add all preprocessing',
+					'key' => 'item.preprocessing',
+					'preprocessing' => [
+						['type' => 'Right trim', 'params' => 'abc'],
+						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Trim', 'params' => '1a2b3c'],
+						['type' => 'Custom multiplier', 'params' => '123'],
+						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'Delta']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Add symblos preprocessing',
+					'key' => 'item.symbols.preprocessing',
+					'preprocessing' => [
+						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
+						['type' => 'Left trim ', 'params' => '2b!@#$%^&*()-='],
+						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
+						['type' => 'Custom multiplier', 'params' => '4e+10'],
+						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Add the same preprocessing',
+					'key' => 'item.theSamePpreprocessing',
+					'preprocessing' => [
+						['type' => 'Right trim', 'params' => 'abc'],
+						['type' => 'Right trim', 'params' => 'abc'],
+						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Trim', 'params' => '1a2b3c'],
+						['type' => 'Trim', 'params' => '1a2b3c'],
+						['type' => 'Custom multiplier', 'params' => '123'],
+						['type' => 'Custom multiplier', 'params' => '123'],
+						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
+						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'Delta per second']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider preprocessing
+	 */
+	public function testFormItem_CreatePreprocessing($data) {
+		$dbResult = DBselect("SELECT hostid FROM hosts WHERE host='".$this->host."'");
+		$dbRow = DBfetch($dbResult);
+		$hostid = $dbRow['hostid'];
+
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=Create+item');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
+
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
+		$this->zbxTestTabSwitch('Preprocessing');
+
+		$stepCount = 0;
+		foreach ($data['preprocessing'] as $options) {
+			$this->zbxTestClickWait('param_add');
+			$this->zbxTestDropdownSelect('preprocessing_'.$stepCount.'_type', $options['type']);
+
+			if (array_key_exists('params', $options) && $options['type'] !== 'Regular expression') {
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['params']);
+			}
+			elseif (array_key_exists('params', $options) && $options['type'] === 'Regular expression') {
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['params']);
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_1', $options['output']);
+			}
+			$stepCount ++;
+		}
+
+		$this->zbxTestClickWait('add');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
+				$this->zbxTestCheckFatalErrors();
+
+				$dbResultItem = DBselect("SELECT name,key_,itemid FROM items where key_ = '".$data['key']."'");
+				$rowItem = DBfetch($dbResultItem);
+				$this->assertEquals($rowItem['name'], $data['name']);
+				$this->assertEquals($rowItem['key_'], $data['key']);
+
+				$dbResultPreprocessing = DBselect("SELECT * FROM item_preproc where itemid ='".$rowItem['itemid']."'  ORDER BY step ASC");
+				while ($row = DBfetch($dbResultPreprocessing)) {
+					$type[] = $row['type'];
+					$dbParams[] = $row['params'];
+				}
+
+				foreach ($data['preprocessing'] as $key => $options) {
+					$dbType = get_preprocessing_types($type[$key]);
+					$this->assertEquals($options['type'], $dbType);
+
+					switch ($options['type']) {
+						case 'Custom multiplier':
+						case 'Right trim':
+						case 'Left trim ':
+						case 'Trim':
+							$this->assertEquals($options['params'], $dbParams[$key]);
+							break;
+						case 'Regular expression':
+							$reg_exp = $options['params']."\n".$options['output'];
+							$this->assertEquals($reg_exp, $dbParams[$key]);
+							break;
+					}
+				}
+				break;
+
+			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
+				$this->zbxTestTextPresent($data['error']);
+
+				$sqlItem = "SELECT * FROM items where key_ = '".$data['key']."'";
+				$this->assertEquals(0, DBcount($sqlItem));
+				break;
+		}
+	}
+
+	public function testFormItem_CopyItemPreprocessing() {
+		$preprocessingItemId = '15094';
+		$dbResultHost = DBselect("SELECT hostid FROM hosts WHERE host='".$this->host."'");
+		$dbRowHost = DBfetch($dbResultHost);
+		$hostid = $dbRowHost['hostid'];
+
+		$this->zbxTestLogin('items.php?filter_set=1&hostid=15001');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
+
+		$this->zbxTestCheckboxSelect('group_itemid_'.$preprocessingItemId);
+		$this->zbxTestClickButton('item.masscopyto');
+
+		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
+		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
+		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
+		$this->zbxTestClickWait('copy');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
+
+		$this->zbxTestClickLinkTextWait('All hosts');
+		$this->zbxTestClickLinkTextWait($this->host);
+		$this->zbxTestClickLinkTextWait('Items');
+		$this->zbxTestClickLinkTextWait('testInheritanceItemPreprocessing');
+
+		$dbItem = DBselect('SELECT * FROM items WHERE itemid='.$preprocessingItemId);
+		$rowItem = DBfetch($dbItem);
+		$this->zbxTestAssertElementValue('name', $rowItem['name']);
+		$this->zbxTestAssertElementValue('key', $rowItem['key_']);
+		$this->zbxTestTabSwitch('Preprocessing');
+
+		$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$preprocessingItemId);
+		$itemsPreproc = DBfetchArray($dbResult);
+		foreach ($itemsPreproc as $itemPreproc) {
+			$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
+			$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type'][readonly]");
+			$this->zbxTestDropdownAssertSelected("preprocessing[".($itemPreproc['step']-1)."][type]", $preprocessing_type);
+			if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
+			}
+			elseif ($itemPreproc['type'] == 5) {
+				$reg_exp = preg_split("/\n/", $itemPreproc['params']);
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
+				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_1'][readonly]");
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $reg_exp[0]);
+				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
+			}
+		}
 	}
 
 	/**

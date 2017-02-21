@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,6 +101,13 @@ class CZabbixServer {
 	protected $error;
 
 	/**
+	 * Total result count (if any).
+	 *
+	 * @var int
+	 */
+	protected $total;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param string $host
@@ -143,15 +150,22 @@ class CZabbixServer {
 	 *
 	 * @param string $type
 	 * @param string $sid   user session ID
+	 * @param int    $limit item count for details type
 	 *
 	 * @return bool|array
 	 */
-	public function getQueue($type, $sid) {
-		return $this->request([
+	public function getQueue($type, $sid, $limit = 0) {
+		$request = [
 			'request' => 'queue.get',
 			'sid' => $sid,
 			'type' => $type
-		]);
+		];
+
+		if ($type == self::QUEUE_DETAILS) {
+			$request['limit'] = $limit;
+		}
+
+		return $this->request($request);
 	}
 
 	/**
@@ -173,6 +187,15 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Returns the total result count.
+	 *
+	 * @return int|null
+	 */
+	public function getTotalCount() {
+		return $this->total;
+	}
+
+	/**
 	 * Executes a given JSON request and returns the result. Returns false if an error has occurred.
 	 *
 	 * @param array $params
@@ -180,6 +203,10 @@ class CZabbixServer {
 	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
 	protected function request(array $params) {
+		// reset object state
+		$this->error = null;
+		$this->total = null;
+
 		// connect to the server
 		if (!$this->connect()) {
 			return false;
@@ -244,6 +271,9 @@ class CZabbixServer {
 
 		// request executed successfully
 		if ($response['response'] == self::RESPONSE_SUCCESS) {
+			// saves total count
+			$this->total = array_key_exists('total', $response) ? $response['total'] : null;
+
 			return $response['data'];
 		}
 		// an error on the server side occurred

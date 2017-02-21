@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@ list($table, $info) = make_latest_issues($data['filter'], 'zabbix.php?action=das
 
 $output = [
 	'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
-	'body' => (new CDiv([getMessages(), $table]))->toString(),
-	'footer' =>
-		(new CListItem($info))->toString().
-		(new CListItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))))->toString()
+	'body' => $table->toString(),
+	'footer' =>(new CList([$info, _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 ];
+
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

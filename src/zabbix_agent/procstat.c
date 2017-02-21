@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+#include <math.h>
 
 #include "common.h"
 #include "log.h"
@@ -1101,8 +1103,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 
 	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 	ticks_diff *= __UINT64_C(1000000000000);
-	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
-	*value = (double)ticks_diff / 10;
+	*value = round((double)ticks_diff / (time_diff * sysconf(_SC_CLK_TCK))) / 10;
 
 	ret = SUCCEED;
 out:
