@@ -676,7 +676,8 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 	zbx_vector_uint64_destroy(&parent_groupids);
 }
 
-static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
+static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid,
+		zbx_uint64_t operationid, int esc_step)
 {
 	const char		*__function_name = "execute_commands";
 	DB_RESULT		result;
@@ -1196,7 +1197,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 							subject, message, event, NULL);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, NULL, action->actionid, operationid, escalation->esc_step);
+					execute_commands(event, NULL, action->actionid, operationid,
+							escalation->esc_step);
 					break;
 			}
 		}
@@ -1345,7 +1347,8 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 							message);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, r_event, action->actionid, operationid, escalation->esc_step);
+					execute_commands(event, r_event, action->actionid, operationid,
+							escalation->esc_step);
 					break;
 			}
 		}
