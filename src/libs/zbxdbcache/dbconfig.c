@@ -2533,9 +2533,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type, status, type, value_type;
-	int			old_nextcheck, type_changed, delay_changed, delay_macros_expanded, key_changed, found,
-				update_index;
+	unsigned char		status, type, value_type;
+	int			type_changed, delay_changed, delay_macros_expanded, key_changed, found, update_index;
 	char			*delay = NULL;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
@@ -2693,7 +2692,6 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		item->status = status;
 		item->value_type = value_type;
-		old_nextcheck = item->nextcheck;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -2742,8 +2740,13 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
+			unsigned char	old_poller_type;
+			int		old_nextcheck;
+
 			old_poller_type = item->poller_type;
 			DCitem_poller_type_update(item, host, ZBX_REACHABLE);
+
+			old_nextcheck = item->nextcheck;
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key) && 0 != delay_macros_expanded &&
 					(0 == item->nextcheck || 0 != key_changed || 0 != type_changed ||
@@ -7281,7 +7284,8 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 	while (num < items_num && FAIL == zbx_binary_heap_empty(queue))
 	{
-		int				disable_until, old_nextcheck, old_poller_type;
+		unsigned char			old_poller_type;
+		int				disable_until, old_nextcheck;
 		const zbx_binary_heap_elem_t	*min;
 		ZBX_DC_HOST			*dc_host;
 		ZBX_DC_ITEM			*dc_item;
