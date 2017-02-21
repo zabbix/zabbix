@@ -29,28 +29,23 @@ class CUpdateIntervalParser extends CParser {
 	private $scheduling_interval_parser;
 	private $user_macro_parser;
 	private $lld_macro_parser;
+
 	private $delay;
 	private $intervals = [];
-
-	/**
-	 * An options array.
-	 *
-	 * Supported options:
-	 *   'lldmacros' => true	Low-level discovery macros.
-	 *
-	 * @var array
-	 */
-	public $options = ['lldmacros' => true];
+	private $options = ['lldmacros' => true];
 
 	public function __construct($options = []) {
-		$this->simple_interval_parser = new CSimpleIntervalParser();
-		$this->flexible_interval_parser = new CFlexibleIntervalParser();
-		$this->scheduling_interval_parser = new CSchedulingIntervalParser();
-		$this->user_macro_parser = new CUserMacroParser();
-		$this->lld_macro_parser = new CLLDMacroParser();
-
 		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
+		}
+
+		$this->simple_interval_parser = new CSimpleIntervalParser();
+		$this->flexible_interval_parser = new CFlexibleIntervalParser(['lldmacros' => $this->options['lldmacros']]);
+		$this->scheduling_interval_parser = new CSchedulingIntervalParser();
+		$this->user_macro_parser = new CUserMacroParser();
+
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
 		}
 	}
 
@@ -58,128 +53,79 @@ class CUpdateIntervalParser extends CParser {
 	 * Parse the given source string. The string must contain simple interval and possibly more multiple intervals of
 	 * two types - flexible and scheduling - separated by a semicolon.
 	 *
-	 * @param string $source	Source string that needs to be parsed.
-	 * @param int    $pos		Position offset.
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->delay = '';
+		$this->intervals = [];
 
 		$p = $pos;
-		$i = 0;
 
 		// First interval must be simple interval (or macro). Other intervals may be mixed and repeat multiple times.
 		if ($this->simple_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->simple_interval_parser->getLength();
-			$this->delay = $this->simple_interval_parser->getmatch();
+			$this->delay = $this->simple_interval_parser->getMatch();
 		}
 		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
-			$this->delay = $this->user_macro_parser->getmatch();
+			$this->delay = $this->user_macro_parser->getMatch();
 		}
 		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->lld_macro_parser->getLength();
-			$this->delay = $this->lld_macro_parser->getmatch();
+			$this->delay = $this->lld_macro_parser->getMatch();
 		}
 		else {
 			return self::PARSE_FAIL;
 		}
 
-		if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-			$this->length = $p - $pos;
-			$this->match = substr($source, $pos, $this->length);
+		while (isset($source[$p]) && $source[$p] === ';') {
+			$p++;
 
-			return self::PARSE_SUCCESS_CONT;
-		}
-
-		$p++;
-
-		for (; isset($source[$p]); $p++) {
 			if ($this->flexible_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->flexible_interval_parser->getLength();
 
-				/*
-				 * It's possible that flexible interval consists of two macros
-				 * {$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD} but it still counts as flexible interval.
-				 */
-				$this->intervals[$i++] = [
+				$this->intervals[] = [
 					'type' => ITEM_DELAY_FLEXIBLE,
 					'interval' => $this->flexible_interval_parser->getMatch()
 				];
-
-				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-					$this->length = $p - $pos - 1;
-					$this->match = substr($source, $pos, $this->length);
-
-					return self::PARSE_SUCCESS_CONT;
-				}
-				else {
-					continue;
-				}
 			}
 			elseif ($this->scheduling_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->scheduling_interval_parser->getLength();
 
-				$this->intervals[$i++] = [
+				$this->intervals[] = [
 					'type' => ITEM_DELAY_SCHEDULING,
 					'interval' => $this->scheduling_interval_parser->getMatch()
 				];
-
-				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-					$this->length = $p - $pos;
-					$this->match = substr($source, $pos, $this->length);
-
-					return self::PARSE_SUCCESS_CONT;
-				}
-				else {
-					continue;
-				}
 			}
 			elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->user_macro_parser->getLength();
 
-				$this->intervals[$i++] = [
+				$this->intervals[] = [
 					'type' => ITEM_DELAY_SCHEDULING,
 					'interval' => $this->user_macro_parser->getMatch()
 				];
-
-				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-					$this->length = $p - $pos - 1;
-					$this->match = substr($source, $pos, $this->length);
-
-					return self::PARSE_SUCCESS_CONT;
-				}
-				else {
-					continue;
-				}
 			}
 			elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->lld_macro_parser->getLength();
 
-				$this->intervals[$i++] = [
+				$this->intervals[] = [
 					'type' => ITEM_DELAY_SCHEDULING,
 					'interval' => $this->lld_macro_parser->getMatch()
 				];
-
-				if (isset($source[$p]) && $source[$p] !== ';' && $source[$p] !== '') {
-					$this->length = $p - $pos - 1;
-					$this->match = substr($source, $pos, $this->length);
-
-					return self::PARSE_SUCCESS_CONT;
-				}
-				else {
-					continue;
-				}
 			}
 			else {
-				return self::PARSE_FAIL;
+				$p--;
+				break;
 			}
 		}
 
-		$this->length = $p - $pos - 1;
+		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
 	/**

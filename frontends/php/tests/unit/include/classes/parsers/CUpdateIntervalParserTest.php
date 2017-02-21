@@ -28,96 +28,195 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 		return [
 			// success
 			[
-				'333h', 0,
+				'333h', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '333h'
+					'match' => '333h',
+					'delay' => '333h',
+					'intervals' => []
 				]
 			],
 			[
-				'0;5m/1-5,09:00-18:00;wd6-7h9', 0,
+				'0;5m/1-5,09:00-18:00;wd6-7h9', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '0;5m/1-5,09:00-18:00;wd6-7h9'
+					'match' => '0;5m/1-5,09:00-18:00;wd6-7h9',
+					'delay' => '0',
+					'intervals' => [
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '5m/1-5,09:00-18:00'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'wd6-7h9']
+					]
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL1}', 0,
+				'{$SIMPLE_INTERVAL1}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$SIMPLE_INTERVAL1}'
+					'match' => '{$SIMPLE_INTERVAL1}',
+					'delay' => '{$SIMPLE_INTERVAL1}',
+					'intervals' => []
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0,
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}'
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => [
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$SCHEDULING_INTERVAL}']
+					]
 				]
 			],
 			[
-				'0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}', 0,
+				'0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}'
+					'match' => '0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}',
+					'delay' => '0',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$UPDATE_AT_NINE_A_M}'],
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}']
+					]
 				]
 			],
 			[
-				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}'
+					'match' => '{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}',
+					'delay' => '{#SIMPLE_INTERVAL}',
+					'intervals' => [
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD}'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{#SCHEDULING_INTERVAL}']
+					]
 				]
 			],
 			// partial success
 			[
-				'random text.....10s....text', 16,
+				'random text.....10s....text', 16, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '10s'
+					'match' => '10s',
+					'delay' => '10s',
+					'intervals' => []
 				]
 			],
 			[
-				'11s;md1-31a', 0,
+				'11s;md1-31a', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '11s;md1-31'
+					'match' => '11s;md1-31',
+					'delay' => '11s',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md1-31']
+					]
 				]
 			],
 			[
-				'30m;5h/1-7,09:00-18:00;600s/7-7,00:00-18:00;md30;wd5;md1-31h18m59s59;', 0,
+				'30m;5h/1-7,09:00-18:00;600s/7-7,00:00-18:00;md30;wd5;md1-31h18m59s59;', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '30m;5h/1-7,09:00-18:00;600s/7-7,00:00-18:00;md30;wd5;md1-31h18m59s59'
+					'match' => '30m;5h/1-7,09:00-18:00;600s/7-7,00:00-18:00;md30;wd5;md1-31h18m59s59',
+					'delay' => '30m',
+					'intervals' => [
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '5h/1-7,09:00-18:00'],
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '600s/7-7,00:00-18:00'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md30'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'wd5'],
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md1-31h18m59s59']
+					]
 				]
 			],
 			[
-				'3;md1;', 0,
+				'3;md1;', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '3;md1'
+					'match' => '3;md1',
+					'delay' => '3',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md1']
+					]
+				]
+			],
+			[
+				'12s;md1-31wd', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '12s;md1-31',
+					'delay' => '12s',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md1-31']
+					]
+				]
+			],
+			[
+				'4;5;6', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '4',
+					'delay' => '4',
+					'intervals' => []
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => []
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}']
+					]
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => [
+						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}']
+					]
 				]
 			],
 			// fail
 			[
-				'', 0,
+				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'match' => '',
+					'delay' => '',
+					'intervals' => []
 				]
 			],
 			[
-				'12s;md1-31wd', 0,
+				's', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'match' => '',
+					'delay' => '',
+					'intervals' => []
 				]
 			],
 			[
-				'4;5;6', 0,
+				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'match' => '',
+					'delay' => '',
+					'intervals' => []
 				]
 			]
 		];
@@ -128,18 +227,17 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
+	 * @param array  $options
 	 * @param array  $expected
 	*/
-	public function testParse($source, $pos, $expected) {
-		static $parser = null;
-
-		if ($parser === null) {
-			$parser = new CUpdateIntervalParser();
-		}
+	public function testParse($source, $pos, $options, $expected) {
+		$parser = new CUpdateIntervalParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
-			'match' => $parser->getMatch()
+			'match' => $parser->getMatch(),
+			'delay' => $parser->getDelay(),
+			'intervals' => $parser->getIntervals()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}
