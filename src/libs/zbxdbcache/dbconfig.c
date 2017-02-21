@@ -7590,7 +7590,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		dc_requeue_unreachable_item(dc_item, dc_host);
+		dc_requeue_item(dc_item, dc_host, ZBX_UNREACHABLE, time(NULL));
 	}
 
 	UNLOCK_CACHE;
