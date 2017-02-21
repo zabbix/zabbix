@@ -36,7 +36,7 @@ $fields = [
 	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
 	'twb_groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'subgroups' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
+	'subgroups' =>		[T_ZBX_INT, O_OPT, null,	IN([1]),	null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"hostgroup.massdelete","hostgroup.massdisable","hostgroup.massenable"'),
@@ -177,99 +177,58 @@ if (hasRequest('form')) {
 
 				// Apply permissions to all subgroups.
 				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$user_groups = API::UserGroup()->get([
-						'output' => ['usrgrpid', 'name'],
-						'selectRights' => ['id', 'permission']
-					]);
+					// Get child groupids.
+					$parent = $name.'/';
+					$len = strlen($parent);
 
-					$host_groups = API::HostGroup()->get([
+					$groups = API::HostGroup()->get([
 						'output' => ['groupid', 'name'],
-						'preservekeys' => true
+						'search' => ['name' => $parent],
+						'startSearch' => true
 					]);
 
-					// In each user group search rights to host groups. Set -1 as default, if there are no rights.
-					foreach ($user_groups as &$user_group) {
-						$user_group['rights'] = zbx_toHash($user_group['rights'], 'id');
+					$child_groupids = [];
+					foreach ($groups as $group) {
+						if (substr($group['name'], 0, $len) === $parent) {
+							$child_groupids[$group['groupid']] = true;
+						}
+					}
 
-						if ($user_group['rights']) {
-							foreach ($user_group['rights'] as $rights) {
-								foreach ($host_groups as $host_group) {
-									if (!array_key_exists($host_group['groupid'], $user_group['rights'])) {
-										$user_group['rights'][$host_group['groupid']] = [
-											'id' => $host_group['groupid'],
-											'permission' => PERM_NONE
-										];
-									}
+					if ($child_groupids) {
+						$child_groupids = array_keys($child_groupids);
+
+						$usrgrps = API::UserGroup()->get([
+							'output' => ['usrgrpid'],
+							'selectRights' => ['id', 'permission']
+						]);
+
+						$upd_usergrps = [];
+
+						// In each user group search rights to host groups. Set -1 as default, if there are no rights.
+						foreach ($usrgrps as $usrgrp) {
+							$rights = zbx_toHash($usrgrp['rights'], 'id');
+
+							if (array_key_exists($groupId, $rights)) {
+								foreach ($child_groupids as $child_groupid) {
+									$rights[$child_groupid] = [
+										'id' => $child_groupid,
+										'permission' => $rights[$groupId]['permission']
+									];
 								}
 							}
-						}
-						else {
-							$user_group['rights'] = [];
-
-							foreach ($host_groups as $host_group) {
-								$user_group['rights'][$host_group['groupid']] = [
-									'id' => $host_group['groupid'],
-									'permission' => PERM_NONE
-								];
+							else {
+								foreach ($child_groupids as $child_groupid) {
+									unset($rights[$child_groupid]);
+								}
 							}
+
+							$upd_usergrps[] = [
+								'usrgrpid' => $usrgrp['usrgrpid'],
+								'rights' => $rights
+							];
 						}
-					}
-					unset($user_group);
 
-					// Get subgroupids.
-					$subgroup_name = $name.'/';
-					$len = strlen($subgroup_name);
-
-					$subgroupids = [];
-					foreach ($host_groups as $host_group) {
-						if (substr($host_group['name'], 0, $len) === $subgroup_name) {
-							$subgroupids[$host_group['groupid']] = true;
-						}
-					}
-
-					// Find parent host group permission and save it for later usage.
-					foreach ($user_groups as &$user_group) {
-						$user_group['new_permission'] = '';
-
-						foreach ($user_group['rights'] as $rights) {
-							if ($rights['id'] == $groupId) {
-								$user_group['new_permission'] = $rights['permission'];
-								break;
-							}
-						}
-					}
-					unset($user_group);
-
-					// Find subgroups and replace it with parent permission.
-					foreach ($user_groups as &$user_group) {
-						foreach ($user_group['rights'] as &$rights) {
-							if (array_key_exists($rights['id'], $subgroupids) && $user_group['new_permission'] !== '') {
-								$rights['permission'] = $user_group['new_permission'];
-							}
-						}
-						unset($rights);
-					}
-					unset($user_group);
-
-					// Remove extra fields, permissions with -1 and rights that are not changed.
-					foreach ($user_groups as &$user_group) {
-						foreach ($user_group['rights'] as $groupid => &$rights) {
-							if ($rights['permission'] == PERM_NONE) {
-								unset($user_group['rights'][$groupid]);
-							}
-						}
-						unset($rights, $user_group['name'], $user_group['new_permission']);
-					}
-					unset($user_group);
-
-					/*
-					 * Due to nature of host groups not having rights record in table in case of PERM_NONE, it's hard to
-					 * tell whether a permission should be overwritten to PERM_NONE or simply ignore it, because it was
-					 * already that way. Thus this API call* will also update other user groups that are unrelated to
-					 * this editing one.
-					 */
-					if ($user_groups) {
-						API::UserGroup()->update($user_groups);
+						API::UserGroup()->update($upd_usergrps);
 					}
 				}
 			}
