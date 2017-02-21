@@ -283,7 +283,7 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Frontend messaging'),
 		(new CCheckBox('messages[enabled]'))->setChecked($this->data['messages']['enabled'] == 1)
 	);
-	$userMessagingFormList->addRow(_('Message timeout (seconds)'),
+	$userMessagingFormList->addRow(_('Message timeout'),
 		(new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'timeout_row'
