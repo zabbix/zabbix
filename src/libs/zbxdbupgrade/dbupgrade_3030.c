@@ -288,6 +288,27 @@ static int	DBpatch_3030023(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3030024(void)
+{
+	const ZBX_FIELD	field = {"hk_events_internal", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030025(void)
+{
+	const ZBX_FIELD	field = {"hk_events_discovery", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030026(void)
+{
+	const ZBX_FIELD	field = {"hk_events_autoreg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -318,5 +339,8 @@ DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
 DBPATCH_ADD(3030022, 0, 1)
 DBPATCH_ADD(3030023, 0, 0)
+DBPATCH_ADD(3030024, 0, 0)
+DBPATCH_ADD(3030025, 0, 0)
+DBPATCH_ADD(3030026, 0, 0)
 
 DBPATCH_END()
