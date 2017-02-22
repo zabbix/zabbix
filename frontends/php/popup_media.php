@@ -57,7 +57,7 @@ check_fields($fields);
 insert_js_function('add_media');
 
 if (isset($_REQUEST['add'])) {
-	if ((new CTimePeriodsParser())->parse(getRequest('period')) == CParser::PARSE_SUCCESS) {
+	if ((new CTimePeriodsParser(['usermacros' => true]))->parse(getRequest('period')) == CParser::PARSE_SUCCESS) {
 		$severity = 0;
 		$_REQUEST['severity'] = getRequest('severity', []);
 		foreach ($_REQUEST['severity'] as $id) {

@@ -112,7 +112,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$delay = CMacrosResolverHelper::resolveTimeUnitMacros([$item['hostid'] => [$item['delay']]]);
 		$item['delay'] = $delay[$item['hostid']][0];
 
-		$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+		$update_interval_parser = new CUpdateIntervalParser();
 
 		if ($update_interval_parser->parse($item['delay']) != CParser::PARSE_SUCCESS) {
 			show_error_message(_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay')));

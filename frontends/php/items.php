@@ -1445,7 +1445,7 @@ else {
 				$delay = '';
 			}
 			else {
-				$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
@@ -1564,7 +1564,7 @@ else {
 			$item['delay'] = '';
 		}
 		else {
-			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 				$item['delay'] = $update_interval_parser->getDelay();

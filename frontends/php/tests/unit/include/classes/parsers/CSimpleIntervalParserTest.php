@@ -28,149 +28,191 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 		return [
 			// success
 			[
-				'5', 0,
+				'5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '5'
 				]
 			],
 			[
-				'10s', 0,
+				'10s', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '10s'
 				]
 			],
 			[
-				'30m', 0,
+				'30m', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '30m'
 				]
 			],
 			[
-				'604800', 0,
+				'604800', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '604800'
 				]
 			],
 			[
-				'5h', 0,
+				'5h', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '5h'
 				]
 			],
 			[
-				'3d', 0,
+				'3d', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '3d'
 				]
 			],
 			[
-				'02', 0,
+				'02', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '02'
 				]
 			],
 			[
-				'00', 0,
+				'00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '00'
 				]
 			],
 			[
-				'00h', 0,
+				'00h', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '00h'
 				]
 			],
 			[
-				'2w', 0,
+				'2w', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2w'
 				]
 			],
+			[
+				'{$M}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M}'
+				]
+			],
+			[
+				'{#M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#M}'
+				]
+			],
 			// partial success
 			[
-				'random text.....10s....text', 16,
+				'random text.....10s....text', 16, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '10s'
 				]
 			],
 			[
-				'2ww', 0,
+				'2ww', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '2w'
 				]
 			],
 			[
-				'9z', 0,
+				'9z', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '9'
 				]
 			],
 			[
-				'9/', 0,
+				'9/', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '9'
 				]
 			],
 			[
-				'10sm', 0,
+				'10sm', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '10s'
 				]
 			],
 			[
-				'300;', 0,
+				'300;', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '300'
 				]
 			],
 			[
-				'1y', 0,
+				'1y', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1'
 				]
 			],
+			[
+				'{$M};', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$M}'
+				]
+			],
+			[
+				'{#M};', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#M}'
+				]
+			],
 			// fail
 			[
-				'', 0,
+				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				's', 0,
+				's', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'qwerty', 0,
+				'qwerty', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				' 10s', 0,
+				'{$M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{#M}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				' 10s', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -184,14 +226,11 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
+	 * @param array  $options
 	 * @param array  $expected
 	*/
-	public function testParse($source, $pos, $expected) {
-		static $parser = null;
-
-		if ($parser === null) {
-			$parser = new CSimpleIntervalParser();
-		}
+	public function testParse($source, $pos, $options, $expected) {
+		$parser = new CSimpleIntervalParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),

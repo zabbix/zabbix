@@ -26,27 +26,34 @@ class CFlexibleIntervalParser extends CParser {
 
 	private $simple_interval_parser;
 	private $time_period_parser;
-	private $user_macro_parser;
-	private $lld_macro_parser;
 
-	private $options = ['lldmacros' => true];
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false
+	];
 
 	public function __construct($options = []) {
+		if (array_key_exists('usermacros', $options)) {
+			$this->options['usermacros'] = $options['usermacros'];
+		}
 		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 
-		$this->simple_interval_parser = new CSimpleIntervalParser();
-		$this->time_period_parser = new CTimePeriodParser();
-		$this->user_macro_parser = new CUserMacroParser();
-
-		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-		}
+		$this->simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
+		$this->time_period_parser = new CTimePeriodParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
 	}
 
 	/**
 	 * Parse the given flexible interval. The source string can contain macros separated by a forward slash.
+	 *
+	 * (sumple|{$M}|{#M})/(time_period|{$M}|{#M})
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -57,36 +64,20 @@ class CFlexibleIntervalParser extends CParser {
 
 		$p = $pos;
 
-		if ($this->simple_interval_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->simple_interval_parser->getLength();
-		}
-		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->user_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_parser->getLength();
-		}
-		else {
+		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
+		$p += $this->simple_interval_parser->getLength();
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
-		if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->time_period_parser->getLength();
-		}
-		elseif ($this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->user_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_parser->getLength();
-		}
-		else {
+		if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
+		$p += $this->time_period_parser->getLength();
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);

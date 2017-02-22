@@ -442,7 +442,7 @@ $config['hk_history'] = timeUnitToSeconds($config['hk_history']);
 $config['hk_trends'] = timeUnitToSeconds($config['hk_trends']);
 
 // Resolve delay, history and trend macros.
-$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $simple_interval_parser = new CSimpleIntervalParser();
 
 foreach ($items as &$item) {

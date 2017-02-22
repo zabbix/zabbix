@@ -24,6 +24,30 @@
  */
 class CSchedulingIntervalParser extends CParser {
 
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false
+	];
+
+	private $user_macro_parser;
+	private $lld_macro_parser;
+
+	public function __construct($options = []) {
+		if (array_key_exists('usermacros', $options)) {
+			$this->options['usermacros'] = $options['usermacros'];
+		}
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
+
+		if ($this->options['usermacros']) {
+			$this->user_macro_parser = new CUserMacroParser();
+		}
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
+		}
+	}
+
 	/**
 	 * Parse the given scheduled interval.
 	 *
@@ -36,6 +60,34 @@ class CSchedulingIntervalParser extends CParser {
 
 		$p = $pos;
 
+		if ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->user_macro_parser->getLength();
+		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_parser->getLength();
+		}
+		elseif (!self::parseIntervals($source, $p)) {
+			return self::PARSE_FAIL;
+		}
+
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Parse multiple intervals.
+	 *
+	 * @param string	$source
+	 * @param int		$pos
+	 *
+	 * @return bool
+	 */
+	private static function parseIntervals($source, &$pos) {
+		$p = $pos;
+
+		$precedence = 0;
 		$prefixes = [
 			0 => ['prefix' => 'md', 'min' => 1, 'max' => 31],
 			1 => ['prefix' => 'wd', 'min' => 1, 'max' => 7],
@@ -43,8 +95,6 @@ class CSchedulingIntervalParser extends CParser {
 			3 => ['prefix' => 'm', 'min' => 0, 'max' => 59],
 			4 => ['prefix' => 's', 'min' => 0, 'max' => 59]
 		];
-
-		$precedence = 0;
 
 		while (isset($source[$p])) {
 			for ($i = $precedence; $i < count($prefixes); $i++) {
@@ -58,18 +108,14 @@ class CSchedulingIntervalParser extends CParser {
 			break;
 		}
 
-		if ($p == $pos) {
-			return self::PARSE_FAIL;
-		}
+		$ret = ($p != $pos);
+		$pos = $p;
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
-
-		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return $ret;
 	}
 
 	/**
-	 * Parse month days.
+	 * Parse single interval.
 	 *
 	 * @param string	$source
 	 * @param int		$pos

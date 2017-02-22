@@ -28,49 +28,63 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 		return [
 			// success
 			[
-				'1-7,00:00-23:00', 0,
+				'1-7,00:00-23:00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '1-7,00:00-23:00'
 				]
 			],
 			[
-				'5-5,00:00-23:00', 0,
+				'5-5,00:00-23:00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '5-5,00:00-23:00'
 				]
 			],
 			[
-				'7,00:00-23:00', 0,
+				'7,00:00-23:00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '7,00:00-23:00'
 				]
 			],
 			[
-				'7,23:59-24:00', 0,
+				'7,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '7,23:59-24:00'
 				]
 			],
 			[
-				'7,0:00-0:01', 0,
+				'7,0:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '7,0:00-0:01'
 				]
 			],
 			[
-				'7,0:00-00:01', 0,
+				'7,0:00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '7,0:00-00:01'
 				]
 			],
 			[
-				'7,00:00-0:01', 0,
+				'{$M}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M}'
+				]
+			],
+			[
+				'{#M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#M}'
+				]
+			],
+			[
+				'7,00:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '7,00:00-0:01'
@@ -78,28 +92,28 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 			],
 			// partial success
 			[
-				'random text.....1-7,00:00-00:01....text', 16,
+				'random text.....1-7,00:00-00:01....text', 16, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1-7,00:00-00:01'
 				]
 			],
 			[
-				'1-7,00:00-00:011', 0,
+				'1-7,00:00-00:011', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1-7,00:00-00:01'
 				]
 			],
 			[
-				'1-7,00:00-00:01a', 0,
+				'1-7,00:00-00:01a', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1-7,00:00-00:01'
 				]
 			],
 			[
-				'1-7,00:00-00:01;', 0,
+				'1-7,00:00-00:01;', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1-7,00:00-00:01'
@@ -107,259 +121,273 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 			],
 			// fail
 			[
-				'', 0,
+				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'a', 0,
+				'a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1', 0,
+				'1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'11', 0,
+				'11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1a', 0,
+				'1a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-', 0,
+				'1-', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-a', 0,
+				'1-a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1', 0,
+				'1-1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1--', 0,
+				'1--', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1- ', 0,
+				'1- ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1 -', 0,
+				'1 -', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1 ', 0,
+				'1-1 ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,', 0,
+				'1-1,', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1, ', 0,
+				'1-1, ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,1', 0,
+				'1-1,1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,1a', 0,
+				'1-1,1a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11', 0,
+				'1-1,11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11a', 0,
+				'1-1,11a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:', 0,
+				'1-1,11:', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:a', 0,
+				'1-1,11:a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:1', 0,
+				'1-1,11:1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11', 0,
+				'1-1,11:11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-', 0,
+				'1-1,11:11-', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11 ', 0,
+				'1-1,11:11 ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11- ', 0,
+				'1-1,11:11- ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11--', 0,
+				'1-1,11:11--', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-1', 0,
+				'1-1,11:11-1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-11', 0,
+				'1-1,11:11-11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-11:', 0,
+				'1-1,11:11-11:', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-11:1', 0,
+				'1-1,11:11-11:1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-1,11:11-11:11', 0,
+				'1-1,11:11-11:11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'8,11:11-11:12', 0,
+				'8,11:11-11:12', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'7-3,11:11-11:12', 0,
+				'7-3,11:11-11:12', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-7,00:00-24:01', 0,
+				'1-7,00:00-24:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-7,12:00-11:59', 0,
+				'1-7,12:00-11:59', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-7,00:00-24:0', 0,
+				'1-7,00:00-24:0', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'1-7,00:0-24:00', 0,
+				'{$M}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{#M}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'1-7,00:0-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -373,14 +401,11 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
+	 * @param array  $options
 	 * @param array  $expected
-	*/
-	public function testParse($source, $pos, $expected) {
-		static $parser = null;
-
-		if ($parser === null) {
-			$parser = new CTimePeriodParser();
-		}
+	 */
+	public function testParse($source, $pos, $options, $expected) {
+		$parser = new CTimePeriodParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),

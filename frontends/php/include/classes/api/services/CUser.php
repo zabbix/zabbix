@@ -961,7 +961,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		$time_periods_parser = new CTimePeriodsParser();
+		$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 		foreach ($media as $media_item) {
 			if ($time_periods_parser->parse($media_item['period']) != CParser::PARSE_SUCCESS) {
@@ -1157,7 +1157,7 @@ class CUser extends CApiService {
 			'severity' => null
 		];
 
-		$time_periods_parser = new CTimePeriodsParser();
+		$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 		foreach ($media as $media_item) {
 			if (!check_db_fields($mediaDBfields, $mediaItem)) {

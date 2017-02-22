@@ -52,7 +52,7 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$MACRO};1-7,00:00-24:00;', 0, [],
+				'{$MACRO};1-7,00:00-24:00;', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$MACRO};1-7,00:00-24:00;',
@@ -60,7 +60,7 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'1-7,00:00-24:00;{$MACRO}', 0, [],
+				'1-7,00:00-24:00;{$MACRO}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '1-7,00:00-24:00;{$MACRO}',
@@ -68,7 +68,7 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$MACRO1};{$MACRO2}', 0, [],
+				'{$MACRO1};{$MACRO2}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$MACRO1};{$MACRO2}',
@@ -76,6 +76,14 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			// fail
+			[
+				'', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods' => []
+				]
+			],
 			[
 				';', 0, [],
 				[

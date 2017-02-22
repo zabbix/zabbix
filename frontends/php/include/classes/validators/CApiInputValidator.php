@@ -655,7 +655,7 @@ class CApiInputValidator {
 		}
 
 		if ($flags & API_MULTIPLE) {
-			$time_period_parser = new CTimePeriodsParser();
+			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 		}
 		else {
 			$time_period_parser = new CTimePeriodParser();

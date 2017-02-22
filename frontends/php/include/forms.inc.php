@@ -754,7 +754,7 @@ function getItemFilterForm(&$items) {
 			$delay = $item['delay'];
 			$value = $delay;
 
-			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 			if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 				$delay = $update_interval_parser->getDelay();
@@ -1072,7 +1072,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
 
-			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => ($data['parent_discoveryid'])]);
+			$update_interval_parser = new CUpdateIntervalParser([
+				'usermacros' => true,
+				'lldmacros' => (bool) $data['parent_discoveryid']
+			]);
 
 			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
 				$data['delay'] = $update_interval_parser->getDelay();

@@ -187,7 +187,10 @@ abstract class CItemGeneral extends CApiService {
 
 		$item_key_parser = new CItemKey();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
-		$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => (get_class($this) === 'CItemPrototype')]);
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => (get_class($this) === 'CItemPrototype')
+		]);
 		$simple_interval_parser = new CSimpleIntervalParser();
 		$user_macro_parser = new CUserMacroParser();
 		$lld_macro_parser = new CLLDMacroParser();

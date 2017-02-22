@@ -111,7 +111,7 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_TIME_PERIOD:
-				if ((new CTimePeriodsParser())->parse($conditionValue) != CParser::PARSE_SUCCESS) {
+				if ((new CTimePeriodsParser(['usermacros' => true]))->parse($conditionValue) != CParser::PARSE_SUCCESS) {
 					$this->setError(_('Invalid time period.'));
 				}
 				break;

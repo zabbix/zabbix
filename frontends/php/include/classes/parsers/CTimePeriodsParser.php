@@ -28,18 +28,14 @@ class CTimePeriodsParser extends CParser {
 	private $user_macro_parser;
 
 	private $periods = [];
-	private $options = ['user_macros' => true];
+	private $options = ['usermacros' => false];
 
 	public function __construct($options = []) {
-		if (array_key_exists('user_macros', $options)) {
-			$this->options['user_macros'] = $options['user_macros'];
+		if (array_key_exists('usermacros', $options)) {
+			$this->options['usermacros'] = $options['usermacros'];
 		}
 
-		$this->time_period_parser = new CTimePeriodParser();
-
-		if ($this->options['user_macros']) {
-			$this->user_macro_parser = new CUserMacroParser();
-		}
+		$this->time_period_parser = new CTimePeriodParser(['usermacros' => $this->options['usermacros']]);
 	}
 
 	/**
@@ -57,26 +53,22 @@ class CTimePeriodsParser extends CParser {
 		$p = $pos;
 
 		while (isset($source[$p])) {
-			if ($this->time_period_parser->parse($source, $p) != self::PARSE_FAIL) {
-				$p += $this->time_period_parser->getLength();
-				$periods[] = $this->time_period_parser->getMatch();
+			if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
+				break;
 			}
-			elseif ($this->options['user_macros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-				$p += $this->user_macro_parser->getLength();
-				$periods[] = $this->user_macro_parser->getMatch();
-			}
-			else {
-				return self::PARSE_FAIL;
-			}
+			$p += $this->time_period_parser->getLength();
+			$periods[] = $this->time_period_parser->getMatch();
 
 			if (isset($source[$p])) {
-				if ($source[$p] === ';') {
-					$p++;
+				if ($source[$p] !== ';') {
+					break;
 				}
-				else {
-					return self::PARSE_FAIL;
-				}
+				$p++;
 			}
+		}
+
+		if ($p == $pos || isset($source[$p])) {
+			return self::PARSE_FAIL;
 		}
 
 		$this->length = $p - $pos;

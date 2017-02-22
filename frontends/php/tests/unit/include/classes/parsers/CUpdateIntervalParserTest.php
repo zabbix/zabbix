@@ -49,7 +49,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL1}', 0, [],
+				'{$SIMPLE_INTERVAL1}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$SIMPLE_INTERVAL1}',
@@ -58,7 +58,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0, [],
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}',
@@ -70,7 +70,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}', 0, [],
+				'0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0;{$UPDATE_AT_NINE_A_M};{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}',
@@ -82,7 +82,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, [],
+				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}',
@@ -161,7 +161,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				'{$SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL}',
@@ -170,7 +170,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}',
@@ -181,7 +181,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',

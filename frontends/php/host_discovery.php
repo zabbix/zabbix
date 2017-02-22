@@ -439,7 +439,7 @@ else {
 			$discovery['delay'] = '';
 		}
 		else {
-			$update_interval_parser = new CUpdateIntervalParser(['lldmacros' => false]);
+			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 			if ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
 				$discovery['delay'] = $update_interval_parser->getDelay();

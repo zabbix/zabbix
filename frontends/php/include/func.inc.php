@@ -1997,7 +1997,7 @@ function fatal_error($msg) {
 
 function parse_period($str) {
 	$out = null;
-	$time_periods_parser = new CTimePeriodsParser();
+	$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 	if ($time_periods_parser->parse($str) == CParser::PARSE_SUCCESS) {
 		$periods = $time_periods_parser->getPeriods();
