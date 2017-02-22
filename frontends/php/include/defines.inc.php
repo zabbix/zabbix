@@ -1026,12 +1026,12 @@ define('API_REGEX',			13);
 define('API_TIME_UNIT',		14);
 
 // flags
-define('API_REQUIRED',		0x01);
-define('API_NOT_EMPTY',		0x02);
-define('API_ALLOW_NULL',	0x04);
-define('API_NORMALIZE',		0x08);
-define('API_MULTIPLE',		0x10);
-define('API_DEPRECATED',	0x20);
+define('API_REQUIRED',			0x01);
+define('API_NOT_EMPTY',			0x02);
+define('API_ALLOW_NULL',		0x04);
+define('API_NORMALIZE',			0x08);
+define('API_DEPRECATED',		0x10);
+define('API_ALLOW_USER_MACRO',	0x20);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

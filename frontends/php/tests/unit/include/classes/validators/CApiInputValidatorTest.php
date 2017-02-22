@@ -981,14 +981,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'1-7,00:00-24:00'
 			],
 			[
-				['type' => API_TIME_PERIOD, 'flags' => API_MULTIPLE],
+				['type' => API_TIME_PERIOD],
 				'1-5,09:00-18:00;6-7,09:00-15:00',
 				'/1/period',
 				'1-5,09:00-18:00;6-7,09:00-15:00'
 			],
 			[
+				['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/period',
+				'{$MACRO}'
+			],
+			[
 				['type' => API_TIME_PERIOD],
-				'1-5,09:00-18:00;6-7,09:00-15:00',
+				'{$MACRO}',
 				'/1/period',
 				'Invalid parameter "/1/period": a time period is expected.'
 			],
@@ -1098,7 +1104,61 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_TIME_UNIT],
+				'30h',
+				'/1/time_unit',
+				'30h'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'2147483647s',
+				'/1/time_unit',
+				'2147483647s'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'3550w',
+				'/1/time_unit',
+				'3550w'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'2147483648s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'3551w',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
 				'30mm',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'101s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value must be one of 1-100.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'100s',
+				'/1/time_unit',
+				'100s'
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
+				'{$MACRO}',
+				'/1/time_unit',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'{$MACRO}',
 				'/1/time_unit',
 				'Invalid parameter "/1/time_unit": a time unit is expected.'
 			]

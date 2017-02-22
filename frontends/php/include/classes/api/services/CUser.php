@@ -275,7 +275,7 @@ class CUser extends CApiService {
 				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_MULTIPLE, 'length' => DB::getFieldLength('media', 'period')]
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -374,7 +374,7 @@ class CUser extends CApiService {
 				'sendto' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media', 'sendto')],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_MULTIPLE, 'length' => DB::getFieldLength('media', 'period')]
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {

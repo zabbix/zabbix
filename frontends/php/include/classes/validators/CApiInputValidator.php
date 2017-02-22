@@ -236,30 +236,8 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule)) {
-			$valid = false;
-
-			foreach (explode(',', $rule['in']) as $in) {
-				if (strpos($in, ':') !== false) {
-					list($from, $to) = explode(':', $in);
-				}
-				else {
-					$from = $in;
-					$to = $in;
-				}
-
-				if ($from <= $data && $data <= $to) {
-					$valid = true;
-					break;
-				}
-			}
-
-			if (!$valid) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
-				);
-				return false;
-			}
+		if (!self::checkInt32In($rule, $data, $path, $error)) {
+			return false;
 		}
 
 		if (is_string($data)) {
@@ -267,6 +245,46 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['in']  (optional)
+	 * @param int    $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkInt32In($rule, $data, $path, &$error) {
+		if (!array_key_exists('in', $rule)) {
+			return true;
+		}
+
+		$valid = false;
+
+		foreach (explode(',', $rule['in']) as $in) {
+			if (strpos($in, ':') !== false) {
+				list($from, $to) = explode(':', $in);
+			}
+			else {
+				$from = $in;
+				$to = $in;
+			}
+
+			if ($from <= $data && $data <= $to) {
+				$valid = true;
+				break;
+			}
+		}
+
+		if (!$valid) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
+			);
+		}
+
+		return $valid;
 	}
 
 	/**
@@ -623,7 +641,7 @@ class CApiInputValidator {
 	 * Time period validator like "1-7,00:00-24:00".
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_MULTIPLE
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -654,12 +672,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($flags & API_MULTIPLE) {
-			$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
-		}
-		else {
-			$time_period_parser = new CTimePeriodParser();
-		}
+		$time_period_parser = new CTimePeriodsParser(['usermacros' => ($flags & API_ALLOW_USER_MACRO)]);
 
 		if ($time_period_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time period is expected'));
@@ -720,7 +733,7 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_USER_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
 	 * @param int    $rule['in']      (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -740,34 +753,27 @@ class CApiInputValidator {
 			return false;
 		}
 
-		// The given input may be in seconds as interger or string. In order to parser accept the value, conver to string.
 		$data = (string) $data;
 
-		// In some places time units can be replaced with macros. Allow both checks.
-		$simple_interval_parser = new CSimpleIntervalParser();
+		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => ($flags & API_ALLOW_USER_MACRO)]);
 
-		if ($flags & API_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
+		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
+			return false;
+		}
 
-			if ($simple_interval_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				$data_ = timeUnitToSeconds($data);
-				return self::validateInt32($rule, $data_, $path, $error);
-			}
-			elseif ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
-				return false;
-			}
+		if (($flags & API_ALLOW_USER_MACRO) && $data[0] === '{') {
+			return true;
 		}
-		else {
-			if ($simple_interval_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				$data_ = timeUnitToSeconds($data);
-				return self::validateInt32($rule, $data_, $path, $error);
-			}
-			else {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
-				return false;
-			}
+
+		$seconds = timeUnitToSeconds($data);
+
+		if (bccomp($seconds, '2147483647') > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+			return false;
 		}
+
+		return self::checkInt32In($rule, $seconds, $path, $error);
 	}
 
 	/**
