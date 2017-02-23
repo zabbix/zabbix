@@ -249,7 +249,7 @@ static int	http_variable_urldecode(const char *source, char **result)
 			if (FAIL == is_hex_n_range(source + 1, 2, target, sizeof(char), 0, 0xff))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot perform URL decode of '%s' part of url '%s'",
-						--source, url);
+						source, url);
 				zbx_free(buffer);
 				break;
 			}
@@ -348,10 +348,13 @@ int	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 			else if (ZBX_CONST_STRLEN("urldecode()") == len &&
 					0 == strncmp(*data + offset, "urldecode()", len))
 			{
-				/* on error substitute will remain unchanged, so encoded value will stay */
+				/* on error substitute will remain unchanged */
 				substitute = NULL;
-				if (http_variable_urldecode(httptest->macros.values[index].second, &substitute))
-					ret = FAIL;
+				if (FAIL == (ret = http_variable_urldecode(httptest->macros.values[index].second,
+						&substitute)))
+				{
+					break;
+				}
 			}
 			else
 				continue;
