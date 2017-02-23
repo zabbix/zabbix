@@ -96,7 +96,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		}
 
 		$this->zbxTestClick('tab_test');
-		$this->zbxTestInputType('test_string', $test_string);
+		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
 

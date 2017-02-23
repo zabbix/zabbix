@@ -432,6 +432,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 60 sec element still not visible');
 	}
 
+	public function zbxTestWaitUntilElementNotVisible($by) {
+		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::invisibilityOfElementLocated($by), 'after 60 sec element still visible');
+	}
+
 	public function zbxTestWaitUntilElementClickable($by) {
 		$this->webDriver->wait(60)->until(WebDriverExpectedCondition::elementToBeClickable($by));
 	}

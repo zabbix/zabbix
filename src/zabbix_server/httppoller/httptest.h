@@ -20,6 +20,17 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
+#define PUNYCODE_BASE		36
+#define PUNYCODE_BASE_MAX	35
+#define PUNYCODE_TMIN		1
+#define PUNYCODE_TMAX		26
+#define PUNYCODE_SKEW		38
+#define PUNYCODE_DAMP		700
+#define PUNYCODE_INITIAL_N	128
+#define PUNYCODE_INITIAL_BIAS	72
+#define PUNYCODE_BIAS_LIMIT	(((PUNYCODE_BASE_MAX) * PUNYCODE_TMAX) / 2)
+#define PUNYCODE_MAX_UINT32	((uint32_t)-1)
+
 int	process_httptests(int httppoller_num, int now);
 
 #endif

@@ -50,7 +50,7 @@ $fields = [
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'variables'       => [T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'],
+	'pairs'           => [T_ZBX_STR, O_OPT, null,  null,                    null],
 	'steps'           => [T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'],
 	'http_user'       => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
@@ -63,7 +63,6 @@ $fields = [
 	'templated'			=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'verify_host'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'verify_peer'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
-	'headers'			=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_cert_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
@@ -201,12 +200,10 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
-		$action = AUDIT_ACTION_UPDATE;
 		$messageTrue = _('Web scenario updated');
 		$messageFalse = _('Cannot update web scenario');
 	}
 	else {
-		$action = AUDIT_ACTION_ADD;
 		$messageTrue = _('Web scenario added');
 		$messageFalse = _('Cannot add web scenario');
 	}
@@ -221,19 +218,46 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$steps = getRequest('steps', []);
-		if (!empty($steps)) {
-			$i = 1;
-			foreach ($steps as $stepNumber => &$step) {
-				$step['no'] = $i++;
-				$step['follow_redirects'] = $step['follow_redirects']
-					? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
-					: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
-				$step['retrieve_mode'] = $step['retrieve_mode']
-					? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
-					: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
+		$pairNames = ['headers', 'variables', 'post_fields', 'query_fields'];
+		$i = 1;
+		foreach ($steps as &$step) {
+			$step['no'] = $i++;
+			$step['follow_redirects'] = $step['follow_redirects']
+				? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
+				: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
+			$step['retrieve_mode'] = $step['retrieve_mode']
+				? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
+				: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
+
+			foreach ($pairNames as $pairName) {
+				$step[$pairName] = [];
 			}
-			unset($step);
+
+			if (array_key_exists('pairs', $step)) {
+				$pairs = array_filter(array_values($step['pairs']), function($pair) {
+					return (array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
+						(array_key_exists('value', $pair) && '' !== trim($pair['value']));
+				});
+				foreach ($pairNames as $pairName) {
+					$step[$pairName] = array_filter($pairs, function($pair) use ($pairName){
+						return array_key_exists('type', $pair) && $pairName === $pair['type'];
+					});
+				}
+				unset($step['pairs']);
+			}
+
+			if (HTTPSTEP_POST_TYPE_FORM == $step['post_type']) {
+				$step['posts'] = $step['post_fields'];
+			}
+			unset($step['post_fields']);
+			unset($step['post_type']);
 		}
+		unset($step);
+
+		$pairs = array_filter(array_values(getRequest('pairs', [])), function($pair) {
+			return (array_key_exists('name', $pair) && '' !== trim($pair['name'])) ||
+				(array_key_exists('value', $pair) && '' !== trim($pair['value']));
+		});
 
 		$httpTest = [
 			'hostid' => $_REQUEST['hostid'],
@@ -242,17 +266,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'applicationid' => getRequest('applicationid'),
 			'delay' => $_REQUEST['delay'],
 			'retries' => $_REQUEST['retries'],
-			'status' => isset($_REQUEST['status']) ? 0 : 1,
+			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
-			'variables' => $_REQUEST['variables'],
+			'variables' => array_filter($pairs, function($pair) {
+				return array_key_exists('type', $pair) && 'variables' === $pair['type'];
+			}),
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
+			'http_user' => ($_REQUEST['authentication'] == HTTPTEST_AUTH_NONE) ? '' : $_REQUEST['http_user'],
+			'http_password' => ($_REQUEST['authentication'] == HTTPTEST_AUTH_NONE) ? '' : $_REQUEST['http_password'],
 			'verify_peer' => getRequest('verify_peer', HTTPTEST_VERIFY_PEER_OFF),
 			'verify_host' => getRequest('verify_host', HTTPTEST_VERIFY_HOST_OFF),
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
-			'headers' => getRequest('headers')
+			'headers' => array_filter($pairs, function($pair) {
+				return array_key_exists('type', $pair) && 'headers' === $pair['type'];
+			})
 		];
 
 		if ($new_application) {
@@ -288,15 +318,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$httpTest['http_user'] = $_REQUEST['http_user'];
-			$httpTest['http_password'] = $_REQUEST['http_password'];
-		}
-		else {
-			$httpTest['http_user'] = '';
-			$httpTest['http_password'] = '';
-		}
-
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get([
@@ -308,6 +329,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
 			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, ['applicationid']);
+
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid']) && isset($dbHttpSteps[$step['httpstepid']])) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], ['httpstepid']);
@@ -325,6 +347,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 		else {
+			foreach ($httpTest['steps'] as &$step) {
+				unset($step['httptestid'], $step['httpstepid']);
+			}
+			unset($step);
+
 			$result = API::HttpTest()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
@@ -334,11 +361,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 			$httpTestId = reset($result['httptestids']);
 		}
-
-		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO,
-			_('Web scenario').' ['.getRequest('name').'] ['.$httpTestId.'] '._('Host').' ['.$host['name'].']'
-		);
 
 		unset($_REQUEST['form']);
 		show_messages(true, $messageTrue);
@@ -356,55 +378,25 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.massenable', 'httptest.massdisable'])
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
-	$result = true;
-	$httpTestIds = getRequest('group_httptestid');
 	$enable = (getRequest('action') === 'httptest.massenable');
 	$status = $enable ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
-	$statusName = $enable ? 'enabled' : 'disabled';
-	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
+	$result = true;
 
-	$httpTests = API::HttpTest()->get([
-		'output' => ['httptestid', 'name', 'status'],
-		'selectHosts' => ['name'],
-		'httptestids' => $httpTestIds,
-		'editable' => true
-	]);
+	$upd_httptests = [];
 
-	if ($httpTests) {
-		$httpTestsToUpdate = [];
-
-		DBstart();
-
-		foreach ($httpTests as $httpTest) {
-			// change status if it's necessary
-			if ($httpTest['status'] != $status) {
-				$httpTestsToUpdate[] = [
-					'httptestid' => $httpTest['httptestid'],
-					'status' => $status
-				];
-			}
-		}
-
-		if ($httpTestsToUpdate) {
-			$result = API::HttpTest()->update($httpTestsToUpdate);
-
-			if ($result) {
-				foreach ($httpTests as $httpTest) {
-					$host = reset($httpTest['hosts']);
-
-					add_audit($auditAction, AUDIT_RESOURCE_SCENARIO,
-						_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-							_('Host').' ['.$host['name'].'] '.$statusName
-					);
-				}
-			}
-		}
-
-		$result = DBend($result);
-
-		$updated = count($httpTests);
+	foreach (getRequest('group_httptestid') as $httptestid) {
+		$upd_httptests[] = [
+			'httptestid' => $httptestid,
+			'status' => $status
+		];
 	}
+
+	if ($upd_httptests) {
+		$result = (bool) API::HttpTest()->update($upd_httptests);
+	}
+
+	$updated = count($upd_httptests);
 
 	$messageSuccess = $enable
 		? _n('Web scenario enabled', 'Web scenarios enabled', $updated)
@@ -542,19 +534,89 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
-		$data['variables'] = $dbHttpTest['variables'];
+		$dbHttpTestFields = DBselect(
+			'SELECT htf.*'.
+			' FROM httptest_field htf'.
+			' WHERE htf.httptestid='.zbx_dbstr($_REQUEST['httptestid']).
+			' ORDER BY htf.httptest_fieldid'
+		);
+
+		$data['pairs'] = [];
+		while (false !== ($field = DBfetch($dbHttpTestFields))) {
+			if (HTTPFIELD_TYPE_HEADER == $field['type']) {
+				$pairType = 'headers';
+			}
+			else if (HTTPFIELD_TYPE_VARIABLE == $field['type']) {
+				$pairType = 'variables';
+			}
+			else {
+				continue;
+			}
+
+			$data['pairs'][] = [
+				'id' => $field['httptest_fieldid'],
+				'type' => $pairType,
+				'name' => $field['name'],
+				'value' => $field['value']
+			];
+		}
+
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
-		$data['headers'] = $dbHttpTest['headers'];
+
 		$data['verify_peer'] = $dbHttpTest['verify_peer'];
 		$data['verify_host'] = $dbHttpTest['verify_host'];
 		$data['ssl_cert_file'] = $dbHttpTest['ssl_cert_file'];
 		$data['ssl_key_file'] = $dbHttpTest['ssl_key_file'];
 		$data['ssl_key_password'] = $dbHttpTest['ssl_key_password'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
+
+		$dbHttpStepFields = DBfetchArray(DBselect(
+			'SELECT htf.*'.
+			' FROM httpstep_field htf'.
+			' WHERE htf.httpstepid IN'.
+			' (SELECT h.httpstepid'.
+			' FROM httpstep h'.
+			' WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).')'.
+			' ORDER BY type, htf.httpstep_fieldid'
+		));
+
+		foreach($data['steps'] as &$step) {
+			$step['pairs'] = [];
+
+			$stepFields = array_filter($dbHttpStepFields, function($field) use ($step) {
+				return $field['httpstepid'] === $step['httpstepid'];
+			});
+
+			foreach ($stepFields as $field) {
+				if (HTTPFIELD_TYPE_HEADER == $field['type']) {
+					$pairType = 'headers';
+				}
+				else if (HTTPFIELD_TYPE_VARIABLE == $field['type']) {
+					$pairType = 'variables';
+				}
+				else if (HTTPFIELD_TYPE_QUERY == $field['type']) {
+					$pairType = 'query_fields';
+				}
+				else if (HTTPFIELD_TYPE_POST == $field['type']) {
+					$pairType = 'post_fields';
+				}
+				else {
+					continue;
+				}
+
+				$step['pairs'][] = [
+					'id' => $field['httpstep_fieldid'],
+					'type' => $pairType,
+					'name' => $field['name'],
+					'value' => $field['value']
+				];
+			}
+		}
+		unset($step);
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
@@ -583,19 +645,18 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
-		$data['variables'] = getRequest('variables', []);
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
 		$data['http_password'] = getRequest('http_password', '');
 		$data['http_proxy'] = getRequest('http_proxy', '');
 		$data['templated'] = (bool) getRequest('templated');
 		$data['steps'] = getRequest('steps', []);
-		$data['headers'] = getRequest('headers');
 		$data['verify_peer'] = getRequest('verify_peer');
 		$data['verify_host'] = getRequest('verify_host');
 		$data['ssl_cert_file'] = getRequest('ssl_cert_file');
 		$data['ssl_key_file'] = getRequest('ssl_key_file');
 		$data['ssl_key_password'] = getRequest('ssl_key_password');
+		$data['pairs'] = array_values(getRequest('pairs', []));
 	}
 
 	$data['application_list'] = [];

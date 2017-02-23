@@ -1040,11 +1040,6 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'variables' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
-			],
 			'agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1124,12 +1119,7 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'headers' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
-			],
+			]
 		],
 	],
 	'httpstep' => [
@@ -1171,6 +1161,12 @@ return [
 				'length' => 10,
 				'default' => '15',
 			],
+			'post_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 			'posts' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
@@ -1188,11 +1184,6 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'variables' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
-			],
 			'follow_redirects' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -1204,12 +1195,75 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			]
+		],
+	],
+	'httptest_field' => [
+		'key' => 'httptest_fieldid',
+		'fields' => [
+			'httptest_fieldid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 			],
-			'headers' => [
+			'httptestid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'httptest',
+				'ref_field' => 'httptestid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			]
+		],
+	],
+	'httpstep_field' => [
+		'key' => 'httpstep_fieldid',
+		'fields' => [
+			'httpstep_fieldid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 			],
+			'httpstepid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'httpstep',
+				'ref_field' => 'httpstepid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			]
 		],
 	],
 	'interface' => [

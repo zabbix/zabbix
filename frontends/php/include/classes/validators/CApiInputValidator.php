@@ -107,6 +107,9 @@ class CApiInputValidator {
 
 			case API_REGEX:
 				return self::validateRegex($rule, $data, $path, $error);
+
+			case API_CUSTOM:
+				return self::validateCustom($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -138,6 +141,7 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
 			case API_REGEX:
+			case API_CUSTOM:
 				return true;
 
 			case API_IDS:
@@ -818,5 +822,91 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Helper to create array of params for method / function invocation
+	 *
+	 * @param ReflectionFunctionAbstract $reflection
+	 * @param array $params
+	 * @param mixed $data
+	 * @param string   $path
+	 * @param string $error
+	 *
+	 * @return array - matched params
+	 */
+	protected static function getCallbackParams($reflection, $params, &$data, $path, &$error) {
+		$values = [];
+
+		foreach ($reflection->getParameters() as $param) {
+			if ('data' === $param->getName()) {
+				$values[] = &$data;
+			}
+			elseif ('path' === $param->getName()) {
+				$values[] = $path;
+			}
+			elseif ('error' === $param->getName()) {
+				$values[] = &$error;
+			}
+			elseif (array_key_exists($param->getName(), $params)) {
+				$values[] = $params[$param->getName()];
+			}
+			elseif ($param->isDefaultValueAvailable()) {
+				$values[] = $param->getDefaultValue();
+			}
+			else {
+				$values[] = null;
+			}
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Custom validator based on reflection
+	 *
+	 * @param array    $rule
+	 * @param callable $rule['validator']
+	 * @param array    $rule['params']  (optional)
+	 * @param mixed    $data
+	 * @param string   $path
+	 * @param string   $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCustom($rule, &$data = null, $path, &$error) {
+		if (!array_key_exists('validator', $rule)) {
+			// This message can be untranslated because warn about incorrect validation rules at a development stage.
+			$error = 'Incorrect validation rules.';
+
+			return false;
+		}
+
+		$callable = $rule['validator'];
+		$params = [];
+
+		if (array_key_exists('params', $rule)) {
+			$params = $rule['params'];
+		}
+
+		if (is_array($callable)) {
+			$reflection = new ReflectionMethod($callable[0], $callable[1]);
+		}
+		else {
+			$reflection = new ReflectionFunction($callable);
+		}
+
+		$argument = self::getCallbackParams($reflection, $params, $data, $path, $error);
+
+		if (is_array($callable)) {
+			if($reflection->isStatic()) {
+				// for static methods object should be set to null
+				$callable[0] = null;
+			}
+
+			return $reflection->invokeArgs($callable[0], $argument);
+		}
+
+		return $reflection->invokeArgs($argument);
 	}
 }

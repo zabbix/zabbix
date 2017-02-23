@@ -118,7 +118,11 @@ class CXmlExportWriter extends CExportWriter {
 			'httptests' => 'httptest',
 			'steps' => 'step',
 			'tags' => 'tag',
-			'preprocessing' => 'step'
+			'preprocessing' => 'step',
+			'headers' => 'header',
+			'variables' => 'variable',
+			'query_fields' => 'query_field',
+			'posts' => 'post_field'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

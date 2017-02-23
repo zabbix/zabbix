@@ -98,19 +98,52 @@ $httpFormList->addRow(_('User agent string'),
 );
 
 // append HTTP proxy to form list
-$httpFormList
-	->addRow(_('HTTP proxy'),
-		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
-	)
-	->addRow(_('Variables'),
-		(new CTextArea('variables', $this->data['variables']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Headers'),
-		(new CTextArea('headers', $this->data['headers']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+$httpFormList->addRow(_('HTTP proxy'),
+	(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
+);
+
+$pairTables = [
+	['id' => 'variables', 'label' => _('Variables')],
+	['id' => 'headers', 'label' => _('Headers')]
+];
+
+foreach ($pairTables as $pairTable){
+	$pairTab = (new CTable())
+		->setId($pairTable['id'])
+		->addClass('pair-container')
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([
+			new CColHeader(),
+			new CColHeader(_('Name')),
+			new CColHeader(),
+			new CColHeader(_('Value')),
+			new CColHeader()
+		])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-type', $pairTable['id'])
+					->addClass('pairs-control-add')
+			))->setColSpan(5)
+		]))->setId($pairTable['id'] . '_footer'));
+
+	$httpFormList->addRow($pairTable['label'],
+		(new CDiv($pairTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', $pairTable['id'])
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+}
+
+$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+
+if (FALSE === array_key_exists('pairs', $this->data)) {
+	$this->data['pairs'] = [];
+}
+zbx_add_post_js('pairManager.add('.CJs::encodeJson($this->data['pairs']).');');
 
 /*
  * Authentication tab
@@ -180,6 +213,15 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 	if (!isset($step['posts'])) {
 		$step['posts'] = '';
+	}
+	if (is_array($step['posts'])) {
+		$step['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+	}
+	else {
+		$step['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+	}
+	if (!isset($step['pairs'])) {
+		$step['pairs'] = [];
 	}
 	if (!isset($step['required'])) {
 		$step['required'] = '';

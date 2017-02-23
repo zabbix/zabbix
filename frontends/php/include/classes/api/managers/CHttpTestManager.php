@@ -109,19 +109,9 @@ class CHttpTestManager {
 			$httpTests[$hnum]['httptestid'] = $httpTestIds[$hnum];
 
 			$httpTest['httptestid'] = $httpTestIds[$hnum];
+			$this->createTestFieldsReal($httpTest, array_merge($httpTest['variables'], $httpTest['headers']));
 			$this->createHttpTestItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
-		}
-
-		// TODO: REMOVE info
-		$dbCursor = DBselect(
-			'SELECT ht.name,h.name AS hostname'.
-			' FROM httptest ht'.
-				' INNER JOIN hosts h ON ht.hostid=h.hostid'.
-			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
-		);
-		while ($httpTest = DBfetch($dbCursor)) {
-			info(_s('Created: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
 		}
 
 		return $httpTests;
@@ -147,6 +137,9 @@ class CHttpTestManager {
 		$deleteStepItemIds = [];
 		$steps_create = [];
 		$steps_update = [];
+
+		$deleteFieldsIds = [];
+		$fields_create = [];
 
 		foreach ($httpTests as $key => $httpTest) {
 			DB::update('httptest', [
@@ -189,8 +182,9 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 
+			$db_http_test = $dbHttpTest[$httpTest['httptestid']];
+
 			if (array_key_exists('steps', $httpTest)) {
-				$db_http_test = $dbHttpTest[$httpTest['httptestid']];
 				$dbSteps = zbx_toHash($db_http_test['steps'], 'httpstepid');
 
 				foreach ($httpTest['steps'] as $webstep) {
@@ -229,6 +223,49 @@ class CHttpTestManager {
 					unset($httpTest['applicationid']);
 				}
 			}
+
+			$sourceFields = [];
+
+			$fieldTypes = ['headers' => HTTPFIELD_TYPE_HEADER, 'variables' => HTTPFIELD_TYPE_VARIABLE];
+			foreach ($fieldTypes as $fieldName => $field_type) {
+				if (array_key_exists($fieldName, $httpTest)) {
+					/* Same values in same order should not be changed */
+					$source = array_values($db_http_test[$fieldName]);
+					$target = array_values($httpTest[$fieldName]);
+
+					$invalidate = false;
+					$pairCount = count($source);
+					if ($pairCount === count($target)) {
+						for ($i = 0; $i < $pairCount; $i++) {
+							if ($source[$i]['name'] !== $target[$i]['name'] ||
+								$source[$i]['value'] !== $target[$i]['value']) {
+								$invalidate = true;
+
+								break;
+							}
+						}
+
+						if(!$invalidate) {
+							continue;
+						}
+					}
+
+					$sourceFields[] = $field_type;
+				}
+			}
+
+			if (!empty($sourceFields)) {
+				foreach ($fieldTypes as $fieldName => $fieldType) {
+					if (in_array($fieldType, $sourceFields)) {
+						foreach ($httpTest[$fieldName] as $field) {
+							$field['type'] = $fieldType;
+							$fields_create[$key][] = $field;
+						}
+					}
+				}
+
+				DB::delete('httptest_field', ['httptestid' => $httpTest['httptestid'], 'type' => $sourceFields]);
+			}
 		}
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
@@ -237,9 +274,13 @@ class CHttpTestManager {
 		}
 
 		foreach ($httpTests as $key => $httpTest) {
+			if (array_key_exists($key, $fields_create)) {
+				$this->createTestFieldsReal($httpTest, $fields_create[$key]);
+			}
+
 			if (array_key_exists('steps', $httpTest)) {
 				if (array_key_exists($key, $steps_update)) {
-					$this->updateStepsReal($httpTest, $steps_update[$key]);
+					$this->updateStepsReal($httpTest, $dbHttpTest[$httpTest['httptestid']], $steps_update[$key]);
 				}
 
 				if (array_key_exists($key, $steps_create)) {
@@ -274,17 +315,6 @@ class CHttpTestManager {
 					]);
 				}
 			}
-		}
-
-		// TODO: REMOVE info
-		$dbCursor = DBselect(
-			'SELECT ht.name,h.name AS hostname'.
-			' FROM httptest ht'.
-				' INNER JOIN hosts h ON ht.hostid=h.hostid'.
-			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
-		);
-		while ($httpTest = DBfetch($dbCursor)) {
-			info(_s('Updated: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['hostname']));
 		}
 
 		return $httpTests;
@@ -712,13 +742,16 @@ class CHttpTestManager {
 
 		$insertItems = [];
 
+		$delay = array_key_exists('delay', $httpTest) ? $httpTest['delay'] : DB::getDefault('httptest', 'delay');
+		$status = array_key_exists('status', $httpTest) ? $httpTest['status'] : DB::getDefault('httptest', 'status');
+
 		foreach ($checkitems as $item) {
 			$item['hostid'] = $httpTest['hostid'];
-			$item['delay'] = $httpTest['delay'];
+			$item['delay'] = $delay;
 			$item['type'] = ITEM_TYPE_HTTPTEST;
 			$item['history'] = self::ITEM_HISTORY;
 			$item['trends'] = self::ITEM_TRENDS;
-			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status'])
+			$item['status'] = ($status == HTTPTEST_STATUS_ACTIVE)
 				? ITEM_STATUS_ACTIVE
 				: ITEM_STATUS_DISABLED;
 
@@ -747,6 +780,51 @@ class CHttpTestManager {
 	}
 
 	/**
+	 * Create web scenario fields.
+	 *
+	 * @param $httpTest
+	 * @param $httpfields
+	 *
+	 * @throws Exception
+	 */
+	protected function createTestFieldsReal($httpTest, $httpfields) {
+		$fields = [];
+		foreach ($httpfields as $httpfield) {
+			$fields[] = [
+				'httptestid' => $httpTest['httptestid'],
+				'type' => $httpfield['type'],
+				'name' => $httpfield['name'],
+				'value' => $httpfield['value']
+			];
+		}
+
+		DB::insert('httptest_field', $fields);
+	}
+
+	/**
+	 * Create web scenario fields.
+	 *
+	 * @param $httpstepid
+	 * @param $httpfields
+	 *
+	 * @throws Exception
+	 */
+	protected function createStepFieldsReal($httpstepid, $httpfields) {
+		$fields = [];
+
+		foreach ($httpfields as $httpfield) {
+			$fields[] = [
+				'httpstepid' => $httpstepid,
+				'type' => $httpfield['type'],
+				'name' => $httpfield['name'],
+				'value' => $httpfield['value']
+			];
+		}
+
+		DB::insert('httpstep_field', $fields);
+	}
+
+	/**
 	 * Create web scenario steps with items.
 	 *
 	 * @param $httpTest
@@ -758,6 +836,19 @@ class CHttpTestManager {
 		foreach ($websteps as $snum => $webstep) {
 			$websteps[$snum]['httptestid'] = $httpTest['httptestid'];
 		}
+		foreach ($websteps as $snum => &$webstep) {
+			if (is_array($webstep['posts'])) {
+				$webstep['post_fields'] = $webstep['posts'];
+				$webstep['posts'] = '';
+				$webstep['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+			}
+			else {
+				$webstep['post_fields'] = [];
+				$webstep['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+			}
+		}
+		unset($webstep);
+
 		$webstepids = DB::insert('httpstep', $websteps);
 
 		// if this is a template scenario, fetch the parent http items to link inherited items to them
@@ -774,6 +865,15 @@ class CHttpTestManager {
 
 		foreach ($websteps as $snum => $webstep) {
 			$webstepid = $webstepids[$snum];
+
+			$fields = [];
+			foreach (['variables', 'headers', 'post_fields', 'query_fields'] as $field) {
+				if (array_key_exists($field, $webstep)) {
+					$fields = array_merge($fields, $webstep[$field]);
+				}
+			}
+
+			$this->createStepFieldsReal($webstepid, $fields);
 
 			$stepitems = [
 				[
@@ -851,11 +951,12 @@ class CHttpTestManager {
 	 * Update web scenario steps.
 	 *
 	 * @param $httpTest
+	 * @param $dbTest
 	 * @param $websteps
 	 *
 	 * @throws Exception
 	 */
-	protected function updateStepsReal($httpTest, $websteps) {
+	protected function updateStepsReal($httpTest, $dbTest, $websteps) {
 		$item_key_parser = new CItemKey();
 
 		// get all used keys
@@ -868,11 +969,84 @@ class CHttpTestManager {
 			, 'key_'
 		);
 
+		$fields_create = [];
+		$fieldTypes = [
+			'headers' => HTTPFIELD_TYPE_HEADER,
+			'variables' => HTTPFIELD_TYPE_VARIABLE,
+			'post_fields' => HTTPFIELD_TYPE_POST,
+			'query_fields' => HTTPFIELD_TYPE_QUERY,
+		];
+
+		$dbSteps = zbx_toHash($dbTest['steps'], 'httpstepid');
+		foreach ($websteps as &$webstep) {
+			if (array_key_exists('posts', $webstep)) {
+				if (is_array($webstep['posts'])) {
+					$webstep['post_fields'] = $webstep['posts'];
+					$webstep['posts'] = '';
+					$webstep['post_type'] = HTTPSTEP_POST_TYPE_FORM;
+				}
+				else {
+					$webstep['post_fields'] = [];
+					$webstep['post_type'] = HTTPSTEP_POST_TYPE_RAW;
+				}
+			}
+
+			/* step should exist as it was checked before*/
+			$dbStep = $dbSteps[$webstep['httpstepid']];
+
+			$sourceFields = [];
+			foreach ($fieldTypes as $fieldName => $field_type) {
+				if (array_key_exists($fieldName, $webstep)) {
+					// Same values in same order should not be changed
+					$source = array_values($dbStep[$fieldName]);
+					$target = array_values($webstep[$fieldName]);
+
+					$invalidate = false;
+					$pairCount = count($source);
+					if ($pairCount === count($target)) {
+						for ($i = 0; $i < $pairCount; $i++) {
+							if ($source[$i]['name'] !== $target[$i]['name'] ||
+								$source[$i]['value'] !== $target[$i]['value']) {
+								$invalidate = true;
+								break;
+							}
+						}
+
+						if(!$invalidate) {
+							continue;
+						}
+					}
+
+					$sourceFields[] = $field_type;
+				}
+			}
+
+			if (!empty($sourceFields)) {
+				foreach ($fieldTypes as $fieldName => $fieldType) {
+					if (in_array($fieldType, $sourceFields)) {
+						foreach ($webstep[$fieldName] as $field) {
+							$field['type'] = $fieldType;
+							$fields_create[$webstep['httpstepid']][] = $field;
+						}
+					}
+				}
+
+				DB::delete('httpstep_field', ['httpstepid' => $webstep['httpstepid'], 'type' => $sourceFields]);
+			}
+		}
+		unset($webstep);
+
 		foreach ($websteps as $webstep) {
+			$key = $webstep['httpstepid'];
+
 			DB::update('httpstep', [
 				'values' => $webstep,
-				'where' => ['httpstepid' => $webstep['httpstepid']]
+				'where' => ['httpstepid' => $key]
 			]);
+
+			if (array_key_exists($key, $fields_create)) {
+				$this->createStepFieldsReal($key, $fields_create[$key]);
+			}
 
 			// update item keys
 			$itemids = [];
@@ -967,7 +1141,7 @@ class CHttpTestManager {
 				$insert[] = ['itemid' => $itemid, 'applicationid' => $applicationid];
 			}
 
-			DB::insert('items_applications', $insert);
+			DB::insertBatch('items_applications', $insert);
 		}
 	}
 

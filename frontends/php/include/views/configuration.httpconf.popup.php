@@ -53,11 +53,11 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
 		'url' => getRequest('url'),
+		'post_type' => getRequest('post_type',HTTPSTEP_POST_TYPE_FORM),
 		'posts' => getRequest('posts'),
-		'variables' => getRequest('variables'),
+		'pairs' => array_values(getRequest('pairs',[])),
 		'required' => getRequest('required'),
 		'status_codes' => getRequest('status_codes'),
-		'headers' => getRequest('headers'),
 		'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
 		'retrieve_mode' => getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 	];
@@ -88,15 +88,78 @@ else {
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 		->addRow(_('URL'),
-			(new CTextBox('url', getRequest('url', ''), false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			new CDiv([
+				(new CTextBox('url', getRequest('url', ''), false, null))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('parse', _('Parse')))
+					->onClick('javascript: parseUrl();')
+					->addClass(ZBX_STYLE_BTN_GREY)
+			])
+		);
+
+	$switch = (new CDiv(
+		(new CRadioButtonList('post_type', getRequest('post_type',HTTPSTEP_POST_TYPE_FORM)))
+			->addValue(_('Form data'), HTTPSTEP_POST_TYPE_FORM, null, 'return switchToPostType(this.value);')
+			->addValue(_('Raw data'), HTTPSTEP_POST_TYPE_RAW, null, 'return switchToPostType(this.value);')
+			->setModern(true))
 		)
-		->addRow(_('Post'), (new CTextArea('posts', getRequest('posts', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-		->addRow(_('Variables'),
-			(new CTextArea('variables', getRequest('variables', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-		->addRow(_('Headers'),
-			(new CTextArea('headers', getRequest('headers', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
+		->setAttribute('style', 'padding: 5px; margin: 5px 0px 10px 0px;');
+
+	$footer = (new CDiv(
+			(new CTextArea('posts', getRequest('posts', '')))
+				->setAttribute('style', 'width: 100%')
+		))
+		->setId('post_raw')
+		->setAttribute('style', 'display: none;');
+
+	$pairTables = [
+		['id' => 'query_fields', 'label' => _('Query fields')],
+		['id' => 'post_fields', 'label' => _('Post'), 'header' => $switch, 'footer' => $footer],
+		['id' => 'variables', 'label' => _('Variables')],
+		['id' => 'headers', 'label' => _('Headers')]
+	];
+
+	foreach ($pairTables as $pairTable) {
+		$pairTab = (new CTable())
+			->setId($pairTable['id'])
+			->addClass('pair-container')
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([
+				new CColHeader(),
+				new CColHeader(_('Name')),
+				new CColHeader(),
+				new CColHeader(_('Value')),
+				new CColHeader()
+			])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setAttribute('data-type', $pairTable['id'])
+						->addClass('pairs-control-add')
+				))->setColSpan(5)
+			]))->setId($pairTable['id'] . '_footer'));
+
+		$items = [];
+		if (array_key_exists('header', $pairTable)) {
+			$items[] = $pairTable['header'];
+		}
+
+		$items[] = $pairTab;
+		if (array_key_exists('footer', $pairTable)) {
+			$items[] = $pairTable['footer'];
+		}
+
+		$httpPopupFormList->addRow($pairTable['label'],
+			(new CDiv($items))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('data-type', $pairTable['id'])
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
+	}
+
+	$httpPopupFormList
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
 		->addRow(_('Timeout'),
@@ -130,5 +193,8 @@ else {
 	$httpPopupForm->addItem($httpPopupTab);
 	$httpPopupWidget->addItem($httpPopupForm);
 }
+
+zbx_add_post_js('pairManager.add('.CJs::encodeJson(array_values(getRequest('pairs',[]))).');');
+zbx_add_post_js('setPostType('.CJs::encodeJson(getRequest('post_type',HTTPSTEP_POST_TYPE_FORM)).');');
 
 return $httpPopupWidget;

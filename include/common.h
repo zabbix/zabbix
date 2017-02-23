@@ -1361,6 +1361,14 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_DELTA_VALUE		9
 #define ZBX_PREPROC_DELTA_SPEED 	10
 
+#define ZBX_HTTPFIELD_HEADER		0
+#define ZBX_HTTPFIELD_VARIABLE		1
+#define ZBX_HTTPFIELD_POST_FIELD	2
+#define ZBX_HTTPFIELD_QUERY_FIELD	3
+
+#define ZBX_POSTTYPE_RAW		0
+#define ZBX_POSTTYPE_FORM		1
+
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
 typedef union

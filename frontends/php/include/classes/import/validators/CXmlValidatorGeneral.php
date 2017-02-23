@@ -73,7 +73,23 @@ class CXmlValidatorGeneral {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
 
-		if ($rules['type'] & XML_STRING) {
+		if ($rules['type'] & XML_ANY) {
+			$isValid = false;
+			foreach($rules['types'] as $type) {
+				try {
+					$this->validateData($type, $data, $parent_data, $path);
+					$isValid = true;
+					break;
+				} catch (Exception $ex) {
+					/* code is not missing here */
+				}
+			}
+
+			if (!$isValid) {
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('unsupported value')));
+			}
+		}
+		elseif ($rules['type'] & XML_STRING) {
 			$this->validateString($data, $path);
 		}
 		elseif ($rules['type'] & XML_ARRAY) {
