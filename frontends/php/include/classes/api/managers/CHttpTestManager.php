@@ -997,23 +997,25 @@ class CHttpTestManager {
 			$sourceFields = [];
 			foreach ($fieldTypes as $fieldName => $field_type) {
 				if (array_key_exists($fieldName, $webstep)) {
-					// Same values in same order should not be changed
-					$source = array_values($dbStep[$fieldName]);
-					$target = array_values($webstep[$fieldName]);
+					if (array_key_exists($fieldName, $dbStep)) {
+						// Same values in same order should not be changed
+						$source = array_values($dbStep[$fieldName]);
+						$target = array_values($webstep[$fieldName]);
 
-					$invalidate = false;
-					$pairCount = count($source);
-					if ($pairCount === count($target)) {
-						for ($i = 0; $i < $pairCount; $i++) {
-							if ($source[$i]['name'] !== $target[$i]['name'] ||
-								$source[$i]['value'] !== $target[$i]['value']) {
-								$invalidate = true;
-								break;
+						$invalidate = false;
+						$pairCount = count($source);
+						if ($pairCount === count($target)) {
+							for ($i = 0; $i < $pairCount; $i++) {
+								if ($source[$i]['name'] !== $target[$i]['name'] ||
+									$source[$i]['value'] !== $target[$i]['value']) {
+									$invalidate = true;
+									break;
+								}
 							}
-						}
 
-						if(!$invalidate) {
-							continue;
+							if(!$invalidate) {
+								continue;
+							}
 						}
 					}
 
