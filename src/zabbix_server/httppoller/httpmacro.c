@@ -193,8 +193,8 @@ out:
  ******************************************************************************/
 void	http_variable_urlencode(const char *source, char **result)
 {
-	char *target, *buffer;
-	static char HEX[] = "0123456789ABCDEF";
+	char		*target, *buffer;
+	static char	HEX[] = "0123456789ABCDEF";
 
 	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
 	target = buffer;
