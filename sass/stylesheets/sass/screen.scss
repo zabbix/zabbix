@@ -710,6 +710,7 @@ footer {
 
 	td {
 		padding: 6px 5px;
+		position: relative;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -1112,6 +1113,7 @@ footer {
 	position: relative;
 	vertical-align: top;
 	display: inline-block;
+	white-space: nowrap;
 }
 
 .multiselect {
@@ -2534,6 +2536,257 @@ $form-icon-btn: (
 }
 
 // Dashboard
+.dashbrd-grid-widget-container {
+	position: relative;
+	margin: 0 -.25rem;
+}
+
+.dashbrd-grid-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+	position: absolute;
+	z-index: 999;
+}
+
+.dashbrd-grid-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+	z-index: 1000;
+}
+
+.dashbrd-grid-widget-content {
+	flex: 1;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+
+	.list-table {
+		border: none;
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+
+		td {
+			@extend %dashbrd-widget-td;
+		}
+
+		tbody tr {
+
+			&:last-child td {
+				border-bottom: 1px solid $table-border-color;
+			}
+		}
+	}
+
+	.debug-output {
+		margin: 10px 10px 0 10px;
+		max-height: 300px;
+		border-color: $table-border-color;
+	}
+
+	.msg-good, .msg-bad {
+		margin: 0 10px;
+	}
+}
+
+.dashbrd-grid-widget {
+	display: flex;
+	position: absolute;
+}
+
+.dashbrd-grid-widget-padding {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	min-width: 8.33333%;
+	margin: .25rem;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+}
+
+.dashbrd-grid-widget-head {
+	position: relative;
+	padding: 8px 40px 8px 10px;
+	min-height: 17px;
+
+	h4 {
+		color: h4-widget-color($font-color);
+		font-weight: bold;
+		@extend %overflow-ellipsis;
+	}
+
+	ul {
+		position: absolute;
+		top: 0;
+		right: 3px;
+
+		li {
+			display: block;
+			float: left;
+			padding: 0;
+
+			select {
+				margin: 4px 0;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-foot {
+	text-align: right;
+	color: $font-alt-color;
+	padding: 8px 8px 6px 8px;
+
+	ul {
+		display: flex;
+		justify-content: flex-end;
+
+		li {
+			padding: 0 0 0 13px;
+			@extend %overflow-ellipsis;
+		}
+	}
+}
+
+.ui-resize-dot {
+	@extend %ui-resize-dot;
+}
+
+.ui-resizable-border-n {
+	border-top: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-e {
+	border-right: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-border-s {
+	border-bottom: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-w {
+	border-left: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-n {
+	@extend %ui-resizable;
+	cursor: ns-resize;
+	height: 5px;
+	width: 100%;
+	top: 4px;
+	left: 0;
+
+	.ui-resize-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+		bottom: 0;
+	}
+}
+
+.ui-resizable-ne {
+	@extend %ui-resize-dot;
+	cursor: nesw-resize;
+	right: 0;
+	top: 0;
+}
+
+.ui-resizable-nw {
+	@extend %ui-resize-dot;
+	cursor: nwse-resize;
+	left: 0;
+	top: 0;
+}
+
+.ui-resizable-e {
+	@extend %ui-resizable;
+	cursor: ew-resize;
+	width: 5px;
+	right: 4px;
+	top: 0;
+	height: 100%;
+
+	.ui-resize-dot {
+		left: 0;
+		top: 50%;
+		@include transform(translateY(-50%));
+	}
+}
+
+.ui-resizable-s {
+	@extend %ui-resizable;
+	cursor: ns-resize;
+	height: 5px;
+	width: 100%;
+	bottom: 5px;
+	left: 0;
+
+	.ui-resize-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+		bottom: -5px;
+	}
+}
+
+.ui-resizable-se {
+	@extend %ui-resize-dot;
+	cursor: nwse-resize;
+	right: 0;
+	bottom: 0;
+}
+
+.ui-resizable-sw {
+	@extend %ui-resize-dot;
+	cursor: nesw-resize;
+	left: 0;
+	bottom: 0;
+}
+
+.ui-resizable-w {
+	@extend %ui-resizable;
+	cursor: ew-resize;
+	width: 5px;
+	left: 4px;
+	top: 0;
+	height: 100%;
+
+	.ui-resize-dot {
+		right: 0;
+		top: 50%;
+		@include transform(translateY(-50%));
+	}
+}
+
+%ui-resize-dot {
+	z-index: 90;
+	width: 7px;
+	height: 7px;
+	position: absolute;
+	background-color: $ui-bg-color;
+	border: 1px solid $form-border-focus-color;
+	@include border-radius(100%);
+}
+
+%ui-resizable {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+}
+
 .dashbrd-widget-placeholder {
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
@@ -3695,6 +3948,17 @@ td.inactive-bg {
 	}
 }
 
+.remove-btn {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	min-height: auto;
+	border: none;
+	background-color: $transparent !important;
+	@extend %close-icon;
+	@include border-radius(2px);
+}
+
 .overlay-close-btn {
 	position: absolute;
 	z-index: 1000;
@@ -3780,15 +4044,23 @@ a.overlay-close-btn {
 }
 
 .preloader-container {
-	border-radius: 50%;
+	z-index: 10;
 	padding: 7px;
 	display: inline-block;
-	margin: 0 auto;
+	width: 24px;
+	height: 24px;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin: auto;
+	position: absolute;
 	background-color: rgba($ui-bg-color, .8);
+	@include border-radius(50%);
+	@include transform(translateY(-50%));
 }
 
 .preloader {
-	border-radius: 50%;
+	@include border-radius(50%);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;

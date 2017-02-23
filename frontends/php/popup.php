@@ -84,10 +84,6 @@ switch ($srctbl) {
 		$page['title'] = _('Screens');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
-	case 'slides':
-		$page['title'] = _('Slide shows');
-		$min_user_type = USER_TYPE_ZABBIX_USER;
-		break;
 	case 'graphs':
 		$page['title'] = _('Graphs');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -151,7 +147,6 @@ $allowedSrcFields = [
 	'graph_prototypes'		=> '"graphid", "name"',
 	'item_prototypes'		=> '"itemid", "name", "flags"',
 	'sysmaps'				=> '"sysmapid", "name"',
-	'slides'				=> '"slideshowid"',
 	'help_items'			=> '"key"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
@@ -1595,74 +1590,6 @@ elseif ($srctbl == 'sysmaps') {
 		);
 
 		insert_js('var popupReference = '.zbx_jsvalue($sysmaps, true).';');
-	}
-
-	$form->addItem($table);
-	$widget->addItem($form)->show();
-}
-/*
- * Slides
- */
-elseif ($srctbl == 'slides') {
-	require_once dirname(__FILE__).'/include/screens.inc.php';
-
-	$form = (new CForm())
-		->setName('slideform')
-		->setId('slides');
-
-	$table = (new CTableInfo())
-		->setHeader([
-			$multiselect
-				? (new CColHeader(
-					(new CCheckBox('all_slides'))
-						->onClick("javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');")
-				))->addClass(ZBX_STYLE_CELL_WIDTH)
-				: null,
-			_('Name')
-		]);
-
-	$slideshows = [];
-
-	$dbSlideshows = DBfetchArray(DBselect('SELECT s.slideshowid,s.name FROM slideshows s'));
-
-	order_result($dbSlideshows, 'name');
-
-	foreach ($dbSlideshows as $dbSlideshow) {
-		if (!slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
-			continue;
-		}
-		$slideshows[$dbSlideshow['slideshowid']] = $dbSlideshow;
-
-		$name = new CLink($dbSlideshow['name'], 'javascript:void(0);');
-		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($dbSlideshow['slideshowid']).');';
-		}
-		else {
-			$values = [
-				$dstfld1 => $dbSlideshow[$srcfld1],
-				$dstfld2 => $dbSlideshow[$srcfld2]
-			];
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
-		}
-		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
-
-		$table->addRow([
-			$multiselect
-				? new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', $dbSlideshow['slideshowid'])
-				: null,
-			$name
-		]);
-	}
-
-	if ($multiselect) {
-		$table->setFooter(
-			new CCol(
-				(new CButton('select', _('Select')))
-					->onClick("javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).');')
-			)
-		);
-
-		insert_js('var popupReference = '.zbx_jsvalue($slideshows, true).';');
 	}
 
 	$form->addItem($table);

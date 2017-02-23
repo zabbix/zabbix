@@ -104,7 +104,12 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	}
 
 	zbx_ipc_message_init(&message);
-	DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI);
+
+	if (FAIL == DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI))
+	{
+		zbx_strlcpy(error, "cannot find host IPMI interface", max_error_len);
+		goto cleanup;
+	}
 
 	if (FAIL == zbx_ipmi_port_expand_macros(host->hostid, interface.port_orig, &interface.port, &errmsg))
 	{

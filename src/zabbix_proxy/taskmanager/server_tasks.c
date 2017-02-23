@@ -44,6 +44,8 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	ZBX_UNUSED(proxy_hostid);
+
 	result = DBselect(
 			"select t.taskid,t.type,t.clock,t.ttl,"
 				"r.status,r.parent_taskid,r.info"

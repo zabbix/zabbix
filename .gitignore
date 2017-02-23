@@ -294,6 +294,9 @@ src/zabbix_server/housekeeper/Makefile.in
 src/zabbix_server/httppoller/.deps
 src/zabbix_server/httppoller/Makefile
 src/zabbix_server/httppoller/Makefile.in
+src/zabbix_server/ipmi/.deps
+src/zabbix_server/ipmi/Makefile
+src/zabbix_server/ipmi/Makefile.in
 src/zabbix_server/pinger/.deps
 src/zabbix_server/pinger/Makefile
 src/zabbix_server/pinger/Makefile.in

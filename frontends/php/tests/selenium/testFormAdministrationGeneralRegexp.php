@@ -96,7 +96,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		}
 
 		$this->zbxTestClick('tab_test');
-		$this->zbxTestInputType('test_string', $test_string);
+		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
 
@@ -179,7 +179,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Delete() {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestClickLinkText($this->regexp2);
+		$this->zbxTestClickLinkTextWait($this->regexp2);
 
 		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
