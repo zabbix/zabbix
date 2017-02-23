@@ -193,13 +193,11 @@ out:
  ******************************************************************************/
 void	http_variable_urlencode(const char *source, char **result)
 {
-	char		*target;
+	char		*target, *buffer;
 	const char	*hex = "0123456789ABCDEF";
 
-	zbx_free(*result);
-
-	*result = zbx_malloc(NULL, strlen(source) * 3 + 1);
-	target = *result;
+	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
+	target = buffer;
 
 	while ('\0' != *source)
 	{
@@ -217,6 +215,8 @@ void	http_variable_urlencode(const char *source, char **result)
 	}
 
 	*target = '\0';
+	zbx_free(*result);
+	*result = buffer;
 }
 
 /******************************************************************************
