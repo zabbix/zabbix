@@ -590,12 +590,13 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array $data
+	 * @param array $field_names
 	 *
 	 * @return string
 	 */
-	public static function resolveTimeUnitMacros(array $data) {
+	public static function resolveTimeUnitMacros(array $data, array $field_names) {
 		self::init();
 
-		return self::$macrosResolver->resolveTimeUnitMacros($data);
+		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
 	}
 }

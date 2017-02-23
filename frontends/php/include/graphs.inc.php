@@ -164,7 +164,7 @@ function get_hosts_by_graphid($graphid) {
  */
 function get_min_itemclock_by_graphid($graphid) {
 	$items = DBfetchArray(DBselect(
-		'SELECT DISTINCT i.itemid,i.value_type,i.history,i.trends'.
+		'SELECT DISTINCT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
 		' FROM items i,graphs_items gi'.
 		' WHERE i.itemid=gi.itemid'.
 			' AND gi.graphid='.zbx_dbstr($graphid)
@@ -196,31 +196,23 @@ function get_min_itemclock_by_itemid($items) {
 
 	$max = ['history' => 0, 'trends' => 0];
 
+	$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['history', 'trends']);
+
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	foreach ($items as $item) {
 		$item_types[$item['value_type']][] = $item['itemid'];
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$resolved_macros = CMacrosResolverHelper::resolveTimeUnitMacros([
-				$item['hostid'] => [
-					$item['history'],
-					$item['trends']
-				]
-			]);
-
-			list($item['history'], $item['trends']) = $resolved_macros[$item['hostid']];
-
 			if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-				$item['history'] = timeUnitToSeconds($item['history']);
+				$item['history'] = (int) timeUnitToSeconds($item['history']);
+				$max['history'] = max($max['history'], $item['history']);
 			}
 
 			if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-				$item['trends'] = timeUnitToSeconds($item['trends']);
+				$item['trends'] = (int) timeUnitToSeconds($item['trends']);
+				$max['trends'] = max($max['trends'], $item['trends']);
 			}
-
-			$max['history'] = max($max['history'], (int) $item['history']);
-			$max['trends'] = max($max['trends'], (int) $item['trends']);
 		}
 	}
 
@@ -265,7 +257,7 @@ function get_min_itemclock_by_itemid($items) {
 	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
 	if ($min_clock == 0) {
 		if ($item_types[ITEM_VALUE_TYPE_FLOAT] || $item_types[ITEM_VALUE_TYPE_UINT64]) {
-			$min_clock = time() - SEC_PER_DAY * max($max['history'], $max['trends']);
+			$min_clock = time() - max($max['history'], $max['trends']);
 
 			/*
 			 * In case history storage exceeds the maximum time difference between current year and minimum 1970

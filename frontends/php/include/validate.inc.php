@@ -209,7 +209,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_TP) {
-		if ((new CTimePeriodsParser(['usermacros' => true]))->parse($var) != CParser::PARSE_SUCCESS) {
+		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
+
+		if ($time_period_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time period is expected'));
 		}

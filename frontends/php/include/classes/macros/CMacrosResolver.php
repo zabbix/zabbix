@@ -1522,12 +1522,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve item delay macros, item history and item trend macros.
 	 *
-	 * @param array $data
-	 * @param array $data[<key>][<macro-n>]		Array of macros to resolve. Usually the key is a host ID.
+	 * @param array  $data
+	 * @param string $data[n]['hostid']
+	 * @param string $data[n][<sources>]  see options['source']
+	 * @param array  $options
+	 * @param array  $options['sources']  an array of the field names
 	 *
 	 * @return array
 	 */
-	public function resolveTimeUnitMacros(array $data) {
+	public function resolveTimeUnitMacros(array $data, array $options) {
 		$usermacros = [];
 		$macro_values = [];
 
@@ -1536,11 +1539,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		// Find macros.
-		foreach ($data as $key => $texts) {
+		foreach ($data as $key => $value) {
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $value[$source];
+			}
+
 			$matched_macros = $this->extractMacros($texts, $types);
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$key], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$key] = [
+					'hostids' => array_key_exists('hostid', $value) ? [$value['hostid']] : [],
+					'macros' => $matched_macros['usermacros']
+				];
 			}
 		}
 
@@ -1554,14 +1565,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach (array_keys($macro_values) as $key) {
-			foreach ($data[$key] as &$text) {
-				$matched_macros = $this->getMacroPositions($text, $types);
+			foreach ($options['sources'] as $source) {
+				$matched_macros = $this->getMacroPositions($data[$key][$source], $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$text = substr_replace($text, $macro_values[$key][$macro], $pos, strlen($macro));
+					$data[$key][$source] =
+						substr_replace($data[$key][$source], $macro_values[$key][$macro], $pos, strlen($macro));
 				}
 			}
-			unset($text);
 		}
 
 		return $data;

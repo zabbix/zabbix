@@ -1997,28 +1997,13 @@ function fatal_error($msg) {
 
 function parse_period($str) {
 	$out = null;
-	$time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
+	$time_periods_parser = new CTimePeriodsParser();
 
-	if ($time_periods_parser->parse($str) == CParser::PARSE_SUCCESS) {
-		$periods = $time_periods_parser->getPeriods();
-
-		foreach ($periods as $key => &$period) {
-			if (strpos($period, '{') !== false) {
-				$period = CMacrosResolverHelper::resolveTimeUnitMacros([[$period]]);
-				$period = $period[0][0];
-
-				if ($time_periods_parser->parse($period) != CParser::PARSE_SUCCESS) {
-					unset($periods[$key]);
-					continue;
-				}
-			}
-		}
-	}
-	else {
+	if ($time_periods_parser->parse($str) != CParser::PARSE_SUCCESS) {
 		return null;
 	}
 
-	foreach ($periods as $period) {
+	foreach ($time_periods_parser->getPeriods() as $period) {
 		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
 			return null;
 		}
