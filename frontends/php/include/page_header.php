@@ -114,8 +114,8 @@ switch ($page['type']) {
 		}
 		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
-		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh()) {
-			$pageTitle .= ' ['._s('refreshed every %1$s.', CWebUser::$data['refresh']).']';
+		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
+			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
 		}
 		break;
 }

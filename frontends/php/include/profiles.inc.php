@@ -49,16 +49,17 @@ function setHostGroupInternal($groupid, $internal) {
  * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
  * If the value is incorrect, set an error.
  *
- * @param CSimpleIntervalParser     $simple_interval_parser		Simple interval parser class.
- * @param string                    $value						Value to parse and validate.
- * @param int                       $min						Lowed bound.
- * @param int                       $max						Upper bound.
- * @param bool                      $allow_zero					Set to "true" to allow value to be zero.
- * @param string                    $error						Untranslated error message
+ * @param string $value       Value to parse and validate.
+ * @param int    $min         Lowed bound.
+ * @param int    $max         Upper bound.
+ * @param bool   $allow_zero  Set to "true" to allow value to be zero.
+ * @param string $error       Untranslated error message
+ *
  * @return boolean
  */
-function validateTimeUnitConfig(CSimpleIntervalParser $simple_interval_parser, $value, $min, $max, $allow_zero,
-		$error) {
+function validateTimeUnitConfig($value, $min, $max, $allow_zero, $error) {
+	$simple_interval_parser = new CSimpleIntervalParser();
+
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
 		$value = timeUnitToSeconds($value);
 
@@ -66,14 +67,12 @@ function validateTimeUnitConfig(CSimpleIntervalParser $simple_interval_parser, $
 			return true;
 		}
 		elseif ($value < $min || $value > $max) {
-			error(_s($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
-
+			error(sprintf($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
 			return false;
 		}
 	}
 	else {
-		error(_s($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
-
+		error(sprintf($error, _('a time unit is expected')));
 		return false;
 	}
 
@@ -107,84 +106,33 @@ function update_config($config) {
 		}
 	}
 
-	$simple_interval_parser = new CSimpleIntervalParser();
+	$fields = [
+		'event_expire' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid event expiry time: %1$s.')],
+		'hk_events_trigger' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid trigger data storage period: %1$s.')],
+		'hk_events_internal' =>
+			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid internal data storage period: %1$s.')],
+		'hk_events_discovery' =>
+			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid network discovery data storage period: %1$s.')],
+		'hk_events_autoreg' =>
+			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid auto-registration data storage period: %1$s.')],
+		'hk_services' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid IT services data storage period: %1$s.')],
+		'hk_audit' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid audit data storage period: %1$s.')],
+		'hk_sessions' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid user sessions data storage period: %1$s.')],
+		'hk_history' => [SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, _('Invalid history data storage period: %1$s.')],
+		'hk_trends' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, true, _('Invalid trends data storage period: %1$s.')],
+		'ok_period' => [0, SEC_PER_DAY, false, _('Invalid displaying of OK triggers: %1$s.')],
+		'blink_period' => [0, SEC_PER_DAY, false, _('Invalid blinking on trigger status change: %1$s.')],
+		'refresh_unsupported' => [0, SEC_PER_DAY, false, _('Invalid refresh of unsupported items: %1$s')]
+	];
 
-	if (array_key_exists('event_expire', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['event_expire'], SEC_PER_DAY, ZBX_MAX_DATE,
-				false, 'Invalid event expiry time: %1$s')) {
-		return false;
-	}
+	foreach ($fields as $field => $args) {
+		if (array_key_exists($field, $config)) {
+			array_unshift($args, $config[$field]);
 
-	if (array_key_exists('hk_events_trigger', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_trigger'], SEC_PER_DAY, ZBX_MAX_DATE,
-				false, 'Invalid trigger data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_events_internal', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_internal'], SEC_PER_DAY,
-				ZBX_MAX_DATE, false, 'Invalid internal data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_events_discovery', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_discovery'], SEC_PER_DAY,
-				ZBX_MAX_DATE, false, 'Invalid network discovery data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_events_autoreg', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_events_autoreg'], SEC_PER_DAY, ZBX_MAX_DATE,
-				false, 'Invalid auto-registration data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_services', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_services'], SEC_PER_DAY, ZBX_MAX_DATE,
-				false, 'Invalid IT services data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_audit', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_audit'], SEC_PER_DAY, ZBX_MAX_DATE, false,
-				'Invalid audit data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_sessions', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_sessions'], SEC_PER_DAY, ZBX_MAX_DATE,
-				false, 'Invalid user sessions data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_history', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_history'], SEC_PER_HOUR, ZBX_MAX_DATE, true,
-				'Invalid history data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('hk_trends', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['hk_trends'], SEC_PER_DAY, ZBX_MAX_DATE, true,
-				'Invalid trends data storage period: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('ok_period', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['ok_period'], 0, SEC_PER_DAY, false,
-				'Invalid displaying of OK triggers: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('blink_period', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['blink_period'], 0, SEC_PER_DAY, false,
-				'Invalid blinking on trigger status change: %1$s')) {
-		return false;
-	}
-
-	if (array_key_exists('refresh_unsupported', $config)
-			&& !validateTimeUnitConfig($simple_interval_parser, $config['refresh_unsupported'], 0, 65535, false,
-				'Invalid refresh of unsupported items: %1$s')) {
-		return false;
+			if (!call_user_func_array('validateTimeUnitConfig', $args)) {
+				return false;
+			}
+		}
 	}
 
 	$updateSeverity = false;

@@ -220,7 +220,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'surname' => getRequest('surname'),
 			'url' => getRequest('url'),
 			'autologin' => getRequest('autologin', 0),
-			'autologout' => hasRequest('autologout_visible') ? getRequest('autologout') : '0s',
+			'autologout' => hasRequest('autologout_visible') ? getRequest('autologout') : '0',
 			'theme' => getRequest('theme'),
 			'refresh' => getRequest('refresh'),
 			'rows_per_page' => getRequest('rows_per_page'),
@@ -343,7 +343,6 @@ if (!empty($_REQUEST['form'])) {
 	$data['userid'] = $userId;
 	$data['form'] = getRequest('form');
 	$data['form_refresh'] = getRequest('form_refresh', 0);
-	$data['autologout'] = getRequest('autologout');
 
 	// render view
 	$usersView = new CView('administration.users.edit', $data);

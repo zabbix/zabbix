@@ -261,7 +261,7 @@ class CUser extends CApiService {
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'url' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:10000'],
+			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -308,16 +308,17 @@ class CUser extends CApiService {
 			$db_user = $db_users[$user['userid']];
 
 			$upd_user = [];
-			$strings = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
-			$integers = ['autologin',  'type',  'rows_per_page'];
 
-			foreach ($strings as $field_name) {
+			// strings
+			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
+			foreach ($field_names as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
 			}
 
-			foreach ($integers as $field_name) {
+			// integers
+			foreach (['autologin', 'type', 'rows_per_page'] as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
@@ -360,7 +361,7 @@ class CUser extends CApiService {
 			'passwd' =>			['type' => API_STRING_UTF8, 'length' => 255],
 			'url' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:10000'],
+			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -582,11 +583,11 @@ class CUser extends CApiService {
 	 */
 	private function checkLoginOptions(array $user) {
 		if (!array_key_exists('autologout', $user) && array_key_exists('autologin', $user) && $user['autologin'] != 0) {
-			$user['autologout'] = '0s';
+			$user['autologout'] = '0';
 		}
 
 		if (!array_key_exists('autologin', $user) && array_key_exists('autologout', $user)
-				&& $user['autologout'] != 0) {
+				&& timeUnitToSeconds($user['autologout']) != 0) {
 			$user['autologin'] = 0;
 		}
 

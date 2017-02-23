@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		<?php if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::getRefresh()): ?>
+		<?php if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::getRefresh() != 0): ?>
 			PageRefresh.init(<?= CWebUser::getRefresh() * 1000 ?>);
 		<?php endif ?>
 
