@@ -179,7 +179,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: http_variable_urlencode                                          *
@@ -191,18 +190,13 @@ out:
  * Parameters:  source  - [IN] the value to encode                            *
  *              result  - [OUT] encoded string                                *
  *                                                                            *
- * Return value: SUCCEED - the source string was encoded successfully         *
- *                                                                            *
- * Comments: This function have the same signature as http_variable_urldecode *
- *           but it never returns values other than SUCCEED.                  *
- *                                                                            *
  ******************************************************************************/
-int	http_variable_urlencode(const char *source, char **result)
+void	http_variable_urlencode(const char *source, char **result)
 {
 	char *target, *buffer;
 	static char HEX[] = "0123456789ABCDEF";
 
-	buffer = zbx_malloc(NULL, strlen(source)*3 + 1);
+	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
 	target = buffer;
 
 	while ('\0' != *source)
@@ -223,9 +217,7 @@ int	http_variable_urlencode(const char *source, char **result)
 	*target = '\0';
 	zbx_free(*result);
 	*result = buffer;
-	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -285,7 +277,6 @@ static int	http_variable_urldecode(const char *source, char **result)
 
 	return FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *
