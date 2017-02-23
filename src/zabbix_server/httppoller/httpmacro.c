@@ -248,7 +248,7 @@ static int	http_variable_urldecode(const char *source, char **result)
 			/* Percent-decoding */
 			if (FAIL == is_hex_n_range(source + 1, 2, target, sizeof(char), 0, 0xff))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot perform URL decode of '%s' part of url '%s'",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot perform URL decode of '%s' part of string '%s'",
 						source, url);
 				zbx_free(buffer);
 				break;
