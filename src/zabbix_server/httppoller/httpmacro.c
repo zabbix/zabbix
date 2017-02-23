@@ -193,11 +193,13 @@ out:
  ******************************************************************************/
 void	http_variable_urlencode(const char *source, char **result)
 {
-	char		*target, *buffer;
-	static char	HEX[] = "0123456789ABCDEF";
+	char		*target;
+	const char	*hex = "0123456789ABCDEF";
 
-	buffer = zbx_malloc(NULL, strlen(source) * 3 + 1);
-	target = buffer;
+	zbx_free(*result);
+
+	*result = zbx_malloc(NULL, strlen(source) * 3 + 1);
+	target = *result;
 
 	while ('\0' != *source)
 	{
@@ -205,8 +207,8 @@ void	http_variable_urlencode(const char *source, char **result)
 		{
 			/* Percent-encoding */
 			*target++ = '%';
-			*target++ = HEX[(unsigned char)*source >> 4];
-			*target++ = HEX[(unsigned char)*source & 15];
+			*target++ = hex[(unsigned char)*source >> 4];
+			*target++ = hex[(unsigned char)*source & 15];
 		}
 		else
 			*target++ = *source;
@@ -215,8 +217,6 @@ void	http_variable_urlencode(const char *source, char **result)
 	}
 
 	*target = '\0';
-	zbx_free(*result);
-	*result = buffer;
 }
 
 /******************************************************************************
