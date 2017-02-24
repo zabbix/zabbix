@@ -1093,13 +1093,13 @@ class CHttpTest extends CApiService {
 				}
 				else {
 					foreach (['http_user', 'http_password'] as $field_name) {
-						$_httptest += [
+						$httptest += [
 							$field_name => ($method === 'validateUpdate')
 								? $db_httptests[$httptest['httptestid']][$field_name]
 								: ''
 						];
 
-						if ($_httptest[$field_name] === '') {
+						if ($httptest[$field_name] === '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
 							);
