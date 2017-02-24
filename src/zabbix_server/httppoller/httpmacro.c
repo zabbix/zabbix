@@ -295,7 +295,7 @@ int	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 {
 	const char	*__function_name = "http_substitute_variables";
 	char		replace_char, *substitute;
-	size_t		left, right, len, offset = 0;
+	size_t		left, right, len, offset;
 	int		index, ret = SUCCEED;
 	zbx_ptr_pair_t	pair;
 
@@ -308,6 +308,8 @@ int	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 
 		if ('{' == (*data)[left+1])
 			offset = 1;
+		else
+			offset = 0;
 
 		for (right = left + 1; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
 			;
