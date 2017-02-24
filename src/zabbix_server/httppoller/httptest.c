@@ -453,13 +453,6 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 			goto out;
 		}
 
-		/* keys and values of query fields / post fields should be encoded */
-		if (ZBX_HTTPFIELD_QUERY_FIELD == type || ZBX_HTTPFIELD_POST_FIELD == type)
-		{
-			http_variable_urlencode(key, &key);
-			http_variable_urlencode(value, &value);
-		}
-
 		switch (type)
 		{
 			case ZBX_HTTPFIELD_HEADER:
