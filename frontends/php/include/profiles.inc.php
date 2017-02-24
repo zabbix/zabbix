@@ -44,41 +44,6 @@ function setHostGroupInternal($groupid, $internal) {
 	);
 }
 
-/**
- * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
- * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
- * If the value is incorrect, set an error.
- *
- * @param string $value       Value to parse and validate.
- * @param int    $min         Lowed bound.
- * @param int    $max         Upper bound.
- * @param bool   $allow_zero  Set to "true" to allow value to be zero.
- * @param string $error       Untranslated error message
- *
- * @return boolean
- */
-function validateTimeUnitConfig($value, $min, $max, $allow_zero, $error) {
-	$simple_interval_parser = new CSimpleIntervalParser();
-
-	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
-		$value = timeUnitToSeconds($value);
-
-		if ($allow_zero && $value == 0) {
-			return true;
-		}
-		elseif ($value < $min || $value > $max) {
-			error(sprintf($error, _s('must be between "%1$s" and "%2$s"', $min, $max)));
-			return false;
-		}
-	}
-	else {
-		error(sprintf($error, _('a time unit is expected')));
-		return false;
-	}
-
-	return true;
-}
-
 function update_config($config) {
 	$configOrig = select_config();
 
@@ -107,29 +72,90 @@ function update_config($config) {
 	}
 
 	$fields = [
-		'event_expire' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid event expiry time: %1$s.')],
-		'hk_events_trigger' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid trigger data storage period: %1$s.')],
-		'hk_events_internal' =>
-			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid internal data storage period: %1$s.')],
-		'hk_events_discovery' =>
-			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid network discovery data storage period: %1$s.')],
-		'hk_events_autoreg' =>
-			[SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid auto-registration data storage period: %1$s.')],
-		'hk_services' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid IT services data storage period: %1$s.')],
-		'hk_audit' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid audit data storage period: %1$s.')],
-		'hk_sessions' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, false, _('Invalid user sessions data storage period: %1$s.')],
-		'hk_history' => [SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, _('Invalid history data storage period: %1$s.')],
-		'hk_trends' => [SEC_PER_DAY, 25 * SEC_PER_YEAR, true, _('Invalid trends data storage period: %1$s.')],
-		'ok_period' => [0, SEC_PER_DAY, false, _('Invalid displaying of OK triggers: %1$s.')],
-		'blink_period' => [0, SEC_PER_DAY, false, _('Invalid blinking on trigger status change: %1$s.')],
-		'refresh_unsupported' => [0, SEC_PER_DAY, false, _('Invalid refresh of unsupported items: %1$s')]
+		'event_expire' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid event expiry time: %1$s.')
+		],
+		'hk_events_trigger' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid trigger data storage period: %1$s.')
+		],
+		'hk_events_internal' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid internal data storage period: %1$s.')
+		],
+		'hk_events_discovery' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid network discovery data storage period: %1$s.')
+		],
+		'hk_events_autoreg' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid auto-registration data storage period: %1$s.')
+		],
+		'hk_services' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid IT services data storage period: %1$s.')
+		],
+		'hk_audit' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid audit data storage period: %1$s.')
+		],
+		'hk_sessions' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _('Invalid user sessions data storage period: %1$s.')
+		],
+		'hk_history' => [
+			'min' => SEC_PER_HOUR,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => true,
+			'message' => _('Invalid history data storage period: %1$s.')
+		],
+		'hk_trends' => [
+			'min' => SEC_PER_DAY,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => true,
+			'message' => _('Invalid trends data storage period: %1$s.')
+		],
+		'ok_period' => [
+			'min' => 0,
+			'max' => SEC_PER_DAY,
+			'allow_zero' => false,
+			'message' => _('Invalid displaying of OK triggers: %1$s.')
+		],
+		'blink_period' => [
+			'min' => 0,
+			'max' => SEC_PER_DAY,
+			'allow_zero' => false,
+			'message' => _('Invalid blinking on trigger status change: %1$s.')
+		],
+		'refresh_unsupported' => [
+			'min' => 0,
+			'max' => SEC_PER_DAY,
+			'allow_zero' => false,
+			'message' => _('Invalid refresh of unsupported items: %1$s')
+		]
 	];
 
 	foreach ($fields as $field => $args) {
 		if (array_key_exists($field, $config)) {
-			array_unshift($args, $config[$field]);
-
-			if (!call_user_func_array('validateTimeUnitConfig', $args)) {
+			if (!validateTimeUnit($config[$field], $args['min'], $args['max'], $args['allow_zero'], $error)) {
+				error(sprintf($args['message'], $error));
 				return false;
 			}
 		}

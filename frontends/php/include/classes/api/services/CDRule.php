@@ -184,8 +184,6 @@ class CDRule extends CApiService {
 		$proxy_hostids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists('name', $drule)) {
@@ -221,20 +219,9 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if ($simple_interval_parser->parse($drule['delay']) == CParser::PARSE_SUCCESS) {
-					$delay = timeUnitToSeconds($drule['delay']);
-
-					if ($delay < 1 || $delay > SEC_PER_WEEK) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'delay',
-								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_WEEK)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($drule['delay']) != CParser::PARSE_SUCCESS) {
+				if (!validateTimeUnit($drule['delay'], 1, SEC_PER_WEEK, false, $error, true)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+						_s('Incorrect value for field "%1$s": %2$s', 'delay', $error)
 					);
 				}
 			}
@@ -338,8 +325,6 @@ class CDRule extends CApiService {
 		$proxy_hostids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists($drule['druleid'], $db_drules)) {
@@ -384,20 +369,9 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if ($simple_interval_parser->parse($drule['delay']) == CParser::PARSE_SUCCESS) {
-					$delay = timeUnitToSeconds($drule['delay']);
-
-					if ($delay < 1 || $delay > SEC_PER_WEEK) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'delay',
-								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_WEEK)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($drule['delay']) != CParser::PARSE_SUCCESS) {
+				if (!validateTimeUnit($drule['delay'], 1, SEC_PER_WEEK, false, $error, true)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+						_s('Incorrect value for field "%1$s": %2$s', 'delay', $error)
 					);
 				}
 			}
