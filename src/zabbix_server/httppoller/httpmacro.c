@@ -328,12 +328,15 @@ int	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 			continue;
 
 		substitute = httptest->macros.values[index].second;
+
 		if ('.' == replace_char && 1 == offset)
 		{
 			right += 2;
 			offset = right;
+
 			for (; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
-						;
+				;
+
 			if ('}' != (*data)[right])
 				break;
 
