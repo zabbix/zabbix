@@ -411,11 +411,9 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 	DB_RESULT		result;
 	DB_ROW			row;
 	size_t 			alloc_len = 0, offset;
-	zbx_ptr_pair_t		pair = {NULL, NULL};
+	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers;
-	char			*key, *value, *temp;
-
-	httptest->headers = NULL;
+	char			*key, *value;
 
 	zbx_vector_ptr_pair_create(&headers);
 	zbx_vector_ptr_pair_create(&httptest->variables);
@@ -462,7 +460,6 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 				vector = &httptest->variables;
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN;
 				zbx_free(key);
 				zbx_free(value);
 				ret = FAIL;
