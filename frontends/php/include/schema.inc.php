@@ -2585,19 +2585,19 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '365',
+				'default' => '1',
 			],
 			'hk_events_discovery' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '365',
+				'default' => '1',
 			],
 			'hk_events_autoreg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '365',
+				'default' => '1',
 			],
 			'hk_services_mode' => [
 				'null' => false,
