@@ -354,8 +354,8 @@ static void	add_headers(char *headers, struct curl_slist **headers_slist)
 static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, char *value_delimiter,
 		char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
 {
-	int p;
-	char *key, *value;
+	int	p;
+	char	*key, *value;
 
 	for (p = 0; p < pairs->values_num; p++)
 	{
@@ -382,7 +382,8 @@ static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, c
  ******************************************************************************/
 static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 {
-	int p;
+	int	p;
+
 	for (p = 0; p < pairs->values_num; p++)
 	{
 		zbx_free(pairs->values[p].first);
