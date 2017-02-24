@@ -1391,5 +1391,12 @@ INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (1,1,'we
 INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (2,1,'web.favorite.graphids',519,'graphid',1);
 INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (3,1,'web.favorite.screenids',16,'screenid',1);
 
+-- testFormAdministrationUserGroups
+INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Selenium script','test',2,14,NULL,'selenium script description');
+UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
+
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
