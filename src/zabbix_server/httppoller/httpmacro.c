@@ -235,7 +235,6 @@ void	http_variable_urlencode(const char *source, char **result)
  ******************************************************************************/
 static int	http_variable_urldecode(const char *source, char **result)
 {
-	int 		i, high, low;
 	const char	*url = source;
 	char		*target, *buffer = zbx_malloc(NULL, strlen(source) + 1);
 
