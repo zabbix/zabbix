@@ -444,10 +444,8 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
-		if (ZBX_HTTPFIELD_VARIABLE != type && (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
-				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)) ||
-				SUCCEED != (ret = http_substitute_variables(httptest, &key)) ||
-				SUCCEED != (ret = http_substitute_variables(httptest, &value))))
+		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL,
+				NULL, NULL, host, NULL, NULL, &key, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			httppairs_free(&httptest->variables);
 			zbx_free(key);
