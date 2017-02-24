@@ -103,14 +103,22 @@ class C32ImportConverter extends CConverter {
 				unset($item['preprocessing']);
 			}
 
-			// Merge item delay_flex into delay separated by a semicolon.
+			// Merge delay_flex into delay separated by a semicolon.
+			$item['delay'] = (string) $item['delay'];
 			if ($item['delay_flex'] !== '') {
 				$item['delay'] .= ';'.$item['delay_flex'];
 			}
+			unset($item['delay_flex']);
 
 			// Convert to days.
-			$item['history'] .= 'd';
-			$item['trends'] .= 'd';
+			$item['history'] = (string) $item['history'];
+			if ($item['history'] != 0) {
+				$item['history'] .= 'd';
+			}
+			$item['trends'] = (string) $item['trends'];
+			if ($item['trends'] != 0) {
+				$item['trends'] .= 'd';
+			}
 		}
 		unset($item);
 
@@ -129,13 +137,15 @@ class C32ImportConverter extends CConverter {
 			$discovery_rule['item_prototypes'] =
 				$this->convertItems($discovery_rule['item_prototypes']);
 
-			// Merge item delay_flex into delay separated by a semicolon.
+			// Merge delay_flex into delay separated by a semicolon.
+			$discovery_rule['delay'] = (string) $discovery_rule['delay'];
 			if ($discovery_rule['delay_flex'] !== '') {
 				$discovery_rule['delay'] .= ';'.$discovery_rule['delay_flex'];
 			}
+			unset($discovery_rule['delay_flex']);
 
 			// Convert to days.
-			if (strpos($discovery_rule['lifetime'], '{') === false) {
+			if (strpos($discovery_rule['lifetime'], '{') === false && $discovery_rule['lifetime'] != 0) {
 				$discovery_rule['lifetime'] .= 'd';
 			}
 		}
