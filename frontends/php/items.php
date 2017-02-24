@@ -489,8 +489,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
 				'units' => getRequest('units', ''),
 				'delay' => $delay,
-				'history' => getRequest('history', '0s'),
-				'trends' => getRequest('trends', '0s'),
+				'history' => getRequest('history', DB::getDefault('items', 'history')),
+				'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -612,11 +612,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
 				}
-				if ($db_item['history'] != getRequest('history', '0s')) {
-					$item['history'] = getRequest('history', '0s');
+				if ($db_item['history'] != getRequest('history', DB::getDefault('items', 'history'))) {
+					$item['history'] = getRequest('history', DB::getDefault('items', 'history'));
 				}
-				if ($db_item['trends'] != getRequest('trends', '0s')) {
-					$item['trends'] = getRequest('trends', '0s');
+				if ($db_item['trends'] != getRequest('trends', DB::getDefault('items', 'trends'))) {
+					$item['trends'] = getRequest('trends', DB::getDefault('items', 'trends'));
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
@@ -1133,7 +1133,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'delay_flex' => getRequest('delay_flex', []),
-		'history' => getRequest('history', ZBX_ITEM_HISTORY_DEFAULT),
+		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', 0),
 		'type' => getRequest('type', 0),
 		'interfaceid' => getRequest('interfaceid', 0),
@@ -1148,7 +1148,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
-		'trends' => getRequest('trends', ZBX_ITEM_TRENDS_DEFAULT),
+		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'applications' => getRequest('applications', []),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
@@ -1432,12 +1432,6 @@ else {
 				$item['host'] = $host['name'];
 			}
 
-			// Hide trend (zero values) for non-numeric item types.
-			if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
-					|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = '';
-			}
-
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 
@@ -1460,7 +1454,10 @@ else {
 			$history = $item['history'];
 			$history = (strpos($history, '{') === false) ? convertUnitsS(timeUnitToSeconds($history)) : $history;
 
-			$trends = $item['trends'];
+			// Hide trend (zero values) for non-numeric item types.
+			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+				? $item['trends']
+				: '';
 			$trends = (strpos($trends, '{') === false && $trends !== '')
 				? convertUnitsS(timeUnitToSeconds($trends))
 				: $trends;
@@ -1576,14 +1573,6 @@ else {
 			else {
 				$item['delay'] = '';
 			}
-		}
-
-		if (strpos($item['history'], '{') === false) {
-			$item['history'] = timeUnitToSeconds($item['history']);
-		}
-
-		if (strpos($item['trends'], '{') === false && $item['trends'] !== '') {
-			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}
 	unset($item);

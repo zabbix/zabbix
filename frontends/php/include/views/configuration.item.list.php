@@ -77,6 +77,8 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 	'sources' => ['expression', 'recovery_expression']
 ]);
 
+$simple_interval_parser = new CSimpleIntervalParser();
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
@@ -232,6 +234,17 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = '';
 	}
 
+	if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
+		$item['history'] = convertUnitsS(timeUnitToSeconds($item['history']));
+	}
+
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+		$item['trends'] = '';
+	}
+	else if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+		$item['trends'] = convertUnitsS(timeUnitToSeconds($item['trends']));
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$menuIcon,
@@ -242,10 +255,8 @@ foreach ($this->data['items'] as $item) {
 		(strpos($item['delay'], '{') === false && $item['delay'] !== '')
 			? convertUnitsS($item['delay'])
 			: $item['delay'],
-		(strpos($item['history'], '{') === false) ? convertUnitsS($item['history']) : $item['history'],
-		(strpos($item['trends'], '{') === false && $item['trends'] !== '')
-			? convertUnitsS($item['trends'])
-			: $item['trends'],
+		$item['history'],
+		$item['trends'],
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,

@@ -473,17 +473,19 @@ function validateDateInterval($year, $month, $day) {
  * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
  * If the value is incorrect, set an error.
  *
- * @param string $value       Value to parse and validate.
- * @param int    $min         Lowed bound.
- * @param int    $max         Upper bound.
- * @param bool   $allow_zero  Set to "true" to allow value to be zero.
+ * @param string $value                  Value to parse and validate.
+ * @param int    $min                    Lowed bound.
+ * @param int    $max                    Upper bound.
+ * @param bool   $allow_zero             Set to "true" to allow value to be zero.
  * @param string $error
- * @param bool   $usermacros  Set to "true" to allow user macros.
+ * @param array  $options
+ * @param bool   $options['usermacros']
+ * @param bool   $options['lldmacros']
  *
  * @return bool
  */
-function validateTimeUnit($value, $min, $max, $allow_zero, &$error, $usermacros = false) {
-	$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => $usermacros]);
+function validateTimeUnit($value, $min, $max, $allow_zero, &$error, $options) {
+	$simple_interval_parser = new CSimpleIntervalParser($options);
 
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
 		if ($value[0] != '{') {

@@ -309,7 +309,7 @@ $itemFormList->addRow(_('Units'),
 );
 
 $itemFormList->addRow(_('Update interval'),
-	(new CTextBox('delay', $data['delay'], false, 1024))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
+	(new CTextBox('delay', $data['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_delay'
 );
 
 // Append custom intervals to form list.
@@ -400,8 +400,7 @@ $itemFormList->addRow(_('History storage period'), $keepHistory);
 
 // Append trend storage to form list.
 $keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {

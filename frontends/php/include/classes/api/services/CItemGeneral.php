@@ -191,9 +191,6 @@ abstract class CItemGeneral extends CApiService {
 			'usermacros' => true,
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
 		]);
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
-		$lld_macro_parser = new CLLDMacroParser();
 
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
@@ -480,9 +477,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create', $simple_interval_parser,
-				$user_macro_parser, $lld_macro_parser
-			);
+			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 		}
 		unset($item);
 
@@ -493,16 +488,12 @@ abstract class CItemGeneral extends CApiService {
 	 * Check item specific fields. Each API like Item, Itemprototype and Discovery rule may inherit different fields
 	 * to validate.
 	 *
-	 * @param array                 $item						An array of single item data.
-	 * @param string                $method						A string of "create" or "update" method.
-	 * @param CSimpleIntervalParser $simple_interval_parser		Simple interval parser class.
-	 * @param CUserMacroParser      $user_macro_parser			User macro parser class.
-	 * @param CLLDMacroParser       $lld_macro_parser			LLD macro parser class.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @return bool
 	 */
-	protected function checkSpecificFields(array $item, $method, CSimpleIntervalParser $simple_interval_parser,
-			CUserMacroParser $user_macro_parser, CLLDMacroParser $lld_macro_parser) {
+	protected function checkSpecificFields(array $item, $method) {
 		return true;
 	}
 

@@ -1090,14 +1090,11 @@ function sortOperations($eventsource, &$operations) {
 		foreach ($operations as $key => $operation) {
 			$esc_step_from[$key] = $operation['esc_step_from'];
 			$esc_step_to[$key] = $operation['esc_step_to'];
-
 			// Try to sort by "esc_period" in seconds, otherwise sort as string in case it's a macro or something invalid.
-			$esc_period_ = $operation['esc_period'];
-			if ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS) {
-				$esc_period_ = timeUnitToSeconds($operation['esc_period']);
-			}
+			$esc_period[$key] = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS)
+				? timeUnitToSeconds($operation['esc_period'])
+				: $operation['esc_period'];
 
-			$esc_period[$key] = $esc_period_;
 			$operationTypes[$key] = $operation['operationtype'];
 		}
 		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
@@ -1230,7 +1227,7 @@ function get_operators_by_conditiontype($conditiontype) {
 	return [];
 }
 
-function count_operations_delay($operations, $def_period = '0s') {
+function count_operations_delay($operations, $def_period) {
 	$delays = [1 => 0];
 	$periods = [];
 	$max_step = 0;

@@ -994,31 +994,17 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Check discovery rule specific fields.
 	 *
-	 * @param array                 $item						An array of single discovery rule data.
-	 * @param string                $method						A string of "create" or "update" method.
-	 * @param CSimpleIntervalParser	$simple_interval_parser		Simple interval parser class.
-	 * @param CUserMacroParser	    $user_macro_parser			User macro parser class.
-	 * @param CLLDMacroParser       $lld_macro_parser			LLD macro parser class.
+	 * @param array  $item    An array of single item data.
+	 * @param string $method  A string of "create" or "update" method.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkSpecificFields(array $item, $method, CSimpleIntervalParser $simple_interval_parser,
-			CUserMacroParser $user_macro_parser, CLLDMacroParser $lld_macro_parser) {
+	protected function checkSpecificFields(array $item, $method) {
 		if (array_key_exists('lifetime', $item)) {
-			if ($simple_interval_parser->parse($item['lifetime']) == CParser::PARSE_SUCCESS) {
-				$lifetime = timeUnitToSeconds($item['lifetime']);
-
-				if ($lifetime != 0 && ($lifetime < SEC_PER_HOUR || $lifetime > SEC_PER_YEAR * 10)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'lifetime',
-							_s('must be between "%1$s" and "%2$s"', SEC_PER_HOUR, SEC_PER_YEAR * 10)
-						)
-					);
-				}
-			}
-			elseif ($user_macro_parser->parse($item['lifetime']) != CParser::PARSE_SUCCESS) {
+			if (!validateTimeUnit($item['lifetime'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+					['usermacros' => true])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s', 'lifetime', _('invalid lifetime'))
+					_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
 				);
 			}
 		}

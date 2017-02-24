@@ -356,7 +356,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'trapper_hosts'	=> getRequest('trapper_hosts'),
 			'port'			=> getRequest('port'),
 			'history'		=> getRequest('history'),
-			'trends'		=> getRequest('trends'),
 			'units'			=> getRequest('units'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
@@ -376,6 +375,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ipmi_sensor'	=> getRequest('ipmi_sensor'),
 			'ruleid'		=> getRequest('parent_discoveryid')
 		];
+
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$item['trends'] = getRequest('trends');
+		}
 
 		if (hasRequest('update')) {
 			$itemId = getRequest('itemid');
@@ -554,16 +557,11 @@ else {
 	]);
 
 	foreach ($data['items'] as &$item) {
-		if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
-				|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-			$item['trends'] = '';
-		}
-
 		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 			$item['delay'] = '';
 		}
 		else {
-			$update_interval_parser = new CUpdateIntervalParser('usermacros' => true, 'lldmacros' => true);
+			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 
 			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 				$item['delay'] = $update_interval_parser->getDelay();
@@ -575,14 +573,6 @@ else {
 			else {
 				$item['delay'] = '';
 			}
-		}
-
-		if (strpos($item['history'], '{') === false) {
-			$item['history'] = timeUnitToSeconds($item['history']);
-		}
-
-		if (strpos($item['trends'], '{') === false && $item['trends'] !== '') {
-			$item['trends'] = timeUnitToSeconds($item['trends']);
 		}
 	}
 	unset($item);
