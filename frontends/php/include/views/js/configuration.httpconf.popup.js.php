@@ -434,12 +434,6 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			helper: function(e, ui) {
-				/*ui.children().each(function() {
-					var td = $(this);
-
-					td.width(td.width());
-				});*/
-
 				return ui;
 			},
 			start: function(e, ui) {

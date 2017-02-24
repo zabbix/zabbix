@@ -166,12 +166,6 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			helper: function(e, ui) {
-				/*ui.children().each(function() {
-					var td = $(this);
-
-					td.width(td.width());
-				});*/
-
 				return ui;
 			},
 			start: function(e, ui) {
@@ -190,8 +184,8 @@
 
 		jQuery('#steps_' + step).remove();
 
-		jQuery('input[id^=steps_' + step + '_]').each( function(item) {
-			item.remove();
+		jQuery('input[id^=steps_' + step + '_]').each( function() {
+			this.remove();
 		});
 
 		if (table.find('tr.sortable').length <= 1) {
