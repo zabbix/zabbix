@@ -80,7 +80,7 @@ function inheritPermissions($groupid, $name) {
 			'selectRights' => ['id', 'permission']
 		]);
 
-		$upd_usergrps = [];
+		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
 			$rights = zbx_toHash($usrgrp['rights'], 'id');
@@ -99,12 +99,12 @@ function inheritPermissions($groupid, $name) {
 				}
 			}
 
-			$upd_usergrps[] = [
+			$upd_usrgrps[] = [
 				'usrgrpid' => $usrgrp['usrgrpid'],
 				'rights' => $rights
 			];
 		}
 
-		API::UserGroup()->update($upd_usergrps);
+		API::UserGroup()->update($upd_usrgrps);
 	}
 }
