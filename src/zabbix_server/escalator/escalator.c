@@ -687,6 +687,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
+	int			message_type = (r_event != NULL ?
+					MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -787,8 +789,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, zbx
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, (NULL != r_event ? r_event : event), NULL, NULL, NULL,
-					NULL, NULL, NULL, &script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, &script.command, message_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)

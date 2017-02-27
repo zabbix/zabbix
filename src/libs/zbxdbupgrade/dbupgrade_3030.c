@@ -297,10 +297,17 @@ static int	DBpatch_3030024(void)
 
 static int	DBpatch_3030025(void)
 {
-	return DBcreate_index("alerts", "p_eventid_7", "p_eventid", 0);
+	const ZBX_FIELD	field = {"p_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("alerts", 5, &field);
 }
 
 static int	DBpatch_3030026(void)
+{
+	return DBcreate_index("alerts", "alerts_7", "p_eventid", 0);
+}
+
+static int	DBpatch_3030027(void)
 {
 	int			ret = FAIL;
 	DB_ROW			row;
@@ -385,5 +392,6 @@ DBPATCH_ADD(3030023, 0, 0)
 DBPATCH_ADD(3030024, 0, 1)
 DBPATCH_ADD(3030025, 0, 1)
 DBPATCH_ADD(3030026, 0, 1)
+DBPATCH_ADD(3030027, 0, 1)
 
 DBPATCH_END()
