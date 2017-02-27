@@ -51,20 +51,19 @@ class CTimePeriodsParser extends CParser {
 
 		$periods = [];
 		$p = $pos;
+		$offset = 0;
 
-		while (isset($source[$p])) {
-			if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
+		while (isset($source[$p + $offset])) {
+			if ($this->time_period_parser->parse($source, $p + $offset) == self::PARSE_FAIL) {
 				break;
 			}
-			$p += $this->time_period_parser->getLength();
+			$p += $offset + $this->time_period_parser->getLength();
 			$periods[] = $this->time_period_parser->getMatch();
 
-			if (isset($source[$p])) {
-				if ($source[$p] !== ';') {
-					break;
-				}
-				$p++;
+			if (isset($source[$p]) && $source[$p] !== ';') {
+				break;
 			}
+			$offset = 1;
 		}
 
 		if ($p == $pos || isset($source[$p])) {
