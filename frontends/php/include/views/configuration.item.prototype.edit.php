@@ -458,7 +458,7 @@ $preprocessing->addRow(
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))
-	->addRow(_('Preprocessing'), $preprocessing);
+	->addRow(_('Preprocessing steps'), $preprocessing);
 
 // append tabs to form
 $itemTab = (new CTabView())
