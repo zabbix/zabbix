@@ -290,7 +290,7 @@ static int	http_variable_urldecode(const char *source, char **result)
  * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
  ******************************************************************************/
-int	http_substitute_variables(zbx_httptest_t *httptest, char **data)
+int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
 	const char	*__function_name = "http_substitute_variables";
 	char		replace_char, *substitute;
