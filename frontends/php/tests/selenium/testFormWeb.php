@@ -479,7 +479,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestTextPresent('Variables');
 		$this->zbxTestAssertVisibleId('variables');
-		$this->zbxTestAssertAttribute("//textarea[@id='variables']", 'rows', 7);
+		$this->zbxTestAssertAttribute("//input[@id='pair_name_1']", 'maxlength', 255);
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
@@ -983,7 +983,7 @@ class testFormWeb extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -just numbers',
-					'variables' => '1234567890',
+					'variables' => '{1234567890}',
 					'add_step' => [
 						['step' => 'Variables -just numbers']
 					]
@@ -994,7 +994,7 @@ class testFormWeb extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -symbols',
-					'variables' => '!@#$%^&*()_+{}:"|<>?,./',
+					'variables' => '{!@#$%^&*()_+:"|<>?,./}',
 					'add_step' => [
 						['step' => 'Variables -symbols']
 					]
@@ -1456,7 +1456,7 @@ class testFormWeb extends CWebTest {
 		}
 
 		if (isset($data['variables'])) {
-			$this->zbxTestInputType('variables', $data['variables']);
+			$this->zbxTestInputType('pair_name_1', $data['variables']);
 		}
 
 		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
