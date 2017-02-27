@@ -290,24 +290,45 @@ static int	DBpatch_3030023(void)
 
 static int	DBpatch_3030024(void)
 {
+	const ZBX_FIELD	field = {"hk_events_internal", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030025(void)
+{
+	const ZBX_FIELD	field = {"hk_events_discovery", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030026(void)
+{
+	const ZBX_FIELD	field = {"hk_events_autoreg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030027(void)
+{
 	const ZBX_FIELD field = {"p_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_field("alerts", &field);
 }
 
-static int	DBpatch_3030025(void)
+static int	DBpatch_3030028(void)
 {
 	const ZBX_FIELD	field = {"p_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("alerts", 5, &field);
 }
 
-static int	DBpatch_3030026(void)
+static int	DBpatch_3030029(void)
 {
 	return DBcreate_index("alerts", "alerts_7", "p_eventid", 0);
 }
 
-static int	DBpatch_3030027(void)
+static int	DBpatch_3030030(void)
 {
 	int			ret = FAIL;
 	DB_ROW			row;
@@ -393,5 +414,8 @@ DBPATCH_ADD(3030024, 0, 1)
 DBPATCH_ADD(3030025, 0, 1)
 DBPATCH_ADD(3030026, 0, 1)
 DBPATCH_ADD(3030027, 0, 1)
+DBPATCH_ADD(3030028, 0, 1)
+DBPATCH_ADD(3030029, 0, 1)
+DBPATCH_ADD(3030030, 0, 1)
 
 DBPATCH_END()

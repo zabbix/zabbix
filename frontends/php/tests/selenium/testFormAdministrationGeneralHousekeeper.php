@@ -45,19 +45,19 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestTextPresent('Internal data storage period (in days)');
 		$this->zbxTestAssertElementPresentId('hk_events_internal');
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "value", 1);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_internal'][@disabled]");
 
 		$this->zbxTestTextPresent('Network discovery data storage period (in days)');
 		$this->zbxTestAssertElementPresentId('hk_events_discovery');
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", 1);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
 
 		$this->zbxTestTextPresent('Auto-registration data storage period (in days)');
 		$this->zbxTestAssertElementPresentId('hk_events_autoreg');
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 5);
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", 365);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", 1);
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_autoreg'][@disabled]");
 
 		$this->zbxTestCheckboxSelect('hk_events_mode', false);
@@ -66,9 +66,9 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_events_autoreg'][@disabled]");
 
-		// IT services
+		// Services
 
-		$this->zbxTestTextPresent('IT services');
+		$this->zbxTestTextPresent('Services');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->zbxTestAssertElementPresentId('hk_services_mode');
 		$this->assertTrue($this->zbxTestCheckboxSelected('hk_services_mode'));
@@ -246,7 +246,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 						'Incorrect value "0" for "Internal event and alert data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Network discovery event and alert data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Auto-registration event and alert data storage period" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "IT service data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Service data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Audit data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "User session data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "-1" for "History data storage period" field: must be between 0 and 99999.',
@@ -260,9 +260,9 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'resetDefaults' => true,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 365,
-					'hk_events_internal' => 365,
-					'hk_events_discovery' => 365,
-					'hk_events_autoreg' => 365,
+					'hk_events_internal' => 1,
+					'hk_events_discovery' => 1,
+					'hk_events_autoreg' => 1,
 					'hk_services_mode' => true,
 					'hk_services' => 365,
 					'hk_audit_mode' => true,
@@ -311,7 +311,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 				$this->zbxTestInputTypeOverwrite('hk_events_autoreg', $data['hk_events_autoreg']);
 			}
 
-			// IT services
+			// Services
 
 			if (isset($data['hk_services_mode'])) {
 				$this->zbxTestCheckboxSelect('hk_services_mode', $data['hk_services_mode']);
@@ -408,7 +408,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 				$this->zbxTestAssertElementValue('hk_events_autoreg', $data['hk_events_autoreg']);
 			}
 
-			// IT services
+			// Services
 
 			if (isset($data['hk_services_mode'])) {
 				$this->assertEquals($this->zbxTestCheckboxSelected('hk_services_mode'), $data['hk_services_mode']);
