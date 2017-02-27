@@ -39,6 +39,13 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 3.2.4
 
 New features:
@@ -371,6 +378,13 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.9rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 3.0.9rc1
