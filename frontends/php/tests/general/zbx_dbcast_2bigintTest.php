@@ -97,19 +97,4 @@ class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
 
 		$DB = $oldDB;
 	}
-
-	/**
-	 * @dataProvider provider
-	 */
-	public function test_sqlite($field) {
-		global $DB;
-
-		$oldDB = $DB;
-
-		$DB['TYPE'] = ZBX_DB_SQLITE3;
-
-		$this->assertEquals('CAST('.$field.' AS BIGINT)', zbx_dbcast_2bigint($field));
-
-		$DB = $oldDB;
-	}
 }
