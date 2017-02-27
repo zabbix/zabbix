@@ -1276,9 +1276,9 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 			/* set default housekeeper configuration */
 			config->config->hk.events_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.events_trigger = 365;
-			config->config->hk.events_internal = 365;
-			config->config->hk.events_autoreg = 365;
-			config->config->hk.events_discovery = 365;
+			config->config->hk.events_internal = 1;
+			config->config->hk.events_autoreg = 1;
+			config->config->hk.events_discovery = 1;
 
 			config->config->hk.audit_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.audit = 365;
