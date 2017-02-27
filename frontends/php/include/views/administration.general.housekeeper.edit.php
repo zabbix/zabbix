@@ -59,7 +59,7 @@ $houseKeeperTab = (new CFormList())
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
 	->addRow(null)
-	->addRow(new CTag('h4', true, _('IT services')))
+	->addRow(new CTag('h4', true, _('Services')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
 		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)

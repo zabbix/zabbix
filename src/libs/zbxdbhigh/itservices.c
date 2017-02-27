@@ -40,7 +40,7 @@ typedef struct
 }
 zbx_status_update_t;
 
-/* IT service node */
+/* Service node */
 typedef struct
 {
 	/* service id */
@@ -68,7 +68,7 @@ typedef struct
 }
 zbx_itservice_index_t;
 
-/* a set of IT services used during update session                          */
+/* a set of services used during update session                          */
 /*                                                                          */
 /* All services are stored into hashset accessed by serviceid. The services */
 /* also are indexed by triggerid.                                           */
@@ -87,7 +87,7 @@ zbx_itservice_index_t;
 /*                                                                          */
 typedef struct
 {
-	/* loaded IT services */
+	/* loaded services */
 	zbx_hashset_t	itservices;
 	/* service index by triggerid */
 	zbx_hashset_t	index;
@@ -98,7 +98,7 @@ zbx_itservices_t;
  *                                                                            *
  * Function: its_itservices_init                                              *
  *                                                                            *
- * Purpose: initializes IT services data set to store services during update  *
+ * Purpose: initializes services data set to store services during update     *
  *          session                                                           *
  *                                                                            *
  * Parameters: set   - [IN] the data set to initialize                        *
@@ -114,7 +114,7 @@ static void	its_itservices_init(zbx_itservices_t *itservices)
  *                                                                            *
  * Function: its_itservices_clean                                             *
  *                                                                            *
- * Purpose: cleans IT services data set by releasing allocated memory         *
+ * Purpose: cleans services data set by releasing allocated memory            *
  *                                                                            *
  * Parameters: set   - [IN] the data set to clean                             *
  *                                                                            *
@@ -147,15 +147,15 @@ static void	its_itservices_clean(zbx_itservices_t *itservices)
  *                                                                            *
  * Function: its_itservice_create                                             *
  *                                                                            *
- * Purpose: creates a new IT service node                                     *
+ * Purpose: creates a new service node                                        *
  *                                                                            *
- * Parameters: itservices  - [IN] the IT services data                        *
+ * Parameters: itservices  - [IN] the services data                           *
  *             serviceid   - [IN] the service id                              *
  *             algorithm   - [IN] the service status calculation mode         *
  *             triggerid   - [IN] the source trigger id for leaf nodes        *
  *             status      - [IN] the initial service status                  *
  *                                                                            *
- * Return value: the created IT service node                                  *
+ * Return value: the created service node                                     *
  *                                                                            *
  ******************************************************************************/
 static zbx_itservice_t	*its_itservice_create(zbx_itservices_t *itservices, zbx_uint64_t serviceid,
@@ -222,7 +222,7 @@ static void	zbx_status_update_free(zbx_status_update_t *update)
  *                                                                            *
  * Purpose: loads all missing children of the specified services              *
  *                                                                            *
- * Parameters: itservices   - [IN] the IT services data                       *
+ * Parameters: itservices   - [IN] the services data                          *
  *                                                                            *
  ******************************************************************************/
 static void	its_itservices_load_children(zbx_itservices_t *itservices)
@@ -299,7 +299,7 @@ out:
  * Purpose: recursively loads parent nodes of the specified service until the *
  *          root node                                                         *
  *                                                                            *
- * Parameters: itservices   - [IN] the IT services data                       *
+ * Parameters: itservices   - [IN] the services data                          *
  *             serviceids   - [IN] a vector containing ids of services to     *
  *                                 load parents                               *
  *                                                                            *
@@ -372,7 +372,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
  * Purpose: loads services that might be affected by the specified triggerid  *
  *          or are required to calculate status of loaded services            *
  *                                                                            *
- * Parameters: itservices - [IN] the IT services data                         *
+ * Parameters: itservices - [IN] the services data                            *
  *             triggerids - [IN] the sorted list of trigger ids               *
  *                                                                            *
  ******************************************************************************/
@@ -509,7 +509,7 @@ static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_st
  * Purpose: writes service status changes and generated service alarms into   *
  *          database                                                          *
  *                                                                            *
- * Parameters: itservices - [IN] the IT services data                         *
+ * Parameters: itservices - [IN] the services data                            *
  *             alarms     - [IN] the service alarms update queue              *
  *                                                                            *
  * Return value: SUCCEED - the data was written successfully                  *
@@ -711,9 +711,9 @@ out:
  *                                                                            *
  * Function: DBupdate_itservices                                              *
  *                                                                            *
- * Purpose: updates IT services by applying event list                        *
+ * Purpose: updates services by applying event list                           *
  *                                                                            *
- * Return value: SUCCEED - the IT services were updated successfully          *
+ * Return value: SUCCEED - the services were updated successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -815,7 +815,7 @@ void	zbx_create_itservices_lock()
 {
 	if (FAIL == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
 	{
-		zbx_error("cannot create mutex for IT services");
+		zbx_error("cannot create mutex for services");
 		exit(EXIT_FAILURE);
 	}
 }

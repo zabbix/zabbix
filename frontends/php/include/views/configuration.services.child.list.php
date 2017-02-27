@@ -21,7 +21,7 @@
 
 include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
-$servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
+$servicesChildWidget = (new CWidget())->setTitle(_('Service dependencies'));
 
 // create form
 $servicesChildForm = (new CForm())->setName('servicesForm');

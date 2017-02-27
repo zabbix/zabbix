@@ -47,7 +47,7 @@ class testGeneric extends CWebTest {
 			['slides.php',						'Configuration of slide shows'],
 			['zabbix.php?action=map.view',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.view',					'Status of discovery'],
-			['srv_status.php',					'IT services [refreshed every 30 sec.]'],
+			['srv_status.php',					'Services [refreshed every 30 sec.]'],
 
 			// inventory
 			['hostinventoriesoverview.php',	'Host inventory overview'],
@@ -81,7 +81,7 @@ class testGeneric extends CWebTest {
 			['slideconf.php',					'Configuration of slide shows'],
 			['sysmaps.php',					'Configuration of network maps'],
 			['discoveryconf.php',				'Configuration of discovery rules'],
-			['services.php',					'Configuration of IT services'],
+			['services.php',					'Configuration of services'],
 
 			// Administration
 			['adm.gui.php',					'Configuration of GUI'],
