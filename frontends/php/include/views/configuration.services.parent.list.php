@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('IT service parent'));
+$widget = (new CWidget())->setTitle(_('Service parent'));
 
 // create form
 $servicesParentForm = (new CForm())

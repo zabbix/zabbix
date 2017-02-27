@@ -108,7 +108,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'srv_status.php',
 					'active_if' => ['report.services'],
-					'label' => _('IT services'),
+					'label' => _('Services'),
 					'sub_pages' => ['chart5.php']
 				],
 				[
@@ -238,7 +238,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'services.php',
-					'label' => _('IT services')
+					'label' => _('Services')
 				]
 			]
 		],

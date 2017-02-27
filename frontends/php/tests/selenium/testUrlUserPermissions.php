@@ -235,8 +235,8 @@ class testUrlUserPermissions extends CWebTest {
 			]],
 			[[
 				'url' => 'srv_status.php',
-				'title' =>	'IT services [refreshed every 30 sec.]',
-				'header' =>	'IT services',
+				'title' =>	'Services [refreshed every 30 sec.]',
+				'header' =>	'Services',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -544,8 +544,8 @@ class testUrlUserPermissions extends CWebTest {
 			]],
 			[[
 				'url' => 'services.php',
-				'title' =>	'Configuration of IT services',
-				'header' => 'IT services',
+				'title' =>	'Configuration of services',
+				'header' => 'Services',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
