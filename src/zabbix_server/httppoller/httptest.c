@@ -879,6 +879,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		zbx_strncpy_alloc(&encoded_url, &alloc_len, &offset, url, domain - url);
 		/* domain */
 		zbx_strcpy_alloc(&encoded_url, &alloc_len, &offset, encoded_domain);
+		zbx_free(encoded_domain);
 
 		if ('\0' != delimiter)
 		{
