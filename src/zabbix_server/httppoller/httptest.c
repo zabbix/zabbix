@@ -849,6 +849,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		domain++;
 
 	tmp = domain;
+
 	while ('\0' != *tmp && ':' != *tmp && '/' != *tmp)
 	{
 		if (0 != ((*tmp) & 0x80))
