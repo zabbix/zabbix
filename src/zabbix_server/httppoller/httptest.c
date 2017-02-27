@@ -639,11 +639,11 @@ out:
  ******************************************************************************/
 static int	punycode_encode(const char *text, char **output)
 {
-	int ret = FAIL;
-	const size_t length = 2048;
-	char buffer[length];
-	size_t offset = 0, size = 0;
-	uint32_t n, tmp, count = 0, *codepoints;
+	int		ret = FAIL;
+	const size_t	length = 2048;
+	char		buffer[length];
+	size_t		offset = 0, size = 0;
+	uint32_t	n, tmp, count = 0, *codepoints;
 
 	zbx_free(*output);
 	codepoints = zbx_malloc(NULL, strlen(text) * sizeof(uint32_t));
@@ -727,11 +727,11 @@ out:
  ******************************************************************************/
 static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 {
-	int			p, type, ansi = 1, ret = SUCCEED;
+	int			type, ansi = 1, ret = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
 	size_t 			alloc_len = 0, offset;
-	zbx_ptr_pair_t		pair = {NULL, NULL};
+	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers, query_fields, post_fields;
 	char			*key, *value, *url = NULL, query_delimiter = '?', *domain, *tmp;
 
@@ -817,7 +817,9 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 
 	/* URL is created from httpstep->httpstep->url, query_fields and fragment */
 	zbx_strcpy_alloc(&url, &alloc_len, &offset, httpstep->httpstep->url);
+
 	value = strchr(url, '#');
+
 	if (NULL != value)
 	{
 		/* URL contains fragment delimiter, so it must be dropped */
@@ -857,10 +859,10 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	if (0 == ansi)
 	{
 		/* non-ansi URL, conversion to the punicode is needed */
-		char *rest = NULL, *encoded_url = NULL, *encoded_domain = NULL, delimiter;
-		size_t 	encoded_len = 0, encoded_offset;
+		char	*rest = NULL, *encoded_url = NULL, *encoded_domain = NULL, delimiter;
 
 		delimiter = *tmp;
+
 		if ('\0' != delimiter)
 		{
 			rest = tmp + 1;
@@ -900,9 +902,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	else
 		httpstep->posts = httpstep->httpstep->posts; /* post data in raw format */
 
-	httpstep->headers = NULL;
 	httpstep_pairs_join(&httpstep->headers, &alloc_len, &offset, ":", "\r\n", &headers);
-
 out:
 	httppairs_free(&headers);
 	httppairs_free(&query_fields);
