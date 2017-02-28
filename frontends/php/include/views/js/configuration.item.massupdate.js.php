@@ -45,11 +45,8 @@
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			$preproc_types_cbbox,
-			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-				->setAttribute('placeholder', _('number')),
-			(new CTextBox('preprocessing[#{rowNum}][params][1]'))
-				->setAttribute('placeholder', _('output'))
-				->addStyle('display: none;'),
+			(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('number')),
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', _('output')),
 			(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
