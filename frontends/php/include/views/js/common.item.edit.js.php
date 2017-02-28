@@ -33,7 +33,7 @@
 			$preproc_types[$key] = new COptGroup($preproc_type['label']);
 
 			foreach ($preproc_type['values'] as $value => $label) {
-				$preproc_types[$key]->addItem(new CComboItem($value, $label, ($value == $step['type'])));
+				$preproc_types[$key]->addItem(new CComboItem($value, $label));
 			}
 		}
 
