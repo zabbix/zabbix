@@ -518,7 +518,7 @@ INDEX		|1		|actionid
 
 TABLE|config|configid|ZBX_DATA
 FIELD		|configid	|t_id		|	|NOT NULL	|0
-FIELD		|refresh_unsupported|t_varchar(32)|'600s'	|NOT NULL	|ZBX_PROXY
+FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
