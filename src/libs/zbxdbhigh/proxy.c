@@ -489,7 +489,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",config r where t.groupid=r.discovery_groupid");
 	}
-	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
+	else if (SUCCEED == str_in_list("httptest,httptest_field,httptestitem,httpstep", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -498,7 +498,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.httptestid",
 				httptests->values, httptests->values_num);
 	}
-	else if (0 == strcmp(table->table, "httpstepitem"))
+	else if (SUCCEED == str_in_list("httpstepitem,httpstep_field", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -679,8 +679,10 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"config",
 		"httptest",
 		"httptestitem",
+		"httptest_field",
 		"httpstep",
 		"httpstepitem",
+		"httpstep_field",
 		NULL
 	};
 
