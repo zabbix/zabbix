@@ -311,7 +311,7 @@ static int	DBpatch_3030026(void)
 
 static int	DBpatch_3030027(void)
 {
-	const ZBX_FIELD field = {"p_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"p_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("alerts", &field);
 }
@@ -328,6 +328,16 @@ static int	DBpatch_3030029(void)
 	return DBcreate_index("alerts", "alerts_7", "p_eventid", 0);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: This procedure fills in field 'p_eventid' for all recovery       *
+ *           actions. 'p_eventid' value is defined as per last problematic    *
+ *           event, that was closed by correct recovery event.                *
+ *           This is done because the relation beetwen ecovery alerts and     *
+ *           this method is most successful for updating zabbix 3.0 to latest *
+ *           versions.                                                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBpatch_3030030(void)
 {
 	int			ret = FAIL;
@@ -336,11 +346,6 @@ static int	DBpatch_3030030(void)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		prev_eventid = 0, curr_eventid;
-
-	/* This procedure fills in field 'p_eventid' for all recovery actions. 'p_eventid' value is defined as per last
-	problematic event, that was closed by currect recovery event. This is done because the relation beetwen
-	recovery alerts and problem events is partially missing and this method is most successful for updating
-	zabbix 3.0 to latest versions. */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
