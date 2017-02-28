@@ -1,6 +1,7 @@
 Changes for 3.3.0
 
 New features:
+..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
 ..F....... [ZBXNEXT-3660] renamed "IT services" to "Services" (Ivo)
 ....I..PS. [ZBXNEXT-3568] decreased internal, discovery and auto registration default data storage period to 1 day (vso)
 ..F.I..... [ZBXNEXT-3679] implemented a new design for Dashboard page (Pavel, Sasha)
