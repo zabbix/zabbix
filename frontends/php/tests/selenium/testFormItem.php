@@ -2365,7 +2365,7 @@ class testFormItem extends CWebTest {
 					'name' => 'Item left trim',
 					'key' => 'item-empty-left-trim',
 					'preprocessing' => [
-						['type' => 'Left trim ', 'params' => ''],
+						['type' => 'Left trim', 'params' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -2422,8 +2422,8 @@ class testFormItem extends CWebTest {
 					'name' => 'Item two delta',
 					'key' => 'item-two-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta']
+						['type' => 'Simple change'],
+						['type' => 'Simple change']
 					],
 					'error' => 'Only one "Delta" step is allowed.'
 				]
@@ -2434,8 +2434,8 @@ class testFormItem extends CWebTest {
 					'name' => 'Item two delta per second',
 					'key' => 'item-two-delta-per-second',
 					'preprocessing' => [
-						['type' => 'Delta per second'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second'],
+						['type' => 'Change per second']
 					],
 					'error' => 'Only one "Delta" step is allowed.'
 				]
@@ -2446,8 +2446,8 @@ class testFormItem extends CWebTest {
 					'name' => 'Item two different delta',
 					'key' => 'item-two--different-delta',
 					'preprocessing' => [
-						['type' => 'Delta'],
-						['type' => 'Delta per second']
+						['type' => 'Simple change'],
+						['type' => 'Change per second']
 					],
 					'error' => 'Only one "Delta" step is allowed.'
 				]
@@ -2459,14 +2459,14 @@ class testFormItem extends CWebTest {
 					'key' => 'item.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
 						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta']
+						['type' => 'Simple change']
 					]
 				]
 			],
@@ -2477,7 +2477,7 @@ class testFormItem extends CWebTest {
 					'key' => 'item.symbols.preprocessing',
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim ', 'params' => '2b!@#$%^&*()-='],
+						['type' => 'Left trim', 'params' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'params' => '4e+10'],
 						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
@@ -2492,8 +2492,8 @@ class testFormItem extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Right trim', 'params' => 'abc'],
 						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim ', 'params' => 'def'],
-						['type' => 'Left trim ', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
+						['type' => 'Left trim', 'params' => 'def'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Trim', 'params' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'params' => '123'],
@@ -2506,7 +2506,7 @@ class testFormItem extends CWebTest {
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Delta per second']
+						['type' => 'Change per second']
 					]
 				]
 			]
