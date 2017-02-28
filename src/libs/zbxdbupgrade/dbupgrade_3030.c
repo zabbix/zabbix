@@ -283,7 +283,7 @@ static int	DBpatch_3030023(void)
 
 static void	DBpatch_conv_day(int *value, char *suffix)
 {
-	if (25 * 365 < *value)
+	if (25 * 365 <= *value)
 	{
 		*value = 25 * 365;
 		*suffix = 'd';
@@ -309,6 +309,17 @@ static void	DBpatch_conv_sec(int *value, char *suffix)
 	}
 
 	*suffix = suffixes[factor - factors];
+}
+
+static void	DBpatch_conv_sec_limit_1w(int *value, char *suffix)
+{
+	if (7 * 24 * 60 * 60 <= *value)
+	{
+		*value = 1;
+		*suffix = 'w';
+	}
+	else
+		DBpatch_conv_sec(value, suffix);
 }
 
 typedef struct
@@ -686,7 +697,7 @@ static int	DBpatch_3030053(void)
 
 static int	DBpatch_3030054(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
 
 	return DBpatch_table_convert("actions", "actionid", field_convs);
 }
@@ -707,7 +718,7 @@ static int	DBpatch_3030056(void)
 
 static int	DBpatch_3030057(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
 
 	return DBpatch_table_convert("operations", "operationid", field_convs);
 }
