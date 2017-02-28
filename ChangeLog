@@ -1,6 +1,8 @@
 Changes for 3.3.0
 
 New features:
+..F....... [ZBXNEXT-3660] renamed "IT services" to "Services" (Ivo)
+....I..PS. [ZBXNEXT-3568] decreased internal, discovery and auto registration default data storage period to 1 day (vso)
 ..F.I..... [ZBXNEXT-3679] implemented a new design for Dashboard page (Pavel, Sasha)
 ....I..PS. [ZBXNEXT-3386] added IPMI manager and reworked IPMI pollers to avoid connecting to one host from multiple pollers (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
@@ -29,6 +31,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+........S. [ZBX-11805] fixed aggregate checks log messages formats (abs)
 A.F.....S. [ZBX-11470] fixed unary minus and prefix extraction for trigger expression references; optimized simple macro and macro function calculation (gleb, vso)
 ..F....PS. [ZBX-7015] forced setting UTF-8 character set for connections to Oracle database (gleb)
 ..F....... [ZBX-11371] prevented executing client side script by changing value of $ZBX_SERVER_NAME from setup.php page (Cemeris)
@@ -36,14 +39,32 @@ A......... [ZBX-5116] prevented escaping forward slashes while encoding API resp
 .......PS. [ZBX-11036] fixed server not to synchronize IPMI configuration for new hosts without IPMI (vso)
 
 --------------------------------------------------------------------------------
+Changes for 3.2.5rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
+.......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
+
+--------------------------------------------------------------------------------
+Changes for 3.2.4
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Japanese, Polish, Portuguese (Brazil) translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.2.4rc1
 
 New features:
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
 .......PS. [ZBXNEXT-3681] improved bulk inserts for Oracle database backend (wiper)
 ........S. [ZBXNEXT-3669] optimized trigger expression batch processing to avoid recalculation of identical functions (wiper)
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+...G...... [ZBX-11568] fixed wrong number round for cpu statistics (abs)
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 ........S. [ZBX-11740] fixed empty value handling in event correlation on oracle databases (wiper)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
@@ -67,7 +88,7 @@ A......... [ZBX-11545] fixed dependency validation and update when trigger expre
 .......PS. [ZBX-11630] added escaping '"', ''', '&', '<' and '>' characters in SOAP XML for VMware requests (Sergejs)
 .......PS. [ZBX-11525] ensured unique value timestamps (clock, ns) from active agents and senders (dimir)
 ........S. [ZBX-11558] fixed removing trigger dependencies for triggers that are created from LLD prototypes (viktors)
-..F....... [ZBX-11385] fixed interfaces displaying in host inventory page (Oleg, Pavel)
+..F....... [ZBX-11385] fixed interface displaying in host inventory page (Oleg, Pavel)
 ...G...PS. [ZBX-11101] fixed potential crash in case of failure in zbx_tls_connect() with mbed TLS (gleb)
 ...G...PS. [ZBX-11101] fixed compilation warnings regarding gnutls_transport_set_ptr() with GnuTLS (asaveljevs, gleb)
 ...G...PS. [ZBX-11101] fixed certificates with empty issuer and subject fields being rejected with OpenSSL (asaveljevs, gleb)
@@ -361,6 +382,21 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.9rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
+.......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.8
+
+New features:
+A.F....... [ZBX-1357] updated Czech, French, Japanese, Polish, Portuguese (Brazil) translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.8rc1
 
 New features:
@@ -369,6 +405,9 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+...G...... [ZBX-11568] fixed wrong number round for cpu statistics (abs)
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 ..F....... [ZBX-11365] fixed button and multiselect positioning in action operations edit form (Ivo, Pavel)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ........S. [ZBX-11703] removed possibility to execute commit without transaction in processing LLD rules (Sergejs)
@@ -386,7 +425,7 @@ A.F....... [ZBX-11482] improved performance for getting last value of web items 
 .......PS. [ZBX-11630] added escaping '"', ''', '&', '<' and '>' characters in SOAP XML for VMware requests (Sergejs)
 .......PS. [ZBX-11525] ensured unique value timestamps (clock, ns) from active agents and senders (dimir)
 ........S. [ZBX-11558] fixed removing trigger dependencies for triggers that are created from LLD prototypes (viktors)
-..F....... [ZBX-11385] fixed interfaces displaying in host inventory page (Oleg, Pavel)
+..F....... [ZBX-11385] fixed interface displaying in host inventory page (Oleg, Pavel)
 ...G...PS. [ZBX-11101] fixed potential crash in case of failure in zbx_tls_connect() with mbed TLS (gleb)
 ...G...PS. [ZBX-11101] fixed compilation warnings regarding gnutls_transport_set_ptr() with GnuTLS (asaveljevs, gleb)
 ...G...PS. [ZBX-11101] fixed certificates with empty issuer and subject fields being rejected with OpenSSL (asaveljevs, gleb)
@@ -1977,11 +2016,25 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.17rc1
+Changes for 2.2.18rc1
 
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.17
+
+New features:
+A.F....... [ZBX-1357] updated Czech, French, Italian, Japanese, Korean, Polish, Portuguese (Brazil) translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.17rc1
+
+Bug fixes:
+........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
+.......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)
 .......PS. [ZBX-11655] fixed Oracle and MySQL column limit calculation when using UTF-8 (vso)
 ...G...... [ZBX-11719] fixed reading files with vfs.file.regmatch[] and vfs.file.cksum[] keys on windows (Sergejs)
 .......PS. [ZBX-11587] fixed handling database failure during transaction commit (viktors)

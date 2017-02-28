@@ -537,13 +537,13 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 -- delete maint period
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (544, 1, 1411543800, 2, 27, 'Id [3] Name [Maintenance2]', '192.168.3.32', 0, '');
 
--- add IT service
+-- add service
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (545, 1, 1411543800, 0, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
--- update IT service
+-- update service
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (546, 1, 1411543800, 1, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
--- delete IT service
+-- delete service
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (547, 1, 1411543800, 2, 18, 'Name [service1] id [1]', '192.168.3.32', 0, '');
 
 -- add DRule
@@ -1390,6 +1390,13 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'sysmapid',1);
 INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (2,1,'web.favorite.graphids',519,'graphid',1);
 INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (3,1,'web.favorite.screenids',16,'screenid',1);
+
+-- testFormAdministrationUserGroups
+INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts');
+INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Selenium script','test',2,14,NULL,'selenium script description');
+UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
