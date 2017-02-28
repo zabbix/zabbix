@@ -161,7 +161,8 @@ static void	its_itservices_clean(zbx_itservices_t *itservices)
 static zbx_itservice_t	*its_itservice_create(zbx_itservices_t *itservices, zbx_uint64_t serviceid,
 		zbx_uint64_t triggerid, int status, int algorithm)
 {
-	zbx_itservice_t		itservice = {serviceid, triggerid, status, status, algorithm}, *pitservice;
+	zbx_itservice_t		itservice = {.serviceid = serviceid, .triggerid = triggerid, .old_status = status,
+				.status = status, .algorithm = algorithm}, *pitservice;
 	zbx_itservice_index_t	*pindex;
 
 	zbx_vector_ptr_create(&itservice.children);
@@ -173,7 +174,7 @@ static zbx_itservice_t	*its_itservice_create(zbx_itservices_t *itservices, zbx_u
 	{
 		if (NULL == (pindex = zbx_hashset_search(&itservices->index, &triggerid)))
 		{
-			zbx_itservice_index_t	index = {triggerid};
+			zbx_itservice_index_t	index = {.triggerid = triggerid};
 
 			zbx_vector_ptr_create(&index.itservices);
 

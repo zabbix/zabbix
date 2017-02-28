@@ -952,7 +952,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		/* items currently being accessed                               */
 		if (0 == item->refcount)
 		{
-			zbx_vc_item_weight_t	weight = {item};
+			zbx_vc_item_weight_t	weight = {.item = item};
 
 			if (0 < item->values_total)
 				weight.weight = (double)item->hits / item->values_total;
@@ -2946,7 +2946,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	{
 		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
-			zbx_vc_item_t   new_item = {itemid, value_type};
+			zbx_vc_item_t   new_item = {.itemid = itemid, .value_type = value_type};
 
 			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;
@@ -3069,7 +3069,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	{
 		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
-			zbx_vc_item_t   new_item = {itemid, value_type};
+			zbx_vc_item_t   new_item = {.itemid = itemid, .value_type = value_type};
 
 			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;

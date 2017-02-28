@@ -141,13 +141,20 @@ zbx_hk_history_rule_t;
 
 /* the history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
-	{"history", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
-	{"history_str", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
-	{"history_log", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
-	{"history_uint", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
-	{"history_text", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
-	{"trends", "trends", &cfg.hk.trends_mode, &cfg.hk.trends_global, &cfg.hk.trends},
-	{"trends_uint","trends", &cfg.hk.trends_mode, &cfg.hk.trends_global, &cfg.hk.trends},
+	{.table = "history",		.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
+	{.table = "history_str",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
+	{.table = "history_log",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
+	{.table = "history_uint",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
+	{.table = "history_text",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history},
+	{.table = "trends",		.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
+			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends},
+	{.table = "trends_uint",	.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
+			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends},
 	{NULL}
 };
 
