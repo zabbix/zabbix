@@ -205,6 +205,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "process_step_data";
@@ -288,7 +289,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#ifdef HAVE_LIBCURL
 static void	add_headers(char *headers, struct curl_slist **headers_slist)
 {
 	char      *p_begin;
@@ -346,15 +346,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	const char	*__function_name = "process_httptest";
 
 	DB_RESULT	result;
-	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
 	char		*err_str = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
-	zbx_httpstat_t	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
+	DB_ROW		row;
+	zbx_httpstat_t	stat;
 	int		err;
 	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
