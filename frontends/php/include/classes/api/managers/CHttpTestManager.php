@@ -329,27 +329,42 @@ class CHttpTestManager {
 	public function link($templateId, $hostIds) {
 		$hostIds = zbx_toArray($hostIds);
 
-		$httpTests = [];
-		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
-				'ht.authentication,ht.http_user,ht.http_password,ht.http_proxy,ht.retries,ht.hostid,ht.templateid,'.
-				'ht.headers,ht.verify_peer,ht.verify_host,ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password'.
-			' FROM httptest ht'.
-			' WHERE ht.hostid='.zbx_dbstr($templateId)
-		);
-		while ($dbHttpTest = DBfetch($dbCursor)) {
-			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
-		}
+		$httpTests = API::HttpTest()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $templateId,
+			'selectSteps' => API_OUTPUT_EXTEND,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.variables,'.
-				'hs.required,hs.status_codes,hs.headers,hs.follow_redirects,hs.retrieve_mode'.
-			' FROM httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', array_keys($httpTests))
-		);
-		while ($dbHttpStep = DBfetch($dbCursor)) {
-			$httpTests[$dbHttpStep['httptestid']]['steps'][] = $dbHttpStep;
+		$presetType = function (&$field, $index, $type) {
+			$field['type'] = $type;
+		};
+
+		$types = [
+			'headers' => HTTPFIELD_TYPE_HEADER,
+			'variables' => HTTPFIELD_TYPE_VARIABLE,
+			'posts' => HTTPFIELD_TYPE_POST,
+			'query_fields' => HTTPFIELD_TYPE_QUERY
+		];
+
+		foreach ($httpTests as &$httpTest) {
+			foreach ($types as $field => $type) {
+				if (array_key_exists($field, $httpTest) && is_array($httpTest[$field])) {
+					array_walk($httpTest[$field], $presetType, $type);
+				}
+			}
+
+			foreach ($httpTest['steps'] as &$httpStep) {
+				foreach ($types as $field => $type) {
+					if (array_key_exists($field, $httpStep) && is_array($httpStep[$field])) {
+						array_walk($httpStep[$field], $presetType, $type);
+					}
+				}
+			}
+			unset($httpStep);
 		}
+		unset($httpTest);
 
 		$this->inherit($httpTests, $hostIds);
 	}
