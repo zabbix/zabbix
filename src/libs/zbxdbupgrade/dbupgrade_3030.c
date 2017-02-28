@@ -645,7 +645,7 @@ static int	DBpatch_3030051(void)
 			DBpatch_conv_day(&value, &suffix);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d%c", value, suffix);
 		}
-		else	/* items.lifetime may be a macro, in such case simply rewrite with max allowed value */
+		else	/* items.lifetime may be a macro, in such case simply overwrite with max allowed value */
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "9125d");	/* 25 * 365 days */
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "' where itemid=%s;\n", row[0]);
@@ -949,6 +949,64 @@ static int	DBpatch_3030087(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_trailing_semicolon_remove(const char *table, const char *recid, const char *field,
+		const char *condition)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	const char	*semicolon;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = FAIL;
+
+	result = DBselect("select %s,%s from %s%s", recid, field, table, condition);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (NULL == (semicolon = strrchr(row[1], ';')) || '\0' != (semicolon + 1))
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='%.*s' where %s=%s;\n",
+				table, field, semicolon - row[1], row[1], recid, row[0]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3030088(void)
+{
+	return DBpatch_trailing_semicolon_remove("config", "configid", "work_period", "");
+}
+
+static int	DBpatch_3030089(void)
+{
+	return DBpatch_trailing_semicolon_remove("media", "mediaid", "period", "");
+}
+
+static int	DBpatch_3030090(void)
+{
+	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", "where conditiontype=6");
+											/* CONDITION_TYPE_TIME_PERIOD */
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -1042,5 +1100,8 @@ DBPATCH_ADD(3030084, 0, 1)
 DBPATCH_ADD(3030085, 0, 1)
 DBPATCH_ADD(3030086, 0, 1)
 DBPATCH_ADD(3030087, 0, 1)
+DBPATCH_ADD(3030088, 0, 1)
+DBPATCH_ADD(3030089, 0, 1)
+DBPATCH_ADD(3030090, 0, 1)
 
 DBPATCH_END()
