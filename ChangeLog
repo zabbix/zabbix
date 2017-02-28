@@ -44,6 +44,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
 .......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
 
 --------------------------------------------------------------------------------
@@ -386,6 +387,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
 .......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
 
 --------------------------------------------------------------------------------
@@ -2019,6 +2021,7 @@ Changes for 2.2.18rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.17
