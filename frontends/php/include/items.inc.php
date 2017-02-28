@@ -1284,31 +1284,86 @@ function getParamFieldLabelByType($itemType) {
 }
 
 /**
- * Get either one or all item pre-processing types.
+ * Get either one or all item preprocessing types. If grouped set to true, returns group labels. Returns empty string if
+ * no specific type is found.
  *
- * @param int $type
+ * Usage examples:
+ *    - get_preprocessing_types()					Returns array as defined.
+ *    - get_preprocessing_types(4)					Returns string: 'Trim'.
+ *    - get_preprocessing_types('wrong')			Returns an empty string: ''.
+ *    - get_preprocessing_types(null, false)		Returns subarrays in one array maintaining index:
+ *														[5] => Regular expression
+ *														[4] => Trim
+ *														[2] => Right trim
+ *														[3] => Left trim
+ *														[1] => Custom multiplier
+ *														[9] => Simple change
+ *														[10] => Speed per second
+ *														[6] => Boolean to decimal
+ *														[7] => Octal to decimal
+ *														[8] => Hexadecimal to decimal
  *
- * @return array
+ * @param int  $type			Item preprocessing type.
+ * @param bool $grouped			Group label flag.
+ *
+ * @return mixed
  */
-function get_preprocessing_types($type = null) {
+function get_preprocessing_types($type = null, $grouped = true) {
 	$types = [
-		ZBX_PREPROC_MULTIPLIER => _('Custom multiplier'),
-		ZBX_PREPROC_RTRIM => _('Right trim'),
-		ZBX_PREPROC_LTRIM => _('Left trim '),
-		ZBX_PREPROC_TRIM => _('Trim'),
-		ZBX_PREPROC_REGSUB => _('Regular expression'),
-		ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
-		ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
-		ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal'),
-		ZBX_PREPROC_DELTA_VALUE => _('Delta'),
-		ZBX_PREPROC_DELTA_SPEED => _('Delta per second')
+		[
+			'label' => _('Text'),
+			'values' => [
+				ZBX_PREPROC_REGSUB => _('Regular expression'),
+				ZBX_PREPROC_TRIM => _('Trim'),
+				ZBX_PREPROC_RTRIM => _('Right trim'),
+				ZBX_PREPROC_LTRIM => _('Left trim')
+			]
+		],
+		[
+			'label' => _('Arithmetic'),
+			'values' => [
+				ZBX_PREPROC_MULTIPLIER => _('Custom multiplier')
+			]
+		],
+		[
+			'label' => _('Delta'),
+			'values' => [
+				ZBX_PREPROC_DELTA_VALUE => _('Simple change'),
+				ZBX_PREPROC_DELTA_SPEED => _('Change per second')
+			]
+		],
+		[
+			'label' => _('Numeral systems'),
+			'values' => [
+				ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
+				ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
+				ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal')
+			]
+		]
 	];
 
-	if ($type !== null && array_key_exists($type, $types)) {
-		return $types[$type];
+	if ($type !== null) {
+		foreach ($types as $groups) {
+			if (array_key_exists($type, $groups['values'])) {
+				return $groups['values'][$type];
+			}
+		}
+
+		return '';
 	}
 	else {
-		return $types;
+		if ($grouped) {
+			return $types;
+		}
+		else {
+			$out = [];
+
+			foreach ($types as $groups) {
+				$out += $groups['values'];
+			}
+
+			return $out;
+		}
 	}
 }
 

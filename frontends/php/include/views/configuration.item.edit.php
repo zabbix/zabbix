@@ -592,6 +592,21 @@ foreach ($data['preprocessing'] as $i => $step) {
 		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
 	}
 
+	$preproc_types = [];
+	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+
+	foreach (get_preprocessing_types() as $key => $preproc_type) {
+		$preproc_types[$key] = new COptGroup($preproc_type['label']);
+
+		foreach ($preproc_type['values'] as $value => $label) {
+			$preproc_types[$key]->addItem(new CComboItem($value, $label, ($value == $step['type'])));
+		}
+	}
+
+	foreach ($preproc_types as $preproc_type) {
+		$preproc_types_cbbox->addItem($preproc_type);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			$readonly
@@ -602,7 +617,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 			$readonly
 				? (new CTextBox('preprocessing['.$i.'][type_name]', get_preprocessing_types($step['type'])))
 						->setReadonly(true)
-				: (new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+				: $preproc_types_cbbox,
 			$params[0],
 			$params[1],
 			$readonly

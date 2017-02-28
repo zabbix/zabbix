@@ -25,14 +25,29 @@
 </script>
 <?php if (!$data['is_discovery_rule']) : ?>
 	<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
-	<?=
-		(new CRow([
+	<?php
+		$preproc_types = [];
+		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+
+		foreach (get_preprocessing_types() as $key => $preproc_type) {
+			$preproc_types[$key] = new COptGroup($preproc_type['label']);
+
+			foreach ($preproc_type['values'] as $value => $label) {
+				$preproc_types[$key]->addItem(new CComboItem($value, $label, ($value == $step['type'])));
+			}
+		}
+
+		foreach ($preproc_types as $preproc_type) {
+			$preproc_types_cbbox->addItem($preproc_type);
+		}
+
+		echo (new CRow([
 			$readonly
 				? null
 				: (new CCol(
 					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CComboBox('preprocessing[#{rowNum}][type]', '', null, get_preprocessing_types())),
+				$preproc_types_cbbox,
 				(new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 					->setAttribute('placeholder', _('number')),
 				(new CTextBox('preprocessing[#{rowNum}][params][1]'))

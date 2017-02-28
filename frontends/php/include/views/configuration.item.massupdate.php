@@ -299,10 +299,25 @@ foreach ($data['preprocessing'] as $i => $step) {
 			break;
 	}
 
+	$preproc_types = [];
+	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+
+	foreach (get_preprocessing_types() as $key => $preproc_type) {
+		$preproc_types[$key] = new COptGroup($preproc_type['label']);
+
+		foreach ($preproc_type['values'] as $value => $label) {
+			$preproc_types[$key]->addItem(new CComboItem($value, $label, ($value == $step['type'])));
+		}
+	}
+
+	foreach ($preproc_types as $preproc_type) {
+		$preproc_types_cbbox->addItem($preproc_type);
+	}
+
 	$preprocessing->addRow(
 		(new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CComboBox('preprocessing['.$i.'][type]', $step['type'], null, get_preprocessing_types())),
+			$preproc_types_cbbox,
 			$params[0],
 			$params[1],
 			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
