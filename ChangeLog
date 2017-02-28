@@ -44,6 +44,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11444] fixed incorrect check for time functions in recovery expressions (abs)
 .......PS. [ZBX-11758] fixed crash in web monitoring when variable is empty or the first step was called regexp function on Solaris (Sergejs)
 .......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
 
