@@ -2267,12 +2267,6 @@ static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size
 
 	while ('\0' != *s && 0 < max_chars)
 	{
-		if ('\r' == *s)
-		{
-			s++;
-			continue;
-		}
-
 		csize = zbx_utf8_char_len(s);
 
 		/* process non-UTF-8 characters as single byte characters */
