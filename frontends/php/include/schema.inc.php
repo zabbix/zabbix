@@ -2307,13 +2307,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '0s',
+				'default' => '600s',
 			],
 			'work_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '1-5,00:00-24:00',
+				'default' => '1-5,09:00-18:00',
 			],
 			'alert_usrgrpid' => [
 				'null' => true,
