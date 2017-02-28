@@ -44,6 +44,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
 
 --------------------------------------------------------------------------------
 Changes for 3.2.4
@@ -385,6 +386,7 @@ Changes for 3.0.9rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-11765] fixed incorrect rollback in process of escalation for DB2 database (Sergejs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.8
@@ -401,6 +403,7 @@ New features:
 ..F.....S. [ZBXNEXT-3572] added option to control amount of queued items (vjaceslavs)
 
 Bug fixes:
+.......PS. [ZBX-11765] added savepoint statement for correct rollback on DB2 (Sergejs)
 ...G...... [ZBX-11568] fixed wrong number round for cpu statistics (abs)
 ........S. [ZBX-11781] fixed potential buffer overflow in the housekeeper process (abs)
 .......PS. [ZBX-10902] fixed wrong averages in web monitoring if a web server doesn't respond to a request (abs)

@@ -217,7 +217,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 {
 	int	keep_from;
 
-	if ((zbx_uint64_t)history * SEC_PER_DAY > now)
+	if ((zbx_uint64_t)history * SEC_PER_DAY > (zbx_uint64_t)now)
 		keep_from = 0;
 	else
 		keep_from = now - history * SEC_PER_DAY;
