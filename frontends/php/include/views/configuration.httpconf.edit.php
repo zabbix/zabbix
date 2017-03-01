@@ -173,7 +173,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['name'] = '';
 	}
 	if (!isset($step['timeout'])) {
-		$step['timeout'] = 15;
+		$step['timeout'] = DB::getDefault('httpstep', 'timeout');
 	}
 	if (!isset($step['url'])) {
 		$step['url'] = '';
@@ -222,7 +222,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			$dragHandler,
 			$numSpan,
 			$name,
-			$step['timeout'].SPACE._('sec'),
+			$step['timeout'],
 			$url,
 			htmlspecialchars($step['required']),
 			$step['status_codes'],

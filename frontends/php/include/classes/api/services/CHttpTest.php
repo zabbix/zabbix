@@ -808,6 +808,14 @@ class CHttpTest extends CApiService {
 
 				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
 			}
+
+			if (array_key_exists('timeout', $step)) {
+				if (!validateTimeUnit($step['timeout'], 0, SEC_PER_HOUR, false, $error, ['usermacros' => true])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'timeout', $error)
+					);
+				}
+			}
 		}
 	}
 
