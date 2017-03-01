@@ -4050,10 +4050,10 @@ httptest_t;
 
 typedef struct
 {
-	zbx_uint64_t	id;
-	int		type;
-	char		*name;
-	char		*value;
+	zbx_uint64_t		id;
+	int			type;
+	char			*name;
+	char			*value;
 }
 httpfield_t;
 
@@ -4109,7 +4109,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[11]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 		zbx_vector_ptr_create(&httptest->fields);
