@@ -960,17 +960,17 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 					"esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL), NULL);
 		}
 
-		if (NULL == r_event)
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
-		}
-		else
+		if (NULL != r_event)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, r_event->eventid, userid,
 					now, mediatypeid, row[1], subject, message, status, perror,
 					escalation->esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
+		}
+		else
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
+					now, mediatypeid, row[1], subject, message, status, perror,
+					escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
 		}
 	}
 
@@ -986,17 +986,17 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
 				(NULL != r_event ? "p_eventid" : NULL), NULL);
 
-		if (NULL == r_event)
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
-					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE, NULL);
-		}
-		else
+		if (NULL != r_event)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, r_event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					escalation->esc_step, event->eventid);
+					escalation->esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
+		}
+		else
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
+					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
+					escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
 		}
 	}
 
