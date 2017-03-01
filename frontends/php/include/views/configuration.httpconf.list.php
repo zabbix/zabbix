@@ -90,8 +90,6 @@ $httpTable = (new CTableInfo())
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $httpTests = $this->data['httpTests'];
 
-$simple_interval_parser = new CSimpleIntervalParser();
-
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
@@ -122,10 +120,6 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 
 			$info_icons[] = makeErrorIcon($errorMessage);
 		}
-	}
-
-	if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
-		$httpTest['delay'] = convertUnitsS(timeUnitToSeconds($httpTest['delay']));
 	}
 
 	$httpTable->addRow([

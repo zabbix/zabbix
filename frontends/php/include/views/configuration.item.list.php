@@ -77,7 +77,6 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 	'sources' => ['expression', 'recovery_expression']
 ]);
 
-$simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 foreach ($this->data['items'] as $item) {
@@ -235,29 +234,16 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = '';
 	}
 
-	if ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-		$item['history'] = convertUnitsS(timeUnitToSeconds($item['history']));
-	}
-
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
-	}
-	else if ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-		$item['trends'] = convertUnitsS(timeUnitToSeconds($item['trends']));
 	}
 
 	// hide zeroes for trapper and SNMP trap items
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 		$item['delay'] = '';
 	}
-	else {
-		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-			$item['delay'] = $update_interval_parser->getDelay();
-
-			if (strpos($item['delay'], '{') === false) {
-				$item['delay'] = convertUnitsS(timeUnitToSeconds($item['delay']));
-			}
-		}
+	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
 	$itemTable->addRow([

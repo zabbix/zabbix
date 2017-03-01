@@ -447,28 +447,26 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $simple_interval_parser = new CSimpleIntervalParser();
 
 foreach ($items as &$item) {
-	if ($item['type'] != ITEM_TYPE_SNMPTRAP && $item['type'] != ITEM_TYPE_TRAPPER) {
-		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-			$delay = $update_interval_parser->getDelay();
-			$item['delay'] = ($delay[0] !== '{')
-				? convertUnitsS(timeUnitToSeconds($delay))
-				: (new CSpan($delay))->addClass(ZBX_STYLE_RED);
-		}
-		else {
+	if ($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER) {
+		$item['delay'] = '';
+	}
+	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+		$item['delay'] = $update_interval_parser->getDelay();
+
+		if ($item['delay'][0] === '{') {
 			$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
 		}
 	}
 	else {
-		$item['delay'] = '';
+		$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
 	}
 
 	if ($config['hk_history_global']) {
 		$history = $config['hk_history'];
-		$item['history'] = convertUnitsS($history);
+		$item['history'] = $history;
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 		$history = timeUnitToSeconds($item['history']);
-		$item['history'] = convertUnitsS($history);
 	}
 	else {
 		$history = 0;
@@ -478,11 +476,10 @@ foreach ($items as &$item) {
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		if ($config['hk_trends_global']) {
 			$trends = $config['hk_trends'];
-			$item['trends'] = convertUnitsS($trends);
+			$item['trends'] = $trends;
 		}
 		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
 			$trends = timeUnitToSeconds($item['trends']);
-			$item['trends'] = convertUnitsS($trends);
 		}
 		else {
 			$trends = 0;

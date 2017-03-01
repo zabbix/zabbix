@@ -55,8 +55,6 @@ $discoveryTable = (new CTableInfo())
 		_('Status')
 	]);
 
-$simple_interval_parser = new CSimpleIntervalParser();
-
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
@@ -70,10 +68,6 @@ foreach ($data['drules'] as $drule) {
 			->addClass(discovery_status2style($drule['status']))
 			->addSID()
 	);
-
-	if ($simple_interval_parser->parse($drule['delay']) == CParser::PARSE_SUCCESS) {
-		$drule['delay'] = convertUnitsS(timeUnitToSeconds($drule['delay']));
-	}
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),

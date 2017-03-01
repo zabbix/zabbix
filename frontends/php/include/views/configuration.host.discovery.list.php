@@ -102,14 +102,8 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
 		$discovery['delay'] = '';
 	}
-	else {
-		if ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
-			$discovery['delay'] = $update_interval_parser->getDelay();
-
-			if (strpos($discovery['delay'], '{') === false) {
-				$discovery['delay'] = convertUnitsS(timeUnitToSeconds($discovery['delay']));
-			}
-		}
+	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
+		$discovery['delay'] = $update_interval_parser->getDelay();
 	}
 
 	$discoveryTable->addRow([
