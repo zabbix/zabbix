@@ -4185,7 +4185,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes"
+				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes,post_type"
 				" from httpstep"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
@@ -4220,6 +4220,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httpstep->posts = zbx_strdup(NULL, row[6]);
 			httpstep->required = zbx_strdup(NULL, row[7]);
 			httpstep->status_codes = zbx_strdup(NULL, row[8]);
+			httpstep->post_type = atoi(row[9]);
 			zbx_vector_ptr_create(&httpstep->httpstepitems);
 			zbx_vector_ptr_create(&httpstep->fields);
 
@@ -4609,8 +4610,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			{
 				httpfield = (httpfield_t *)httptest->fields.values[j];
 
-				zbx_db_insert_add_values(&db_insert_tfield, httptestfieldid, httpfield->type,
-						httpfield->name, httpfield->value);
+				zbx_db_insert_add_values(&db_insert_tfield, httptestfieldid, httptest->httptestid,
+						httpfield->type, httpfield->name, httpfield->value);
 
 				httptestfieldid++;
 			}
@@ -4626,10 +4627,10 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				for (k = 0; k < httpstep->fields.values_num; k++)
 				{
-					httpfield = (httpfield_t *)httpstep->fields.values[j];
+					httpfield = (httpfield_t *)httpstep->fields.values[k];
 
-					zbx_db_insert_add_values(&db_insert_sfield, httpstepfieldid, httpfield->type,
-							httpfield->name, httpfield->value);
+					zbx_db_insert_add_values(&db_insert_sfield, httpstepfieldid, httpstepid,
+							httpfield->type, httpfield->name, httpfield->value);
 
 					httpstepfieldid++;
 				}
@@ -4759,7 +4760,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 
 			for (k = 0; k < httpstep->fields.values_num; k++)
 			{
-				httpfield = (httpfield_t *)httpstep->fields.values[j];
+				httpfield = (httpfield_t *)httpstep->fields.values[k];
 
 				zbx_free(httpfield->name);
 				zbx_free(httpfield->value);
