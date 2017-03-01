@@ -1284,12 +1284,22 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
-	static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
-	const char	*__function_name = "DCsync_config";
-	DB_ROW		row;
-	int		i, found = 1;
+#define SELECTED_FIELD_COUNT	27
 
-#define DEFAULT_REFRESH_UNSUPPORTED	600
+	const char	*__function_name = "DCsync_config";
+	DB_ROW		db_row;
+	const ZBX_TABLE	*config_table;
+	const char	*selected_fields[] = {"refresh_unsupported", "discovery_groupid", "snmptrap_logging",
+					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
+					"severity_name_4", "severity_name_5", "hk_events_mode", "hk_events_trigger",
+					"hk_events_internal", "hk_events_discovery", "hk_events_autoreg",
+					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
+					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
+					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
+					"default_inventory_mode"};	/* sync with DCsync_config_select() */
+	const char	*row[SELECTED_FIELD_COUNT];
+	size_t		i;
+	int		j, found = 1, refresh_unsupported;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1301,138 +1311,120 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		config->config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
 	}
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (db_row = DBfetch(result)))
 	{
+		/* load default config data */
+
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
-		if (0 == found)
-		{
-			/* load default config data */
+		config_table = DBget_table("config");
 
-			*refresh_unsupported_changed = 1;
-
-			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
-			config->config->discovery_groupid = 0;
-			config->config->snmptrap_logging = ZBX_SNMPTRAP_LOGGING_ENABLED;
-			config->config->default_inventory_mode = HOST_INVENTORY_DISABLED;
-
-			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
-				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
-
-			/* set default housekeeper configuration */
-			config->config->hk.events_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.events_trigger = 365 * SEC_PER_DAY;
-			config->config->hk.events_internal = 365 * SEC_PER_DAY;
-			config->config->hk.events_autoreg = 365 * SEC_PER_DAY;
-			config->config->hk.events_discovery = 365 * SEC_PER_DAY;
-
-			config->config->hk.audit_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.audit = 365 * SEC_PER_DAY;
-
-			config->config->hk.services_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.services = 365 * SEC_PER_DAY;
-
-			config->config->hk.sessions_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.sessions = 365 * SEC_PER_DAY;
-
-			config->config->hk.history_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.history_global = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.history = 90 * SEC_PER_DAY;
-
-			config->config->hk.trends_mode = ZBX_HK_OPTION_ENABLED;
-			config->config->hk.trends_global = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.trends = 365 * SEC_PER_DAY;
-		}
+		for (i = 0; i < SELECTED_FIELD_COUNT; i++)
+			row[i] = DBget_field(config_table, selected_fields[i])->default_value;
 	}
 	else
 	{
-		int	refresh_unsupported;
-
-		/* store the config data */
-
-		if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported, ZBX_LENGTH_UNLIMITED))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid unsupported item refresh interval, restoring default");
-			refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
-		}
-
-		if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
-			*refresh_unsupported_changed = 1;
-
-		config->config->refresh_unsupported = refresh_unsupported;
-		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
-		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
-		config->config->default_inventory_mode = atoi(row[26]);
-
-		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
-			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
-
-		/* read housekeeper configuration */
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[9])) &&
-				(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[10]) ||
-				SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[11]) ||
-				SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[12]) ||
-				SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[13])))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
-					" housekeeping will be disabled due to invalid settings");
-			config->config->hk.events_mode = ZBX_HK_OPTION_DISABLED;
-		}
-
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[14])) &&
-				SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[15]))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "IT services data housekeeping will be disabled due to invalid"
-					" settings");
-			config->config->hk.services_mode = ZBX_HK_OPTION_DISABLED;
-		}
-
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[16])) &&
-				SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[17]))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
-					" settings");
-			config->config->hk.audit_mode = ZBX_HK_OPTION_DISABLED;
-		}
-
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[18])) &&
-				SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[19]))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "user sessions data housekeeping will be disabled due to invalid"
-					" settings");
-			config->config->hk.sessions_mode = ZBX_HK_OPTION_DISABLED;
-		}
-
-		config->config->hk.history_mode = atoi(row[20]);
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[21])) &&
-				SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[22]))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
-					" store their history due to invalid global override settings");
-			config->config->hk.history_mode = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
-		}
-
-		config->config->hk.trends_mode = atoi(row[23]);
-		if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
-				SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[25]))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
-					" will store their history due to invalid global override settings");
-			config->config->hk.trends_mode = ZBX_HK_OPTION_DISABLED;
-			config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
-		}
-
-		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
-			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
+		for (i = 0; i < SELECTED_FIELD_COUNT; i++)
+			row[i] = db_row[i];
 	}
+
+	/* store the config data */
+
+	if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported, ZBX_LENGTH_UNLIMITED))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid unsupported item refresh interval, restoring default");
+
+		config_table = DBget_table("config");
+
+		if (SUCCEED != is_time_suffix(DBget_field(config_table, "refresh_unsupported")->default_value,
+				&refresh_unsupported, ZBX_LENGTH_UNLIMITED))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			refresh_unsupported = 0;
+		}
+	}
+
+	if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
+		*refresh_unsupported_changed = 1;
+
+	config->config->refresh_unsupported = refresh_unsupported;
+	ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
+	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+	config->config->default_inventory_mode = atoi(row[26]);
+
+	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
+		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
+
+#if TRIGGER_SEVERITY_COUNT != 6
+#	error "row indexes below are based on assumption of six trigger severity levels"
+#endif
+
+	/* read housekeeper configuration */
+
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[9])) &&
+			(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[10]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[11]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[12]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[13])))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
+				" housekeeping will be disabled due to invalid settings");
+		config->config->hk.events_mode = ZBX_HK_OPTION_DISABLED;
+	}
+
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[14])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[15]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "IT services data housekeeping will be disabled due to invalid"
+				" settings");
+		config->config->hk.services_mode = ZBX_HK_OPTION_DISABLED;
+	}
+
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[16])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[17]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
+				" settings");
+		config->config->hk.audit_mode = ZBX_HK_OPTION_DISABLED;
+	}
+
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[18])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[19]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "user sessions data housekeeping will be disabled due to invalid"
+				" settings");
+		config->config->hk.sessions_mode = ZBX_HK_OPTION_DISABLED;
+	}
+
+	config->config->hk.history_mode = atoi(row[20]);
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[21])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[22]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
+				" store their history due to invalid global override settings");
+		config->config->hk.history_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
+	}
+
+	config->config->hk.trends_mode = atoi(row[23]);
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[25]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
+				" will store their history due to invalid global override settings");
+		config->config->hk.trends_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
+	}
+
+	if (NULL == db_row && NULL != (db_row = DBfetch(result)))	/* table must have only one record */
+		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-#undef DEFAULT_REFRESH_UNSUPPORTED
-
 	return SUCCEED;
+
+#undef SELECTED_FIELD_COUNT
 }
 
 static void	DCsync_hosts(DB_RESULT result)
