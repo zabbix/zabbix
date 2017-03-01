@@ -25,7 +25,6 @@
 class CTimePeriodsParser extends CParser {
 
 	private $time_period_parser;
-	private $user_macro_parser;
 
 	private $periods = [];
 	private $options = ['usermacros' => false];

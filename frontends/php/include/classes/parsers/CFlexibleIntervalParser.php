@@ -53,7 +53,7 @@ class CFlexibleIntervalParser extends CParser {
 	/**
 	 * Parse the given flexible interval. The source string can contain macros separated by a forward slash.
 	 *
-	 * (sumple|{$M}|{#M})/(time_period|{$M}|{#M})
+	 * (simple_interval|{$M}|{#M})/(time_period|{$M}|{#M})
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
