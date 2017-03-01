@@ -98,7 +98,7 @@
 		}
 
 		function refreshContainers() {
-			jQuery('.pair-container').each(function() {
+			jQuery('.pair-container:not(.disabled)').each(function() {
 				jQuery(this).sortable( {
 					disabled: (jQuery(this).find('tr.sortable').length < 2)
 				} );
@@ -444,6 +444,19 @@
 		jQuery('.pairs-control-add').on('click', function() {
 			pairManager.addNew(jQuery(this).data('type'));
 		});
+
+		jQuery(function() {
+			jQuery('#retrieve_mode')
+				.on('change', function() {
+					jQuery('#post_fields').toggleClass('disabled',this.checked);
+					jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link, #post_type input').attr('disabled', this.checked);
+
+					if (false === this.checked) {
+						pairManager.refresh();
+					}
+				})
+				.trigger('change');
+		});
 	});
 
 	function add_var_to_opener_obj(obj, name, value) {
@@ -477,7 +490,7 @@
 			prefix = name + '[' + pair.id + ']';
 
 			/* empty values are ignored */
-			if (undefined !== pair.isNew && '' === pair.name.trim() && '' === pair.value.trim()) {
+			if (undefined === pair.name || (undefined !== pair.isNew && '' === pair.name.trim() && '' === pair.value.trim())) {
 				continue;
 			}
 
