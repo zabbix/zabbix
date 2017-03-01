@@ -1014,8 +1014,8 @@ static int	DBpatch_3030089(void)
 
 static int	DBpatch_3030090(void)
 {
-	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", "where conditiontype=6");
-											/* CONDITION_TYPE_TIME_PERIOD */
+	/* CONDITION_TYPE_TIME_PERIOD */
+	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
 }
 
 #endif
