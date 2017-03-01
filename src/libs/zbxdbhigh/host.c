@@ -4050,10 +4050,10 @@ httptest_t;
 
 typedef struct
 {
-	zbx_uint64_t		id;
-	int			type;
-	char			*name;
-	char			*value;
+	zbx_uint64_t	id;
+	int		type;
+	char		*name;
+	char		*value;
 }
 httpfield_t;
 
