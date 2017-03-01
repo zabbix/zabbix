@@ -172,15 +172,16 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$result = true;
 
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
+	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	$delay = getRequest('delay', '0s');
-	$delay_flex = '';
-	$intervals = [];
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+		$intervals = [];
 
-	if (getRequest('delay_flex')) {
 		foreach (getRequest('delay_flex') as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
@@ -216,12 +217,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($intervals) {
-			$delay_flex = join(';', $intervals);
+			$delay .= ';'.implode(';', $intervals);
 		}
-	}
-
-	if ($delay_flex !== '') {
-		$delay .= ';'.$delay_flex;
 	}
 
 	if ($result) {
@@ -432,28 +429,6 @@ else {
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);
-
-	// hide zeroes for trapper and SNMP trap items
-	foreach ($data['discoveries'] as &$discovery) {
-		if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
-			$discovery['delay'] = '';
-		}
-		else {
-			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-			if ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
-				$discovery['delay'] = $update_interval_parser->getDelay();
-
-				if (strpos($discovery['delay'], '{') === false) {
-					$discovery['delay'] = timeUnitToSeconds($discovery['delay']);
-				}
-			}
-			else {
-				$discovery['delay'] = '';
-			}
-		}
-	}
-	unset($discovery);
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 

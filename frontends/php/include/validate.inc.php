@@ -484,7 +484,7 @@ function validateDateInterval($year, $month, $day) {
  *
  * @return bool
  */
-function validateTimeUnit($value, $min, $max, $allow_zero, &$error, $options) {
+function validateTimeUnit($value, $min, $max, $allow_zero, &$error, $options = []) {
 	$simple_interval_parser = new CSimpleIntervalParser($options);
 
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {

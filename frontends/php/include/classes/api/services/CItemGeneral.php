@@ -257,11 +257,10 @@ abstract class CItemGeneral extends CApiService {
 			$host = $dbHosts[$fullItem['hostid']];
 
 			// Validate update interval.
-			if (($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP)
-					|| $fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
 				if ($update_interval_parser->parse($fullItem['delay']) != CParser::PARSE_SUCCESS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+						_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay'))
 					);
 				}
 
@@ -283,7 +282,7 @@ abstract class CItemGeneral extends CApiService {
 						// Remove flexible and scheduling intervals and leave only the delay part.
 						$item['delay'] = $delay;
 					}
-					else {
+					elseif (!$update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING)) {
 						// For trapper items, remove flexible intervals if they are written as macros.
 						$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
 						foreach ($flexible_intervals as $key => $flexible_interval) {
@@ -312,7 +311,7 @@ abstract class CItemGeneral extends CApiService {
 			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
 					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = '0s';
+				$item['trends'] = '0';
 			}
 
 			// check if the item requires an interface

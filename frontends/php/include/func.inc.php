@@ -566,7 +566,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
 	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
 
-	return $str ? rtrim($str) : '0'._x('s', 'second short');
+	return $str ? rtrim($str) : '0';
 }
 
 /**
@@ -760,16 +760,16 @@ function timeUnitToSeconds($time) {
 				$sec = $time;
 				break;
 			case 'm':
-				$sec = $time * SEC_PER_MIN;
+				$sec = bcmul($time, SEC_PER_MIN);
 				break;
 			case 'h':
-				$sec = $time * SEC_PER_HOUR;
+				$sec = bcmul($time, SEC_PER_HOUR);
 				break;
 			case 'd':
-				$sec = $time * SEC_PER_DAY;
+				$sec = bcmul($time, SEC_PER_DAY);
 				break;
 			case 'w':
-				$sec = $time * SEC_PER_WEEK;
+				$sec = bcmul($time, SEC_PER_WEEK);
 				break;
 		}
 	}

@@ -134,7 +134,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
-		'esc_period' => getRequest('esc_period', '0s'),
+		'esc_period' => getRequest('esc_period', ZBX_DEFAULT_OPERATION_STEP_DURATION),
 		'def_shortdata' => getRequest('def_shortdata', ''),
 		'def_longdata' => getRequest('def_longdata', ''),
 		'r_shortdata' => getRequest('r_shortdata', ''),
@@ -658,7 +658,7 @@ if (hasRequest('form')) {
 	if ($data['new_operation'] && !is_array($data['new_operation'])) {
 		$data['new_operation'] = [
 			'operationtype' => 0,
-			'esc_period' => '0s',
+			'esc_period' => '0',
 			'esc_step_from' => 1,
 			'esc_step_to' => 1,
 			'evaltype' => 0

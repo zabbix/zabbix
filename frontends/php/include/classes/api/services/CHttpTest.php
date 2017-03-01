@@ -485,20 +485,9 @@ class CHttpTest extends CApiService {
 			}
 
 			if (array_key_exists('delay', $httpTest)) {
-				if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
-					$delay = timeUnitToSeconds($httpTest['delay']);
-
-					if ($delay < 1 || $delay > SEC_PER_DAY) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'delay',
-								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_DAY)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($httpTest['delay']) != CParser::PARSE_SUCCESS) {
+				if (!validateTimeUnit($httpTest['delay'], 1, SEC_PER_DAY, false, $error, ['usermacros' => true])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+						_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error)
 					);
 				}
 			}
@@ -562,9 +551,6 @@ class CHttpTest extends CApiService {
 		// Required fields for steps.
 		$required_fields = ['httpstepid'];
 
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
-
 		foreach ($httpTests as &$httpTest) {
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
 
@@ -575,20 +561,9 @@ class CHttpTest extends CApiService {
 			}
 
 			if (array_key_exists('delay', $httpTest)) {
-				if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
-					$delay = timeUnitToSeconds($httpTest['delay']);
-
-					if ($delay < 1 || $delay > SEC_PER_DAY) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'delay',
-								_s('must be between "%1$s" and "%2$s"', 1, SEC_PER_DAY)
-							)
-						);
-					}
-				}
-				elseif ($user_macro_parser->parse($httpTest['delay']) != CParser::PARSE_SUCCESS) {
+				if (!validateTimeUnit($httpTest['delay'], 1, SEC_PER_DAY, false, $error, ['usermacros' => true])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s', 'delay', _('invalid delay'))
+						_s('Incorrect value for field "%1$s": %2$s.', 'delay', $error)
 					);
 				}
 			}

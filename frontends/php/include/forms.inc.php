@@ -391,7 +391,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	$filterColumn2->addRow(_('Update interval'),
-		(new CTextBox('filter_delay', $filter_delay))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('filter_delay', $filter_delay))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	);
 	$filterColumn4->addRow(_('Status'),
@@ -428,7 +428,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	$filterColumn3->addRow(_('History'),
-		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Triggers'),
 		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
@@ -447,7 +447,7 @@ function getItemFilterForm(&$items) {
 		'filter_snmp_oid_row'
 	);
 	$filterColumn3->addRow(_('Trends'),
-		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
@@ -676,16 +676,17 @@ function getItemFilterForm(&$items) {
 		}
 
 		// trends
-		if (zbx_empty($filter_trends)) {
+		if ($filter_trends === ''
+				&& !in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 			$trends = $item['trends'];
 			$value = $trends;
 
-			if (strpos($trends, '{') === false && $trends !== '') {
+			if (strpos($trends, '{') === false) {
 				$value = timeUnitToSeconds($trends);
-				$trends = convertUnitsS(timeUnitToSeconds($trends));
+				$trends = convertUnitsS($value);
 			}
 
-			if (!array_key_exists($trends, $item_params['trends']) && $trends !== '') {
+			if (!array_key_exists($trends, $item_params['trends'])) {
 				$item_params['trends'][$trends] = [
 					'name' => $trends,
 					'count' => 0,
@@ -702,19 +703,19 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $trends !== '') {
+			if ($show_item) {
 				$item_params['trends'][$trends]['count']++;
 			}
 		}
 
 		// history
-		if (zbx_empty($filter_history)) {
+		if ($filter_history === '') {
 			$history = $item['history'];
 			$value = $history;
 
 			if (strpos($history, '{') === false) {
 				$value = timeUnitToSeconds($history);
-				$history = convertUnitsS(timeUnitToSeconds($history));
+				$history = convertUnitsS($value);
 			}
 
 			if (!array_key_exists($history, $item_params['history'])) {
@@ -740,12 +741,8 @@ function getItemFilterForm(&$items) {
 		}
 
 		// interval
-		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER) {
-			// Skip trapper items. Don't add them to subfilter.
-			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-				continue;
-			}
-
+		if ($filter_delay === '' && $filter_type != ITEM_TYPE_TRAPPER
+				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -758,7 +755,7 @@ function getItemFilterForm(&$items) {
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
 				if (strpos($delay, '{') === false) {
 					$value = timeUnitToSeconds($delay);
-					$delay = convertUnitsS(timeUnitToSeconds($delay));
+					$delay = convertUnitsS($value);
 				}
 				else {
 					$value = $delay;
@@ -782,7 +779,7 @@ function getItemFilterForm(&$items) {
 				$show_item &= $value;
 			}
 
-			if ($show_item && $delay !== '') {
+			if ($show_item) {
 				$item_params['interval'][$delay]['count']++;
 			}
 		}

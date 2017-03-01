@@ -168,9 +168,6 @@ elseif (hasRequest('update')) {
 		$result = (bool) API::User()->update($user);
 
 		$result = DBend($result);
-		if (!$result) {
-			error(API::User()->resetErrors());
-		}
 
 		if ($result) {
 			ob_end_clean();

@@ -1232,31 +1232,40 @@ function count_operations_delay($operations, $def_period) {
 	$periods = [];
 	$max_step = 0;
 
-	foreach ($operations as $operation) {
-		$step_to = $operation['esc_step_to'] ? $operation['esc_step_to'] : 9999;
-		$esc_period = $operation['esc_period'] ? $operation['esc_period'] : $def_period;
+	$simple_interval_parser = new CSimpleIntervalParser();
 
-		if (strpos($esc_period, '{') === false) {
-			$esc_period = timeUnitToSeconds($esc_period);
-		}
-		else {
-			continue;
-		}
+	$def_period = CMacrosResolverHelper::resolveTimeUnitMacros(
+		[['def_period' => $def_period]], ['def_period']
+	)[0]['def_period'];
+
+	$def_period = ($simple_interval_parser->parse($def_period) == CParser::PARSE_SUCCESS)
+		? timeUnitToSeconds($def_period)
+		: null;
+
+	$operations = CMacrosResolverHelper::resolveTimeUnitMacros($operations, ['esc_period']);
+
+	foreach ($operations as $operation) {
+		$esc_period = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS)
+			? timeUnitToSeconds($operation['esc_period'])
+			: null;
+
+		$esc_period = ($esc_period === null || $esc_period != 0) ? $esc_period : $def_period;
+		$step_to = ($operation['esc_step_to'] != 0) ? $operation['esc_step_to'] : 9999;
 
 		if ($max_step < $operation['esc_step_from']) {
 			$max_step = $operation['esc_step_from'];
 		}
 
 		for ($i = $operation['esc_step_from']; $i <= $step_to; $i++) {
-			if (!isset($periods[$i]) || $periods[$i] > $esc_period) {
+			if (!array_key_exists($i, $periods) || $esc_period === null || $periods[$i] > $esc_period) {
 				$periods[$i] = $esc_period;
 			}
 		}
 	}
 
 	for ($i = 1; $i <= $max_step; $i++) {
-		$esc_period = isset($periods[$i]) ? $periods[$i] : $def_period;
-		$delays[$i + 1] = $delays[$i] + $esc_period;
+		$esc_period = array_key_exists($i, $periods) ? $periods[$i] : $def_period;
+		$delays[$i + 1] = ($esc_period !== null && $delays[$i] !== null) ? $delays[$i] + $esc_period : null;
 	}
 
 	return $delays;

@@ -240,7 +240,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
 			'applicationid' => getRequest('applicationid'),
-			'delay' => getRequest('delay', ZBX_HTTPTEST_DEFAULT_DELAY),
+			'delay' => getRequest('delay', DB::getDefault('httptest', 'delay')),
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
@@ -567,7 +567,7 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
-		$data['delay'] = getRequest('delay', ZBX_HTTPTEST_DEFAULT_DELAY);
+		$data['delay'] = getRequest('delay', DB::getDefault('httptest', 'delay'));
 		$data['retries'] = getRequest('retries', 1);
 
 		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);

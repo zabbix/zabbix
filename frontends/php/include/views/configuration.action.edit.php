@@ -397,7 +397,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 $operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
-	$delay = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
+	$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
 }
 else {
 	$operationsTable->setHeader([_('Details'), _('Action')]);
@@ -412,6 +412,8 @@ if ($data['action']['operations']) {
 	];
 
 	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
+
+	$simple_interval_parser = new CSimpleIntervalParser();
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
@@ -443,10 +445,17 @@ if ($data['action']['operations']) {
 				? $operation['esc_step_from']
 				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
-			$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-			$esc_delay_txt = $delay[$operation['esc_step_from']]
-				? convert_units(['value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'])
-				: _('Immediately');
+			$esc_period_txt = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS
+					&& timeUnitToSeconds($operation['esc_period']) == 0)
+				? _('Default')
+				: $operation['esc_period'];
+
+			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
+				? _('Unknown')
+				: ($delays[$operation['esc_step_from']] != 0
+					? convert_units(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+					: _('Immediately')
+				);
 
 			$operationRow = [
 				$esc_steps_txt,

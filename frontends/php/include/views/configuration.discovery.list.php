@@ -50,10 +50,13 @@ $discoveryTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('IP range'),
-		_('Update interval'),
+		_('Interval'),
 		_('Checks'),
 		_('Status')
 	]);
+
+$simple_interval_parser = new CSimpleIntervalParser();
+
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
@@ -68,11 +71,15 @@ foreach ($data['drules'] as $drule) {
 			->addSID()
 	);
 
+	if ($simple_interval_parser->parse($drule['delay']) == CParser::PARSE_SUCCESS) {
+		$drule['delay'] = convertUnitsS(timeUnitToSeconds($drule['delay']));
+	}
+
 	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
-		(strpos($drule['delay'], '{') === false) ? convertUnitsS(timeUnitToSeconds($drule['delay'])) : $drule['delay'],
+		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status
 	]);

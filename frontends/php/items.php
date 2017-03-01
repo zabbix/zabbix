@@ -388,15 +388,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
+	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	$delay = getRequest('delay', '0s');
-	$delay_flex = '';
-	$intervals = [];
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+		$intervals = [];
 
-	if (getRequest('delay_flex')) {
 		foreach (getRequest('delay_flex') as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 				if ($interval['delay'] === '' && $interval['period'] === '') {
@@ -432,12 +433,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($intervals) {
-			$delay_flex = join(';', $intervals);
+			$delay .= ';'.implode(';', $intervals);
 		}
-	}
-
-	if ($delay_flex !== '') {
-		$delay .= ';'.$delay_flex;
 	}
 
 	if ($result) {
@@ -708,11 +705,11 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$result = true;
 
 	if (isset($visible['update_interval'])) {
-		$delay = getRequest('delay', '0s');
-		$delay_flex = '';
-		$intervals = [];
+		$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
-		if (getRequest('delay_flex')) {
+		if (hasRequest('delay_flex')) {
+			$intervals = [];
+
 			foreach (getRequest('delay_flex') as $interval) {
 				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
 					if ($interval['delay'] === '' && $interval['period'] === '') {
@@ -748,12 +745,8 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			}
 
 			if ($intervals) {
-				$delay_flex = join(';', $intervals);
+				$delay .= ';'.implode(';', $intervals);
 			}
-		}
-
-		if ($delay_flex !== '') {
-			$delay .= ';'.$delay_flex;
 		}
 	}
 	else {
@@ -1424,6 +1417,8 @@ else {
 		// resolve name macros
 		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
+		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 
@@ -1439,15 +1434,10 @@ else {
 				$delay = '';
 			}
 			else {
-				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
 					$delay = (strpos($delay, '{') === false) ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
-				}
-				else {
-					$delay = '';
 				}
 			}
 
@@ -1551,31 +1541,6 @@ else {
 			}
 		}
 	}
-
-	/*
-	 * 1) Convert trapper item delays to empty strings, for better sorting and representation;
-	 * 2) Get only delay from the whole update interval and convert delay to seconds, so items are properly sorted.
-	 */
-	foreach ($data['items'] as &$item) {
-		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-			$item['delay'] = '';
-		}
-		else {
-			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-				$item['delay'] = $update_interval_parser->getDelay();
-
-				if (strpos($item['delay'], '{') === false) {
-					$item['delay'] = timeUnitToSeconds($item['delay']);
-				}
-			}
-			else {
-				$item['delay'] = '';
-			}
-		}
-	}
-	unset($item);
 
 	if ($sortField === 'status') {
 		orderItemsByStatus($data['items'], $sortOrder);

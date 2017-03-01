@@ -78,7 +78,7 @@ $httpTable = (new CTableInfo())
 			: null,
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('Number of steps'),
-		_('Update interval'),
+		_('Interval'),
 		_('Attempts'),
 		_('Authentication'),
 		_('HTTP proxy'),
@@ -89,6 +89,8 @@ $httpTable = (new CTableInfo())
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $httpTests = $this->data['httpTests'];
+
+$simple_interval_parser = new CSimpleIntervalParser();
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
@@ -122,14 +124,16 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		}
 	}
 
+	if ($simple_interval_parser->parse($httpTest['delay']) == CParser::PARSE_SUCCESS) {
+		$httpTest['delay'] = convertUnitsS(timeUnitToSeconds($httpTest['delay']));
+	}
+
 	$httpTable->addRow([
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
-		(strpos($httpTest['delay'], '{') === false)
-			? convertUnitsS(timeUnitToSeconds($httpTest['delay']))
-			: $httpTest['delay'],
+		$httpTest['delay'],
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),

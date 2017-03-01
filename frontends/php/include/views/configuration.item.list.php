@@ -78,6 +78,7 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 ]);
 
 $simple_interval_parser = new CSimpleIntervalParser();
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 foreach ($this->data['items'] as $item) {
 	// description
@@ -245,6 +246,20 @@ foreach ($this->data['items'] as $item) {
 		$item['trends'] = convertUnitsS(timeUnitToSeconds($item['trends']));
 	}
 
+	// hide zeroes for trapper and SNMP trap items
+	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+		$item['delay'] = '';
+	}
+	else {
+		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item['delay'] = $update_interval_parser->getDelay();
+
+			if (strpos($item['delay'], '{') === false) {
+				$item['delay'] = convertUnitsS(timeUnitToSeconds($item['delay']));
+			}
+		}
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$menuIcon,
@@ -252,9 +267,7 @@ foreach ($this->data['items'] as $item) {
 		$description,
 		$triggerInfo,
 		CHtml::encode($item['key_']),
-		(strpos($item['delay'], '{') === false && $item['delay'] !== '')
-			? convertUnitsS($item['delay'])
-			: $item['delay'],
+		$item['delay'],
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),

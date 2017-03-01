@@ -1093,7 +1093,7 @@ class testFormAction extends CWebTest {
 					$this->zbxTestAssertVisibleId('new_operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'maxlength', 255);
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'size', 20);
-					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'value', '0s');
+					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_period\']', 'value', '0');
 					break;
 				}
 			}

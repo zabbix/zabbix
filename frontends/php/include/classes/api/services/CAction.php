@@ -24,8 +24,6 @@
  */
 class CAction extends CApiService {
 
-	const MAX_ESC_PERIOD = 999999;
-
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
 	protected $sortColumns = ['actionid', 'name', 'status'];
@@ -1422,9 +1420,6 @@ class CAction extends CApiService {
 			]
 		];
 
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
-
 		foreach ($operations as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
@@ -1448,22 +1443,10 @@ class CAction extends CApiService {
 				}
 
 				if (array_key_exists('esc_period', $operation)) {
-					if ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS) {
-						$esc_period = timeUnitToSeconds($operation['esc_period']);
-
-						if ($esc_period != 0 && ($esc_period < SEC_PER_MIN || $esc_period > self::MAX_ESC_PERIOD)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s', 'esc_period',
-									_s('must be between "%1$s" and "%2$s"', SEC_PER_MIN, self::MAX_ESC_PERIOD)
-								)
-							);
-						}
-					}
-					elseif ($user_macro_parser->parse($operation['esc_period']) != CParser::PARSE_SUCCESS) {
+					if (!validateTimeUnit($operation['esc_period'], SEC_PER_MIN, SEC_PER_WEEK, true, $error,
+							['usermacros' => true])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s', 'esc_period',
-								_('Incorrect action operation step duration.')
-							)
+							_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
 						);
 					}
 				}
@@ -1599,6 +1582,8 @@ class CAction extends CApiService {
 							}
 						}
 						else {
+							$user_macro_parser = new CUserMacroParser();
+
 							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
@@ -2346,8 +2331,6 @@ class CAction extends CApiService {
 		];
 
 		$duplicates = [];
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($actions as $action) {
 			if (!check_db_fields($actionDbFields, $action)) {
@@ -2365,7 +2348,7 @@ class CAction extends CApiService {
 			}
 
 			if (array_key_exists('esc_period', $action) && $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$this->validateStepDuration($action['esc_period'], $simple_interval_parser, $user_macro_parser);
+				self::validateStepDuration($action['esc_period']);
 			}
 		}
 
@@ -2459,30 +2442,14 @@ class CAction extends CApiService {
 	/**
 	 * Validate default step duration and operation step duration values.
 	 *
-	 * @param string                $esc_period					Step duration.
-	 * @param CSimpleIntervalParser $simple_interval_parser		Simple interval parser class.
-	 * @param CUserMacroParser      $user_macro_parser			User macro parser class.
+	 * @param string $esc_period  Step duration.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateStepDuration($esc_period, CSimpleIntervalParser $simple_interval_parser,
-			CUserMacroParser $user_macro_parser) {
-		if ($simple_interval_parser->parse($esc_period) == CParser::PARSE_SUCCESS) {
-			$esc_period = timeUnitToSeconds($esc_period);
-
-			if ($esc_period < SEC_PER_MIN || $esc_period > self::MAX_ESC_PERIOD) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s', 'esc_period',
-						_s('must be between "%1$s" and "%2$s"', SEC_PER_MIN, self::MAX_ESC_PERIOD)
-					)
-				);
-			}
-		}
-		elseif ($user_macro_parser->parse($esc_period) != CParser::PARSE_SUCCESS) {
+	private static function validateStepDuration($esc_period) {
+		if (!validateTimeUnit($esc_period, SEC_PER_MIN, SEC_PER_WEEK, false, $error, ['usermacros' => true])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s', 'esc_period',
-					_('Incorrect action operation step duration.')
-				)
+				_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
 			);
 		}
 	}
@@ -2510,8 +2477,6 @@ class CAction extends CApiService {
 
 		// check fields
 		$duplicates = [];
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($actions as $action) {
 			$actionName = isset($action['name']) ? $action['name'] : $db_actions[$action['actionid']]['name'];
@@ -2525,7 +2490,7 @@ class CAction extends CApiService {
 			// check if user changed esc_period for trigger eventsource
 			if (array_key_exists('esc_period', $action)
 					&& $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$this->validateStepDuration($action['esc_period'], $simple_interval_parser, $user_macro_parser);
+				self::validateStepDuration($action['esc_period']);
 			}
 
 			$this->checkNoParameters(

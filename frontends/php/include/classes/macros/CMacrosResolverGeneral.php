@@ -850,22 +850,22 @@ class CMacrosResolverGeneral {
 
 		$user_macro_parser = new CUserMacroParser();
 
+		/*
+		 * @var array $host_templates
+		 * @var array $host_templates[<hostid>]		array of templates
+		 */
+		$host_templates = [];
+
+		/*
+		 * @var array  $host_macros
+		 * @var array  $host_macros[<hostid>]
+		 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
+		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
+		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context>' => '<value>', ...]
+		 */
+		$host_macros = [];
+
 		if ($hostids) {
-			/*
-			 * @var array $host_templates
-			 * @var array $host_templates[<hostid>]		array of templates
-			 */
-			$host_templates = [];
-
-			/*
-			 * @var array  $host_macros
-			 * @var array  $host_macros[<hostid>]
-			 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
-			 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
-			 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context>' => '<value>', ...]
-			 */
-			$host_macros = [];
-
 			do {
 				$hostids = array_keys($hostids);
 
@@ -921,6 +921,7 @@ class CMacrosResolverGeneral {
 					}
 				}
 			} while ($hostids);
+		}
 
 			$all_macros_resolved = true;
 
@@ -951,10 +952,6 @@ class CMacrosResolverGeneral {
 				unset($value);
 			}
 			unset($element);
-		}
-		else {
-			$all_macros_resolved = false;
-		}
 
 		if (!$all_macros_resolved) {
 			// Global macros.

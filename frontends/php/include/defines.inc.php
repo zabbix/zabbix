@@ -766,8 +766,6 @@ define('HTTPTEST_VERIFY_PEER_ON', 1);
 define('HTTPTEST_VERIFY_HOST_OFF', 0);
 define('HTTPTEST_VERIFY_HOST_ON', 1);
 
-define('ZBX_HTTPTEST_DEFAULT_DELAY', '1m');
-
 define('EVENT_ACK_DISABLED',	'0');
 define('EVENT_ACK_ENABLED',		'1');
 
