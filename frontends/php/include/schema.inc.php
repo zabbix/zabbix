@@ -1336,7 +1336,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
-				'default' => '0s',
+				'default' => '0',
 			],
 			'history' => [
 				'null' => false,
@@ -1876,7 +1876,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0s',
+				'default' => '1h',
 			],
 			'def_shortdata' => [
 				'null' => false,
@@ -1939,7 +1939,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0s',
+				'default' => '0',
 			],
 			'esc_step_from' => [
 				'null' => false,
