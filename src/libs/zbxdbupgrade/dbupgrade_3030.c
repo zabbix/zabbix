@@ -984,7 +984,7 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (NULL == (semicolon = strrchr(row[1], ';')) || '\0' != (semicolon + 1))
+		if (NULL == (semicolon = strrchr(row[1], ';')) || '\0' != *(semicolon + 1))
 			continue;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='%.*s' where %s=%s;\n",
