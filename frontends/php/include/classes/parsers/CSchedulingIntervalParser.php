@@ -101,7 +101,7 @@ class CSchedulingIntervalParser extends CParser {
 				$prefix = $prefixes[$i];
 
 				if (self::parseInterval($source, $p, $prefix['prefix'], $prefix['min'], $prefix['max'])) {
-					$precedence = $i;
+					$precedence = $i + 1;
 					continue 2;
 				}
 			}
