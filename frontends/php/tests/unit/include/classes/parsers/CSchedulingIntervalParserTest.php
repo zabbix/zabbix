@@ -1281,6 +1281,146 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'md1-31'
 				]
 			],
+			[
+				'wd5md7', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd5'
+				]
+			],
+			[
+				'm5md7', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm5'
+				]
+			],
+			[
+				's5m7', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's5'
+				]
+			],
+			[
+				's6w7', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's6'
+				]
+			],
+			[
+				's7md31', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's7'
+				]
+			],
+			[
+				'm6wd1', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm6'
+				]
+			],
+			[
+				'md1md2', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1'
+				]
+			],
+			[
+				'wd1wd2', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1'
+				]
+			],
+			[
+				'm1m2', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm1'
+				]
+			],
+			[
+				's1s2', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's1'
+				]
+			],
+			[
+				'md1,2md3', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'md1,2'
+				]
+			],
+			[
+				'wd1,2md3', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd1,2'
+				]
+			],
+			[
+				'wd3,4wd5', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'wd3,4'
+				]
+			],
+			[
+				'm10,20wd5', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm10,20'
+				]
+			],
+			[
+				'm30,40md1', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm30,40'
+				]
+			],
+			[
+				's10,20m15', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's10,20'
+				]
+			],
+			[
+				's30,40wd2', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's30,40'
+				]
+			],
+			[
+				's50,59md1', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's50,59'
+				]
+			],
+			[
+				's50,55s59', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 's50,55'
+				]
+			],
+			[
+				'm10,20m30', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'm10,20'
+				]
+			],
 			// fail
 			[
 				'md', 0, [],
