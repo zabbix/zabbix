@@ -460,14 +460,14 @@ static int	DBpatch_3030031(void)
 
 static int	DBpatch_3030032(void)
 {
-	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("drules", &field);
 }
 
 static int	DBpatch_3030033(void)
 {
-	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("drules", &field);
 }
@@ -481,14 +481,14 @@ static int	DBpatch_3030034(void)
 
 static int	DBpatch_3030035(void)
 {
-	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httptest", &field);
 }
 
 static int	DBpatch_3030036(void)
 {
-	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("httptest", &field);
 }
@@ -502,14 +502,14 @@ static int	DBpatch_3030037(void)
 
 static int	DBpatch_3030038(void)
 {
-	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httpstep", &field);
 }
 
 static int	DBpatch_3030039(void)
 {
-	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("httpstep", &field);
 }
@@ -523,7 +523,7 @@ static int	DBpatch_3030040(void)
 
 static int	DBpatch_3030041(void)
 {
-	const ZBX_FIELD field = {"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field);
 }
@@ -733,14 +733,14 @@ static int	DBpatch_3030056(void)
 
 static int	DBpatch_3030057(void)
 {
-	const ZBX_FIELD field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030058(void)
 {
-	const ZBX_FIELD field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"refresh_unsupported", "10m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
