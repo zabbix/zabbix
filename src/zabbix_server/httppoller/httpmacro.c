@@ -89,29 +89,15 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
 			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
 
-	if (0 == nkey || 0 == nvalue)
+	if (0 == nkey && 0 != nvalue)
 	{
-		if (0 == nkey && 0 != nvalue)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
-					__function_name, (int)nvalue, pvalue);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
+				__function_name, (int)nvalue, pvalue);
 
-			if (NULL != err_str && NULL == *err_str)
-			{
-				*err_str = zbx_dsprintf(*err_str, "missing variable name (only value provided):"
-						" \"%.*s\"", (int)nvalue, pvalue);
-			}
-		}
-		else if (0 == nvalue && 0 != nkey)
+		if (NULL != err_str && NULL == *err_str)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable value (only name provided): \"%.*s\"",
-					__function_name, (int)nkey, pkey);
-
-			if (NULL != err_str && NULL == *err_str)
-			{
-				*err_str = zbx_dsprintf(*err_str, "missing variable value (only name provided):"
-						" \"%.*s\"", (int)nkey, pkey);
-			}
+			*err_str = zbx_dsprintf(*err_str, "missing variable name (only value provided):"
+					" \"%.*s\"", (int)nvalue, pvalue);
 		}
 
 		goto out;

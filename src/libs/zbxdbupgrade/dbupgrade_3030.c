@@ -363,7 +363,7 @@ static int 	DBpatch_3030030_pair_cmp_func(const void *d1, const void *d2)
 static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t parentid, int type,
 		const char *source, const char separator, int unique, int allow_empty)
 {
-	char			*buffer = zbx_strdup(NULL, source), *key = buffer, *value;
+	char			*buffer = zbx_strdup(NULL, source), *key = buffer, *value, replace;
 	zbx_vector_ptr_pair_t	pairs;
 	zbx_ptr_pair_t		pair = {NULL, NULL};
 	int			index, ret = FAIL;
@@ -378,16 +378,21 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 		while ('\0' != *ptr && '\n' != *ptr && '\r' != *ptr)
 			ptr++;
 
+		replace = *ptr;
+		*ptr = '\0';
+
 		/* parse line */
 		value = strchr(key, separator);
 
 		/* if separator is absent and empty values are allowed, consider that value is empty */
-		if (0 != allow_empty && (NULL == value || value > ptr))
-			value = ptr - 1;
+		if (0 != allow_empty && NULL == value)
+			value = ptr;
 
-		if (NULL != value && value < ptr)
+		if (NULL != value)
 		{
-			char	*tail = value++;
+			char	*tail = value;
+			if (ptr != value)
+				value++;
 
 			TRIM_LEADING_WHITESPACE(key);
 			if (key != tail)
@@ -403,14 +408,7 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 			if (value != tail)
 			{
 				TRIM_TRAILING_WHITESPACE(tail);
-				if ('\0' != tail[1])
-				{
-					tail[1] = '\0';
-					if (1 == ptr - tail)
-					{
-						ptr++;
-					}
-				}
+				tail[1] = '\0';
 			}
 			else
 			{
@@ -432,6 +430,9 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 		}
 
 skip:
+		if ('\0' != replace)
+			ptr++;
+
 		/* skip LF/CR symbols until the next nonempty line */
 		while ('\n' == *ptr || '\r' == *ptr)
 			ptr++;
@@ -464,19 +465,19 @@ static int	DBpatch_3030030_migrate_pairs(const char *table, const char *field, i
 	len = strlen(table) + 1;
 	target = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("_field"));
 	zbx_strlcpy(target, table, len);
-	strcat(target, "_field");
+	zbx_strlcat(target, "_field", ZBX_CONST_STRLEN("_field"));
 
 	target_id = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("_fieldid"));
 	zbx_strlcpy(target_id, table, len);
-	strcat(target_id, "_fieldid");
+	zbx_strlcat(target_id, "_fieldid", ZBX_CONST_STRLEN("_field"));
 
 	source_id = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("id"));
 	zbx_strlcpy(source_id, table, len);
-	strcat(source_id, "id");
+	zbx_strlcat(source_id, "id", ZBX_CONST_STRLEN("id"));
 
 	zbx_db_insert_prepare(&db_insert, target, target_id, source_id, "type", "name", "value", NULL);
 
-	result = DBselect("SELECT %s, %s FROM %s", source_id, field, table);
+	result = DBselect("select %s, %s from %s", source_id, field, table);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -488,7 +489,6 @@ static int	DBpatch_3030030_migrate_pairs(const char *table, const char *field, i
 					allow_empty);
 		}
 	}
-
 	DBfree_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, target_id);
