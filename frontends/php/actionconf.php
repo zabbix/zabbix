@@ -134,7 +134,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
-		'esc_period' => getRequest('esc_period', ZBX_DEFAULT_OPERATION_STEP_DURATION),
+		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
 		'def_shortdata' => getRequest('def_shortdata', ''),
 		'def_longdata' => getRequest('def_longdata', ''),
 		'r_shortdata' => getRequest('r_shortdata', ''),
@@ -579,7 +579,7 @@ if (hasRequest('form')) {
 	}
 	else {
 		$data['action']['name'] = getRequest('name');
-		$data['action']['esc_period'] = getRequest('esc_period', ZBX_DEFAULT_OPERATION_STEP_DURATION);
+		$data['action']['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
 		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
