@@ -108,5 +108,4 @@ class CTimePeriodParser extends CParser {
 
 		return true;
 	}
-
 }
