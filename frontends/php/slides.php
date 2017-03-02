@@ -137,7 +137,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 			);
 		}
 
-		$delay = ($screen['delay'] > 0) ? $screen['delay'] : $data['screen']['delay'];
+		$delay = timeUnitToSeconds(($screen['delay'] === '0') ? $data['screen']['delay'] : $screen['delay']);
 
 		insert_js(
 			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.

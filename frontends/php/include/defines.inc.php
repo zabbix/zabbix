@@ -126,14 +126,15 @@ define('ZBX_SESSION_PASSIVE',	1);
 define('ZBX_DROPDOWN_FIRST_NONE',	0);
 define('ZBX_DROPDOWN_FIRST_ALL',	1);
 
-define('T_ZBX_STR',			0);
-define('T_ZBX_INT',			1);
-define('T_ZBX_DBL',			2);
-define('T_ZBX_CLR',			5);
-define('T_ZBX_DBL_BIG',		9);
-define('T_ZBX_DBL_STR',		10);
-define('T_ZBX_TP',			11);
-define('T_ZBX_PERIOD',		12);
+define('T_ZBX_STR',				0);
+define('T_ZBX_INT',				1);
+define('T_ZBX_DBL',				2);
+define('T_ZBX_CLR',				5);
+define('T_ZBX_DBL_BIG',			9);
+define('T_ZBX_DBL_STR',			10);
+define('T_ZBX_TP',				11);
+define('T_ZBX_PERIOD',			12);
+define('T_ZBX_PERIOD_MACRO',	13);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
