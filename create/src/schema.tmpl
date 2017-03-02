@@ -168,7 +168,7 @@ UNIQUE		|1		|screenid,usrgrpid
 TABLE|slideshows|slideshowid|ZBX_DATA
 FIELD		|slideshowid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|delay		|t_varchar(32)	|'0s'	|NOT NULL	|0
+FIELD		|delay		|t_varchar(32)	|'30s'	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users	|		|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 UNIQUE		|1		|name
@@ -192,7 +192,7 @@ FIELD		|slideid	|t_id		|	|NOT NULL	|0
 FIELD		|slideshowid	|t_id		|	|NOT NULL	|0			|1|slideshows
 FIELD		|screenid	|t_id		|	|NOT NULL	|0			|2|screens
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|delay		|t_varchar(32)	|'0'	|NOT NULL	|0
 INDEX		|1		|slideshowid
 INDEX		|2		|screenid
 
@@ -1454,4 +1454,4 @@ INDEX		|1		|itemid,step
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3030090	|3030090
+ROW		|3030091	|3030091

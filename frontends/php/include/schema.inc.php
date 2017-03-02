@@ -723,7 +723,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '0s',
+				'default' => '30s',
 			],
 			'userid' => [
 				'null' => false,
@@ -830,8 +830,8 @@ return [
 			],
 			'delay' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
 				'default' => '0',
 			],
 		],

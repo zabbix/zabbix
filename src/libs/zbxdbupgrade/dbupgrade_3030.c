@@ -425,96 +425,103 @@ static int	DBpatch_3030028(void)
 
 static int	DBpatch_3030029(void)
 {
-	const ZBX_FIELD field = {"delay", "0s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"delay", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("slideshows", &field);
 }
 
 static int	DBpatch_3030030(void)
 {
-	const ZBX_FIELD field = {"delay", "0s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"delay", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("slideshows", &field);
 }
 
 static int	DBpatch_3030031(void)
 {
-	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const ZBX_FIELD field = {"delay", "0", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("drules", &field);
+	return DBmodify_field_type("slides", &field);
 }
 
 static int	DBpatch_3030032(void)
 {
 	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
-	return DBset_default("drules", &field);
+	return DBmodify_field_type("drules", &field);
 }
 
 static int	DBpatch_3030033(void)
+{
+	const ZBX_FIELD field = {"delay", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBset_default("drules", &field);
+}
+
+static int	DBpatch_3030034(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {NULL}};
 
 	return DBpatch_table_convert("drules", "druleid", field_convs);
 }
 
-static int	DBpatch_3030034(void)
+static int	DBpatch_3030035(void)
 {
 	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("httptest", &field);
 }
 
-static int	DBpatch_3030035(void)
+static int	DBpatch_3030036(void)
 {
 	const ZBX_FIELD field = {"delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBset_default("httptest", &field);
 }
 
-static int	DBpatch_3030036(void)
+static int	DBpatch_3030037(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {NULL}};
 
 	return DBpatch_table_convert("httptest", "httptestid", field_convs);
 }
 
-static int	DBpatch_3030037(void)
+static int	DBpatch_3030038(void)
 {
 	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("httpstep", &field);
 }
 
-static int	DBpatch_3030038(void)
+static int	DBpatch_3030039(void)
 {
 	const ZBX_FIELD field = {"timeout", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBset_default("httpstep", &field);
 }
 
-static int	DBpatch_3030039(void)
+static int	DBpatch_3030040(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {{"timeout", DBpatch_conv_sec}, {NULL}};
 
 	return DBpatch_table_convert("httpstep", "httpstepid", field_convs);
 }
 
-static int	DBpatch_3030040(void)
+static int	DBpatch_3030041(void)
 {
 	const ZBX_FIELD field = {"delay", "0s", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("items", &field);
 }
 
-static int	DBpatch_3030041(void)
+static int	DBpatch_3030042(void)
 {
 	const ZBX_FIELD field = {"delay", "0s", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_3030042(void)
+static int	DBpatch_3030043(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -576,40 +583,40 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3030043(void)
-{
-	return DBdrop_field("items", "delay_flex");
-}
-
 static int	DBpatch_3030044(void)
 {
-	const ZBX_FIELD field = {"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("items", &field);
+	return DBdrop_field("items", "delay_flex");
 }
 
 static int	DBpatch_3030045(void)
 {
 	const ZBX_FIELD field = {"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("items", &field);
+	return DBmodify_field_type("items", &field);
 }
 
 static int	DBpatch_3030046(void)
 {
-	const ZBX_FIELD field = {"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("items", &field);
+	return DBset_default("items", &field);
 }
 
 static int	DBpatch_3030047(void)
 {
 	const ZBX_FIELD field = {"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("items", &field);
+	return DBmodify_field_type("items", &field);
 }
 
 static int	DBpatch_3030048(void)
+{
+	const ZBX_FIELD field = {"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_3030049(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {
 						{"history",	DBpatch_conv_day},
@@ -620,21 +627,21 @@ static int	DBpatch_3030048(void)
 	return DBpatch_table_convert("items", "itemid", field_convs);
 }
 
-static int	DBpatch_3030049(void)
+static int	DBpatch_3030050(void)
 {
 	const ZBX_FIELD field = {"lifetime", "30d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field);
 }
 
-static int	DBpatch_3030050(void)
+static int	DBpatch_3030051(void)
 {
 	const ZBX_FIELD field = {"lifetime", "30d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_3030051(void)
+static int	DBpatch_3030052(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -681,245 +688,245 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3030052(void)
+static int	DBpatch_3030053(void)
 {
 	const ZBX_FIELD field = {"esc_period", "0s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("actions", &field);
 }
 
-static int	DBpatch_3030053(void)
+static int	DBpatch_3030054(void)
 {
 	const ZBX_FIELD field = {"esc_period", "0s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("actions", &field);
 }
 
-static int	DBpatch_3030054(void)
+static int	DBpatch_3030055(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
 
 	return DBpatch_table_convert("actions", "actionid", field_convs);
 }
 
-static int	DBpatch_3030055(void)
+static int	DBpatch_3030056(void)
 {
 	const ZBX_FIELD field = {"esc_period", "0s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("operations", &field);
 }
 
-static int	DBpatch_3030056(void)
+static int	DBpatch_3030057(void)
 {
 	const ZBX_FIELD field = {"esc_period", "0s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("operations", &field);
 }
 
-static int	DBpatch_3030057(void)
+static int	DBpatch_3030058(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
 
 	return DBpatch_table_convert("operations", "operationid", field_convs);
 }
 
-static int	DBpatch_3030058(void)
-{
-	const ZBX_FIELD field = {"refresh_unsupported", "600s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
-
-	return DBmodify_field_type("config", &field);
-}
-
 static int	DBpatch_3030059(void)
 {
 	const ZBX_FIELD field = {"refresh_unsupported", "600s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030060(void)
 {
-	const ZBX_FIELD field = {"work_period", "1-5,09:00-18:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"refresh_unsupported", "600s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030061(void)
 {
 	const ZBX_FIELD field = {"work_period", "1-5,09:00-18:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030062(void)
 {
-	const ZBX_FIELD field = {"event_expire", "1w", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"work_period", "1-5,09:00-18:00", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030063(void)
 {
 	const ZBX_FIELD field = {"event_expire", "1w", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030064(void)
 {
-	const ZBX_FIELD field = {"ok_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"event_expire", "1w", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030065(void)
 {
 	const ZBX_FIELD field = {"ok_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030066(void)
 {
-	const ZBX_FIELD field = {"blink_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"ok_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030067(void)
 {
 	const ZBX_FIELD field = {"blink_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030068(void)
 {
-	const ZBX_FIELD field = {"hk_events_trigger", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"blink_period", "30m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030069(void)
 {
 	const ZBX_FIELD field = {"hk_events_trigger", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030070(void)
 {
-	const ZBX_FIELD field = {"hk_events_internal", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_events_trigger", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030071(void)
 {
 	const ZBX_FIELD field = {"hk_events_internal", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030072(void)
 {
-	const ZBX_FIELD field = {"hk_events_discovery", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_events_internal", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030073(void)
 {
 	const ZBX_FIELD field = {"hk_events_discovery", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030074(void)
 {
-	const ZBX_FIELD field = {"hk_events_autoreg", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_events_discovery", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030075(void)
 {
 	const ZBX_FIELD field = {"hk_events_autoreg", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030076(void)
 {
-	const ZBX_FIELD field = {"hk_services", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_events_autoreg", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030077(void)
 {
 	const ZBX_FIELD field = {"hk_services", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030078(void)
 {
-	const ZBX_FIELD field = {"hk_audit", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_services", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030079(void)
 {
 	const ZBX_FIELD field = {"hk_audit", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030080(void)
 {
-	const ZBX_FIELD field = {"hk_sessions", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_audit", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030081(void)
 {
 	const ZBX_FIELD field = {"hk_sessions", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030082(void)
 {
-	const ZBX_FIELD field = {"hk_history", "90d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_sessions", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030083(void)
 {
 	const ZBX_FIELD field = {"hk_history", "90d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030084(void)
 {
-	const ZBX_FIELD field = {"hk_trends", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_history", "90d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("config", &field);
+	return DBset_default("config", &field);
 }
 
 static int	DBpatch_3030085(void)
 {
 	const ZBX_FIELD field = {"hk_trends", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBset_default("config", &field);
+	return DBmodify_field_type("config", &field);
 }
 
 static int	DBpatch_3030086(void)
+{
+	const ZBX_FIELD field = {"hk_trends", "365d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030087(void)
 {
 	const DBpatch_field_conv_t	field_convs[] = {
 						{"refresh_unsupported",	DBpatch_conv_sec},
@@ -941,7 +948,7 @@ static int	DBpatch_3030086(void)
 	return DBpatch_table_convert("config", "configid", field_convs);
 }
 
-static int	DBpatch_3030087(void)
+static int	DBpatch_3030088(void)
 {
 	const char	*sql =
 			"delete from profiles"
@@ -1002,17 +1009,17 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3030088(void)
+static int	DBpatch_3030089(void)
 {
 	return DBpatch_trailing_semicolon_remove("config", "configid", "work_period", "");
 }
 
-static int	DBpatch_3030089(void)
+static int	DBpatch_3030090(void)
 {
 	return DBpatch_trailing_semicolon_remove("media", "mediaid", "period", "");
 }
 
-static int	DBpatch_3030090(void)
+static int	DBpatch_3030091(void)
 {
 	/* CONDITION_TYPE_TIME_PERIOD */
 	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
@@ -1114,5 +1121,6 @@ DBPATCH_ADD(3030087, 0, 1)
 DBPATCH_ADD(3030088, 0, 1)
 DBPATCH_ADD(3030089, 0, 1)
 DBPATCH_ADD(3030090, 0, 1)
+DBPATCH_ADD(3030091, 0, 1)
 
 DBPATCH_END()
