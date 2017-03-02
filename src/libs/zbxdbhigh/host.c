@@ -4050,7 +4050,6 @@ httptest_t;
 
 typedef struct
 {
-	zbx_uint64_t		id;
 	int			type;
 	char			*name;
 	char			*value;
@@ -4144,7 +4143,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		/* web scenario fields */
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select httptest_fieldid,httptestid,type,name,value"
+				"select httptestid,type,name,value"
 				" from httptest_field"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
@@ -4155,7 +4154,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(httptestid, row[1]);
+			ZBX_STR2UINT64(httptestid, row[0]);
 
 			if (NULL == httptest || httptest->templateid != httptestid)
 			{
@@ -4171,10 +4170,9 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 			httpfield = zbx_malloc(NULL, sizeof(httpfield_t));
 
-			ZBX_STR2UINT64(httpfield->id, row[0]);
-			httpfield->type = atoi(row[2]);
-			httpfield->name = zbx_strdup(NULL, row[3]);
-			httpfield->value = zbx_strdup(NULL, row[4]);
+			httpfield->type = atoi(row[1]);
+			httpfield->name = zbx_strdup(NULL, row[2]);
+			httpfield->value = zbx_strdup(NULL, row[3]);
 
 			zbx_vector_ptr_append(&httptest->fields, httpfield);
 		}
@@ -4239,7 +4237,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select f.httpstep_fieldid,s.httptestid,f.httpstepid,f.type,f.name,f.value"
+				"select s.httptestid,f.httpstepid,f.type,f.name,f.value"
 				" from httpstep_field f"
 				" join httpstep s"
 					" on");
@@ -4252,8 +4250,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(httptestid, row[1]);
-			ZBX_STR2UINT64(httpstepid, row[2]);
+			ZBX_STR2UINT64(httptestid, row[0]);
+			ZBX_STR2UINT64(httpstepid, row[1]);
 
 			if (NULL == httptest || httptest->templateid != httptestid)
 			{
@@ -4282,10 +4280,9 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 			httpfield = zbx_malloc(NULL, sizeof(httpfield_t));
 
-			ZBX_STR2UINT64(httpfield->id, row[0]);
-			httpfield->type = atoi(row[3]);
-			httpfield->name = zbx_strdup(NULL, row[4]);
-			httpfield->value = zbx_strdup(NULL, row[5]);
+			httpfield->type = atoi(row[2]);
+			httpfield->name = zbx_strdup(NULL, row[3]);
+			httpfield->value = zbx_strdup(NULL, row[4]);
 
 			zbx_vector_ptr_append(&httpstep->fields, httpfield);
 		}

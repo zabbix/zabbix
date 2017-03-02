@@ -552,12 +552,4 @@
 		close_window();
 		return true;
 	}
-
-	jQuery(function() {
-		jQuery('#retrieve_mode')
-			.on('change', function() {
-				jQuery('#required, #posts').attr('disabled', this.checked);
-			})
-			.trigger('change');
-	});
 </script>
