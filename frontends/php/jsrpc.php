@@ -67,7 +67,9 @@ switch ($data['method']) {
 		break;
 
 	case 'message.settings':
-		$result = getMessageSettings();
+		$msgsettings = getMessageSettings();
+		$msgsettings['timeout'] = timeUnitToSeconds($msgsettings['timeout']);
+		$result = $msgsettings;
 		break;
 
 	case 'message.get':

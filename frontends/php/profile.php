@@ -163,9 +163,9 @@ elseif (hasRequest('update')) {
 		}
 
 		DBstart();
-		updateMessageSettings($messages);
+		$result = updateMessageSettings($messages);
 
-		$result = (bool) API::User()->update($user);
+		$result = $result && (bool) API::User()->update($user);
 
 		$result = DBend($result);
 

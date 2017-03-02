@@ -101,6 +101,13 @@ function updateMessageSettings($messages) {
 	$updates = [];
 
 	foreach ($messages as $key => $value) {
+		if ($key === 'timeout') {
+			if (!validateTimeUnit($messages['timeout'], 30, SEC_PER_DAY, false, $error)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', $error));
+				return false;
+			}
+		}
+
 		$values = [
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
@@ -126,6 +133,7 @@ function updateMessageSettings($messages) {
 	}
 	catch (APIException $e) {
 		error($e->getMessage());
+		return false;
 	}
-	return $messages;
+	return true;
 }
