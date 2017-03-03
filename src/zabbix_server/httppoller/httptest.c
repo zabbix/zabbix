@@ -411,7 +411,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 	int			type, ret = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
-	size_t 			alloc_len = 0, offset;
+	size_t			alloc_len = 0, offset;
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers;
 	char			*key, *value;
@@ -475,7 +475,6 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 
 	httptest->headers = NULL;
 	httpstep_pairs_join(&httptest->headers, &alloc_len, &offset, ":", "\r\n", &headers);
-
 out:
 	httppairs_free(&headers);
 	DBfree_result(result);
@@ -502,7 +501,7 @@ out:
  ******************************************************************************/
 static zbx_uint32_t	punycode_adapt(zbx_uint32_t delta, int count, int divisor)
 {
-	zbx_uint32_t i;
+	zbx_uint32_t	i;
 
 	delta /= divisor;
 	delta += delta / count;
@@ -553,9 +552,9 @@ static char	punycode_encode_digit(int digit)
  ******************************************************************************/
 static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, char *output, size_t length)
 {
-	int ret = FAIL;
-	zbx_uint32_t n, delta = 0, bias, max_codepoint, q, k, t;
-	size_t h = 0, out = 0, j;
+	int		ret = FAIL;
+	zbx_uint32_t	n, delta = 0, bias, max_codepoint, q, k, t;
+	size_t		h = 0, out = 0, j;
 
 	n = PUNYCODE_INITIAL_N;
 	bias = PUNYCODE_INITIAL_BIAS;

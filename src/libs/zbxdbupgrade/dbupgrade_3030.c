@@ -20,7 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include "log.h"
 
 /*
  * 3.4 development database patches

@@ -365,9 +365,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 	return ret;
 }
 
-#define TRIM_LEADING_WHITESPACE(ptr)	while (' ' == *ptr || '\t' == *ptr) ptr++;
-#define TRIM_TRAILING_WHITESPACE(ptr)	do { ptr--; } while (' ' == *ptr || '\t' == *ptr);
-
 /******************************************************************************
  *                                                                            *
  * Function: http_process_variables                                           *
