@@ -366,7 +366,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-		FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
+			FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -375,9 +375,13 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
 	{
 		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
+		{
 			request_type = ZBX_GET_QUEUE_OVERVIEW;
+		}
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
+		{
 			request_type = ZBX_GET_QUEUE_PROXY;
+		}
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
 		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
@@ -491,6 +495,90 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_getstatus                                                   *
+ *                                                                            *
+ * Purpose: process status request                                            *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
+{
+#define ZBX_GET_STATUS_PING	0
+#define ZBX_GET_STATUS_FULL	1
+
+	const char		*__function_name = "recv_getstatus";
+	int			ret = FAIL, request_type;
+	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
+	struct zbx_json		json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+		SUCCEED != zbx_session_validate(sessionid, USER_TYPE_ZABBIX_USER))
+	{
+		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
+	{
+		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_STATUS_PING))
+		{
+			request_type = ZBX_GET_STATUS_PING;
+		}
+		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_STATUS_FULL))
+		{
+			request_type = ZBX_GET_STATUS_FULL;
+		}
+		else
+		{
+			zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+			goto out;
+		}
+	}
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	switch (request_type)
+	{
+		case ZBX_GET_STATUS_PING:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+			zbx_json_close(&json);
+			break;
+		case ZBX_GET_STATUS_FULL:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+			zbx_json_close(&json);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
+
+	(void)zbx_tcp_send_raw(sock, json.buffer);
+
+	zbx_json_free(&json);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+
+#undef ZBX_GET_STATUS_PING
+#undef ZBX_GET_STATUS_FULL
 }
 
 static void	active_passive_misconfig(zbx_socket_t *sock)
@@ -611,6 +699,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = recv_getqueue(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = recv_getstatus(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
