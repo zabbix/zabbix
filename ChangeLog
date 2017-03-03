@@ -1,4 +1,4 @@
-Changes for 3.3.0
+Changes for 3.4.0alpha1
 
 New features:
 ..F....... [ZBXNEXT-3654] implemented a feature to apply host group permissions to all existing subgroups (Ivo, Sasha)
