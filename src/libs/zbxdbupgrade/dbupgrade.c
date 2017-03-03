@@ -234,10 +234,9 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " ", field->name);
 	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 #ifdef HAVE_POSTGRESQL
-	if (ZBX_TYPE_UINT == field->type && NULL != field->default_value) {
+	if (NULL != field->default_value) {
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		DBset_default_sql(sql, sql_alloc, sql_offset, table_name, field);
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 	}
 #endif
 #endif
