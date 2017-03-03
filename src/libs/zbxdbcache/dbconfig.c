@@ -3619,7 +3619,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 	/* remove deleted actions */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (operation = zbx_hashset_search(&config->corr_operations, &operation->correlationid)))
+		if (NULL == (operation = zbx_hashset_search(&config->corr_operations, &rowid)))
 			continue;
 
 		/* remove operation from correlation->conditions vector */
