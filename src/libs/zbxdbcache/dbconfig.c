@@ -4478,6 +4478,102 @@ void	DCsync_configuration(unsigned char mode)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
+			config->proxies.num_data, config->proxies.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
+			config->hosts.num_data, config->hosts.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
+			config->hosts_h.num_data, config->hosts_h.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __function_name,
+			config->hosts_p.num_data, config->hosts_p.num_slots);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __function_name,
+			config->psks.num_data, config->psks.num_slots);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
+			config->ipmihosts.num_data, config->ipmihosts.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
+			config->host_inventories.num_data, config->host_inventories.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
+			config->htmpls.num_data, config->htmpls.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
+			config->gmacros.num_data, config->gmacros.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __function_name,
+			config->gmacros_m.num_data, config->gmacros_m.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __function_name,
+			config->hmacros.num_data, config->hmacros.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __function_name,
+			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
+			config->interfaces.num_data, config->interfaces.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
+			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
+			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
+			config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
+			config->items.num_data, config->items.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __function_name,
+			config->items_hk.num_data, config->items_hk.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __function_name,
+			config->numitems.num_data, config->numitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __function_name,
+			config->snmpitems.num_data, config->snmpitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,
+			config->ipmiitems.num_data, config->ipmiitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flexitems  : %d (%d slots)", __function_name,
+			config->flexitems.num_data, config->flexitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
+			config->trapitems.num_data, config->trapitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
+			config->logitems.num_data, config->logitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
+			config->dbitems.num_data, config->dbitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sshitems   : %d (%d slots)", __function_name,
+			config->sshitems.num_data, config->sshitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __function_name,
+			config->telnetitems.num_data, config->telnetitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __function_name,
+			config->simpleitems.num_data, config->simpleitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __function_name,
+			config->jmxitems.num_data, config->jmxitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
+			config->calcitems.num_data, config->calcitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems : %d (%d slots)", __function_name,
+			config->deltaitems.num_data, config->deltaitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
+			config->functions.num_data, config->functions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
+			config->triggers.num_data, config->triggers.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
+			config->trigdeps.num_data, config->trigdeps.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __function_name,
+			config->trigger_tags.num_data, config->trigger_tags.num_slots);
+	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
+				i, config->time_triggers[i].values_num, config->time_triggers[i].values_alloc);
+	}
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
+			config->expressions.num_data, config->expressions.num_slots);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : %d (%d slots)", __function_name,
+			config->actions.num_data, config->actions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __function_name,
+			config->action_conditions.num_data, config->action_conditions.num_slots);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __function_name,
+			config->correlations.num_data, config->correlations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __function_name,
+			config->corr_conditions.num_data, config->corr_conditions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
+			config->corr_operations.num_data, config->corr_operations.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
+			config->hostgroups.num_data, config->hostgroups.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item procs : %d (%d slots)", __function_name,
+			config->item_preproc.num_data, config->item_preproc.num_slots);
+
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
