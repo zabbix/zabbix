@@ -950,7 +950,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	DCsync_configuration();
+	DCsync_configuration(ZBX_DBSYNC_INIT);
 	DBclose();
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)

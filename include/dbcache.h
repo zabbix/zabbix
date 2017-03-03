@@ -445,10 +445,14 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-void	DCsync_configuration(void);
+/* initial sync, get all data */
+#define ZBX_DBSYNC_INIT		0
+/* update sync, get changed data */
+#define ZBX_DBSYNC_UPDATE	1
+
+void	DCsync_configuration(unsigned char mode);
 void	init_configuration_cache(void);
 void	free_configuration_cache(void);
-void	DCload_config(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
@@ -623,4 +627,6 @@ typedef struct
 zbx_agent_value_t;
 
 void	zbx_dc_items_update_runtime_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
+void	zbx_dc_update_proxy_lastaccess(zbx_uint64_t hostid, int lastaccess);
+
 #endif

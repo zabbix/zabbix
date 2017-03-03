@@ -5,6 +5,9 @@ noinst_LIBRARIES = libzbxdbcache.a
 libzbxdbcache_a_SOURCES = \
 	dbcache.c \
 	dbconfig.c \
+	dbconfig.h \
+	dbsync.c \
+	dbsync.h \
 	valuecache.c \
 	valuecache.h \
 	item_preproc.c \
