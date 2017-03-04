@@ -1588,10 +1588,7 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 			}
 		}
 
-		if (!array_key_exists($row['eventid'], $alerts)) {
-			$alerts[$row['eventid']] = [];
-		}
-		$alerts[$row['eventid']][] = $alert;
+		$alerts[$row['eventid']][$row['p_eventid']][] = $alert;
 	}
 
 	if ($mediatypeids) {
@@ -1611,14 +1608,12 @@ function makeEventsActions(array $problems, $display_recovery_alerts = false, $h
 	}
 
 	foreach ($problems as $index => $problem) {
-		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']] : [];
+		$event_alerts = array_key_exists($problem['eventid'], $alerts) ? $alerts[$problem['eventid']][0] : [];
 		$r_event_alerts = [];
-		if (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0 && array_key_exists($problem['r_eventid'], $alerts)) {
-			foreach ($alerts[$problem['r_eventid']] as $r_alert) {
-				if ($r_alert['p_eventid'] == $problem['eventid']) {
-					$r_event_alerts[] = $r_alert;
-				}
-			}
+		if (array_key_exists('r_eventid', $problem) && $problem['r_eventid'] != 0
+				&& array_key_exists($problem['r_eventid'], $alerts)
+				&& array_key_exists($problem['eventid'], $alerts[$problem['r_eventid']])) {
+			$r_event_alerts = $alerts[$problem['r_eventid']][$problem['eventid']];
 		}
 
 		if ($event_alerts || $r_event_alerts) {
