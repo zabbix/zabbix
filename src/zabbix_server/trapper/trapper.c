@@ -497,6 +497,209 @@ out:
 	return ret;
 }
 
+void	status_section_begin(struct zbx_json *json, const char *name)
+{
+	zbx_json_addarray(json, name);
+}
+
+void	status_section_end(struct zbx_json *json)
+{
+	zbx_json_close(json);
+}
+
+void	status_entry_begin(struct zbx_json *json)
+{
+	zbx_json_addobject(json, NULL);
+}
+
+void	status_entry_end(struct zbx_json *json)
+{
+	zbx_json_close(json);
+}
+
+void	status_template_stats(struct zbx_json *json)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	templates;
+
+	if (NULL == (result = DBselect("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
+		return;
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], &templates))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
+
+	status_section_begin(json, "template stats");
+
+	status_entry_begin(json);
+	zbx_json_adduint64(json, "count", templates);
+	status_entry_end(json);
+
+	status_section_end(json);
+out:
+	DBfree_result(result);
+}
+
+void	status_host_stats(struct zbx_json *json)
+{
+	zbx_host_stats_t	host_stats = DCget_host_stats();
+
+	status_section_begin(json, "host stats");
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", HOST_STATUS_MONITORED);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", host_stats.monitored);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", HOST_STATUS_NOT_MONITORED);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", host_stats.not_monitored);
+	status_entry_end(json);
+
+	status_section_end(json);
+}
+
+void	status_item_stats(struct zbx_json *json)
+{
+	zbx_item_stats_t	item_stats = DCget_item_stats();
+
+	status_section_begin(json, "item stats");
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", ITEM_STATUS_ACTIVE);
+	zbx_json_adduint64(json, "state", ITEM_STATE_NORMAL);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", item_stats.active_normal);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", ITEM_STATUS_ACTIVE);
+	zbx_json_adduint64(json, "state", ITEM_STATE_NOTSUPPORTED);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", item_stats.active_notsupported);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", ITEM_STATUS_DISABLED);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", item_stats.disabled);
+	status_entry_end(json);
+
+	status_section_end(json);
+}
+
+void	status_trigger_stats(struct zbx_json *json)
+{
+	zbx_trigger_stats_t	trigger_stats = DCget_trigger_stats();
+
+	status_section_begin(json, "trigger stats");
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", TRIGGER_STATUS_ENABLED);
+	zbx_json_adduint64(json, "value", TRIGGER_VALUE_OK);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", trigger_stats.enabled_ok);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", TRIGGER_STATUS_ENABLED);
+	zbx_json_adduint64(json, "value", TRIGGER_VALUE_PROBLEM);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", trigger_stats.enabled_problem);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", TRIGGER_STATUS_DISABLED);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", trigger_stats.disabled);
+	status_entry_end(json);
+
+	status_section_end(json);
+}
+
+void	status_user_stats(struct zbx_json *json)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		now;
+	zbx_uint64_t	users_offline, users_online = 0;
+
+	if (NULL == (result = DBselect("select count(*) from users")))
+		return;
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], &users_offline))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
+
+	DBfree_result(result);
+	now = time(NULL);
+	DBselect("select max(lastaccess) from sessions where status=%d group by userid,status", ZBX_SESSION_ACTIVE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (atoi(row[0]) + ZBX_USER_ONLINE_TIME < now)
+			continue;
+
+		users_online++;
+
+		if (0 == users_offline)	/* new user can be created and log in between two selects */
+			continue;
+
+		users_offline--;
+	}
+
+	status_section_begin(json, "user stats");
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", ZBX_USER_STATUS_ONLINE);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", users_online);
+	status_entry_end(json);
+
+	status_entry_begin(json);
+	zbx_json_addobject(json, "attributes");
+	zbx_json_adduint64(json, "status", ZBX_USER_STATUS_OFFLINE);
+	zbx_json_close(json);
+	zbx_json_adduint64(json, "count", users_offline);
+	status_entry_end(json);
+
+	status_section_end(json);
+out:
+	DBfree_result(result);
+}
+
+void	status_required_performance(struct zbx_json *json)
+{
+	char	*tmp = NULL;
+
+	status_section_begin(json, "required performance");
+
+	status_entry_begin(json);
+	tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, DCget_required_performance());
+	zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
+	status_entry_end(json);
+
+	status_section_end(json);
+
+	zbx_free(tmp);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: recv_getstatus                                                   *
@@ -512,11 +715,12 @@ out:
  ******************************************************************************/
 static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
+#define ZBX_GET_STATUS_UNKNOWN	-1
 #define ZBX_GET_STATUS_PING	0
 #define ZBX_GET_STATUS_FULL	1
 
 	const char		*__function_name = "recv_getstatus";
-	int			ret = FAIL, request_type;
+	int			ret = FAIL, request_type = ZBX_GET_STATUS_UNKNOWN;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	struct zbx_json		json;
 
@@ -539,11 +743,12 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		{
 			request_type = ZBX_GET_STATUS_FULL;
 		}
-		else
-		{
-			zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
-			goto out;
-		}
+	}
+
+	if (ZBX_GET_STATUS_UNKNOWN == request_type)
+	{
+		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		goto out;
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -552,13 +757,18 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	{
 		case ZBX_GET_STATUS_PING:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 			zbx_json_close(&json);
 			break;
 		case ZBX_GET_STATUS_FULL:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
-
+			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+			status_template_stats(&json);
+			status_host_stats(&json);
+			status_item_stats(&json);
+			status_trigger_stats(&json);
+			status_user_stats(&json);
+			status_required_performance(&json);
 			zbx_json_close(&json);
 			break;
 		default:
@@ -577,6 +787,7 @@ out:
 
 	return ret;
 
+#undef ZBX_GET_STATUS_UNKNOWN
 #undef ZBX_GET_STATUS_PING
 #undef ZBX_GET_STATUS_FULL
 }

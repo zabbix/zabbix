@@ -76,6 +76,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
+		zbx_trigger_stats_t	trigger_stats;
+
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
@@ -85,7 +87,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_trigger_count());
+		trigger_stats = DCget_trigger_stats();
+		SET_UI64_RESULT(result, trigger_stats.enabled_ok + trigger_stats.enabled_problem);
 	}
 	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
 	{
@@ -109,13 +112,16 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
 	{
+		zbx_host_stats_t	host_stats;
+
 		if (1 != nparams)
 		{
 			error = zbx_strdup(error, "Invalid number of parameters.");
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_host_count());
+		host_stats = DCget_host_stats();
+		SET_UI64_RESULT(result, host_stats.monitored);
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
 			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */

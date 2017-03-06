@@ -9254,23 +9254,82 @@ int	DCget_item_unsupported_count(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_trigger_count                                              *
+ * Function: DCget_item_stats                                                 *
  *                                                                            *
- * Purpose: return the number of active triggers                              *
- *                                                                            *
- * Return value: the number of active triggers                                *
+ * Purpose: count enabled, not supported and disabled items                   *
  *                                                                            *
  ******************************************************************************/
-int	DCget_trigger_count(void)
+zbx_item_stats_t	DCget_item_stats(void)
 {
+	static zbx_item_stats_t	item_stats = {0, 0, 0};
+	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		functionid;
 	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_FUNCTION	*dc_function;
-	const ZBX_DC_TRIGGER	*dc_trigger;
-	const ZBX_DC_HOST	*dc_host;
-	const char		*p, *q;
-	int			count = 0;
+
+	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
+		goto out;
+
+	item_stats.active_normal = item_stats.active_notsupported = item_stats.disabled = 0;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
+	{
+		const ZBX_DC_HOST	*dc_host;
+
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+		{
+			item_stats.disabled++;
+			continue;
+		}
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
+		item_stats.active_normal++;
+
+		if (ITEM_STATE_NOTSUPPORTED == dc_item->state)
+			item_stats.active_notsupported++;
+	}
+
+	UNLOCK_CACHE;
+
+	last_counted = time(NULL);
+out:
+	return item_stats;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_trigger_stats                                              *
+ *                                                                            *
+ * Purpose: count active (OK and PROBLEM) and inactive triggers               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_trigger_stats_t	DCget_trigger_stats(void)
+{
+	static zbx_trigger_stats_t	trigger_stats = {0, 0, 0};
+	static time_t			last_counted = 0;
+	zbx_hashset_iter_t		iter;
+	zbx_uint64_t			functionid;
+	const ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_FUNCTION		*dc_function;
+	const ZBX_DC_TRIGGER		*dc_trigger;
+	const ZBX_DC_HOST		*dc_host;
+	const char			*p, *q;
+
+	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
+		goto out;
+
+	trigger_stats.enabled_ok = trigger_stats.enabled_problem = trigger_stats.disabled = 0;
 
 	LOCK_CACHE;
 
@@ -9279,7 +9338,10 @@ int	DCget_trigger_count(void)
 	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
 	{
 		if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
+		{
+			trigger_stats.disabled++;
 			continue;
+		}
 
 		for (p = dc_trigger->expression; '\0' != *p; p++)
 		{
@@ -9316,29 +9378,43 @@ int	DCget_trigger_count(void)
 			p = q;
 		}
 
-		count++;
+		switch (dc_trigger->value)
+		{
+			case TRIGGER_VALUE_OK:
+				trigger_stats.enabled_ok++;
+				break;
+			case TRIGGER_VALUE_PROBLEM:
+				trigger_stats.enabled_problem++;
+				break;
+		}
 next:;
 	}
 
 	UNLOCK_CACHE;
 
-	return count;
+	last_counted = time(NULL);
+out:
+	return trigger_stats;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_host_count                                                 *
+ * Function: DCget_host_stats                                                 *
  *                                                                            *
- * Purpose: return the number of monitored hosts                              *
- *                                                                            *
- * Return value: the number of monitored hosts                                *
+ * Purpose: count monitored and not monitored hosts                           *
  *                                                                            *
  ******************************************************************************/
-int	DCget_host_count(void)
+zbx_host_stats_t	DCget_host_stats(void)
 {
-	int			nhosts = 0;
+	static zbx_host_stats_t	host_stats = {0, 0};
+	static time_t		last_counted = 0;
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_HOST	*dc_host;
+
+	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
+		goto out;
+
+	host_stats.monitored = host_stats.not_monitored = 0;
 
 	LOCK_CACHE;
 
@@ -9346,13 +9422,22 @@ int	DCget_host_count(void)
 
 	while (NULL != (dc_host = zbx_hashset_iter_next(&iter)))
 	{
-		if (HOST_STATUS_MONITORED == dc_host->status)
-			nhosts++;
+		switch (dc_host->status)
+		{
+			case HOST_STATUS_MONITORED:
+				host_stats.monitored++;
+				break;
+			case HOST_STATUS_NOT_MONITORED:
+				host_stats.not_monitored++;
+				break;
+		}
 	}
 
 	UNLOCK_CACHE;
 
-	return nhosts;
+	last_counted = time(NULL);
+out:
+	return host_stats;
 }
 
 /******************************************************************************

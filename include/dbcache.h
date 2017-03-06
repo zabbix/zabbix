@@ -47,6 +47,8 @@
 
 #define ZBX_EXPAND_MACROS		1
 
+#define ZBX_STATUS_LIFETIME	60
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
@@ -407,6 +409,29 @@ typedef struct
 }
 zbx_queue_item_t;
 
+typedef struct
+{
+	zbx_uint64_t	monitored;
+	zbx_uint64_t	not_monitored;
+}
+zbx_host_stats_t;
+
+typedef struct
+{
+	zbx_uint64_t	active_normal;
+	zbx_uint64_t	active_notsupported;
+	zbx_uint64_t	disabled;
+}
+zbx_item_stats_t;
+
+typedef struct
+{
+	zbx_uint64_t	enabled_ok;
+	zbx_uint64_t	enabled_problem;
+	zbx_uint64_t	disabled;
+}
+zbx_trigger_stats_t;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -540,9 +565,11 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 int	DCget_item_count(zbx_uint64_t hostid);
 int	DCget_item_unsupported_count(zbx_uint64_t hostid);
-int	DCget_trigger_count(void);
 double	DCget_required_performance(void);
-int	DCget_host_count(void);
+
+zbx_host_stats_t	DCget_host_stats(void);
+zbx_item_stats_t	DCget_item_stats(void);
+zbx_trigger_stats_t	DCget_trigger_stats(void);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
