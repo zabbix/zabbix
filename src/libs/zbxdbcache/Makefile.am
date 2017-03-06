@@ -11,6 +11,8 @@ libzbxdbcache_a_SOURCES = \
 	valuecache.c \
 	valuecache.h \
 	item_preproc.c \
-	item_preproc.h
+	item_preproc.h \
+	macroindex.c \
+	macroindex.h
 
 libzbxdbcache_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/ -I@top_srcdir@/src/libs/zbxalgo

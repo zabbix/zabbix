@@ -24,6 +24,8 @@
 #	error This header must be used by configuration cache implementation
 #endif
 
+#include "macroindex.h"
+
 typedef struct
 {
 	zbx_uint64_t		triggerid;
@@ -322,39 +324,16 @@ typedef struct
 }
 ZBX_DC_HTMPL;
 
-typedef struct
+typedef struct zbx_dc_macro
 {
-	zbx_uint64_t	globalmacroid;
-	const char	*macro;
-	const char	*context;
-	const char	*value;
-}
-ZBX_DC_GMACRO;
-
-typedef struct
-{
-	const char		*macro;
-	zbx_vector_ptr_t	gmacros;
-}
-ZBX_DC_GMACRO_M;
-
-typedef struct
-{
-	zbx_uint64_t	hostmacroid;
+	zbx_uint64_t	macroid;
 	zbx_uint64_t	hostid;
 	const char	*macro;
 	const char	*context;
 	const char	*value;
-}
-ZBX_DC_HMACRO;
 
-typedef struct
-{
-	zbx_uint64_t		hostid;
-	const char		*macro;
-	zbx_vector_ptr_t	hmacros;
 }
-ZBX_DC_HMACRO_HM;
+zbx_dc_macro_t;
 
 typedef struct
 {
@@ -575,11 +554,8 @@ typedef struct
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		ipmihosts;
-	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
-	zbx_hashset_t		gmacros_m;		/* macro */
 	zbx_hashset_t		hmacros;
-	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
 	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
@@ -595,6 +571,7 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 	zbx_hashset_t		item_preproc;
+	zbx_macro_index_t	macro_index;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
