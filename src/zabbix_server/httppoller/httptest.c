@@ -1260,7 +1260,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 						&httptest->variables, page.data, &var_err_str))
 				{
 					char	*variables = NULL;
-					size_t alloc_len = 0, offset;
+					size_t	alloc_len = 0, offset;
 
 					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
 							&httptest->variables);
@@ -1276,7 +1276,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 						page.data, &var_err_str))
 				{
 					char	*variables = NULL;
-					size_t alloc_len = 0, offset;
+					size_t	alloc_len = 0, offset;
 
 					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
 							&httpstep.variables);
