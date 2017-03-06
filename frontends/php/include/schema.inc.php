@@ -4353,6 +4353,13 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'p_eventid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'eventid',
+			],
 		],
 	],
 	'history' => [
