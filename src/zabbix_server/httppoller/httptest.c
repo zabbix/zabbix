@@ -28,6 +28,17 @@
 #include "httptest.h"
 #include "zbxregexp.h"
 
+#define PUNYCODE_BASE		36
+#define PUNYCODE_BASE_MAX	35
+#define PUNYCODE_TMIN		1
+#define PUNYCODE_TMAX		26
+#define PUNYCODE_SKEW		38
+#define PUNYCODE_DAMP		700
+#define PUNYCODE_INITIAL_N	128
+#define PUNYCODE_INITIAL_BIAS	72
+#define PUNYCODE_BIAS_LIMIT	(((PUNYCODE_BASE_MAX) * PUNYCODE_TMAX) / 2)
+#define PUNYCODE_MAX_UINT32	((uint32_t)-1)
+
 typedef struct
 {
 	char	*data;
@@ -905,7 +916,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	if (ZBX_POSTTYPE_FORM == httpstep->httpstep->post_type)
 		httpstep_pairs_join(&httpstep->posts, &alloc_len, &offset, "=", "&", &post_fields);
 	else
-		httpstep->posts = httpstep->httpstep->posts; /* post data in raw format */
+		httpstep->posts = httpstep->httpstep->posts;	/* post data in raw format */
 
 	httpstep_pairs_join(&httpstep->headers, &alloc_len, &offset, ":", "\r\n", &headers);
 out:
@@ -1062,10 +1073,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		dbstep.httptestid = httptest->httptest.httptestid;
 		dbstep.no = atoi(row[1]);
 		dbstep.name = row[2];
+
 		dbstep.url = zbx_strdup(NULL, row[3]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&dbstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 		http_substitute_variables(httptest, &dbstep.url);
+
 		dbstep.post_type = atoi(row[8]);
 
 		if (ZBX_POSTTYPE_RAW == dbstep.post_type)
@@ -1085,6 +1098,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		}
 
 		dbstep.timeout = atoi(row[4]);
+
 		dbstep.required = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&dbstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);

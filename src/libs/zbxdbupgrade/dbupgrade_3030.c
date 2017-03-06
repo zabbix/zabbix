@@ -545,6 +545,7 @@ static int	DBpatch_3030038(void)
 
 	return DBadd_field("httpstep", &field);
 }
+
 #endif
 
 DBPATCH_START(3030)
@@ -590,4 +591,5 @@ DBPATCH_ADD(3030035, 0, 1)
 DBPATCH_ADD(3030036, 0, 1)
 DBPATCH_ADD(3030037, 0, 1)
 DBPATCH_ADD(3030038, 0, 1)
+
 DBPATCH_END()
