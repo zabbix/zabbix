@@ -6751,8 +6751,15 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 	{
 		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
 
-		if (TRIGGER_STATUS_ENABLED == dc_trigger->status && 0 == dc_trigger->locked &&
-				SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
+		if (TRIGGER_STATUS_DISABLED == dc_trigger->status || 1 == dc_trigger->locked)
+			continue;
+
+		/* We trigger the evaluation of the recovery expression only if the trigger have a value of */
+		/* TRIGGER_VALUE_PROBLEM and if the recovery mode use the recovery expression */
+		if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression) ||
+				(TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == dc_trigger->recovery_mode &&
+				TRIGGER_VALUE_PROBLEM == dc_trigger->value &&
+				SUCCEED == DCconfig_find_active_time_function(dc_trigger->recovery_expression)))
 		{
 			dc_trigger->locked = 1;
 
