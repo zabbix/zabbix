@@ -1259,7 +1259,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				if (NULL == err_str && FAIL == http_process_variables(httptest,
 						&httptest->variables, page.data, &var_err_str))
 				{
-					char	*variables;
+					char	*variables = NULL;
 					size_t alloc_len = 0, offset;
 
 					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
