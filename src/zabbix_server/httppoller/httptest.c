@@ -562,6 +562,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 	while (h < count)
 	{
 		max_codepoint = PUNYCODE_MAX_UINT32;
+
 		for (j = 0; j < count; ++j)
 		{
 			if (codepoints[j] >= n && codepoints[j] < max_codepoint)
@@ -569,7 +570,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 		}
 
 		if (max_codepoint - n > (PUNYCODE_MAX_UINT32 - delta) / (h + 1))
-			goto out; /* overflow */
+			goto out;	/* overflow */
 
 		delta += (max_codepoint - n) * (h + 1);
 		n = max_codepoint;
@@ -577,7 +578,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 		for (j = 0; j < count; ++j)
 		{
 			if (codepoints[j] < n && 0 == ++delta)
-				goto out; /* overflow */
+				goto out;	/* overflow */
 
 			if (codepoints[j] == n)
 			{
@@ -586,7 +587,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 				while(1)
 				{
 					if (out >= length)
-						goto out; /* out of memory */
+						goto out;	/* out of memory */
 
 					if (k <= bias)
 						t = PUNYCODE_TMIN;
@@ -605,7 +606,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 				}
 
 				output[out++] = punycode_encode_digit(q);
-				bias = punycode_adapt(delta, h + 1, (h == 0)?PUNYCODE_DAMP:2);
+				bias = punycode_adapt(delta, h + 1, (h == 0) ? PUNYCODE_DAMP : 2);
 				delta = 0;
 				++h;
 			}
@@ -616,7 +617,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 	}
 
 	if (out >= length)
-		goto out; /* out of memory */
+		goto out;	/* out of memory */
 
 	output[out] = '\0';
 	ret = SUCCEED;
@@ -688,6 +689,7 @@ static int	punycode_encode(const char *text, char **output)
 				zbx_strcpy_alloc(output, &size, &offset, buffer);
 				count = 0;
 			}
+
 			zbx_chrcpy_alloc(output, &size, &offset, *text++);
 		}
 	}
@@ -729,7 +731,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	int			type, ansi = 1, ret = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
-	size_t 			alloc_len = 0, offset;
+	size_t			alloc_len = 0, offset;
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers, query_fields, post_fields;
 	char			*key, *value, *url = NULL, query_delimiter = '?', *domain, *tmp;
@@ -822,6 +824,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	if (NULL != value)
 	{
 		/* URL contains fragment delimiter, so it must be dropped */
+
 		zabbix_log(LOG_LEVEL_DEBUG, "URL contains fragment delimiter, fragment part is deleted from URL");
 		*value = '\0';
 		offset = value - url;
@@ -859,6 +862,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	if (0 == ansi)
 	{
 		/* non-ansi URL, conversion to the punicode is needed */
+
 		char	*rest = NULL, *encoded_url = NULL, *encoded_domain = NULL, delimiter;
 
 		delimiter = *tmp;
@@ -886,6 +890,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		if ('\0' != delimiter)
 		{
 			/* rest of the URL (if any) */
+
 			zbx_chrcpy_alloc(&encoded_url, &alloc_len, &offset, delimiter);
 			zbx_strcpy_alloc(&encoded_url, &alloc_len, &offset, rest);
 		}
@@ -945,7 +950,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	int		err;
 	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
-	CURL            *easyhandle = NULL;
+	CURL		*easyhandle = NULL;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",

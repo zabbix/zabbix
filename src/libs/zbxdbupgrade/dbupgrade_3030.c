@@ -359,13 +359,13 @@ static int 	DBpatch_3030030_pair_cmp_func(const void *d1, const void *d2)
 #define TRIM_LEADING_WHITESPACE(ptr)	while (' ' == *ptr || '\t' == *ptr) ptr++;
 #define TRIM_TRAILING_WHITESPACE(ptr)	do { ptr--; } while (' ' == *ptr || '\t' == *ptr);
 
-static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t parentid, int type,
+static void	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t parentid, int type,
 		const char *source, const char separator, int unique, int allow_empty)
 {
 	char			*buffer = zbx_strdup(NULL, source), *key = buffer, *value, replace;
 	zbx_vector_ptr_pair_t	pairs;
 	zbx_ptr_pair_t		pair = {NULL, NULL};
-	int			index, ret = FAIL;
+	int			index;
 
 	zbx_vector_ptr_pair_create(&pairs);
 
@@ -390,6 +390,7 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 		if (NULL != value)
 		{
 			char	*tail = value;
+
 			if (ptr != value)
 				value++;
 
@@ -400,7 +401,7 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 				tail[1] = '\0';
 			}
 			else
-				goto skip; /* no key */
+				goto skip;	/* no key */
 
 			tail = ptr;
 			TRIM_LEADING_WHITESPACE(value);
@@ -411,9 +412,8 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 			}
 			else
 			{
-				/* no value */
 				if (0 == allow_empty)
-					goto skip;
+					goto skip;	/* no value */
 			}
 
 			pair.first = key;
@@ -427,7 +427,6 @@ static int	DBpatch_3030030_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t
 			else
 				pairs.values[index].second = value;
 		}
-
 skip:
 		if ('\0' != replace)
 			ptr++;
@@ -447,8 +446,6 @@ skip:
 
 	zbx_vector_ptr_pair_destroy(&pairs);
 	zbx_free(buffer);
-
-	return ret;
 }
 
 static int	DBpatch_3030030_migrate_pairs(const char *table, const char *field, int type, char separator,
