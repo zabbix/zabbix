@@ -2027,140 +2027,113 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+	$server_status = (new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT))
+		->getStatus(get_cookie('zbx_sessionid'));
+
+	if ($server_status === false) {
+		return false;
+	}
+
 	$status = [
-		'triggers_count' => 0,
-		'triggers_count_enabled' => 0,
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,
-		'items_count' => 0,
 		'items_count_monitored' => 0,
 		'items_count_disabled' => 0,
 		'items_count_not_supported' => 0,
-		'hosts_count' => 0,
 		'hosts_count_monitored' => 0,
 		'hosts_count_not_monitored' => 0,
 		'hosts_count_template' => 0,
+		'users_count' => 0,
 		'users_online' => 0,
 		'qps_total' => 0
 	];
 
-	// server
-	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
-	$status['zabbix_server'] = $zabbixServer->isRunning() ? _('Yes') : _('No');
-
-	// triggers
-	$dbTriggers = DBselect(
-		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
-			' FROM triggers t'.
-			' WHERE NOT EXISTS ('.
-				'SELECT f.functionid FROM functions f'.
-					' JOIN items i ON f.itemid=i.itemid'.
-					' JOIN hosts h ON i.hostid=h.hostid'.
-					' WHERE f.triggerid=t.triggerid AND (i.status<>'.ITEM_STATUS_ACTIVE.' OR h.status<>'.HOST_STATUS_MONITORED.')'.
-				')'.
-			' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-			' GROUP BY t.status,t.value'
-		);
-	while ($dbTrigger = DBfetch($dbTriggers)) {
-		switch ($dbTrigger['status']) {
-			case TRIGGER_STATUS_ENABLED:
-				switch ($dbTrigger['value']) {
-					case TRIGGER_VALUE_FALSE:
-						$status['triggers_count_off'] = $dbTrigger['cnt'];
-						break;
-					case TRIGGER_VALUE_TRUE:
-						$status['triggers_count_on'] = $dbTrigger['cnt'];
-						break;
-				}
-				break;
-			case TRIGGER_STATUS_DISABLED:
-				$status['triggers_count_disabled'] += $dbTrigger['cnt'];
-				break;
-		}
-	}
-	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
-	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
-
-	// items
-	$dbItems = DBselect(
-		'SELECT COUNT(i.itemid) AS cnt,i.status,i.state'.
-				' FROM items i'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-				' WHERE h.status='.HOST_STATUS_MONITORED.
-					' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
-				' GROUP BY i.status,i.state');
-	while ($dbItem = DBfetch($dbItems)) {
-		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
-			if ($dbItem['state'] == ITEM_STATE_NORMAL) {
-				$status['items_count_monitored'] = $dbItem['cnt'];
-			}
-			else {
-				$status['items_count_not_supported'] = $dbItem['cnt'];
-			}
-		}
-		elseif ($dbItem['status'] == ITEM_STATUS_DISABLED) {
-			$status['items_count_disabled'] += $dbItem['cnt'];
-		}
-	}
-	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
-			+ $status['items_count_not_supported'];
-
 	// hosts
-	$dbHosts = DBselect(
-		'SELECT COUNT(*) AS cnt,h.status'.
-		' FROM hosts h'.
-		' WHERE '.dbConditionInt('h.status', [
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE
-			]).
-			' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
-		' GROUP BY h.status');
-	while ($dbHost = DBfetch($dbHosts)) {
-		switch ($dbHost['status']) {
+	foreach ($server_status['template stats'] as $stats) {
+		$status['hosts_count_template'] += $stats['count'];
+	}
+
+	foreach ($server_status['host stats'] as $stats) {
+		switch ($stats['attributes']['status']) {
 			case HOST_STATUS_MONITORED:
-				$status['hosts_count_monitored'] = $dbHost['cnt'];
+				$status['hosts_count_monitored'] += $stats['count'];
 				break;
+
 			case HOST_STATUS_NOT_MONITORED:
-				$status['hosts_count_not_monitored'] = $dbHost['cnt'];
-				break;
-			case HOST_STATUS_TEMPLATE:
-				$status['hosts_count_template'] = $dbHost['cnt'];
+				$status['hosts_count_not_monitored'] += $stats['count'];
 				break;
 		}
 	}
 	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
 			+ $status['hosts_count_template'];
 
-	// users
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u'));
+	// items
+	foreach ($server_status['item stats'] as $stats) {
+		switch ($stats['attributes']['status']) {
+			case ITEM_STATUS_ACTIVE:
+				if (array_key_exists('state', $stats['attributes'])) {
+					switch ($stats['attributes']['state']) {
+						case ITEM_STATE_NORMAL:
+							$status['items_count_monitored'] += $stats['count'];
+							break;
 
-	$status['users_count'] = $row['usr_cnt'];
-	$status['users_online'] = 0;
+						case ITEM_STATE_NOTSUPPORTED:
+							$status['items_count_not_supported'] += $stats['count'];
+							break;
+					}
+				}
+				break;
 
-	$db_sessions = DBselect(
-		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-		' FROM sessions s'.
-		' WHERE s.status='.ZBX_SESSION_ACTIVE.
-		' GROUP BY s.userid,s.status'
-	);
-	while ($session = DBfetch($db_sessions)) {
-		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
-			$status['users_online']++;
+			case ITEM_STATUS_DISABLED:
+				$status['items_count_disabled'] += $stats['count'];
+				break;
 		}
 	}
+	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
+			+ $status['items_count_not_supported'];
 
-	// comments: !!! Don't forget sync code with C !!!
-	$row = DBfetch(DBselect(
-		'SELECT SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) AS qps'.
-		' FROM items i,hosts h'.
-		' WHERE i.status='.ITEM_STATUS_ACTIVE.
-		' AND i.hostid=h.hostid'.
-		' AND h.status='.HOST_STATUS_MONITORED.
-		' AND i.delay<>0'.
-		' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
-	));
-	$status['qps_total'] = round($row['qps'], 2);
+	// triggers
+	foreach ($server_status['trigger stats'] as $stats) {
+		switch ($stats['attributes']['status']) {
+			case TRIGGER_STATUS_ENABLED:
+				if (array_key_exists('value', $stats['attributes'])) {
+					switch ($stats['attributes']['value']) {
+						case TRIGGER_VALUE_FALSE:
+							$status['triggers_count_off'] += $stats['count'];
+							break;
+
+						case TRIGGER_VALUE_TRUE:
+							$status['triggers_count_on'] += $stats['count'];
+							break;
+					}
+				}
+				break;
+
+			case TRIGGER_STATUS_DISABLED:
+				$status['triggers_count_disabled'] += $stats['count'];
+				break;
+		}
+	}
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
+	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
+
+	// users
+	foreach ($server_status['user stats'] as $stats) {
+		switch ($stats['attributes']['status']) {
+			case ZBX_SESSION_ACTIVE:
+				$status['users_online'] += $stats['count'];
+				break;
+
+			case ZBX_SESSION_PASSIVE:
+				$status['users_count'] += $stats['count'];
+				break;
+		}
+	}
+	$status['users_count'] += $status['users_online'];
+
+	// performance
+	$status['qps_total'] += $server_status['required performance'][0]['count'];
 
 	return $status;
 }

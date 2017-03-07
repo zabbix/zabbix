@@ -214,55 +214,71 @@ function make_system_status($filter, $backurl) {
 }
 
 function make_status_of_zbx() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$table = (new CTableInfo())
-		->setHeader([
-			_('Parameter'),
-			_('Value'),
-			_('Details')
-		]);
+		$server_details = isset($ZBX_SERVER, $ZBX_SERVER_PORT)
+			? $ZBX_SERVER.':'.$ZBX_SERVER_PORT
+			: _('Zabbix server IP or port is not set!');
+	}
+	else {
+		$server_details = '';
+	}
+
+	$table = (new CTableInfo())->setHeader([_('Parameter'), _('Value'), _('Details')]);
 
 	show_messages(); // because in function get_status(); function clear_messages() is called when fsockopen() fails.
 	$status = get_status();
 
 	$table->addRow([
 		_('Zabbix server is running'),
-		(new CSpan($status['zabbix_server']))->addClass($status['zabbix_server'] == _('Yes') ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
+		(new CSpan($status !== false ? _('Yes') : _('No')))
+			->addClass($status !== false ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+		$server_details
 	]);
-	$title = (new CSpan(_('Number of hosts (enabled/disabled/templates)')))->setAttribute('title', 'asdad');
-	$table->addRow([_('Number of hosts (enabled/disabled/templates)'), $status['hosts_count'],
-		[
-			(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-			(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED), ' / ',
-			(new CSpan($status['hosts_count_template']))->addClass(ZBX_STYLE_GREY)
-		]
+	$table->addRow([_('Number of hosts (enabled/disabled/templates)'), $status !== false ? $status['hosts_count'] : '',
+		$status !== false
+			? [
+				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED), ' / ',
+				(new CSpan($status['hosts_count_template']))->addClass(ZBX_STYLE_GREY)
+			]
+			: ''
 	]);
 	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
 		->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
-	$table->addRow([$title, $status['items_count'],
-		[
-			(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-			(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
-			(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-		]
+	$table->addRow([$title, $status !== false ? $status['items_count'] : '',
+		$status !== false
+			? [
+				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
+				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+			]
+			: ''
 	]);
 	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
 		->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
-	$table->addRow([$title, $status['triggers_count'],
-		[
-			$status['triggers_count_enabled'], ' / ',
-			$status['triggers_count_disabled'], ' [',
-			(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
-			(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
-		]
+	$table->addRow([$title, $status !== false ? $status['triggers_count'] : '',
+		$status !== false
+			? [
+				$status['triggers_count_enabled'], ' / ',
+				$status['triggers_count_disabled'], ' [',
+				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
+				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
+			]
+			: ''
 	]);
-	$table->addRow([_('Number of users (online)'), $status['users_count'], (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN)]);
-	$table->addRow([_('Required server performance, new values per second'), $status['qps_total'], '']);
+	$table->addRow([_('Number of users (online)'), $status !== false ? $status['users_count'] : '',
+		$status !== false ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
+	]);
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		$table->addRow([_('Required server performance, new values per second'),
+			$status !== false ? $status['qps_total'] : '', ''
+		]);
+	}
 
 	// check requirements
-	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
 				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? ZBX_STYLE_ORANGE : ZBX_STYLE_RED;

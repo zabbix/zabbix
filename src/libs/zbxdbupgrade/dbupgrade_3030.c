@@ -312,8 +312,8 @@ static void	DBpatch_conv_sec(int *value, const char **suffix)
 {
 	if (0 != *value)
 	{
-		const int	factors[] =	{60,	60,	24,	7,	0}, *factor = factors;
-		const char	*suffixes[] =	{"s",	"m",	"h",	"d",	"w"};
+		const int	factors[] = {60, 60, 24, 7, 0}, *factor = factors;
+		const char	*suffixes[] = {"s", "m", "h", "d", "w"};
 
 		while (0 != *factor && 0 == *value % *factor)
 			*value /= *factor++;
