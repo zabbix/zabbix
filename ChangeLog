@@ -32,6 +32,7 @@ A.F.I..PS. [ZBXNEXT-3344] increased SNMP OID length limitation from 255 to 512 b
 A.......S. [ZBX-9425] added permission check on the server side for global script execution (Sergejs)
 
 Bug fixes:
+...G...... [ZBX-11671] added register information and backtrace to log when metric thread crashes (viktors)
 ..F.....S. [ZBX-11381] fixed displaying list of recovery actions in "Problems" and "Event details" (Sergejs)
 ........S. [ZBX-11805] fixed aggregate checks log messages formats (abs)
 A.F.....S. [ZBX-11470] fixed unary minus and prefix extraction for trigger expression references; optimized simple macro and macro function calculation (gleb, vso)
