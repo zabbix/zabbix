@@ -573,7 +573,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 	{
 		if (0x80 > codepoints[j])
 		{
-			if (2 < length - out)
+			if (2 > length - out)
 				goto out;	/* overflow */
 
 			output[out++] = (char)codepoints[j];
