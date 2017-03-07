@@ -85,6 +85,9 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	total, free, used;
 	double		pfree, pused;
 
+	char	*p = NULL;
+	*p = 0;
+
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
