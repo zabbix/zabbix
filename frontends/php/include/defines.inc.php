@@ -365,10 +365,7 @@ define('PRIVATE_SHARING',	1);
 
 define('ZBX_ITEM_DELAY_DEFAULT',			'30s');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
-define('ZBX_ITEM_HISTORY_DEFAULT',			'90d');
-define('ZBX_ITEM_TRENDS_DEFAULT',			'365d');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
-define('ZBX_LLD_RULE_LIFETIME_DEFAULT',	'30d');
 
 define('ITEM_TYPE_ZABBIX',			0);
 define('ITEM_TYPE_SNMPV1',			1);
