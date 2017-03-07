@@ -493,7 +493,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: punycode_adapt                                                   *
@@ -565,10 +564,27 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 {
 	int		ret = FAIL;
 	zbx_uint32_t	n, delta = 0, bias, max_codepoint, q, k, t;
-	size_t		h = 0, out = 0, j;
+	size_t		h = 0, out = 0, offset, j;
 
 	n = PUNYCODE_INITIAL_N;
 	bias = PUNYCODE_INITIAL_BIAS;
+
+	for (j = 0; j < count; ++j)
+	{
+		if (0x80 > codepoints[j])
+		{
+			if (2 < length - out)
+				goto out;	/* overflow */
+
+			output[out++] = (char)codepoints[j];
+		}
+	}
+
+	offset = out;
+	h = offset;
+
+	if (0 < out)
+		output[out++] = '-';
 
 	while (h < count)
 	{
@@ -617,7 +633,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 				}
 
 				output[out++] = punycode_encode_digit(q);
-				bias = punycode_adapt(delta, h + 1, (h == 0) ? PUNYCODE_DAMP : 2);
+				bias = punycode_adapt(delta, h + 1, (h == offset) ? PUNYCODE_DAMP : 2);
 				delta = 0;
 				++h;
 			}
@@ -638,6 +654,57 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: punycode_encode_part                                             *
+ *                                                                            *
+ * Purpose: encodes unicode domain name part into punycode (RFC 3492)         *
+ *          domain is being split in parts by punycode_encode by using        *
+ *          character '.' as part separator                                   *
+ *                                                                            *
+ * Parameters: codepoints      - [IN] codepoints to encode                    *
+ *             count           - [IN] codepoint count                         *
+ *             output          - [IN/OUT] encoded result                      *
+ *             size            - [IN/OUT] memory size allocated for result    *
+ *             offset          - [IN/OUT] offset within result buffer         *
+ *                                                                            *
+ * Return value: SUCCEED if encoding was successful. FAIL on error.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, char **output, size_t *size,
+		size_t *offset)
+{
+	char		buffer[MAX_STRING_LEN];
+	zbx_uint32_t	i, ansi = 1;
+
+	if (0 == count)
+		return SUCCEED;
+
+	for (i = 0; i < count; i++)
+	{
+		if (0x80 < codepoints[i])
+		{
+			ansi = 0;
+			break;
+		}
+		else
+			buffer[i] = (char)(codepoints[i]);
+	}
+
+	if (0 == ansi)
+	{
+		zbx_strcpy_alloc(output, size, offset, "xn--");
+		if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, MAX_STRING_LEN))
+			return FAIL;
+	}
+	else
+		buffer[count] = '\0';
+
+	zbx_strcpy_alloc(output, size, offset, buffer);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: punycode_encode                                                  *
  *                                                                            *
  * Purpose: encodes unicode domain names into punycode (RFC 3492)             *
@@ -651,7 +718,6 @@ out:
 static int	punycode_encode(const char *text, char **output)
 {
 	int		ret = FAIL;
-	char		buffer[MAX_STRING_LEN];
 	size_t		offset = 0, size = 0;
 	zbx_uint32_t	n, tmp, count = 0, *codepoints;
 
@@ -690,30 +756,22 @@ static int	punycode_encode(const char *text, char **output)
 		}
 		else
 		{
-			if (0 != count)
+			if ('.' == *text)
 			{
-				zbx_strcpy_alloc(output, &size, &offset, "xn--");
-				if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, MAX_STRING_LEN))
+				if (SUCCEED != punycode_encode_part(codepoints, count, output, &size, &offset))
 					goto out;
 
-				zbx_strcpy_alloc(output, &size, &offset, buffer);
+				zbx_chrcpy_alloc(output, &size, &offset, *text++);
 				count = 0;
 			}
-
-			zbx_chrcpy_alloc(output, &size, &offset, *text++);
+			else
+			{
+				codepoints[count++] = *text++;
+			}
 		}
 	}
 
-	if (0 != count)
-	{
-		zbx_strcpy_alloc(output, &size, &offset, "xn--");
-		if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, MAX_STRING_LEN))
-			goto out;
-
-		zbx_strcpy_alloc(output, &size, &offset, buffer);
-	}
-
-	ret = SUCCEED;
+	ret = punycode_encode_part(codepoints, count, output, &size, &offset);
 out:
 	if (SUCCEED != ret)
 		zbx_free(*output);
