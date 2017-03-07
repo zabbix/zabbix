@@ -430,6 +430,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 	zbx_vector_ptr_pair_create(&headers);
 	zbx_vector_ptr_pair_create(&httptest->variables);
 
+	httptest->headers = NULL;
 	result = DBselect(
 			"select name, value, type"
 			" from httptest_field"
@@ -484,7 +485,6 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 		zbx_vector_ptr_pair_append(vector, pair);
 	}
 
-	httptest->headers = NULL;
 	httpstep_pairs_join(&httptest->headers, &alloc_len, &offset, ":", "\r\n", &headers);
 out:
 	httppairs_free(&headers);
