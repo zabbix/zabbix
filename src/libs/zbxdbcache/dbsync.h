@@ -40,6 +40,23 @@
 #define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0080)
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_get_row_hostids_t                                     *
+ *                                                                            *
+ * Purpose: retrieves host identifiers associated with the data row           *
+ *                                                                            *
+ * Parameter: row     - [IN] the data row                                     *
+ *            hostids - [IN] the associated host identifiers                  *
+ *                                                                            *
+ * Comments: For example for host it would be the host identifier,            *
+ *                           item - the item.hostid,                          *
+ *                           trigger - host identifiers of items used         *
+ *                                     in trigger expressions                 *
+ *                                                                            *
+ ******************************************************************************/
+typedef void (*zbx_dbsync_get_row_hostids_t)(char **row, zbx_vector_uint64_t *hostids);
+
 typedef struct
 {
 	/* a row tag, describing the changes (see ZBX_DBSYNC_ROW_* defines) */
@@ -56,19 +73,28 @@ zbx_dbsync_row_t;
 typedef struct
 {
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
-	unsigned char		mode;
+	unsigned char			mode;
 
 	/* the number of columns in diff */
-	int			columns_num;
+	int				columns_num;
 
 	/* the current row */
-	int			row_index;
+	int				row_index;
 
 	/* the changed rows */
-	zbx_vector_ptr_t	rows;
+	zbx_vector_ptr_t		rows;
 
 	/* the database result set for ZBX_DBSYNC_ALL mode */
-	DB_RESULT		dbresult;
+	DB_RESULT			dbresult;
+
+	/* a list of columns with user macros that will expanded during synchronization process */
+	zbx_vector_ptr_t		columns;
+
+	/* row with expanded macros */
+	char				**row;
+
+	/* function to retrieve associated hostids to resolve user macros */
+	zbx_dbsync_get_row_hostids_t	get_hostids_func;
 
 	/* statistics */
 	zbx_uint64_t	add_num;
@@ -77,31 +103,34 @@ typedef struct
 }
 zbx_dbsync_t;
 
+void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache);
+void	zbx_dbsync_free_env();
+
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 void	zbx_dbsync_reset(zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***rows, unsigned char *tag);
 
-int	zbx_dbsync_compare_config(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_hosts(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_host_inventory(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_host_templates(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_global_macros(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_host_macros(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_interfaces(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_items(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_triggers(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_trigger_dependency(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_functions(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_expressions(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_actions(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_action_conditions(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_trigger_tags(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_correlations(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_corr_conditions(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_corr_operations(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_host_groups(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
-int	zbx_dbsync_compare_item_preprocs(ZBX_DC_CONFIG *cache, zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_items(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync);
 
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

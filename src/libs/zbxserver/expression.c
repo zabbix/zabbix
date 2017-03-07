@@ -130,14 +130,29 @@ int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *fun
  ******************************************************************************/
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
-	const char	*start = expression;
+	zbx_token_t	token;
+	int		pos = 0;
 	zbx_uint64_t	functionid;
 
 	if ('\0' == *expression)
 		return;
 
-	while (SUCCEED == get_N_functionid(start, 1, &functionid, &start))
-		zbx_vector_uint64_append(functionids, functionid);
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				is_uint64_n(expression + token.token.l + 1, token.token.r - token.token.l - 1,
+						&functionid);
+				zbx_vector_uint64_append(functionids, functionid);
+				/* break; is not missing here */
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_SIMPLE_MACRO:
+			case ZBX_TOKEN_MACRO:
+				pos = token.token.r;
+				break;
+		}
+	}
 
 	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3492,10 +3507,23 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
-					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					/* When processing trigger expressions the user macros are already expanded. */
+					/* An unexpanded user macro means either unknown macro or macro value        */
+					/* validation failure.                                                       */
 
-				/* when processing trigger expressions the user macros are already expanded */
+					if (NULL != error)
+					{
+						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
+								token.token.r - token.token.l + 1,
+								*data + token.token.l);
+					}
+
+					ret = FAIL;
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
+					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_URL))

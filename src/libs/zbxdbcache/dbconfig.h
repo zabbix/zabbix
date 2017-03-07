@@ -24,19 +24,12 @@
 #	error This header must be used by configuration cache implementation
 #endif
 
-#include "macroindex.h"
-
 typedef struct
 {
 	zbx_uint64_t		triggerid;
 	const char		*description;
 	const char		*expression;
 	const char		*recovery_expression;
-
-	/* cached expressions with expanded user macros, can be NULL */
-	const char		*expression_ex;
-	const char		*recovery_expression_ex;
-
 	const char		*error;
 	const char		*correlation_tag;
 	int			lastchange;
@@ -324,16 +317,39 @@ typedef struct
 }
 ZBX_DC_HTMPL;
 
-typedef struct zbx_dc_macro
+typedef struct
 {
-	zbx_uint64_t	macroid;
+	zbx_uint64_t	globalmacroid;
+	const char	*macro;
+	const char	*context;
+	const char	*value;
+}
+ZBX_DC_GMACRO;
+
+typedef struct
+{
+	const char		*macro;
+	zbx_vector_ptr_t	gmacros;
+}
+ZBX_DC_GMACRO_M;
+
+typedef struct
+{
+	zbx_uint64_t	hostmacroid;
 	zbx_uint64_t	hostid;
 	const char	*macro;
 	const char	*context;
 	const char	*value;
-
 }
-zbx_dc_macro_t;
+ZBX_DC_HMACRO;
+
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	const char		*macro;
+	zbx_vector_ptr_t	hmacros;
+}
+ZBX_DC_HMACRO_HM;
 
 typedef struct
 {
@@ -554,8 +570,11 @@ typedef struct
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		ipmihosts;
+	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
+	zbx_hashset_t		gmacros_m;		/* macro */
 	zbx_hashset_t		hmacros;
+	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
 	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
@@ -571,7 +590,6 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 	zbx_hashset_t		item_preproc;
-	zbx_macro_index_t	macro_index;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -581,5 +599,28 @@ typedef struct
 	ZBX_DC_CONFIG_TABLE	*config;
 }
 ZBX_DC_CONFIG;
+
+/* validator function optionally used to validate macro values when expanding user macros */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_macro_value_validator_func_t                                 *
+ *                                                                            *
+ * Purpose: validate macro value when expanding user macros                   *
+ *                                                                            *
+ * Parameters: value   - [IN] the macro value                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the value is valid                                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+typedef int (*zbx_macro_value_validator_func_t)(const char *value);
+
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
+		zbx_macro_value_validator_func_t validator_func);
+
+void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
+		zbx_vector_uint64_t *hostids);
+
 
 #endif
