@@ -854,7 +854,7 @@ class CHttpTest extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect templated web scenario step count.'));
 					}
 
-					foreach ($httptest['steps'] as $httpstep) {
+					foreach ($httptest['steps'] as &$httpstep) {
 						if (!array_key_exists('httpstepid', $httpstep)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 								'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
@@ -862,15 +862,13 @@ class CHttpTest extends CApiService {
 							));
 						}
 
-						$unexpected_parameters = array_values(array_diff(['name', 'no'], array_keys($httpstep)));
-
-						if ($unexpected_parameters) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Cannot update step for a templated web scenario "%1$s": %2$s.', $httptest['name'],
-								_s('unexpected parameter "%1$s"', $unexpected_parameters[0])
-							));
+						foreach (['name', 'no'] as $field) {
+							if (array_key_exists($field, $httpstep)) {
+								unset($httpstep[$field]);
+							}
 						}
 					}
+					unset ($httpstep);
 
 					foreach ($httptest['steps'] as $httpstep) {
 						if (array_key_exists('httpstepid', $httpstep)
