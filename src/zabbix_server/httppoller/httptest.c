@@ -651,13 +651,12 @@ out:
 static int	punycode_encode(const char *text, char **output)
 {
 	int		ret = FAIL;
-	const size_t	length = 2048;
-	char		buffer[length];
+	char		buffer[MAX_STRING_LEN];
 	size_t		offset = 0, size = 0;
-	uint32_t	n, tmp, count = 0, *codepoints;
+	zbx_uint32_t	n, tmp, count = 0, *codepoints;
 
 	zbx_free(*output);
-	codepoints = zbx_malloc(NULL, strlen(text) * sizeof(uint32_t));
+	codepoints = zbx_malloc(NULL, strlen(text) * sizeof(zbx_uint32_t));
 
 	while ('\0' != *text)
 	{
@@ -674,7 +673,7 @@ static int	punycode_encode(const char *text, char **output)
 
 		if (0 != n)
 		{
-			tmp = ((uint32_t)((*text) & (0x3f >> n))) << 6 * n;
+			tmp = ((zbx_uint32_t)((*text) & (0x3f >> n))) << 6 * n;
 			text++;
 
 			while (0 < n)
@@ -683,7 +682,7 @@ static int	punycode_encode(const char *text, char **output)
 				if ('\0' == *text || (0x80 != ((*text) & 0xc0)))
 					goto out;
 
-				tmp |= ((uint32_t)((*text) & 0x3f)) << 6 * n;
+				tmp |= ((zbx_uint32_t)((*text) & 0x3f)) << 6 * n;
 				text++;
 			}
 
@@ -694,7 +693,7 @@ static int	punycode_encode(const char *text, char **output)
 			if (0 != count)
 			{
 				zbx_strcpy_alloc(output, &size, &offset, "xn--");
-				if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, length))
+				if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, MAX_STRING_LEN))
 					goto out;
 
 				zbx_strcpy_alloc(output, &size, &offset, buffer);
@@ -708,7 +707,7 @@ static int	punycode_encode(const char *text, char **output)
 	if (0 != count)
 	{
 		zbx_strcpy_alloc(output, &size, &offset, "xn--");
-		if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, length))
+		if (SUCCEED != punycode_encode_codepoints(codepoints, count, buffer, MAX_STRING_LEN))
 			goto out;
 
 		zbx_strcpy_alloc(output, &size, &offset, buffer);
