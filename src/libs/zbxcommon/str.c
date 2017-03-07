@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "threads.h"
+#include "module.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -2045,6 +2046,19 @@ const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 	INTERFACE_TYPE_JMX,
 	INTERFACE_TYPE_IPMI
 };
+
+const char	*zbx_sysinfo_ret_string(int ret)
+{
+	switch (ret)
+	{
+		case SYSINFO_RET_OK:
+			return "SYSINFO_SUCCEED";
+		case SYSINFO_RET_FAIL:
+			return "SYSINFO_FAIL";
+		default:
+			return "SYSINFO_UNKNOWN";
+	}
+}
 
 const char	*zbx_result_string(int result)
 {
