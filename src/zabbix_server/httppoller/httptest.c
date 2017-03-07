@@ -680,7 +680,7 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
 
 	for (i = 0; i < count; i++)
 	{
-		if (0x80 < codepoints[i])
+		if (0x80 <= codepoints[i])
 		{
 			ansi = 0;
 			break;
