@@ -159,13 +159,14 @@ $userFormList->addRow(
 $themes = array_merge([THEME_DEFAULT => _('System default')], Z::getThemes());
 $userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], null, $themes));
 
-$autologout = timeUnitToSeconds($this->data['autologout']);
+$autologout_enabled = ((new CSimpleIntervalParser())->parse($data['autologout']) == CParser::PARSE_SUCCESS)
+	? (bool) timeUnitToSeconds($this->data['autologout'])
+	: true;
 
 // append auto-login & auto-logout to form list
-$autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked($autologout != 0);
-if ($autologout != 0) {
-	$autologoutTextBox = (new CTextBox('autologout', $this->data['autologout']))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+$autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked($autologout_enabled);
+if ($autologout_enabled) {
+	$autologoutTextBox = (new CTextBox('autologout', $this->data['autologout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 }
 else {
 	$autologoutTextBox = (new CTextBox('autologout', DB::getDefault('users', 'autologout')))
