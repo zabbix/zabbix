@@ -9269,7 +9269,9 @@ zbx_item_stats_t	DCget_item_stats(void)
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	item_stats.active_normal = item_stats.active_notsupported = item_stats.disabled = 0;
+	item_stats.active_normal = 0;
+	item_stats.active_notsupported = 0;
+	item_stats.disabled = 0;
 
 	LOCK_CACHE;
 
@@ -9329,7 +9331,9 @@ zbx_trigger_stats_t	DCget_trigger_stats(void)
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	trigger_stats.enabled_ok = trigger_stats.enabled_problem = trigger_stats.disabled = 0;
+	trigger_stats.enabled_ok = 0;
+	trigger_stats.enabled_problem = 0;
+	trigger_stats.disabled = 0;
 
 	LOCK_CACHE;
 
@@ -9414,7 +9418,8 @@ zbx_host_stats_t	DCget_host_stats(void)
 	if (last_counted + ZBX_STATUS_LIFETIME > time(NULL))
 		goto out;
 
-	host_stats.monitored = host_stats.not_monitored = 0;
+	host_stats.monitored = 0;
+	host_stats.not_monitored = 0;
 
 	LOCK_CACHE;
 

@@ -638,7 +638,10 @@ void	status_user_stats(struct zbx_json *json)
 	zbx_uint64_t	users_offline, users_online = 0;
 
 	if (NULL == (result = DBselect("select count(*) from users")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
 		return;
+	}
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], &users_offline))
 	{
@@ -648,7 +651,13 @@ void	status_user_stats(struct zbx_json *json)
 
 	DBfree_result(result);
 	now = time(NULL);
-	DBselect("select max(lastaccess) from sessions where status=%d group by userid,status", ZBX_SESSION_ACTIVE);
+
+	if (NULL == (result = DBselect("select max(lastaccess) from sessions where status=%d group by userid,status",
+			ZBX_SESSION_ACTIVE)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -667,14 +676,14 @@ void	status_user_stats(struct zbx_json *json)
 
 	status_entry_begin(json);
 	zbx_json_addobject(json, "attributes");
-	zbx_json_adduint64(json, "status", ZBX_USER_STATUS_ONLINE);
+	zbx_json_adduint64(json, "status", ZBX_SESSION_ACTIVE);
 	zbx_json_close(json);
 	zbx_json_adduint64(json, "count", users_online);
 	status_entry_end(json);
 
 	status_entry_begin(json);
 	zbx_json_addobject(json, "attributes");
-	zbx_json_adduint64(json, "status", ZBX_USER_STATUS_OFFLINE);
+	zbx_json_adduint64(json, "status", ZBX_SESSION_PASSIVE);
 	zbx_json_close(json);
 	zbx_json_adduint64(json, "count", users_offline);
 	status_entry_end(json);

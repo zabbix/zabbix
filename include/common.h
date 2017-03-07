@@ -679,10 +679,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
 #define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
 
-/* user statuses */
-#define ZBX_USER_STATUS_OFFLINE	0
-#define ZBX_USER_STATUS_ONLINE	1
-
 #define ZBX_USER_ONLINE_TIME	600
 
 typedef struct
