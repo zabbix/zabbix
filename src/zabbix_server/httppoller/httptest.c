@@ -569,7 +569,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 	n = PUNYCODE_INITIAL_N;
 	bias = PUNYCODE_INITIAL_BIAS;
 
-	for (j = 0; j < count; ++j)
+	for (j = 0; j < count; j++)
 	{
 		if (0x80 > codepoints[j])
 		{
@@ -590,7 +590,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 	{
 		max_codepoint = PUNYCODE_MAX_UINT32;
 
-		for (j = 0; j < count; ++j)
+		for (j = 0; j < count; j++)
 		{
 			if (codepoints[j] >= n && codepoints[j] < max_codepoint)
 				max_codepoint = codepoints[j];
@@ -602,7 +602,7 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 		delta += (max_codepoint - n) * (h + 1);
 		n = max_codepoint;
 
-		for (j = 0; j < count; ++j)
+		for (j = 0; j < count; j++)
 		{
 			if (codepoints[j] < n && 0 == ++delta)
 				goto out;	/* overflow */
@@ -611,7 +611,8 @@ static int	punycode_encode_codepoints(zbx_uint32_t *codepoints, size_t count, ch
 			{
 				q = delta;
 				k = PUNYCODE_BASE;
-				while(1)
+
+				while (1)
 				{
 					if (out >= length)
 						goto out;	/* out of memory */
@@ -765,9 +766,7 @@ static int	punycode_encode(const char *text, char **output)
 				count = 0;
 			}
 			else
-			{
 				codepoints[count++] = *text++;
-			}
 		}
 	}
 
