@@ -2950,35 +2950,43 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		return SUCCEED;
 	}
 
-	switch (item_value->value_type)
+	if (0 == (ZBX_DC_FLAG_NOVALUE & item_value->flags))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			(*data)->value.dbl = item_value->value.value_dbl;
-			cache->stats.history_float_counter++;
-			cache->stats.history_counter++;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			(*data)->value.ui64 = item_value->value.value_uint;
-			cache->stats.history_uint_counter++;
-			cache->stats.history_counter++;
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
-					&item_value->value.value_str))
-			{
-				return FAIL;
-			}
-			cache->stats.history_str_counter++;
-			cache->stats.history_counter++;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
-				return FAIL;
+		switch (item_value->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				(*data)->value.dbl = item_value->value.value_dbl;
+				cache->stats.history_float_counter++;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				(*data)->value.ui64 = item_value->value.value_uint;
+				cache->stats.history_uint_counter++;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
+						&item_value->value.value_str))
+				{
+					return FAIL;
+				}
+				cache->stats.history_str_counter++;
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
+						&item_value->value.value_str))
+				{
+					return FAIL;
+				}
+				cache->stats.history_text_counter++;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
+					return FAIL;
 
-			cache->stats.history_log_counter++;
-			cache->stats.history_counter++;
-			break;
+				cache->stats.history_log_counter++;
+				break;
+		}
+
+		cache->stats.history_counter++;
 	}
 
 	(*data)->value_type = item_value->value_type;
