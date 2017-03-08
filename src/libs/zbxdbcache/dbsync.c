@@ -450,21 +450,6 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbsync_reset                                                 *
- *                                                                            *
- * Purpose: resets the iterator                                               *
- *                                                                            *
- * Parameters: sync  - [IN] the changeset                                     *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dbsync_reset(zbx_dbsync_t *sync)
-{
-	if (ZBX_DBSYNC_UPDATE == sync->mode)
-		sync->row_index = 0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dbsync_next                                                  *
  *                                                                            *
  * Purpose: gets the next row from the changeset                              *
