@@ -221,8 +221,10 @@ class CZabbixServer {
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
-		file_put_contents('/tmp/php.log', "\n".$this->error."\n", FILE_APPEND);
+			file_put_contents('/tmp/php.log', "\n".$this->error."\n", FILE_APPEND);
+
 			return false;
 		}
 
