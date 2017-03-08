@@ -235,10 +235,10 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 		goto out;
 	}
 
-	/* zbx_shmget() will:                                                 */
-	/*	- see that a shared memory segment with this id exists       */
-	/*	- create a new segment with a different id */
-	/*	- mark the old segment for deletion                                        */
+	/* zbx_shmget() will:                                          */
+	/*	- see that a shared memory segment with this id exists */
+	/*	- create a new segment with a different id             */
+	/*	- mark the old segment for deletion                    */
 
 
 	if (-1 == (shmid = zbx_shmget(shm->shmid, shm_size)))

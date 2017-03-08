@@ -351,10 +351,10 @@ void	diskstat_shm_extend()
 	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (old_max - 1);
 	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (new_max - 1);
 
-	/* zbx_shmget() will:                                                 */
-	/*	- see that a shared memory segment with this id exists       */
-	/*	- create a new segment with a different id */
-	/*	- mark the old segment for deletion                                        */
+	/* zbx_shmget() will:                                          */
+	/*	- see that a shared memory segment with this id exists */
+	/*	- create a new segment with a different id             */
+	/*	- mark the old segment for deletion                    */
 
 
 	if (-1 == (new_shmid = zbx_shmget(collector->diskstat_shmid, new_shm_size)))

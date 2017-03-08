@@ -27,7 +27,7 @@
  *                                                                            *
  * Purpose: Create block of shared memory                                     *
  *                                                                            *
- * Parameters:  shmid - Shared memory segment id to delete                                 *
+ * Parameters:  shmid - Shared memory segment id to delete                    *
  *              size - size                                                   *
  *                                                                            *
  * Return value: If the function succeeds, then return SHM ID                 *
@@ -35,9 +35,9 @@
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:
- * - The shmid parameter can be set to ZBX_NONEXISTENT_SHMID if no         *
- *     shared memory segments must be destroyed                           *
+ * Comments:                                                                  *
+ * - The shmid parameter can be set to ZBX_NONEXISTENT_SHMID if no            *
+ *     shared memory segments must be destroyed                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_shmget(int shmid, size_t size)
