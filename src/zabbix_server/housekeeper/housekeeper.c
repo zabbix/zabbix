@@ -367,7 +367,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	char		*tmp = NULL;
 
 	result = DBselect(
-			"select i.itemid,i.value_type,i.history,i.trends"
+			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)",
@@ -375,12 +375,13 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t		itemid;
+		zbx_uint64_t		itemid, hostid;
 		int			history, trends, value_type;
 		zbx_hk_history_rule_t	*rule;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
+		ZBX_STR2UINT64(hostid, row[4]);
 
 		if (value_type < ITEM_VALUE_TYPE_MAX)
 		{
@@ -388,7 +389,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
 			{
 				tmp = zbx_strdup(tmp, row[2]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
 				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
@@ -415,7 +416,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
 			{
 				tmp = zbx_strdup(tmp, row[3]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, &tmp,
 						MACRO_TYPE_COMMON, NULL, 0);
 
 				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
