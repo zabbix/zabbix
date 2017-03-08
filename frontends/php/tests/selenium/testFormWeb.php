@@ -885,7 +885,7 @@ class testFormWeb extends CWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Incorrect value for field "delay": a time unit is expected.'
 					]
 				]
 			],
@@ -1499,7 +1499,7 @@ class testFormWeb extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				$this->zbxTestTextPresent(['Number of steps', 'Update interval', 'Status']);
+				$this->zbxTestTextPresent(['Number of steps', 'Interval', 'Status']);
 				break;
 
 			case TEST_BAD:

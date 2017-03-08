@@ -572,7 +572,7 @@ class testFormDiscoveryRule extends CWebTest {
 			case 'JMX agent':
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 1024);
+				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($data['form'])) {
 					$this->zbxTestAssertElementValue('delay', '30s');

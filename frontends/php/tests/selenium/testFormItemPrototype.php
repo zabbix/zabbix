@@ -1048,7 +1048,7 @@ class testFormItemPrototype extends CWebTest {
 			case 'Calculated':
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 1024);
+				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
 					$this->zbxTestAssertElementValue('delay', '30s');
@@ -1769,10 +1769,10 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
-					'history' => 2147483648,
+					'history' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "history": must be between "3600" and "2147483647"'
+						'Incorrect value for field "history": must be between "3600" and "788400000".'
 					]
 				]
 			],
@@ -1785,7 +1785,7 @@ class testFormItemPrototype extends CWebTest {
 					'history' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "history": invalid history storage period'
+							'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
@@ -1809,7 +1809,7 @@ class testFormItemPrototype extends CWebTest {
 					'trends' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": invalid trend storage period'
+							'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1819,10 +1819,10 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
-					'trends' => 2147483648,
+					'trends' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": must be between "86400" and "2147483647"'
+							'Incorrect value for field "trends": must be between "86400" and "788400000".'
 					]
 				]
 			],

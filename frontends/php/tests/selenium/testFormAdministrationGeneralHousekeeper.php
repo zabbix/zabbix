@@ -226,7 +226,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "2147483647"',
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -236,7 +236,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_events_mode' => true,
 					'hk_events_internal' => 0,
 					'errors' => [
-						'Invalid internal data storage period: must be between "86400" and "2147483647"',
+						'Invalid internal data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -246,7 +246,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_events_mode' => true,
 					'hk_events_discovery' => 0,
 					'errors' => [
-						'Invalid network discovery data storage period: must be between "86400" and "2147483647"',
+						'Invalid network discovery data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -256,7 +256,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_events_mode' => true,
 					'hk_events_autoreg' => 0,
 					'errors' => [
-						'Invalid auto-registration data storage period: must be between "86400" and "2147483647"',
+						'Invalid auto-registration data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -266,7 +266,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_services_mode' => true,
 					'hk_services' => 0,
 					'errors' => [
-						'Invalid IT services data storage period: must be between "86400" and "2147483647"',
+						'Invalid IT services data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -276,7 +276,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_audit_mode' => true,
 					'hk_audit' => 0,
 					'errors' => [
-						'Invalid audit data storage period: must be between "86400" and "2147483647"',
+						'Invalid audit data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -286,7 +286,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_sessions_mode' => true,
 					'hk_sessions' => 0,
 					'errors' => [
-						'Invalid user sessions data storage period: must be between "86400" and "2147483647"',
+						'Invalid user sessions data storage period: must be between "86400" and "788400000"',
 					]
 				]
 			],
@@ -297,7 +297,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_history_global' => true,
 					'hk_history' => -1,
 					'errors' => [
-						'Invalid history data storage period: must be between "3600" and "2147483647"',
+						'Invalid history data storage period: a time unit is expected.',
 					]
 				]
 			],
@@ -308,7 +308,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends_global' => true,
 					'hk_trends' => -1,
 					'errors' => [
-						'Invalid trends data storage period: must be between "86400" and "2147483647"',
+						'Invalid trends data storage period: a time unit is expected.',
 					]
 				]
 			],

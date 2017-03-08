@@ -61,7 +61,7 @@ class testPageUsers extends CWebTest {
 		$userid = $user['userid'];
 		$alias = $user['alias'];
 
-		DBexecute('UPDATE users SET autologout='0' WHERE userid=2');
+		DBexecute('UPDATE users SET autologout=0 WHERE userid=2');
 
 		$sqlHashUser = 'select * from users where userid='.$userid;
 		$oldHashUser = DBhash($sqlHashUser);
