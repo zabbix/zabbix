@@ -476,8 +476,6 @@ class CHttpTest extends CApiService {
 		}
 
 		$this->checkHostPermissions(array_keys($hostids));
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($httpTests as $httpTest) {
 			if (zbx_empty($httpTest['name'])) {
