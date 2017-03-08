@@ -6186,6 +6186,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
+	dst_trigger->flags = 0;
 
 	dst_trigger->expression = NULL;
 	dst_trigger->recovery_expression = NULL;
@@ -6384,7 +6385,8 @@ void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const 
  * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num)
+void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
+		size_t num)
 {
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
@@ -10398,7 +10400,8 @@ static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t
 			parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
 		}
 
-		zbx_vector_uint64_append_vector(nested_groupids, &parent_group->nested_groupids);
+		zbx_vector_uint64_append_array(nested_groupids, parent_group->nested_groupids.values,
+				parent_group->nested_groupids.values_num);
 	}
 }
 

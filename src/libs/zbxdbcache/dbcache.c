@@ -890,6 +890,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num,
 			ZBX_EXPAND_MACROS);
 
+	zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
+
 	if (0 == trigger_order.values_num)
 		goto clean_triggers;
 
