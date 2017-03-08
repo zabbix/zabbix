@@ -153,11 +153,11 @@ function update_config($config) {
 	];
 
 	foreach ($fields as $field => $args) {
-		if (array_key_exists($field, $config)) {
-			if (!validateTimeUnit($config[$field], $args['min'], $args['max'], $args['allow_zero'], $error)) {
-				error(sprintf($args['message'], $error));
-				return false;
-			}
+		if (array_key_exists($field, $config)
+				&& !validateTimeUnit($config[$field], $args['min'], $args['max'], $args['allow_zero'], $error)) {
+			error(sprintf($args['message'], $error));
+
+			return false;
 		}
 	}
 
