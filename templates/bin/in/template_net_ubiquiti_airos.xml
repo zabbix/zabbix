@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+  	  <classes>
+  	  	<class>Performance</class>
+  	  	<class>Inventory</class>
+  	  </classes>
+	  <name>Template Ubiquiti AirOS</name>
+	  <description>Template Ubiquiti AirOS</description>
+	  <sysObjectID>.1.3.6.1.4.1.10002.1</sysObjectID>
+	  <metrics>
+	    <cpuLoad>
+	      <oid>.1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2</oid>
+	      <snmpObject>loadValue.2</snmpObject>
+	      <mib>FROGFOOT-RESOURCES-MIB</mib>
+	      <vendorDescription>5 minute load average of processor load.</vendorDescription>
+	    </cpuLoad>
+	    <memoryFree>
+	      <oid>1.3.6.1.4.1.10002.1.1.1.1.2.0</oid>
+	      <snmpObject>memFree</snmpObject>
+	      <mib>FROGFOOT-RESOURCES-MIB</mib>
+	      <multiplier>1024</multiplier>
+	    </memoryFree>
+	    <memoryTotal>
+	      <oid>1.3.6.1.4.1.10002.1.1.1.1.1.0</oid>
+	      <snmpObject>memTotal</snmpObject>
+	      <mib>FROGFOOT-RESOURCES-MIB</mib>
+	      <multiplier>1024</multiplier>
+	    </memoryTotal>
+	    <memoryUsedPercentage>
+			 <snmpObject>memoryUsedPercentage</snmpObject>
+			 <calculated>true</calculated>   	  
+	    </memoryUsedPercentage>
+	    
+	    
+	    <hwModel>
+	      <oid>.1.2.840.10036.3.1.2.1.3.5</oid>
+	      <snmpObject>dot11manufacturerProductName.5</snmpObject>
+	      <mib>IEEE802dot11-MIB</mib>
+	      <vendorDescription>A printable string used to identify the manufacturer's product name of the resource.  Maximum string length is 128 octets.</vendorDescription>
+	    </hwModel>
+	    
+	    <hwFirmwareVersion>
+	    	<oid>.1.2.840.10036.3.1.2.1.4.5</oid>
+	      	<snmpObject>dot11manufacturerProductVersion.5</snmpObject>
+		  	<mib>IEEE802dot11-MIB</mib>
+	      	<vendorDescription>Printable string used to identify the manufacturer's product version of the resource.  Maximum string length is 128 octets.</vendorDescription>
+	    </hwFirmwareVersion>
+	    
+	    
+	   </metrics>
+  </template>
+  </tns:root>

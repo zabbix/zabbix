@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+  	  <classes>
+  	  	<class>Performance</class>
+  	  	<class>Fault</class>
+  	  	<class>Inventory</class>
+  	  </classes>
+	  <name>Template Cisco IOS Software releases 12.2_3.5_ or later</name>
+	  <description>Cisco IOS Software releases 12.2(3.5) or later</description>
+	  <sysObjectID>{sysobjectid}</sysObjectID>
+	  <!-- iso.3.6.1.4.1.9.1.1045 Cisco IOS Software, C2900 Software (C2900-UNIVERSALK9_NPE-M), Version 15.4(3)M2, RELEASE SOFTWARE (fc2) Technical Support: http://www.cisco.com/techsupport Copyright (c) 1986-2015 by Cisco Systems, Inc. Compiled Fri 06-Feb-15 17:29 by prod_rel_team  -->
+	  <!-- iso.3.6.1.4.1.9.1.1208 Cisco IOS Software, C2960S Software (C2960S-UNIVERSALK9-M), Version 12.2(55)SE8, RELEASE SOFTWARE (fc2)-->
+	  <!-- 	iso.3.6.1.4.1.9.1.896 Cisco IOS Software, s2t54 Software (s2t54-ADVENTERPRISEK9_NPE-M), Version 15.1(2)SY5, RELEASE SOFTWARE (fc7)-->
+	  <!--  iso.3.6.1.4.1.9.1.864 Cisco IOS Software, c7600rsp72043_rp Software (c7600rsp72043_rp-ADVENTERPRISEK9-M), Version 15.3(1)S1, RELEASE SOFTWARE (fc1)-->
+	  <discoveryRules>
+	  	<discoveryRule>
+	  				<name>CPU Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]</snmp_oid>
+                    <key>cpu.discovery</key>
+                    <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
+                     indexed with cpmCPUTotalIndex .
+                     This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+                     like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+                     In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+	  	</discoveryRule>
+	  	<discoveryRule>
+	  				<name>Memory Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]</snmp_oid>
+                    <key>memory.discovery</key>
+                    <description>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+                    http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+	  	</discoveryRule>
+	  	<discoveryRule>
+			<name>Temperature Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]</snmp_oid>
+                <key>temperature.discovery</key>
+                <description>Discovery of ciscoEnvMonTemperatureStatusTable (ciscoEnvMonTemperatureStatusDescr), a table of ambient temperature status
+                 maintained by the environmental monitor.
+				</description>
+		</discoveryRule>
+	  </discoveryRules>
+	  <metrics>
+	    <cpuLoad>
+	      <oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}</oid>
+	      <snmpObject>cpmCPUTotal5minRev[{#SNMPINDEX}]</snmpObject>
+	      <mib>CISCO-PROCESS-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</ref>
+	      <vendorDescription>The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.</vendorDescription>
+	      <discoveryRule>CPU Discovery</discoveryRule>
+	    </cpuLoad>
+	    <memoryUsed>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolUsed[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently in use by applications on themanaged device.</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsed>
+	    <memoryFree>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolFree[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently unused on the managed device.Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memoryin the pool</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryFree>
+	    <memoryUsedPercentage>
+			 <snmpObject>memoryUsedPercentage[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>	    	  
+	         <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsedPercentage>
+	    <temperatureValue>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureStatusValue[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current measurement of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+	    </temperatureValue>
+	    <temperatureStatus>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureState[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current state of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+		      <valueMap>CISCO-ENVMON-MIB::CiscoEnvMonState</valueMap>	    
+	    </temperatureStatus>
+	  </metrics>
+	  
+	  
+	   <macros>
+	   	<macro>
+	   		<macro>{$TEMP_CRIT:"CPU"}</macro>
+	   		<value>75</value>
+	   	</macro>
+	   	<macro>
+	   		<macro>{$TEMP_WARN:"CPU"}</macro>
+	   		<value>70</value>
+	   	</macro>
+	   </macros>
+  </template>
+  
+    <template>
+     <classes>
+  	  	<class>Performance</class>
+  	  	<class>Fault</class>
+  	  	<class>Inventory</class>
+  	  </classes>
+	  <name>Template Cisco IOS Software releases later to 12.0_3_T and prior to 12.2_3.5_</name>
+	  <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5)</description>
+	  <sysObjectID>{sysobjectid}</sysObjectID>
+	  <discoveryRules>
+	  	<discoveryRule>
+	  				<name>CPU Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]</snmp_oid>
+                    <key>cpu.discovery</key>
+                    <description>If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
+                     indexed with cpmCPUTotalIndex .
+                     This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+                     like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+                     In case of a single CPU, cpmCPUTotalTable has only one entry.</description>
+	  	</discoveryRule>
+	  	<discoveryRule>
+	  				<name>Memory Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]</snmp_oid>
+                    <key>memory.discovery</key>
+                    <description>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+                    http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+	  	</discoveryRule>
+	  </discoveryRules>	  
+	  <metrics>
+	    <cpuLoad>
+	      <oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}</oid>
+	      <snmpObject>cpmCPUTotal5min[{#SNMPINDEX}]</snmpObject>
+	      <mib>CISCO-PROCESS-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</ref>
+	      <vendorDescription>The overall CPU busy percentage in the last 5 minute
+period. This object deprecates the avgBusy5 object from 
+the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+by cpmCPUTotal5minRev which has the changed range 
+of value (0..100)</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </cpuLoad>
+	    <memoryUsed>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolUsed[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently in use by applications on themanaged device.</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsed>
+	    <memoryFree>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolFree[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently unused on the managed device.Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memoryin the pool</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryFree>
+   	    <memoryUsedPercentage>
+			 <snmpObject>memoryUsedPercentage[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>	    	  
+	         <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsedPercentage>
+	    <temperatureValue>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureStatusValue[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current measurement of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+	    </temperatureValue>
+	    <temperatureStatus>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureState[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current state of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+		      <valueMap>CISCO-ENVMON-MIB::CiscoEnvMonState</valueMap>	    
+	    </temperatureStatus>
+	  </metrics>
+	  
+	  
+	  <macros>
+	   	<macro>
+	   		<macro>{$TEMP_CRIT:"CPU"}</macro>
+	   		<value>75</value>
+	   	</macro>
+	   	<macro>
+	   		<macro>{$TEMP_WARN:"CPU"}</macro>
+	   		<value>70</value>
+	   	</macro>
+	   </macros>
+  </template>
+  
+  
+<template>
+     <classes>
+  	  	<class>Performance</class>
+  	  	<class>Fault</class>
+  	  	<class>Inventory</class>
+  	  </classes>
+	  <name>Template Cisco IOS Software releases prior to 12.0_3_T</name>
+	  <description>Cisco IOS Software releases prior to 12.0(3)T</description>
+	  <sysObjectID>{sysobjectid}</sysObjectID>
+  	  <discoveryRules>
+	  	<discoveryRule>
+			<name>Memory Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]</snmp_oid>
+                <key>memory.discovery</key>
+                <description>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+                http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</description>
+	  	</discoveryRule>
+  	</discoveryRules>	  
+	  <metrics>
+	    <cpuLoad>
+	      <oid>.1.3.6.1.4.1.9.2.1.58</oid>
+	      <snmpObject>avgBusy5</snmpObject>
+	      <mib>OLD-CISCO-CPU-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html</ref>
+	      <vendorDescription>5 minute exponentially-decayed moving 
+average of the CPU busy percentage.</vendorDescription>
+	    </cpuLoad>
+	    <memoryUsed>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolUsed[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently in use by applications on themanaged device.</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsed>
+	    <memoryFree>
+	      <oid>1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}</oid>
+	      <snmpObject>ciscoMemoryPoolFree[{#SNMPVALUE}]</snmpObject>
+	      <mib>CISCO-MEMORY-POOL-MIB</mib>
+	      <ref>http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</ref>
+	      <vendorDescription>Indicates the number of bytes from the memory pool that are currently unused on the managed device.Note that the sum of ciscoMemoryPoolUsed andciscoMemoryPoolFree is the total amount of memoryin the pool</vendorDescription>
+	      <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryFree>
+		<memoryUsedPercentage>
+			 <snmpObject>memoryUsedPercentage[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>	    	  
+	         <discoveryRule>Memory Discovery</discoveryRule>
+	    </memoryUsedPercentage>
+	    <temperatureValue>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureStatusValue[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current measurement of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+	    </temperatureValue>
+	    <temperatureStatus>
+	    	  <oid>1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}</oid>
+		      <snmpObject>ciscoEnvMonTemperatureState[{#SNMPVALUE}]</snmpObject>
+		      <mib>CISCO-ENVMON-MIB</mib>
+		      <vendorDescription>The current state of the testpoint being instrumented.</vendorDescription>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+		      <valueMap>CISCO-ENVMON-MIB::CiscoEnvMonState</valueMap>	    
+	    </temperatureStatus>
+	  </metrics>
+  </template>
+  
+  <!-- multiple CPU:
+  	Procedure for Devices with Multiple CPUs
+If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB
+and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable , indexed with cpmCPUTotalIndex . This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router, like different CPU chips, group of CPUs, or CPUs in different modules/cards. In case of a single CPU, cpmCPUTotalTable has only one entry.
+Information about different physical entities in the router is stored in the entPhysicalTable of RFC 2737 standard-based ENTITY-MIB. You can link between two tables ( cpmCPUTotalTable and entPhysicalTable ) easily: each row of cpmCPUTotalTable has an object cpmCPUTotalPhysicalIndex that keeps the value of the entPhysicalIndex (index of entPhysicalTable ), and points to the entry in entPhysicalTable , correspondent to the physical entity for which these CPU statistics are maintained.
+This implies that the IOS device must support both CISCO-PROCESS-MIB and ENTITY-MIB for you to be able to retrieve relevant information about CPU utilization. The only case where you do not need to have or use ENTITY-MIB is when you only have a single CPU.
+  
+http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+   -->
+    <value_maps>
+        <value_map>
+            <name>CISCO-ENVMON-MIB::CiscoEnvMonState</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>normal</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>warning</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>critical</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>shutdown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>notPresent</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>notFunctioning</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+  
+</tns:root>

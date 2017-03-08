@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+	  <classes>
+	  	<class>General</class>
+	  </classes>
+	  <name>Template HOST-RESOURCES-MIB</name>
+	  <description>HOST-RESOURCES-MIB: CPU, Memory and Storage</description>
+	  <sysObjectID>na</sysObjectID>
+	   <discoveryRules>
+		<discoveryRule>
+	  				<name>CPU Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]</snmp_oid>
+                    <key>hrProcessorLoad.discovery</key>
+                    <description>HOST-RESOURCES-MIB::hrProcessorTable discovery</description>
+	  	</discoveryRule>
+
+	  	<discoveryRule>
+	  				<name>Memory Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},HOST-RESOURCES-MIB::hrStorageDescr,{#ALLOC_UNITS},HOST-RESOURCES-MIB::hrStorageAllocationUnits,{#STORAGE_TYPE},.1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
+                    <key>memory.discovery</key>
+                    <description>HOST-RESOURCES-MIB::hrStorage discovery with memory filter</description>
+                    <filter>
+                        <evaltype>2</evaltype>
+                        <formula/>
+                        <conditions>
+                            <condition>
+                                <macro>{#STORAGE_TYPE}</macro>
+                                <value>.+2$</value>
+                                <operator>8</operator>
+                                <formulaid>B</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#STORAGE_TYPE}</macro>
+                                <value>.+hrStorageRam</value>
+                                <operator>8</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+	  	</discoveryRule>
+	  	
+	  	<discoveryRule>
+	  				<!-- filter where units (or total is not 0) -->
+	  				<name>Storage Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},HOST-RESOURCES-MIB::hrStorageDescr,{#ALLOC_UNITS},HOST-RESOURCES-MIB::hrStorageAllocationUnits,{#STORAGE_TYPE},.1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
+                    <key>storage.discovery</key>
+                    <description>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</description>
+                    <filter>
+                        <evaltype>2</evaltype>
+                        <formula/>
+                        <conditions>
+                            <condition>
+                                <macro>{#STORAGE_TYPE}</macro>
+                                <value>.+4$</value>
+                                <operator>8</operator>
+                                <formulaid>B</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#STORAGE_TYPE}</macro>
+                                <value>.+hrStorageFixedDisk</value>
+                                <operator>8</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+	  	</discoveryRule>
+	  </discoveryRules>
+	  <metrics>
+	  	<memoryUnits>
+	  		<oid>HOST-RESOURCES-MIB::hrStorageAllocationUnits.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageAllocationUnits[{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The size, in bytes, of the data objects allocated from this pool.
+	  		 If this entry is monitoring sectors, blocks, buffers, or packets, for example,
+	  		 this number will commonly be greater than one.  Otherwise this number will typically be one.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+	  		<discoveryRule>Memory Discovery</discoveryRule>
+	  	</memoryUnits>
+	  	
+	  	<memoryUnitsUsed>
+			<oid>HOST-RESOURCES-MIB::hrStorageUsed.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageUsed[{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+	  		<discoveryRule>Memory Discovery</discoveryRule>	  		
+	  	</memoryUnitsUsed>
+	  	
+	  	<memoryUnitsTotal>
+	  		<oid>HOST-RESOURCES-MIB::hrStorageSize.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageSize[{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The size of the storage represented by this entry, in units of hrStorageAllocationUnits. This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system. For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+	  		<discoveryRule>Memory Discovery</discoveryRule>	  		
+	  	</memoryUnitsTotal>
+	  	
+	  	
+	  	<memoryUsed>
+	  		 <snmpObject>memoryUsed[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <discoveryRule>Memory Discovery</discoveryRule>
+	  	</memoryUsed>
+	  	
+	  	
+	  	<memoryTotal>
+	  		 <snmpObject>memoryTotal[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <discoveryRule>Memory Discovery</discoveryRule>
+	  	</memoryTotal>
+	  	
+
+	  	
+	  	
+	  	<!-- storage coming up next -->
+	  	<storageUnits>
+	  		<oid>HOST-RESOURCES-MIB::hrStorageAllocationUnits.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageAllocationUnits[Storage-{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The size, in bytes, of the data objects allocated from this pool.
+	  		 If this entry is monitoring sectors, blocks, buffers, or packets, for example,
+	  		 this number will commonly be greater than one.  Otherwise this number will typically be one.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+			<metricLocation>{#SNMPVALUE}</metricLocation>
+	  		<discoveryRule>Storage Discovery</discoveryRule>
+	  	</storageUnits>
+	  	
+	  	<storageUnitsUsed>
+			<oid>HOST-RESOURCES-MIB::hrStorageUsed.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageUsed[Storage-{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+	  		<metricLocation>{#SNMPVALUE}</metricLocation>
+	  		<discoveryRule>Storage Discovery</discoveryRule>	  		
+	  	</storageUnitsUsed>
+	  	
+	  	<storageUnitsTotal>
+	  		<oid>HOST-RESOURCES-MIB::hrStorageSize.{#SNMPINDEX}</oid>
+	  		<snmpObject>hrStorageSize[Storage-{#SNMPVALUE}]</snmpObject>
+	  		<vendorDescription>The size of the storage represented by this entry, in units of hrStorageAllocationUnits. This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system. For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</vendorDescription>
+	  		<mib>HOST-RESOURCES-MIB</mib>
+	  		<metricLocation>{#SNMPVALUE}</metricLocation>
+	  		<discoveryRule>Storage Discovery</discoveryRule>	  		
+	  	</storageUnitsTotal>
+	  	
+	  	
+	  	<storageUsed>
+	  		 <snmpObject>storageUsed[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <metricLocation>{#SNMPVALUE}</metricLocation>
+			 <discoveryRule>Storage Discovery</discoveryRule>
+	  	</storageUsed>
+	  	
+	  	
+	  	<storageTotal>
+	  		 <snmpObject>storageTotal[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <metricLocation>{#SNMPVALUE}</metricLocation>
+			 <discoveryRule>Storage Discovery</discoveryRule>
+	  	</storageTotal>
+	  	
+	  	<storageUsedPercentage>
+			 <snmpObject>storageUsedPercentage[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <metricLocation>{#SNMPVALUE}</metricLocation>
+			 <discoveryRule>Storage Discovery</discoveryRule>	    	  
+	    </storageUsedPercentage>
+	    
+	    
+	    <!-- performance template part -->
+		<cpuLoad>
+	      <oid>1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}</oid>
+	      <snmpObject>hrProcessorLoad[{#SNMPINDEX}]</snmpObject>
+	      <mib>HOST-RESOURCES-MIB</mib>
+	      <vendorDescription>The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.</vendorDescription>
+	      <discoveryRule>CPU Discovery</discoveryRule>
+	    </cpuLoad>
+	    
+	    <memoryUsedPercentage>
+			 <snmpObject>memoryUsedPercentage[{#SNMPVALUE}]</snmpObject>
+			 <calculated>true</calculated>
+			 <discoveryRule>Memory Discovery</discoveryRule>	    	  
+	    </memoryUsedPercentage>
+	    
+	  </metrics>
+  </template>
+  </tns:root>

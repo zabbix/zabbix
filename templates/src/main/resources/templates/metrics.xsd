@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.example.org/zbx_template_new/" targetNamespace="http://www.example.org/zbx_template_new/">
+    <element name="root" type="tns:rootType"/>
+    <complexType name="templateType">
+    	 <all>
+    		<element name="classes" maxOccurs="1" minOccurs="1">
+    			<complexType>
+    				<sequence>
+    					<element type="tns:templateClass" name="class" maxOccurs="unbounded"/>
+    				</sequence>
+    			</complexType>
+    		</element>
+    		<element name="name" type="string" maxOccurs="1" minOccurs="1"/>
+    		<element name="description" type="string" maxOccurs="1" minOccurs="0"/>
+    		<element name="sysObjectID" type="string"/>
+    		<element name="discoveryRules" minOccurs="0" maxOccurs="1">
+				<complexType>
+	    			 <sequence>
+	    				<element name="discoveryRule" maxOccurs="unbounded" minOccurs="0">
+							<complexType>
+				    			 <all>
+				    				<element name="name" type="string" maxOccurs="1" minOccurs="1"/>
+				    				<element name="key" type="string" maxOccurs="1" minOccurs="1"/>
+				    				<element name="snmp_oid" type="string" maxOccurs="1" minOccurs="1"/>
+				    				<element name="description" type="string" maxOccurs="1" minOccurs="0"/>
+				    				<element name="filter" minOccurs="0" maxOccurs="1">
+				    					<complexType>
+				    						<sequence>
+				    							<element name="evaltype" type="byte"/>
+												<element name="formula" type="string"/>				    							
+												<element name="conditions">
+													<complexType>
+														<sequence>
+															<element name="condition" maxOccurs="unbounded" minOccurs="0">
+																<complexType>
+																	<sequence>
+																		<element name="macro" type="string"/>
+																		<element name="value" type="string"/>
+																		<element name="operator" type="int"/>
+																		<element name="formulaid" type="string"/>
+																	</sequence>
+																</complexType>
+															</element>
+														</sequence>
+													</complexType>
+												</element>
+				    						</sequence>
+				    					</complexType>
+				    				</element>
+				    			</all>
+			    			</complexType>	    				
+	    				</element>
+	    			</sequence>
+    			</complexType>    		
+    		</element>
+    		<element name="metrics">
+    			<complexType>
+	    			 	<choice maxOccurs="unbounded">
+	    			 		<sequence><!-- Template HOST-RESOURCES -->
+									<choice minOccurs="0">
+									  <sequence>
+									    <element name="memoryUnits" type="tns:metricType"/>
+									    <element name="memoryUnitsUsed" type="tns:metricType"/>
+								        <element name="memoryUnitsTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+										<element name="memoryUsed" type="tns:metricType"/>
+								        <element name="memoryTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+									  </sequence>
+									</choice>
+					    			 
+					    			<choice minOccurs="0">
+									  <sequence>
+									    <element name="storageUnits" type="tns:metricType"/>
+									    <element name="storageUnitsUsed" type="tns:metricType"/>
+								        <element name="storageUnitsTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+										<element name="storageUsed" type="tns:metricType"/>
+								        <element name="storageTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+									  </sequence>
+									</choice>
+					    			<element name="storageUsedPercentage" type="tns:metricType" maxOccurs="1" minOccurs="1"/>
+					    			 
+		    				</sequence>
+	    			 		<sequence><!-- Template Performance -->
+				    				<element name="cpuLoad" type="tns:metricType" maxOccurs="1" minOccurs="1"/>
+				    				<element name="cpuUtil" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+									<choice minOccurs="0">
+									  <sequence>
+									    <element name="memoryUsed" type="tns:metricType"/>
+									    <element name="memoryFree" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								        <element name="memoryTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+									  </sequence>
+									  <sequence>
+									    <element name="memoryFree" type="tns:metricType"/>
+								        <element name="memoryTotal" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+									  </sequence>
+									</choice>
+					    			<element name="memoryUsedPercentage" type="tns:metricType" maxOccurs="1" minOccurs="1"/>
+		    				</sequence>
+		    				<sequence> <!-- Template General and System Info -->
+		    					<element name="sysUptime" type="tns:metricType"/>
+		    					<element name="sysLocation" type="tns:metricType"/>
+		    					<element name="sysContact" type="tns:metricType"/>
+		    					<element name="sysObjectID" type="tns:metricType"/>
+		    					<element name="sysName" type="tns:metricType"/>
+		    					<element name="sysDescr" type="tns:metricType"/>
+		    				</sequence>
+							<sequence> <!-- Template Fault and System Info -->
+				    			<element name="temperatureValue" type="tns:metricType" maxOccurs="unbounded" minOccurs="1"/>
+								<element name="temperatureStatus" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								<element name="temperatureLocale" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								<element name="overallStatus" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+		    				</sequence>
+							<sequence> <!-- Template Fault (Disks) -->
+								<!-- array controllers -->
+								<element name="diskArrayStatus" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								<element name="diskArrayModel" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								<element name="physicalDiskStatus" type="tns:metricType" maxOccurs="1" minOccurs="1"/>
+								<element name="physicalDiskSerialNumber" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+		    				</sequence>
+		    				
+							<sequence> <!-- Template Fault (Power Supply) -->
+								<element name="psVoltage" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+								<element name="psStatus" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+		    				</sequence>
+		    				
+							<sequence> <!-- Template Inventory -->
+				    			<choice maxOccurs="unbounded">
+				    				<element name="osVersion" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    				<element name="hwVersion" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    				<element name="hwModel" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    				<element name="hwLabel" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    				<element name="hwSerialNumber" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    				<element name="hwFirmwareVersion" type="tns:metricType" maxOccurs="1" minOccurs="0"/>
+				    			</choice>
+		    				</sequence>
+	    				</choice>
+    			</complexType>
+    		</element>
+    		<element name="templates" minOccurs="0" type="tns:templateDependencies"/>
+    		<element name="macros" minOccurs="0" type="tns:macros"/>
+    	</all>
+    </complexType>
+    
+	<complexType name="rootType">
+    	 <sequence>
+    		<element name="template" type="tns:templateType" maxOccurs="unbounded" minOccurs="1"/>
+    		<element name="value_maps" type="tns:valueMapsType" maxOccurs="1" minOccurs="0"/>
+    	 </sequence>
+    </complexType>
+    
+		<complexType name="templateDependencies">
+					<sequence>
+	    				<element name="template" minOccurs="0" maxOccurs="unbounded">
+	    					<complexType>
+	    						<sequence>
+	    							<element name="name" type="string"/>
+	    						</sequence>
+	    					</complexType>
+	    				</element>
+	    			</sequence>
+		</complexType>
+		
+		 	<complexType name="macros">
+	    			<sequence>
+	    				<element name="macro" minOccurs="0" maxOccurs="unbounded">
+	    					<complexType>
+	    						<sequence>
+	    							<element name="macro" type="string"/>
+	    							<element name="value" type="string"/>
+	    						</sequence>
+	    					</complexType>
+	    				</element>
+	    			</sequence>
+    		</complexType>
+    
+    
+    <complexType name="metricType">
+		<sequence>
+			<element name="name" type="tns:langString" maxOccurs="unbounded" minOccurs="1"/>
+	 		<element name="group" type="tns:groupList" maxOccurs="1" minOccurs="1"/>
+			<choice>
+				<sequence>
+					<element name="oid" type="string" maxOccurs="1" minOccurs="1"/>
+				    <element name="snmpObject" type="string" maxOccurs="1" minOccurs="1"/>
+				    <element name="mib" type="string" maxOccurs="1" minOccurs="0"/>	
+				</sequence>
+				<sequence>
+					<element name="snmpObject" type="string" maxOccurs="1" minOccurs="1"/>
+					<element name="expressionFormula" type="string" maxOccurs="1" minOccurs="1"/>
+				</sequence>
+			</choice>
+			<choice maxOccurs="unbounded" minOccurs="0">
+				<element name="description" type="tns:langString" maxOccurs="unbounded" minOccurs="0"/>
+			    <element name="vendorDescription" type="tns:langString" maxOccurs="unbounded" minOccurs="0"/>
+			    <element name="ref" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="history" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="trends" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="units" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="update" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="valueType" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="discoveryRule" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="metricLocation" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="valueMap" type="string" maxOccurs="1" minOccurs="0"/>
+			    <element name="inventory_link" type="tns:inventory_link" maxOccurs="1" minOccurs="0"/>
+			    <element name="multiplier" type="string" maxOccurs="1" minOccurs="0"/> <!-- change to float -->
+			    <element name="triggers" minOccurs="0" maxOccurs="1">
+		    	<complexType>
+		    		<sequence>
+		    			<element name="trigger" type="tns:trigger" maxOccurs="unbounded" minOccurs="0"/>
+		    		</sequence>
+		    	</complexType>
+		    </element>
+			</choice>
+	 	</sequence>
+    </complexType>
+
+    <complexType name="trigger">
+		<sequence>
+			<element name="id" type="string" maxOccurs="1" minOccurs="0"/>
+			<element name="expression" type="string" maxOccurs="1" minOccurs="1"/>
+	 		<element name="name" type="tns:langString" maxOccurs="unbounded" minOccurs="1"/>
+		    <element name="url" type="string" maxOccurs="1" minOccurs="0"/>
+		    
+		  	<element name="priority" type="byte" maxOccurs="1" minOccurs="1"/>
+		  	<element name="description" type="tns:langString" maxOccurs="unbounded" minOccurs="0"/>
+		  	<element name="dependsOn" maxOccurs="1" minOccurs="0">
+		  		<complexType>
+		  			<sequence><element name="dependency" type="string" maxOccurs="unbounded" minOccurs="0"/></sequence>
+		  		</complexType>
+		  	</element>
+	 	</sequence>
+    </complexType>    
+
+                    
+    
+<simpleType name="groupList">
+    <restriction base="string">
+        <enumeration value="CPU"/>
+        <enumeration value="Memory"/>
+        <enumeration value="Storage"/>
+        
+        <enumeration value="Temperature"/>
+        <enumeration value="Status"/>
+        <enumeration value="Disk Arrays"/>
+        <enumeration value="Disks"/>
+        <enumeration value="Power Supply"/>
+        
+		<enumeration value="General"/>
+        <enumeration value="Inventory"/>
+        
+        <enumeration value="Internal Items"/><!-- place items used in calculated items only -->
+        
+    </restriction>
+</simpleType>
+
+<simpleType name="templateClass">
+    <restriction base="string">
+        <enumeration value="Performance"/>
+        <enumeration value="Fault"/>
+        <enumeration value="General"/>
+        <enumeration value="Inventory"/>
+    </restriction>
+</simpleType>
+
+<complexType name="valueMapsType">
+	<sequence>
+		<element name="value_map" maxOccurs="unbounded">
+			<complexType>
+				<sequence>
+					<element name="name"></element>
+					<element name="mappings">
+						<complexType>
+							<sequence>
+								<element name="mapping" maxOccurs="unbounded">
+									<complexType>
+									<sequence>
+										<element name="value" type="string"/>
+										<element name="newvalue" type="string"/>
+									</sequence>
+									</complexType>		
+								</element>
+							</sequence>
+						</complexType>
+					</element>
+				</sequence>	
+			</complexType>
+		</element>
+	</sequence>
+</complexType>
+
+<!-- lang proto -->
+  <complexType name="langString">
+    <simpleContent>
+      <extension base="string">
+       	 <attribute name="lang" default="EN">
+       	 	<simpleType>
+       	 		<restriction base="string">
+		        <enumeration value="EN"/>
+		        <enumeration value="RU"/>
+    		</restriction>
+       	 	</simpleType>
+       	 </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <simpleType name="inventory_link">
+	
+    	<restriction base="int">
+    		<minInclusive value="1"></minInclusive>
+    		<maxInclusive value="70"></maxInclusive>
+    		
+    	</restriction>
+
+  </simpleType>
+
+
+<!-- host inventory (for inventory link) 
+ID	Property	Type	Description
+4	alias	string	Alias.
+11	asset_tag	string	Asset tag.
+28	chassis	string	Chassis.
+23	contact	string	Contact person.
+32	contract_number	string	Contract number.
+47	date_hw_decomm	string	HW decommissioning date.
+46	date_hw_expiry	string	HW maintenance expiry date.
+45	date_hw_install	string	HW installation date.
+44	date_hw_purchase	string	HW purchase date.
+34	deployment_status	string	Deployment status.
+14	hardware	string	Hardware.
+15	hardware_full	string	Detailed hardware.
+39	host_netmask	string	Host subnet mask.
+38	host_networks	string	Host networks.
+40	host_router	string	Host router.
+30	hw_arch	string	HW architecture.
+33	installer_name	string	Installer name.
+24	location	string	Location.
+25	location_lat	string	Location latitude.
+26	location_lon	string	Location longitude.
+12	macaddress_a	string	MAC address A.
+13	macaddress_b	string	MAC address B.
+29	model	string	Model.
+3	name	string	Name.
+27	notes	string	Notes.
+41	oob_ip	string	OOB IP address.
+42	oob_netmask	string	OOB host subnet mask.
+43	oob_router	string	OOB router.
+5	os	string	OS name.
+6	os_full	string	Detailed OS name.
+7	os_short	string	Short OS name.
+61	poc_1_cell	string	Primary POC mobile number.
+58	poc_1_email	string	Primary email.
+57	poc_1_name	string	Primary POC name.
+63	poc_1_notes	string	Primary POC notes.
+59	poc_1_phone_a	string	Primary POC phone A.
+60	poc_1_phone_b	string	Primary POC phone B.
+62	poc_1_screen	string	Primary POC screen name.
+68	poc_2_cell	string	Secondary POC mobile number.
+65	poc_2_email	string	Secondary POC email.
+64	poc_2_name	string	Secondary POC name.
+70	poc_2_notes	string	Secondary POC notes.
+66	poc_2_phone_a	string	Secondary POC phone A.
+67	poc_2_phone_b	string	Secondary POC phone B.
+69	poc_2_screen	string	Secondary POC screen name.
+8	serialno_a	string	Serial number A.
+9	serialno_b	string	Serial number B.
+48	site_address_a	string	Site address A.
+49	site_address_b	string	Site address B.
+50	site_address_c	string	Site address C.
+51	site_city	string	Site city.
+53	site_country	string	Site country.
+56	site_notes	string	Site notes.
+55	site_rack	string	Site rack location.
+52	site_state	string	Site state.
+54	site_zip	string	Site ZIP/postal code.
+16	software	string	Software.
+18	software_app_a	string	Software application A.
+19	software_app_b	string	Software application B.
+20	software_app_c	string	Software application C.
+21	software_app_d	string	Software application D.
+22	software_app_e	string	Software application E.
+17	software_full	string	Software details.
+10	tag	string	Tag.
+1	type	string	Type.
+2	type_full	string	Type details.
+35	url_a	string	URL A.
+36	url_b	string	URL B.
+37	url_c	string	URL C.
+31	vendor	string	Vendor.
+-->
+
+
+
+</schema>

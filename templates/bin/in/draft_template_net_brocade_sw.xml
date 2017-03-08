@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+  <!-- http://community.brocade.com/t5/Fibre-Channel-SAN/Is-Fabric-watch-license-necessary-for-getting-info-CPU-memory/td-p/72057
+  http://community.brocade.com/t5/Ethernet-Fabric-VDX-CNA/I-have-found-CPU-OIDs-of-FC-Switch-1-3-6-1-4-1-1588-2-1-1-1-26/td-p/6375
+  license is required
+  -->
+	  <classes>
+	  	<class>Inventory</class>
+	  	<class>Performance</class>
+	  	<class>Fault</class>
+	  </classes>
+	  <name>Template Brocade</name>
+	  <description>Template Brocade Draft</description>
+	  <sysObjectID>xxx</sysObjectID>
+	  <discoveryRules>
+	  	  	<discoveryRule>
+			<name>Temperature Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4]</snmp_oid>
+                <key>temperature.discovery</key>
+		</discoveryRule>
+	  </discoveryRules>
+	  <metrics>
+	    <cpuLoad>
+	      <oid>1.3.6.1.4.1.1588.2.1.1.1.26.1.0</oid>
+	      <snmpObject>Cpu1MinAvg.0</snmpObject>
+	      <mib>SW MIB</mib>
+	    </cpuLoad>
+
+	    <memoryUsedPercentage>
+			<oid>1.3.6.1.4.1.1588.2.1.1.1.26.6.0</oid>
+	        <snmpObject>swMemUsage.0</snmpObject>
+	        <mib>SW MIB</mib>	    	  
+	    </memoryUsedPercentage>
+	    
+		<temperatureValue>
+	    	  <oid>.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>Temperature[{#SNMPINDEX}]</snmpObject>
+		      <mib>SW MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPINDEX}</metricLocation>
+	    </temperatureValue>
+
+	    
+	   </metrics>
+		<macros>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>75</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>65</value>
+            </macro>
+         </macros>	   
+  </template>
+  
+  </tns:root>

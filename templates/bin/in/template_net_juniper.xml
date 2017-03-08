@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+	<classes>
+	  <class>Performance</class>
+	  <class>Fault</class>
+	  <class>Inventory</class>
+	</classes>
+	  <name>Template Juniper</name>
+	  <description>Template Juniper</description>
+	  <sysObjectID>{sysobjectid}</sysObjectID>
+	  <discoveryRules>
+	  	<discoveryRule>
+	  				<name>CPU and Memory Discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5]</snmp_oid>
+                    <key>jnxOperatingTable.discovery</key>
+                    <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory 
+                    http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
+                    <filter>
+                        <evaltype>0</evaltype>
+                        <formula/>
+                        <conditions>
+							<condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <!-- <value>9\.[0-9]\.[0-9]\.[0-9]</value>  -->
+                                <value>Routing Engine.*</value>
+                                <operator>8</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+	  	</discoveryRule>
+		<discoveryRule>
+	  				<name>Temperature discovery</name>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5]</snmp_oid>
+                    <key>jnxOperatingTable.discovery.temp</key>
+                    <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature 
+                    http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
+                    <filter>
+                        <evaltype>0</evaltype>
+                        <formula/>
+                        <conditions>
+							<condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <!-- <value>9\.[0-9]\.[0-9]\.[0-9]</value>  -->
+                                <value>Routing Engine.*</value>
+                                <operator>8</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+	  	</discoveryRule>	  	
+	  </discoveryRules>
+	  <metrics>
+	    <cpuLoad>
+	      <oid>1.3.6.1.4.1.2636.3.1.13.1.21.{#SNMPINDEX}</oid>
+	      <snmpObject>jnxOperating5MinLoadAvg[{#SNMPVALUE}]</snmpObject>
+	      <mib>JUNIPER-MIB</mib>
+	      <ref>http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</ref>
+	      <vendorDescription>The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.</vendorDescription>
+	      <discoveryRule>CPU and Memory Discovery</discoveryRule>
+	    </cpuLoad>
+	    <memoryUsedPercentage>
+		  <oid>1.3.6.1.4.1.2636.3.1.13.1.11.{#SNMPINDEX}</oid>
+	      <snmpObject>jnxOperatingBuffer[{#SNMPVALUE}]</snmpObject>
+	      <mib>JUNIPER-MIB</mib>
+	      <ref>http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</ref>
+	      <vendorDescription>The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.</vendorDescription>
+	      <discoveryRule>CPU and Memory Discovery</discoveryRule>
+	    </memoryUsedPercentage>
+	    
+	    <!-- fault metrics -->
+	     <temperatureValue>
+	    	  <oid>1.3.6.1.4.1.2636.3.1.13.1.7.{#SNMPINDEX}</oid>
+		      <snmpObject>jnxOperatingTemp[{#SNMPVALUE}]</snmpObject>
+		      <mib>JUNIPER-MIB</mib>
+		      <vendorDescription>The temperature in Celsius (degrees C) of {#SNMPVALUE}</vendorDescription>
+		      <discoveryRule>Temperature discovery</discoveryRule>
+		      <metricLocation>{#SNMPVALUE}</metricLocation>
+	     </temperatureValue>
+	   </metrics>
+	   <macros>
+	   		<macro>
+               <macro>{$TEMP_CRIT:"Routing Engine"}</macro>
+               <value>80</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN:"Routing Engine"}</macro>
+               <value>70</value>
+            </macro>
+	   	</macros>
+  </template>
+   
+  </tns:root>
+ 
+

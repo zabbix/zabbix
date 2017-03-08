@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+  <!-- http://ixnfo.com/nebolshoy-spisok-oid-dlya-kommutatorov-d-link.html 
+  https://dlink-manuals.org/dlink-howto-use-snmp-to-show-firmware-information-on-des-3028/1/
+  -->
+	  <classes>
+	  	<class>Inventory</class>
+	  	<class>Performance</class>
+	  	<class>Fault</class>
+	  </classes>
+	  <name>Template Alcatel</name>
+	  <description>Template Alcatel based on Template_Alcatel-OS6850-U24X Draft</description>
+	  <sysObjectID>xxx</sysObjectID>
+	  <metrics>
+	    <cpuLoad>
+	      <oid>enterprises.6486.800.1.2.1.16.1.1.1.14.0</oid>
+	      <snmpObject>Cpu1MinAvg.0</snmpObject>
+	      <mib>ALCATEL</mib>
+	    </cpuLoad>
+
+	    <memoryUsedPercentage>
+			<oid>enterprises.6486.800.1.2.1.16.1.1.1.10.0</oid>
+	        <snmpObject>Memory1MinAvg.0</snmpObject>
+	        <mib>ALCATEL</mib>	    	  
+	    </memoryUsedPercentage>
+	    
+		<temperatureValue>
+	    	  <oid>enterprises.6486.800.1.2.1.16.1.1.1.18.0</oid>
+		      <snmpObject>TemperatureChas1MinAvg.0</snmpObject>
+		      <mib>ALCATEL</mib>
+		      <metricLocation>Chassis</metricLocation>
+	    </temperatureValue>
+
+<!-- 	    
+	    <hwModel>
+	      <oid>1.3.6.1.2.1.1.1.0</oid>
+	      <snmpObject>sysDescr[hwModel]</snmpObject>
+	      <mib>ALCATEL</mib>
+	      <vendorDescription>A textual description of the entity.  This value should
+				include the full name and version identification of thesystem's hardware type, software operating-system, and
+				networking software.</vendorDescription>
+	    </hwModel>
+	     -->
+	    <hwSerialNumber>
+	    	<oid>.1.3.6.1.2.1.47.1.1.1.1.11.1</oid>
+	      	<snmpObject>SysSeriaNumer.1</snmpObject>
+		  	<mib>ALCATEL</mib>
+	    </hwSerialNumber>
+	    
+	   </metrics>
+		<macros>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>75</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>65</value>
+            </macro>
+         </macros>	   
+  </template>
+  
+  </tns:root>

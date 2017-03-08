@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+	  <classes>
+	  	<class>General</class>
+	  </classes>
+	  <name>Template SNMP Generic</name>
+	  <description>Template SNMP Generic</description>
+	  <sysObjectID>na</sysObjectID>
+	  <metrics>
+	    <sysUptime>
+          <oid>1.3.6.1.2.1.1.3.0</oid>
+	      <snmpObject>sysUpTime</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</vendorDescription>
+	      <multiplier>0.01</multiplier>
+	    </sysUptime>
+	     <sysLocation>
+          <oid>1.3.6.1.2.1.1.6.0</oid>
+	      <snmpObject>sysLocation</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription> The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</vendorDescription>
+	    </sysLocation>
+	    <sysContact>
+          <oid>1.3.6.1.2.1.1.4.0</oid>
+	      <snmpObject>sysContact</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</vendorDescription>
+	    </sysContact>
+	    <sysObjectID>
+	      <oid>1.3.6.1.2.1.1.2.0</oid>
+	      <snmpObject>sysObjectID</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription> The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</vendorDescription>
+	    </sysObjectID>
+	    <sysName>
+          <oid>1.3.6.1.2.1.1.5.0</oid>
+	      <snmpObject>sysName</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</vendorDescription>
+	    </sysName>
+   	    <sysDescr>
+	      <oid>1.3.6.1.2.1.1.1.0</oid>
+	      <snmpObject>sysDescr</snmpObject>
+	      <mib>SNMPv2-MIB</mib>
+	      <vendorDescription>A textual description of the entity.  This value should
+include the full name and version identification of thesystem's hardware type, software operating-system, and
+networking software.</vendorDescription>
+	    </sysDescr>
+	   </metrics>
+  </template>
+  </tns:root>

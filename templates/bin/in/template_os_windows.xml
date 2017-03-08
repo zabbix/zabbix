@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+	  <classes>
+	  	<class>Inventory</class>
+	  	<class>Performance</class>
+	  </classes>
+	  <name>Template Windows</name>
+	  <description>Template Windows</description>
+	  <sysObjectID>{oid}</sysObjectID>
+	  <metrics></metrics>
+	  <templates>
+	  	<template>
+	  		<name>Template HOST-RESOURCES-MIB_SNMP_PLACEHOLDER</name>
+	  	</template>
+  	  </templates>
+  </template>
+</tns:root>

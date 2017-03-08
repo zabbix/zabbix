@@ -1,0 +1,937 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:root xmlns:tns="http://www.example.org/zbx_template_new/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/zbx_template_new/ ../../main/resources/templates/metrics.xsd ">
+  <template>
+  	  <classes>
+  	  	<class>Fault</class>
+  	  	<class>Inventory</class>
+  	  </classes>
+	  <name>Template HP iLO</name>
+	  <description>Template HP iLO</description>
+	  <sysObjectID>.1.3.6.1.4.1.232.9.4.10</sysObjectID>
+	  
+	  <discoveryRules>
+	  	<discoveryRule>
+			<name>Temperature Discovery</name>
+                <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},.1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+                <key>tempDescr.discovery</key>
+                <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable</description>
+				<filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                      <condition>
+                          <macro>{#SENSOR_LOCALE}</macro>
+                          <value>(3|4|5|7|8|9|10|12|13)</value><!-- ambient -->
+                          <operator>8</operator>
+                          <formulaid>A</formulaid>
+                      </condition>
+                  </conditions>
+        	    </filter>
+		</discoveryRule>
+	    <discoveryRule>
+			<name>Temperature Discovery Ambient</name>
+            <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},.1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+            <key>tempDescr.discovery.ambient</key>
+            <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter</description>
+        	<filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                      <condition>
+                          <macro>{#SNMPINDEX}</macro>
+                          <value>0\.1</value> <!-- ambient intake index-->
+                          <operator>8</operator>
+                          <formulaid>B</formulaid>
+                      </condition>
+                      <condition>
+                          <macro>{#SENSOR_LOCALE}</macro>
+                          <value>11</value><!-- ambient -->
+                          <operator>8</operator>
+                          <formulaid>A</formulaid>
+                      </condition>
+                  </conditions>
+            </filter>
+		</discoveryRule>
+		
+	    <discoveryRule>
+			<name>Temperature Discovery CPU</name>
+            <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},.1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+            <key>tempDescr.discovery.cpu</key>
+            <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter</description>
+        	<filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                      <condition>
+                          <macro>{#SENSOR_LOCALE}</macro>
+                          <value>6</value><!-- cpu -->
+                          <operator>8</operator>
+                          <formulaid>A</formulaid>
+                      </condition>
+                  </conditions>
+            </filter>
+		</discoveryRule>
+		<discoveryRule>
+			<name>Array Controller Discovery</name>
+            <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.4.1.232.3.2.2.1.1.1,{#CNTLR_SLOT},1.3.6.1.4.1.232.3.2.2.1.1.5,{#CNTLR_LOCATION},1.3.6.1.4.1.232.3.2.2.1.1.20]</snmp_oid>
+            <key>array.discovery</key>
+            <description>Scanning table of Array controllers: CPQIDA-MIB::cpqDaCntlrTable </description>
+		</discoveryRule>
+		
+		<discoveryRule>
+			<name>Physical Disk Discovery</name>
+            <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.5.1.1.5,{#DISK_LOCATION},1.3.6.1.4.1.232.3.2.5.1.1.64]</snmp_oid>
+            <key>physicalDisk.discovery</key>
+            <description>Scanning  table of physical drive entries CPQIDA-MIB::cpqDaPhyDrvTable.</description>
+		</discoveryRule>
+		
+	  </discoveryRules>
+	  <metrics>
+	  	<temperatureValue>
+	    	  <oid>.1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>cpqHeTemperatureCelsius[{#SNMPINDEX}]</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <metricLocation>{#SNMPINDEX}</metricLocation>
+	    </temperatureValue>
+	  	<temperatureValue>
+	    	  <oid>.1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>cpqHeTemperatureCelsius[Ambient-{#SNMPINDEX}]</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <discoveryRule>Temperature Discovery Ambient</discoveryRule>
+		      <metricLocation>Ambient</metricLocation>
+	    </temperatureValue>
+	    <temperatureValue>
+	    	  <oid>.1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</oid>
+		      <snmpObject>cpqHeTemperatureCelsius[CPU-{#SNMPINDEX}]</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <discoveryRule>Temperature Discovery CPU</discoveryRule>
+		      <metricLocation>CPU</metricLocation>
+	    </temperatureValue>
+	    <!-- by element status 	    
+	    <temperatureStatus>
+	    	  <oid>.1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</oid>
+		      <snmpObject>cpqHeTemperatureCondition.[{#SNMPINDEX}]</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <vendorDescription>The Temperature sensor condition.
+		      This value will be one of the following:
+		      other(1)  Temperature could not be determined.
+		      ok(2)  The temperature sensor is within normal operating range.
+		      degraded(3)  The temperature sensor is outside of normal operating range.
+		      failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
+		      The system will automatically shutdown if the failed(4) condition results,
+		      so it is unlikely that this value will ever be returned by the agent.
+		      If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+		      </vendorDescription>
+		      <metricLocation>{#SNMPINDEX}</metricLocation>
+		      <valueMap>CPQSINFO-MIB::status</valueMap>
+	    </temperatureStatus>-->
+	  	<temperatureStatus>
+	    	  <oid>1.3.6.1.4.1.232.6.2.6.1.0</oid>
+		      <snmpObject>cpqHeThermalCondition.0</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <vendorDescription>This value specifies the overall condition of the system's
+		      thermal environment.
+		      This value will be one of the following:
+		      other(1)  Temperature could not be determined.
+		      ok(2)  The temperature sensor is within normal operating range.
+		      degraded(3)  The temperature sensor is outside of normal operating range.
+		      failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
+		      </vendorDescription>
+		      <metricLocation>System</metricLocation>
+		      <valueMap>CPQSINFO-MIB::status</valueMap>
+	    </temperatureStatus>
+	  	<temperatureLocale>
+	    	  <oid>.1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}</oid>
+		      <snmpObject>cpqHeTemperatureLocale[{#SNMPINDEX}]</snmpObject>
+		      <mib>CPQHLTH-MIB</mib>
+		      <discoveryRule>Temperature Discovery</discoveryRule>
+		      <vendorDescription>This specifies the location of the temperature sensor present in the system.		      </vendorDescription>
+		      <metricLocation>{#SNMPINDEX}</metricLocation>
+		      <valueMap>CPQHLTH-MIB::cpqHeTemperatureLocale</valueMap>
+	    </temperatureLocale>
+	  	
+	    <overallStatus>
+	      <oid>.1.3.6.1.4.1.232.2.1.3.0</oid>
+	      <snmpObject>cpqSiMibCondition.0</snmpObject>
+	      <mib>CPQSINFO-MIB</mib>
+	      <vendorDescription>The overall condition. This object represents the overall status of the server information represented by this MIB.</vendorDescription>
+	      <valueMap>CPQSINFO-MIB::status</valueMap>
+	    </overallStatus>
+	      
+
+	    <diskArrayStatus>
+	      <oid>1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}</oid>
+	      <snmpObject>cpqDaCntlrCondition[{#SNMPINDEX}]</snmpObject>
+	      <mib>CPQIDA-MIB</mib>
+	      <discoveryRule>Array Controller Discovery</discoveryRule>
+	      <vendorDescription>This value represents the overall condition of this controller,
+	      and any associated logical drives,physical drives, and array accelerators.</vendorDescription>
+	      <!-- <metricLocation>{#CNTLR_SLOT}</metricLocation>  -->
+	      <metricLocation>{#CNTLR_LOCATION}</metricLocation>
+	      <valueMap>CPQSINFO-MIB::status</valueMap>
+	    </diskArrayStatus>
+	    
+	    <diskArrayModel>
+	      <oid>1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}</oid>
+	      <snmpObject>cpqDaCntlrModel[{#SNMPINDEX}]</snmpObject>
+	      <mib>CPQIDA-MIB</mib>
+	      <discoveryRule>Array Controller Discovery</discoveryRule>
+	      <vendorDescription>Array Controller Model. The type of controller card.</vendorDescription>
+	      <!-- <metricLocation>{#CNTLR_SLOT}</metricLocation>  -->
+	      <metricLocation>{#CNTLR_LOCATION}</metricLocation>
+	      <valueMap>CPQIDA-MIB::cpqDaCntlrModel</valueMap>
+	    </diskArrayModel>
+	    
+	    <physicalDiskStatus>
+	      <oid>1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}</oid>
+	      <snmpObject>cpqDaPhyDrvStatus[{#SNMPINDEX}]</snmpObject>
+	      <mib>CPQIDA-MIB</mib>
+	      <discoveryRule>Physical Disk Discovery</discoveryRule>
+	      <vendorDescription>Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:
+	      other (1)  Indicates that the instrument agent does not recognize  the drive. 
+	      You may need to upgrade your instrument agent  and/or driver software.
+	      ok (2)  Indicates the drive is functioning properly.
+	      failed (3)  Indicates that the drive is no longer operating and  should be replaced.
+	      predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.
+		  </vendorDescription>
+	      <metricLocation>{#DISK_LOCATION}</metricLocation>
+	      <valueMap>CPQIDA-MIB::cpqDaPhyDrvStatus</valueMap>
+	    </physicalDiskStatus>
+	    
+	     <physicalDiskSerialNumber>
+	      <oid>1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}</oid>
+	      <snmpObject>cpqDaPhyDrvSerialNum[{#SNMPINDEX}]</snmpObject>
+	      <mib>CPQIDA-MIB</mib>
+	      <discoveryRule>Physical Disk Discovery</discoveryRule>
+	      <vendorDescription>Physical Drive Serial Number.
+	      This is the serial number assigned to the physical drive.
+	      This value is based upon the serial number as returned by the SCSI inquiry command
+	      but may have been modified due to spacelimitations.  This can be used for identification purposes.
+		  </vendorDescription>
+	      <metricLocation>{#DISK_LOCATION}</metricLocation>
+	    </physicalDiskSerialNumber>
+
+		<!-- inventory -->
+	    <hwModel>
+	       <oid>.1.3.6.1.4.1.232.2.2.4.2.0</oid>
+	       <snmpObject>cpqSiProductName</snmpObject>
+   	      <mib>CPQSINFO-MIB</mib>
+   	      <vendorDescription>The machine product name.The name of the machine used in this system.</vendorDescription>
+	    </hwModel>
+	    
+	    <hwSerialNumber>
+	       <oid>.1.3.6.1.4.1.232.2.2.2.1.0</oid>
+	       <snmpObject>cpqSiSysSerialNum</snmpObject>
+   	      <mib>CPQSINFO-MIB</mib>
+   	      <vendorDescription>The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.</vendorDescription>
+	    </hwSerialNumber>
+	    
+	   </metrics>
+
+	   
+	    <macros>
+              <macro>
+                  <macro>{$HEALTH_CRIT_STATUS}</macro>
+                  <value>4</value>
+              </macro>
+              <macro>
+                  <macro>{$HEALTH_WARN_STATUS}</macro>
+                  <value>3</value>
+              </macro>
+              
+			<macro>
+                  <macro>{$TEMP_CRIT:"Ambient"}</macro>
+                  <value>35</value>
+              </macro>
+              
+              <macro>
+                  <macro>{$TEMP_WARN:"Ambient"}</macro>
+                  <value>30</value>
+              </macro>
+              
+              <macro>
+                  <macro>{$DISK_ARRAY_CRIT_STATUS}</macro>
+                  <value>4</value>
+              </macro>
+              <macro>
+                  <macro>{$DISK_ARRAY_WARN_STATUS}</macro>
+                  <value>3</value>
+              </macro>
+              
+              <macro>
+                  <macro>{$DISK_OK_STATUS}</macro>
+                  <value>2</value>
+              </macro>
+              <macro>
+                  <macro>{$DISK_WARN_STATUS}</macro>
+                  <value>4</value>
+              </macro>
+              <macro>
+                  <macro>{$DISK_FAIL_STATUS}</macro>
+                  <value>3</value>
+              </macro>
+            </macros>
+  	</template>
+  
+  
+    <value_maps>
+        <value_map>
+            <name>CPQSINFO-MIB::status</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>ok</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>degraded</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>failed</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        
+        <value_map>
+            <name>CPQHLTH-MIB::cpqHeTemperatureLocale</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>system</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>systemBoard</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>ioBoard</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>cpu</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>memory</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>storage</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>removableMedia</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>powerSupply</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>ambient</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>chassis</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>bridgeCard</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <!-- imported
+
+        <value_map>
+            <name>HP AB Controller Statua</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>invalid</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>enabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>tmpDisabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>permDisabled</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP AB Error code</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>invalid</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>badConfig</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>lowBattery</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>disableCmd</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>noResources</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>notConnected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>badMirrorData</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>readErr</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>writeErr</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>configCmd</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>expandInProgress</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>snapshotInProgress</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>redundantLowBattery</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>redundantSizeMismatch</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>redundantCacheFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>17</value>
+                    <newvalue>excessiveEccErrors</newvalue>
+                </mapping>
+                <mapping>
+                    <value>18</value>
+                    <newvalue>adgEnablerMissing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>19</value>
+                    <newvalue>postEccErrors</newvalue>
+                </mapping>
+                <mapping>
+                    <value>20</value>
+                    <newvalue>batteryHotRemoved</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP Fan Present</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>absent</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>present</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP Fan Type</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>systemFan</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>cpuFan</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP form factor</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>portable</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>laptop</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>desktop</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>tower</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>mini-tower</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>rack-mount</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP Physical disk rotation speed</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>rpm7200</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>rpm10k</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>rpm15k</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP PSU Status</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>noError</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>generalFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>bistFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>fanFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>tempFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>interlockOpen</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>epromFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>vrefFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>dacFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>ramTestFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>voltageChannelFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>orringdiodeFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>brownOut</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>giveupOnStartup</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>nvramInvalid</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>calibrationTableInvalid</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP RAID current role</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>notDuplexed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>active</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>backup</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP RAID fault tolerance</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>mirroring</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>dataGuard (RAID4)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>distribDataGuard (RAID5)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>advancedDataGuard (RAID6)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>raid50</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>raid60</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP RAID physical disk status</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>OK</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>predictiveFailure</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>erasing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>eraseDone</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>eraseQueued</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>HP RAID SMART status</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>OK</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>replaceDrive</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        -->
+        <value_map>
+            <name>CPQIDA-MIB::cpqDaCntlrModel</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>ida</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>idaExpansion</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>ida-2</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>smart</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>smart-2e</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>smart-2p</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>smart-2sl</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>smart-3100es</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>smart-3200</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>smart-2dh</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>smart-221</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>sa-4250es</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>sa-4200</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>sa-integrated</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>sa-431</newvalue>
+                </mapping>
+                <mapping>
+                    <value>17</value>
+                    <newvalue>sa-5300</newvalue>
+                </mapping>
+                <mapping>
+                    <value>18</value>
+                    <newvalue>raidLc2</newvalue>
+                </mapping>
+                <mapping>
+                    <value>19</value>
+                    <newvalue>sa-5i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>20</value>
+                    <newvalue>sa-532</newvalue>
+                </mapping>
+                <mapping>
+                    <value>21</value>
+                    <newvalue>sa-5312</newvalue>
+                </mapping>
+                <mapping>
+                    <value>22</value>
+                    <newvalue>sa-641</newvalue>
+                </mapping>
+                <mapping>
+                    <value>23</value>
+                    <newvalue>sa-642</newvalue>
+                </mapping>
+                <mapping>
+                    <value>24</value>
+                    <newvalue>sa-6400</newvalue>
+                </mapping>
+                <mapping>
+                    <value>25</value>
+                    <newvalue>sa-6400em</newvalue>
+                </mapping>
+                <mapping>
+                    <value>26</value>
+                    <newvalue>sa-6i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>27</value>
+                    <newvalue>sa-generic</newvalue>
+                </mapping>
+                <mapping>
+                    <value>29</value>
+                    <newvalue>sa-p600</newvalue>
+                </mapping>
+                <mapping>
+                    <value>30</value>
+                    <newvalue>sa-p400</newvalue>
+                </mapping>
+                <mapping>
+                    <value>31</value>
+                    <newvalue>sa-e200</newvalue>
+                </mapping>
+                <mapping>
+                    <value>32</value>
+                    <newvalue>sa-e200i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>33</value>
+                    <newvalue>sa-p400i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>34</value>
+                    <newvalue>sa-p800</newvalue>
+                </mapping>
+                <mapping>
+                    <value>35</value>
+                    <newvalue>sa-e500</newvalue>
+                </mapping>
+                <mapping>
+                    <value>36</value>
+                    <newvalue>sa-p700m</newvalue>
+                </mapping>
+                <mapping>
+                    <value>37</value>
+                    <newvalue>sa-p212</newvalue>
+                </mapping>
+                <mapping>
+                    <value>38</value>
+                    <newvalue>sa-p410</newvalue>
+                </mapping>
+                <mapping>
+                    <value>39</value>
+                    <newvalue>sa-p410i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>40</value>
+                    <newvalue>sa-p411</newvalue>
+                </mapping>
+                <mapping>
+                    <value>41</value>
+                    <newvalue>sa-b110i</newvalue>
+                </mapping>
+                <mapping>
+                    <value>42</value>
+                    <newvalue>sa-p712m</newvalue>
+                </mapping>
+                <mapping>
+                    <value>43</value>
+                    <newvalue>sa-p711m</newvalue>
+                </mapping>
+                <mapping>
+                    <value>44</value>
+                    <newvalue>sa-p812</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        
+     	 <value_map>
+            <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>other</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>ok</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>predictiveFailure</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+  </tns:root>

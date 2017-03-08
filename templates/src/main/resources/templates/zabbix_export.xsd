@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="zabbix_export">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:float" name="version"/>
+        <xs:element type="xs:dateTime" name="date"/>
+        <xs:element name="groups">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="group">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="templates">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="template" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="zabbixHostFormat" name="template"/>
+                    <xs:element type="xs:string" name="name"/>
+                    <xs:element type="xs:string" name="description"/>
+                    <xs:element name="groups">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="group" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="applications">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="application" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="items">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="item" type="itemObj" maxOccurs="unbounded" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="discovery_rules">
+                      <xs:complexType>
+                      	<xs:sequence>
+                      		<xs:element name="discovery_rule" maxOccurs="unbounded" minOccurs="0">
+                      			<xs:complexType>
+                      				<xs:sequence>
+                      					<xs:element type="xs:string"
+                      						name="name" />
+                      					<xs:element type="xs:byte"
+                      						name="type" />
+                      					<xs:element type="xs:string"
+                      						name="snmp_community" />
+                      					<xs:element type="xs:string"
+                      						name="snmp_oid" />
+                      					<xs:element type="xs:string"
+                      						name="key" />
+                      					<xs:element type="xs:integer"
+                      						name="delay" />
+                      					<xs:element type="xs:byte"
+                      						name="status" />
+                      					<xs:element type="xs:string"
+                      						name="allowed_hosts" />
+                      					<xs:element type="xs:string"
+                      						name="snmpv3_contextname" />
+                      					<xs:element type="xs:string"
+                      						name="snmpv3_securityname" />
+                      					<xs:element type="xs:byte"
+                      						name="snmpv3_securitylevel" />
+                      					<xs:element type="xs:byte"
+                      						name="snmpv3_authprotocol" />
+                      					<xs:element type="xs:string"
+                      						name="snmpv3_authpassphrase" />
+                      					<xs:element type="xs:byte"
+                      						name="snmpv3_privprotocol" />
+                      					<xs:element type="xs:string"
+                      						name="snmpv3_privpassphrase" />
+                      					<xs:element type="xs:string"
+                      						name="delay_flex" />
+                      					<xs:element type="xs:string"
+                      						name="params" />
+                      					<xs:element type="xs:string"
+                      						name="ipmi_sensor" />
+                      					<xs:element type="xs:byte"
+                      						name="authtype" />
+                      					<xs:element type="xs:string"
+                      						name="username" />
+                      					<xs:element type="xs:string"
+                      						name="password" />
+                      					<xs:element type="xs:string"
+                      						name="publickey" />
+                      					<xs:element type="xs:string"
+                      						name="privatekey" />
+                      					<xs:element type="xs:short"
+                      						name="port" />
+                      					<xs:element name="filter">
+                      						<xs:complexType>
+                      							<xs:sequence>
+                      								<xs:element
+                      									type="xs:byte" name="evaltype" />
+                      								<xs:element
+                      									type="xs:string" name="formula" />
+                      								<xs:element
+                      									name="conditions">
+                      									<xs:complexType>
+                      										<xs:sequence>
+                      											<xs:element
+                      												name="condition" maxOccurs="unbounded"
+                      												minOccurs="0">
+                      												<xs:complexType>
+                      													<xs:sequence>
+                      														<xs:element
+                      															type="xs:string" name="macro" />
+                      														<xs:element
+                      															type="xs:string" name="value" />
+                      														<xs:element
+                      															type="xs:byte" name="operator" />
+                      														<xs:element
+                      															type="xs:string" name="formulaid" />
+                      													</xs:sequence>
+                      												</xs:complexType>
+                      											</xs:element>
+                      										</xs:sequence>
+                      									</xs:complexType>
+                      								</xs:element>
+                      							</xs:sequence>
+                      						</xs:complexType>
+                      					</xs:element>
+                      					<xs:element type="xs:byte"
+                      						name="lifetime" />
+                      					<xs:element type="xs:string"
+                      						name="description" />
+                      					<xs:element
+                      						name="item_prototypes">
+                      						<xs:complexType>
+                      							<xs:sequence>
+                      								<xs:element
+                      									name="item_prototype"
+                      									maxOccurs="unbounded" minOccurs="0" type="itemProtoObj"/>
+                      							</xs:sequence>
+                      						</xs:complexType>
+                      					</xs:element>
+                      					<xs:element
+                      						name="trigger_prototypes">
+                      						<xs:complexType>
+                      							<xs:sequence>
+                      								<xs:element name="trigger_prototype" type="triggerObj" maxOccurs="unbounded" minOccurs="0"></xs:element>
+                      							</xs:sequence>
+                      						</xs:complexType>
+                      					</xs:element>
+                      					<xs:element
+                      						name="graph_prototypes">
+                      						<xs:complexType>
+                      							<xs:sequence>
+                      								<xs:element
+                      									name="graph_prototype"
+                      									maxOccurs="unbounded" minOccurs="0">
+                      									<xs:complexType>
+                      										<xs:sequence>
+                      											<xs:element
+                      												type="xs:string" name="name" />
+                      											<xs:element
+                      												type="xs:short" name="width" />
+                      											<xs:element
+                      												type="xs:short" name="height" />
+                      											<xs:element
+                      												type="xs:float" name="yaxismin" />
+                      											<xs:element
+                      												type="xs:float" name="yaxismax" />
+                      											<xs:element
+                      												type="xs:byte"
+                      												name="show_work_period" />
+                      											<xs:element
+                      												type="xs:byte" name="show_triggers" />
+                      											<xs:element
+                      												type="xs:byte" name="type" />
+                      											<xs:element
+                      												type="xs:byte" name="show_legend" />
+                      											<xs:element
+                      												type="xs:byte" name="show_3d" />
+                      											<xs:element
+                      												type="xs:float" name="percent_left" />
+                      											<xs:element
+                      												type="xs:float" name="percent_right" />
+                      											<xs:element
+                      												type="xs:byte" name="ymin_type_1" />
+                      											<xs:element
+                      												type="xs:byte" name="ymax_type_1" />
+                      											<xs:element
+                      												type="xs:byte" name="ymin_item_1" />
+                      											<xs:element
+                      												type="xs:byte" name="ymax_item_1" />
+                      											<xs:element
+                      												name="graph_items">
+                      												<xs:complexType>
+                      													<xs:sequence>
+                      														<xs:element
+                      															name="graph_item"
+                      															maxOccurs="unbounded"
+                      															minOccurs="0">
+                      															<xs:complexType>
+                      																<xs:sequence>
+                      																	<xs:element
+                      																		type="xs:byte" name="sortorder" />
+                      																	<xs:element
+                      																		type="xs:byte" name="drawtype" />
+                      																	<xs:element
+                      																		type="xs:string" name="color" />
+                      																	<xs:element
+                      																		type="xs:byte" name="yaxisside" />
+                      																	<xs:element
+                      																		type="xs:byte" name="calc_fnc" />
+                      																	<xs:element
+                      																		type="xs:byte" name="type" />
+                      																	<xs:element
+                      																		name="item">
+                      																		<xs:complexType>
+                      																			<xs:sequence>
+                      																				<xs:element
+                      																					type="xs:string" name="host" />
+                      																				<xs:element
+                      																					type="xs:string" name="key" />
+                      																			</xs:sequence>
+                      																		</xs:complexType>
+                      																	</xs:element>
+                      																</xs:sequence>
+                      															</xs:complexType>
+                      														</xs:element>
+                      													</xs:sequence>
+                      												</xs:complexType>
+                      											</xs:element>
+                      										</xs:sequence>
+                      									</xs:complexType>
+                      								</xs:element>
+                      							</xs:sequence>
+                      						</xs:complexType>
+                      					</xs:element>
+                      					<xs:element type="xs:string"
+                      						name="host_prototypes" />
+                      				</xs:sequence>
+                      			</xs:complexType>
+                      		</xs:element>
+                      	</xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="macros">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="macro" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="macro"/>
+                                <xs:element type="xs:string" name="value"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element type="templateDependencies" name="templates"/>
+                    <xs:element name="screens">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="screen" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name"/>
+                                <xs:element type="xs:byte" name="hsize"/>
+                                <xs:element type="xs:byte" name="vsize"/>
+                                <xs:element name="screen_items">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="screen_item">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element type="xs:byte" name="resourcetype"/>
+                                            <xs:element type="xs:short" name="width"/>
+                                            <xs:element type="xs:byte" name="height"/>
+                                            <xs:element type="xs:byte" name="x"/>
+                                            <xs:element type="xs:byte" name="y"/>
+                                            <xs:element type="xs:byte" name="colspan"/>
+                                            <xs:element type="xs:byte" name="rowspan"/>
+                                            <xs:element type="xs:byte" name="elements"/>
+                                            <xs:element type="xs:byte" name="valign"/>
+                                            <xs:element type="xs:byte" name="halign"/>
+                                            <xs:element type="xs:byte" name="style"/>
+                                            <xs:element type="xs:string" name="url"/>
+                                            <xs:element type="xs:byte" name="dynamic"/>
+                                            <xs:element type="xs:byte" name="sort_triggers"/>
+                                            <xs:element name="resource">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element type="xs:string" name="name"/>
+                                                  <xs:element type="xs:string" name="host"/>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element type="xs:byte" name="max_columns"/>
+                                            <xs:element type="xs:string" name="application"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="triggers">
+        	<xs:complexType>
+        		<xs:sequence>
+        			<xs:element name="trigger" type="triggerObj" minOccurs="0" maxOccurs="unbounded"></xs:element>
+        		</xs:sequence>
+        	</xs:complexType>
+        </xs:element>
+        <xs:element name="value_maps">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="value_map" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name"/>
+                    <xs:element name="mappings">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="mapping" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:short" name="value"/>
+                                <xs:element type="xs:string" name="newvalue"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  
+                      <xs:complexType name="applicationsType">
+                        <xs:sequence>
+                          <xs:element name="application" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+
+<xs:complexType name="templateDependencies">
+				<xs:sequence>
+    				<xs:element name="template" minOccurs="0" maxOccurs="unbounded">
+    					<xs:complexType>
+    						<xs:sequence>
+    							<xs:element name="name" type="xs:string"/>
+    						</xs:sequence>
+    					</xs:complexType>
+    				</xs:element>
+    			</xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="itemObj">
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name"/>
+                                <xs:element type="itemType" name="type"/>
+                                <xs:element type="xs:string" name="snmp_community"/>
+                                <xs:element type="xs:integer" name="multiplier"/>
+                                <xs:element type="xs:string" name="snmp_oid"/>
+                                <xs:element type="xs:string" name="key"/>
+                                <xs:element type="xs:integer" name="delay"/>
+                                <xs:element type="xs:integer" name="history"/>
+                                <xs:element type="xs:integer" name="trends"/>
+                                <xs:element type="xs:byte" name="status"/>
+                                <xs:element type="xs:byte" name="value_type"/>
+                                <xs:element type="xs:string" name="allowed_hosts"/>
+                                <xs:element type="xs:string" name="units"/>
+                                <xs:element type="xs:byte" name="delta"/>
+                                <xs:element type="xs:string" name="snmpv3_contextname"/>
+                                <xs:element type="xs:string" name="snmpv3_securityname"/>
+                                <xs:element type="xs:string" name="snmpv3_securitylevel"/>
+                                <xs:element type="xs:string" name="snmpv3_authprotocol"/>
+                                <xs:element type="xs:string" name="snmpv3_authpassphrase"/>
+                                <xs:element type="xs:string" name="snmpv3_privprotocol"/>
+                                <xs:element type="xs:string" name="snmpv3_privpassphrase"/>
+                                <xs:element type="xs:float" name="formula"/>
+                                <xs:element type="xs:string" name="delay_flex"/>
+                                <xs:element type="xs:string" name="params"/>
+                                <xs:element type="xs:string" name="ipmi_sensor"/>
+                                <xs:element type="xs:byte" name="data_type"/>
+                                <xs:element type="xs:byte" name="authtype"/>
+                                <xs:element type="xs:string" name="username"/>
+                                <xs:element type="xs:string" name="password"/>
+                                <xs:element type="xs:string" name="publickey"/>
+                                <xs:element type="xs:string" name="privatekey"/>
+                                <xs:element type="xs:string" name="port"/>
+                                <xs:element type="xs:string" name="description"/>
+                                <xs:element type="xs:int" name="inventory_link"/>
+                                <xs:element type="applicationsType" name="applications"/>
+                                <xs:element name="valuemap">
+                                	<xs:complexType>
+                                		<xs:sequence>
+                                			<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                		</xs:sequence>
+                                	</xs:complexType>
+                                </xs:element>
+                                <xs:element type="xs:string" name="logtimefmt"/>
+                              </xs:sequence>
+                            </xs:complexType>
+
+
+
+                            
+  <xs:complexType name="itemProtoObj">
+	  <xs:complexContent>
+	    <xs:extension base="itemObj">
+	      <xs:sequence>
+				<xs:element name="application_prototypes">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="application_prototype" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element
+											type="xs:string" name="name" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+	      </xs:sequence>
+	    </xs:extension>
+	  </xs:complexContent>
+   </xs:complexType> 
+
+
+<xs:simpleType name="itemType">
+	<!--     Type of the item. 
+	Possible values: 
+	0 - Zabbix agent; 
+	1 - SNMPv1 agent; 
+	2 - Zabbix trapper; 
+	3 - simple check; 
+	4 - SNMPv2 agent; 
+	5 - Zabbix internal; 
+	6 - SNMPv3 agent; 
+	7 - Zabbix agent (active); 
+	8 - Zabbix aggregate; 
+	9 - web item; 
+	10 - external check; 
+	11 - database monitor; 
+	12 - IPMI agent; 
+	13 - SSH agent; 
+	14 - TELNET agent; 
+	15 - calculated; 
+	16 - JMX agent; 
+	17 - SNMP trap.  
+	   -->
+    <xs:restriction base="xs:int">
+	       <xs:minInclusive value="0"/>
+	       <xs:maxInclusive value="17"/>
+    </xs:restriction>
+   </xs:simpleType>
+   
+			<xs:complexType name="triggerObj">
+				<xs:sequence>
+					<xs:element
+						type="xs:string" name="expression" />
+					<xs:element
+						type="xs:string" name="name" />
+					<xs:element
+						type="xs:string" name="url" />
+					<xs:element
+						type="xs:byte" name="status" />
+					<xs:element
+						type="triggerPriority" name="priority" />
+					<xs:element
+						type="xs:string" name="description" />
+					<xs:element
+						type="xs:byte" name="type" />
+					<xs:element
+						name="dependencies">
+						<xs:complexType
+							mixed="true">
+							<xs:sequence>
+								<xs:element
+									name="dependency" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element
+												type="xs:string" name="name" />
+											<xs:element
+												type="xs:string"
+												name="expression" />
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+
+<xs:simpleType name="triggerPriority">
+	<!--     Type of the item. 
+	Possible values are: 
+	0 - (default) not classified; 
+	1 - information; 
+	2 - warning; 
+	3 - average; 
+	4 - high; 
+	5 - disaster.
+	   -->
+    <xs:restriction base="xs:int">
+	       <xs:minInclusive value="0"/>
+	       <xs:maxInclusive value="5"/>
+    </xs:restriction>
+   </xs:simpleType>   
+    
+   <xs:simpleType name="zabbixHostFormat">
+	   <xs:restriction base="xs:token">
+	       <xs:pattern value="[0-9a-zA-Z_\. \-]+"/>
+	   </xs:restriction>
+	</xs:simpleType>
+	<!-- https://searchcode.com/codesearch/view/80067365/ -->
+	 
+</xs:schema>

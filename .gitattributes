@@ -330,6 +330,14 @@ src/zabbix_server/ipmi/ipmi_protocol.h -text
 src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
+templates/src/main/resources/application.properties -text
+templates/src/main/resources/log4j.properties -text
+templates/src/main/resources/templates/metrics.xsd -text
+templates/src/main/resources/templates/to_metrics.xsl -text
+templates/src/main/resources/templates/to_metrics_add_name_placeholder.xsl -text
+templates/src/main/resources/templates/to_metrics_lang.xsl -text
+templates/src/main/resources/templates/to_zabbix_export.xsl -text
+templates/src/main/resources/templates/zabbix_export.xsd -text
 tests/images/image.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
