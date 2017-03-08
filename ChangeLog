@@ -48,6 +48,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
 .......PS. [ZBX-11855] fixed data truncation when escaping strings that contain carriage return (vso)
 ........S. [ZBX-11444] fixed incorrect check for time functions in recovery expressions (abs)
