@@ -150,9 +150,6 @@ int	init_collector_data(char **error)
 	const char	*__function_name = "init_collector_data";
 	int		cpu_count, ret = FAIL;
 	size_t		sz, sz_cpu;
-#ifndef _WINDOWS
-	key_t		shm_key;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -170,13 +167,7 @@ int	init_collector_data(char **error)
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))
-	{
-		*error = zbx_strdup(*error, "cannot create IPC key for collector");
-		goto out;
-	}
-
-	if (-1 == (shm_id = zbx_shmget(shm_key, sz + sz_cpu)))
+	if (-1 == (shm_id = zbx_shmget(ZBX_NONEXISTENT_SHMID, sz + sz_cpu)))
 	{
 		*error = zbx_strdup(*error, "cannot allocate shared memory for collector");
 		goto out;
@@ -260,19 +251,12 @@ void	free_collector_data()
 void	diskstat_shm_init()
 {
 #ifndef _WINDOWS
-	key_t	shm_key;
 	size_t	shm_size;
 
 	/* initially allocate memory for collecting statistics for only 1 disk */
 	shm_size = sizeof(ZBX_DISKDEVICES_DATA);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_DISKSTAT)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for disk statistics collector");
-		exit(EXIT_FAILURE);
-	}
-
-	if (-1 == (collector->diskstat_shmid = zbx_shmget(shm_key, shm_size)))
+	if (-1 == (collector->diskstat_shmid = zbx_shmget(ZBX_NONEXISTENT_SHMID, shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for disk statistics collector");
 		exit(EXIT_FAILURE);
@@ -348,14 +332,13 @@ void	diskstat_shm_extend()
 {
 #ifndef _WINDOWS
 	const char		*__function_name = "diskstat_shm_extend";
-	key_t			shm_key;
 	size_t			old_shm_size, new_shm_size;
 	int			old_shmid, new_shmid, old_max, new_max;
 	ZBX_DISKDEVICES_DATA	*new_diskdevices;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* caclulate the size of the new shared memory segment */
+	/* calculate the size of the new shared memory segment */
 	old_max = diskdevices->max_diskdev;
 
 	if (old_max < 4)
@@ -368,19 +351,13 @@ void	diskstat_shm_extend()
 	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (old_max - 1);
 	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (new_max - 1);
 
-	/* Create the new shared memory segment. The same key is used. */
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_DISKSTAT)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for extending disk statistics collector");
-		exit(EXIT_FAILURE);
-	}
-
 	/* zbx_shmget() will:                                                 */
-	/*	- see that a shared memory segment with this key exists       */
-	/*	- mark it for deletion                                        */
-	/*	- create a new segment with this key, but with a different id */
+	/*	- see that a shared memory segment with this id exists       */
+	/*	- create a new segment with a different id */
+	/*	- mark the old segment for deletion                                        */
 
-	if (-1 == (new_shmid = zbx_shmget(shm_key, new_shm_size)))
+
+	if (-1 == (new_shmid = zbx_shmget(collector->diskstat_shmid, new_shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for extending disk statistics collector");
 		exit(EXIT_FAILURE);

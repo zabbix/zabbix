@@ -30,8 +30,6 @@ extern char	*CONFIG_FILE;
  * Purpose: creates dynamic shared memory segment                             *
  *                                                                            *
  * Parameters: shm       - [OUT] the dynamic shared memory data               *
- *             proj_id   - [IN] the project id used to create shared memory   *
- *                              key                                           *
  *             shm_size  - [IN] the inital size (can be 0)                    *
  *             mutex     - [IN] the name of mutex used to synchronize memory  *
  *                              access                                        *
@@ -45,14 +43,13 @@ extern char	*CONFIG_FILE;
  *                         must be freed by the caller.                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAME mutex,
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
 		zbx_shm_copy_func_t copy_func, char **errmsg)
 {
 	const char	*__function_name = "zbx_dshm_create";
-	key_t		shm_key;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proj_id:%d size:" ZBX_FS_SIZE_T, __function_name, proj_id,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T, __function_name,
 			(zbx_fs_size_t)shm_size);
 
 	if (SUCCEED != zbx_mutex_create(&shm->lock, mutex, errmsg))
@@ -60,13 +57,7 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 
 	if (0 < shm_size)
 	{
-		if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, proj_id)))
-		{
-			*errmsg = zbx_strdup(*errmsg, "cannot create IPC key");
-			goto out;
-		}
-
-		if (-1 == (shm->shmid = zbx_shmget(shm_key, shm_size)))
+		if (-1 == (shm->shmid = zbx_shmget(ZBX_NONEXISTENT_SHMID, shm_size)))
 		{
 			*errmsg = zbx_strdup(*errmsg, "cannot allocate shared memory");
 			goto out;
@@ -75,7 +66,6 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 	else
 		shm->shmid = ZBX_NONEXISTENT_SHMID;
 
-	shm->proj_id = proj_id;
 	shm->size = shm_size;
 	shm->copy_func = copy_func;
 
@@ -229,20 +219,12 @@ out:
 int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 {
 	const char	*__function_name = "zbx_dshm_realloc";
-	key_t		shm_key;
 	int		shmid, ret = FAIL;
 	void		*addr, *addr_old = NULL;
 	size_t		shm_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() shmid:%d size:" ZBX_FS_SIZE_T, __function_name, shm->shmid,
 			(zbx_fs_size_t)size);
-
-	/* Create the new shared memory segment. The same key is used. */
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, shm->proj_id)))
-	{
-		*errmsg = zbx_strdup(NULL, "cannot create IPC key");
-		goto out;
-	}
 
 	shm_size = ZBX_SIZE_T_ALIGN8(size);
 
@@ -254,11 +236,12 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 	}
 
 	/* zbx_shmget() will:                                                 */
-	/*	- see that a shared memory segment with this key exists       */
-	/*	- mark it for deletion                                        */
-	/*	- create a new segment with this key, but with a different id */
+	/*	- see that a shared memory segment with this id exists       */
+	/*	- create a new segment with a different id */
+	/*	- mark the old segment for deletion                                        */
 
-	if (-1 == (shmid = zbx_shmget(shm_key, shm_size)))
+
+	if (-1 == (shmid = zbx_shmget(shm->shmid, shm_size)))
 	{
 		*errmsg = zbx_strdup(NULL, "cannot allocate shared memory");
 		goto out;

@@ -28,12 +28,7 @@
 
 #define ZBX_NONEXISTENT_SHMID		(-1)
 
-#define ZBX_IPC_COLLECTOR_ID		'l'
-#define ZBX_IPC_COLLECTOR_DISKSTAT	'm'
-#define ZBX_IPC_COLLECTOR_PROC_ID	'p'
-
-key_t	zbx_ftok(char *path, int id);
-int	zbx_shmget(key_t key, size_t size);
+int	zbx_shmget(int shmid, size_t size);
 
 /* data copying callback function prototype */
 typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);
@@ -43,9 +38,6 @@ typedef struct
 {
 	/* shared memory segment identifier */
 	int			shmid;
-
-	/* project id used to generate shared memory key */
-	int			proj_id;
 
 	/* allocated size */
 	size_t			size;
@@ -68,7 +60,7 @@ typedef struct
 }
 zbx_dshm_ref_t;
 
-int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAME mutex,
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
 		zbx_shm_copy_func_t copy_func, char **errmsg);
 
 int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg);

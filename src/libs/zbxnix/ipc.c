@@ -23,41 +23,11 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ftok                                                         *
- *                                                                            *
- * Purpose: Create IPC id                                                     *
- *                                                                            *
- * Parameters:  path - filename                                               *
- *              id - user selectable ID                                       *
- *                                                                            *
- * Return value: If the function succeeds, then return unique ID              *
- *               -1 on an error                                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-key_t	zbx_ftok(char *path, int id)
-{
-	key_t	ipc_key;
-
-	if (-1 == (ipc_key = ftok(path, id)))
-	{
-		zbx_error("cannot create IPC key for path [%s] id [%c]: %s",
-			path, (char)id, zbx_strerror(errno));
-	}
-
-	return ipc_key;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_shmget                                                       *
  *                                                                            *
  * Purpose: Create block of shared memory                                     *
  *                                                                            *
- * Parameters:  key - IPC key                                                 *
+ * Parameters:  shmid - Shared memory segment id to delete                                 *
  *              size - size                                                   *
  *                                                                            *
  * Return value: If the function succeeds, then return SHM ID                 *
@@ -65,47 +35,28 @@ key_t	zbx_ftok(char *path, int id)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments:
+ * - The shmid parameter can be set to ZBX_NONEXISTENT_SHMID if no         *
+ *     shared memory segments must be destroyed                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_shmget(key_t key, size_t size)
+int	zbx_shmget(int shmid, size_t size)
 {
-	int	shm_id, ret = SUCCEED;
+	int	shm_id;
+	void	*addr;
 
-	if (-1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
-		return shm_id;
-
-	/* if shared memory block exists, try to remove and re-create it */
-	if (EEXIST == errno)
-	{
-		/* get ID of existing memory */
-		if (-1 == (shm_id = shmget(key, 0 /* get reference */, 0600)))
-		{
-			zbx_error("cannot attach to existing shared memory: %s", zbx_strerror(errno));
-			ret = FAIL;
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "zbx_shmget() removing existing shm_id:%d", shm_id);
-
-		if (SUCCEED == ret && -1 == shmctl(shm_id, IPC_RMID, 0))
-		{
-			zbx_error("cannot remove existing shared memory: %s", zbx_strerror(errno));
-			ret = FAIL;
-		}
-
-		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory of size " ZBX_FS_SIZE_T ": %s",
-					(zbx_fs_size_t)size, zbx_strerror(errno));
-			ret = FAIL;
-		}
-	}
-	else
+	if (-1 == (shm_id = shmget(IPC_PRIVATE, size, IPC_CREAT | IPC_EXCL | 0600)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory of size " ZBX_FS_SIZE_T ": %s",
 				(zbx_fs_size_t)size, zbx_strerror(errno));
-		ret = FAIL;
+		return -1;
 	}
 
-	return (ret == SUCCEED) ? shm_id : -1;
+	if (ZBX_NONEXISTENT_SHMID != shmid && -1 == shmctl(shmid, IPC_RMID, 0))
+	{
+		zbx_error("cannot remove existing shared memory: %s", zbx_strerror(errno));
+		return -1;
+	}
+
+	return shm_id;
 }
