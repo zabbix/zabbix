@@ -2636,7 +2636,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			DCstrpool_replace(found, &item->db_error, row[36]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
+			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
 			item->unreachable = 0;
 
 			zbx_vector_ptr_create_ext(&item->preproc_ops, __config_mem_malloc_func, __config_mem_realloc_func,
