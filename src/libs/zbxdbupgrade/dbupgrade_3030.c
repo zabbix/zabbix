@@ -385,6 +385,36 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3030031(void)
+{
+	const ZBX_FIELD field = {"maxsessions", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030032(void)
+{
+	const ZBX_FIELD field = {"attempts", "3", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030033(void)
+{
+	const ZBX_FIELD field = {"attempt_interval", "10", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_3030034(void)
+{
+	/* type=0 (MEDIA_TYPE_EMAIL) */
+	if (ZBX_DB_OK > DBexecute("update media_type set maxsessions=0 where type=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -422,5 +452,10 @@ DBPATCH_ADD(3030027, 0, 1)
 DBPATCH_ADD(3030028, 0, 1)
 DBPATCH_ADD(3030029, 0, 1)
 DBPATCH_ADD(3030030, 0, 1)
+DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
+DBPATCH_ADD(3030033, 0, 1)
+DBPATCH_ADD(3030034, 0, 1)
+
 
 DBPATCH_END()

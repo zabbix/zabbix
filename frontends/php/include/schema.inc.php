@@ -1721,6 +1721,24 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'maxsessions' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'attempts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '3',
+			],
+			'attempt_interval' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '10',
+			],
 		],
 	],
 	'usrgrp' => [
