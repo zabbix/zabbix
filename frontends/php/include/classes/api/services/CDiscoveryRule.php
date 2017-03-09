@@ -1000,13 +1000,12 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkSpecificFields(array $item, $method) {
-		if (array_key_exists('lifetime', $item)) {
-			if (!validateTimeUnit($item['lifetime'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
+		if (array_key_exists('lifetime', $item)
+				&& !validateTimeUnit($item['lifetime'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
 					['usermacros' => true])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
-				);
-			}
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
+			);
 		}
 
 		if (array_key_exists('preprocessing', $item)) {

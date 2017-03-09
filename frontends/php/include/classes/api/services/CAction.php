@@ -1442,13 +1442,12 @@ class CAction extends CApiService {
 					}
 				}
 
-				if (array_key_exists('esc_period', $operation)) {
-					if (!validateTimeUnit($operation['esc_period'], SEC_PER_MIN, SEC_PER_WEEK, true, $error,
+				if (array_key_exists('esc_period', $operation)
+						&& !validateTimeUnit($operation['esc_period'], SEC_PER_MIN, SEC_PER_WEEK, true, $error,
 							['usermacros' => true])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
-						);
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
+					);
 				}
 			}
 
