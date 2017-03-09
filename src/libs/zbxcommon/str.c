@@ -4440,6 +4440,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 					token->token.r = token->token.l + 1;
 					return SUCCEED;
 				}
+
+				if (NULL == dollar)
+					token_search = ZBX_TOKEN_SEARCH_BASIC;
+
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
