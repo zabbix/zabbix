@@ -462,35 +462,35 @@ foreach ($items as &$item) {
 	}
 
 	if ($config['hk_history_global']) {
-		$history = $config['hk_history'];
-		$item['history'] = $history;
+		$keep_history = $config['hk_history'];
+		$item['history'] = $keep_history;
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-		$history = timeUnitToSeconds($item['history']);
+		$keep_history = timeUnitToSeconds($item['history']);
 	}
 	else {
-		$history = 0;
+		$keep_history = 0;
 		$item['history'] = (new CSpan($item['history']))->addClass(ZBX_STYLE_RED);
 	}
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		if ($config['hk_trends_global']) {
-			$trends = $config['hk_trends'];
-			$item['trends'] = $trends;
+			$keep_trends = $config['hk_trends'];
+			$item['trends'] = $keep_trends;
 		}
 		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-			$trends = timeUnitToSeconds($item['trends']);
+			$keep_trends = timeUnitToSeconds($item['trends']);
 		}
 		else {
-			$trends = 0;
+			$keep_trends = 0;
 			$item['trends'] = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
 		}
 	}
 	else {
-		$trends = 0;
+		$keep_trends = 0;
 	}
 
-	$item['show_link'] = ($history != 0 || $trends != 0);
+	$item['show_link'] = ($keep_history != 0 || $keep_trends != 0);
 }
 unset($item);
 
