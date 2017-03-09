@@ -1542,7 +1542,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Returns true if at least one of the given triggers is used in IT services.
+	 * Returns true if at least one of the given triggers is used in services.
 	 *
 	 * @param array $triggerIds
 	 *
