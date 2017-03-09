@@ -181,7 +181,6 @@ class CZabbixServer {
 			'type' => 'full',
 			'sid' => $sid
 		]);
-		file_put_contents('/tmp/php.log', print_r($response, true), FILE_APPEND);
 
 		if ($response === false) {
 			return false;
@@ -223,8 +222,6 @@ class CZabbixServer {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
-			file_put_contents('/tmp/php.log', "\n".$this->error."\n", FILE_APPEND);
-
 			return false;
 		}
 
@@ -279,7 +276,6 @@ class CZabbixServer {
 	 * @return mixed    the output of the script if it has been executed successfully or false otherwise
 	 */
 	protected function request(array $params) {
-		file_put_contents('/tmp/php.log', print_r($params, true));
 		// reset object state
 		$this->error = null;
 		$this->total = null;
@@ -341,8 +337,6 @@ class CZabbixServer {
 
 		$response = CJs::decodeJson($response);
 
-
-		file_put_contents('/tmp/php.log', print_r($response, true), FILE_APPEND);
 		if (!$response || !$this->validateResponse($response)) {
 			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
