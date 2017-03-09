@@ -923,35 +923,35 @@ class CMacrosResolverGeneral {
 			} while ($hostids);
 		}
 
-			$all_macros_resolved = true;
+		$all_macros_resolved = true;
 
-			foreach ($data as &$element) {
-				$hostids = [];
-				foreach ($element['hostids'] as $hostid) {
-					$hostids[$hostid] = true;
-				}
-
-				$hostids = array_keys($hostids);
-				natsort($hostids);
-
-				foreach ($element['macros'] as $usermacro => &$value) {
-					if ($user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
-						$value = $this->getHostUserMacros($hostids, $user_macro_parser->getMacro(),
-							$user_macro_parser->getContext(), $host_templates, $host_macros
-						);
-
-						if ($value['value'] === null) {
-							$all_macros_resolved = false;
-						}
-					}
-					else {
-						// This macro cannot be resolved.
-						$value = ['value' => $usermacro, 'value_default' => null];
-					}
-				}
-				unset($value);
+		foreach ($data as &$element) {
+			$hostids = [];
+			foreach ($element['hostids'] as $hostid) {
+				$hostids[$hostid] = true;
 			}
-			unset($element);
+
+			$hostids = array_keys($hostids);
+			natsort($hostids);
+
+			foreach ($element['macros'] as $usermacro => &$value) {
+				if ($user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
+					$value = $this->getHostUserMacros($hostids, $user_macro_parser->getMacro(),
+						$user_macro_parser->getContext(), $host_templates, $host_macros
+					);
+
+					if ($value['value'] === null) {
+						$all_macros_resolved = false;
+					}
+				}
+				else {
+					// This macro cannot be resolved.
+					$value = ['value' => $usermacro, 'value_default' => null];
+				}
+			}
+			unset($value);
+		}
+		unset($element);
 
 		if (!$all_macros_resolved) {
 			// Global macros.
