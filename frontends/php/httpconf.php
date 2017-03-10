@@ -34,7 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null],
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
-	'sel_step'			=> [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null],
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
