@@ -627,9 +627,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
-
-		if ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
+		if ((new CUserMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a user macro is expected'));
 			return false;
 		}
