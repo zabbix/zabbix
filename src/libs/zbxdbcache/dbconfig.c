@@ -2649,10 +2649,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 					continue;
 
 				if (NULL == (item = zbx_hashset_search(&config->items, &function->itemid)))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
-				}
 
 				item->update_triggers = 1;
 				if (NULL != item->triggers)
