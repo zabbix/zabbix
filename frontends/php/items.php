@@ -395,7 +395,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 
 		foreach (getRequest('delay_flex') as $interval) {
