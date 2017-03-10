@@ -80,6 +80,7 @@ extern int	CONFIG_PASSIVE_FORKS;
 extern int	CONFIG_ACTIVE_FORKS;
 extern int	CONFIG_TASKMANAGER_FORKS;
 extern int	CONFIG_IPMIMANAGER_FORKS;
+extern int	CONFIG_ALERTMANAGER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -153,6 +154,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TASKMANAGER_FORKS;
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return CONFIG_IPMIMANAGER_FORKS;
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return CONFIG_ALERTMANAGER_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -229,6 +232,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "task manager";
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
 			return "ipmi manager";
+		case ZBX_PROCESS_TYPE_ALERTMANAGER:
+			return "alert manager";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

@@ -944,7 +944,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
-			status = ALERT_STATUS_NOT_SENT;
+			status = ALERT_STATUS_NEW;
 			perror = "";
 		}
 		else

@@ -27,13 +27,37 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxexec.h"
+#include "zbxipcservice.h"
 
 #include "alerter.h"
+#include "alerter_protocol.h"
+#include "alert_manager.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: execute_script_alert                                             *
+ *                                                                            *
+ * Purpose: execute script alert type                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	execute_script_alert(const char *command, char *error, size_t max_error_len)
+{
+	char	*output = NULL;
+	int	ret = FAIL;
+
+	if (SUCCEED == (ret = zbx_execute(command, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", command, output);
+		zbx_free(output);
+	}
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -147,6 +171,213 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 /******************************************************************************
  *                                                                            *
+ * Function: alerter_register                                                 *
+ *                                                                            *
+ * Purpose: registers alerter with alert manager                              *
+ *                                                                            *
+ * Parameters: socket - [IN] the connections socket                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_register(zbx_ipc_socket_t *socket)
+{
+	pid_t	ppid;
+
+	ppid = getppid();
+
+	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_send_result                                              *
+ *                                                                            *
+ * Purpose: sends alert sending result to alert manager                       *
+ *                                                                            *
+ * Parameters: socket  - [IN] the connections socket                          *
+ *             errcode - [IN] the error code                                  *
+ *             errmsg  - [IN] the error message                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_send_result(zbx_ipc_socket_t *socket, int errcode, const char *errmsg)
+{
+	unsigned char	*data;
+	zbx_uint32_t	data_len;
+
+	data_len = zbx_alerter_serialize_result(&data,  errcode, errmsg);
+	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_RESULT, data, data_len);
+
+	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_process_email                                            *
+ *                                                                            *
+ * Purpose: processes email alert                                             *
+ *                                                                            *
+ * Parameters: socket      - [IN] the connections socket                      *
+ *             ipc_message - [IN] the ipc message with media type and alert   *
+ *                                data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+	zbx_uint64_t	alertid;
+	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password;
+	unsigned short	smtp_port;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication;
+	int		ret;
+	char		error[MAX_STRING_LEN];
+
+
+	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &sendto, &subject, &message, &smtp_server,
+			&smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
+			&smtp_authentication, &username, &password);
+
+	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, subject, message, smtp_security,
+			smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
+			ALARM_ACTION_TIMEOUT, error, sizeof(error));
+
+	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
+
+	zbx_free(sendto);
+	zbx_free(subject);
+	zbx_free(message);
+	zbx_free(smtp_server);
+	zbx_free(smtp_helo);
+	zbx_free(smtp_email);
+	zbx_free(username);
+	zbx_free(password);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_process_jabber                                           *
+ *                                                                            *
+ * Purpose: processes jabber alert                                            *
+ *                                                                            *
+ * Parameters: socket      - [IN] the connections socket                      *
+ *             ipc_message - [IN] the ipc message with media type and alert   *
+ *                                data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_process_jabber(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+#ifdef HAVE_JABBER
+	zbx_uint64_t	alertid;
+	char		*sendto, *subject, *message, *username, *password;
+	int		ret;
+	char		error[MAX_STRING_LEN];
+
+	zbx_alerter_deserialize_jabber(ipc_message->data, &alertid, &sendto, &subject, &message, &username, &password);
+
+	/* Jabber uses its own timeouts */
+	ret = send_jabber(username, password, sendto, subject, message, error, max_error_len);
+	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
+
+	zbx_free(sendto);
+	zbx_free(subject);
+	zbx_free(message);
+	zbx_free(username);
+	zbx_free(password);
+
+#else
+	ZBX_UNUSED(ipc_message);
+	alerter_send_result(socket, FAIL, "Zabbix server was compiled without Jabber support");
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_process_sms                                              *
+ *                                                                            *
+ * Purpose: processes SMS alert                                               *
+ *                                                                            *
+ * Parameters: socket      - [IN] the connections socket                      *
+ *             ipc_message - [IN] the ipc message with media type and alert   *
+ *                                data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+	zbx_uint64_t	alertid;
+	char		*sendto, *message, *gsm_modem;
+	int		ret;
+	char		error[MAX_STRING_LEN];
+
+	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
+
+	/* SMS uses its own timeouts */
+	ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
+	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
+
+	zbx_free(sendto);
+	zbx_free(message);
+	zbx_free(gsm_modem);
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_process_eztexting                                        *
+ *                                                                            *
+ * Purpose: processes eztexting alert                                         *
+ *                                                                            *
+ * Parameters: socket      - [IN] the connections socket                      *
+ *             ipc_message - [IN] the ipc message with media type and alert   *
+ *                                data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_process_eztexting(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+	zbx_uint64_t	alertid;
+	char		*sendto, *message, *username, *password, *exec_path;
+	int		ret;
+	char		error[MAX_STRING_LEN];
+
+	zbx_alerter_deserialize_eztexting(ipc_message->data, &alertid, &sendto, &message, &username, &password,
+			&exec_path);
+
+	/* Ez Texting uses its own timeouts */
+	ret = send_ez_texting(username, password, sendto, message, exec_path, error, sizeof(error));
+	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
+
+	zbx_free(sendto);
+	zbx_free(message);
+	zbx_free(username);
+	zbx_free(password);
+	zbx_free(exec_path);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_process_exec                                             *
+ *                                                                            *
+ * Purpose: processes script alert                                            *
+ *                                                                            *
+ * Parameters: socket      - [IN] the connections socket                      *
+ *             ipc_message - [IN] the ipc message with media type and alert   *
+ *                                data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+	zbx_uint64_t	alertid;
+	char		*command;
+	int		ret;
+	char		error[MAX_STRING_LEN];
+
+	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
+
+	/* Ez Texting uses its own timeouts */
+	ret = execute_script_alert(command, error, sizeof(error));
+	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
+
+	zbx_free(command);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: main_alerter_loop                                                *
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
@@ -156,13 +387,14 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)
 {
-	char		error[MAX_STRING_LEN], *error_esc;
-	int		res, alerts_success, alerts_fail;
-	double		sec;
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ALERT	alert;
-	DB_MEDIATYPE	mediatype;
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
+	char			*error = NULL;
+	int			success_num, fail_num;
+	zbx_ipc_socket_t	alerter_socket;
+	zbx_ipc_message_t	message;
+	double			time_stat, time_idle, time_now, time_read;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -173,104 +405,79 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_ipc_message_init(&message);
+
+	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, 10, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alerter service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	alerter_register(&alerter_socket);
+
+	/* initialize statistics */
+	time_stat = zbx_time();
+	time_idle = 0;
+	success_num = 0;
+	fail_num = 0;
+
+	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	for (;;)
 	{
+		time_now = zbx_time();
+
+		if (STAT_INTERVAL < time_now - time_stat)
+		{
+			zbx_setproctitle("%s #%d [sent %d, failed %d alerts, idle " ZBX_FS_DBL " sec during "
+					ZBX_FS_DBL " sec]", get_process_type_string(process_type), process_num,
+					success_num, fail_num, time_idle, time_now - time_stat);
+
+			time_stat = time_now;
+			time_idle = 0;
+			success_num = 0;
+			fail_num = 0;
+		}
+
 		zbx_handle_log();
 
-		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		sec = zbx_time();
-
-		alerts_success = alerts_fail = 0;
-
-		result = DBselect(
-				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
-					"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-					"mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
-					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,mt.exec_params,"
-					"a.retries"
-				" from alerts a,media_type mt"
-				" where a.mediatypeid=mt.mediatypeid"
-					" and a.status=%d"
-					" and a.alerttype=%d"
-				" order by a.alertid",
-				ALERT_STATUS_NOT_SENT,
-				ALERT_TYPE_MESSAGE);
-
-		while (NULL != (row = DBfetch(result)))
+		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
-			ZBX_STR2UINT64(alert.alertid, row[0]);
-			ZBX_STR2UINT64(alert.mediatypeid, row[1]);
-			alert.sendto = row[2];
-			alert.subject = row[3];
-			alert.message = row[4];
-			alert.status = atoi(row[5]);
-
-			ZBX_STR2UINT64(mediatype.mediatypeid, row[6]);
-			mediatype.type = atoi(row[7]);
-			mediatype.description = row[8];
-			mediatype.smtp_server = row[9];
-			mediatype.smtp_helo = row[10];
-			mediatype.smtp_email = row[11];
-			mediatype.exec_path = row[12];
-			mediatype.exec_params = row[21];
-			mediatype.gsm_modem = row[13];
-			mediatype.username = row[14];
-			mediatype.passwd = row[15];
-			mediatype.smtp_port = (unsigned short)atoi(row[16]);
-			ZBX_STR2UCHAR(mediatype.smtp_security, row[17]);
-			ZBX_STR2UCHAR(mediatype.smtp_verify_peer, row[18]);
-			ZBX_STR2UCHAR(mediatype.smtp_verify_host, row[19]);
-			ZBX_STR2UCHAR(mediatype.smtp_authentication, row[20]);
-
-			alert.retries = atoi(row[22]);
-
-			*error = '\0';
-			res = execute_action(&alert, &mediatype, error, sizeof(error));
-
-			if (SUCCEED == res)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
-						alert.alertid);
-				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
-						ALERT_STATUS_SENT, alert.alertid);
-				alerts_success++;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
-
-				error_esc = DBdyn_escape_field("alerts", "error", error);
-
-				alert.retries++;
-
-				if (ALERT_MAX_RETRIES > alert.retries)
-				{
-					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							alert.retries, error_esc, alert.alertid);
-				}
-				else
-				{
-					DBexecute("update alerts set status=%d,retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							ALERT_STATUS_FAILED, alert.retries, error_esc, alert.alertid);
-				}
-
-				zbx_free(error_esc);
-
-				alerts_fail++;
-			}
-
+			zabbix_log(LOG_LEVEL_CRIT, "cannot read alerter service request");
+			exit(EXIT_FAILURE);
 		}
-		DBfree_result(result);
 
-		sec = zbx_time() - sec;
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), alerts_success, alerts_fail, sec,
-				CONFIG_SENDER_FREQUENCY);
+		time_read = zbx_time();
+		time_idle += time_read - time_now;
 
-		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
+		switch (message.code)
+		{
+			case ZBX_IPC_ALERTER_EMAIL:
+				alerter_process_email(&alerter_socket, &message);
+				break;
+			case ZBX_IPC_ALERTER_JABBER:
+				alerter_process_jabber(&alerter_socket, &message);
+				break;
+			case ZBX_IPC_ALERTER_SMS:
+				alerter_process_sms(&alerter_socket, &message);
+				break;
+			case ZBX_IPC_ALERTER_EZTEXTING:
+				alerter_process_eztexting(&alerter_socket, &message);
+				break;
+			case ZBX_IPC_ALERTER_EXEC:
+				alerter_process_exec(&alerter_socket, &message);
+				break;
+		}
+
+		zbx_ipc_message_clean(&message);
 	}
+
+	zbx_ipc_socket_close(&alerter_socket);
 }

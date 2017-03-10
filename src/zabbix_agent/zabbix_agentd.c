@@ -220,6 +220,7 @@ int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive che
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 0;
 int	CONFIG_IPMIMANAGER_FORKS	= 0;
+int	CONFIG_ALERTMANAGER_FORKS	= 0;
 
 char	*opt = NULL;
 

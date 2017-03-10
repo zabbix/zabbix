@@ -38,6 +38,7 @@
 #include "../libs/zbxnix/control.h"
 
 #include "alerter/alerter.h"
+#include "alerter/alert_manager.h"
 #include "dbsyncer/dbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
@@ -131,7 +132,7 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;
 
-int	CONFIG_ALERTER_FORKS		= 1;
+int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
 int	CONFIG_PINGER_FORKS		= 1;
@@ -153,6 +154,7 @@ int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_TASKMANAGER_FORKS	= 1;
 int	CONFIG_IPMIMANAGER_FORKS	= 0;
+int	CONFIG_ALERTMANAGER_FORKS	= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -362,6 +364,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
 		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_ALERTMANAGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_ALERTMANAGER_FORKS;
 	}
 	else
 		return FAIL;
@@ -660,6 +667,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"StartAlerters",		&CONFIG_ALERTER_FORKS,			TYPE_INT,
+			PARM_OPT,	1,			100},
 		{NULL}
 	};
 
@@ -946,7 +955,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
+			+ CONFIG_ALERTMANAGER_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -1051,6 +1061,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
 				break;
 #endif
+			case ZBX_PROCESS_TYPE_ALERTMANAGER:
+				threads[i] = zbx_thread_start(alert_manager_thread, &thread_args);
+				break;
 		}
 	}
 

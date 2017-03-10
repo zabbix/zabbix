@@ -1700,7 +1700,8 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ipc_service_remove_client(client->service, client);
+	if (NULL != client)
+		ipc_service_remove_client(client->service, client);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
