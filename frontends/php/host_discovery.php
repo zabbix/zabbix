@@ -432,11 +432,17 @@ else {
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if ($sortField === 'status') {
-		orderItemsByStatus($data['discoveries'], $sortOrder);
-	}
-	else {
-		order_result($data['discoveries'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['discoveries'], $sortOrder, ['usermacros' => true]);
+			break;
+
+		case 'status':
+			orderItemsByStatus($data['discoveries'], $sortOrder);
+			break;
+
+		default:
+			order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
 	// paging

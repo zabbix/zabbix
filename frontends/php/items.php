@@ -1532,22 +1532,26 @@ else {
 	$data['flicker'] = getItemFilterForm($data['items']);
 
 	// Remove subfiltered items.
-	if (!empty($data['items'])) {
-		foreach ($data['items'] as $number => $item) {
-			foreach ($item['subfilters'] as $value) {
-				if (!$value) {
-					unset($data['items'][$number]);
-					break;
-				}
+	foreach ($data['items'] as $number => $item) {
+		foreach ($item['subfilters'] as $value) {
+			if (!$value) {
+				unset($data['items'][$number]);
+				break;
 			}
 		}
 	}
 
-	if ($sortField === 'status') {
-		orderItemsByStatus($data['items'], $sortOrder);
-	}
-	else {
-		order_result($data['items'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true]);
+			break;
+
+		case 'status':
+			orderItemsByStatus($data['items'], $sortOrder);
+			break;
+
+		default:
+			order_result($data['items'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));

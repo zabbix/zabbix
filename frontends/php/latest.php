@@ -443,7 +443,7 @@ $config['hk_history'] = timeUnitToSeconds($config['hk_history']);
 $config['hk_trends'] = timeUnitToSeconds($config['hk_trends']);
 
 // Resolve delay, history and trend macros.
-$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$update_interval_parser = new CUpdateIntervalParser();
 $simple_interval_parser = new CSimpleIntervalParser();
 
 foreach ($items as &$item) {
@@ -452,10 +452,6 @@ foreach ($items as &$item) {
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 		$item['delay'] = $update_interval_parser->getDelay();
-
-		if ($item['delay'][0] === '{') {
-			$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
-		}
 	}
 	else {
 		$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);

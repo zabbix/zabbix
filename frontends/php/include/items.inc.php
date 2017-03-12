@@ -207,6 +207,45 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Order items by update interval.
+ *
+ * @param array  $items
+ * @param int    $items['type']
+ * @param string $items['delay']
+ * @param string $sortorder
+ * @param array  $options
+ * @param bool   $options['usermacros']
+ * @param bool   $options['lldmacros']
+ */
+function orderItemsByDelay(array &$items, $sortorder, array $options){
+	$update_interval_parser = new CUpdateIntervalParser($options);
+
+	foreach ($items as &$item) {
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			$item['delay_sort'] = 0;
+		}
+		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item['delay_sort'] = $update_interval_parser->getDelay();
+
+			if ($item['delay_sort'][0] !== '{') {
+				$item['delay_sort'] = timeUnitToSeconds($item['delay_sort']);
+			}
+		}
+		else {
+			$item['delay_sort'] = $item['delay'];
+		}
+	}
+	unset($item);
+
+	order_result($items, 'delay_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['delay_sort']);
+	}
+	unset($item);
+}
+
+/**
  * Orders items by both status and state. Items are sorted in the following order: enabled, disabled, not supported.
  *
  * Keep in sync with orderTriggersByStatus().

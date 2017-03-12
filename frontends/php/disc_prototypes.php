@@ -553,30 +553,16 @@ else {
 		'limit' => $config['search_limit'] + 1
 	]);
 
-	foreach ($data['items'] as &$item) {
-		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
-			$item['delay'] = '';
-		}
-		else {
-			$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
-
-			if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-				$item['delay'] = $update_interval_parser->getDelay();
-
-				if (strpos($item['delay'], '{') === false) {
-					$item['delay'] = timeUnitToSeconds($item['delay']);
-				}
-			}
-			else {
-				$item['delay'] = '';
-			}
-		}
-	}
-	unset($item);
-
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
-	order_result($data['items'], $sortField, $sortOrder);
+	switch ($sortField) {
+		case 'delay':
+			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true, 'lldmacros' => true]);
+			break;
+
+		default:
+			order_result($data['items'], $sortField, $sortOrder);
+	}
 
 	$url = (new CUrl('disc_prototypes.php'))
 		->setArgument('parent_discoveryid', $data['parent_discoveryid']);

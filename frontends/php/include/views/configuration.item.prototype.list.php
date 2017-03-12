@@ -49,7 +49,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
-$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 
 foreach ($this->data['items'] as $item) {
 	$description = [];
