@@ -76,10 +76,8 @@ DB_ACTION;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACTION *action, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject,
-		const char *message)
-;
+static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message);
 
 /******************************************************************************
  *                                                                            *
@@ -460,8 +458,8 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, co
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	flush_user_msg(ZBX_USER_MSG **user_msg, DB_ESCALATION *escalation, const DB_EVENT *event,
-		const DB_EVENT *r_event, const DB_ACTION *action)
+static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT *event, const DB_EVENT *r_event,
+		zbx_uint64_t actionid)
 {
 	ZBX_USER_MSG	*p;
 
@@ -470,7 +468,7 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, DB_ESCALATION *escalation, c
 		p = *user_msg;
 		*user_msg = (*user_msg)->next;
 
-		add_message_alert(escalation, event, r_event, action, p->userid, p->mediatypeid, p->subject,
+		add_message_alert(event, r_event, actionid, esc_step, p->userid, p->mediatypeid, p->subject,
 				p->message);
 
 		zbx_free(p->subject);
@@ -882,9 +880,8 @@ skip:
 
 #undef ZBX_IPMI_FIELDS_NUM
 
-static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACTION *action, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject,
-		const char *message)
+static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message)
 {
 	const char	*__function_name = "add_message_alert";
 
@@ -962,16 +959,17 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 
 		if (NULL != r_event)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, r_event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
+					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
+					(int)ALERT_TYPE_MESSAGE, event->eventid);
 		}
 		else
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
+					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
+					(int)ALERT_TYPE_MESSAGE);
 		}
+
 	}
 
 	DBfree_result(result);
@@ -988,15 +986,15 @@ static void	add_message_alert(DB_ESCALATION *escalation, const DB_EVENT *event, 
 
 		if (NULL != r_event)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, r_event->eventid, userid,
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
+					esc_step, (int)ALERT_TYPE_MESSAGE, event->eventid);
 		}
 		else
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, event->eventid, userid,
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
+					esc_step, (int)ALERT_TYPE_MESSAGE);
 		}
 	}
 
@@ -1211,7 +1209,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	}
 	DBfree_result(result);
 
-	flush_user_msg(&user_msg, escalation, event, NULL, action);
+	flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid);
 
 	if (0 == action->esc_period)
 	{
@@ -1260,14 +1258,17 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
  *                                                                            *
  * Purpose: execute escalation recovery operations                            *
  *                                                                            *
- * Parameters: escalation - [IN] the escalation                               *
- *             event      - [IN] the event                                    *
+ * Parameters: event      - [IN] the event                                    *
  *             r_event    - [IN] the recovery event                           *
  *             action     - [IN] the action                                   *
  *                                                                            *
+ * Comments: Action recovery operations have a single escalation step, so     *
+ *           alerts created by escalation recovery operations must have       *
+ *           esc_step field set to 1.                                         *
+ *                                                                            *
  ******************************************************************************/
-static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, const DB_EVENT *event,
-		const DB_EVENT *r_event, const DB_ACTION *action)
+static void	escalation_execute_recovery_operations(const DB_EVENT *event, const DB_EVENT *r_event,
+		const DB_ACTION *action)
 {
 	const char	*__function_name = "escalation_execute_recovery_operations";
 	DB_RESULT	result;
@@ -1349,8 +1350,7 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 							message);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, r_event, action->actionid, operationid,
-							escalation->esc_step);
+					execute_commands(event, r_event, action->actionid, operationid, 1);
 					break;
 			}
 		}
@@ -1359,7 +1359,7 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 	}
 	DBfree_result(result);
 
-	flush_user_msg(&user_msg, escalation, event, r_event, action);
+	flush_user_msg(&user_msg, 1, event, r_event, action->actionid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1781,7 +1781,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 
 		message = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", error, action->longdata);
 		add_sentusers_msg(&user_msg, action->actionid, event, NULL, action->shortdata, message);
-		flush_user_msg(&user_msg, escalation, event, NULL, action);
+		flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid);
 
 		zbx_free(message);
 	}
@@ -1835,11 +1835,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* Action recovery operations have a single escalation step, so alerts */
-	/* created by escalation operations must have esc_step field set to 1. */
-	escalation->esc_step = 1;
-
-	escalation_execute_recovery_operations(escalation, event, r_event, action);
+	escalation_execute_recovery_operations(event, r_event, action);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2162,6 +2158,9 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 		if (0 != escalation.r_eventid)
 		{
+			if (0 == escalation.esc_step)
+				escalation_execute(&escalation, &action, &event);
+
 			escalation_recover(&escalation, &action, &event, &r_event);
 		}
 		else if (escalation.nextcheck <= now)
