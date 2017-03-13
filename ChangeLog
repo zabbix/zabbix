@@ -48,6 +48,7 @@ Changes for 3.2.5rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-11738] fixed performing actions for problemas that have started and resolved while another problems escalation is executed (vikotrs)
 ..F....... [ZBX-6851] fixed zero number display in Event ID column in windows eventlog history (vmurzins)
 ........S. [ZBX-11829] fixed generation of problems in multiple event mode (Sergejs)
 ..F....... [ZBX-11624] fixed undefined index error for regular expressions form (vmurzins)
