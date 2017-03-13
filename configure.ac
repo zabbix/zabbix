@@ -1353,6 +1353,10 @@ if test "x$have_ipmi" = "xyes"; then
 	have_ipcservice="yes"
 fi
 
+if test "x$server" = "xyes"; then
+	have_ipcservice="yes"
+fi
+
 dnl Check for libevent, used by Zabbix IPC services
 if test "x$have_ipcservice" = "xyes"; then
 	AC_DEFINE([HAVE_IPCSERVICE], 1, [Define to 1 if Zabbix IPC services are used])

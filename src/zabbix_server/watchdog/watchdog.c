@@ -231,6 +231,7 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 		sec = zbx_time();
 		action = 0;
 
+		/*
 		if (ZBX_DB_OK != DBconnect(ZBX_DB_CONNECT_ONCE))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "watchdog: database is down");
@@ -248,7 +249,9 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 			action = 2;
 		}
 
+
 		DBclose();
+		*/
 
 		sec = zbx_time() - sec;
 

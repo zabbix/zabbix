@@ -273,6 +273,29 @@ int	__zbx_DBexecute(const char *fmt, ...)
 	return rc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_DBexecute_once                                             *
+ *                                                                            *
+ * Purpose: execute a non-select statement                                    *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	__zbx_DBexecute_once(const char *fmt, ...)
+{
+	va_list	args;
+	int	rc;
+
+	va_start(args, fmt);
+
+	rc = zbx_db_vexecute(fmt, args);
+
+	va_end(args);
+
+	return rc;
+}
+
 int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);

@@ -412,10 +412,13 @@ int	DBstatement_execute();
 #endif
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBexecute_once(fmt, ...) __zbx_DBexecute_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBexecute __zbx_DBexecute
+#	define DBexecute_once __zbx_DBexecute_once
 #endif
 int	__zbx_DBexecute(const char *fmt, ...);
+int	__zbx_DBexecute_once(const char *fmt, ...);
 
 #ifdef HAVE___VA_ARGS__
 #	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
