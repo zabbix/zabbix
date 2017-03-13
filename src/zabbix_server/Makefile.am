@@ -13,7 +13,6 @@ SUBDIRS = \
 	snmptrapper \
 	timer \
 	trapper \
-	watchdog \
 	escalator \
 	proxypoller \
 	selfmon \
@@ -42,7 +41,6 @@ zabbix_server_LDADD = \
 	trapper/libzbxtrapper.a \
 	snmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
-	watchdog/libzbxwatchdog.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	selfmon/libzbxselfmon.a \

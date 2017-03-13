@@ -1617,7 +1617,6 @@ AC_OUTPUT([
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/selfmon/Makefile

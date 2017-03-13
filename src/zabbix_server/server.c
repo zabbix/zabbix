@@ -49,7 +49,6 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
-#include "watchdog/watchdog.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
@@ -146,7 +145,6 @@ int	CONFIG_SNMPTRAPPER_FORKS	= 0;
 int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 1;
 int	CONFIG_SELFMON_FORKS		= 1;
-int	CONFIG_WATCHDOG_FORKS		= 1;
 int	CONFIG_DATASENDER_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 0;
@@ -264,11 +262,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_WATCHDOG;
-		*local_process_num = local_server_num - server_count + CONFIG_WATCHDOG_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_IPMIMANAGER_FORKS))
 	{
@@ -949,7 +942,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
 
-	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
+	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
@@ -991,9 +984,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				threads[i] = zbx_thread_start(dbconfig_thread, &thread_args);
-				break;
-			case ZBX_PROCESS_TYPE_WATCHDOG:
-				threads[i] = zbx_thread_start(watchdog_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_PROCESS_TYPE_POLLER;
