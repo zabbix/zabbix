@@ -438,10 +438,6 @@ $tab_rows = [];
 
 $config = select_config();
 
-// Safely convert history and trends to seconds since they don't contain macros.
-$config['hk_history'] = timeUnitToSeconds($config['hk_history']);
-$config['hk_trends'] = timeUnitToSeconds($config['hk_trends']);
-
 // Resolve delay, history and trend macros.
 $update_interval_parser = new CUpdateIntervalParser();
 $simple_interval_parser = new CSimpleIntervalParser();
@@ -458,8 +454,8 @@ foreach ($items as &$item) {
 	}
 
 	if ($config['hk_history_global']) {
-		$keep_history = $config['hk_history'];
-		$item['history'] = $keep_history;
+		$keep_history = timeUnitToSeconds($config['hk_history']);
+		$item['history'] = $config['hk_history'];
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 		$keep_history = timeUnitToSeconds($item['history']);
@@ -471,8 +467,8 @@ foreach ($items as &$item) {
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		if ($config['hk_trends_global']) {
-			$keep_trends = $config['hk_trends'];
-			$item['trends'] = $keep_trends;
+			$keep_trends = timeUnitToSeconds($config['hk_trends']);
+			$item['trends'] = $config['hk_trends'];
 		}
 		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
 			$keep_trends = timeUnitToSeconds($item['trends']);
@@ -484,6 +480,7 @@ foreach ($items as &$item) {
 	}
 	else {
 		$keep_trends = 0;
+		$item['trends'] = '';
 	}
 
 	$item['show_link'] = ($keep_history != 0 || $keep_trends != 0);

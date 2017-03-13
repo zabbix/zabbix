@@ -560,6 +560,14 @@ else {
 			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true, 'lldmacros' => true]);
 			break;
 
+		case 'history':
+			orderItemsByHistory($data['items'], $sortOrder);
+			break;
+
+		case 'trends':
+			orderItemsByTrends($data['items'], $sortOrder);
+			break;
+
 		default:
 			order_result($data['items'], $sortField, $sortOrder);
 	}

@@ -1546,6 +1546,14 @@ else {
 			orderItemsByDelay($data['items'], $sortOrder, ['usermacros' => true]);
 			break;
 
+		case 'history':
+			orderItemsByHistory($data['items'], $sortOrder);
+			break;
+
+		case 'trends':
+			orderItemsByTrends($data['items'], $sortOrder);
+			break;
+
 		case 'status':
 			orderItemsByStatus($data['items'], $sortOrder);
 			break;

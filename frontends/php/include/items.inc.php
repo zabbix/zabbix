@@ -207,6 +207,62 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Order items by keep history.
+ *
+ * @param array  $items
+ * @param string $items['history']
+ * @param string $sortorder
+ */
+function orderItemsByHistory(array &$items, $sortorder){
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	foreach ($items as &$item) {
+		$item['history_sort'] = ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS)
+			? timeUnitToSeconds($update_interval_parser->getDelay())
+			: $item['history'];
+	}
+	unset($item);
+
+	order_result($items, 'history_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['history_sort']);
+	}
+	unset($item);
+}
+
+/**
+ * Order items by keep trends.
+ *
+ * @param array  $items
+ * @param int    $items['value_type']
+ * @param string $items['trends']
+ * @param string $sortorder
+ */
+function orderItemsByTrends(array &$items, $sortorder){
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	foreach ($items as &$item) {
+		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+			$item['trends_sort'] = 0;
+		}
+		else {
+			$item['trends_sort'] = ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS)
+				? timeUnitToSeconds($update_interval_parser->getDelay())
+				: $item['trends'];
+		}
+	}
+	unset($item);
+
+	order_result($items, 'trends_sort', $sortorder);
+
+	foreach ($items as &$item) {
+		unset($item['trends_sort']);
+	}
+	unset($item);
+}
+
+/**
  * Order items by update interval.
  *
  * @param array  $items
