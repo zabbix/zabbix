@@ -257,6 +257,11 @@ class testFormUserProfile extends CWebTest {
 			]],
 			[[
 				'expected' => TEST_BAD,
+				'autologout' => '25h',
+				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+			]],
+			[[
+				'expected' => TEST_BAD,
 				'autologout' => '2d',
 				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 			]],
@@ -324,6 +329,144 @@ class testFormUserProfile extends CWebTest {
 				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
 				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+				break;
+		}
+	}
+
+	public static function messaging() {
+		return [
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => ' ',
+				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => 's',
+				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '1.5',
+				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '{$DEFAULT_DELAY}',
+				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '0',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '1s',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '29',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '25h',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '2d',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '86401',
+				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'messages_disabled' => true,
+				'timeout' => '1y',
+				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'messages_disabled' => true,
+				'timeout' => '30s'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'timeout' => '1m'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'timeout' => '1d'
+			]],
+			[[
+				'expected' => TEST_GOOD
+			]]
+		];
+	}
+
+	/**
+	 * @dataProvider messaging
+	 */
+	public function testFormProfile_MessagesTimeout($data) {
+		$this->zbxTestLogin('profile.php');
+		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
+		$this->zbxTestTabSwitch('Messaging');
+
+		if (array_key_exists('messages_disabled', $data)) {
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@id='start'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@id='stop'][@disabled]");
+		}
+
+		if (array_key_exists('timeout', $data)) {
+			$this->zbxTestCheckboxSelect('messages_enabled', true);
+			$this->zbxTestInputTypeOverwrite('messages_timeout', $data['timeout']);
+			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='start'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//button[@id='stop'][@disabled]");
+		}
+		else {
+			$this->zbxTestCheckboxSelect('messages_enabled', false);
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@id='start'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@id='stop'][@disabled]");
+		}
+
+		$this->zbxTestClickWait('update');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckFatalErrors();
+				break;
+			case TEST_BAD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
+				$this->zbxTestTextPresent($data['error_msg']);
+				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}

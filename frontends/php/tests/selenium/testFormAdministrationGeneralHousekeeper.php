@@ -176,7 +176,6 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-//					'resetDefaults' => true,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 86400,
 					'hk_events_internal' => 86400,
@@ -225,6 +224,66 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'expected' => TEST_BAD,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '1439m',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '23h',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '13140001m',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '219001h',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '9126d',
+					'errors' => [
+						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hk_events_mode' => true,
+					'hk_events_trigger' => '1304w',
 					'errors' => [
 						'Invalid trigger data storage period: must be between "86400" and "788400000"',
 					]

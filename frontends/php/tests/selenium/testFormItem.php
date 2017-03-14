@@ -1660,10 +1660,27 @@ class testFormItem extends CWebTest {
 			// History
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty',
-					'history' => ''
+					'history' => ' ',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Incorrect value for field "history": a time unit is expected.'
+					]
+				]
+			],
+			// History
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item history',
+					'key' => 'item-history-test',
+					'history' => 3599,
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Incorrect value for field "history": must be between "3600" and "788400000".'
+					]
 				]
 			],
 			// History
@@ -1695,12 +1712,14 @@ class testFormItem extends CWebTest {
 			// Trends
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
-					'trends' => '',
-					'dbCheck' => true,
-					'formCheck' => true
+					'trends' => ' ',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Incorrect value for field "trends": a time unit is expected.'
+					]
 				]
 			],
 			// Trends
@@ -1723,6 +1742,19 @@ class testFormItem extends CWebTest {
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => 788400001,
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+					]
+				]
+			],
+			// Trends
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
+					'trends' => 86399,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
 							'Incorrect value for field "trends": must be between "86400" and "788400000".'
@@ -2153,7 +2185,6 @@ class testFormItem extends CWebTest {
 		}
 
 		$value_type = $this->zbxTestGetSelectedLabel('value_type');
-
 		if ($itemFlexFlag == true) {
 			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];

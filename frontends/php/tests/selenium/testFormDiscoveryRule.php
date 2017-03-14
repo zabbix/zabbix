@@ -759,6 +759,136 @@ class testFormDiscoveryRule extends CWebTest {
 						'Item with key "discovery-key-no1" already exists on "Simple form test host".']
 				]
 			],
+			// Empty keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => ' ',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": a time unit is expected.'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '-30',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": a time unit is expected.'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 1,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 3599,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '59m',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '1304w',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '9126d',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '219001h',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => '13140001m',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
+			// Incorrect keep lost resources period
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery lifetime',
+					'key' => 'discovery-lifetime-test',
+					'lifetime' => 788400001,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+					]
+				]
+			],
 			// Empty timedelay
 			[
 				[
@@ -792,6 +922,58 @@ class testFormDiscoveryRule extends CWebTest {
 					'name' => 'Discovery delay',
 					'key' => 'discovery-delay-test',
 					'delay' => 86401,
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '1w',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '2d',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '25h',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Item will not be refreshed. Please enter a correct update interval.'
+					]
+				]
+			],
+			// Incorrect timedelay
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '1441m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item will not be refreshed. Please enter a correct update interval.'
@@ -1469,6 +1651,10 @@ class testFormDiscoveryRule extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->zbxTestInputType('params_es', $data['params_es']);
+		}
+
+		if (isset($data['lifetime']))	{
+			$this->zbxTestInputTypeOverwrite('lifetime', $data['lifetime']);
 		}
 
 		if (isset($data['delay']))	{

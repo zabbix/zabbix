@@ -124,6 +124,11 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
 			],
 			[
+				'work_period' => '{WORKING_HOURS}',
+				'success_expected' => TEST_BAD,
+				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+			],
+			[
 				'work_period' => '{$WORKING_HOURS}',
 				'success_expected' => TEST_GOOD,
 				'error-msg' => null
