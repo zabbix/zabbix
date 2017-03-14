@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with IT services.
+ * Class containing methods for operations with services.
  */
 class CService extends CApiService {
 

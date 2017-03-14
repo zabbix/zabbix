@@ -288,6 +288,103 @@ static int	DBpatch_3030023(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3030024(void)
+{
+	const ZBX_FIELD	field = {"hk_events_internal", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030025(void)
+{
+	const ZBX_FIELD	field = {"hk_events_discovery", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030026(void)
+{
+	const ZBX_FIELD	field = {"hk_events_autoreg", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_3030027(void)
+{
+	const ZBX_FIELD	field = {"p_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("alerts", &field);
+}
+
+static int	DBpatch_3030028(void)
+{
+	const ZBX_FIELD	field = {"p_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("alerts", 5, &field);
+}
+
+static int	DBpatch_3030029(void)
+{
+	return DBcreate_index("alerts", "alerts_7", "p_eventid", 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: This procedure fills in field 'p_eventid' for all recovery       *
+ *           actions. 'p_eventid' value is defined as per last problematic    *
+ *           event, that was closed by correct recovery event.                *
+ *           This is done because the relation beetwen ecovery alerts and     *
+ *           this method is most successful for updating zabbix 3.0 to latest *
+ *           versions.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3030030(void)
+{
+	int			ret = FAIL;
+	DB_ROW			row;
+	DB_RESULT		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		prev_eventid = 0, curr_eventid;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select eventid, r_eventid"
+			" from event_recovery"
+			" order by r_eventid, eventid desc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(curr_eventid, row[1]);
+		if (prev_eventid == curr_eventid)
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update alerts set p_eventid=%s where eventid=%s;\n",
+				row[0], row[1]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+
+		prev_eventid = curr_eventid;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -318,5 +415,12 @@ DBPATCH_ADD(3030020, 0, 1)
 DBPATCH_ADD(3030021, 0, 1)
 DBPATCH_ADD(3030022, 0, 1)
 DBPATCH_ADD(3030023, 0, 0)
+DBPATCH_ADD(3030024, 0, 1)
+DBPATCH_ADD(3030025, 0, 1)
+DBPATCH_ADD(3030026, 0, 1)
+DBPATCH_ADD(3030027, 0, 1)
+DBPATCH_ADD(3030028, 0, 1)
+DBPATCH_ADD(3030029, 0, 1)
+DBPATCH_ADD(3030030, 0, 1)
 
 DBPATCH_END()

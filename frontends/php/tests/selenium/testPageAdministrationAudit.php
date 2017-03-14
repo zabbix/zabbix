@@ -43,7 +43,7 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_GRAPH_ELEMENT => 'Graph element',
 		AUDIT_RESOURCE_HOST => 'Host',
 		AUDIT_RESOURCE_HOST_GROUP => 'Host group',
-		AUDIT_RESOURCE_IT_SERVICE => 'IT service',
+		AUDIT_RESOURCE_IT_SERVICE => 'Service',
 		AUDIT_RESOURCE_IMAGE => 'Image',
 		AUDIT_RESOURCE_ITEM => 'Item',
 		AUDIT_RESOURCE_MACRO => 'Macro',

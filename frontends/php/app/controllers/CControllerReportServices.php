@@ -143,7 +143,7 @@ class CControllerReportServices extends CController {
 		$data['sla'] = reset($sla);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('IT services availability report'));
+		$response->setTitle(_('Service availability report'));
 		$this->setResponse($response);
 	}
 }
