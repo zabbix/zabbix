@@ -2698,15 +2698,30 @@ static int	dc_trigger_deplist_release(ZBX_DC_TRIGGER_DEPLIST *trigdep)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigder_deplist_init                                          *
+ * Function: dc_trigger_deplist_init                                          *
  *                                                                            *
  * Purpose: initializes trigger dependency list                               *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigder_deplist_init(ZBX_DC_TRIGGER_DEPLIST *trigdep, ZBX_DC_TRIGGER *trigger)
+static void	dc_trigger_deplist_init(ZBX_DC_TRIGGER_DEPLIST *trigdep, ZBX_DC_TRIGGER *trigger)
 {
 	trigdep->refcount = 1;
 	trigdep->trigger = trigger;
+	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_mem_malloc_func, __config_mem_realloc_func,
+			__config_mem_free_func);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_trigger_deplist_reset                                         *
+ *                                                                            *
+ * Purpose: resets trigger dependency list to release memory allocated by     *
+ *          dependencies vector                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_trigger_deplist_reset(ZBX_DC_TRIGGER_DEPLIST *trigdep)
+{
+	zbx_vector_ptr_destroy(&trigdep->dependencies);
 	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
 }
@@ -2753,13 +2768,13 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 		trigdep_down = DCfind_id(&config->trigdeps, triggerid_down, sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
 		if (0 == found)
-			dc_trigder_deplist_init(trigdep_down, trigger_down);
+			dc_trigger_deplist_init(trigdep_down, trigger_down);
 		else
 			trigdep_down->refcount++;
 
 		trigdep_up = DCfind_id(&config->trigdeps, triggerid_up, sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
 		if (0 == found)
-			dc_trigder_deplist_init(trigdep_up, trigger_up);
+			dc_trigger_deplist_init(trigdep_up, trigger_up);
 		else
 			trigdep_up->refcount++;
 
@@ -2792,11 +2807,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			}
 
 			if (1 == trigdep_down->dependencies.values_num)
-			{
-				/* recreate vector to release allocated memory */
-				zbx_vector_ptr_destroy(&trigdep_down->dependencies);
-				zbx_vector_ptr_create(&trigdep_down->dependencies);
-			}
+				dc_trigger_deplist_reset(trigdep_down);
 			else
 				zbx_vector_ptr_remove_noorder(&trigdep_down->dependencies, index);
 		}
