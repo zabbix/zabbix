@@ -218,7 +218,7 @@ function orderItemsByHistory(array &$items, $sortorder){
 
 	foreach ($items as &$item) {
 		$item['history_sort'] = ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS)
-			? timeUnitToSeconds($update_interval_parser->getDelay())
+			? timeUnitToSeconds($item['history'])
 			: $item['history'];
 	}
 	unset($item);
@@ -248,7 +248,7 @@ function orderItemsByTrends(array &$items, $sortorder){
 		}
 		else {
 			$item['trends_sort'] = ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS)
-				? timeUnitToSeconds($update_interval_parser->getDelay())
+				? timeUnitToSeconds($item['trends'])
 				: $item['trends'];
 		}
 	}
