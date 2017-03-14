@@ -85,32 +85,20 @@
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 						'hostSelectRow'
 					)
-					->addRow(_('Triggers'), [
-						(new CDiv([
-							(new CTable())
-								->setHeader([_('Name'), _('Action')])
-								->setId('triggerContainer')
-								->setAttribute('style', 'width: 100%;'),
-						]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-					], 'triggerListRow')
-					->addRow(_('New triggers'),
-						(new CDiv([
-							new CVar('elementExpressionTrigger', ''),
-							(new CMultiSelect([
-								'name' => 'elementNameTriggers',
-								'objectName' => 'triggers'
-							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-							new CDiv(
-								(new CButton(null, _('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->setId('newSelementTriggers')
-						)]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-						'triggerSelectRow'
-					)
+					->addRow(_('Trigger'), [
+						new CVar('elementExpressionTrigger', ''),
+						(new CTextBox('elementName'))
+							->setReadonly(true)
+							->setId('elementNameTrigger')
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('PopUp("popup.php?dstfrm=selementForm&dstfld1=elementid'.
+								'&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers'.
+								'&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1'.
+								'&real_hosts=1&noempty=1")')
+					], 'triggerSelectRow')
 					->addRow(_('Map'), [
 						(new CTextBox('elementName'))
 							->setReadonly(true)

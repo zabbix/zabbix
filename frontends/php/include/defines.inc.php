@@ -402,10 +402,6 @@ define('ZBX_DEFAULT_KEY_JMX',					'jmx[<object name>,<attribute name>]');
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
 
-define('SYSMAP_PROBLEMS_NUMBER',			0);
-define('SYSMAP_SINGLE_PROBLEM',				1);
-define('SYSMAP_PROBLEMS_NUMBER_CRITICAL',	2);
-
 define('ZBX_ICON_PREVIEW_HEIGHT',	24);
 define('ZBX_ICON_PREVIEW_WIDTH',	24);
 

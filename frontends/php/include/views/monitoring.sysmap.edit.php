@@ -136,15 +136,9 @@ $map_tab->addRow(_('Icon highlight'),
 $map_tab->addRow(_('Mark elements on trigger status change'),
 	(new CCheckBox('markelements'))->setChecked($data['sysmap']['markelements'] == 1)
 );
-
-$map_tab->addRow(_('Display problems'),
-	(new CRadioButtonList('expandproblem', (int) $data['sysmap']['expandproblem']))
-		->addValue(_('Expand single problem'), SYSMAP_SINGLE_PROBLEM)
-		->addValue(_('Number of problems'), SYSMAP_PROBLEMS_NUMBER)
-		->addValue(_('Number of problems and expand most critical one'), SYSMAP_PROBLEMS_NUMBER_CRITICAL)
-		->setModern(true)
+$map_tab->addRow(_('Expand single problem'),
+	(new CCheckBox('expandproblem'))->setChecked($data['sysmap']['expandproblem'] == 1)
 );
-
 $map_tab->addRow(_('Advanced labels'),
 	(new CCheckBox('label_format'))->setChecked($data['sysmap']['label_format'] == 1)
 );
