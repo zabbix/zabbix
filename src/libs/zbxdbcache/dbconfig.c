@@ -2783,11 +2783,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			dc_trigger_deplist_release(trigdep_up);
 		}
 
-		if (SUCCEED == dc_trigger_deplist_release(trigdep_down))
-		{
-			dc_trigger_deplist_release(trigdep_up);
-		}
-		else
+		if (SUCCEED != dc_trigger_deplist_release(trigdep_down))
 		{
 			if (FAIL == (index = zbx_vector_ptr_search(&trigdep_down->dependencies, &triggerid_up,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
