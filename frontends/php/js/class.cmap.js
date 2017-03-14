@@ -497,6 +497,11 @@ ZABBIX.apps.map = (function($) {
 							jQuery('#elementNameHost').multiSelect('clean');
 							break;
 
+						// triggers
+						case '2':
+							jQuery('#elementNameTriggers').multiSelect('clean');
+							break;
+
 						// host group
 						case '3':
 							jQuery('#elementNameHostGroup').multiSelect('clean');
@@ -532,6 +537,10 @@ ZABBIX.apps.map = (function($) {
 
 				$('#newSelementUrl').click($.proxy(function() {
 					this.form.addUrls();
+				}, this));
+
+				$('#newSelementTriggers').click($.proxy(function() {
+					this.form.addTriggers();
 				}, this));
 
 				$('#x, #y', this.form.domNode).change(function() {
@@ -1141,7 +1150,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'show',
-						value: '#triggerSelectRow',
+						value: '#triggerSelectRow, #triggerListRow',
 						cond: [{
 							elementType: '2'
 						}]
@@ -1251,6 +1260,20 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
+			// triggers
+			$('#elementNameTriggers').multiSelectHelper({
+				id: 'elementNameTriggers',
+				objectName: 'triggers',
+				name: 'elementValue',
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=triggers&dstfrm=selementForm&dstfld1=elementNameTriggers' +
+						'&srcfld1=triggerid&multiselect=1'
+				}
+			});
+
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
@@ -1316,6 +1339,13 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Add triggers to the list.
+			 */
+			addTriggers: function() {
+				var triggers = $('#elementNameTriggers').multiSelect('getData');
+			},
+
+			/**
 			 * Set form controls with element fields values.
 			 *
 			 * @param {Object} selement
@@ -1362,6 +1392,11 @@ ZABBIX.apps.map = (function($) {
 							$('#elementNameHost').multiSelect('addData', item);
 							break;
 
+						// triggers
+						case '2':
+							$('#elementNameTriggers').multiSelect('addData', item);
+							break;
+
 						// host group
 						case '3':
 							$('#elementNameHostGroup').multiSelect('addData', item);
@@ -1406,6 +1441,20 @@ ZABBIX.apps.map = (function($) {
 					// host
 					case '0':
 						var elementData = $('#elementNameHost').multiSelect('getData');
+
+						if (empty(elementData)) {
+							data.elementid = '0';
+							data.elementName = '';
+						}
+						else {
+							data.elementid = elementData[0].id;
+							data.elementName = elementData[0].name;
+						}
+						break;
+
+					// triggers
+					case '2':
+						var elementData = $('#elementNameTriggers').multiSelect('getData');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
