@@ -207,8 +207,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "timer";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return "housekeeper";
-		case ZBX_PROCESS_TYPE_WATCHDOG:
-			return "db watchdog";
 		case ZBX_PROCESS_TYPE_DATASENDER:
 			return "data sender";
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
