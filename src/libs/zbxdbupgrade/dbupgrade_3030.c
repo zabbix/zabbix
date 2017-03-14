@@ -385,6 +385,73 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3030031(void)
+{
+	const ZBX_TABLE table =
+			{"sysmap_shape", "shapeid", 0,
+				{
+					{"shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"width", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"height", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"text", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"font", "9", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"font_size", "11", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"font_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"text_halign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"text_valign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_width", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL,0},
+					{"background_color", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"zindex", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3030032(void)
+{
+	return DBcreate_index("sysmap_shape", "sysmap_shape_1", "sysmapid", 0);
+}
+
+static int	DBpatch_3030033(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	unsigned char	value_type, data_type, delta;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	mapid;
+	const char	*formula;
+	int		width, ret;
+
+	zbx_db_insert_prepare(&db_insert, "sysmap_shape", "shapeid", "sysmapid", "width", "height", "text", NULL);
+
+	result = DBselect("select sysmapid,width from sysmaps");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(mapid, row[0]);
+		width = atoi(row[1]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mapid, width, 15, "{MAP.NAME}");
+	}
+
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "shapeid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3030)
@@ -422,5 +489,8 @@ DBPATCH_ADD(3030027, 0, 1)
 DBPATCH_ADD(3030028, 0, 1)
 DBPATCH_ADD(3030029, 0, 1)
 DBPATCH_ADD(3030030, 0, 1)
+DBPATCH_ADD(3030031, 0, 1)
+DBPATCH_ADD(3030032, 0, 1)
+DBPATCH_ADD(3030033, 0, 1)
 
 DBPATCH_END()
