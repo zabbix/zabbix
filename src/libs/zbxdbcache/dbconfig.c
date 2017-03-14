@@ -7581,7 +7581,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 
 	if (0 != trigdep->dependencies.values_num)
 	{
-		for (i = 0; trigdep->dependencies.values_num; i++)
+		for (i = 0; i < trigdep->dependencies.values_num; i++)
 		{
 			next_trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[i];
 
