@@ -48,7 +48,7 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')],
-	'delay' =>				[T_ZBX_STR, O_OPT, null,	null,
+	'delay' =>				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
 		_('Update interval')
 	],

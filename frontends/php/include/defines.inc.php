@@ -136,17 +136,18 @@ define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
-define('T_ZBX_TU_MACRO',	13);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
 define('O_NO',		2);
 
-define('P_SYS',				1);
-define('P_UNSET_EMPTY',		2);
-define('P_ACT',				16);
-define('P_NZERO',			32);
-define('P_NO_TRIM',			64);
+define('P_SYS',					0x0001);
+define('P_UNSET_EMPTY',			0x0002);
+define('P_ACT',					0x0010);
+define('P_NZERO',				0x0020);
+define('P_NO_TRIM',				0x0040);
+define('P_ALLOW_USER_MACRO',	0x0080);
+define('P_ALLOW_LLD_MACRO',		0x0100);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');

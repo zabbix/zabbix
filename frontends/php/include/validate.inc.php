@@ -216,8 +216,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time period is expected'));
 		}
 	}
-	elseif ($type == T_ZBX_TU || $type == T_ZBX_TU_MACRO) {
-		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => ($type == T_ZBX_TU_MACRO)]);
+	elseif ($type == T_ZBX_TU) {
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => ($flags & P_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & P_ALLOW_LLD_MACRO)
+		]);
 
 		if ($simple_interval_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;
