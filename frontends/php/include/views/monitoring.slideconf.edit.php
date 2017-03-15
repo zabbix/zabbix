@@ -105,7 +105,7 @@ $slideshow_tab
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Default delay (in seconds)'),
+	->addRow(_('Default delay'),
 		(new CTextBox('delay', $data['slideshow']['delay']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	);
 
