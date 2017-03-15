@@ -147,44 +147,44 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		});
 	}
 
-	var text = group.add('text', attributes, lines);
-	var size = group.element.getBBox();
-	size.width = Math.ceil(size.width);
-	size.height = Math.ceil(size.height);
+	var text = group.add('text', attributes, lines),
+		size = group.element.getBBox(),
+		width = Math.ceil(size.width),
+		height = Math.ceil(size.height);
 
 	switch (anchor.horizontal) {
 		case 'center':
-			pos[0] -= Math.floor(size.width/2);
+			pos[0] -= Math.floor(width/2);
 		break;
 
 		case 'right':
-			pos[0] -= size.width;
+			pos[0] -= width;
 		break;
 	}
 
 	switch (anchor.vertical) {
 		case 'middle':
-			pos[1] -= Math.floor(size.height/2);
+			pos[1] -= Math.floor(height/2);
 		break;
 
 		case 'bottom':
-			pos[1] -= size.height;
+			pos[1] -= height;
 		break;
 	}
 
 	if (rect !== null) {
-		rect.element.setAttribute('width', size.width + (this.textPadding * 2));
-		rect.element.setAttribute('height', size.height + (this.textPadding * 2));
+		rect.element.setAttribute('width', width + (this.textPadding * 2));
+		rect.element.setAttribute('height', height + (this.textPadding * 2));
 	}
 
 	if (clip !== undefined)
 	{
 		if (clip.attributes.x !== undefined && clip.attributes.y !== undefined) {
-			clip.attributes.x -= (pos[0] + Math.floor(size.width/2));
+			clip.attributes.x -= (pos[0] + Math.floor(width/2));
 			clip.attributes.y -= pos[1];
 		}
 		else if (clip.attributes.cx !== undefined && clip.attributes.cy !== undefined) {
-			clip.attributes.cx -= (pos[0] + Math.floor(size.width/2));
+			clip.attributes.cx -= (pos[0] + Math.floor(width/2));
 			clip.attributes.cy -= pos[1];
 		}
 
@@ -197,10 +197,10 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 				{
 					type: 'rect',
 					attributes: {
-						x: -Math.floor(size.width / 2),
+						x: -Math.floor(width / 2),
 						y: 0,
-						width: size.width,
-						height: size.height,
+						'width': width,
+						'height': height,
 						fill: this.maskColor
 					}
 				},
@@ -218,7 +218,7 @@ SVGCanvas.prototype.createTextarea = function (attributes, parent, content) {
 		}
 	}
 
-	text.element.setAttribute('transform', 'translate(' + Math.floor(size.width/2) + ' ' + offset + ')');
+	text.element.setAttribute('transform', 'translate(' + Math.floor(width/2) + ' ' + offset + ')');
 	group.element.setAttribute('transform', 'translate(' + pos.join(' ') + ')');
 
 	return group;
@@ -425,13 +425,23 @@ SVGElement.prototype.remove = function () {
 	this.clear();
 
 	if (this.element !== null) {
-		this.element.remove();
+		/* .remove() does not work in IE */
+		if (typeof this.element.remove !== 'function') {
+			if (this.element.parentElement !== undefined) {
+				this.element.parentElement.removeChild(this.element);
+			}
+		}
+		else {
+			this.element.remove();
+		}
 		this.element = null;
 	}
 
-	this.parent.items = this.parent.items.filter(function (item) {
-		return item.id !== this.id;
-	});
+	if (this.parent !== null) {
+		this.parent.items = this.parent.items.filter(function (item) {
+			return item.id !== this.id;
+		});
+	}
 
 	return this;
 };
@@ -453,9 +463,7 @@ SVGElement.prototype.replace = function (target) {
 SVGElement.prototype.create = function () {
 	var element = document.createElementNS('http://www.w3.org/2000/svg', this.type);
 
-	if (this.element !== null) {
-		this.element.remove();
-	}
+	this.remove();
 
 	this.element = element;
 	this.update(this.attributes);
