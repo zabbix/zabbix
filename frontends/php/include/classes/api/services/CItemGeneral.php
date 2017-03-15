@@ -268,11 +268,21 @@ abstract class CItemGeneral extends CApiService {
 
 				// Check if not macros. If delay is a macro, skip this step, otherwise check if delay is valid.
 				if ($delay[0] !== '{') {
-					$delay_ = timeUnitToSeconds($delay);
+					$delay_sec = timeUnitToSeconds($delay);
 					$intervals = $update_interval_parser->getIntervals();
+					$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
+					$has_scheduling_intervals = (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+					$has_macros = false;
+
+					foreach ($intervals as $interval) {
+						if (strpos($interval['interval'], '{') !== false) {
+							$has_macros = true;
+							break;
+						}
+					}
 
 					// If delay is 0, there must be at least one either flexible or scheduling interval.
-					if ($delay_ < 0 || $delay_ > SEC_PER_DAY || ($delay_ == 0 && !$intervals)) {
+					if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY || ($delay_sec == 0 && !$intervals)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('Item will not be refreshed. Please enter a correct update interval.')
 						);
@@ -282,24 +292,12 @@ abstract class CItemGeneral extends CApiService {
 						// Remove flexible and scheduling intervals and leave only the delay part.
 						$item['delay'] = $delay;
 					}
-					elseif (!$update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING)) {
-						// For trapper items, remove flexible intervals if they are written as macros.
-						$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
-						foreach ($flexible_intervals as $key => $flexible_interval) {
-							if (strpos($flexible_interval, '{') !== false) {
-								unset($flexible_intervals[$key]);
-							}
-						}
-
-						// If there are no flexible intervals or they contain macros, skip the next check calculation.
-						if ($flexible_intervals) {
-							$next_check = calculateItemNextCheck(0, $delay_, $flexible_intervals, time());
-							if ($next_check == ZBX_JAN_2038) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_('Item will not be refreshed. Please enter a correct update interval.')
-								);
-							}
-						}
+					// If there are scheduling intervals or intervals with macros, skip the next check calculation.
+					elseif (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+							&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Item will not be refreshed. Please enter a correct update interval.')
+						);
 					}
 				}
 				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
