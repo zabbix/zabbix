@@ -470,4 +470,102 @@ class testFormUserProfile extends CWebTest {
 				break;
 		}
 	}
+
+	public static function media() {
+		return [
+			[[
+				'expected' => TEST_BAD,
+				'error_msg' => 'Incorrect value for field "sendto": cannot be empty.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test',
+				'period' => ' ',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test@zabbix.com',
+				'period' => '0-0,00:00-00:00',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test@zabbix.com',
+				'period' => '1-11,00:00-24:00',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test@zabbix.com',
+				'period' => '1-7,00:00-25:00',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test@zabbix.com',
+				'period' => '1-7,24:00-00:00',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'send_to' => 'test@zabbix.com',
+				'period' => 'test',
+				'error_msg' => 'Field "When active" is not correct: a time period is expected'
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'type' => 'Jabber',
+				'send_to' => 'testmacro@zabbix.com',
+				'period' => '{$WORKING_HOURS}',
+			]],
+			[[
+				'expected' => TEST_GOOD,
+				'type' => 'SMS via IP',
+				'send_to' => 'testperiod@zabbix.com',
+				'period' => '1-7,00:00-24:00',
+			]]
+		];
+	}
+
+	/**
+	 * @dataProvider media
+	 */
+	public function testFormProfile_Media($data) {
+		$this->zbxTestLogin('profile.php');
+		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
+		$this->zbxTestTabSwitch('Media');
+		$this->zbxTestClickButtonText('Add');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+
+		if (array_key_exists('type', $data)) {
+			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
+		}
+
+		if (array_key_exists('send_to', $data)) {
+			$this->zbxTestInputTypeOverwrite('sendto', $data['send_to']);
+		}
+
+		if (array_key_exists('period', $data)) {
+			$this->zbxTestInputTypeOverwrite('period', $data['period']);
+		}
+
+		$this->zbxTestClickWait('add');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestWaitWindowClose();
+				$this->zbxTestClickWait('update');
+				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckFatalErrors();
+				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
+				$this->assertEquals(1, DBcount($sql));
+				break;
+			case TEST_BAD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Page received incorrect data');
+				$this->zbxTestTextPresent($data['error_msg']);
+				$this->zbxTestCheckFatalErrors();
+				break;
+		}
+	}
 }
